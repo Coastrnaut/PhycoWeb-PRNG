@@ -1,0 +1,9 @@
+# Comprehensive Python dependency manifest for Aetheris-PRNG and PhycoWeb-PRNG pipelines
+# Verified compatible with Python 3.8, 3.9, 3.10, and 3.11+ environments
+
+# Core Numerical Computing Arrays
+numpy>=1.21.0
+
+# Statistical Analysis Framework (Optional, for advanced validation checks)
+scipy>=1.7.0
+nistrng
