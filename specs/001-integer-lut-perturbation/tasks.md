@@ -169,7 +169,7 @@ Project Structure section.
 
 **Independent Test**: four JSON reports exist, each listing every `SP800_22R1A_BATTERY` test once with a status, plus a `summary.md`.
 
-- [ ] T020 [US3] Implement `scripts/nist_eval.py` per contracts/cli.md and the data-model "Statistical Results Record".
+- [X] T020 [US3] Implement `scripts/nist_eval.py` per contracts/cli.md and the data-model "Statistical Results Record".
   - Generate `--bits` bits from `--model` (reuse the model loaders from `gen_vectors.py` by importing them; do not duplicate them). Emit each word MSB-first. `--bits` must be a multiple of 32; otherwise exit 2.
   - Convert to a `numpy.int64` array (**not** `int8`: nistrng's Cumulative Sums test overflows on `int8` input and returns a meaningless p-value, analysis finding N1) and run each test in `nistrng.SP800_22R1A_BATTERY` individually on its own `bits.copy()`, checking `is_eligible` first. *(Amended during implementation, finding N2: `run_all_battery` shares one array and Binary Matrix Rank modifies it in place, which corrupts later tests. See research R6.)* The text below about `run_all_battery` return values describes the original approach and no longer applies. Ineligible tests are not run and come back as `None` (or as an entry whose result is `None`). Pair the returned list with `list(nistrng.SP800_22R1A_BATTERY)` by position, and record each `None` as `status: "not_eligible"`, `p_value: null`, `elapsed_ms: null`. Never run an ineligible test. If the returned list length differs from the battery length, exit 2 with an error rather than guessing the pairing.
   - Each record holds `name`, `status` (`pass`/`fail`/`not_eligible`), `p_value` (from `result.score`) and `elapsed_ms`.
@@ -179,8 +179,8 @@ Project Structure section.
   - Before writing, assert every battery test name appears exactly once.
   - Exit 0 whenever the evaluation ran, regardless of pass/fail.
   - (FR-011, FR-014, SC-005; Principle IV)
-- [ ] T021 [US3] Run `scripts/nist_eval.py` four times with `--bits 1000000`: models `float-v0` and `lut-v1` × seeds `1024 2048 4096 8192` and `4660 43981 21845 43690`. Write to `reports/001-integer-lut-perturbation/nist_<model>_seed-<s0>-<s1>-<s2>-<s3>_1000000.json`. Record each command and its wall time in `test-log.md`. If any run takes longer than 10 minutes, say so; do not reduce `--bits` without first amending the spec (Principle IV). (FR-011, FR-014)
-- [ ] T022 [US3] Write `reports/001-integer-lut-perturbation/summary.md`.
+- [X] T021 [US3] Run `scripts/nist_eval.py` four times with `--bits 1000000`: models `float-v0` and `lut-v1` × seeds `1024 2048 4096 8192` and `4660 43981 21845 43690`. Write to `reports/001-integer-lut-perturbation/nist_<model>_seed-<s0>-<s1>-<s2>-<s3>_1000000.json`. Record each command and its wall time in `test-log.md`. If any run takes longer than 10 minutes, say so; do not reduce `--bits` without first amending the spec (Principle IV). (FR-011, FR-014)
+- [X] T022 [US3] Write `reports/001-integer-lut-perturbation/summary.md`.
   - A per-test table with columns test, float-v0 p / status, lut-v1 p / status, for each seed, copied from the JSON files and not rounded beyond 6 decimals.
   - Counts of pass, fail and not_eligible per run.
   - Both limitation statements, verbatim.
