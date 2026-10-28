@@ -31,6 +31,10 @@ table of pre-computed integer values indexed by an integer phase counter.
 - Q: Should SC-001's multiplication ban cover the whole per-step path or only the perturbation
   stage? → A: Only the perturbation stage, which matches FR-002 and FR-008. Float,
   trigonometry and division stay banned throughout the per-step path.
+- Analysis remediation (2026-10-28, approved by the owner): the existing semantics of the
+  non-perturbation stages were moved into the spec as FR-008a (finding C1). These record
+  current behavior, so the outputs don't change. The seed domain is limited to 0…65535 and
+  anything else is rejected (FR-008b, finding F2).
 
 ## Review & Approval *(Constitution Principle VIII)*
 
@@ -123,6 +127,9 @@ record exists with seed, sample size, commit, and per-test p-values.
   perturbation period or cause errors.
 - Zero-step behavior: the first generated block must use a well-defined table entry (the
   current model increments the step counter before computing, so step 1 is the first sample).
+- Seed outside the 16-bit range: a negative seed value or one above 65535 is rejected
+  (FR-008b). The archived model never masks `P[1]` or `P[3]`, so accepting such seeds would
+  silently diverge from it for the whole run.
 - Two signals sharing one table: `food_a` and `food_b` must remain distinct sequences (different
   phase rates and/or offsets) so they do not collapse into identical perturbations.
 
@@ -181,6 +188,23 @@ record exists with seed, sample size, commit, and per-test p-values.
      from step 6. `D` is always in 0…65535 after masking, and the comparison treats it as an
      unsigned 16-bit value. If true, apply `P[1] ^= 0x5A5A` and `P[3] ^= 0xA5A5`.
   8. Harvest the output word from the low 8 bits of `D[0]…D[3]` (MSB to LSB).
+- **FR-008a**: The other stages MUST keep their current semantics, recorded here exactly
+  (Constitution Principle I). They describe existing behavior, not an endorsed design; see Open
+  Issues 1–3. `wrap32(x) = ((x + 2³¹) mod 2³²) − 2³¹`.
+
+  | Stage | Operation | Width / rule |
+  |-------|-----------|--------------|
+  | Flux | `Q[k] = wrap32(D[i] × (P[i] − P[j])) >> 8` for (i,j) = (0,1), (1,2), (2,3), (3,0) | Unbounded difference of two values in 0…65535. The product wraps to 32-bit two's complement, then an **arithmetic** right shift by 8 (sign-extending) |
+  | Growth | `growth = wrap32(abs(Q[k])) >> 2` | `abs` of a 32-bit value, wrapped, so `abs(−2³¹)` stays `−2³¹`; arithmetic shift |
+  | Decay | `decay = D[k] >> 4` | `D` is non-negative, so the shift is logical and arithmetic alike |
+  | Vein update | `D[k] = (D[k] + growth − decay) & 0xFFFF`; if the result is 0, set it to 1 | Wraps modulo 2¹⁶; result in 1…65535 |
+  | Disruption | if `D[0] > 4096 or D[2] > 4096`: `P[1] ^= 0x5A5A`, `P[3] ^= 0xA5A5` | Unsigned 16-bit comparison (FR-007c step 7); XOR keeps `P` in 0…65535 |
+  | Output | `(D[0]&0xFF)<<24 \| (D[1]&0xFF)<<16 \| (D[2]&0xFF)<<8 \| (D[3]&0xFF)` | **Unsigned** 32-bit word, 0…2³²−1 (the archived model returns the same bits as a signed int32) |
+
+- **FR-008b**: Each seed value MUST be an integer in 0…65535. A seed with fewer than 4 values
+  or any value outside that range MUST be rejected with an error. Values beyond the fourth are
+  ignored. With this domain, the new model matches the archived model on every stage except
+  perturbation, for every seed it accepts.
 - **FR-008**: All other generator stages (flux, growth/decay, Frustrated Foraging disruption,
   output harvesting) MUST remain behaviorally unchanged.
 - **FR-009**: The reference model MUST exist as a runnable source file in the repository, and
@@ -262,9 +286,9 @@ Found while writing down the arithmetic semantics; each needs its own feature:
 
 - **Flux stage multiplies two variables**: `Q = (D × (P_i − P_j)) >> 8` multiplies two state
   variables, which conflicts with Constitution Principle I (multiplierless) and the 0-DSP target.
-- **Flux overflow is unspecified**: `D` (up to 65535) × `ΔP` (up to ±65535) can exceed the
-  32-bit signed range of the container, so the result depends on the platform's overflow
-  behavior. The overflow rule must be specified.
+- **Flux overflow design**: `D` (up to 65535) × `ΔP` (up to ±65535) exceeds the 32-bit signed
+  range in practice (research R1). The current behavior, a 32-bit wrap, is now specified in
+  FR-008a. Whether to keep it, widen the product, or saturate is an open design question.
 - **State width mismatch**: `P` and `D` are held as unsigned 0…65535 values, while the
   constitution and `readmee.md` describe "16-bit signed" state. The intended signedness of
   `P`, `D` and `Q` must be defined.
