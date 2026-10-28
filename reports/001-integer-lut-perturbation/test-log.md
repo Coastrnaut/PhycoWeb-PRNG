@@ -61,3 +61,17 @@ environment, owner action) is pending.
 | 4 × `nist_eval.py` as above (fixed harness) | exit 0; 90 s, 110 s, 60 s, 61 s (all under the 10-minute limit). Pass/fail/not-eligible: float-v0 12/2/1 and 12/2/1; lut-v1 8/6/1 (seed 1024…) and 12/2/1 (seed 4660…) |
 
 Summary: `reports/001-integer-lut-perturbation/summary.md`.
+
+## Phase 6 / T025 full validation (2026-10-28)
+
+| Step | Command | Result |
+|------|---------|--------|
+| full suite | `python -W ignore -m unittest discover -s tests -v` | Ran 31 tests — OK |
+| quickstart 1 | `python scripts/archive_baseline.py` | exit 0; all unchanged (after the T023 README edit, so F1 is fixed) |
+| quickstart 2 | `python scripts/gen_vectors.py --model float-v0 ... --verify vectors/float-v0_...hex` | exit 0; OK 10000 words (`--verify` used so the committed file is not rewritten) |
+| quickstart 3 | `python scripts/gen_lut.py --check` | exit 0; line 65 = 0400, line 193 = FC00 |
+| quickstart 4 | `python scripts/gen_vectors.py --model lut-v1 ... --verify vectors/lut-v1_...hex` | exit 0; OK 10000 words |
+| quickstart 5 | `python -W ignore -m unittest discover -s tests` | OK |
+| quickstart 6 | 4 × `nist_eval.py` into a scratch directory, compared with the committed reports (excluding `elapsed_ms`, `git_head`, `git_dirty`, `command`, `versions`) | all 4 reproduced exactly |
+
+`git status` after steps 1–5 showed no changes under `baseline/`, `vectors/`, `data/` or `phycoweb/`.
