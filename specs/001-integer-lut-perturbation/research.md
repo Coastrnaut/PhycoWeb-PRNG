@@ -103,6 +103,25 @@ are not part of the repository.
   p-value meaningless. With `int64` input the same 20,000 bits run cleanly (score 0.490, pass).
   The deleted `nistrng_bench.py` used `int8`, so its Cumulative Sums results are unreliable.
   **Decision**: pass bits as `numpy.int64`.
+- **Finding N2 (implementation, 2026-10-28)**: nistrng 1.2.3's Binary Matrix Rank test
+  **modifies its input array in place**. `run_all_battery` passes one shared array to every
+  test, so every test after Binary Matrix Rank runs on corrupted bits. The first four reports
+  produced with `run_all_battery` were therefore invalid for 9 of 15 tests. One cross-check:
+  float-v0 Cumulative Sums came out as p = 0.000000 inside the battery, against 0.201 when run
+  alone and 0.171 (forward) from an independent scipy recomputation.
+  **Decision**: run each test individually on `bits.copy()`, checking eligibility the same way.
+  Record all p-values for tests that return several (`p_values`); `p_value` is the minimum.
+  `tests/test_nist_eval.py` guards this. Those first reports were discarded and regenerated.
+- **Finding N3 (implementation, 2026-10-28)**: two more nistrng 1.2.3 behaviors affect the
+  report.
+  - `Result.score` is the **mean** of a test's p-values. For multi-p-value tests (Cumulative
+    Sums forward/backward, the Random Excursion states) it can look like a pass while the test
+    fails. The harness records the full list (`p_values`, from the private `_score_list`) and
+    reports the minimum as `p_value`.
+  - Non-Overlapping Template Matching evaluates **one randomly chosen** template
+    (`random.choice`), not all 148 as SP 800-22 does, so its result varied from run to run. The
+    harness seeds Python `random` with `TEMPLATE_SEED = 0` before each test and records the
+    seed. The one-template limitation is stated in every report.
 - **Limitation (recorded in the report)**: This is a single sequence per seed, not the
   multi-sequence proportion and uniformity analysis of the full NIST procedure. Results are a
   screening signal, not a certification, and say nothing about cryptographic security
