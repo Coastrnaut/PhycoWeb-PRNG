@@ -6,18 +6,18 @@
 
 | Field | Width / range | Initial value | Notes |
 |-------|---------------|---------------|-------|
-| `P[0..3]` | integer 0 … 65535 (16-bit pattern) | `seed[0..3] & 0xFFFF` | Node pressures |
+| `P[0..3]` | integer 0 … 65535 (16-bit pattern) | `seed[0..3]` (validated, not masked) | Node pressures |
 | `D[0..3]` | integer 1 … 65535 | 256 | Vein thickness; 0 is replaced by 1 |
 | `phase_a` | 0 … 255 | 0 | `food_a` phase counter (FR-007b) |
 | `phase_b` | 0 … 255 | 0 | `food_b` phase counter (FR-007b) |
 | `step_count` | unbounded, ≥ 0 | 0 | Diagnostic only; not used in any computation |
 
 **Validation**:
-- `seed` must contain at least 4 integers; elements beyond 4 are ignored (current behavior).
-  Fewer than 4 raises `ValueError`.
-- Seed values are masked to 16 bits at construction. The current model stores them unmasked in
-  int32 until the first update; no seed in use exceeds 16 bits, so this is a no-op for existing
-  vectors. A test covers it.
+- `seed` must contain at least 4 values; elements beyond 4 are ignored (current behavior).
+  Fewer than 4 raises `ValueError` (spec FR-008b).
+- Each of the first 4 values must be an `int` (not `bool`) in 0 … 65535, else `ValueError`.
+  Values are not masked. The archived model never masks `P[1]`/`P[3]`, so masking would
+  diverge from it for out-of-range seeds; rejecting them keeps parity (FR-008, FR-008b).
 
 **State transition (one `compute_block()` call)**: exactly the eight stages of spec FR-007c.
 Wrap points are explicit:
