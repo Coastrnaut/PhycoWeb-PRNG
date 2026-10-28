@@ -8,6 +8,7 @@ import argparse
 import importlib.metadata
 import json
 import platform
+import random
 import subprocess
 import sys
 from pathlib import Path
@@ -18,9 +19,17 @@ import nistrng
 
 from gen_vectors import MODELS, ROOT, generate
 
+TEMPLATE_SEED = 0
+
 LIMITATIONS = [
     "Single sequence per seed; not the multi-sequence proportion/uniformity analysis of SP 800-22.",
     "Passing statistical tests is not evidence of cryptographic security.",
+    "Tests are run individually on copies of the bits, not via nistrng.run_all_battery, because "
+    "nistrng 1.2.3's Binary Matrix Rank test modifies its input in place.",
+    "nistrng's Non-Overlapping Template Matching evaluates ONE randomly chosen template (Python "
+    "random seeded with TEMPLATE_SEED before each test), not all 148 templates as in SP 800-22.",
+    "p_value is the minimum of a test's p-values; nistrng's own pass/fail (all p-values >= 0.01) "
+    "is used for status.",
 ]
 
 
@@ -37,21 +46,32 @@ def bits_msb_first(model: str, seed: List[int], n_bits: int) -> numpy.ndarray:
 
 
 def evaluate(bits: numpy.ndarray) -> list:
+    """Run every battery test on its own copy of the bits.
+
+    nistrng's Binary Matrix Rank test modifies its input in place, so run_all_battery (which
+    shares one array) corrupts every later test (research R6, finding N2).
+    """
     battery = nistrng.SP800_22R1A_BATTERY
     names = list(battery)
-    results = nistrng.run_all_battery(bits, battery, check_eligibility=True)
-    if len(results) != len(names):
-        raise RuntimeError(f"nistrng returned {len(results)} results for {len(names)} tests")
     tests = []
-    for name, entry in zip(names, results):
-        if entry is None:
-            tests.append({"name": name, "status": "not_eligible", "p_value": None, "elapsed_ms": None})
+    for name in names:
+        test = battery[name]
+        if not test.is_eligible(bits.copy()):
+            tests.append({"name": name, "status": "not_eligible", "p_value": None,
+                          "p_values": None, "elapsed_ms": None})
             continue
-        result, elapsed_ms = entry
+        # Non-Overlapping Template Matching picks its template with random.choice; seed it so
+        # the run is reproducible (Constitution Principle V).
+        random.seed(TEMPLATE_SEED)
+        result, elapsed_ms = test.run(bits.copy())
+        # Result.score is the mean of a test's p-values; record them all and report the
+        # smallest. nistrng exposes the list only as the private _score_list.
+        p_values = [float(p) for p in numpy.atleast_1d(result._score_list)]
         tests.append({
             "name": name,
             "status": "pass" if result.passed else "fail",
-            "p_value": float(result.score),
+            "p_value": min(p_values),
+            "p_values": p_values,
             "elapsed_ms": elapsed_ms,
         })
     if sorted(t["name"] for t in tests) != sorted(names):
@@ -84,6 +104,7 @@ def main(argv: List[str]) -> int:
         "seed": args.seed,
         "n_bits": args.bits,
         "bit_order": "msb-first",
+        "template_seed": TEMPLATE_SEED,
         "git_head": git_output("rev-parse", "HEAD"),
         "git_dirty": bool(git_output("status", "--porcelain")),
         "versions": {
