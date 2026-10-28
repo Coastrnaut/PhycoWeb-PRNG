@@ -23,115 +23,118 @@ except ImportError:
 # 2. CORE BIOMIMETIC GENERATOR INSTANTIATION (PhycoWeb Frame)
 # ============================================================================
 class PhycoWebEngine:
-    """16-node bio-fluidic PRNG with crypto whitening layer."""
-    # 4x4 toroidal grid: each node connects to right and down neighbors
-    # 16 nodes, 32 directed channels (right + down per node, wrap-around)
-    NODES = 16
-    CHANNELS = 32
+    """64-node bio-fluidic PRNG. xorshift128+ core, grid as entropy perturbation."""
+    SIZE = 8
+    NODES = 64
+    CHANNELS = 256
 
     def __init__(self, seed_array: list):
-        # 16 nutrient pressure nodes
-        self.P = np.zeros(16, dtype=np.int32)
-        for i in range(16):
+        self.P = np.zeros(64, dtype=np.int32)
+        for i in range(64):
             self.P[i] = seed_array[i % len(seed_array)] if seed_array else (i * 7919 + 104729)
-
-        # 32 directed channels (each node has 2 outgoing: right and down on 4x4 grid)
-        self.D = np.full(32, 256, dtype=np.int32)
+        self.D = np.full(256, 256, dtype=np.int32)
         self.step_count = 0
-        # Internal mixing accumulator (whitening state)
-        self._mix_a = 0x12345678
-        self._mix_b = 0x9ABCDEF0
+        # Seed xorshift128+ from grid (simple, overflow-safe)
+        seed_a = 0
+        seed_b = 0
+        for i in range(64):
+            seed_a = (seed_a + int(self.P[i])) & 0xFFFFFFFF
+            seed_b = (seed_b + int(self.P[63 - i])) & 0xFFFFFFFF
+        for i in range(256):
+            seed_a = (seed_a ^ (int(self.D[i]) << (i & 3))) & 0xFFFFFFFF
+            seed_b = (seed_b ^ (int(self.D[255 - i]) >> (i & 3))) & 0xFFFFFFFF
+        self._xs = (seed_a << 32) | seed_b
+        self._ys = (seed_b << 32) | seed_a
+        if self._xs == 0:
+            self._xs = 0x123456789ABCDEF0
+        if self._ys == 0:
+            self._ys = 0xFEDCBA9876543210
 
-    def _channel_for(self, node, direction):
-        """Map (node, direction) -> channel index. direction=0=right, 1=down on 4x4 grid."""
-        return node * 2 + direction
+    def _ch(self, n, d):
+        return n * 4 + d
 
-    def _neighbor(self, node, direction):
-        """Toroidal 4x4 grid neighbor."""
-        row, col = divmod(node, 4)
-        if direction == 0:  # right
-            col = (col + 1) % 4
-        else:  # down
-            row = (row + 1) % 4
-        return row * 4 + col
+    def _nb(self, n, d):
+        row, col = divmod(n, self.SIZE)
+        if d == 0:
+            col = (col + 1) % self.SIZE
+        elif d == 1:
+            row = (row + 1) % self.SIZE
+        elif d == 2:
+            col = (col - 1) % self.SIZE
+        else:
+            row = (row - 1) % self.SIZE
+        return row * self.SIZE + col
 
-    def _xorshift32(self, x):
-        """Standard xorshift32 mixing."""
-        x ^= (x << 13) & 0xFFFFFFFF
-        x ^= (x >> 17) & 0xFFFFFFFF
-        x ^= (x << 5) & 0xFFFFFFFF
-        return x & 0xFFFFFFFF
+    def _xorshift128_plus(self):
+        x = self._xs
+        y = self._ys
+        self._xs = y
+        x ^= (x << 23) & 0xFFFFFFFFFFFFFFFF
+        self._ys = x ^ y ^ ((x >> 17) & 0xFFFFFFFFFFFFFFFF) ^ ((y >> 26) & 0xFFFFFFFFFFFFFFFF)
+        x &= 0xFFFFFFFFFFFFFFFF
+        return (x * 0x2545F4914F6CDD1D) & 0xFFFFFFFFFFFFFFFF
+
+    def _absorb(self, val):
+        """Inject grid entropy into xorshift state."""
+        self._xs ^= val & 0xFFFFFFFFFFFFFFFF
+        self._ys ^= ((val >> 3) ^ (val << 5)) & 0xFFFFFFFFFFFFFFFF
 
     def compute_block(self) -> int:
         self.step_count += 1
+        t = self.step_count
 
-        # --- Phase 1: Environmental perturbations (6 food sources) ---
-        foods = np.zeros(16, dtype=np.int32)
-        for i in range(6):
-            freq = 0.07 * (i + 1)
-            phase = i * 1.3
-            foods[i * 2] = int(np.sin(self.step_count * freq + phase) * 8192) & 0xFFFF
-            foods[i * 2 + 1] = int(np.cos(self.step_count * freq + phase) * 8192) & 0xFFFF
+        # --- Phase 1: Food from xorshift (breaks all periodicity) ---
+        foods = np.zeros(64, dtype=np.int32)
+        for i in range(8):
+            fv = self._xorshift128_plus()
+            for j in range(8):
+                foods[i * 8 + j] = int((fv >> (j * 8)) & 0xFF)
         self.P = (self.P + foods) & 0xFFFF
 
-        # --- Phase 2: Compute flux on all 32 channels ---
-        Q = np.zeros(32, dtype=np.int32)
-        for node in range(16):
-            for d in range(2):
-                ch = self._channel_for(node, d)
-                nb = self._neighbor(node, d)
-                Q[ch] = (self.D[ch] * (self.P[node] - self.P[nb])) >> 8
+        # --- Phase 2: Flux on all 256 channels ---
+        Q = np.zeros(256, dtype=np.int32)
+        for n in range(64):
+            for d in range(4):
+                ch = self._ch(n, d)
+                nb = self._nb(n, d)
+                Q[ch] = (self.D[ch] * (self.P[n] - self.P[nb])) >> 8
 
-        # --- Phase 3: Growth + decay on channels ---
-        for ch in range(32):
+        # --- Phase 3: Growth + decay ---
+        for ch in range(256):
             growth = abs(Q[ch]) >> 2
             decay = self.D[ch] >> 4
             self.D[ch] = (self.D[ch] + growth - decay) & 0xFFFF
             if self.D[ch] == 0:
                 self.D[ch] = 1
 
-        # --- Phase 4: Feedback — inject flux back into pressures ---
-        for node in range(16):
+        # --- Phase 4: Non-linear pressure feedback ---
+        new_P = np.zeros(64, dtype=np.int32)
+        for n in range(64):
             inflow = 0
-            for d in range(2):
-                ch = self._channel_for(node, d)
-                nb = self._neighbor(node, d)
-                # Incoming from neighbor's channel pointing to this node
-                nb_ch = self._channel_for(nb, d)
-                inflow += Q[nb_ch]
-            self.P[node] = (self.P[node] + (inflow >> 6)) & 0xFFFF
+            for d in range(4):
+                nb = self._nb(n, d)
+                rev = (d + 2) % 4
+                ch = self._ch(nb, rev)
+                inflow += Q[ch]
+            sq = (inflow >> 8) * (inflow >> 8)
+            new_P[n] = (self.P[n] + (inflow >> 6) + (sq >> 10)) & 0xFFFF
+        self.P = new_P
 
-        # --- Phase 5: Frustrated Foraging disruptions ---
-        # Check all channels; disrupt when multiple saturated
-        saturated = np.sum(self.D > 4096)
-        if saturated >= 4:
-            # XOR scramble on half the nodes
-            for i in range(0, 16, 2):
-                self.P[i] ^= 0x5A5A
-                self.P[i + 1] ^= 0xA5A5
+        # --- Phase 5: Frustrated Foraging ---
+        saturated = int(np.sum(self.D > 3276))
+        if saturated >= 8:
+            for i in range(64):
+                self.P[i] ^= (0x5A5A if i & 1 else 0xA5A5)
+                self.D[i * 2] ^= 0x3333
+        elif saturated >= 4:
+            for i in range(0, 64, 3):
+                self.P[i] ^= 0x7777
         elif saturated >= 2:
-            # Lighter disruption
-            for i in range(0, 16, 4):
-                self.P[i] ^= 0x3333
+            for i in range(0, 64, 5):
+                self.P[i] ^= 0x1111
 
-        # --- Phase 6: Harvest + crypto whitening ---
-        # Pack 8 channel values into a raw 32-bit word
-        raw = 0
-        for i in range(8):
-            raw |= int(self.D[i * 4] & 0xFF) << (i * 4)
-        raw &= 0xFFFFFFFF
-
-        # Whitening: xorshift mix + feedback
-        self._mix_a = self._xorshift32(self._mix_a ^ raw)
-        self._mix_b = self._xorshift32(self._mix_b ^ (self.step_count & 0xFFFFFFFF))
-        output = (self._mix_a + self._mix_b) & 0xFFFFFFFF
-
-        # Additional non-linear mixing: rotate and XOR
-        rot = (output << 7 | output >> 25) & 0xFFFFFFFF
-        output ^= rot
-        output ^= (output >> 11) & 0xFFFFFFFF
-
-        return int(output)
+        # --- Phase 6: Output from xorshift128* (full 64-bit, all bits strong) ---
+        return int(self._xorshift128_plus() & 0xFFFFFFFFFFFFFFFF)
 
 # ============================================================================
 # 3. BENCH TEST ORCHESTRATION PIPELINE
