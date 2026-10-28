@@ -3,7 +3,7 @@
 ## `phycoweb.model.PhycoWebEngine`
 
 ```text
-PhycoWebEngine(seed: Sequence[int])     # len(seed) >= 4, else ValueError
+PhycoWebEngine(seed: Sequence[int])     # len(seed) >= 4 and seed[0..3] each int in 0..65535, else ValueError
   .compute_block() -> int               # one step; returns unsigned 32-bit word (0 … 2**32-1)
   .step_count -> int                    # number of compute_block() calls so far
 ```
