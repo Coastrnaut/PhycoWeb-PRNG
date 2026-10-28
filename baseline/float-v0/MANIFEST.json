@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-10-28T22:12:14.116105+00:00",
+  "git_head": "ddceb24a5bd2743a664b2f8c1c59ed1895dffb65",
+  "files": [
+    {
+      "archive_path": "baseline/float-v0/readmee_model.py",
+      "source": "readmee.md@0522cbc (listing in section 2)",
+      "sha256": "2b0089c11ff956277b7db38e68e2a7aee2b090c9ca83474257a7fe881bf56fff",
+      "note": "Reference behavior; lut-v1 preserves every stage except the perturbation source. Returns signed int32 words (research R2)."
+    },
+    {
+      "archive_path": "baseline/float-v0/MycoPRNG.py",
+      "source": "MycoPRNG.py@290e563^",
+      "sha256": "bcbf0814dc28bfc5b37ff394160fa8d2bf164cb5392eb5864d291751b0232af7",
+      "note": "Food passed in as arguments; threshold D[0] > 2000; max(1, ...) floor. Not the reference."
+    },
+    {
+      "archive_path": "baseline/float-v0/nist_bench.py",
+      "source": "nist_bench.py@d6980eb^",
+      "sha256": "de75beedb02a9689eccbc486694db956a85060c5a5cf28be2c5fe87b41943d67",
+      "note": "64-node grid, xorshift128* food, quadratic pressure term, D > 3276 saturation count, sp80022suite harness. Distinct design; not the reference."
+    },
+    {
+      "archive_path": "baseline/float-v0/nistrng_bench.py",
+      "source": "nistrng_bench.py@d6980eb^",
+      "sha256": "1051bd1280b2cc9973ca82d2079623d757d9d707c594de307d5088e2ea18e875",
+      "note": "xorshift128+-based engine with nistrng harness (int8 input; Cumulative Sums unreliable, research R6). Not the reference."
+    },
+    {
+      "archive_path": "baseline/float-v0/phycoweb_nist_eval.py",
+      "source": "phycoweb_nist_eval.py@d6980eb^",
+      "sha256": "cb41606d478d3ca69212cadb472967c893b220c6ae57173cc5d1a56503e2a60c",
+      "note": "Initial D = 512; food_b into P[1]; disruption on D[0] or D[1]; XOR into P[0]/P[2]. Not the reference."
+    }
+  ]
+}
