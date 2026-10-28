@@ -6,6 +6,8 @@
 
 **Status**: Approved for planning (2026-10-28); result review pending
 
+**Implementation status**: Reference model complete; RTL-pending (Constitution Principle II).
+
 **Input**: User description: "replace sin/cos perturbation with integer LUT source"
 
 ## Context
