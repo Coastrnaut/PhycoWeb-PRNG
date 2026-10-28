@@ -77,7 +77,10 @@ Additional notes:
 - Non-Overlapping Template Matching gives p = 1.000000 in all four runs. With a single template this result is treated as **uninformative**. It has not been investigated.
 - Overlapping Template Matching was not eligible for this sequence length in nistrng; it is reported and not omitted.
 - Results from an earlier harness version were **invalid** (research R6, findings N2 and N3: in-place input mutation, averaged p-values, random template) and were discarded. Only these regenerated records are valid.
-- Provenance: the owner committed files while these runs were in progress, so `git_head` differs between records (`b9fb0f7` for float-v0 with seed 1024…, `22bd079` for the others). All four runs used identical `phycoweb/` and `scripts/` contents (`git diff 22bd079 -- phycoweb scripts` is empty; the code in `b9fb0f7`'s dirty tree was the same).
+- Provenance: the owner committed files while these runs were in progress, so `git_head` differs between records (`b9fb0f7` for float-v0 with seed 1024…, `22bd079` for the others). All four runs used identical `phycoweb/` and `scripts/` contents (`git diff 22bd079 -- phycoweb scripts` is empty; the code in `b9fb0f7`'s dirty tree was the same). After the runs,
+  `scripts/gen_vectors.py` changed in one way only: its archive loader now sets
+  `sys.dont_write_bytecode`, so no `__pycache__` is written into `baseline/`. That does not
+  affect generated words; `--verify` against both vector files still passes.
 - Linear Complexity was not cross-checked independently. Cumulative Sums was: float-v0 with seed 1024… has a forward p of 0.170501, matching an independent scipy recomputation (0.1705).
 
 **These results do not show that either model is random or secure. Passing statistical tests is not evidence of cryptographic security** (Constitution Principle IV, Security Policy).
