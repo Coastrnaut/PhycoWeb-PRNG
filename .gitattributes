@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+baseline/** -text
+*.hex text eol=lf
