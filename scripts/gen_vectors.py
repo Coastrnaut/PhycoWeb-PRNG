@@ -21,7 +21,12 @@ def load_float_v0():
     """Load the archived readmee.md model from its file without modifying it."""
     spec = importlib.util.spec_from_file_location("phycoweb_float_v0", FLOAT_V0_PATH)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Keep the immutable archive directory free of __pycache__ output.
+    previous, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.dont_write_bytecode = previous
     return module
 
 
