@@ -1,0 +1,116 @@
+{
+  "model": "float-v0",
+  "seed": [
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "n_bits": 1000000,
+  "bit_order": "msb-first",
+  "git_head": "606d43224de9e1f9a1f5ddfb718b7f8b31a8b023",
+  "git_dirty": true,
+  "versions": {
+    "python": "3.10.11",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.2.6",
+    "nistrng": "1.2.3"
+  },
+  "command": "python scripts/nist_eval.py --model float-v0 --seed 1024 2048 4096 8192 --bits 1000000 --out reports/001-integer-lut-perturbation/nist_float-v0_seed-1024-2048-4096-8192_1000000.json",
+  "tests": [
+    {
+      "name": "monobit",
+      "status": "pass",
+      "p_value": 0.1498673990686541,
+      "elapsed_ms": 0
+    },
+    {
+      "name": "frequency_within_block",
+      "status": "pass",
+      "p_value": 0.3454153954663015,
+      "elapsed_ms": 0
+    },
+    {
+      "name": "runs",
+      "status": "pass",
+      "p_value": 0.3606771775651714,
+      "elapsed_ms": 89
+    },
+    {
+      "name": "longest_run_ones_in_a_block",
+      "status": "pass",
+      "p_value": 0.981278061906201,
+      "elapsed_ms": 42
+    },
+    {
+      "name": "binary_matrix_rank",
+      "status": "pass",
+      "p_value": 0.3348391295781492,
+      "elapsed_ms": 724
+    },
+    {
+      "name": "dft",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 33
+    },
+    {
+      "name": "non_overlapping_template_matching",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 947
+    },
+    {
+      "name": "overlapping_template_matching",
+      "status": "not_eligible",
+      "p_value": null,
+      "elapsed_ms": null
+    },
+    {
+      "name": "maurers_universal",
+      "status": "fail",
+      "p_value": 0.009969714363162104,
+      "elapsed_ms": 237
+    },
+    {
+      "name": "linear_complexity",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 49556
+    },
+    {
+      "name": "serial",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 9060
+    },
+    {
+      "name": "approximate_entropy",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 5993
+    },
+    {
+      "name": "cumulative sums",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 249
+    },
+    {
+      "name": "random_excursion",
+      "status": "fail",
+      "p_value": 0.630213022379425,
+      "elapsed_ms": 1819
+    },
+    {
+      "name": "random_excursion_variant",
+      "status": "fail",
+      "p_value": 0.0,
+      "elapsed_ms": 6
+    }
+  ],
+  "limitations": [
+    "Single sequence per seed; not the multi-sequence proportion/uniformity analysis of SP 800-22.",
+    "Passing statistical tests is not evidence of cryptographic security."
+  ]
+}
