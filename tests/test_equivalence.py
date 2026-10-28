@@ -4,6 +4,7 @@ The archived model is fed the LUT food values through a substitute `np` namespac
 perturbation source is the only possible difference. The archived file is never modified.
 """
 import importlib.util
+import sys
 import unittest
 import warnings
 from pathlib import Path
@@ -42,7 +43,12 @@ class LutNumpy:
 def load_archived_with_lut_food():
     spec = importlib.util.spec_from_file_location("float_v0_lut_food", ARCHIVED)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Keep the immutable archive directory free of __pycache__ output.
+    previous, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.dont_write_bytecode = previous
     module.np = LutNumpy()
     return module
 
