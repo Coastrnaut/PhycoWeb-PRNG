@@ -48,3 +48,16 @@ run the equivalence tests against single-edit copies of `phycoweb/model.py`.
 
 **SC-002 status: OPEN.** Verified on one environment only (this machine). T019 (second
 environment, owner action) is pending.
+
+## Phase 5 / US3 (2026-10-28)
+
+| Command | Result |
+|---------|--------|
+| `python scripts/nist_eval.py --model lut-v1 ... --bits 33 ...` | exit 2 (not a multiple of 32), as specified |
+| 4 × `python scripts/nist_eval.py --model {float-v0,lut-v1} --seed {1024 2048 4096 8192, 4660 43981 21845 43690} --bits 1000000 --out reports/001-integer-lut-perturbation/nist_<model>_seed-<seed>_1000000.json` (first harness, `run_all_battery`) | exit 0; 44–70 s each. **Results invalid** (N2) and discarded |
+| Independent forward Cumulative Sums (scipy) vs nistrng | float-v0: independent p = 0.1705 against 0.000000 inside the battery and 0.201 run alone, which led to the discovery of N2 (Binary Matrix Rank modifies its input in place) |
+| Per-test isolation check, forward vs reverse order | 14/15 order-independent; Non-Overlapping Template order-dependent, which led to N3 (random template; `score` = mean of p-values) |
+| `python -W ignore -m unittest tests.test_nist_eval -v` (after N2/N3 fixes) | Ran 4 tests — OK |
+| 4 × `nist_eval.py` as above (fixed harness) | exit 0; 90 s, 110 s, 60 s, 61 s (all under the 10-minute limit). Pass/fail/not-eligible: float-v0 12/2/1 and 12/2/1; lut-v1 8/6/1 (seed 1024…) and 12/2/1 (seed 4660…) |
+
+Summary: `reports/001-integer-lut-perturbation/summary.md`.
