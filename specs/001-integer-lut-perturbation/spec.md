@@ -28,6 +28,9 @@ table of pre-computed integer values indexed by an integer phase counter.
   (`food_b`); periods 64 and ≈42.67 steps; combined period 128 steps (Option A).
 - Q: How are table values reduced to integers? → A: Truncation toward zero, matching the
   current model's `int()` conversion.
+- Q: Should SC-001's multiplication ban cover the whole per-step path or only the perturbation
+  stage? → A: Only the perturbation stage, which matches FR-002 and FR-008. Float,
+  trigonometry and division stay banned throughout the per-step path.
 
 ## Review & Approval *(Constitution Principle VIII)*
 
@@ -216,7 +219,11 @@ record exists with seed, sample size, commit, and per-test p-values.
 ### Measurable Outcomes
 
 - **SC-001**: Zero floating-point, trigonometric, multiplication, or division operations remain
-  in the generator's per-step path (verified by review and automated source check).
+  in the perturbation stage, and zero floating-point, trigonometric, or division operations
+  remain anywhere in the generator's per-step path (verified by review and automated source
+  check). *Amended 2026-10-28, before any results existed, with owner approval: the earlier
+  wording banned multiplication across the whole per-step path, which contradicted FR-002 and
+  FR-008. The flux-stage product is tracked as Open Issue 1.*
 - **SC-002**: 100% of 10,000 output words match the committed golden vectors on every run, on at
   least two different environments.
 - **SC-003**: The (`food_a`, `food_b`) pair repeats with a period of exactly 128 steps, and no
@@ -261,3 +268,9 @@ Found while writing down the arithmetic semantics; each needs its own feature:
 - **State width mismatch**: `P` and `D` are held as unsigned 0…65535 values, while the
   constitution and `readmee.md` describe "16-bit signed" state. The intended signedness of
   `P`, `D` and `Q` must be defined.
+- **Disruption almost always fires** (found during planning, research R8): the disruption
+  fires on about 99.5% of steps and `D` stays at its 65,535 ceiling, so the threshold
+  supervisor is effectively always on. This needs design review.
+- **Signed output words** (found during planning, research R2): the `readmee.md` model returns
+  signed output words when bit 31 is set. This feature defines the output as unsigned 32-bit;
+  the bit pattern is unchanged.
