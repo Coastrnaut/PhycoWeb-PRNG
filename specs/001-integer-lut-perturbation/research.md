@@ -64,6 +64,10 @@ are not part of the repository.
   - `phycoweb_nist_eval.py`: initial `D = 512`, injects `food_b` into `P[1]`, disruption on
     `D[0] or D[1]`, XOR into `P[0]`/`P[2]`.
   - `nistrng_bench.py`: a different engine built on xorshift128+.
+  - `nist_bench.py`: a fifth, distinct design. It uses a 64-node grid (`D` has 256 channels,
+    initial value 256), takes its food from a xorshift128* generator, adds a quadratic pressure
+    term (`sq = (inflow>>8)²`), uses a saturation count threshold `D > 3276` with multi-node
+    XOR disruptions, and evaluates with the `sp80022suite` package rather than `nistrng`.
 - **Decision**: All are archived as provenance (FR-013). Only `readmee.md` defines the
   behavior that this feature preserves (spec Assumption 1). The manifest records each variant's
   source commit and a one-line note on how it differs.
@@ -94,6 +98,11 @@ are not part of the repository.
   - The report records the commands run, the nistrng/numpy/Python versions and the git HEAD.
 - **Rationale**: 10⁶ bits meets the minimum length that SP 800-22 recommends for most tests.
   Including ineligible tests keeps the report complete.
+- **Finding (input dtype)**: nistrng's Cumulative Sums test overflows when it is given an
+  `int8` bit array (`RuntimeWarning: overflow encountered in scalar add`), which makes its
+  p-value meaningless. With `int64` input the same 20,000 bits run cleanly (score 0.490, pass).
+  The deleted `nistrng_bench.py` used `int8`, so its Cumulative Sums results are unreliable.
+  **Decision**: pass bits as `numpy.int64`.
 - **Limitation (recorded in the report)**: This is a single sequence per seed, not the
   multi-sequence proportion and uniformity analysis of the full NIST procedure. Results are a
   screening signal, not a certification, and say nothing about cryptographic security
