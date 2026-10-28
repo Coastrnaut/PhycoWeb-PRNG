@@ -151,3 +151,5 @@ The verification metrics, architecture models, and automated build scripts have 
 Now that the PhycoWeb-PRNG technical manual is available for download, let me know:
 • Would you like me to map this bio-inspired model into a structural VHDL implementation file using an integer matrix array?
 • Do you want to build an open-source VHDL Testbench to analyze this self-routing grid inside a simulation waveform viewer?
+
+pip install -r requirements.txt
