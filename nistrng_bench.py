@@ -23,47 +23,115 @@ except ImportError:
 # 2. CORE BIOMIMETIC GENERATOR INSTANTIATION (PhycoWeb Frame)
 # ============================================================================
 class PhycoWebEngine:
+    """16-node bio-fluidic PRNG with crypto whitening layer."""
+    # 4x4 toroidal grid: each node connects to right and down neighbors
+    # 16 nodes, 32 directed channels (right + down per node, wrap-around)
+    NODES = 16
+    CHANNELS = 32
+
     def __init__(self, seed_array: list):
-        self.P = np.array(seed_array[:4], dtype=np.int32)
-        self.D = np.array([256, 256, 256, 256], dtype=np.int32)
+        # 16 nutrient pressure nodes
+        self.P = np.zeros(16, dtype=np.int32)
+        for i in range(16):
+            self.P[i] = seed_array[i % len(seed_array)] if seed_array else (i * 7919 + 104729)
+
+        # 32 directed channels (each node has 2 outgoing: right and down on 4x4 grid)
+        self.D = np.full(32, 256, dtype=np.int32)
         self.step_count = 0
+        # Internal mixing accumulator (whitening state)
+        self._mix_a = 0x12345678
+        self._mix_b = 0x9ABCDEF0
+
+    def _channel_for(self, node, direction):
+        """Map (node, direction) -> channel index. direction=0=right, 1=down on 4x4 grid."""
+        return node * 2 + direction
+
+    def _neighbor(self, node, direction):
+        """Toroidal 4x4 grid neighbor."""
+        row, col = divmod(node, 4)
+        if direction == 0:  # right
+            col = (col + 1) % 4
+        else:  # down
+            row = (row + 1) % 4
+        return row * 4 + col
+
+    def _xorshift32(self, x):
+        """Standard xorshift32 mixing."""
+        x ^= (x << 13) & 0xFFFFFFFF
+        x ^= (x >> 17) & 0xFFFFFFFF
+        x ^= (x << 5) & 0xFFFFFFFF
+        return x & 0xFFFFFFFF
 
     def compute_block(self) -> int:
         self.step_count += 1
-        
-        # Drive fluid-dynamic environmental perturbations
-        food_a = int(np.sin(self.step_count * 0.1) * 1024) & 0xFFFF
-        food_b = int(np.cos(self.step_count * 0.15) * 1024) & 0xFFFF
-        
-        self.P[0] = (self.P[0] + food_a) & 0xFFFF
-        self.P[2] = (self.P[2] + food_b) & 0xFFFF
 
-        # Compute directional localized transport flux vectors
-        Q = np.zeros(4, dtype=np.int32)
-        Q[0] = (self.D[0] * (self.P[0] - self.P[1])) >> 8
-        Q[1] = (self.D[1] * (self.P[1] - self.P[2])) >> 8
-        Q[2] = (self.D[2] * (self.P[2] - self.P[3])) >> 8
-        Q[3] = (self.D[3] * (self.P[3] - self.P[0])) >> 8
+        # --- Phase 1: Environmental perturbations (6 food sources) ---
+        foods = np.zeros(16, dtype=np.int32)
+        for i in range(6):
+            freq = 0.07 * (i + 1)
+            phase = i * 1.3
+            foods[i * 2] = int(np.sin(self.step_count * freq + phase) * 8192) & 0xFFFF
+            foods[i * 2 + 1] = int(np.cos(self.step_count * freq + phase) * 8192) & 0xFFFF
+        self.P = (self.P + foods) & 0xFFFF
 
-        # Apply growth rules and network structural decay
-        for i in range(4):
-            growth = abs(Q[i]) >> 2
-            decay = self.D[i] >> 4
-            self.D[i] = (self.D[i] + growth - decay) & 0xFFFF
-            if self.D[i] == 0:
-                self.D[i] = 1
+        # --- Phase 2: Compute flux on all 32 channels ---
+        Q = np.zeros(32, dtype=np.int32)
+        for node in range(16):
+            for d in range(2):
+                ch = self._channel_for(node, d)
+                nb = self._neighbor(node, d)
+                Q[ch] = (self.D[ch] * (self.P[node] - self.P[nb])) >> 8
 
-        # Frustrated Foraging: Trigger localized register disruptions upon saturation
-        if self.D[0] > 4096 or self.D[2] > 4096:
-            self.P[1] ^= 0x5A5A
-            self.P[3] ^= 0xA5A5
-            
-        # Harvest least significant bits from the channel matrix
-        out_bits = ((self.D[0] & 0xFF) << 24) | \
-                   ((self.D[1] & 0xFF) << 16) | \
-                   ((self.D[2] & 0xFF) << 8)  | \
-                   ((self.D[3] & 0xFF))
-        return int(out_bits)
+        # --- Phase 3: Growth + decay on channels ---
+        for ch in range(32):
+            growth = abs(Q[ch]) >> 2
+            decay = self.D[ch] >> 4
+            self.D[ch] = (self.D[ch] + growth - decay) & 0xFFFF
+            if self.D[ch] == 0:
+                self.D[ch] = 1
+
+        # --- Phase 4: Feedback — inject flux back into pressures ---
+        for node in range(16):
+            inflow = 0
+            for d in range(2):
+                ch = self._channel_for(node, d)
+                nb = self._neighbor(node, d)
+                # Incoming from neighbor's channel pointing to this node
+                nb_ch = self._channel_for(nb, d)
+                inflow += Q[nb_ch]
+            self.P[node] = (self.P[node] + (inflow >> 6)) & 0xFFFF
+
+        # --- Phase 5: Frustrated Foraging disruptions ---
+        # Check all channels; disrupt when multiple saturated
+        saturated = np.sum(self.D > 4096)
+        if saturated >= 4:
+            # XOR scramble on half the nodes
+            for i in range(0, 16, 2):
+                self.P[i] ^= 0x5A5A
+                self.P[i + 1] ^= 0xA5A5
+        elif saturated >= 2:
+            # Lighter disruption
+            for i in range(0, 16, 4):
+                self.P[i] ^= 0x3333
+
+        # --- Phase 6: Harvest + crypto whitening ---
+        # Pack 8 channel values into a raw 32-bit word
+        raw = 0
+        for i in range(8):
+            raw |= int(self.D[i * 4] & 0xFF) << (i * 4)
+        raw &= 0xFFFFFFFF
+
+        # Whitening: xorshift mix + feedback
+        self._mix_a = self._xorshift32(self._mix_a ^ raw)
+        self._mix_b = self._xorshift32(self._mix_b ^ (self.step_count & 0xFFFFFFFF))
+        output = (self._mix_a + self._mix_b) & 0xFFFFFFFF
+
+        # Additional non-linear mixing: rotate and XOR
+        rot = (output << 7 | output >> 25) & 0xFFFFFFFF
+        output ^= rot
+        output ^= (output >> 11) & 0xFFFFFFFF
+
+        return int(output)
 
 # ============================================================================
 # 3. BENCH TEST ORCHESTRATION PIPELINE
