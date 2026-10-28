@@ -101,9 +101,16 @@ def execute_nist_bench():
     print("-"*85)
     
     # 5. Run the evaluation loop and output metrics
-    results = nistrng.run_all_battery(sequence)
-    for name, p_value in results.items():
-        pass_flag = "SUCCESS [ PASS ]" if p_value >= 0.01 else "CRITICAL [ FAIL ]"
+    results = nistrng.run_all_battery(binary_vector, nistrng.SP800_22R1A_BATTERY)
+    for entry in results:
+        if entry is None:
+            continue
+        result, elapsed = entry
+        if result is None:
+            continue
+        name = result._test_name
+        p_value = result.score if result.score is not None else 0.0
+        pass_flag = "SUCCESS [ PASS ]" if result.passed else "CRITICAL [ FAIL ]"
         print(f"{name:<30} | {p_value:<12.6f} | {pass_flag:<25}")
             
     print("="*85 + "\n")
