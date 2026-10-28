@@ -8,8 +8,9 @@
   ],
   "n_bits": 1000000,
   "bit_order": "msb-first",
-  "git_head": "606d43224de9e1f9a1f5ddfb718b7f8b31a8b023",
-  "git_dirty": true,
+  "template_seed": 0,
+  "git_head": "22bd079ffc28bad89c7063a1487892c1510837a7",
+  "git_dirty": false,
   "versions": {
     "python": "3.10.11",
     "platform": "Windows-10-10.0.26200-SP0",
@@ -22,95 +23,167 @@
       "name": "monobit",
       "status": "pass",
       "p_value": 0.12700986449488413,
-      "elapsed_ms": 1
+      "p_values": [
+        0.12700986449488413
+      ],
+      "elapsed_ms": 0
     },
     {
       "name": "frequency_within_block",
       "status": "pass",
       "p_value": 0.06970360548934777,
+      "p_values": [
+        0.06970360548934777
+      ],
       "elapsed_ms": 0
     },
     {
       "name": "runs",
       "status": "pass",
       "p_value": 0.6859703487851396,
-      "elapsed_ms": 79
+      "p_values": [
+        0.6859703487851396
+      ],
+      "elapsed_ms": 76
     },
     {
       "name": "longest_run_ones_in_a_block",
       "status": "pass",
       "p_value": 0.45193094804554257,
-      "elapsed_ms": 42
+      "p_values": [
+        0.45193094804554257
+      ],
+      "elapsed_ms": 48
     },
     {
       "name": "binary_matrix_rank",
       "status": "pass",
       "p_value": 0.6699352222613937,
-      "elapsed_ms": 718
+      "p_values": [
+        0.6699352222613937
+      ],
+      "elapsed_ms": 733
     },
     {
       "name": "dft",
-      "status": "fail",
-      "p_value": 0.0,
-      "elapsed_ms": 15
+      "status": "pass",
+      "p_value": 0.3127688264886521,
+      "p_values": [
+        0.3127688264886521
+      ],
+      "elapsed_ms": 32
     },
     {
       "name": "non_overlapping_template_matching",
       "status": "pass",
-      "p_value": 0.3589756604685223,
-      "elapsed_ms": 968
+      "p_value": 0.9999999999483039,
+      "p_values": [
+        0.9999999999483039
+      ],
+      "elapsed_ms": 956
     },
     {
       "name": "overlapping_template_matching",
       "status": "not_eligible",
       "p_value": null,
+      "p_values": null,
       "elapsed_ms": null
     },
     {
       "name": "maurers_universal",
-      "status": "fail",
-      "p_value": 0.009749980922757747,
-      "elapsed_ms": 224
+      "status": "pass",
+      "p_value": 0.99761877867977,
+      "p_values": [
+        0.99761877867977
+      ],
+      "elapsed_ms": 221
     },
     {
       "name": "linear_complexity",
       "status": "fail",
       "p_value": 0.0,
-      "elapsed_ms": 43032
+      "p_values": [
+        0.0
+      ],
+      "elapsed_ms": 83088
     },
     {
       "name": "serial",
-      "status": "fail",
-      "p_value": 0.0,
-      "elapsed_ms": 9068
+      "status": "pass",
+      "p_value": 0.3763015720485851,
+      "p_values": [
+        0.3763015720485851,
+        0.539322250909106
+      ],
+      "elapsed_ms": 16226
     },
     {
       "name": "approximate_entropy",
-      "status": "fail",
-      "p_value": 0.0,
-      "elapsed_ms": 5576
+      "status": "pass",
+      "p_value": 0.2405908208413721,
+      "p_values": [
+        0.2405908208413721
+      ],
+      "elapsed_ms": 5589
     },
     {
       "name": "cumulative sums",
-      "status": "fail",
-      "p_value": 0.0,
-      "elapsed_ms": 233
+      "status": "pass",
+      "p_value": 0.03805415919420252,
+      "p_values": [
+        0.16977657937423607,
+        0.03805415919420252
+      ],
+      "elapsed_ms": 243
     },
     {
       "name": "random_excursion",
       "status": "fail",
-      "p_value": 0.630213022379425,
-      "elapsed_ms": 1618
+      "p_value": 2.1679402764840895e-84,
+      "p_values": [
+        2.311794360925897e-73,
+        2.9411285758780883e-53,
+        3.492299401721557e-26,
+        0.013806820553012694,
+        0.010741753204756278,
+        3.918267663729976e-20,
+        3.4695240486187742e-40,
+        2.1679402764840895e-84
+      ],
+      "elapsed_ms": 1572
     },
     {
       "name": "random_excursion_variant",
-      "status": "fail",
-      "p_value": 0.0,
+      "status": "pass",
+      "p_value": 0.08524929243380919,
+      "p_values": [
+        0.19417826438201866,
+        0.30515595199628615,
+        0.1903297204970161,
+        0.18392019594868114,
+        0.3812464258315117,
+        0.36024401106514686,
+        0.22164816032790388,
+        0.08804509063256238,
+        0.228747855498907,
+        0.6099942813304187,
+        0.4842479984790931,
+        0.08524929243380919,
+        0.6628489803598702,
+        1.0674899923282326,
+        0.9655810287305759,
+        0.8987792356803538,
+        0.5906244232186183,
+        0.3328770246548891
+      ],
       "elapsed_ms": 16
     }
   ],
   "limitations": [
     "Single sequence per seed; not the multi-sequence proportion/uniformity analysis of SP 800-22.",
-    "Passing statistical tests is not evidence of cryptographic security."
+    "Passing statistical tests is not evidence of cryptographic security.",
+    "Tests are run individually on copies of the bits, not via nistrng.run_all_battery, because nistrng 1.2.3's Binary Matrix Rank test modifies its input in place.",
+    "nistrng's Non-Overlapping Template Matching evaluates ONE randomly chosen template (Python random seeded with TEMPLATE_SEED before each test), not all 148 templates as in SP 800-22.",
+    "p_value is the minimum of a test's p-values; nistrng's own pass/fail (all p-values >= 0.01) is used for status."
   ]
 }
