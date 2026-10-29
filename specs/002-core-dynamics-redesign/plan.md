@@ -191,3 +191,12 @@ the package, so tuning code cannot leak into the reference model by accident.
 
 No constitution violations. The spec-001 exception (flux multiplier) is resolved by FR-001 in
 this feature.
+
+RTL-pending exceptions from the `design.md` 1.0 Principle III checklist (raised for the owner
+at the design review, T035):
+
+| Item | Exception | Why accepted for now | Resolution |
+|------|-----------|----------------------|------------|
+| Grid parameterization (Principle III: 2×2 to 16×16 without restructuring) | `phyco-v2` is a fixed 4-node ring (the 2×2 grid). Larger grids are not designed | No RTL in scope. The statistical question is answered for the 2×2 core first | Generalization belongs to a later RTL feature |
+| Timing (≥ 200 MHz target, a SHOULD) | About 7 serial 32-bit carry chains per step (`design.md` §7) | No RTL in scope | Report at synthesis; restructuring would be a new design version |
+| Food source and output tap | The food source drives nodes 0 and 2; the output reads all 4 nodes | Point-to-point signals and an output function, not a grid broadcast (`design.md` §7) | Owner judgment at T035 |
