@@ -41,16 +41,16 @@ The model is in `phycoweb/`, the harness in `sp80022/`, protocol code in `protoc
 
 **Purpose**: Package skeletons and storage rules.
 
-- [ ] T001 Create the package skeletons:
+- [X] T001 Create the package skeletons:
   - `sp80022/__init__.py` with a docstring and `__version__ = "0.1.0"`.
   - `protocol/__init__.py` with a docstring only.
   - The directories `research/002/variants/`, `reports/002-core-dynamics-redesign/harness/`,
     `reports/002-core-dynamics-redesign/dev/` and `data/controls/`, each with a `.gitkeep`.
   - (FR-010, FR-015, SC-004; Plan: Project Structure)
-- [ ] T002 [P] In `.gitignore`, ignore positive-control bytes but keep the directory: add
+- [X] T002 [P] In `.gitignore`, ignore positive-control bytes but keep the directory: add
   `data/controls/*` and `!data/controls/.gitkeep` (plan, Owner Decisions Q1). Also add `*.bin binary` to
   `.gitattributes`, so stored bytes are never line-converted. (SC-004; Principle V)
-- [ ] T003 [P] Add `scipy` to `requirements.txt`, keeping the existing entries. Record the
+- [X] T003 [P] Add `scipy` to `requirements.txt`, keeping the existing entries. Record the
   installed versions: scipy 1.15.3 on Windows, 1.18.1 in WSL (FR-010, SC-004; plan, Technical Context; Principle V).
 
 ---
@@ -62,7 +62,7 @@ uses these.
 
 **⚠️ CRITICAL**: No story work starts until this phase is done.
 
-- [ ] T004 [P] Write `tests/test_protocol.py::TestSeedSets` (it must fail at first):
+- [X] T004 [P] Write `tests/test_protocol.py::TestSeedSets` (it must fail at first):
   - each of the 4 sets has 100 unique seeds;
   - no two sets share a seed;
   - first seeds and canonical SHA-256 values equal the spec table exactly (`dev` 56053 7029 30841
@@ -72,7 +72,7 @@ uses these.
   - a tampered expected hash raises `ValueError`;
   - `load(name, allow={"dev"})` raises `PermissionError` for `heldout-*`.
   - (FR-015, SC-006, data-model §2)
-- [ ] T005 Implement `protocol/seedsets.py` so T004 passes. It provides:
+- [X] T005 Implement `protocol/seedsets.py` so T004 passes. It provides:
   - `derive(name) -> list[tuple[int,int,int,int]]`, where seed *i* is "the first 8 bytes of
     SHA-256(`phycoweb-002/<name>/<i>`) as 4 big-endian u16", for i = 0…99.
   - `canonical_text(seeds)` producing lines `"a b c d\n"`.
@@ -81,12 +81,12 @@ uses these.
     allow-list (`PermissionError`).
   - `FEATURE001_SEEDS = [(1024,2048,4096,8192), (4660,43981,21845,43690)]`, for dev use.
   - Standard library only. (FR-015, R8)
-- [ ] T006 [P] Implement `scripts/seedsets.py` per contracts/cli.md (`--set`, `--print`,
+- [X] T006 [P] Implement `scripts/seedsets.py` per contracts/cli.md (`--set`, `--print`,
   `--check`; exit 0 or 2). (Quickstart D1) (FR-015, SC-006)
-- [ ] T007 [P] Create `protocol/disclaimer.py` with one constant `DISCLAIMER`. Its text must
+- [X] T007 [P] Create `protocol/disclaimer.py` with one constant `DISCLAIMER`. Its text must
   include both "Passing NIST SP 800-22 does not show cryptographic security" and "This generator
   must not be used to generate secrets". Every report writer imports it. (FR-019, SC-007)
-- [ ] T008 [P] Create `scripts/repro_nistrng_defects.py`:
+- [X] T008 [P] Create `scripts/repro_nistrng_defects.py`:
   - run every nistrng 1.2.3 test on 4 sequences of 2²¹ bits from `os.urandom`;
   - give each test its own copy and call `random.seed(0)`;
   - use a `multiprocessing` Pool for Linear Complexity;
@@ -95,7 +95,7 @@ uses these.
     and the command.
   - Run it and confirm N4–N8 reproduce (research R1). If any does not reproduce, stop and report
     it. (Quickstart H0) (FR-014, SC-005; Principle IV)
-- [ ] T009 Create `reports/002-core-dynamics-redesign/harness-changelog.md` per data-model §6.
+- [X] T009 Create `reports/002-core-dynamics-redesign/harness-changelog.md` per data-model §6.
   - Entry 1: date 2026-10-28; change "replace nistrng 1.2.3 with own SP 800-22 implementation
     `sp80022`"; categories `defect-fix` (N4–N8) and `added-coverage` (147 more template
     sub-tests; OTM eligible at 2²¹); evidence `harness/nistrng-defects.json`.
@@ -140,12 +140,12 @@ deterministic and independently cross-checked.
   - Cache the expansions in `tests/data/expansions/` as packed bytes, with their SHA-256 in the
     test.
   - (FR-010, SC-004; R3b)
-- [ ] T012 [P] [US3] Write `tests/test_sp80022.py::TestTemplates`:
+- [X] T012 [P] [US3] Write `tests/test_sp80022.py::TestTemplates`:
   - `templates(m)` counts for m = 2…10 are [2, 4, 6, 12, 20, 40, 74, 148, 284];
   - `templates(9)[0] == "000000001"` and `templates(9)[-1] == "111111110"`;
   - the list is in increasing numeric order.
   - (FR-011, R6)
-- [ ] T013 [P] [US3] Write `tests/test_sp80022.py::TestHarnessContract`:
+- [X] T013 [P] [US3] Write `tests/test_sp80022.py::TestHarnessContract`:
   - input not modified (the hash of the bytes is the same before and after `battery`);
   - int8 input with n = 2²¹ gives the same p-values as int64 (N1);
   - two runs give identical p-values (FR-013);
@@ -153,7 +153,7 @@ deterministic and independently cross-checked.
   - excursions with J < 500 give `eligible=False` and `p_values=[]`;
   - every p is in [0, 1].
   - (contracts/sp80022-api.md)
-- [ ] T014 [P] [US3] Write `tests/test_sp80022.py::TestKnownBad`. These inputs must fail the
+- [X] T014 [P] [US3] Write `tests/test_sp80022.py::TestKnownBad`. These inputs must fail the
   expected tests (R3e):
   - all zeros;
   - `0101…`;
@@ -163,7 +163,7 @@ deterministic and independently cross-checked.
     only that **at least one** test returns p < 0.01. Its exact failures aren't known in advance,
     and taking them from this harness's own output would be circular.
   - (FR-010; Principle IV: the harness must be able to fail.)
-- [ ] T015 [P] [US3] Write `tests/test_assess.py`:
+- [X] T015 [P] [US3] Write `tests/test_assess.py`:
   - proportion bound 0.96015 and threshold count 97 at m′ = 100;
   - q(100) rounds to 0.01837;
   - k_max table (2→1, 2→1, 8→1, 18→2, 148→7) at m′ = 100;
@@ -176,22 +176,22 @@ deterministic and independently cross-checked.
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] Implement `sp80022/special.py`:
+- [X] T016 [P] [US3] Implement `sp80022/special.py`:
   - `igamc(a, x)` via `scipy.special.gammaincc`, and `erfc` via `math.erfc`;
   - `binom_sf(n, p, k)` = P(X > k), computed exactly with `fractions.Fraction` and
     `math.comb`, then converted to float. (FR-010; spec Pre-registered
     Protocol; R4)
-- [ ] T017 [P] [US3] Implement `sp80022/tests_basic.py`: `frequency`, `block_frequency`
+- [X] T017 [P] [US3] Implement `sp80022/tests_basic.py`: `frequency`, `block_frequency`
   (M=128), `runs` (prerequisite τ = 2/√n, which gives p = 0.0 if it fails), `longest_run`
   (M=10000, K=6), `rank` (32×32 over GF(2), N=2048), and `dft` (T = √(ln(1/0.05)·n),
   N₀ = 0.95·n/2). Use int64 counts and never modify the input. (FR-010, R2)
-- [ ] T018 [P] [US3] Implement `sp80022/tests_template.py`:
+- [X] T018 [P] [US3] Implement `sp80022/tests_template.py`:
   - `templates(m)` per R6;
   - `non_overlapping_template` (m=9, N=8, M=n/8; μ, σ² and p as in R6; restart after each
     match; 148 p-values in template order);
   - `overlapping_template` (m=9, M=1032, K=5, N=n//1032; Rev. 1a π values from R2).
   - Use vectorized window codes (`numpy` sliding 9-bit code array). (FR-011, R2, R6)
-- [ ] T019 [P] [US3] Implement `sp80022/tests_complex.py`:
+- [X] T019 [P] [US3] Implement `sp80022/tests_complex.py`:
   - `universal`: L=8, Q=2560, K = n//8 − Q; expected value and variance from the SP 800-22
     table for L=8; the c coefficient as in §2.9.
   - `linear_complexity`: M=500, K=6; Berlekamp–Massey over all 4,194 blocks at once as numpy
@@ -199,7 +199,7 @@ deterministic and independently cross-checked.
   - `serial`: m=16; 2 p-values; ψ² computed with `numpy.bincount` over cyclic windows.
   - `approximate_entropy`: m=10.
   - (FR-010; R2, R5)
-- [ ] T020 [P] [US3] Implement `sp80022/tests_walk.py`:
+- [X] T020 [P] [US3] Implement `sp80022/tests_walk.py`:
   - `cumulative_sums` (forward, then reverse);
   - `random_excursions` (8 states, order −4…−1, +1…+4; ineligible if J < 500);
   - `random_excursions_variant` (18 states, −9…−1, +1…+9; ineligible if J < 500).
@@ -213,7 +213,7 @@ deterministic and independently cross-checked.
   - T010–T015 must now pass. Fix the implementation, never the expected values. If an expected
     value seems wrong, stop and report it.
   - (contracts/sp80022-api.md) (FR-010, FR-012, FR-013)
-- [ ] T022 [US3] Implement `scripts/sts_eval.py` per contracts/cli.md:
+- [X] T022 [US3] Implement `scripts/sts_eval.py` per contracts/cli.md:
   - `--source {phyco-v2,lut-v1,os-csprng,file}`, `--set dev | --seed … | --bytes`,
     `--sequences`, `--workers`, `--save-bytes`, `--out`.
   - It refuses `heldout-*` (exit 2), through `protocol.seedsets.load(allow={"dev"})` or explicit
@@ -225,11 +225,11 @@ deterministic and independently cross-checked.
   - Bits come from `gen_vectors.generate`, MSB-first. When `phyco-v2` doesn't exist yet, that
     choice exits 2 with a clear message.
   - (FR-010, FR-013, R5, R7)
-- [ ] T023 [US3] Measure throughput: one 2²¹-bit urandom sequence through `battery`, timing
+- [X] T023 [US3] Measure throughput: one 2²¹-bit urandom sequence through `battery`, timing
   each test. Target under 60 s per sequence (R5). Record the timings in
   `reports/002-core-dynamics-redesign/harness/timing.json`. If over target, optimize the slowest
   test without changing its results (T010–T015 still pass). (FR-010, SC-003; R5)
-- [ ] T024 [US3] Positive-control calibration (quickstart H2): run `sts_eval.py --source
+- [X] T024 [US3] Positive-control calibration (quickstart H2): run `sts_eval.py --source
   os-csprng --sequences 100 --save-bytes data/controls/cal-<k>.bin --out
   reports/002-core-dynamics-redesign/harness/cal-<k>.json` for k = 1, 2, 3.
   - Then pool all 300 sequences' p-values per sub-test and check uniformity.
@@ -237,7 +237,7 @@ deterministic and independently cross-checked.
     uniformity P-valueᴛ ≥ 0.0001.
   - If the same sub-test fails in 2 or more runs, treat it as a harness defect: stop and
     investigate. (FR-010, FR-014, SC-005; R3c)
-- [ ] T025 [US3] Re-score `data/controls/cal-1.bin` with `--source file` and assert the p-values
+- [X] T025 [US3] Re-score `data/controls/cal-1.bin` with `--source file` and assert the p-values
   and verdicts are byte-identical to `cal-1.json`, apart from timestamps. Also run the same
   re-score in WSL and compare: verdicts exact, p-values within 1e-9. Record the result in
   `reports/002-core-dynamics-redesign/harness/reproducibility.md`. (FR-013, SC-004, R7)
