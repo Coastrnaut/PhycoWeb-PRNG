@@ -337,7 +337,7 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
     generator;
   - links to the dev evidence lines in `runs.jsonl`.
   - (FR-002, FR-004, FR-006, FR-008, FR-009)
-- [ ] T035 [US1] ⛔ **Owner design review** of `design.md` (Principles III, VI and VIII), including its Principle III checklist.
+- [X] T035 [US1] ⛔ **Owner design review** of `design.md` (Principles III, VI and VIII), including its Principle III checklist.
   Record it in spec.md under Review & Approval as a new row "Design review". Wait for approval.
   (FR-001 to FR-009)
 
