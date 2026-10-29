@@ -28,6 +28,36 @@
 > be re-scored with the feature-002 harness, and the results added here as a re-score table.
 > The original text below is left unchanged as the approved record.
 
+### Re-score with the feature-002 harness (2026-10-28, T057)
+
+The same four inputs were regenerated (10⁶ bits each, MSB-first, from `gen_vectors.generate`) and scored with `sp80022` 1.0.0, the harness validated in feature 002 (research R3, NIST STS oracle). Each input is **a single sequence**, so these are per-test p-values only: no proportion or uniformity assessment is possible, and roughly 1 sub-test in 100 is expected below 0.01 by chance (about 2 of the 188 per input). Bold marks p < 0.01. Records: `reports/002-core-dynamics-redesign/feature001-rescore/*.json`, made with `python -W ignore scripts/sts_eval.py --source file --bytes <input> --bits 1000000 --out ...` (exit 1 by design: one sequence cannot pass a family, m′ < 55).
+
+| Test | float-v0, seed 1024… | float-v0, seed 4660… | lut-v1, seed 1024… | lut-v1, seed 4660… |
+|------|------|------|------|------|
+| Frequency (Monobit) | 0.1499 | 0.1270 | **0.0020** | 0.6017 |
+| Block Frequency (M=128) | 0.7013 | 0.2412 | 0.1416 | 0.7351 |
+| Runs | 0.3607 | 0.6860 | 0.1086 | 0.2334 |
+| Longest Run (M=10000) | 0.9606 | 0.1684 | 0.6116 | 0.3175 |
+| Rank | 0.3348 | 0.6699 | 0.7294 | 0.3787 |
+| DFT | 0.0587 | 0.3128 | 0.2629 | 0.3446 |
+| Non-Overlapping Template (148) | **2/148 below 0.01 (min 0.0011)** | 0/148 below 0.01 (min 0.0156) | **3/148 below 0.01 (min 0.0051)** | **1/148 below 0.01 (min 0.0014)** |
+| Overlapping Template | 0.3874 | 0.4582 | 0.9217 | 0.0320 |
+| Universal (L=7) | 0.2716 | 0.0567 | 0.1434 | 0.6061 |
+| Linear Complexity | 0.3416 | 0.3862 | 0.8137 | 0.3145 |
+| Serial (2) | 0/2 below 0.01 (min 0.9634) | 0/2 below 0.01 (min 0.8221) | 0/2 below 0.01 (min 0.2144) | 0/2 below 0.01 (min 0.2833) |
+| Approximate Entropy (m=10) | 0.2566 | 0.0939 | 0.4874 | 0.4234 |
+| Cumulative Sums (2) | 0/2 below 0.01 (min 0.1705) | 0/2 below 0.01 (min 0.0381) | **2/2 below 0.01 (min 0.0025)** | 0/2 below 0.01 (min 0.7958) |
+| Random Excursions (8) | not eligible (J < 500) | not eligible (J < 500) | not eligible (J < 500) | not eligible (J < 500) |
+| Random Excursions Variant (18) | not eligible (J < 500) | not eligible (J < 500) | not eligible (J < 500) | not eligible (J < 500) |
+
+Input SHA-256: float-v0 1024… `075854dde62a92a5…`; float-v0 4660… `0c8f4471ae1135d0…`; lut-v1 1024… `25a7b878fab1d2b6…`; lut-v1 4660… `68b607a4e56ab1c2…`.
+
+Reading (no new claim is made from single sequences):
+
+- lut-v1 with seed 1024… has Frequency p = 0.0020 and both Cumulative Sums p < 0.01, so the original Monobit and Cumulative Sums failures are **reproduced** by the validated harness. Its original Frequency Within Block and Approximate Entropy failures are **not** reproduced (p = 0.14 and 0.49). The parameters differ from nistrng's (block M = 128, ApEn m = 10, research R2), so that difference is not a contradiction.
+- The Linear Complexity and Random Excursion failures in the original text were nistrng artefacts. With the validated harness, Linear Complexity has p between 0.31 and 0.81 on all four inputs, and the excursion tests are not eligible (fewer than 500 cycles) on all four.
+- Single-sequence results cannot show that a generator is good. The multi-sequence verdict for lut-v1 is in feature 002: it fails 11 of 15 families on 100 dev seeds and on 100 held-out seeds (`reports/002-core-dynamics-redesign/attempt-1/`).
+
 Source records: the four `nist_*.json` files in this directory. Values below are copied from them, rounded to 6 decimals. `p_value` is the smallest of a test's p-values; status is nistrng's verdict (every p-value ≥ 0.01).
 
 ## Seed 1024, 2048, 4096, 8192
