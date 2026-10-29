@@ -17,12 +17,11 @@ _UNIVERSAL_EV = {1: (0.7326495, 0.690), 2: (1.5374383, 1.338), 3: (2.4016068, 1.
                  16: (15.167379, 3.421)}
 
 
-def universal(bits, L: int = None, Q: int = None, variance_correction: bool = True) -> TestResult:
+def universal(bits, L: int = None, Q: int = None) -> TestResult:
     """2.9 Maurer's "Universal Statistical" Test.
 
-    L and Q default to the SP 800-22 table for n (L = 8, Q = 2560 at n = 2**21). The worked
-    example in section 2.9.8 omits the c(L, K) correction; `variance_correction=False`
-    reproduces it. The evaluator always uses the correction, as NIST STS does.
+    L and Q default to the SP 800-22 table for n (L = 8, Q = 2560 at n = 2**21). sigma uses
+    the c(L, K) correction, as in the section 2.9.8 example (c = 0.591311).
     """
     x = as_bits(bits)
     n = x.size
@@ -50,11 +49,8 @@ def universal(bits, L: int = None, Q: int = None, variance_correction: bool = Tr
         last_l[v] = i
     fn = total / K
     expected, variance = _UNIVERSAL_EV[L]
-    if variance_correction:
-        c = 0.7 - 0.8 / L + (4 + 32 / L) * K ** (-3 / L) / 15
-        sigma = c * math.sqrt(variance / K)
-    else:
-        sigma = math.sqrt(variance)
+    c = 0.7 - 0.8 / L + (4 + 32 / L) * K ** (-3 / L) / 15
+    sigma = c * math.sqrt(variance / K)
     p = erfc(abs(fn - expected) / (math.sqrt(2) * sigma))
     return TestResult("universal", True, [p], {"L": L, "Q": Q, "K": K},
                       {"fn": fn, "expected": expected, "sigma": sigma})
