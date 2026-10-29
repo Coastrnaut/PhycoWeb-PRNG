@@ -120,7 +120,7 @@ deterministic and independently cross-checked.
 
 ### Tests for User Story 3 (write first)
 
-- [ ] T010 [P] [US3] Write `tests/test_sp80022.py::TestWorkedExamples`. For each of the 15 SP
+- [X] T010 [P] [US3] Write `tests/test_sp80022.py::TestWorkedExamples`. For each of the 15 SP
   800-22 Rev. 1a test sections, encode the section's worked example (input bits, parameters,
   intermediate statistic, p-value) and assert the p-value to the printed decimals.
   - Transcribe them from the published document (NIST SP 800-22 Rev. 1a, April 2010), citing
@@ -128,7 +128,7 @@ deterministic and independently cross-checked.
   - The PDF may be fetched from nist.gov (csrc.nist.gov/pubs/sp/800/22/r1/upd1/final). Read it;
     it is a reference document, not something to execute.
   - (FR-010, FR-013; R3a)
-- [ ] T011 [P] [US3] Write `tests/test_sp80022.py::TestAppendixB`.
+- [X] T011 [P] [US3] Write `tests/test_sp80022.py::TestAppendixB`.
   - Compute the first 10⁶ binary digits of π, e, √2 and √3 with exact integer arithmetic:
     - √2 and √3 with `math.isqrt`;
     - e from the series Σ 1/k! in fixed point;
@@ -204,7 +204,7 @@ deterministic and independently cross-checked.
   - `random_excursions` (8 states, order −4…−1, +1…+4; ineligible if J < 500);
   - `random_excursions_variant` (18 states, −9…−1, +1…+9; ineligible if J < 500).
   - (FR-012, R2)
-- [ ] T021 [US3] Implement `sp80022/assess.py` (proportion, uniformity, q(m′), k_max, family and
+- [X] T021 [US3] Implement `sp80022/assess.py` (proportion, uniformity, q(m′), k_max, family and
   overall verdicts, per R4).
   - Complete `sp80022/__init__.py` with `battery(bits)`, which runs the 15 tests in SP 800-22
     order, each on a read-only view (`bits.view(); v.flags.writeable = False`).
@@ -241,9 +241,9 @@ deterministic and independently cross-checked.
   and verdicts are byte-identical to `cal-1.json`, apart from timestamps. Also run the same
   re-score in WSL and compare: verdicts exact, p-values within 1e-9. Record the result in
   `reports/002-core-dynamics-redesign/harness/reproducibility.md`. (FR-013, SC-004, R7)
-- [ ] T026 [US3] ⛔ **Owner action**: in WSL, run `sudo apt install build-essential` (gcc and
+- [X] T026 [US3] ⛔ **Owner action**: in WSL, run `sudo apt install build-essential` (gcc and
   make are missing; sudo is not passwordless). Wait for confirmation. (FR-010; plan Q2; Principle IX)
-- [ ] T027 [US3] Download NIST STS 2.1.2 from the official nist.gov page
+- [X] T027 [US3] Download NIST STS 2.1.2 from the official nist.gov page
   (csrc.nist.gov, "NIST SP 800-22 … Statistical Test Suite" download) into `~/nist-sts/` in WSL,
   outside the repository.
   - Record the URL, file size and SHA-256.
@@ -251,7 +251,7 @@ deterministic and independently cross-checked.
   - Save the build log and hashes in `reports/002-core-dynamics-redesign/harness/sts-2.1.2.md`.
   - Approved by the owner (Q2). Do not run anything else from the archive.
   - (FR-010, SC-004; Principle V; R3d)
-- [ ] T028 [US3] Create `scripts/sts_oracle_compare.py`:
+- [X] T028 [US3] Create `scripts/sts_oracle_compare.py`:
   - write test inputs as binary files (the 4 Appendix B expansions, plus the first 10 sequences
     of `cal-1.bin`);
   - drive the STS `assess` binary non-interactively (scripted stdin) with the R2 parameters
@@ -260,12 +260,12 @@ deterministic and independently cross-checked.
   - compare with `sp80022` per p-value at ±1e-6.
   - Write `reports/002-core-dynamics-redesign/harness/oracle-compare.json` and a short `.md`.
   - Any mismatch blocks Phase 4 until it is explained and logged in the change log. (FR-010, FR-014, SC-005; R3d)
-- [ ] T029 [US3] Add changelog entries for every harness fix made during T021–T028, each with
+- [X] T029 [US3] Add changelog entries for every harness fix made during T021–T028, each with
   its category and evidence.
   - Bump `sp80022.__version__` to `1.0.0` when T024, T025 and T028 all pass.
   - Then write `reports/002-core-dynamics-redesign/harness/phase-report.md` per the
     constitution's Phase Completion Reporting section. (FR-014, SC-005)
-- [ ] T030 [US3] ⛔ **Owner review of the harness phase report** (Principle VIII). Phase 4 may
+- [X] T030 [US3] ⛔ **Owner review of the harness phase report** (Principle VIII). Phase 4 may
   start only after approval. Add a "Harness review" row to spec.md under Review & Approval.
   (FR-014, SC-005; Principle VIII)
 
