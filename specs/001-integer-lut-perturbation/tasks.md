@@ -157,7 +157,7 @@ Project Structure section.
 
 - [X] T017 [US2] Extend `scripts/gen_vectors.py` with `--model lut-v1`, using `phycoweb.model.PhycoWebEngine`. Insert the repository root into `sys.path`, use the same output format and `--verify` behavior, and use `MODEL_ID` in the header. (FR-010)
 - [X] T018 [US2] Run `python scripts/gen_vectors.py --model lut-v1 --seed 1024 2048 4096 8192 --count 10000 --out vectors/lut-v1_seed-1024-2048-4096-8192_10000.hex`, then the `--verify` form, then `python -m unittest tests.test_vectors -v`. Append the commands and outputs to `reports/001-integer-lut-perturbation/test-log.md`. (FR-010, SC-002)
-- [ ] T019 [US2] ⛔ **Owner action**: on a second environment (a different Python minor version or OS, research R7), run the `--verify` command from T018 and `python -m unittest discover -s tests -v`. Record the environment (OS, Python version) and results in `reports/001-integer-lut-perturbation/test-log.md`. SC-002 stays open until this is done. (SC-002)
+- [X] T019 [US2] ⛔ **Owner action**: on a second environment (a different Python minor version or OS, research R7), run the `--verify` command from T018 and `python -m unittest discover -s tests -v`. Record the environment (OS, Python version) and results in `reports/001-integer-lut-perturbation/test-log.md`. SC-002 stays open until this is done. (SC-002)
 
 **Checkpoint**: The golden vectors are committed-ready and checked locally. Cross-environment parity is waiting on the owner.
 
@@ -198,7 +198,7 @@ Project Structure section.
 - [X] T024 [P] Add the line `**Implementation status**: Reference model complete; RTL-pending (Constitution Principle II).` under the Status line in `specs/001-integer-lut-perturbation/spec.md`. (FR-012)
 - [X] T025 Run every quickstart.md step 1–6 in order and `python -m unittest discover -s tests -v`. Append the outputs to `test-log.md`. (All FR/SC)
 - [X] T026 Write `reports/001-integer-lut-perturbation/phase-report.md` per the constitution's Phase Completion Reporting section. It must include: files created or modified; FR/SC IDs, each with its evidence path or marked **open** (SC-002 until T019 is done); the exact commands run and their pass/fail results; open issues (spec Open Issues 1–5); security concerns (the `readmee.md` claim); and a recommendation to proceed, revise or stop. (Principles V, VII)
-- [ ] T027 ⛔ **Owner gate (Principle VIII)**: the owner reviews the vectors, `summary.md` and `phase-report.md`, then fills in the "Result review" row in `specs/001-integer-lut-perturbation/spec.md`. The feature is not complete until this is done. Committing any of these files requires separate explicit authorization (Principle IX).
+- [X] T027 ⛔ **Owner gate (Principle VIII)**: the owner reviews the vectors, `summary.md` and `phase-report.md`, then fills in the "Result review" row in `specs/001-integer-lut-perturbation/spec.md`. The feature is not complete until this is done. Committing any of these files requires separate explicit authorization (Principle IX).
 
 ---
 
