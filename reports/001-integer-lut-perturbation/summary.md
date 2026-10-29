@@ -11,12 +11,15 @@
 > - **Overlapping Template**: p = 0.0 on 5 of 5 sequences (N5).
 > - **Maurer's Universal**: p ≈ 0.998 every time (N7).
 > - **Non-Overlapping Template**: divides by the variance squared, so p = 1.0 always (N4).
+> - **Random Excursion Variant**: returns p-values above 1, which is impossible (N9; found
+>   during feature-002 T008, same day).
 >
 > Therefore:
 >
 > - The Linear Complexity and Random Excursion failures below, in every run, say **nothing**
 >   about either model.
-> - The Maurer's Universal and Non-Overlapping Template passes are also **uninformative**.
+> - The Maurer's Universal, Non-Overlapping Template and Random Excursion Variant passes are
+>   also **uninformative**.
 > - The other lut-v1 failures with seed 1024… (Monobit, Frequency Within Block, Approximate
 >   Entropy, Cumulative Sums) were in tests that behaved normally on urandom input. They still
 >   stand, but they are unconfirmed.
