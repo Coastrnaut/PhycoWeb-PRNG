@@ -1,0 +1,660 @@
+{
+ "sts_dir": "/home/coast/nist-sts/sts-2.1.2/sts-2.1.2",
+ "tolerance": 1e-06,
+ "rows": [
+  {
+   "input": "pi",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.4522757696422417e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.9757687452770512e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.2044315490263884e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.0146610341397206e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.4410059076541692e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.7384730746812516e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.816014940178803e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.234000898686638e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.380625459043941e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.2593403959401144e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.0801750490759847e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 6.819618664222205e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 3.9097954462885554e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 4.0901928033409973e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "pi",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 4.04966622014058e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.714716767522219e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.5629835934701823e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.149697456126475e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.298987654165586e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.603652730053362e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.949312282174432e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.994870678176611e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.145861243586401e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 5.217425597114911e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.295961696319182e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 3.53166606070765e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.8860044204724886e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.6416814236671655e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 3.0500521952525617e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "e",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 3.9582230992873946e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 9.420238811230774e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.6030304901023555e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.425127038074848e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.008469492305933e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.1721323018031313e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.438689292785014e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.95998047786439e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.887282265553239e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.816702898700285e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.5910864997747964e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.114557395906715e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.24117848332439e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.535476912925773e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 4.873928355353385e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt2",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 4.92569838306256e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.6179503887522344e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.656663479760901e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.6028384175758035e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.3498873613349005e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.540454061561448e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 7.1286099245782e-10,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.986833090914189e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.2075756193082903e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.0377800294977284e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.3087379030496393e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 2.505210096037658e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.4315714186595727e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 1.9117770910792586e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 4.849785411598084e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sqrt3",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 4.842228903401136e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.6933070851331564e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.295421071106917e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.977743983669569e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.1075621525756816e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 5.045702211603498e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 2.172956150015004e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.979126936310863e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 5.5393028219885565e-08,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 3.414299786785868e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.79895532923269e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 1.3575457669112723e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 1.8214605401745132e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.778290181306488e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 0.0,
+   "mismatches": 0
+  },
+  {
+   "input": "sha1",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 0.0,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.538203202814062e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "block_frequency",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.906531549386806e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "runs",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.915779511227569e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "longest_run",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.3808524294308704e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "rank",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.816634133764097e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "dft",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.897304368145505e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "non_overlapping_template",
+   "values_per_sequence": 148,
+   "max_abs_diff": 4.999506626468531e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "overlapping_template",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.590928649461645e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "universal",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.999491874380091e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "linear_complexity",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.784766035395571e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "serial",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.980135211996028e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "approximate_entropy",
+   "values_per_sequence": 1,
+   "max_abs_diff": 4.897734981190727e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "cumulative_sums",
+   "values_per_sequence": 2,
+   "max_abs_diff": 4.910454132200925e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "random_excursions",
+   "values_per_sequence": 8,
+   "max_abs_diff": 4.89764547639826e-07,
+   "mismatches": 0
+  },
+  {
+   "input": "cal-1 first 10",
+   "test": "random_excursions_variant",
+   "values_per_sequence": 18,
+   "max_abs_diff": 4.92424503673039e-07,
+   "mismatches": 0
+  }
+ ],
+ "expansion_files": {
+  "pi": {
+   "equal_to_sts_data_file": true
+  },
+  "e": {
+   "equal_to_sts_data_file": true
+  },
+  "sqrt2": {
+   "equal_to_sts_data_file": true
+  },
+  "sqrt3": {
+   "equal_to_sts_data_file": true
+  }
+ },
+ "max_abs_diff": 4.999506626468531e-07,
+ "total_mismatches": 0,
+ "versions": {
+  "python": "3.14.4",
+  "numpy": "2.5.4",
+  "sp80022": "1.0.0",
+  "sp80022_sha256": "1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700",
+  "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0"
+ },
+ "command": "python scripts/sts_oracle_compare.py (in WSL)"
+}
