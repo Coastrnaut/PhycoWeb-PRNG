@@ -472,7 +472,7 @@ attempt record exists, and re-scoring it gives identical results.
   - A held-out set is never reused. After attempt 3, no further attempts are made without a spec
     amendment. (FR-018, spec Edge Cases)
 
-- [ ] T056 [US2] **Archive before any redesign** (Principle V). If T055 chooses redesign,
+- [X] T056 (not applicable: attempt 1 passed and no redesign was chosen at T055) [US2] **Archive before any redesign** (Principle V). If T055 chooses redesign,
   first copy the frozen `phycoweb/model_v2.py`, `design.md` and `vectors/phyco-v2_*.hex` to
   `baseline/phyco-v2.<k>/`, where k is the attempt number. Write `baseline/phyco-v2.<k>/MANIFEST.json`
   with the SHA-256 of each file. Its `model_sha256` and `design_sha256` must equal the values in
@@ -486,13 +486,13 @@ attempt record exists, and re-scoring it gives identical results.
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T057 [P] Re-score the four feature-001 inputs with the validated harness: the 10⁶-bit
+- [X] T057 [P] Re-score the four feature-001 inputs with the validated harness: the 10⁶-bit
   sequences for `float-v0` and `lut-v1` × 2 seeds, regenerated from `gen_vectors.generate`. Run
   them with `sts_eval.py --source file`, and note that single sequences give per-test p-values
   only, with no proportion or uniformity. Add a re-score table below the erratum in
   `reports/001-integer-lut-perturbation/summary.md`, leaving the approved text unchanged.
   (FR-010, FR-014; Principle IV; plan Q3, quickstart H5)
-- [ ] T058 [P] SC-007 check: grep every file under `reports/002-core-dynamics-redesign/`, plus
+- [X] T058 [P] SC-007 check: grep every file under `reports/002-core-dynamics-redesign/`, plus
   `design.md`, for "cryptographically secure", "secure", "crypto-grade" and "suitable for
   secrets" used as claims. Every `summary.md` and `phase-report.md` must contain `DISCLAIMER`.
   Record the result in the final phase report. (FR-019, SC-007)
