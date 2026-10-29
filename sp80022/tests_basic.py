@@ -45,7 +45,9 @@ def runs(bits) -> TestResult:
 
 # (M, class lower bound v_min, class upper bound v_max, pi) for the three SP 800-22 cases.
 _LONGEST_RUN = [
-    (8, 1, 4, [0.2148, 0.3672, 0.2305, 0.1875]),
+    # M = 8: exact values 55/256, 94/256, 59/256, 48/256 (SP 800-22 prints them rounded to 4
+    # decimals; the exact values reproduce the section 2.4.8 example).
+    (8, 1, 4, [55 / 256, 94 / 256, 59 / 256, 48 / 256]),
     (128, 4, 9, [0.1174, 0.2430, 0.2493, 0.1752, 0.1027, 0.1124]),
     (10000, 10, 16, [0.0882, 0.2092, 0.2483, 0.1933, 0.1208, 0.0675, 0.0727]),
 ]
