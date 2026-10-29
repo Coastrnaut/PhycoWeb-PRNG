@@ -343,7 +343,7 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
 
 ### Tests for User Story 1 (write first, after T035)
 
-- [ ] T036 [P] [US1] Write `tests/test_purity_v2.py`. It is an AST check of
+- [X] T036 [P] [US1] Write `tests/test_purity_v2.py`. It is an AST check of
   `phycoweb/model_v2.py`:
   - no `Mult`, `Div`, `FloorDiv`, `Mod` or `Pow` nodes anywhere;
   - no float constants;
@@ -351,38 +351,38 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
   - every `LShift`/`RShift` right operand is an int constant;
   - imports only from {`typing`, `phycoweb.lut`}.
   - (FR-001, SC-001, data-model §1)
-- [ ] T037 [P] [US1] Write `tests/test_widths_v2.py`. Fuzz from 5,000 random states
+- [X] T037 [P] [US1] Write `tests/test_widths_v2.py`. Fuzz from 5,000 random states
   (`random.Random(20261029)`) plus edge states (all 0, all max), step once, and assert every state
   element is within its `design.md` width and signedness. (FR-002)
-- [ ] T038 [P] [US1] Write `tests/test_design_trace.py`. A step-by-step re-implementation
+- [X] T038 [P] [US1] Write `tests/test_design_trace.py`. A step-by-step re-implementation
   transcribed literally from `design.md`'s numbered list must agree with `model_v2` on
   2 dev seeds × 10,000 words and on the 5,000 fuzz states. (FR-004, Principle II)
-- [ ] T039 [P] [US1] Write `tests/test_vectors_v2.py`, covering: golden files for dev seeds 0
+- [X] T039 [P] [US1] Write `tests/test_vectors_v2.py`, covering: golden files for dev seeds 0
   and 1; determinism; `ValueError` for seeds outside 0…65535 and for non-int seeds; seeds of
   length < 4. For the all-equal seeds `(0,0,0,0)` and `(65535,65535,65535,65535)`: the first
   2¹⁶ words are not all equal, and no word value repeats at a fixed lag ≤ 2¹⁵ for the whole
   window (no short cycle). (FR-008, FR-009; spec Edge Cases)
-- [ ] T040 [P] [US1] Write `tests/test_disruption_v2.py`. The disruption rate must be in
+- [X] T040 [P] [US1] Write `tests/test_disruption_v2.py`. The disruption rate must be in
   [0.01, 0.50] for 3 dev seeds over 10⁶ steps (quick check). The full measurement over 100 seeds
   is T044. (FR-005)
 
 ### Implementation for User Story 1
 
-- [ ] T041 [US1] Implement `phycoweb/model_v2.py` exactly as `design.md` 1.0 describes, per
+- [X] T041 [US1] Implement `phycoweb/model_v2.py` exactly as `design.md` 1.0 describes, per
   contracts/model-v2-api.md (`MODEL_ID = "phyco-v2"`, `WARMUP`, `PhycoWebEngineV2`,
   `disruptions`, `step_count`). Do not modify `phycoweb/model.py` or `phycoweb/lut.py`. T036–T040
   must pass. (FR-001 to FR-009)
-- [ ] T042 [US1] Add `"phyco-v2"` to `MODELS` in `scripts/gen_vectors.py`. Check that the
+- [X] T042 [US1] Add `"phyco-v2"` to `MODELS` in `scripts/gen_vectors.py`. Check that the
   `float-v0` and `lut-v1` outputs stay byte-identical (`--verify` against both existing vector
   files). Generate `vectors/phyco-v2_seed-<a>-<b>-<c>-<d>_10000.hex` for dev seeds 0 and 1.
   (FR-008, contracts/cli.md)
-- [ ] T043 [US1] Run the full test suite (all feature-001 tests plus the new ones) on Windows
+- [X] T043 [US1] Run the full test suite (all feature-001 tests plus the new ones) on Windows
   and in WSL. Record the results in `reports/002-core-dynamics-redesign/dev/test-log.md`. (SC-001, SC-004;
   Principle V)
-- [ ] T044 [US1] Measure the disruption rate on all 100 dev seeds × 10⁶ steps. Write
+- [X] T044 [US1] Measure the disruption rate on all 100 dev seeds × 10⁶ steps. Write
   `reports/002-core-dynamics-redesign/dev/disruption.json` with the min, max and per-seed rates.
   All must be in [1%, 50%]. (FR-005, SC-002)
-- [ ] T045 [US1] Write the dev evidence: `python scripts/sts_eval.py --source phyco-v2 --set dev
+- [X] T045 [US1] Write the dev evidence: `python scripts/sts_eval.py --source phyco-v2 --set dev
   --out reports/002-core-dynamics-redesign/dev/dev-final.json`. Also run `--source lut-v1 --set
   dev`, which must fail at least one family (to show the harness can discriminate). This is
   **not** an acceptance result. (Quickstart M3) (FR-015, SC-006; Principle IV)
