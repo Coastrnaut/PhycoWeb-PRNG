@@ -14,7 +14,7 @@ from typing import Callable, Iterator, List, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 FLOAT_V0_PATH = ROOT / "baseline" / "float-v0" / "readmee_model.py"
 
-MODELS = ("float-v0", "lut-v1")
+MODELS = ("float-v0", "lut-v1", "phyco-v2")
 
 
 def load_float_v0():
@@ -50,6 +50,13 @@ def word_source(model: str, seed: Sequence[int]) -> Callable[[], int]:
 
         assert MODEL_ID == model
         return PhycoWebEngine(list(seed)).compute_block
+    if model == "phyco-v2":
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        from phycoweb.model_v2 import MODEL_ID as V2_ID, PhycoWebEngineV2
+
+        assert V2_ID == model
+        return PhycoWebEngineV2(list(seed)).compute_block
     raise ValueError(f"unknown model {model!r}")
 
 
