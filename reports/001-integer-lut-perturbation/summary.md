@@ -2,6 +2,29 @@
 
 **Feature**: 001-integer-lut-perturbation | **Date**: 2026-10-28 | **Tool**: nistrng 1.2.3 via `scripts/nist_eval.py` | **Sample**: 1,000,000 bits per run, MSB-first per 32-bit word
 
+> **Erratum (2026-10-28, approved by the owner; feature 002 research R1).** The harness used
+> here, nistrng 1.2.3, was found to be defective after this summary was approved. On sequences
+> of 2²¹ bits taken directly from `os.urandom`, it gave:
+>
+> - **Linear Complexity**: p = 0.0 on 5 of 5 sequences (N8).
+> - **Random Excursion**: p = 0.0 on 39 of 40 sub-tests (N6).
+> - **Overlapping Template**: p = 0.0 on 5 of 5 sequences (N5).
+> - **Maurer's Universal**: p ≈ 0.998 every time (N7).
+> - **Non-Overlapping Template**: divides by the variance squared, so p = 1.0 always (N4).
+>
+> Therefore:
+>
+> - The Linear Complexity and Random Excursion failures below, in every run, say **nothing**
+>   about either model.
+> - The Maurer's Universal and Non-Overlapping Template passes are also **uninformative**.
+> - The other lut-v1 failures with seed 1024… (Monobit, Frequency Within Block, Approximate
+>   Entropy, Cumulative Sums) were in tests that behaved normally on urandom input. They still
+>   stand, but they are unconfirmed.
+>
+> The defects were observed at 2²¹ bits, not at the 10⁶ bits used here. The four inputs will
+> be re-scored with the feature-002 harness, and the results added here as a re-score table.
+> The original text below is left unchanged as the approved record.
+
 Source records: the four `nist_*.json` files in this directory. Values below are copied from them, rounded to 6 decimals. `p_value` is the smallest of a test's p-values; status is nistrng's verdict (every p-value ≥ 0.01).
 
 ## Seed 1024, 2048, 4096, 8192
