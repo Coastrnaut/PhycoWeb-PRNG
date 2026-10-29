@@ -1,0 +1,22 @@
+{
+ "attempt": 1,
+ "roles": {
+  "positive": {
+   "identical": true,
+   "differing_fields": [],
+   "verdict": "pass"
+  },
+  "negative": {
+   "identical": true,
+   "differing_fields": [],
+   "verdict": "fail"
+  },
+  "candidate": {
+   "identical": true,
+   "differing_fields": [],
+   "verdict": "pass"
+  }
+ },
+ "date": "2026-10-28T22:30:15",
+ "identical": true
+}
