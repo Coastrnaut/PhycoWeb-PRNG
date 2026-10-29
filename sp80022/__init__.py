@@ -14,7 +14,7 @@ from .assess import assess
 from .special import TestResult
 from .tests_template import templates
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = ["battery", "templates", "assess", "source_sha256", "tests", "TestResult",
            "__version__"]
