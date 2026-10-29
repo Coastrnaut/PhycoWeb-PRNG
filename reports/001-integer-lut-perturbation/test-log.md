@@ -75,3 +75,23 @@ Summary: `reports/001-integer-lut-perturbation/summary.md`.
 | quickstart 6 | 4 × `nist_eval.py` into a scratch directory, compared with the committed reports (excluding `elapsed_ms`, `git_head`, `git_dirty`, `command`, `versions`) | all 4 reproduced exactly |
 
 `git status` after steps 1–5 showed no changes under `baseline/`, `vectors/`, `data/` or `phycoweb/`.
+
+## T019: second environment (2026-10-28)
+
+Environment: Ubuntu 26.04.1 LTS under WSL2 (`Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43`) |
+Python 3.14.4 | numpy 2.5.4 | scipy 1.18.1 | nistrng 1.2.3. Venv `~/.venvs/phycoweb`; same working tree
+(`/mnt/c/GIT/PhycoWeb-PRNG`); `PYTHONDONTWRITEBYTECODE=1`. Run by Claude Code through `wsl.exe` at the owner's request.
+
+| Command | Result |
+|---------|--------|
+| `pip install -r requirements.txt` | exit 0 |
+| `python -W ignore -m unittest discover -s tests -v` | Ran 31 tests — OK |
+| `python scripts/gen_vectors.py --model lut-v1 --seed 1024 2048 4096 8192 --count 10000 --verify vectors/lut-v1_seed-1024-2048-4096-8192_10000.hex` | exit 0; OK 10000 words |
+| `python scripts/gen_vectors.py --model float-v0 ... --verify vectors/float-v0_...hex` (optional) | exit 0; OK 10000 words, so the float-v0 baseline also reproduces on this platform (analysis finding A2) |
+| `python scripts/gen_lut.py --check` | exit 0 |
+
+**SC-002: PASSED.** Identical golden vectors on Windows 11 / Python 3.10.11 / numpy 2.2.6 and
+Ubuntu 26.04 (WSL2) / Python 3.14.4 / numpy 2.5.4.
+
+Limitation: both environments run on the same x86-64 machine and share one working tree. The
+OS, C library, Python and numpy versions all differ, but the CPU architecture does not.
