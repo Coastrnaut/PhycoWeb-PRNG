@@ -56,3 +56,38 @@ sequence count, or loosen a threshold.
   Same environment: identical. WSL vs Windows: verdicts identical, p-values within 3.1e-13.
 - **T023 timing**: 1.44 s per sequence (nistrng: 128 s), and 60 s for 100 sequences on 32
   workers. See [harness/timing.json](./harness/timing.json).
+
+## Entry 2: 2026-10-28, harness `sp80022` 1.0.0 (validated; frozen pending review T030)
+
+- **Changes since 0.1.0** (made during T010, T011 and T021–T028; research R11):
+  - `sp800-22-fidelity`: Longest Run with M = 8 uses the exact π = 55/256, 94/256, 59/256 and
+    48/256 instead of the 4-decimal printed values, which reproduce the §2.4.8 example.
+    No effect at n = 2²¹, which uses M = 10000.
+  - `sp800-22-fidelity`: Universal always applies the c(L, K) correction, as in the §2.9.8
+    example. The unused `variance_correction` option was removed. Its default was already the
+    correction, so evaluator output does not change.
+  - Version bumped from 0.1.0 to 1.0.0. Source SHA-256
+    `1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700`.
+- **Decisions recorded, with no code change** (R11):
+  - Overlapping Template keeps the Rev. 1a π (§2.8.4, §3.8). STS 2.1.2 and the published
+    example values use the older Poisson π. At n = 2²¹, the old π would make random data fail
+    p < 0.01 on 1.23% of sequences instead of 1.00%. That is a calibration error, not extra
+    strictness.
+  - Linear Complexity keeps π₀ = 0.010417 (§2.10.4, §3.10). STS uses 0.01047. Effect: λ ≈ 0.001.
+  - Two document inconsistencies: §2.6.8 N₁, and the §2.14.8 state +1 entry. Our values agree
+    with Appendix B.
+- **Evidence**:
+  - `python -W ignore -m unittest discover -s tests -t .`: 80 tests OK, 3 skipped (G-SHA-1
+    examples; see R11).
+  - Worked examples (T010) and Appendix B (T011): 56 of 64 Appendix B values match directly. The
+    other 8 (OTM and LC) match when recomputed from our counts with the published constants.
+  - [harness/oracle-compare.md](./harness/oracle-compare.md): sp80022 vs NIST STS 2.1.2 on
+    π, e, √2, √3, SHA-1 and 10 cal-1 sequences. 0 mismatches at ±1e-6; largest difference
+    5.0e-7. Oracle build: [harness/sts-2.1.2.md](./harness/sts-2.1.2.md).
+  - `cal-1` re-scored with 1.0.0
+    ([harness/cal-1-rescore-1.0.0.json](./harness/cal-1-rescore-1.0.0.json)): sequences,
+    sub-tests, families, verdict, parameters and bytes are identical to `cal-1.json` (0.1.0).
+    So the T024 and T025 evidence carries over to 1.0.0.
+- **Statement (FR-014)**: this change removes no test or sub-test, does not shorten sequences,
+  does not reduce the sequence count, and does not loosen thresholds.
+- **Status**: validated. The harness becomes authoritative after owner review (T030).
