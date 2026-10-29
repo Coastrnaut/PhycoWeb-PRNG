@@ -1,0 +1,17 @@
+{
+ "attempt": 1,
+ "seed_set": "heldout-1",
+ "status": "draft",
+ "git_head": "5dd9308117c20d154d608f591657dd2598b6c6f7",
+ "model_id": "phyco-v2",
+ "model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+ "lut_sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3",
+ "design_version": "1.0",
+ "design_sha256": "a1109bf128732374efc6a5b68c43a54d037d2315362649c41b4522122c7216f3",
+ "harness_version": "1.0.0",
+ "harness_sha256": "1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700",
+ "warmup": 256,
+ "dev_evidence": "reports/002-core-dynamics-redesign/dev/dev-final.json",
+ "approved_by": "Coastrnaut (repository owner; approved in session, recorded by the agent)",
+ "approved_on": "2026-10-28"
+}
