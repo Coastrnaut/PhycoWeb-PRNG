@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Approved for planning (2026-10-28); result review pending
+**Status**: Complete (result review approved 2026-10-28)
 
 **Implementation status**: Reference model complete; RTL-pending (Constitution Principle II).
 
@@ -46,7 +46,7 @@ until a human reviewer approves it below.
 | Gate | Reviewer | Date | Decision | Notes |
 |------|----------|------|----------|-------|
 | Spec approval (algorithm change) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session after the v1.1.0 revision |
-| Result review (golden vectors + NIST results) | _pending_ | _pending_ | _pending_ | Required before the feature is declared complete |
+| Result review (golden vectors + NIST results) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session after reviewing summary.md and phase-report.md; redesign continues in spec 002 |
 
 ## User Scenarios & Testing *(mandatory)*
 
