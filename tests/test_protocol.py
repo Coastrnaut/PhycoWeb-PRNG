@@ -1,6 +1,9 @@
 """Protocol tests for feature 002: seed sets (FR-015, SC-006, data-model section 2)."""
 import hashlib
+import subprocess
+import sys
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from protocol import seedsets
@@ -55,6 +58,25 @@ class TestSeedSets(unittest.TestCase):
     def test_unknown_set_rejected(self):
         with self.assertRaises(ValueError):
             seedsets.load("heldout-4", allow={"heldout-4"})
+
+
+class TestExploreGuard(unittest.TestCase):
+    """explore.py refuses held-out seed sets and logs nothing (T032; SC-006)."""
+
+    ROOT = Path(__file__).resolve().parents[1]
+    RUNS = ROOT / "research" / "002" / "runs.jsonl"
+
+    def _runs(self):
+        return self.RUNS.read_bytes() if self.RUNS.exists() else None
+
+    def test_heldout_refused(self):
+        for name in ("heldout-1", "heldout-2", "heldout-3", "nonsense"):
+            before = self._runs()
+            proc = subprocess.run([sys.executable, str(self.ROOT / "research" / "002" / "explore.py"),
+                                   "--variant", "any", "--set", name],
+                                  capture_output=True, text=True, cwd=self.ROOT)
+            self.assertEqual(proc.returncode, 2, name)
+            self.assertEqual(self._runs(), before, name)
 
 
 if __name__ == "__main__":
