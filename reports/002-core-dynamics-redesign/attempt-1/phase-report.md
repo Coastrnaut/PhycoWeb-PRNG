@@ -75,3 +75,7 @@ None new. The OS CSPRNG is used only as the positive control. The disclaimer is 
 ## Recommendation
 
 **Proceed** to Phase 6 (T057–T061) after the owner's result review (T055).
+
+## Disclaimer
+
+Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts.
