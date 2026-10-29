@@ -2,3 +2,4 @@
 * text=auto
 baseline/** -text
 *.hex text eol=lf
+*.bin binary
