@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Draft — awaiting human review (Constitution Principle VIII)
+**Status**: Approved for planning (2026-10-28); design-freeze and result reviews pending
 
 **Input**: User description: "Redesign the PhycoWeb-PRNG core dynamics so the integer reference
 model passes the NIST SP 800-22 battery under acceptance rules that are fixed before any tuning.
@@ -18,8 +18,15 @@ as cryptographic security."
 
 Feature 001 produced `lut-v1`, an integer-only reference model. Its NIST SP 800-22 screening
 (single sequence of 10⁶ bits per seed) failed Linear Complexity and Random Excursion in every run,
-and failed up to six tests with one seed. Feature 001 also recorded structural defects that this
-feature addresses:
+and failed up to six tests with one seed.
+
+> **Note (2026-10-28, added during planning; it changes no requirement).** The Linear Complexity
+> and Random Excursion failures above come from defects in nistrng 1.2.3. That tool fails these
+> tests even on OS cryptographic random data (research R1, N6 and N8), so the failures say
+> nothing about lut-v1. The other lut-v1 failures are unconfirmed until re-scored with the
+> feature-002 harness. See the erratum in `reports/001-integer-lut-perturbation/summary.md`.
+
+Feature 001 also recorded structural defects that this feature addresses:
 
 - the flux stage multiplies two state variables, conflicting with the multiplierless rule
   (Open Issue 1);
@@ -35,7 +42,8 @@ Acceptance Protocol"). After approval, those rules may only be made stricter, ne
 
 | Gate | Reviewer | Date | Decision | Notes |
 |------|----------|------|----------|-------|
-| Spec approval (algorithm change + acceptance protocol) | _pending_ | _pending_ | _pending_ | Required before any tuning run |
+| Spec approval (algorithm change + acceptance protocol) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session; protocol frozen as written, may only become stricter |
+| Spec amendment 1 (protocol clarification, stricter only) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session (analysis findings I1, I2). Changes: a failed positive control halts the attempt before the candidate is evaluated, and the set counts as used (Edge Cases, FR-017); proportion **or** uniformity failures count toward k_max. Made before any result was produced |
 | Design freeze (before each held-out attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
 | Result review | _pending_ | _pending_ | _pending_ | Required before the feature is declared complete |
 
@@ -130,9 +138,10 @@ of harness rules against the list of permitted changes.
 - **Seed with all-equal values** (e.g., `[0,0,0,0]`) must not produce a constant or short-cycle
   output. Development checks include such seeds.
 - **Positive control fails by chance**: About 1 in 5 attempts with a perfect generator fail at
-  least one test under this protocol (see Assumptions). If the control fails, the result is inconclusive and the
-  protocol must be reviewed by amendment **before** the candidate's results for that held-out
-  set are revealed.
+  least one test under this protocol (see Assumptions). If the positive control fails, the
+  attempt is **INCONCLUSIVE** and **halts before the candidate is generated or scored**. The
+  negative control is still evaluated and reported. The held-out set counts as used. Any
+  protocol amendment is made, and approved, before the next attempt. *(Amendment 1, 2026-10-28.)*
 
 ## Requirements *(mandatory)*
 
@@ -189,8 +198,9 @@ of harness rules against the list of permitted changes.
   source hash, the design document version and the harness version are recorded, and the owner
   approves the freeze.
 - **FR-017**: Each held-out attempt MUST use the next unused held-out set, exactly once. The
-  positive control MUST be evaluated first, then the negative control, then the candidate. All
-  three results MUST be reported whatever the outcome.
+  positive control MUST be evaluated first, then the negative control, then the candidate. Every
+  result that was produced MUST be reported whatever the outcome. If the positive control fails,
+  the candidate is not evaluated (see Edge Cases). *(Amendment 1.)*
 - **FR-018**: At most three held-out attempts are allowed (sets 1–3). Results of every attempt,
   including failed ones, MUST be kept and reported.
 - **FR-019**: All reports MUST state that passing SP 800-22 does not show cryptographic security,
@@ -244,6 +254,9 @@ generator with m′ = 100:
 
 If m′ < 100 for a test, k_max and the proportion bound are recomputed with the same formulas for
 that m′.
+
+A sub-test **fails** if it fails the proportion criterion **or** the uniformity criterion. Both
+kinds of failure count toward k_max. *(Amendment 1: clarification, using the stricter reading.)*
 
 **Overall verdict.**
 - **PASS**: all 15 tests pass, the positive control passes, and the negative control fails.
@@ -303,5 +316,7 @@ that m′.
 - **Feature 001 artifacts** (`lut-v1` model, vectors, archive) stay unchanged. The redesign is a
   new model id (`phyco-v2`), and `lut-v1` is kept as the negative control.
 - Failing the protocol is a valid, reportable outcome of this feature.
-- **Out of scope**: RTL implementation, cryptographic analysis, and correcting the README's
-  "cryptographically secure" wording (tracked separately).
+- **Out of scope**: RTL implementation and cryptographic analysis. The README's unsupported
+  claims ("cryptographically secure", "high-entropy", "Crypto Whitening Box", "validated … ready
+  for deployment") were corrected on 2026-10-28 at the owner's request, separately from this
+  feature's requirements. The file was renamed from `readmee.md` to `README.md` the same day.
