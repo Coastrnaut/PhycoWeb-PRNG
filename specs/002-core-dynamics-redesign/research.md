@@ -9,7 +9,7 @@ The defect IDs continue the series from feature 001 (N1–N3, in
 
 **Finding.** While sizing the harness, each nistrng test was run on sequences of 2²¹ bits taken
 directly from `os.urandom`. An ideal source should give p-values spread evenly over [0, 1].
-Five of the 15 tests do not:
+Six of the 15 tests do not:
 
 | ID | Test | Observed on urandom input | Effect |
 |----|------|---------------------------|--------|
@@ -18,6 +18,7 @@ Five of the 15 tests do not:
 | N6 | Random Excursion | p = 0.0 on 39 of 40 sub-tests across 5 sequences (one was 0.0006) | Always fails |
 | N7 | Maurer's Universal | p between 0.9979 and 0.9989 on 5/5 sequences | Fails uniformity |
 | N8 | Linear Complexity | p = 0.0 on 5/5 sequences | Always fails |
+| N9 | Random Excursion Variant | p-values **above 1** (up to 1.68): on 2 of 4 sequences in the first run and 4 of 4 in the recorded run. Found on 2026-10-28 while running `scripts/repro_nistrng_defects.py` (T008) | Not a valid p-value, so its passes are uninformative |
 
 Method: nistrng 1.2.3 on Windows / Python 3.10.11 / numpy 2.2.6. Each test was run on its own
 copy, with `random.seed(0)`, and all `_score_list` p-values were read. The check is
@@ -29,7 +30,8 @@ measuring the input.
 **Consequence for feature 001.** Every feature-001 run failed Linear Complexity and Random
 Excursion. N6 and N8 show that those failures say nothing about either model. The other failures
 (lut-v1, seed 1024: 4 more tests) were in tests that behaved normally on urandom here, so they
-still stand, but they are unconfirmed until rerun with the new harness. The feature-001 reports
+still stand, but they are unconfirmed until rerun with the new harness. The Random Excursion
+Variant passes are uninformative too (N9). The feature-001 reports
 are approved records and stay unchanged. The plan adds an **erratum** to
 `reports/001-integer-lut-perturbation/summary.md` once the owner approves (Principle VIII). The
 new harness then re-scores the four feature-001 inputs (task in /speckit-tasks).
