@@ -100,3 +100,7 @@ expansions) match when recomputed from our counts with the constants NIST used (
   entry under FR-014;
 - decisions 4.1 and 4.2 (the Rev. 1a constants) are accepted;
 - Phase 4 (design exploration, T031 onward) may start.
+
+## Disclaimer
+
+Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts.
