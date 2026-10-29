@@ -223,3 +223,42 @@ These are inputs to exploration. The frozen design is decided in design.md, not 
   design document must show that the update is the slime-mold dynamics and not a renamed
   standard generator. The owner judges this at freeze.
 - **Risk**: no direction is known to pass. FAIL is a valid outcome (spec, Assumptions).
+
+## R11. Reference constants and document inconsistencies found during validation
+
+Found while transcribing the SP 800-22 Rev. 1a examples (T010, T011) and comparing with NIST STS
+2.1.2 (T028). In every case below, **our counts match the published counts exactly**. The
+differences are in the reference constants, or in the document itself.
+
+- **Overlapping Template π (OTM)**: the §2.8.8 example and the Appendix B OTM values were computed
+  with the old Poisson-based π = 0.367879, 0.183940, 0.137955, 0.099634, 0.069935, 0.140657.
+  STS 2.1.2 still uses them: `overlappingTemplateMatchings.c` overwrites its Rev. 1a table with
+  `Pr(u, η)`. The Rev. 1a text (§3.8) gives π = 0.364091, 0.185659, 0.139381, 0.100571,
+  0.070432, 0.139865.
+  - Empirical check, 4 × 10⁶ urandom blocks (M = 1032): the old π gives χ² = 337
+    (p ≈ 1e-70), while Rev. 1a gives χ² = 2.75 (p = 0.74).
+  - At n = 2²¹ (N = 2032), the old π gives noncentrality λ ≈ 0.176. Random data would then fail
+    at p < 0.01 on 1.23% of sequences instead of 1.00%.
+  - **Decision**: the harness keeps the Rev. 1a π. They are the published values and the
+    correct distribution. The old π raises the false-failure rate on random input; that is a
+    calibration error, not extra strictness. The validation tests recompute with the old π only
+    to reproduce the published numbers.
+- **Linear Complexity π₀**: the published values (§2.10.8, Appendix B) and STS use
+  π₀ = 0.01047, so the seven π values sum to 1.000053. The text gives 0.010417 (= 1/96, to 6
+  places), so the π values sum to 1. **Decision**: keep 0.010417. At N = 4194, λ ≈ 0.001, so
+  the effect is negligible.
+- **Longest Run, M = 8**: SP 800-22 prints π rounded to 4 decimals. The exact values 55/256,
+  94/256, 59/256 and 48/256 reproduce the §2.4.8 example, so the harness uses them. This changes
+  nothing at n = 2²¹, where M = 10000.
+- **Universal**: the §2.9.8 example applies the c(L, K) correction (c = 0.591311), so the
+  correction is always used. The test has no option to turn it off.
+- **Document inconsistencies, where our value agrees with Appendix B**:
+  - §2.6.8 DFT example: the text reports N₁ = 46, but the given input yields 48. Our DFT values
+    match Appendix B on all four expansions.
+  - §2.14.8 Random Excursions example: the table for states +1…+4 contradicts Appendix B for
+    state +1. Our value matches Appendix B.
+- **Skipped examples**: the §2.7.8 and §2.9.8 examples need G-SHA-1 generator output, which is
+  not reproduced here. Appendix B example 3 (STS `data.sha1`) is covered by T028 instead.
+- **Cumulative Sums tolerance**: for e, the Appendix B values differ from ours by up to 7e-7.
+  This comes from the normal-CDF routine STS uses, so the Appendix B comparison uses ±1e-6. The
+  STS comparison (T028) agrees within 5e-7 on every input.
