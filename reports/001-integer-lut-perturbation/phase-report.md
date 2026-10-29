@@ -1,7 +1,7 @@
 # Phase Report: 001-integer-lut-perturbation (implementation)
 
 **Date**: 2026-10-28 | **Constitution**: v1.1.0 (Phase Completion Reporting) | **Status**: implementation
-complete on one environment; **SC-002 open (T019)**; **result review pending (T027)**
+complete and verified on two environments; **result review pending (T027)**
 
 Exact commands and outputs are in [test-log.md](./test-log.md). Statistical results are in
 [summary.md](./summary.md).
@@ -35,7 +35,7 @@ Exact commands and outputs are in [test-log.md](./test-log.md). Statistical resu
 | FR-013 | ✅ | `baseline/float-v0/MANIFEST.json`; `test_baseline` |
 | FR-014 | ✅ | `vectors/float-v0_…hex` (first word D6EDF3D6); float-v0 NIST records |
 | SC-001 | ✅ | `test_purity` |
-| SC-002 | ⏳ **OPEN** | Passed on Windows 11 / Python 3.10.11 only. Needs a second environment (T019, owner) |
+| SC-002 | ✅ | Identical vectors and 31/31 tests on Windows 11 / Python 3.10.11 / numpy 2.2.6 and on Ubuntu 26.04 (WSL2) / Python 3.14.4 / numpy 2.5.4 (T019, test-log.md). Same CPU architecture in both |
 | SC-003 | ✅ | `test_period` (1,280 steps; no shorter period) |
 | SC-004 | ✅ | `test_lut` truncation/magnitude test |
 | SC-005 | ✅ | `summary.md` reports all 15 tests per run, including failures and one not-eligible test |
@@ -70,7 +70,8 @@ Exact commands and outputs are in [test-log.md](./test-log.md). Statistical resu
 
 ## Open issues
 
-- **SC-002 / T019**: needs a second environment (owner action).
+- **SC-002 / T019**: closed. Both environments share one x86-64 CPU, so a different
+  architecture (e.g. ARM) has not been tested.
 - **T027**: owner result review (Principle VIII).
 - Spec Open Issues 1–5 are unchanged, and two are reinforced:
   - **1. Flux multiplier**: still present. It conflicts with Principle I and the 0-DSP target.
@@ -112,9 +113,7 @@ Exact commands and outputs are in [test-log.md](./test-log.md). Statistical resu
 
 The feature's goal is met on this environment: an integer-only, fully specified reference model,
 bit-exact with the archived model apart from the perturbation source, with RTL-ready table data.
-Before closing:
-1. run T019 on a second environment;
-2. complete the T027 result review.
+Before closing, complete the T027 result review. T019 passed on Ubuntu/WSL2 on 2026-10-28.
 
 Then, before any RTL work, address Open Issues 1 and 4 and the README security claim in new
 specs. The statistical failures (Linear Complexity in all runs) suggest the core dynamics, not
