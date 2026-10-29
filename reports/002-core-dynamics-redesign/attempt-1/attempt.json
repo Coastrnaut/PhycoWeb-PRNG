@@ -1,0 +1,38 @@
+{
+ "attempt": 1,
+ "seed_set": "heldout-1",
+ "freeze_sha256": "fb1be3dba203d154d9af8a1f3b4a467ddefe5988fafac6b10d989c16a4d45a01",
+ "order": [
+  {
+   "role": "positive",
+   "start": "2026-10-28T22:26:57",
+   "end": "2026-10-28T22:28:05"
+  },
+  {
+   "role": "negative",
+   "start": "2026-10-28T22:28:05",
+   "end": "2026-10-28T22:29:02"
+  },
+  {
+   "role": "candidate",
+   "start": "2026-10-28T22:29:02",
+   "end": "2026-10-28T22:29:58"
+  }
+ ],
+ "started": "2026-10-28T22:26:57",
+ "finished": "2026-10-28T22:29:58",
+ "positive": {
+  "record": "eval-positive.json",
+  "verdict": "pass"
+ },
+ "negative": {
+  "record": "eval-negative.json",
+  "verdict": "fail"
+ },
+ "candidate": {
+  "record": "eval-candidate.json",
+  "verdict": "pass"
+ },
+ "overall": "PASS",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}
