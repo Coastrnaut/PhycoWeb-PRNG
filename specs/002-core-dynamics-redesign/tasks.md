@@ -461,10 +461,10 @@ attempt record exists, and re-scoring it gives identical results.
 - [X] T053 [US2] ⛔ **Owner design-freeze approval for attempt 1.** The owner fills in
   `approved_by` and `approved_on` in `freeze.json`. Add a "Design freeze 1" row to spec.md under
   Review & Approval. (FR-016)
-- [ ] T054 [US2] Run `python scripts/acceptance.py --attempt 1 --workers 32`. Then run `python
+- [X] T054 [US2] Run `python scripts/acceptance.py --attempt 1 --workers 32`. Then run `python
   scripts/rescore_attempt.py --attempt 1`. Report the verdict as-is, whatever it is. (SC-003,
   SC-004)
-- [ ] T055 [US2] ⛔ **Owner result review for attempt 1.** On PASS, go to Phase 6. On FAIL or
+- [X] T055 [US2] ⛔ **Owner result review for attempt 1.** On PASS, go to Phase 6. On FAIL or
   INCONCLUSIVE, the owner chooses one of:
   - (a) redesign: archive first (T056), bump the `design.md` version, return to T033 using **dev seeds only**, then
     T041–T045, then repeat T051–T056 for attempt 2 and then 3 (new freeze, next set);
