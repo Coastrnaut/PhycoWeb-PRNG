@@ -44,6 +44,7 @@ Acceptance Protocol"). After approval, those rules may only be made stricter, ne
 |------|----------|------|----------|-------|
 | Spec approval (algorithm change + acceptance protocol) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session; protocol frozen as written, may only become stricter |
 | Spec amendment 1 (protocol clarification, stricter only) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session (analysis findings I1, I2). Changes: a failed positive control halts the attempt before the candidate is evaluated, and the set counts as used (Edge Cases, FR-017); proportion **or** uniformity failures count toward k_max. Made before any result was produced |
+| Harness review (T030: `sp80022` 1.0.0 phase report) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session. Harness frozen at 1.0.0, source SHA-256 1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700; later changes need a change-log entry (FR-014). Decision: keep the Rev. 1a OTM π and LC π₀ = 0.010417 (research R11), not the STS 2.1.2 constants. Report: reports/002-core-dynamics-redesign/harness/phase-report.md |
 | Design freeze (before each held-out attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
 | Result review | _pending_ | _pending_ | _pending_ | Required before the feature is declared complete |
 
