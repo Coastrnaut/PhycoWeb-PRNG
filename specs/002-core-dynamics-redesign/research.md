@@ -233,7 +233,7 @@ differences are in the reference constants, or in the document itself.
 - **Overlapping Template π (OTM)**: the §2.8.8 example and the Appendix B OTM values were computed
   with the old Poisson-based π = 0.367879, 0.183940, 0.137955, 0.099634, 0.069935, 0.140657.
   STS 2.1.2 still uses them: `overlappingTemplateMatchings.c` overwrites its Rev. 1a table with
-  `Pr(u, η)`. The Rev. 1a text (§3.8) gives π = 0.364091, 0.185659, 0.139381, 0.100571,
+  `Pr(u, η)`. The Rev. 1a text (§2.8.4 step 4, §3.8) gives π = 0.364091, 0.185659, 0.139381, 0.100571,
   0.070432, 0.139865.
   - Empirical check, 4 × 10⁶ urandom blocks (M = 1032): the old π gives χ² = 337
     (p ≈ 1e-70), while Rev. 1a gives χ² = 2.75 (p = 0.74).
@@ -244,8 +244,8 @@ differences are in the reference constants, or in the document itself.
     calibration error, not extra strictness. The validation tests recompute with the old π only
     to reproduce the published numbers.
 - **Linear Complexity π₀**: the published values (§2.10.8, Appendix B) and STS use
-  π₀ = 0.01047, so the seven π values sum to 1.000053. The text gives 0.010417 (= 1/96, to 6
-  places), so the π values sum to 1. **Decision**: keep 0.010417. At N = 4194, λ ≈ 0.001, so
+  π₀ = 0.01047, so the seven π values sum to 1.000053. The text (§2.10.4 step 6, §3.10) gives 0.010417
+  (= 1/96, to 6 places), so the π values sum to 1. **Decision**: keep 0.010417. At N = 4194, λ ≈ 0.001, so
   the effect is negligible.
 - **Longest Run, M = 8**: SP 800-22 prints π rounded to 4 decimals. The exact values 55/256,
   94/256, 59/256 and 48/256 reproduce the §2.4.8 example, so the harness uses them. This changes
