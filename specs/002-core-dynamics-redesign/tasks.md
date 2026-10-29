@@ -402,14 +402,14 @@ attempt record exists, and re-scoring it gives identical results.
 
 ### Tests for User Story 2 (write first)
 
-- [ ] T046 [P] [US2] Write `tests/test_protocol.py::TestFreeze`. Use a temporary reports
+- [X] T046 [P] [US2] Write `tests/test_protocol.py::TestFreeze`. Use a temporary reports
   directory and patch the path roots. Check:
   - `freeze.py` writes `approved_by` and `approved_on` as empty strings;
   - it refuses if N is not the next attempt, if `attempt-N/` exists, or if the model, design or
     harness has uncommitted changes (mock the git status);
   - the hashes in the record equal the files' SHA-256.
   - (FR-016, data-model §3)
-- [ ] T047 [P] [US2] Write `tests/test_protocol.py::TestAcceptanceGuard`. `acceptance.py` exits
+- [X] T047 [P] [US2] Write `tests/test_protocol.py::TestAcceptanceGuard`. `acceptance.py` exits
   2 in each of these cases, without evaluating anything:
   - the freeze is missing;
   - the approval fields are empty;
@@ -422,10 +422,10 @@ attempt record exists, and re-scoring it gives identical results.
 
 ### Implementation for User Story 2
 
-- [ ] T048 [US2] Implement `protocol/freeze.py` (create, load and validate the freeze record
+- [X] T048 [US2] Implement `protocol/freeze.py` (create, load and validate the freeze record
   from data-model §3) and `scripts/freeze.py` per contracts/cli.md. T046 must pass. The tool
   never writes the approval fields. (FR-016)
-- [ ] T049 [US2] Implement `scripts/acceptance.py` per contracts/cli.md and research R8. T047
+- [X] T049 [US2] Implement `scripts/acceptance.py` per contracts/cli.md and research R8. T047
   must pass.
   - Steps:
     1. Validate the freeze.
@@ -448,7 +448,7 @@ attempt record exists, and re-scoring it gives identical results.
   - If the negative control passes: still run the candidate, report all three, and set the
     verdict to INCONCLUSIVE.
   - Exit 0 only for PASS. (FR-017, FR-018, SC-003)
-- [ ] T050 [US2] Write `scripts/rescore_attempt.py --attempt N`. It re-scores the saved control
+- [X] T050 [US2] Write `scripts/rescore_attempt.py --attempt N`. It re-scores the saved control
   bytes and regenerates both models from the recorded seeds, then asserts identical p-values and
   verdicts. (SC-004, quickstart A4)
 - [ ] T051 [US2] ⛔ **Owner commits** `phycoweb/model_v2.py`, `phycoweb/lut.py`, `design.md`,
