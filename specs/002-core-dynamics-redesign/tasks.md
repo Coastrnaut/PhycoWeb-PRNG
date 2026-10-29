@@ -451,14 +451,14 @@ attempt record exists, and re-scoring it gives identical results.
 - [X] T050 [US2] Write `scripts/rescore_attempt.py --attempt N`. It re-scores the saved control
   bytes and regenerates both models from the recorded seeds, then asserts identical p-values and
   verdicts. (SC-004, quickstart A4)
-- [ ] T051 [US2] ⛔ **Owner commits** `phycoweb/model_v2.py`, `phycoweb/lut.py`, `design.md`,
+- [X] T051 [US2] ⛔ **Owner commits** `phycoweb/model_v2.py`, `phycoweb/lut.py`, `design.md`,
   `sp80022/` and the phyco-v2 vectors, so `freeze.py` sees a clean tree and `git_head` identifies
   the frozen design. The agent never commits (Principle IX). Wait for confirmation.
   (FR-016, SC-006)
-- [ ] T052 [US2] Create `reports/002-core-dynamics-redesign/attempt-1/freeze.json` with `python
+- [X] T052 [US2] Create `reports/002-core-dynamics-redesign/attempt-1/freeze.json` with `python
   scripts/freeze.py --attempt 1 --dev-evidence reports/002-core-dynamics-redesign/dev/dev-final.json`.
   Present the record to the owner. (FR-016, SC-006)
-- [ ] T053 [US2] ⛔ **Owner design-freeze approval for attempt 1.** The owner fills in
+- [X] T053 [US2] ⛔ **Owner design-freeze approval for attempt 1.** The owner fills in
   `approved_by` and `approved_on` in `freeze.json`. Add a "Design freeze 1" row to spec.md under
   Review & Approval. (FR-016)
 - [ ] T054 [US2] Run `python scripts/acceptance.py --attempt 1 --workers 32`. Then run `python
