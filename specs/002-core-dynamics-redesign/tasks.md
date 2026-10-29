@@ -286,7 +286,7 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
 
 ### Exploration (dev seeds only)
 
-- [ ] T031 [US1] Create `research/002/explore.py`:
+- [X] T031 [US1] Create `research/002/explore.py`:
   - load a variant module from `research/002/variants/<id>.py` (same API as
     contracts/model-v2-api.md);
   - accept only `--set dev` or the `FEATURE001_SEEDS` (through `protocol.seedsets.load(allow=
@@ -297,9 +297,9 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
     writer of `runs.jsonl`. It refuses to run a variant whose file hash differs from the hash
     already logged for that id.
   - (FR-015, FR-005, SC-006; R9; Principle V)
-- [ ] T032 [P] [US1] Write `tests/test_protocol.py::TestExploreGuard`: `explore.py --set
+- [X] T032 [P] [US1] Write `tests/test_protocol.py::TestExploreGuard`: `explore.py --set
   heldout-1` exits 2 and appends nothing to `runs.jsonl`. (SC-006)
-- [ ] T033 [US1] Iterate on design variants in `research/002/variants/`, guided by research R10.
+- [X] T033 [US1] Iterate on design variants in `research/002/variants/`, guided by research R10.
   - Hard constraints on each variant:
     - FR-001 operations only: no `*`, `/`, `%` or `**`, and constant shift amounts only;
     - every value ≤ 32 bits with an explicit mask or wrap;
@@ -317,7 +317,7 @@ disruption rate in [1%, 50%], and dev evidence from the validated harness.
     owner rather than loosening anything.
   - Variant files are never edited or deleted once a run with them is logged (Principle V). A
     change creates a new variant id and file. `runs.jsonl` records each file's SHA-256.
-- [ ] T034 [US1] Write `specs/002-core-dynamics-redesign/design.md` (version 1.0) for the chosen
+- [X] T034 [US1] Write `specs/002-core-dynamics-redesign/design.md` (version 1.0) for the chosen
   variant:
   - state table (name, width, signedness, wrap rule, reset value);
   - seed → state derivation;
