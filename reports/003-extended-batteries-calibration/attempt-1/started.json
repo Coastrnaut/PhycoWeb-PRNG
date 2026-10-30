@@ -1,0 +1,7 @@
+{
+ "attempt": 1,
+ "seed_set": "heldout-1",
+ "started": "2026-10-30T08:54:16",
+ "freeze_sha256": "b440721a2bcba98edbe8ccde5a36e238536ea8f6b061f941b623dfec37bff548",
+ "git_head": "5b9fcfd5a6dd4635c42980190c98aec73482595a"
+}

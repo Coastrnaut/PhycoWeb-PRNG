@@ -1,0 +1,246 @@
+{
+ "words_per_seed": 1000000,
+ "rows": [
+  {
+   "model": "phyco-v2",
+   "seed": [
+    12132,
+    10603,
+    3424,
+    61301
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    63843,
+    59181,
+    33610,
+    3838
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    19376,
+    34627,
+    64453,
+    41041
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    28391,
+    757,
+    63086,
+    42482
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    60705,
+    7700,
+    38771,
+    43800
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    27488,
+    47329,
+    4974,
+    46066
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    33758,
+    65414,
+    58077,
+    39643
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    52722,
+    14883,
+    21889,
+    22913
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    14370,
+    29917,
+    2880,
+    19934
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "phyco-v2",
+   "seed": [
+    4618,
+    57077,
+    8491,
+    35819
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    12132,
+    10603,
+    3424,
+    61301
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    63843,
+    59181,
+    33610,
+    3838
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    19376,
+    34627,
+    64453,
+    41041
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    28391,
+    757,
+    63086,
+    42482
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    60705,
+    7700,
+    38771,
+    43800
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    27488,
+    47329,
+    4974,
+    46066
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    33758,
+    65414,
+    58077,
+    39643
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    52722,
+    14883,
+    21889,
+    22913
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    14370,
+    29917,
+    2880,
+    19934
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  {
+   "model": "lut-v1",
+   "seed": [
+    4618,
+    57077,
+    8491,
+    35819
+   ],
+   "words": 1000000,
+   "mismatches": 0,
+   "first_mismatch": null
+  }
+ ],
+ "all_match": true
+}

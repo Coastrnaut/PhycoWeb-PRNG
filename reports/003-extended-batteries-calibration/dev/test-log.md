@@ -49,3 +49,33 @@ rule-3 pattern also matched TestU01's legend lines "(eps means a value < 1.0e-30
 whenever any p-value is outside [0.001, 0.999] — a chance event for a good generator — and would
 have failed a good positive control. The pattern now matches only summary-table rows; a test
 covers the legend-only case. No held-out data was involved.
+
+## T016 stream equivalence and idle throughput (2026-10-29, after T008)
+
+`python -W ignore scripts/stream_equiv.py --binary fast/build/phyco_stream --set dev --out reports/003-extended-batteries-calibration/streams/equivalence.json`
+(WSL venv, Python 3.14.4, 25.4 s): golden vectors plus the first 10⁶ words of all 100 `dev`
+seeds for phyco-v2 and lut-v1; **200,030,000 words compared, all match** (SC-003). Binary
+`17f7c963…dc97ea`, source `1b46c952…e7c451`, LUT header `fb1e468b…c2dac0`.
+
+Idle throughput (`dev/timing.json`; one process at a time, 10⁹ words to `/dev/null`):
+
+| Generator | Words/s | Time for 1 TiB |
+|-----------|---------|----------------|
+| phyco-v2 | 8.5 × 10⁷ | 54 min |
+| lut-v1 | 7.1 × 10⁷ | 65 min |
+| os | 2.1 × 10⁸ | 22 min |
+
+phyco-v2 and lut-v1 are below the plan's 10⁸ words/s goal. The goal was set so the stream would
+not limit PractRand; whether it does is measured at T029 from the rehearsal timing.
+
+## T025 dev rehearsal (2026-10-29 22:42 to 2026-10-30 01:30)
+
+The first launch failed before any run started: Git Bash rewrote the `/mnt/c` script path, and
+the launcher exited 127. It was relaunched with `MSYS_NO_PATHCONV=1`. All 11 runs completed with
+exit 0. Results, S and timing are in `dev/phase-report.md`, `dev/S.json` and `dev/timing.json`.
+
+## T032 tests (2026-10-30)
+
+- Windows: `python -W ignore -m unittest tests.test_batteries tests.test_battery_protocol`:
+  40 OK.
+- WSL: the same, plus `tests.test_fast_stream`: 48 OK.

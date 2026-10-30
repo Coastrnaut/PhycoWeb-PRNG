@@ -1,0 +1,2248 @@
+{
+ "binary": "fast/build/phyco_stream",
+ "binary_sha256": "17f7c9638acfccdbecc2acb5031f2f825d74ef7930f65e451e55aba872dc97ea",
+ "stream_source_sha256": "1b46c952f4914ebb12a536237508b21adbfe945dcbcdf0e10d9d1143c0e7c451",
+ "lut_table_sha256": "fb1e468bd2834ce96be71b76ad63021fdcc561aa395864b96b9ecfcee1c2dac0",
+ "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+ "flags": "-O2 -std=c99 -Wall -Wextra -Werror",
+ "byte_order": "little-endian u32",
+ "reverse": "bit 0 <-> bit 31",
+ "golden": {
+  "phyco-v2_seed-56053-7029-30841-11050_10000.hex": {
+   "words": 10000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  "phyco-v2_seed-41278-32039-25293-40850_10000.hex": {
+   "words": 10000,
+   "mismatches": 0,
+   "first_mismatch": null
+  },
+  "lut-v1_seed-1024-2048-4096-8192_10000.hex": {
+   "words": 10000,
+   "mismatches": 0,
+   "first_mismatch": null
+  }
+ },
+ "dev": {
+  "phyco-v2": [
+   {
+    "seed": [
+     56053,
+     7029,
+     30841,
+     11050
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     41278,
+     32039,
+     25293,
+     40850
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     26646,
+     29351,
+     41158,
+     2166
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     64431,
+     13740,
+     24490,
+     23732
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     55083,
+     9191,
+     24019,
+     29168
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25260,
+     9736,
+     61635,
+     62284
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60721,
+     48669,
+     12285,
+     13564
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25370,
+     22088,
+     60637,
+     47809
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     6508,
+     62283,
+     14472,
+     27620
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     40526,
+     17896,
+     34909,
+     44222
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     24895,
+     14733,
+     26009,
+     36186
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     48664,
+     48971,
+     4267,
+     40654
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     57067,
+     16929,
+     37262,
+     62806
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     24052,
+     4191,
+     15230,
+     4471
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47443,
+     44598,
+     2667,
+     16853
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     32225,
+     53292,
+     33350,
+     62791
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     1863,
+     59143,
+     48349,
+     1491
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     44318,
+     48159,
+     19519,
+     37543
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39481,
+     48535,
+     11524,
+     21452
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47996,
+     3671,
+     55214,
+     45202
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     56124,
+     54830,
+     24321,
+     4481
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     46248,
+     23647,
+     14685,
+     19540
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28643,
+     65317,
+     58643,
+     61548
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     9052,
+     38155,
+     20818,
+     47887
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     23448,
+     65100,
+     10275,
+     51613
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     22034,
+     42079,
+     2192,
+     29669
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     48843,
+     22783,
+     6768,
+     64463
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     15168,
+     39027,
+     33401,
+     39125
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     53380,
+     28920,
+     12782,
+     26664
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     5198,
+     53484,
+     31463,
+     47047
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28014,
+     58347,
+     43585,
+     29283
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     65140,
+     33649,
+     43614,
+     55857
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2493,
+     22022,
+     21350,
+     49686
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     42055,
+     3498,
+     17323,
+     57326
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     5434,
+     46101,
+     18571,
+     14350
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     6764,
+     63857,
+     39477,
+     21299
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7493,
+     29657,
+     56476,
+     13418
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     29725,
+     37152,
+     10772,
+     55719
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     16328,
+     55073,
+     61764,
+     39467
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     58573,
+     44215,
+     3104,
+     49400
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25352,
+     61352,
+     34414,
+     8427
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     34092,
+     33305,
+     19431,
+     7878
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     44641,
+     58928,
+     1834,
+     51395
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     20816,
+     36924,
+     47265,
+     56075
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     19088,
+     8880,
+     50006,
+     33138
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17194,
+     36329,
+     35291,
+     31838
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     55319,
+     8076,
+     48764,
+     64661
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     11061,
+     59359,
+     60297,
+     49168
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     51221,
+     47910,
+     59420,
+     29306
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     56389,
+     41902,
+     47999,
+     60230
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     40053,
+     3873,
+     6774,
+     64059
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     46418,
+     19280,
+     22353,
+     44504
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     8414,
+     29730,
+     16552,
+     63965
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     61454,
+     43500,
+     26268,
+     40630
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     31215,
+     54026,
+     54240,
+     10984
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47453,
+     14020,
+     13608,
+     5421
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     11707,
+     29187,
+     21683,
+     37574
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     58663,
+     23966,
+     23118,
+     58966
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27284,
+     30839,
+     14200,
+     49730
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2315,
+     16337,
+     24177,
+     19817
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     4097,
+     62578,
+     52301,
+     33650
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27553,
+     60515,
+     44805,
+     20282
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17851,
+     43273,
+     30041,
+     2363
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39706,
+     4115,
+     54530,
+     28240
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     63719,
+     29603,
+     56100,
+     23186
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     288,
+     17327,
+     51872,
+     44825
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     42835,
+     21637,
+     42940,
+     55822
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28211,
+     8715,
+     64086,
+     62993
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     584,
+     45489,
+     54780,
+     18292
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27341,
+     29742,
+     1982,
+     27669
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60193,
+     8388,
+     63820,
+     24837
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2868,
+     61812,
+     36154,
+     44601
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47996,
+     50477,
+     10625,
+     38956
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     30642,
+     50491,
+     34156,
+     44599
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     52357,
+     62297,
+     29003,
+     39068
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     37930,
+     30950,
+     53880,
+     39790
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60192,
+     42041,
+     31770,
+     39483
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     31219,
+     25219,
+     4591,
+     15451
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39869,
+     4148,
+     17937,
+     36508
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     22939,
+     12552,
+     48476,
+     24167
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     23104,
+     15261,
+     5287,
+     36021
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     14701,
+     32964,
+     52391,
+     22656
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     61390,
+     41382,
+     39995,
+     42421
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     64068,
+     6892,
+     16605,
+     8384
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7274,
+     2910,
+     26390,
+     13095
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39896,
+     45598,
+     15449,
+     64880
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     50845,
+     23464,
+     39700,
+     60112
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     26060,
+     33805,
+     18478,
+     25564
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     15771,
+     38456,
+     60112,
+     15130
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     59251,
+     11793,
+     24637,
+     57607
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7579,
+     49182,
+     6398,
+     47065
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     53427,
+     33172,
+     2593,
+     16378
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17231,
+     56339,
+     20825,
+     16771
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     4601,
+     40815,
+     39040,
+     11265
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27414,
+     53005,
+     64326,
+     10034
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     33414,
+     19554,
+     27805,
+     56548
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     50713,
+     43800,
+     2666,
+     51763
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     20548,
+     58400,
+     41715,
+     62319
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     51199,
+     29805,
+     10246,
+     10267
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     14088,
+     56628,
+     45655,
+     954
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   }
+  ],
+  "lut-v1": [
+   {
+    "seed": [
+     56053,
+     7029,
+     30841,
+     11050
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     41278,
+     32039,
+     25293,
+     40850
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     26646,
+     29351,
+     41158,
+     2166
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     64431,
+     13740,
+     24490,
+     23732
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     55083,
+     9191,
+     24019,
+     29168
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25260,
+     9736,
+     61635,
+     62284
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60721,
+     48669,
+     12285,
+     13564
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25370,
+     22088,
+     60637,
+     47809
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     6508,
+     62283,
+     14472,
+     27620
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     40526,
+     17896,
+     34909,
+     44222
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     24895,
+     14733,
+     26009,
+     36186
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     48664,
+     48971,
+     4267,
+     40654
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     57067,
+     16929,
+     37262,
+     62806
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     24052,
+     4191,
+     15230,
+     4471
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47443,
+     44598,
+     2667,
+     16853
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     32225,
+     53292,
+     33350,
+     62791
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     1863,
+     59143,
+     48349,
+     1491
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     44318,
+     48159,
+     19519,
+     37543
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39481,
+     48535,
+     11524,
+     21452
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47996,
+     3671,
+     55214,
+     45202
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     56124,
+     54830,
+     24321,
+     4481
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     46248,
+     23647,
+     14685,
+     19540
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28643,
+     65317,
+     58643,
+     61548
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     9052,
+     38155,
+     20818,
+     47887
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     23448,
+     65100,
+     10275,
+     51613
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     22034,
+     42079,
+     2192,
+     29669
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     48843,
+     22783,
+     6768,
+     64463
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     15168,
+     39027,
+     33401,
+     39125
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     53380,
+     28920,
+     12782,
+     26664
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     5198,
+     53484,
+     31463,
+     47047
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28014,
+     58347,
+     43585,
+     29283
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     65140,
+     33649,
+     43614,
+     55857
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2493,
+     22022,
+     21350,
+     49686
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     42055,
+     3498,
+     17323,
+     57326
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     5434,
+     46101,
+     18571,
+     14350
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     6764,
+     63857,
+     39477,
+     21299
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7493,
+     29657,
+     56476,
+     13418
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     29725,
+     37152,
+     10772,
+     55719
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     16328,
+     55073,
+     61764,
+     39467
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     58573,
+     44215,
+     3104,
+     49400
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     25352,
+     61352,
+     34414,
+     8427
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     34092,
+     33305,
+     19431,
+     7878
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     44641,
+     58928,
+     1834,
+     51395
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     20816,
+     36924,
+     47265,
+     56075
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     19088,
+     8880,
+     50006,
+     33138
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17194,
+     36329,
+     35291,
+     31838
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     55319,
+     8076,
+     48764,
+     64661
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     11061,
+     59359,
+     60297,
+     49168
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     51221,
+     47910,
+     59420,
+     29306
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     56389,
+     41902,
+     47999,
+     60230
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     40053,
+     3873,
+     6774,
+     64059
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     46418,
+     19280,
+     22353,
+     44504
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     8414,
+     29730,
+     16552,
+     63965
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     61454,
+     43500,
+     26268,
+     40630
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     31215,
+     54026,
+     54240,
+     10984
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47453,
+     14020,
+     13608,
+     5421
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     11707,
+     29187,
+     21683,
+     37574
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     58663,
+     23966,
+     23118,
+     58966
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27284,
+     30839,
+     14200,
+     49730
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2315,
+     16337,
+     24177,
+     19817
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     4097,
+     62578,
+     52301,
+     33650
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27553,
+     60515,
+     44805,
+     20282
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17851,
+     43273,
+     30041,
+     2363
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39706,
+     4115,
+     54530,
+     28240
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     63719,
+     29603,
+     56100,
+     23186
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     288,
+     17327,
+     51872,
+     44825
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     42835,
+     21637,
+     42940,
+     55822
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     28211,
+     8715,
+     64086,
+     62993
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     584,
+     45489,
+     54780,
+     18292
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27341,
+     29742,
+     1982,
+     27669
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60193,
+     8388,
+     63820,
+     24837
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     2868,
+     61812,
+     36154,
+     44601
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     47996,
+     50477,
+     10625,
+     38956
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     30642,
+     50491,
+     34156,
+     44599
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     52357,
+     62297,
+     29003,
+     39068
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     37930,
+     30950,
+     53880,
+     39790
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     60192,
+     42041,
+     31770,
+     39483
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     31219,
+     25219,
+     4591,
+     15451
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39869,
+     4148,
+     17937,
+     36508
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     22939,
+     12552,
+     48476,
+     24167
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     23104,
+     15261,
+     5287,
+     36021
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     14701,
+     32964,
+     52391,
+     22656
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     61390,
+     41382,
+     39995,
+     42421
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     64068,
+     6892,
+     16605,
+     8384
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7274,
+     2910,
+     26390,
+     13095
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     39896,
+     45598,
+     15449,
+     64880
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     50845,
+     23464,
+     39700,
+     60112
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     26060,
+     33805,
+     18478,
+     25564
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     15771,
+     38456,
+     60112,
+     15130
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     59251,
+     11793,
+     24637,
+     57607
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     7579,
+     49182,
+     6398,
+     47065
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     53427,
+     33172,
+     2593,
+     16378
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     17231,
+     56339,
+     20825,
+     16771
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     4601,
+     40815,
+     39040,
+     11265
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     27414,
+     53005,
+     64326,
+     10034
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     33414,
+     19554,
+     27805,
+     56548
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     50713,
+     43800,
+     2666,
+     51763
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     20548,
+     58400,
+     41715,
+     62319
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     51199,
+     29805,
+     10246,
+     10267
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   },
+   {
+    "seed": [
+     14088,
+     56628,
+     45655,
+     954
+    ],
+    "words": 1000000,
+    "mismatches": 0,
+    "first_mismatch": null
+   }
+  ]
+ },
+ "seed_set": "dev",
+ "words_per_seed": 1000000,
+ "total_words_compared": 200030000,
+ "all_match": true,
+ "versions": {
+  "python": "3.14.4",
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sp80022": "1.0.0"
+ },
+ "git_head": "5b9fcfd",
+ "command": "python scripts/stream_equiv.py --binary fast/build/phyco_stream --set dev --out reports/003-extended-batteries-calibration/streams/equivalence.json",
+ "elapsed_s": 25.0,
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

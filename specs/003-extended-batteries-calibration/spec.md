@@ -43,8 +43,9 @@ they are. The feature-002 protocol, harness `sp80022` 1.0.0 and its unused seed 
 | Spec approval (calibration method + battery protocol) | Coastrnaut (repository owner) | 2026-10-29 | Approved | Approved in session, including option A scale and per-sequence p-values in FR-002; protocol frozen as written, may only become stricter |
 | Plan approval (plan.md, research R1–R11, data-model, contracts) | Coastrnaut (repository owner) | 2026-10-29 | Approved | Approved in session; proceed to tasks |
 | Tool acquisition (PractRand, TestU01 downloads) | Coastrnaut (repository owner) | 2026-10-29 | Approved | Approved in session ("approved, download both"): `PractRand_0.96.zip` (904,832 bytes, sourceforge.net/projects/pracrand, 2025-12-26) and `TestU01.zip` 1.2.3 (3,123,035 bytes, simul.iro.umontreal.ca/testu01, 2015-02-11) |
-| Calibration result review (US1) | _pending_ | _pending_ | _pending_ | Required before any battery attempt |
-| Battery freeze (before each held-out battery attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
+| Calibration result review (US1, T011: reports/003-extended-batteries-calibration/calibration/phase-report.md) | Coastrnaut (repository owner) | 2026-10-30 | Approved | Approved in session after the requested DFT cross-check (dft-crosscheck.md: 0 mismatches vs NIST STS 2.1.2; the excess is the test's own). Overall positive-control false-failure rate 207/1000 = 20.7% (95% CI 18.2–23.3%). Run records (167 MB, runs/*.json.gz) are committed, not kept local |
+| Battery freeze 1 (T034: attempt-1/freeze.json, heldout-1) | Coastrnaut (repository owner) | 2026-10-30 | Approved | Approved in session ("i approve the battery freeze"); approval fields recorded in freeze.json by the agent. S = 101,210, threshold 4.94e-08; draft at git 5b9fcfd with all source, binary and tool hashes |
+| Battery freeze (before each further held-out battery attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
 | Final result review | _pending_ | _pending_ | _pending_ | Required before the feature is declared complete |
 
 ## Clarifications

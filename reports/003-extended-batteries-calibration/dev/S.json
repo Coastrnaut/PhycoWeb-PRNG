@@ -1,0 +1,28 @@
+{
+ "task": "T029",
+ "date": "2026-10-30",
+ "source": "dev rehearsal, phyco-v2 seed (56053, 7029, 30841, 11050)",
+ "per_seed": {
+  "practrand-fwd (1 TiB)": 9483,
+  "smallcrush-fwd": 15,
+  "smallcrush-rev": 15,
+  "crush-fwd": 144,
+  "crush-rev": 144,
+  "bigcrush-fwd": 160,
+  "bigcrush-rev": 160
+ },
+ "per_seed_total": 10121,
+ "seeds": 10,
+ "S": 101210,
+ "threshold": 4.940223298093074e-08,
+ "applies_to": "every role; the effective S at the attempt is max(frozen S, p-values actually reported) per role (stricter only, R8)",
+ "note": "PractRand with -a prints a fixed set of results per checkpoint; the positive-control 2^35 run (5366 p-values) is shorter, so its 1 TiB count is taken to equal the candidate's. Any larger actual count raises S automatically.",
+ "projection": {
+  "method": "slot scheduler simulation (32 slots; PractRand 6, TestU01 2; longest first) with the rehearsal run times of phyco-v2",
+  "hours_per_role": 8.0,
+  "roles": 3,
+  "hours_total_upper": 24.1,
+  "note": "negative control stops PractRand early, positive control stream is faster; equivalence check adds minutes. Below the 5-day limit, no owner decision needed."
+ },
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

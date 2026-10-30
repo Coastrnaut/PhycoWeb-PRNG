@@ -1,0 +1,41 @@
+{
+ "role": "candidate",
+ "generator": "phyco-v2",
+ "seed": [
+  56053,
+  7029,
+  30841,
+  11050
+ ],
+ "battery": "bigcrush",
+ "orientation": "rev",
+ "mode": "dev",
+ "stop_on_fail": false,
+ "length_target_log2": null,
+ "stream_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/phyco_stream",
+  "phyco-v2",
+  "56053",
+  "7029",
+  "30841",
+  "11050",
+  "--reverse"
+ ],
+ "consumer_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/testu01_driver",
+  "bigcrush",
+  "--name",
+  "candidate-bigcrush-rev",
+  "--pvalues",
+  "reports/003-extended-batteries-calibration/dev/rehearsal/candidate-bigcrush-rev/pvalues.jsonl"
+ ],
+ "stream_bytes": 1428399587328,
+ "stream_sha256": "62c4a66090f2cf05b41513c1939bfea9c905b8c910db24e2c00956ebb7a562f3",
+ "exit_status": 0,
+ "stream_exit_status": 0,
+ "started": "2026-10-29T22:42:24",
+ "elapsed_s": 10095.1,
+ "host": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+ "python": "3.14.4",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

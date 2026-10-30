@@ -1,0 +1,59 @@
+{
+ "stored": {
+  "dft": {
+   "sequences": 100000,
+   "rejected": 1230,
+   "rate": 0.0123,
+   "ci95": [
+    0.011626028057734149,
+    0.013002475706756134
+   ],
+   "E_d2": {
+    "mean": 1.0618349248785708,
+    "ci95": [
+     1.0525489854250858,
+     1.0711208643320558
+    ],
+    "n": 100000
+   }
+  },
+  "frequency": {
+   "sequences": 100000,
+   "rejected": 959,
+   "rate": 0.00959,
+   "ci95": [
+    0.008995218277926202,
+    0.010213479664558281
+   ]
+  }
+ },
+ "fresh": {
+  "sequences": 1000,
+  "max_abs_diff_vs_sts": 4.969182137992689e-07,
+  "mismatches_vs_sts": 0,
+  "rejected": 11,
+  "rate": 0.011,
+  "ci95": [
+   0.005503594192313587,
+   0.019596628222016514
+  ],
+  "N1_mean": 996161.014,
+  "N0": 996147.2,
+  "N1_variance": 25215.9957997998,
+  "N1_variance_ci95": [
+   23142.929806808377,
+   27582.122269472293
+  ],
+  "variance_used_by_test": 24903.68,
+  "denominator_implied": 3.9504575108150553
+ },
+ "versions": {
+  "python": "3.14.4",
+  "numpy": "2.5.4",
+  "sp80022": "1.0.0",
+  "sp80022_sha256": "1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700",
+  "sts": "/home/coast/nist-sts/sts-2.1.2/sts-2.1.2"
+ },
+ "command": "python scripts/dft_crosscheck.py --fresh 1000 (in WSL)",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

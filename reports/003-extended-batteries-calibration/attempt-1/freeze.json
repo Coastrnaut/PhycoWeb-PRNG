@@ -1,0 +1,111 @@
+{
+ "attempt": 1,
+ "seed_set": "heldout-1",
+ "seed_set_fingerprint": "bb1e1a2df50d121996863680e0668550690cf1e448af0cf797661a9713d7de80",
+ "status": "draft",
+ "git_head": "5b9fcfd5a6dd4635c42980190c98aec73482595a",
+ "phyco_v2_model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+ "lut_v1_model_sha256": "80ffd147af92006204bd426bc99259fcbd6e55dc655295a9ad1aedc2685ec346",
+ "lut_sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3",
+ "stream_source_sha256": "1b46c952f4914ebb12a536237508b21adbfe945dcbcdf0e10d9d1143c0e7c451",
+ "lut_table_sha256": "fb1e468bd2834ce96be71b76ad63021fdcc561aa395864b96b9ecfcee1c2dac0",
+ "driver_source_sha256": "e1544dc6e503d8d72d6f0055961a874ec59c62cc7d24d1bb8e9fa8df79b08605",
+ "batteries_sha256": "46c4dd1533f93be35024fa7debbcd9a8a00ab389fe9caba4419d74dc1c140677",
+ "battery_run_sha256": "df06b9ae86b3789bde558f743647bf6a132efb54c1e55ce4eb671190ffa4bb46",
+ "battery_attempt_sha256": "c5540dbe5eb8c6d0a68dfbd1e6b5d2406c7a61248eb8f271c3c3f3542065080c",
+ "stream_binary_sha256": "17f7c9638acfccdbecc2acb5031f2f825d74ef7930f65e451e55aba872dc97ea",
+ "driver_binary_sha256": "37128c271173223910840ebbadfb746e6161a6cf8f2fc71b590a532184e608d3",
+ "tool_binaries": {
+  "practrand:RNG_test": "7ae4a26bfdf4e9ff8a062dac8d21569fc1137054205f1d3ff6e93827e1de874f",
+  "practrand:PractRand.a": "8783504f4920ccf36795cec5e6c76f50797d89678a654a0418cb4bc6f7bd9236",
+  "testu01:libtestu01": "b2b28cb62020fd69b4596f4184b7db9b55a83f4d975edec2742d27ecef44bd48",
+  "testu01:libprobdist": "c83c19010989279c26846765914e02063221d476165f19ee09b129f553bc96b2",
+  "testu01:libmylib": "890c3b3522ff8e74e2f14fb09f8b1198330f2bfcc4945c33363936270fb120ce"
+ },
+ "tools": {
+  "practrand": {
+   "owner_permission": "2026-10-29, in session: \"approved, download both\"",
+   "downloaded_on": "2026-10-29",
+   "name": "PractRand",
+   "version": "0.96",
+   "source_url": "https://sourceforge.net/projects/pracrand/files/PractRand_0.96.zip/download",
+   "archive_name": "PractRand_0.96.zip",
+   "archive_bytes": 904832,
+   "archive_sha256": "e4caf7fda98b2c597bbda3b576753cf5a0f6047aab837c82be370ab798a672e1",
+   "download_dir": "~/downloads/practrand-0.96 (new empty directory)",
+   "licence": "doc/license.txt: all PractRand source code and tools freely usable for any purpose; tests and tools public domain (CC0 text included)",
+   "build_commands": [
+    "bash fast/build_tools.sh practrand ~/downloads/practrand-0.96/PractRand",
+    "g++ -c src/*.cpp src/RNGs/*.cpp src/RNGs/other/*.cpp -O3 -Iinclude -Wno-constant-logical-operand",
+    "ar rcs ~/practrand/PractRand.a *.o",
+    "g++ -o ~/practrand/RNG_test tools/RNG_test.cpp PractRand.a -O3 -Iinclude -Itools -pthread"
+   ],
+   "build_flags": "-O3 (as in doc/installation.txt); g++ 15.2.0",
+   "build_warnings": "12 upstream warnings: 6 -Wshift-count-negative and 3 -Wshift-count-overflow in src/xbg_helpers.cpp, 1 -Woverflow in src/RNGs/mrsf.cpp, 2 notes on the unknown -Wno-constant-logical-operand. Not changed. `RNG_test --self_test`: passed",
+   "binaries": {
+    "RNG_test": {
+     "path": "~/practrand/RNG_test",
+     "sha256": "7ae4a26bfdf4e9ff8a062dac8d21569fc1137054205f1d3ff6e93827e1de874f"
+    },
+    "PractRand.a": {
+     "path": "~/practrand/PractRand.a",
+     "sha256": "8783504f4920ccf36795cec5e6c76f50797d89678a654a0418cb4bc6f7bd9236"
+    }
+   },
+   "notes": [
+    "Latest official release on the project page (0.96, 2025-12-26); research R6 expected 0.95/0.94 and chose 'latest official release'.",
+    "-a (display all results) is available, so every p-value is shown (research R6, stricter option).",
+    "Default -tlfail halts after a failure and default -tlmin is 1.5 s (time-based); runs use -tlmaxonly (positive, candidate) and -tlmin 27 (data-based) so checkpoints, and S, do not depend on speed."
+   ]
+  },
+  "testu01": {
+   "owner_permission": "2026-10-29, in session: \"approved, download both\"",
+   "downloaded_on": "2026-10-29",
+   "name": "TestU01",
+   "version": "1.2.3",
+   "source_url": "https://simul.iro.umontreal.ca/testu01/TestU01.zip",
+   "archive_name": "TestU01.zip",
+   "archive_bytes": 3123035,
+   "archive_sha256": "bc1d1dd2aea7ed3b3d28eaad2c8ee55913f11ce67aec8fe4f643c1c0d2ed1cac",
+   "download_dir": "~/downloads/testu01-1.2.3 (new empty directory)",
+   "licence": "COPYING: (c) 2002 Pierre L'Ecuyer; redistribution and use permitted without fee for private, research, academic or other non-commercial purposes; commercial use needs a written licence. Not vendored or redistributed by this repository",
+   "build_commands": [
+    "bash fast/build_tools.sh testu01 ~/downloads/testu01-1.2.3/TestU01-1.2.3",
+    "./configure --prefix=$HOME/testu01 CFLAGS=\"-O2 -std=gnu89\"",
+    "make -j8",
+    "make install"
+   ],
+   "build_flags": "CFLAGS=-O2 -std=gnu89 (gcc 15 defaults to C23, which rejects the 2009 sources)",
+   "build_warnings": "50 upstream warnings (22 -Wunused-result, 11 -Wformat-security, 2 -Wformat-zero-length, others). Not changed",
+   "binaries": {
+    "libtestu01": {
+     "path": "~/testu01/lib/libtestu01.so.0.0.1",
+     "sha256": "b2b28cb62020fd69b4596f4184b7db9b55a83f4d975edec2742d27ecef44bd48"
+    },
+    "libprobdist": {
+     "path": "~/testu01/lib/libprobdist.so.0.0.1",
+     "sha256": "c83c19010989279c26846765914e02063221d476165f19ee09b129f553bc96b2"
+    },
+    "libmylib": {
+     "path": "~/testu01/lib/libmylib.so.0.0.1",
+     "sha256": "890c3b3522ff8e74e2f14fb09f8b1198330f2bfcc4945c33363936270fb120ce"
+    }
+   },
+   "notes": [
+    "Driver smoke test: os stream | testu01_driver smallcrush: 15 statistics, all passed, 10.3 s."
+   ]
+  }
+ },
+ "commands": {
+  "pipeline": "fast/build/phyco_stream <generator> [S0 S1 S2 S3] [--reverse] | (SHA-256 of every byte) | <consumer>",
+  "practrand": "~/practrand/RNG_test stdin32 -tf 2 -te 0 -a -tlmin 27 -tlmax 40 -tlmaxonly -multithreaded",
+  "practrand_negative": "~/practrand/RNG_test stdin32 -tf 2 -te 0 -a -tlmin 27 -tlmax 40 -tlfail -multithreaded",
+  "testu01": "fast/build/testu01_driver <smallcrush|crush|bigcrush> --name <run> --pvalues pvalues.jsonl",
+  "orientations": "practrand: fwd; TestU01: fwd and rev (--reverse)",
+  "failure_rule": "rule 1: min(p, 1-p) <= 0.005/S; rule 2: PractRand FAIL grade or \"fail\"; rule 3: TestU01 eps / 1 - eps"
+ },
+ "S": 101210,
+ "threshold": 4.940223298093074e-08,
+ "approved_by": "Coastrnaut (repository owner)",
+ "approved_on": "2026-10-30"
+}

@@ -86,17 +86,17 @@ agent never commits, pushes or publishes (Principle IX). `REP` =
   (data-model §2) with recommendations marked "recommendation only". (FR-003, FR-004, FR-005)
 - [X] T007 [US1] Smoke run: `calibrate.py --runs 0-1` into the scratchpad (not `$REP`); confirm
   about 60 s per run and a valid record; log in `$REP/calibration/test-log.md`. (FR-001)
-- [ ] T008 [US1] Full calibration: `python -W ignore scripts/calibrate.py --runs 0-999 --workers 32
+- [X] T008 [US1] Full calibration: `python -W ignore scripts/calibrate.py --runs 0-999 --workers 32
   --out-dir $REP/calibration/runs` in the background (~17 h); resume with `--resume` after any
   interruption, and log every interruption. (FR-001, FR-002, FR-006, SC-001)
-- [ ] T009 [US1] Run `calibration_report.py` → `$REP/calibration/summary.json` and `summary.md`;
+- [X] T009 [US1] Run `calibration_report.py` → `$REP/calibration/summary.json` and `summary.md`;
   run it again and confirm byte-identical output (quickstart C3); write `runs/SHA256SUMS`.
   (FR-003, FR-004, SC-001, SC-002)
-- [ ] T010 [US1] Write `$REP/calibration/phase-report.md` (constitution Phase Completion
+- [X] T010 [US1] Write `$REP/calibration/phase-report.md` (constitution Phase Completion
   Reporting): files, FR/SC addressed, commands and results, comparison with the ~19% assumption,
   what it means for feature-002 `heldout-2`/`heldout-3`, recommendations (stricter-only, for a
   separate amendment), open issues, verbatim disclaimer. (FR-003, FR-004, FR-005, FR-016)
-- [ ] T011 ⛔ [US1] **Owner calibration result review** (spec gate). Also decide whether
+- [X] T011 ⛔ [US1] **Owner calibration result review** (spec gate). Also decide whether
   `$REP/calibration/runs/*.json.gz` (~150 MB) are committed or kept local (research R10; if local,
   add a `.gitignore` rule and keep `SHA256SUMS`). Record in spec.md Review & Approval.
   Required before T034. (FR-005; Principle VIII)
@@ -133,7 +133,7 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
   first 10⁶ words of all 100 feature-002 `dev` seeds for both generators against the Python
   models, parallel over seeds; refuses held-out sets (exit 2); writes data-model §3 with the
   binary, source and LUT hashes. (FR-007, FR-010, SC-003)
-- [ ] T016 [US3] After T008: run `stream_equiv.py` → `$REP/streams/equivalence.json` (0
+- [X] T016 [US3] After T008: run `stream_equiv.py` → `$REP/streams/equivalence.json` (0
   mismatches required); measure throughput of each generator and of `os` into `$REP/dev/timing.json`.
   (FR-007, SC-003)
 
@@ -191,7 +191,7 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
 
 ### Dev rehearsal (feature-002 `dev` seed 0 only)
 
-- [ ] T025 [US2] Rehearsal for `phyco-v2` on `(56053, 7029, 30841, 11050)`: PractRand to 1 TiB;
+- [X] T025 [US2] Rehearsal for `phyco-v2` on `(56053, 7029, 30841, 11050)`: PractRand to 1 TiB;
   SmallCrush, Crush and BigCrush in both orientations; plus SmallCrush and a PractRand run of at
   least 2³⁵ bytes for `lut-v1` and `os`. Output in `$REP/dev/rehearsal/`; timings in
   `$REP/dev/timing.json`. All results reported (FR-014). (FR-010; R9)
@@ -205,7 +205,7 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
   grades), and the verdict table from the spec. (FR-014, SC-006)
 - [X] T028 [US2] Implement `protocol/batteries.py` (research R8): parsers, S counting, rules 1–3,
   per-run `fails`, overall verdict; wire into `battery_run.py`. (FR-011, FR-014, SC-004, SC-006)
-- [ ] T029 [US2] Count S from the rehearsal (per generator: one seed's runs × 10) and the
+- [X] T029 [US2] Count S from the rehearsal (per generator: one seed's runs × 10) and the
   projected attempt time; write `$REP/dev/S.json`. If the projection exceeds 5 days, report it for
   an owner decision at T034 (scale may not shrink, FR-015). (FR-011; R8, R9)
 - [X] T030 [US2] Implement `scripts/battery_attempt.py` (contracts/cli.md; data-model §8): guards,
@@ -214,15 +214,15 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
   `attempt.json` and `summary.md` with the disclaimer. (FR-012, FR-013, FR-014, FR-016, SC-003,
   SC-004)
 - [X] T031 [US2] Implement `scripts/battery_rescore.py` (data-model §9). (SC-006)
-- [ ] T032 [US2] Write `$REP/dev/phase-report.md` for the tools and rehearsal: tool records,
+- [X] T032 [US2] Write `$REP/dev/phase-report.md` for the tools and rehearsal: tool records,
   rehearsal results in full, timings, S, PractRand listing finding, test results, open issues,
   disclaimer. (FR-009, FR-011, FR-014, FR-016)
 
 ### Held-out attempt
 
-- [ ] T033 [US2] `battery_freeze.py create --attempt 1 --S <S>` → `$REP/attempt-1/freeze.json`
+- [X] T033 [US2] `battery_freeze.py create --attempt 1 --S <S>` → `$REP/attempt-1/freeze.json`
   (draft, empty approval). (FR-011)
-- [ ] T034 ⛔ [US2] **Owner battery freeze approval** for attempt 1 (requires T011 and T032).
+- [X] T034 ⛔ [US2] **Owner battery freeze approval** for attempt 1 (requires T011 and T032).
   Record approval in freeze.json and spec.md. (FR-010, FR-011, SC-005; Principle VIII)
 - [ ] T035 [US2] Run `battery_attempt.py --attempt 1` in WSL in the background (1–3 days); log
   progress and any interruption in `$REP/attempt-1/` (an interrupted required run makes the

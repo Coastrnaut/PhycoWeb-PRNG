@@ -1,0 +1,31 @@
+{
+ "role": "positive",
+ "generator": "os",
+ "seed": null,
+ "battery": "smallcrush",
+ "orientation": "fwd",
+ "mode": "dev",
+ "stop_on_fail": false,
+ "length_target_log2": null,
+ "stream_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/phyco_stream",
+  "os"
+ ],
+ "consumer_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/testu01_driver",
+  "smallcrush",
+  "--name",
+  "positive-smallcrush-fwd",
+  "--pvalues",
+  "reports/003-extended-batteries-calibration/dev/rehearsal/positive-smallcrush-fwd/pvalues.jsonl"
+ ],
+ "stream_bytes": 907018240,
+ "stream_sha256": "4c543df3f35a72f5f51004279998c67282701e058db6c44094d0b29c9a16b9b6",
+ "exit_status": 0,
+ "stream_exit_status": 0,
+ "started": "2026-10-29T22:42:24",
+ "elapsed_s": 5.6,
+ "host": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+ "python": "3.14.4",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

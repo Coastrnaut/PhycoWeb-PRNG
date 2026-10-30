@@ -1,0 +1,15 @@
+2026-10-29T22:42:24 candidate-bigcrush-fwd start
+t
+2026-10-29T22:42:24 positive-smallcrush-fwd start
+2026-10-29T22:42:26 negative-practrand-fwd exit 0
+2026-10-29T22:42:30 positive-smallcrush-fwd exit 0
+2026-10-29T22:42:32 negative-smallcrush-fwd exit 0
+2026-10-29T22:42:32 candidate-smallcrush-fwd exit 0
+2026-10-29T22:42:33 candidate-smallcrush-rev exit 0
+2026-10-29T22:44:43 positive-practrand-fwd exit 0
+2026-10-29T23:03:18 candidate-crush-fwd exit 0
+2026-10-29T23:03:50 candidate-crush-rev exit 0
+2026-10-30T00:12:50 candidate-practrand-fwd exit 0
+2026-10-30T01:25:14 candidate-bigcrush-fwd exit 0
+2026-10-30T01:30:39 candidate-bigcrush-rev exit 0
+2026-10-30T01:30:39 all done

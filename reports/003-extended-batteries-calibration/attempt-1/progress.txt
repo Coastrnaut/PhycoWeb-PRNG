@@ -1,0 +1,18 @@
+2026-10-30T08:54:16 equivalence start
+2026-10-30T08:54:20 equivalence all_match=True
+2026-10-30T08:54:20 positive bigcrush-fwd-seed0 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed0 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed1 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed2 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed3 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed4 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed5 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed2 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed6 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed7 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed3 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed5 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed7 start
+2026-10-30T08:54:20 positive bigcrush-rev-seed4 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed1 start
+2026-10-30T08:54:20 positive bigcrush-fwd-seed6 start

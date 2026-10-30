@@ -1,0 +1,119 @@
+{
+ "task": "T016",
+ "date": "2026-10-29",
+ "binary": "fast/build/phyco_stream",
+ "binary_sha256": "17f7c9638acfccdbecc2acb5031f2f825d74ef7930f65e451e55aba872dc97ea",
+ "method": "WSL, one process at a time, `phyco_stream <gen> [seed] --words 1000000000 > /dev/null`, wall time from date +%s.%N; calibration finished, no other heavy job running",
+ "streams": [
+  {
+   "generator": "phyco-v2",
+   "seed": [
+    56053,
+    7029,
+    30841,
+    11050
+   ],
+   "words": 1000000000,
+   "seconds": 11.712988941,
+   "words_per_s": 85375305,
+   "seconds_per_TiB": 3220
+  },
+  {
+   "generator": "lut-v1",
+   "seed": [
+    56053,
+    7029,
+    30841,
+    11050
+   ],
+   "words": 1000000000,
+   "seconds": 14.116554114,
+   "words_per_s": 70838817,
+   "seconds_per_TiB": 3880
+  },
+  {
+   "generator": "os",
+   "seed": null,
+   "words": 1000000000,
+   "seconds": 4.774851083,
+   "words_per_s": 209430615,
+   "seconds_per_TiB": 1313
+  }
+ ],
+ "goal_words_per_s": 100000000,
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts.",
+ "rehearsal": {
+  "task": "T025",
+  "started": "2026-10-29T22:42:24",
+  "finished": "2026-10-30T01:30:39",
+  "concurrent_runs": 11,
+  "runs": {
+   "candidate-bigcrush-fwd": {
+    "n_pvalues": 160,
+    "complete": true,
+    "elapsed_s": 9769.4,
+    "stream_bytes": 1428412170240
+   },
+   "candidate-bigcrush-rev": {
+    "n_pvalues": 160,
+    "complete": true,
+    "elapsed_s": 10095.1,
+    "stream_bytes": 1428399587328
+   },
+   "candidate-crush-fwd": {
+    "n_pvalues": 144,
+    "complete": true,
+    "elapsed_s": 1253.3,
+    "stream_bytes": 135370113024
+   },
+   "candidate-crush-rev": {
+    "n_pvalues": 144,
+    "complete": true,
+    "elapsed_s": 1285.7,
+    "stream_bytes": 135369064448
+   },
+   "candidate-practrand-fwd": {
+    "n_pvalues": 9483,
+    "complete": true,
+    "elapsed_s": 5426.0,
+    "stream_bytes": 1099511627776
+   },
+   "candidate-smallcrush-fwd": {
+    "n_pvalues": 15,
+    "complete": true,
+    "elapsed_s": 8.0,
+    "stream_bytes": 907018240
+   },
+   "candidate-smallcrush-rev": {
+    "n_pvalues": 15,
+    "complete": true,
+    "elapsed_s": 8.2,
+    "stream_bytes": 908066816
+   },
+   "negative-practrand-fwd": {
+    "n_pvalues": 421,
+    "complete": false,
+    "elapsed_s": 1.8,
+    "stream_bytes": 134217728
+   },
+   "negative-smallcrush-fwd": {
+    "n_pvalues": 15,
+    "complete": true,
+    "elapsed_s": 7.8,
+    "stream_bytes": 907018240
+   },
+   "positive-practrand-fwd": {
+    "n_pvalues": 5366,
+    "complete": true,
+    "elapsed_s": 138.5,
+    "stream_bytes": 34359738368
+   },
+   "positive-smallcrush-fwd": {
+    "n_pvalues": 15,
+    "complete": true,
+    "elapsed_s": 5.6,
+    "stream_bytes": 907018240
+   }
+  }
+ }
+}
