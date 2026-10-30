@@ -496,9 +496,9 @@ attempt record exists, and re-scoring it gives identical results.
   `design.md`, for "cryptographically secure", "secure", "crypto-grade" and "suitable for
   secrets" used as claims. Every `summary.md` and `phase-report.md` must contain `DISCLAIMER`.
   Record the result in the final phase report. (FR-019, SC-007)
-- [ ] T059 Run quickstart.md end to end (H1–H5, D1, M1–M3, A4 for each completed attempt) on
+- [X] T059 Run quickstart.md end to end (H1–H5, D1, M1–M3, A4 for each completed attempt) on
   Windows and in WSL. Append the results to `reports/002-core-dynamics-redesign/dev/test-log.md`. (SC-001 to SC-007)
-- [ ] T060 Write `reports/002-core-dynamics-redesign/phase-report.md` per the constitution's
+- [X] T060 Write `reports/002-core-dynamics-redesign/phase-report.md` per the constitution's
   Phase Completion Reporting section. It covers: files changed; requirements → evidence
   (FR-001 to FR-019, SC-001 to SC-007); tests actually run; every attempt and its verdict; open
   issues (including the `wrap32(abs(Q))` no-op from feature 001; check that `README.md` section 5
@@ -507,7 +507,7 @@ attempt record exists, and re-scoring it gives identical results.
   Principle IV, such as PractRand, TestU01 and Dieharder, were not run, and that
   positive-control bytes are local only); and a recommendation (proceed, revise or stop). (FR-001 to FR-019, SC-001 to SC-007;
   Principle VII)
-- [ ] T061 ⛔ **Owner final result review** (Principle VIII). Record it in spec.md under Review &
+- [X] T061 ⛔ **Owner final result review** (Principle VIII). Record it in spec.md under Review &
   Approval, and update the spec Status line. (SC-003; Principle VIII)
 
 ---
