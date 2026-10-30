@@ -1,0 +1,35 @@
+{
+ "owner_permission": "2026-10-29, in session: \"approved, download both\"",
+ "downloaded_on": "2026-10-29",
+ "name": "PractRand",
+ "version": "0.96",
+ "source_url": "https://sourceforge.net/projects/pracrand/files/PractRand_0.96.zip/download",
+ "archive_name": "PractRand_0.96.zip",
+ "archive_bytes": 904832,
+ "archive_sha256": "e4caf7fda98b2c597bbda3b576753cf5a0f6047aab837c82be370ab798a672e1",
+ "download_dir": "~/downloads/practrand-0.96 (new empty directory)",
+ "licence": "doc/license.txt: all PractRand source code and tools freely usable for any purpose; tests and tools public domain (CC0 text included)",
+ "build_commands": [
+  "bash fast/build_tools.sh practrand ~/downloads/practrand-0.96/PractRand",
+  "g++ -c src/*.cpp src/RNGs/*.cpp src/RNGs/other/*.cpp -O3 -Iinclude -Wno-constant-logical-operand",
+  "ar rcs ~/practrand/PractRand.a *.o",
+  "g++ -o ~/practrand/RNG_test tools/RNG_test.cpp PractRand.a -O3 -Iinclude -Itools -pthread"
+ ],
+ "build_flags": "-O3 (as in doc/installation.txt); g++ 15.2.0",
+ "build_warnings": "12 upstream warnings: 6 -Wshift-count-negative and 3 -Wshift-count-overflow in src/xbg_helpers.cpp, 1 -Woverflow in src/RNGs/mrsf.cpp, 2 notes on the unknown -Wno-constant-logical-operand. Not changed. `RNG_test --self_test`: passed",
+ "binaries": {
+  "RNG_test": {
+   "path": "~/practrand/RNG_test",
+   "sha256": "7ae4a26bfdf4e9ff8a062dac8d21569fc1137054205f1d3ff6e93827e1de874f"
+  },
+  "PractRand.a": {
+   "path": "~/practrand/PractRand.a",
+   "sha256": "8783504f4920ccf36795cec5e6c76f50797d89678a654a0418cb4bc6f7bd9236"
+  }
+ },
+ "notes": [
+  "Latest official release on the project page (0.96, 2025-12-26); research R6 expected 0.95/0.94 and chose 'latest official release'.",
+  "-a (display all results) is available, so every p-value is shown (research R6, stricter option).",
+  "Default -tlfail halts after a failure and default -tlmin is 1.5 s (time-based); runs use -tlmaxonly (positive, candidate) and -tlmin 27 (data-based) so checkpoints, and S, do not depend on speed."
+ ]
+}
