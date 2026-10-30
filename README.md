@@ -52,7 +52,7 @@ The architecture tracks two primary integer vectors across time: Nutrient Pressu
 \(Q_{ij}(t)=\frac{D_{ij}(t)\cdot \left(P_{i}(t)-P_{j}(t)\right)}{L}\)
 Channel dimensions dynamically adapt based on usage. Active channels grow thicker through reinforcement, while unused paths contract over time due to constant decay:
 \(D_{ij}(t+1)=D_{ij}(t)+\alpha \cdot |{}Q_{ij}(t)|{}-\gamma \cdot D_{ij}(t)\)
-To prevent the web from settling into a stable, repeating shortest-path bridge, a threshold supervisor monitors channel scale metrics. When a channel crosses the critical saturation limit (\(D_{ij} > \tau\)), it triggers a localized XOR disruption on adjacent nodes. This shatters the established network paths and forces the system to start foraging anew. (In the current model `lut-v1`, this disruption fires on about 99.5% of steps, so it is effectively always on. Feature 002 requires a rate between 1% and 50%.)
+To prevent the web from settling into a stable, repeating shortest-path bridge, a threshold supervisor monitors channel scale metrics. When a channel crosses the critical saturation limit (\(D_{ij} > \tau\)), it triggers a localized XOR disruption on adjacent nodes. This shatters the established network paths and forces the system to start foraging anew. (In the feature-001 model `lut-v1`, this disruption fires on about 99.5% of steps, so it is effectively always on. In the feature-002 model `phyco-v2` it fires on 13.5–13.8% of steps, within the required 1–50%.)
 
 2. Complete Bit-Accurate Python Verification Model
 
@@ -131,7 +131,7 @@ This section describes the **hardware design targets**. No RTL exists yet (RTL-p
 
 3.1 Multiplierless Integer Domain Optimization
 
-Floating-point arithmetic introduces significant latency and resource overhead. The target is integer-only arithmetic with fractional scaling done by constant bit-shifts (>> 4 for a division by 16, >> 8 for a division by 256), so that no multipliers or dividers are needed. The current model `lut-v1` is integer-only, but it is **not yet multiplierless**: its flux stage multiplies two state variables (`D[i] * (P[i] - P[j])`), and that intermediate needs 32 bits. P and D are unsigned 16-bit values, not signed. Removing the multiplier is the subject of feature 002 (`specs/002-core-dynamics-redesign`).
+Floating-point arithmetic introduces significant latency and resource overhead. The target is integer-only arithmetic with fractional scaling done by constant bit-shifts (>> 4 for a division by 16, >> 8 for a division by 256), so that no multipliers or dividers are needed. The current model `lut-v1` is integer-only, but it is **not yet multiplierless**: its flux stage multiplies two state variables (`D[i] * (P[i] - P[j])`), and that intermediate needs 32 bits. P and D are unsigned 16-bit values, not signed. Removing the multiplier is the subject of feature 002 (`specs/002-core-dynamics-redesign`); its model `phyco-v2` (`phycoweb/model_v2.py`) is integer-only and multiplierless, with 32-bit pressures and veins.
 
 3.2 Highly Parallel, Decentralized Logic Distribution
 
@@ -143,7 +143,7 @@ Targets for a future synthesis on standard FPGA toolchains (such as AMD/Xilinx V
 
 Optimization Layer	Resource Allocation Metric	System Performance Target
 Logic Fabric	Registers / LUT Inferences	Fully behavioral; avoids vendor-specific block macros.
-DSP Allocation	0 Blocks (target)	Requires removing the lut-v1 flux multiplier first (feature 002).
+DSP Allocation	0 Blocks (target)	lut-v1 still has a flux multiplier; phyco-v2 (feature 002) has none. No synthesis result exists yet.
 Target Clock	Frequency ≥ 200 MHz (target)	Unverified; no RTL or synthesis report exists yet.
 
 
@@ -167,16 +167,21 @@ When using autonomous code generation tools or development loops (such as Hermes
 
 5. Project Status & Verified Evidence
 
-What has been verified (feature 001, `reports/001-integer-lut-perturbation/`):
+What has been verified, feature 002 (`reports/002-core-dynamics-redesign/`, `specs/002-core-dynamics-redesign/design.md`):
+• The `phyco-v2` reference model (`phycoweb/model_v2.py`) is integer-only and multiplierless (add, subtract, XOR, constant shifts and rotations, compare, the lut-v1 table), with golden vectors and an automated purity check. The full test suite (116 tests) passes on Windows and on Ubuntu (WSL2).
+• The SP 800-22 harness `sp80022` 1.0.0 was validated against the published examples, Appendix B and NIST's own STS 2.1.2 (0 mismatches at ±1e-6), and replaces nistrng.
+• Pre-registered acceptance attempt 1 (held-out seeds never used in tuning; 100 sequences of 2²¹ bits; both controls): verdict **PASS**. phyco-v2 passed all 15 test families, the OS-CSPRNG positive control passed, and lut-v1 failed 11 of 15 (`reports/002-core-dynamics-redesign/attempt-1/`). A re-score reproduced every p-value.
+
+What has been verified, feature 001 (`reports/001-integer-lut-perturbation/`):
 • The `lut-v1` reference model is integer-only and deterministic, with golden vectors and 31 automated tests, identical on Windows and on Ubuntu (WSL2).
 • It is bit-exact with the archived floating-point model in every stage except the perturbation source.
 
 What has not been verified, or is known to be weak:
-• Statistical quality. The NIST SP 800-22 screening of feature 001 used nistrng 1.2.3, which was later found to be defective (see the erratum in `reports/001-integer-lut-perturbation/summary.md`). With one seed, lut-v1 also failed four tests that are believed valid. A redesign and a pre-registered SP 800-22 evaluation are in progress (feature 002).
-• Cryptographic security: none. No cryptographic analysis or independent review exists. The output exposes the low 8 bits of each vein value, there is no keying, and the effective state is small.
-• Hardware: no VHDL, testbench or synthesis result exists yet.
+• Statistical quality beyond SP 800-22. The PASS above means only that the SP 800-22 tests detected no defect in 100 held-out sequences. Broader batteries (PractRand, TestU01, Dieharder) have not been run. The feature-001 screening used the defective nistrng 1.2.3; see the erratum and the re-score table in `reports/001-integer-lut-perturbation/summary.md`. lut-v1 fails SP 800-22 under the feature-002 protocol.
+• Cryptographic security: none. No cryptographic analysis or independent review exists. lut-v1's output exposes the low 8 bits of each vein value. phyco-v2 has 272 bits of state, no keying and no cryptanalysis, and its update uses generic add-rotate-XOR operations.
+• Hardware: no VHDL, testbench or synthesis result exists yet. phyco-v2 has open RTL items (a fixed 2×2 ring, a long combinational path per step); see the design review in `specs/002-core-dynamics-redesign/plan.md`.
 
-Do not use PhycoWeb-PRNG for secrets. Even if a future version passes NIST SP 800-22, that would show only that no statistical defect was detected by those tests. It would not show cryptographic security.
+Do not use PhycoWeb-PRNG for secrets. phyco-v2 passing NIST SP 800-22 shows only that no statistical defect was detected by those tests. It does not show cryptographic security.
 
 Setup
 
