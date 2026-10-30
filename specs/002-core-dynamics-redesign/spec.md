@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Approved for planning (2026-10-28); design-freeze and result reviews pending
+**Status**: Complete (2026-10-29): final result review approved; acceptance attempt 1 PASS
 
 **Input**: User description: "Redesign the PhycoWeb-PRNG core dynamics so the integer reference
 model passes the NIST SP 800-22 battery under acceptance rules that are fixed before any tuning.
@@ -48,6 +48,7 @@ Acceptance Protocol"). After approval, those rules may only be made stricter, ne
 | Design review (T035: design.md 1.0, Principles III, VI, VIII) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session: design.md 1.0 (variant v005, SHA-256 7e729d6b…3932), the Principle III checklist and its RTL-pending exceptions, and the FR-007 judgment. | Includes the Principle III checklist (design.md §7), the RTL-pending exceptions (plan.md Complexity Tracking) and the FR-007 judgment (design.md §8) |
 | Design freeze 1 (T053: attempt-1/freeze.json, heldout-1) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session; approval fields recorded in freeze.json by the agent. Draft written 2026-10-28 at git 5dd9308; model 1260142d…, design 1.0 a1109bf1…, harness 1.0.0 1563526e…. Approval = owner fills approved_by / approved_on in freeze.json |
 | Design freeze (before each held-out attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
+| Final result review (T061: reports/002-core-dynamics-redesign/phase-report.md) | Coastrnaut (repository owner) | 2026-10-29 | Approved | Approved in session. Feature 002 accepted as complete: attempt 1 PASS (heldout-1); heldout-2 and heldout-3 unused; open issues O1–O6 recorded in the final report. A statistical pass is not evidence of cryptographic security |
 | Result review (T055: attempt 1) | Coastrnaut (repository owner) | 2026-10-28 | Approved | Approved in session; proceed to Phase 6. | Attempt 1 verdict PASS; report reports/002-core-dynamics-redesign/attempt-1/phase-report.md. Required before the feature is declared complete |
 
 ## User Scenarios & Testing *(mandatory)*
