@@ -1,0 +1,37 @@
+{
+ "owner_permission": "2026-10-29, in session: \"approved, download both\"",
+ "downloaded_on": "2026-10-29",
+ "name": "TestU01",
+ "version": "1.2.3",
+ "source_url": "https://simul.iro.umontreal.ca/testu01/TestU01.zip",
+ "archive_name": "TestU01.zip",
+ "archive_bytes": 3123035,
+ "archive_sha256": "bc1d1dd2aea7ed3b3d28eaad2c8ee55913f11ce67aec8fe4f643c1c0d2ed1cac",
+ "download_dir": "~/downloads/testu01-1.2.3 (new empty directory)",
+ "licence": "COPYING: (c) 2002 Pierre L'Ecuyer; redistribution and use permitted without fee for private, research, academic or other non-commercial purposes; commercial use needs a written licence. Not vendored or redistributed by this repository",
+ "build_commands": [
+  "bash fast/build_tools.sh testu01 ~/downloads/testu01-1.2.3/TestU01-1.2.3",
+  "./configure --prefix=$HOME/testu01 CFLAGS=\"-O2 -std=gnu89\"",
+  "make -j8",
+  "make install"
+ ],
+ "build_flags": "CFLAGS=-O2 -std=gnu89 (gcc 15 defaults to C23, which rejects the 2009 sources)",
+ "build_warnings": "50 upstream warnings (22 -Wunused-result, 11 -Wformat-security, 2 -Wformat-zero-length, others). Not changed",
+ "binaries": {
+  "libtestu01": {
+   "path": "~/testu01/lib/libtestu01.so.0.0.1",
+   "sha256": "b2b28cb62020fd69b4596f4184b7db9b55a83f4d975edec2742d27ecef44bd48"
+  },
+  "libprobdist": {
+   "path": "~/testu01/lib/libprobdist.so.0.0.1",
+   "sha256": "c83c19010989279c26846765914e02063221d476165f19ee09b129f553bc96b2"
+  },
+  "libmylib": {
+   "path": "~/testu01/lib/libmylib.so.0.0.1",
+   "sha256": "890c3b3522ff8e74e2f14fb09f8b1198330f2bfcc4945c33363936270fb120ce"
+  }
+ },
+ "notes": [
+  "Driver smoke test: os stream | testu01_driver smallcrush: 15 statistics, all passed, 10.3 s."
+ ]
+}
