@@ -50,3 +50,26 @@ Vector checks (T042): `scripts/gen_vectors.py --verify` reports "OK: 10000 words
 > Statistical tests that find no defect are not evidence of cryptographic security. The dev
 > results are optimistic, because the design was selected on these seeds (design.md §9). Only
 > the held-out attempt counts for acceptance.
+
+## Quickstart end to end (T059), 2026-10-28
+
+Run on Windows (Python 3.10.11) and WSL (Python 3.14.4), at git `78a1be7` plus report files.
+Steps whose commands write recorded evidence (H2 writes `cal-1.*`; A4 writes `rescore.json`)
+were sent to a scratch directory instead and compared with the recorded evidence. Tolerance:
+Windows exact; WSL p-values within 1e-9 with verdicts exact (research R7).
+
+| Step | Windows | WSL |
+|------|---------|-----|
+| H1 `python -m unittest tests.test_sp80022` (worked examples, Appendix B, templates, contract; includes H4 known-bad) | OK, 3 skipped | OK, 3 skipped |
+| H2 one fresh positive control, 100 × 2²¹ urandom bits | 14/15. Random Excursions Variant failed (3 of 18 sub-tests at 70/74 vs 71 needed; k_max 1). Allowed by H2 (at most one family by chance). Not a repeat of an earlier failing sub-test, so T024's defect rule is not triggered. See phase-report open issue O3 | 15/15 pass |
+| H3 re-score `cal-1.bin` vs `cal-1.json` | identical (max \|Δp\| 0) | verdicts equal, max \|Δp\| 3.1e-13 |
+| H5 re-score the 4 feature-001 inputs vs `feature001-rescore/*.json` | identical | input bytes identical (SHA-256), max \|Δp\| 2.2e-16 |
+| D1 `python scripts/seedsets.py --check` | 4/4 OK | 4/4 OK |
+| D2 `explore.py --set heldout-1` | exit 2 (refused) | exit 2 (refused) |
+| D3 `scripts/disruption_rate.py` (102 seeds × 10⁶ steps) vs `dev/disruption.json` | identical per-seed rates, 13.49–13.83% | identical |
+| M1 `python -W ignore -m unittest discover -s tests -t .` | 116 OK, 3 skipped | 116 OK, 3 skipped |
+| M2 `gen_vectors.py --verify` for the 2 phyco-v2 files | OK, OK | OK, OK |
+| M3 `sts_eval.py --source phyco-v2 --set dev` vs `dev/dev-final.json` | identical, pass | pass, max \|Δp\| 5.6e-16 |
+| A4 attempt 1 re-score (positive, negative, candidate) | identical (also `rescore_attempt.py`, exit 0) | verdicts equal, max \|Δp\| ≤ 1.0e-15 |
+
+H0 (nistrng defects) is recorded in `harness/nistrng-defects.json` and was not repeated.
