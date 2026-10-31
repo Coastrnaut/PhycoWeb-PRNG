@@ -1,0 +1,40 @@
+{
+ "role": "negative",
+ "generator": "lut-v1",
+ "seed": [
+  52722,
+  14883,
+  21889,
+  22913
+ ],
+ "battery": "smallcrush",
+ "orientation": "fwd",
+ "mode": "attempt-1",
+ "stop_on_fail": false,
+ "length_target_log2": null,
+ "stream_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/phyco_stream",
+  "lut-v1",
+  "52722",
+  "14883",
+  "21889",
+  "22913"
+ ],
+ "consumer_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/testu01_driver",
+  "smallcrush",
+  "--name",
+  "smallcrush-fwd-seed7",
+  "--pvalues",
+  "/mnt/c/GIT/PhycoWeb-PRNG/reports/003-extended-batteries-calibration/attempt-1/negative/smallcrush-fwd-seed7/pvalues.jsonl"
+ ],
+ "stream_bytes": 908066816,
+ "stream_sha256": "b09ac46d98359638333cff29dafa1c86fa0f648b707bd64819309e0b2caf5c34",
+ "exit_status": 0,
+ "stream_exit_status": 0,
+ "started": "2026-10-30T21:01:43",
+ "elapsed_s": 8.2,
+ "host": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+ "python": "3.14.4",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

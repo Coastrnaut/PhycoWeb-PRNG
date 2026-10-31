@@ -1,0 +1,38 @@
+{
+ "role": "positive",
+ "generator": "os",
+ "seed": null,
+ "battery": "practrand",
+ "orientation": "fwd",
+ "mode": "attempt-1",
+ "stop_on_fail": false,
+ "length_target_log2": 40,
+ "stream_command": [
+  "/mnt/c/GIT/PhycoWeb-PRNG/fast/build/phyco_stream",
+  "os"
+ ],
+ "consumer_command": [
+  "/home/coast/practrand/RNG_test",
+  "stdin32",
+  "-tf",
+  "2",
+  "-te",
+  "0",
+  "-a",
+  "-tlmin",
+  "27",
+  "-tlmax",
+  "40",
+  "-tlmaxonly",
+  "-multithreaded"
+ ],
+ "stream_bytes": 1099511627776,
+ "stream_sha256": "f8630e44813e541dd3e997951ba46f9ea957694fb46b48fa9cfaeb2f84ef0c55",
+ "exit_status": 0,
+ "stream_exit_status": 0,
+ "started": "2026-10-30T14:08:23",
+ "elapsed_s": 4727.8,
+ "host": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+ "python": "3.14.4",
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

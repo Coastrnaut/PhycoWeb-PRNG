@@ -1,0 +1,3428 @@
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                 Starting Crush
+                 Version: TestU01 1.2.3
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+***********************************************************
+Test smarsa_SerialOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   d = 4096,   t =  2,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =           16777216
+       Expected number per cell =   29.802322
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =     0.01677312,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 16773120
+Value of the statistic                :8.65e+12
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.66
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_SerialOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r =  0,   d =   64,   t =  4,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =           16777216
+       Expected number per cell =   17.881393
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =    0.027525119,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 16515072
+Value of the statistic                :7.74e+13
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.08
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r =  0,   d = 1048576,   t =  2,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99989750
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116267510
+  j =  1                              :               10
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.28
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r = 10,   d = 1048576,   t =  2,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99989750
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116267510
+  j =  1                              :               10
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.64
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r =  0,   d = 1024,   t =  4,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99990134
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116267894
+  j =  1                              :               26
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.75
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r = 20,   d = 1024,   t =  4,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99994850
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116272610
+  j =  1                              :               30
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.67
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r =  0,   d =   32,   t =  8,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99999360
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116277120
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.28
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r = 25,   d =   32,   t =  8,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.75
+Observed number of collisions         : 99998720
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116276480
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.17
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r =  0,   d =    4,   t = 20,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.74
+Observed number of collisions         : 99999360
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116277120
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.23
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r = 28,   d =    4,   t = 20,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      1099511627776
+       Expected number per cell =  1 /  109951.16
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  109951.16
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :      454.74
+Observed number of collisions         : 99998720
+p-value of test                       :   eps      *****
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :   10995116276480
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.83
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  5,  n = 20000000,  r =  0,    d = 2147483648,    t = 2,    p = 1
+
+
+      Number of cells = d^t = 4611686018427387904
+      Lambda = Poisson mean =     433.6809
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    2168.40
+Total observed number                 : 99997435
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.10
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  5,  n = 20000000,  r =  0,    d = 2097152,    t = 3,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    1084.20
+Total observed number                 : 99994875
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:08.02
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  5,  n = 20000000,  r =  0,    d = 65536,    t = 4,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     108.4202
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :     542.10
+Total observed number                 : 99998715
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:08.02
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  3,  n = 20000000,  r =  0,    d = 512,    t = 7,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :     650.52
+Total observed number                 : 59999184
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.29
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  3,  n = 20000000,  r =  7,    d = 512,    t = 7,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :     650.52
+Total observed number                 : 59996925
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.39
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  3,  n = 20000000,  r = 14,    d = 256,    t = 8,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     108.4202
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :     325.26
+Total observed number                 : 59999613
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.34
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N =  3,  n = 20000000,  r = 22,    d = 256,    t = 8,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     108.4202
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :     325.26
+Total observed number                 : 59999805
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.15
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N = 10,  n = 2000000,  r =  0,  t = 2,  p = 0,  m = 30,  Torus =  TRUE
+
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :  357.37
+p-value of test                       :3.2e-157    *****
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :  357.37
+p-value of test                       :3.2e-157    *****
+
+Test on the Nm values of W_{n,i}(mNP1):10721.04
+p-value of test                       :   eps      *****
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     300
+Number of jumps of Y                  > 500000     *****
+p-value of test                       :   eps      *****
+
+Stat. AD (mNP2)                       : 1.79e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:05:01.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N = 10,  n = 2000000,  r =  0,  t = 3,  p = 0,  m = 30,  Torus =  TRUE
+
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :  357.37
+p-value of test                       :3.2e-157    *****
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :  357.37
+p-value of test                       :3.2e-157    *****
+
+Test on the Nm values of W_{n,i}(mNP1):10721.04
+p-value of test                       :   eps      *****
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     300
+Number of jumps of Y                  > 500000     *****
+p-value of test                       :   eps      *****
+
+Stat. AD (mNP2)                       : 1.79e+7
+p-value of test                       :   eps      *****
+
+Stat. AD after spacings (mNP2-S)      : 1.79e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:02:47.94
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N =  5,  n = 2000000,  r =  0,  t = 7,  p = 0,  m = 30,  Torus =  TRUE
+
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+*********  WARNING in file  snpair.c  on line  293
+*********  res->NumClose > 50000
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :  178.68
+p-value of test                       : 1.8e-79    *****
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :  178.68
+p-value of test                       : 1.8e-79    *****
+
+Test on the Nm values of W_{n,i}(mNP1): 5360.52
+p-value of test                       :   eps      *****
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     150
+Number of jumps of Y                  > 250000     *****
+p-value of test                       :   eps      *****
+
+Stat. AD (mNP2)                       : 8.93e+6
+p-value of test                       :   eps      *****
+
+Stat. AD after spacings (mNP2-S)      : 8.93e+6
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:30:27.86
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+snpair_ClosePairsBitMatch test:
+-----------------------------------------------
+   N =  4,  n = 4000000,  r =  0,  t = 2
+
+
+-----------------------------------------------
+Max of all bit distances              :  128.00
+p-value of test                       : 6.9e-65    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.55
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+snpair_ClosePairsBitMatch test:
+-----------------------------------------------
+   N =  2,  n = 4000000,  r =  0,  t = 4
+
+
+-----------------------------------------------
+Max of all bit distances              :  128.00
+p-value of test                       :7.5e-143    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.82
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 40000000,  r =  0,   d =   16,   k =   16
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   12
+Chi-square statistic                  : 2.46e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:04.42
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 40000000,  r = 26,   d =   16,   k =   16
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   12
+Chi-square statistic                  : 2.68e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:04.90
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   d =   64,   k =   64
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   23
+Chi-square statistic                  : 6.24e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:04.28
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 24,   d =   64,   k =   64
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   23
+Chi-square statistic                  : 4.46e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.00
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 40000000,  r =  0,   d =    4
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   51
+Chi-square statistic                  : 2.27e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.42
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 40000000,  r = 28,   d =    4
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   51
+Chi-square statistic                  : 1.78e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.46
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   d =   16
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 5.01e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.73
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 26,   d =   16
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 2.50e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.26
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r =  0,   Alpha =        0,   Beta  =    0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  106
+Chi-square statistic                  : 3.67e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.13
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r = 27,   Alpha =        0,   Beta  =    0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  106
+Chi-square statistic                  : 2.23e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.67
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 5000000,  r =  0,   Alpha =        0,   Beta  = 0.00390625
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 1936
+Chi-square statistic                  : 1.63e+9
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:01.82
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 5000000,  r = 22,   Alpha =        0,   Beta  = 0.00390625
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 1936
+Chi-square statistic                  : 5.06e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.23
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   Up =  TRUE
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    6
+Chi-square statistic                  : 3.60e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.38
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r = 15,   Up = FALSE
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    6
+Chi-square statistic                  : 1.82e+6
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.05
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 50000000,  r =  0,   t = 10,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =            3628800
+       Expected number per cell =    13.77866
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =     0.03628799,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 3628799
+Value of the statistic                :4.67e+12
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.96
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 50000000,  r = 15,   t = 10,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =            3628800
+       Expected number per cell =    13.77866
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =     0.03628799,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 3628799
+Value of the statistic                :3.54e+11
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.36
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  5,  n = 10000000,  r =  0,   t = 13,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =         6227020800
+       Expected number per cell =  1 /  622.70208
+       EColl = n^2 / (2k) =  8029.521918
+       Hashing =   TRUE
+
+       Collision test,    Mu =      8025.2245,    Sigma =    89.5098
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    40126.12
+Observed number of collisions         : 49999490
+p-value of test                       :   eps      *****
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :      31135103490
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:11.63
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  5,  n = 10000000,  r = 15,   t = 13,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =         6227020800
+       Expected number per cell =  1 /  622.70208
+       EColl = n^2 / (2k) =  8029.521918
+       Hashing =   TRUE
+
+       Collision test,    Mu =      8025.2245,    Sigma =    89.5098
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    40126.12
+Observed number of collisions         : 49994880
+p-value of test                       :   eps      *****
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :      31135098880
+  j =  1                              :                0
+  j =  2                              :                0
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:00:13.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 10,  n = 10000000,  r =  0,   d = 100000,   t =  5
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Kolmogorov-Smirnov- statistic = D-    :    1.00
+p-value of test                       :   eps      *****
+
+Anderson-Darling statistic = A2       :  357.37
+p-value of test                       :3.2e-157    *****
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 999990
+Chi-square statistic                  :3.41e+10
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  357.37
+p-value of test                       :3.2e-157    *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:09.34
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N =  5,  n = 10000000,  r =  0,   d = 100000,   t = 10
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Kolmogorov-Smirnov- statistic = D-    :    1.00
+p-value of test                       :   eps      *****
+
+Anderson-Darling statistic = A2       :  178.68
+p-value of test                       : 1.8e-79    *****
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 499995
+Chi-square statistic                  :3.85e+10
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  178.68
+p-value of test                       : 1.8e-79    *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.28
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   d = 100000,   t = 20
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 99999
+Chi-square statistic                  :1.61e+10
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Anderson-Darling statistic            :   0.000
+p-value of test                       : 1 - eps1    *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:01.90
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   d = 100000,   t = 30
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 99999
+Chi-square statistic                  :2.09e+10
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Anderson-Darling statistic            :   0.000
+p-value of test                       : 1 - eps1    *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.46
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_SampleProd test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   t = 10
+
+
+-----------------------------------------------
+Anderson-Darling statistic            :   0.000
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:01.19
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_SampleProd test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   t = 30
+
+
+-----------------------------------------------
+Anderson-Darling statistic            :   0.000
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.55
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_SampleMean test:
+-----------------------------------------------
+   N = 10000000,  n = 20,  r =  0
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.43
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.017
+p-value of test                       :   eps      *****
+
+Anderson-Darling statistic = A2       : 4.21e+6
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.44
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_SampleCorr test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   k = 1
+
+
+-----------------------------------------------
+Normal statistic                      :-2864.02
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.53
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_AppearanceSpacings test:
+-----------------------------------------------
+   N =  1,   Q = 10000000,   K = 400000000,   r = 0,   s = 30,   L = 15
+
+   Sequences of n = (K + Q)L =   6150000000 bits
+   Q = 10000000 initialization blocks
+   K = 400000000 blocks for the test
+   the blocks have L = 15 bits
+
+
+
+-----------------------------------------------
+Normal statistic                      : -6.16e+4
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.98
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_AppearanceSpacings test:
+-----------------------------------------------
+   N =  1,   Q = 10000000,   K = 100000000,   r = 20,   s = 10,   L = 15
+
+   Sequences of n = (K + Q)L =   1650000000 bits
+   Q = 10000000 initialization blocks
+   K = 100000000 blocks for the test
+   the blocks have L = 15 bits
+
+
+
+-----------------------------------------------
+Normal statistic                      : -5.34e+4
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.57
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_WeightDistrib test:
+-----------------------------------------------
+   N =  1,  n = 2000000,  r =  0,  k = 256,  Alpha =      0,  Beta =  0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 2.46e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.88
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_WeightDistrib test:
+-----------------------------------------------
+   N =  1,  n = 2000000,  r =  8,  k = 256,  Alpha =      0,  Beta =  0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 1.19e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.19
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_WeightDistrib test:
+-----------------------------------------------
+   N =  1,  n = 2000000,  r = 16,  k = 256,  Alpha =      0,  Beta =  0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 3.41e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.19
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_WeightDistrib test:
+-----------------------------------------------
+   N =  1,  n = 2000000,  r = 24,  k = 256,  Alpha =      0,  Beta =  0.125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   46
+Chi-square statistic                  : 1.79e+9
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.19
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+svaria_SumCollector test:
+-----------------------------------------------
+   N =  1,  n = 20000000,  r =  0,   g = 10
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   25
+Chi-square statistic                  : 6.07e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.82
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 1000000,  r =  0,    s = 30,    L = 60,    k = 60
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    4
+Chi-square statistic                  :18571.05
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:12.86
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 1000000,  r = 20,    s = 10,    L = 60,    k = 60
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    4
+Chi-square statistic                  :44910.85
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:15.94
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 50000,  r =  0,    s = 30,    L = 300,    k = 300
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    3
+Chi-square statistic                  : 9.41e+6
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:20.61
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 50000,  r = 20,    s = 10,    L = 300,    k = 300
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    3
+Chi-square statistic                  : 9.41e+6
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:21.19
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 2000,  r =  0,    s = 30,    L = 1200,    k = 1200
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    3
+Chi-square statistic                  : 3.76e+5
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.76
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_MatrixRank test:
+-----------------------------------------------
+   N =  1,  n = 2000,  r = 20,    s = 10,    L = 1200,    k = 1200
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    3
+Chi-square statistic                  : 3.76e+5
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:10.26
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_Savir2 test:
+-----------------------------------------------
+   N =  1,  n = 20000000,  r =  0,    m = 1048576,    t = 30
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   17
+Chi-square statistic                  :13298.83
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:03.61
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_GCD test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r =  0,   s = 30
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 2465
+Chi2 statistic for GCD values         : 8.06e+7
+p-value of test                       :   eps      *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.63
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+smarsa_GCD test:
+-----------------------------------------------
+   N =  1,  n = 40000000,  r = 10,   s = 20
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 1559
+Chi2 statistic for GCD values         : 2.82e+8
+p-value of test                       :   eps      *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:01.94
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 50000000,  r =  0,   s = 30,   L0 =   90,   L1 =   90
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :   46
+ChiSquare statistic                   : 3.03e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :   47
+ChiSquare statistic                   : 1.48e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          :   45
+ChiSquare statistic                   : 4.87e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :   36
+ChiSquare statistic                   : 3.12e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :   23
+ChiSquare statistic                   : 2.92e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:13.28
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 20,   s = 10,   L0 =   90,   L1 =   90
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :   44
+ChiSquare statistic                   : 5.19e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :   45
+ChiSquare statistic                   : 1.46e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          :   45
+ChiSquare statistic                   : 9.27e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :   35
+ChiSquare statistic                   : 7.04e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :   22
+ChiSquare statistic                   : 3.15e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.98
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 5000000,  r =  0,   s = 30,   L0 = 1000,   L1 = 1000
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :  140
+ChiSquare statistic                   : 2.26e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :  141
+ChiSquare statistic                   : 1.19e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          :  500
+ChiSquare statistic                   : 5.29e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :  132
+ChiSquare statistic                   : 8.95e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :   72
+ChiSquare statistic                   : 6.11e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:10.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 1000000,  r = 20,   s = 10,   L0 = 1000,   L1 = 1000
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :  128
+ChiSquare statistic                   : 7.83e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :  130
+ChiSquare statistic                   : 1.22e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          :  500
+ChiSquare statistic                   : 4.88e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :  122
+ChiSquare statistic                   : 2.64e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :   66
+ChiSquare statistic                   : 1.74e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.65
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 500000,  r =  0,   s = 30,   L0 = 10000,   L1 = 10000
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :  366
+ChiSquare statistic                   : 9.20e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :  366
+ChiSquare statistic                   : 8.52e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          : 5000
+ChiSquare statistic                   : 5.04e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :  360
+ChiSquare statistic                   : 2.60e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :  192
+ChiSquare statistic                   : 1.63e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:09.88
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+swalk_RandomWalk1 test:
+-----------------------------------------------
+   N =  1,  n = 100000,  r = 20,   s = 10,   L0 = 10000,   L1 = 10000
+
+
+
+-----------------------------------------------
+Test on the values of the Statistic H
+
+Number of degrees of freedom          :  318
+ChiSquare statistic                   : 8.81e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic M
+
+Number of degrees of freedom          :  318
+ChiSquare statistic                   : 8.20e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic J
+
+Number of degrees of freedom          : 5000
+ChiSquare statistic                   : 6.53e+6
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic R
+
+Number of degrees of freedom          :  315
+ChiSquare statistic                   : 2.94e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Test on the values of the Statistic C
+
+Number of degrees of freedom          :  169
+ChiSquare statistic                   : 1.75e+5
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.44
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+scomp_LinearComp test:
+-----------------------------------------------
+   N =  1,  n = 120000,  r =  0,    s = 1
+
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   10
+Chi2 statistic for size of jumps      :   18.10
+p-value of test                       :    0.05
+
+
+-----------------------------------------------
+Normal statistic for number of jumps  : -244.70
+p-value of test                       : 1 - eps1    *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:00.00
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+scomp_LinearComp test:
+-----------------------------------------------
+   N =  1,  n = 120000,  r = 29,    s = 1
+
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   10
+Chi2 statistic for size of jumps      :    2.33
+p-value of test                       :    0.9931
+
+
+-----------------------------------------------
+Normal statistic for number of jumps  : -244.39
+p-value of test                       : 1 - eps1    *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:00.01
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+scomp_LempelZiv test:
+-----------------------------------------------
+   N = 10,  n = 33554432,  r =  0,   s =   30,   k =   25
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  357.37
+p-value of test                       :3.2e-157    *****
+
+Tests on the sum of all N observations
+Standardized normal statistic         : -6.84e+4
+p-value of test                       : 1 - eps1    *****
+
+Sample variance                       :    1.45
+p-value of test                       :    0.16
+
+-----------------------------------------------
+CPU time used                    :  00:00:19.98
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sspectral_Fourier3 test:
+-----------------------------------------------
+   N = 50000,  n = 16384,  r =  0,   s =   30,   k =   14
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.73
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :    0.25
+p-value of test                       :2.6e-233    *****
+
+Anderson-Darling statistic = A2       :85689.81
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:10.42
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sspectral_Fourier3 test:
+-----------------------------------------------
+   N = 50000,  n = 16384,  r = 20,   s =   10,   k =   14
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.81
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :    0.19
+p-value of test                       :3.3e-124    *****
+
+Anderson-Darling statistic = A2       :99629.47
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:08.96
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_LongestHeadRun test:
+-----------------------------------------------
+   N =  1,  n = 1000,  r =  0,   s = 30,   L = 10000020
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    8
+Chi-square statistic                  : 9850.28
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+Global longest run of 1               :   17.00
+p-value of test                       : 1 - eps1    *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:27.78
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_LongestHeadRun test:
+-----------------------------------------------
+   N =  1,  n = 300,  r = 20,   s = 10,   L = 10000020
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    7
+Chi-square statistic                  : 2955.08
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+Global longest run of 1               :   11.00
+p-value of test                       : 1 - eps1    *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.51
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_PeriodsInStrings test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r =  0,   s =   30
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  302
+Chi-square statistic                  : 1.20e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:09.13
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_PeriodsInStrings test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r = 15,   s =   15
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   56
+Chi-square statistic                  : 2.41e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.46
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingWeight2 test:
+-----------------------------------------------
+   N = 100,  n = 100000000,  r =  0,   s = 30,   L = 1000000
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Kolmogorov-Smirnov- statistic = D-    :    1.00
+p-value of test                       :   eps      *****
+
+Anderson-Darling statistic = A2       : 3573.68
+p-value of test                       :   eps      *****
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 10000
+Chi-square statistic                  : 5.70e+5
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.78
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingWeight2 test:
+-----------------------------------------------
+   N = 30,  n = 100000000,  r = 20,   s = 10,   L = 1000000
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Kolmogorov-Smirnov- statistic = D-    :    1.00
+p-value of test                       :   eps      *****
+
+Anderson-Darling statistic = A2       : 1072.10
+p-value of test                       :   eps      *****
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 3000
+Chi-square statistic                  : 1.65e+5
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingCorr test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   s = 30,   L = 30
+
+
+
+-----------------------------------------------
+Normal statistic                      : 1650.85
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:08.69
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingCorr test:
+-----------------------------------------------
+   N =  1,  n = 50000000,  r =  0,   s = 30,   L = 300
+
+
+
+-----------------------------------------------
+Normal statistic                      : -962.14
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:09.57
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingCorr test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   s = 30,   L = 1200
+
+
+
+-----------------------------------------------
+Normal statistic                      : -415.30
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.11
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r =  0,   s = 30,   L = 30,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          :  577
+Chi-square statistic                  : 2.51e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:09.98
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r = 20,   s = 10,   L = 30,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          :  533
+Chi-square statistic                  : 1.18e+8
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.00
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 30000000,  r =  0,   s = 30,   L = 300,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          : 4117
+Chi-square statistic                  : 1.96e+9
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:11.94
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 20,   s = 10,   L = 300,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          : 3585
+Chi-square statistic                  : 8.26e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.26
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r =  0,   s = 30,   L = 1200,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          : 11825
+Chi-square statistic                  : 1.67e+9
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:14.38
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_HammingIndep test:
+-----------------------------------------------
+   N =  1,  n = 1000000,  r = 20,   s = 10,   L = 1200,   d = 0
+
+
+
+Counters with expected numbers >= 10
+-----------------------------------------------
+Number of degrees of freedom          : 7473
+Chi-square statistic                  : 8.69e+7
+p-value of test                       :   eps      *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:02.23
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_Run test:
+-----------------------------------------------
+   N =  1,  n = 1000000000,  r =  0,   s =   30
+
+
+-----------------------------------------------
+Total number of 1 runs:  1000000005
+
+Number of degrees of freedom          :   52
+Chi2 statistic for number of runs     : 1.69e+7
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Total number of bits:  4027268010
+
+Normal statistic for number of bits   :  304.87
+p-value of test                       :   eps      *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:10.57
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_Run test:
+-----------------------------------------------
+   N =  1,  n = 1000000000,  r = 20,   s =   10
+
+
+-----------------------------------------------
+Total number of 1 runs:  1000000000
+
+Number of degrees of freedom          :   52
+Chi2 statistic for number of runs     : 1.86e+7
+p-value of test                       :   eps      *****
+
+
+-----------------------------------------------
+Total number of bits:  4082934590
+
+Normal statistic for number of bits   :  927.24
+p-value of test                       :   eps      *****
+
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.28
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_AutoCor test:
+-----------------------------------------------
+   N = 10,  n = 1000000021,  r =  0,   s = 30,   d = 1
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  357.37
+p-value of test                       :3.2e-157    *****
+
+Tests on the sum of all N observations
+Standardized normal statistic         : -677.08
+p-value of test                       : 1 - eps1    *****
+
+Sample variance                       : 1.96e-6
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.55
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_AutoCor test:
+-----------------------------------------------
+   N =  5,  n = 1000000001,  r = 20,   s = 10,   d = 1
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  178.68
+p-value of test                       : 1.8e-79    *****
+
+Tests on the sum of all N observations
+Standardized normal statistic         :-1436.31
+p-value of test                       : 1 - eps1    *****
+
+Sample variance                       : 3.88e-8
+p-value of test                       : 1 - 3.0e-15    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.63
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_AutoCor test:
+-----------------------------------------------
+   N = 10,  n = 1000000020,  r =  0,   s = 30,   d = 30
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  357.37
+p-value of test                       :3.2e-157    *****
+
+Tests on the sum of all N observations
+Standardized normal statistic         :-1250.00
+p-value of test                       : 1 - eps1    *****
+
+Sample variance                       : 9.37e-7
+p-value of test                       : 1 - eps1    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:06.84
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+crush-fwd-seed5
+
+
+sstring_AutoCor test:
+-----------------------------------------------
+   N =  5,  n = 1000000010,  r = 20,   s = 10,   d = 10
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    1.00
+p-value of test                       :   eps      *****
+
+Kolmogorov-Smirnov- statistic = D-    :   0.000
+p-value of test                       : 1 - eps1    *****
+
+Anderson-Darling statistic = A2       :  178.68
+p-value of test                       : 1.8e-79    *****
+
+Tests on the sum of all N observations
+Standardized normal statistic         :-1491.55
+p-value of test                       : 1 - eps1    *****
+
+Sample variance                       : 2.40e-6
+p-value of test                       : 1 - 1.2e-11    *****
+
+-----------------------------------------------
+CPU time used                    :  00:00:05.98
+
+Generator state:
+
+
+
+
+
+========= Summary results of Crush =========
+
+ Version:          TestU01 1.2.3
+ Generator:        crush-fwd-seed5
+ Number of statistics:  144
+ Total CPU time:   00:48:11.01
+ The following tests gave p-values outside [0.001, 0.9990]:
+ (eps  means a value < 1.0e-300):
+ (eps1 means a value < 1.0e-15):
+
+       Test                          p-value
+ ----------------------------------------------
+  1  SerialOver, t = 2                eps  
+  2  SerialOver, t = 4                eps  
+  3  CollisionOver, t = 2             eps  
+  4  CollisionOver, t = 2             eps  
+  5  CollisionOver, t = 4             eps  
+  6  CollisionOver, t = 4             eps  
+  7  CollisionOver, t = 8             eps  
+  8  CollisionOver, t = 8             eps  
+  9  CollisionOver, t = 20            eps  
+ 10  CollisionOver, t = 20            eps  
+ 11  BirthdaySpacings, t = 2          eps  
+ 12  BirthdaySpacings, t = 3          eps  
+ 13  BirthdaySpacings, t = 4          eps  
+ 14  BirthdaySpacings, t = 7          eps  
+ 15  BirthdaySpacings, t = 7          eps  
+ 16  BirthdaySpacings, t = 8          eps  
+ 17  BirthdaySpacings, t = 8          eps  
+ 18  ClosePairs NP, t = 2          3.2e-157
+ 18  ClosePairs mNP, t = 2         3.2e-157
+ 18  ClosePairs mNP1, t = 2           eps  
+ 18  ClosePairs mNP2, t = 2           eps  
+ 18  ClosePairs NJumps, t = 2         eps  
+ 19  ClosePairs NP, t = 3          3.2e-157
+ 19  ClosePairs mNP, t = 3         3.2e-157
+ 19  ClosePairs mNP1, t = 3           eps  
+ 19  ClosePairs mNP2, t = 3           eps  
+ 19  ClosePairs NJumps, t = 3         eps  
+ 19  ClosePairs mNP2S, t = 3          eps  
+ 20  ClosePairs NP, t = 7           1.8e-79
+ 20  ClosePairs mNP, t = 7          1.8e-79
+ 20  ClosePairs mNP1, t = 7           eps  
+ 20  ClosePairs mNP2, t = 7           eps  
+ 20  ClosePairs NJumps, t = 7         eps  
+ 20  ClosePairs mNP2S, t = 7          eps  
+ 21  ClosePairsBitMatch, t = 2      6.9e-65
+ 22  ClosePairsBitMatch, t = 4     7.5e-143
+ 23  SimpPoker, d = 16                eps  
+ 24  SimpPoker, d = 16                eps  
+ 25  SimpPoker, d = 64                eps  
+ 26  SimpPoker, d = 64                eps  
+ 27  CouponCollector, d = 4           eps  
+ 28  CouponCollector, d = 4           eps  
+ 29  CouponCollector, d = 16          eps  
+ 30  CouponCollector, d = 16          eps  
+ 31  Gap, r = 0                       eps  
+ 32  Gap, r = 27                      eps  
+ 33  Gap, r = 0                       eps  
+ 34  Gap, r = 22                      eps  
+ 35  Run of U01, r = 0                eps  
+ 36  Run of U01, r = 15               eps  
+ 37  Permutation, r = 0               eps  
+ 38  Permutation, r = 15              eps  
+ 39  CollisionPermut, r = 0           eps  
+ 40  CollisionPermut, r = 15          eps  
+ 41  MaxOft, t = 5                    eps  
+ 41  MaxOft AD, t = 5              3.2e-157
+ 42  MaxOft, t = 10                   eps  
+ 42  MaxOft AD, t = 10              1.8e-79
+ 43  MaxOft, t = 20                   eps  
+ 43  MaxOft AD, t = 20              1 - eps1
+ 44  MaxOft, t = 30                   eps  
+ 44  MaxOft AD, t = 30              1 - eps1
+ 45  SampleProd, t = 10             1 - eps1
+ 46  SampleProd, t = 30             1 - eps1
+ 47  SampleMean                       eps  
+ 48  SampleCorr                     1 - eps1
+ 49  AppearanceSpacings, r = 0      1 - eps1
+ 50  AppearanceSpacings, r = 20     1 - eps1
+ 51  WeightDistrib, r = 0             eps  
+ 52  WeightDistrib, r = 8             eps  
+ 53  WeightDistrib, r = 16            eps  
+ 54  WeightDistrib, r = 24            eps  
+ 55  SumCollector                     eps  
+ 56  MatrixRank, 60 x 60              eps  
+ 57  MatrixRank, 60 x 60              eps  
+ 58  MatrixRank, 300 x 300            eps  
+ 59  MatrixRank, 300 x 300            eps  
+ 60  MatrixRank, 1200 x 1200          eps  
+ 61  MatrixRank, 1200 x 1200          eps  
+ 62  Savir2                           eps  
+ 63  GCD, r = 0                       eps  
+ 64  GCD, r = 10                      eps  
+ 65  RandomWalk1 H (L = 90)           eps  
+ 65  RandomWalk1 M (L = 90)           eps  
+ 65  RandomWalk1 J (L = 90)           eps  
+ 65  RandomWalk1 R (L = 90)           eps  
+ 65  RandomWalk1 C (L = 90)           eps  
+ 66  RandomWalk1 H (L = 90)           eps  
+ 66  RandomWalk1 M (L = 90)           eps  
+ 66  RandomWalk1 J (L = 90)           eps  
+ 66  RandomWalk1 R (L = 90)           eps  
+ 66  RandomWalk1 C (L = 90)           eps  
+ 67  RandomWalk1 H (L = 1000)         eps  
+ 67  RandomWalk1 M (L = 1000)         eps  
+ 67  RandomWalk1 J (L = 1000)         eps  
+ 67  RandomWalk1 R (L = 1000)         eps  
+ 67  RandomWalk1 C (L = 1000)         eps  
+ 68  RandomWalk1 H (L = 1000)         eps  
+ 68  RandomWalk1 M (L = 1000)         eps  
+ 68  RandomWalk1 J (L = 1000)         eps  
+ 68  RandomWalk1 R (L = 1000)         eps  
+ 68  RandomWalk1 C (L = 1000)         eps  
+ 69  RandomWalk1 H (L = 10000)        eps  
+ 69  RandomWalk1 M (L = 10000)        eps  
+ 69  RandomWalk1 J (L = 10000)        eps  
+ 69  RandomWalk1 R (L = 10000)        eps  
+ 69  RandomWalk1 C (L = 10000)        eps  
+ 70  RandomWalk1 H (L = 10000)        eps  
+ 70  RandomWalk1 M (L = 10000)        eps  
+ 70  RandomWalk1 J (L = 10000)        eps  
+ 70  RandomWalk1 R (L = 10000)        eps  
+ 70  RandomWalk1 C (L = 10000)        eps  
+ 71  LinearComp, r = 0              1 - eps1
+ 72  LinearComp, r = 29             1 - eps1
+ 73  LempelZiv                      1 - eps1
+ 74  Fourier3, r = 0                  eps  
+ 75  Fourier3, r = 20                 eps  
+ 76  LongestHeadRun, r = 0            eps  
+ 76  LongestHeadRun, r = 0          1 - eps1
+ 77  LongestHeadRun, r = 20           eps  
+ 77  LongestHeadRun, r = 20         1 - eps1
+ 78  PeriodsInStrings, r = 0          eps  
+ 79  PeriodsInStrings, r = 15         eps  
+ 80  HammingWeight2, r = 0            eps  
+ 81  HammingWeight2, r = 20           eps  
+ 82  HammingCorr, L = 30              eps  
+ 83  HammingCorr, L = 300           1 - eps1
+ 84  HammingCorr, L = 1200          1 - eps1
+ 85  HammingIndep, L = 30             eps  
+ 86  HammingIndep, L = 30             eps  
+ 87  HammingIndep, L = 300            eps  
+ 88  HammingIndep, L = 300            eps  
+ 89  HammingIndep, L = 1200           eps  
+ 90  HammingIndep, L = 1200           eps  
+ 91  Run of bits, r = 0               eps  
+ 91  Run of bits, r = 0               eps  
+ 92  Run of bits, r = 20              eps  
+ 92  Run of bits, r = 20              eps  
+ 93  AutoCor, d = 1                 1 - eps1
+ 94  AutoCor, d = 1                 1 - eps1
+ 95  AutoCor, d = 30                1 - eps1
+ 96  AutoCor, d = 10                1 - eps1
+ ----------------------------------------------
+ All other tests were passed
+
+
+

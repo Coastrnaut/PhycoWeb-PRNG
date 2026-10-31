@@ -1,0 +1,1 @@
+{"n_pvalues": 300, "complete": false, "stopped_early": true, "rule2": 222, "rule3": 0, "min_q": 0.0}
