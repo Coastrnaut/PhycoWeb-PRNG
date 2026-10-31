@@ -1239,4 +1239,178 @@ Number of degrees of freedom          :   54
 Chi-square statistic                  :   38.50
 p-value of test                       :    0.95
 
-----------------
+-----------------------------------------------
+CPU time used                    :  00:00:44.55
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   Alpha =        0,   Beta  =   0.0625
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  232
+Chi-square statistic                  :  256.57
+p-value of test                       :    0.13
+
+-----------------------------------------------
+CPU time used                    :  00:00:46.63
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r = 25,   Alpha =        0,   Beta  =  0.03125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  434
+Chi-square statistic                  :  414.55
+p-value of test                       :    0.74
+
+-----------------------------------------------
+CPU time used                    :  00:00:59.50
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r =  0,   Alpha =        0,   Beta  = 0.0078125
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 1437
+Chi-square statistic                  : 1407.04
+p-value of test                       :    0.71
+
+-----------------------------------------------
+CPU time used                    :  00:01:06.65
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 20,   Alpha =        0,   Beta  = 0.000976562
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 7046
+Chi-square statistic                  : 7094.73
+p-value of test                       :    0.34
+
+-----------------------------------------------
+CPU time used                    :  00:00:58.75
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N =  5,  n = 1000000000,  r =  0,   Up = FALSE
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.20
+p-value of test                       :    0.58
+
+Kolmogorov-Smirnov- statistic = D-    :    0.25
+p-value of test                       :    0.46
+
+Anderson-Darling statistic = A2       :    0.40
+p-value of test                       :    0.84
+
+Test on the sum of all N observations
+Number of degrees of freedom          :   30
+Chi-square statistic                  :   30.62
+p-value of test                       :    0.43
+
+-----------------------------------------------
+CPU time used                    :  00:00:43.59
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed8
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N = 10,  n = 1000000000,  r = 15,   Up =  TRUE
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.21
+p-value of test                       :    0.38
+
+Kolmogorov-Smirnov- statistic = D-    :    0.12
+p-value of test                       :    0.70
+
+Anderson-Darling statistic = A2       :    0.46
+p-value of test                       :    0.78
+
+Test on the sum of all N observations
+Number of degrees of freedom          :   60
+Chi-square statistic                  :   62.35
+p-value of test                       :    0.39
+
+-----------------------------------------------
+CPU time used                    :  00:01:48.26
+
+Generator state:
+
+
+
+
+*********************************************************
