@@ -245,7 +245,9 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
   FR-008; Principle V)
 - [ ] T041 Claims check: grep `$REP`, README and new code for "cryptographically secure",
   "crypto-grade", "suitable for secrets", "secure"; confirm the verbatim disclaimer in every
-  `summary.md`, `phase-report.md` and record. (FR-016, SC-007)
+  `summary.md`, `phase-report.md` and record. Also grep for "security level", "security
+  strength" and "bits of security", and confirm each match states a bound or limitation, not a
+  claim (constitution 1.2.0 Security Policy). (FR-016, SC-007)
 - [ ] T042 Update README §5 with the calibration result and the battery verdict, with what the
   verdict does and does not mean (preserve CRLF line endings). Keep the seed-size bullet added
   on 2026-10-31. Update `security.md` §1.3 and §11.4 with the reviewed verdict.
@@ -253,7 +255,9 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
 - [ ] T043 Write the final report `$REP/phase-report.md`: FR-001…FR-016 and SC-001…SC-007 →
   evidence, open issues, security concerns, recommendation. Under security concerns, include the
   seed-entropy bound (64-bit seed caps any security level at 64 bits;
-  `research/security/seed-entropy-bound.md`, FUT-SEC-1…9). (Principle VII)
+  `research/security/seed-entropy-bound.md`, FUT-SEC-1…9). State that constitution 1.2.0,
+  approved 2026-10-31 after this plan's Constitution Check against 1.1.0, applies, and that the
+  feature meets its Security Policy. (Principle VII; Security Policy)
 - [ ] T044 ⛔ **Owner final result review**. Record in spec.md and update its Status line.
   (Principle VIII)
 

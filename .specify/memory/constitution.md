@@ -1,55 +1,3 @@
-<!--
-Sync Impact Report
-==================
-Status: DRAFT for owner review, 2026-10-31. Not in force until the repository owner approves it
-and authorizes the commit (Governance; Principle IX). Until then, version 1.1.0 applies.
-
-Version change: 1.1.0 → 1.2.0
-Bump rationale: MINOR. The Security Policy is materially expanded with binding rules. Every
-change is stricter: no principle or section is removed or redefined, no existing requirement is
-relaxed, and Principles I–IX keep their text and numbers.
-
-Modified principles: none.
-
-Modified sections:
-  - Security Policy:
-      - secret-generation use also needs (c): the security-strength requirements met;
-      - adds the seed-entropy finding: phyco-v2 (design 1.0) and lut-v1 take a 64-bit seed, so
-        any security level they have is at most 64 bits, below the 112-bit minimum;
-      - adds rules: every new or changed model's specification states its bound; no strength
-        above the bound may be stated; no cryptographic claim, evaluation or certification
-        before FUT-SEC-1 to FUT-SEC-9 are met; meeting them is an algorithm change with a new
-        model ID; cryptanalysis stays unrestricted; later amendments may only make the rules
-        stricter;
-      - adds requirements FUT-SEC-1 to FUT-SEC-9 from research/security/seed-entropy-bound.md
-        §5, worded as MUST statements. FUT-SEC-9 also forbids describing any model as FIPS 140-3
-        approved or as an SP 800-90A DRBG.
-  - Development Workflow & Quality Gates: the Constitution Check also covers the Security
-    Policy. The plans of features 001–003 already include that row.
-
-Added sections: none (the new rules are part of the Security Policy).
-Removed sections: none.
-
-Templates requiring updates:
-  - .specify/templates/plan-template.md: ✅ no edit needed (its Constitution Check reads this
-    file at runtime)
-  - .specify/templates/spec-template.md, tasks-template.md: ✅ no edit needed
-
-Impact on existing artifacts (not edited here):
-  - No result of features 001–003 changes, and no cryptographic claim exists, so no existing
-    artifact violates the amendment.
-  - specs/002-core-dynamics-redesign/design.md 1.0 does not state its bound and cannot be
-    edited without changing its frozen hash. The bound rule applies to new or changed models;
-    the research note records the bound for design 1.0 and lut-v1.
-  - security.md §4 quotes the Security Policy "verbatim" and needs the amended text.
-  - research/security/seed-entropy-bound.md (§5, §7) and security.md (§20.1, history) should
-    record that FUT-SEC-1 to FUT-SEC-9 are binding from version 1.2.0.
-  - Feature 003 (in progress): its plan was checked against 1.1.0. Its final report (T043)
-    should cite 1.2.0 if the amendment is adopted first.
-
-Follow-up TODOs: none deferred in this document.
--->
-
 # PhycoWeb-PRNG Constitution
 
 ## Mission
@@ -208,9 +156,10 @@ Rationale: outward-facing actions are hard to reverse and must remain under the 
 **Security strength and seed entropy.** A deterministic generator's output is fixed by its seed
 and its public algorithm, so no security level can exceed the seed's entropy, however large the
 internal state. `phyco-v2` (design 1.0) and `lut-v1` take a seed of four 16-bit words, 64 bits in
-total, so any security level they have is at most 64 bits. That is below the 112-bit minimum for
-approved cryptographic use (NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2). The derivation is
-in `research/security/seed-entropy-bound.md`.
+total, so any security level they have is at most 64 bits. That is below the 112-bit minimum NIST
+accepts for approved cryptographic use through 2030 (SP 800-57 Part 1 Rev. 5; SP 800-131A
+Rev. 2), and below the 128-bit floor this policy sets (FUT-SEC-1). The derivation is in
+`research/security/seed-entropy-bound.md`.
 
 - The specification of every new or changed generator model MUST state its seed or key entropy
   in bits, its secret state reachable from the seed, and the upper bound these place on any
@@ -232,9 +181,10 @@ in `research/security/seed-entropy-bound.md`.
 
 Requirements before any cryptographic claim, evaluation or certification:
 
-- **FUT-SEC-1 Key entropy.** The generator MUST accept a key with at least 128 bits of entropy.
-  No claimed strength MAY be below 112 bits, and no seed or key search or time–memory trade-off
-  attack MAY cost less than the claimed strength.
+- **FUT-SEC-1 Key entropy.** The generator MUST accept a key with at least 128 bits of entropy,
+  and no claimed strength MAY be below 128 bits. No seed or key search, and no time–memory
+  trade-off attack, MAY cost less than the claimed strength. (SP 800-57 Part 1 Rev. 5 accepts
+  112-bit strength for applying protection only through 2030.)
 - **FUT-SEC-2 Reachable secret state.** The secret state reachable through key and IV loading
   MUST be at least twice the claimed strength, in bits (time–memory–data trade-off).
 - **FUT-SEC-3 Stream separation.** If one key may produce more than one stream, a nonce or IV

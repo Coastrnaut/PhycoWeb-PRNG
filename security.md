@@ -1,13 +1,13 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.1 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.2 (2026-10-31). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
   - defines the evidence-driven programme for deciding whether it could ever support a
     cryptographic claim;
   - records the evidence gathered so far in features 001–003.
-- **Governed by:** the [constitution](.specify/memory/constitution.md) v1.1.0, specifically the
+- **Governed by:** the [constitution](.specify/memory/constitution.md) v1.2.0, specifically the
   Security Policy and Principles IV, V, VIII and IX. Where this document and the constitution
   differ, the constitution applies.
 - **Status:** a research and validation plan. It is not a security certification. **No security
@@ -44,9 +44,10 @@
 - **Bounded by the specification**: phyco-v2's seed is four 16-bit words, 64 bits in total.
   That caps any security strength at **64 bits**, however large the internal state (section 9.2,
   S1–S3). 64 bits is below the 112-bit minimum for approved cryptographic use (SP 800-57 Part 1,
-  SP 800-131A). Any cryptographic claim or certification would therefore need a new key interface,
-  and probably another core redesign. See the conditional requirements FUT-SEC-1 to FUT-SEC-9
-  (section 20.1) and the research note
+  SP 800-131A) and below the constitution's 128-bit floor for any claim. Any cryptographic claim
+  or certification would therefore need a new key interface, and probably another core redesign.
+  The constitution's Security Policy (1.2.0) makes requirements FUT-SEC-1 to FUT-SEC-9
+  (section 20.1) binding before any such claim. The derivation is in the research note
   [`research/security/seed-entropy-bound.md`](research/security/seed-entropy-bound.md).
 - **Not established**: unpredictability, state-recovery resistance, backtracking resistance,
   prediction resistance (impossible as specified: there is no reseed input), side-channel
@@ -166,14 +167,29 @@ Every claim must state:
 
 ## 4. Security policy and permitted use
 
-The constitution's Security Policy applies verbatim:
+The constitution's Security Policy (version 1.2.0) applies. Its three general rules, verbatim:
 
 - Real secret generation (keys, nonces, tokens, salts) MUST use an established cryptographic
-  random-number generator, such as the operating system CSPRNG or a NIST SP 800-90A DRBG.
-- PhycoWeb-PRNG MUST NOT be recommended or used for secret generation unless it has both (a) a
-  documented, defensible design rationale and (b) an independent expert cryptographic review, with
-  both recorded in the repository.
-- Documentation MUST state this restriction wherever it describes how to use the generator.
+  random-number generator (e.g., the operating system CSPRNG or a NIST SP 800-90A DRBG).
+- PhycoWeb-PRNG MUST NOT be recommended or used for secret generation unless it has all of
+  (a) a documented, defensible design rationale, (b) independent expert cryptographic review,
+  and (c) evidence that it meets the security-strength requirements below, with all three
+  recorded in the repository.
+- Documentation MUST state this restriction wherever usage of the generator is described.
+
+Its security-strength rules, in summary (the constitution's wording governs):
+
+- No security level can exceed the seed's entropy. `phyco-v2` and `lut-v1` are bounded at
+  64 bits.
+- The specification of every new or changed model must state its seed or key entropy, its
+  reachable secret state and the resulting bound.
+- No artifact may state or imply a strength above a model's bound. Stating a bound, such as "at
+  most 64 bits", reports a limitation and is not a claim.
+- No cryptographic claim, and no evaluation or certification meant to support one, may be made
+  or pursued until the model meets FUT-SEC-1 to FUT-SEC-9 (section 20.1) with recorded evidence.
+  The claim then still needs the owner's approval.
+- Cryptanalysis that looks for weaknesses is not restricted, and its results must be reported.
+- Later amendments may make these rules stricter, never weaker.
 
 In practice:
 
@@ -188,6 +204,7 @@ In practice:
 Lifting the restriction requires all of the following:
 
 - the evidence in sections 8–15;
+- requirements FUT-SEC-1 to FUT-SEC-9 met, with the evidence recorded (section 20.1);
 - an owner-approved security claim (Principle VIII, gate 3);
 - an independent expert review recorded in the repository.
 
@@ -246,7 +263,7 @@ checked against the NIST CSRC pages on 2026-10-31.
 | NIST SP 800-90C | Final, September 2025 | Complete RBG constructions: RBG1, RBG2, RBG3, RBGC | Defines how an approved RBG combines an entropy source and a DRBG. A bio-inspired component would add no assurance to such a construction (section 21) |
 | NIST SP 800-22 Rev. 1a | Final, April 2010. On 19 April 2022 NIST decided to revise it. The revision is to clarify its purpose, "in particular rejecting its use for assessing cryptographic random number generators"; drafting had not started when the decision was announced | Statistical tests | Used here only to detect defects. This project's calibration and DFT cross-check show its limits (section 11.4) |
 | NIST FIPS 140-3 | Approved March 2019 | Cryptographic module validation (CMVP) | An RBG in a validated module must use an approved DRBG, and its entropy source must be validated (ESV programme). A custom generator cannot be approved |
-| NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2 | Final (2020; 2019) | Security strengths; algorithm transitions | 112 bits is the minimum security strength for approved use. `phyco-v2` is bounded at 64 |
+| NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2 | Final (2020; 2019) | Security strengths; algorithm transitions | 112 bits is the minimum security strength for approved use, accepted for applying protection only through 2030; from 2031 the minimum is 128 bits. The constitution's floor for any claim is 128 bits (FUT-SEC-1). `phyco-v2` is bounded at 64 |
 | BSI AIS 20 / AIS 31 | German Common Criteria methodology for RNGs | Functionality classes DRG.1–DRG.4 for deterministic RNGs, PTG.1–PTG.3 for physical true RNGs and NTG.1 for non-physical true RNGs (class names as in the functionality-class proposal; check the current BSI version) | DRG.3 (enhanced backward secrecy) or DRG.4 (adds enhanced forward secrecy through reseeding) would be the bar for any future claim |
 | ISO/IEC 18031 | International standard | Random bit generation | International counterpart to the SP 800-90 series |
 | TestU01 1.2.3 (L'Ecuyer and Simard, ACM TOMS 33(4), 2007) | Used in feature 003 | SmallCrush, Crush, BigCrush | Licence allows non-commercial research use only. Not redistributed here |
@@ -639,7 +656,7 @@ not as an advocate for the design.
 ### 12.2 Generic bounds every claim must respect
 
 - **Seed or key size**: security strength ≤ the entropy of the seed. For phyco-v2 that is
-  64 bits; any claim needs FUT-SEC-1 (section 20.1).
+  64 bits; any claim needs FUT-SEC-1, a key of at least 128 bits (section 20.1).
 - **State size**: the Babbage–Golić time–memory–data trade-off breaks a generator whose secret
   state is smaller than about twice the claimed strength. For a 128-bit claim, the secret state
   must have at least 256 bits that are actually reachable. phyco-v2 has 256 secret bits
@@ -977,7 +994,7 @@ Security work follows the existing Spec Kit layout. It does not use a separate t
 
 ```text
 PhycoWeb-PRNG/
-|-- .specify/memory/constitution.md   governing principles (v1.1.0)
+|-- .specify/memory/constitution.md   governing principles (v1.2.0)
 |-- specs/NNN-<feature>/              spec, plan, research, data model, tasks, design
 |-- reports/NNN-<feature>/            evidence, phase reports, freezes, attempts
 |-- phycoweb/                         reference models (lut-v1, phyco-v2) and the LUT
@@ -1069,20 +1086,27 @@ requirement text are in
 [`research/security/seed-entropy-bound.md`](research/security/seed-entropy-bound.md).
 
 These requirements apply **only if the owner decides to pursue a cryptographic claim, evaluation
-or certification**. They are not scheduled. Meeting them is an algorithm change (Principles VI and
-VIII), and probably another core redesign with a new model ID.
+or certification**. They are not scheduled. Since constitution 1.2.0 (approved 2026-10-31) they
+are binding policy: the Security Policy forbids any cryptographic claim, evaluation or
+certification, for any model, until they are met, and its wording prevails over this summary.
+Meeting them is an algorithm change (Principles VI and VIII), and probably another core redesign
+with a new model ID.
 
 | ID | Requirement (summary) |
 |----|-----------------------|
-| FUT-SEC-1 | A key with at least 128 bits of entropy, never less than 112. No seed or key search, and no trade-off attack, cheaper than the claimed strength |
+| FUT-SEC-1 | A key with at least 128 bits of entropy, and no claimed strength below 128 bits. No seed or key search, and no trade-off attack, cheaper than the claimed strength |
 | FUT-SEC-2 | Reachable secret state of at least twice the claimed strength |
 | FUT-SEC-3 | A nonce or IV with uniqueness rules, if a key can have more than one stream |
 | FUT-SEC-4 | A reseed input from a validated entropy source, if prediction resistance is claimed |
 | FUT-SEC-5 | Analysis of key and IV loading and of the warm-up (related-key, related-IV, weak keys) |
 | FUT-SEC-6 | A specified maximum output per key, and per key and IV |
 | FUT-SEC-7 | A new model ID, vectors, freeze, and the full statistical programme on unused held-out sets |
-| FUT-SEC-8 | First, reproduce the 64-bit bound on a reduced seed domain (section 12.3, item 1) |
-| FUT-SEC-9 | A named certification route. FIPS 140-3 approval is not available to a custom generator (Option B only, section 21) |
+| FUT-SEC-8 | Before a redesigned key interface is implemented, reproduce the 64-bit bound on a reduced seed domain (section 12.3, item 1) |
+| FUT-SEC-9 | A named certification route. FIPS 140-3 approval is not available to a custom generator (Option B only, section 21), and no model may be described as FIPS 140-3 approved or as an SP 800-90A DRBG |
+
+The FUT-SEC-1 floor was raised from 112 to 128 bits when the constitution was amended. SP 800-57
+Part 1 Rev. 5 accepts 112-bit strength for applying protection only through 2030, and a redesign
+and its validation would probably finish after that.
 
 **A wider seed alone is probably not enough**, for these reasons:
 
@@ -1126,12 +1150,12 @@ Neither option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.1.0; this document 2.0) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.2) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
 | 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
-| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9, probably a new core design with a new model ID | Conditional; not scheduled (section 20.1) |
+| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9, probably a new core design with a new model ID | Conditional; not scheduled. Its requirements are binding (constitution 1.2.0, section 20.1) |
 | 6 | Cryptanalysis: state recovery, related seeds, rotational, algebraic, distinguishers | Not started |
 | 7 | RTL: VHDL, differential tests, synthesis, side channels | Not started (O1) |
 | 8 | Independent review, reproduction, qualification decision | Not started |
@@ -1171,8 +1195,9 @@ The project pursues three separate objectives:
 Success in the first two must not be read as success in the third. As specified, `phyco-v2`
 cannot meet the cryptographic objective, because its 64-bit seed caps any security strength at
 64 bits. Any cryptographic work therefore starts with a new, owner-approved specification of the
-key and reseed interface, meeting requirements FUT-SEC-1 to FUT-SEC-9 (section 20.1). That is
-probably another core redesign. The work then follows sections 9–15.
+key and reseed interface, meeting requirements FUT-SEC-1 to FUT-SEC-9, which the constitution
+makes binding (section 20.1). That is probably another core redesign. The work then follows
+sections 9–15.
 
 The next security-related artifact recommended for this repository is a Spec Kit feature for the
 threat model and security claims. It would:
@@ -1196,6 +1221,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 1.0 | before feature 001 (git `64e7e3d`) | Initial validation strategy |
 | 2.0 | 2026-10-31 | Replaced the tool-environment section with the tools actually used. Corrected the definitions of prediction and backtracking resistance (SP 800-90A) and added the AIS 20/31 terms. Checked the standards' status (SP 800-90C final 2025; SP 800-90A Rev. 2 draft; the 2022 SP 800-22 revision decision). Added the security status, threat model, structural facts S1–S11 and generic bounds. Aligned every phase with the evidence from features 001–003 (specification, implementations, harness validation, pre-registered protocol, calibration, DFT cross-check, battery attempt status). Replaced the proposed directory tree with the actual layout. Added AI-assistance practice, weakness reporting and priority status |
 | 2.1 | 2026-10-31 | Recorded the main finding, the 64-bit seed bound, as conditional future feature requirements FUT-SEC-1 to FUT-SEC-9 (section 20.1, roadmap stage 5a). Added the research note `research/security/seed-entropy-bound.md` |
+| 2.2 | 2026-10-31 | Constitution 1.2.0, approved by the owner on 2026-10-31, makes FUT-SEC-1 to FUT-SEC-9 binding through its Security Policy and raises the FUT-SEC-1 floor from 112 to 128 bits. Section 4 now quotes the policy's general rules verbatim and summarizes its security-strength rules. Sections 1.2, 6, 12.2, 18, 20.1, 22 and 24 updated to match |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,
