@@ -298,3 +298,107 @@
 2026-10-31T12:21:42 candidate bigcrush-rev-seed7 start
 2026-10-31T12:21:42 candidate bigcrush-rev-seed4 start
 2026-10-31T12:21:42 candidate bigcrush-rev-seed6 start
+2026-10-31T16:28:57 candidate bigcrush-fwd-seed4 exit 0
+2026-10-31T16:28:57 candidate bigcrush-fwd-seed8 start
+2026-10-31T16:28:57 candidate bigcrush-fwd-seed6 exit 0
+2026-10-31T16:28:57 candidate bigcrush-rev-seed8 start
+2026-10-31T16:29:00 candidate bigcrush-fwd-seed2 exit 0
+2026-10-31T16:29:00 candidate smallcrush-fwd-seed9 start
+2026-10-31T16:29:09 candidate bigcrush-fwd-seed0 exit 0
+2026-10-31T16:29:09 candidate bigcrush-rev-seed9 start
+2026-10-31T16:29:09 candidate smallcrush-fwd-seed9 exit 0
+2026-10-31T16:29:09 candidate smallcrush-rev-seed9 start
+2026-10-31T16:29:09 candidate bigcrush-fwd-seed3 exit 0
+2026-10-31T16:29:09 candidate crush-fwd-seed0 start
+2026-10-31T16:29:14 candidate bigcrush-fwd-seed1 exit 0
+2026-10-31T16:29:14 candidate crush-fwd-seed1 start
+2026-10-31T16:29:16 candidate bigcrush-fwd-seed7 exit 0
+2026-10-31T16:29:16 candidate crush-fwd-seed3 start
+2026-10-31T16:29:18 candidate bigcrush-fwd-seed5 exit 0
+2026-10-31T16:29:18 candidate crush-rev-seed3 start
+2026-10-31T16:29:18 candidate smallcrush-rev-seed9 exit 0
+2026-10-31T16:29:18 candidate crush-rev-seed1 start
+2026-10-31T16:34:58 candidate bigcrush-rev-seed1 exit 0
+2026-10-31T16:34:58 candidate crush-rev-seed4 start
+2026-10-31T16:35:24 candidate bigcrush-rev-seed0 exit 0
+2026-10-31T16:35:24 candidate crush-fwd-seed5 start
+2026-10-31T16:35:24 candidate bigcrush-rev-seed2 exit 0
+2026-10-31T16:35:24 candidate crush-fwd-seed6 start
+2026-10-31T16:35:29 candidate bigcrush-rev-seed3 exit 0
+2026-10-31T16:35:29 candidate crush-rev-seed6 start
+2026-10-31T16:35:42 candidate bigcrush-rev-seed6 exit 0
+2026-10-31T16:35:42 candidate crush-fwd-seed7 start
+2026-10-31T16:36:09 candidate bigcrush-rev-seed4 exit 0
+2026-10-31T16:36:09 candidate crush-rev-seed5 start
+2026-10-31T16:36:13 candidate bigcrush-rev-seed7 exit 0
+2026-10-31T16:36:13 candidate crush-fwd-seed8 start
+2026-10-31T16:36:31 candidate bigcrush-rev-seed5 exit 0
+2026-10-31T16:36:31 candidate crush-rev-seed8 start
+2026-10-31T16:57:48 candidate crush-fwd-seed0 exit 0
+2026-10-31T16:57:48 candidate smallcrush-fwd-seed0 start
+2026-10-31T16:57:56 candidate smallcrush-fwd-seed0 exit 0
+2026-10-31T16:57:56 candidate crush-rev-seed9 start
+2026-10-31T16:57:59 candidate crush-fwd-seed1 exit 0
+2026-10-31T16:57:59 candidate smallcrush-rev-seed0 start
+2026-10-31T16:58:00 candidate crush-fwd-seed3 exit 0
+2026-10-31T16:58:00 candidate crush-fwd-seed9 start
+2026-10-31T16:58:07 candidate smallcrush-rev-seed0 exit 0
+2026-10-31T16:58:07 candidate crush-rev-seed7 start
+2026-10-31T16:58:22 candidate crush-rev-seed1 exit 0
+2026-10-31T16:58:22 candidate smallcrush-rev-seed2 start
+2026-10-31T16:58:31 candidate smallcrush-rev-seed2 exit 0
+2026-10-31T16:58:31 candidate smallcrush-fwd-seed3 start
+2026-10-31T16:58:39 candidate crush-rev-seed3 exit 0
+2026-10-31T16:58:39 candidate smallcrush-rev-seed1 start
+2026-10-31T16:58:40 candidate smallcrush-fwd-seed3 exit 0
+2026-10-31T16:58:40 candidate smallcrush-fwd-seed4 start
+2026-10-31T16:58:49 candidate smallcrush-rev-seed1 exit 0
+2026-10-31T16:58:49 candidate smallcrush-rev-seed5 start
+2026-10-31T16:58:49 candidate smallcrush-fwd-seed4 exit 0
+2026-10-31T16:58:49 candidate smallcrush-fwd-seed5 start
+2026-10-31T16:58:58 candidate smallcrush-rev-seed5 exit 0
+2026-10-31T16:58:58 candidate smallcrush-rev-seed8 start
+2026-10-31T16:58:58 candidate smallcrush-fwd-seed5 exit 0
+2026-10-31T16:58:58 candidate smallcrush-rev-seed7 start
+2026-10-31T16:59:07 candidate smallcrush-rev-seed8 exit 0
+2026-10-31T16:59:07 candidate bigcrush-fwd-seed9 start
+2026-10-31T16:59:07 candidate smallcrush-rev-seed7 exit 0
+2026-10-31T16:59:07 candidate smallcrush-fwd-seed2 start
+2026-10-31T16:59:15 candidate smallcrush-fwd-seed2 exit 0
+2026-10-31T16:59:15 candidate smallcrush-rev-seed3 start
+2026-10-31T16:59:24 candidate smallcrush-rev-seed3 exit 0
+2026-10-31T16:59:24 candidate crush-fwd-seed4 start
+2026-10-31T17:04:08 candidate crush-fwd-seed5 exit 0
+2026-10-31T17:04:08 candidate crush-rev-seed2 start
+2026-10-31T17:04:10 candidate crush-fwd-seed6 exit 0
+2026-10-31T17:04:10 candidate smallcrush-fwd-seed6 start
+2026-10-31T17:04:11 candidate crush-rev-seed4 exit 0
+2026-10-31T17:04:11 candidate crush-rev-seed0 start
+2026-10-31T17:04:19 candidate smallcrush-fwd-seed6 exit 0
+2026-10-31T17:04:19 candidate crush-fwd-seed2 start
+2026-10-31T17:04:26 candidate crush-fwd-seed7 exit 0
+2026-10-31T17:04:26 candidate smallcrush-rev-seed6 start
+2026-10-31T17:04:36 candidate smallcrush-rev-seed6 exit 0
+2026-10-31T17:04:36 candidate smallcrush-rev-seed4 start
+2026-10-31T17:04:40 candidate crush-rev-seed6 exit 0
+2026-10-31T17:04:40 candidate smallcrush-fwd-seed8 start
+2026-10-31T17:04:45 candidate smallcrush-rev-seed4 exit 0
+2026-10-31T17:04:45 candidate smallcrush-fwd-seed1 start
+2026-10-31T17:04:49 candidate smallcrush-fwd-seed8 exit 0
+2026-10-31T17:04:49 candidate smallcrush-fwd-seed7 start
+2026-10-31T17:04:54 candidate smallcrush-fwd-seed1 exit 0
+2026-10-31T17:04:54 candidate crush-fwd-seed8 exit 0
+2026-10-31T17:04:58 candidate smallcrush-fwd-seed7 exit 0
+2026-10-31T17:04:58 candidate practrand-fwd-seed2 start
+2026-10-31T17:05:21 candidate crush-rev-seed5 exit 0
+2026-10-31T17:05:33 candidate crush-rev-seed8 exit 0
+2026-10-31T17:24:20 candidate crush-fwd-seed9 exit 0
+2026-10-31T17:24:20 candidate practrand-fwd-seed3 start
+2026-10-31T17:24:54 candidate crush-rev-seed9 exit 0
+2026-10-31T17:24:56 candidate crush-rev-seed7 exit 0
+2026-10-31T17:25:28 candidate crush-fwd-seed4 exit 0
+2026-10-31T17:25:28 candidate practrand-fwd-seed6 start
+2026-10-31T17:30:13 candidate crush-fwd-seed2 exit 0
+2026-10-31T17:30:45 candidate crush-rev-seed0 exit 0
+2026-10-31T17:30:46 candidate crush-rev-seed2 exit 0
+2026-10-31T17:30:46 candidate practrand-fwd-seed1 start
