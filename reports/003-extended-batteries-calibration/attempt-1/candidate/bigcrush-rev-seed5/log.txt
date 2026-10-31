@@ -1569,4 +1569,482 @@ Generator state:
 
 
 
-********
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r =  0,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =        87178291200
+       Expected number per cell =  1 /  4358.9146
+       EColl = n^2 / (2k) =   2294.14912
+       Hashing =   TRUE
+
+       Collision test,    Mu =      2293.9736,    Sigma =    47.8841
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    45879.47
+Observed number of collisions         :    45548
+p-value of test                       :    0.94
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :    1743165869548
+  j =  1                              :        399908906
+  j =  2                              :            45544
+  j =  3                              :                2
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:03:57.56
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r = 10,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =        87178291200
+       Expected number per cell =  1 /  4358.9146
+       EColl = n^2 / (2k) =   2294.14912
+       Hashing =   TRUE
+
+       Collision test,    Mu =      2293.9736,    Sigma =    47.8841
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    45879.47
+Observed number of collisions         :    45715
+p-value of test                       :    0.78
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :    1743165869715
+  j =  1                              :        399908576
+  j =  2                              :            45703
+  j =  3                              :                6
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:03:56.18
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 40,  n = 10000000,  r =  0,   d = 100000,   t =  8
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.019
+p-value of test                       :    0.96
+
+Kolmogorov-Smirnov- statistic = D-    :    0.22
+p-value of test                       :    0.02
+
+Anderson-Darling statistic = A2       :    1.93
+p-value of test                       :    0.10
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 3999960
+Chi-square statistic                  : 4.00e+6
+p-value of test                       :    0.05
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.085
+p-value of test                       :    0.53
+
+Kolmogorov-Smirnov- statistic = D-    :   0.095
+p-value of test                       :    0.46
+
+Anderson-Darling statistic = A2       :    0.52
+p-value of test                       :    0.73
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:11.34
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 30,  n = 10000000,  r =  0,   d = 100000,   t = 16
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.071
+p-value of test                       :    0.70
+
+Kolmogorov-Smirnov- statistic = D-    :    0.14
+p-value of test                       :    0.28
+
+Anderson-Darling statistic = A2       :    0.73
+p-value of test                       :    0.53
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 2999970
+Chi-square statistic                  : 3.00e+6
+p-value of test                       :    0.24
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.086
+p-value of test                       :    0.61
+
+Kolmogorov-Smirnov- statistic = D-    :   0.078
+p-value of test                       :    0.66
+
+Anderson-Darling statistic = A2       :    0.27
+p-value of test                       :    0.96
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:11.05
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 20,  n = 10000000,  r =  0,   d = 100000,   t = 24
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.067
+p-value of test                       :    0.80
+
+Kolmogorov-Smirnov- statistic = D-    :    0.18
+p-value of test                       :    0.25
+
+Anderson-Darling statistic = A2       :    0.53
+p-value of test                       :    0.71
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 1999980
+Chi-square statistic                  : 2.00e+6
+p-value of test                       :    0.24
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.058
+p-value of test                       :    0.84
+
+Kolmogorov-Smirnov- statistic = D-    :    0.15
+p-value of test                       :    0.35
+
+Anderson-Darling statistic = A2       :    0.54
+p-value of test                       :    0.70
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:57.96
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 20,  n = 10000000,  r =  0,   d = 100000,   t = 32
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.13
+p-value of test                       :    0.48
+
+Kolmogorov-Smirnov- statistic = D-    :    0.25
+p-value of test                       :    0.07
+
+Anderson-Darling statistic = A2       :    1.16
+p-value of test                       :    0.28
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 1999980
+Chi-square statistic                  : 2.00e+6
+p-value of test                       :    0.21
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.20
+p-value of test                       :    0.18
+
+Kolmogorov-Smirnov- statistic = D-    :   0.025
+p-value of test                       :    0.96
+
+Anderson-Darling statistic = A2       :    1.17
+p-value of test                       :    0.28
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:09.06
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleProd test:
+-----------------------------------------------
+   N = 40,  n = 10000000,  r =  0,   t = 8
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.032
+p-value of test                       :    0.90
+
+Kolmogorov-Smirnov- statistic = D-    :    0.12
+p-value of test                       :    0.27
+
+Anderson-Darling statistic = A2       :    1.23
+p-value of test                       :    0.26
+
+-----------------------------------------------
+CPU time used                    :  00:00:58.52
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleProd test:
+-----------------------------------------------
+   N = 20,  n = 10000000,  r =  0,   t = 16
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.15
+p-value of test                       :    0.37
+
+Kolmogorov-Smirnov- statistic = D-    :    0.23
+p-value of test                       :    0.11
+
+Anderson-Darling statistic = A2       :    1.23
+p-value of test                       :    0.26
+
+-----------------------------------------------
+CPU time used                    :  00:00:39.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleProd test:
+-----------------------------------------------
+   N = 20,  n = 10000000,  r =  0,   t = 24
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.14
+p-value of test                       :    0.40
+
+Kolmogorov-Smirnov- statistic = D-    :    0.11
+p-value of test                       :    0.58
+
+Anderson-Darling statistic = A2       :    0.46
+p-value of test                       :    0.78
+
+-----------------------------------------------
+CPU time used                    :  00:00:49.78
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleMean test:
+-----------------------------------------------
+   N = 20000000,  n = 30,  r =  0
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    : 7.45e-5
+p-value of test                       :    0.80
+
+Kolmogorov-Smirnov- statistic = D-    : 3.17e-4
+p-value of test                       :    0.02
+
+Anderson-Darling statistic = A2       :    2.62
+p-value of test                       :    0.04
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.85
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleMean test:
+-----------------------------------------------
+   N = 20000000,  n = 30,  r = 10
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    : 7.52e-5
+p-value of test                       :    0.80
+
+Kolmogorov-Smirnov- statistic = D-    : 2.12e-4
+p-value of test                       :    0.17
+
+Anderson-Darling statistic = A2       :    0.69
+p-value of test                       :    0.56
+
+-----------------------------------------------
+CPU time used                    :  00:00:07.96
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-rev-seed5
+
+
+svaria_SampleCorr test:
+-----------------------------------------------
+   N =  1,  n = 2000000000,  r =  0,   k = 1
+
+
+-----------------------------------------------
+Normal statistic                      :    0.66
+p-value of test                       :    0.26
+
+-----------------------------------------------
+CPU
