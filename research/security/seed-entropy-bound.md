@@ -82,7 +82,7 @@ use.**
 
 | Requirement | Source | phyco-v2 design 1.0 |
 |-------------|--------|---------------------|
-| Security strength of at least 112 bits through 2030 and 128 bits from 2031; at least 128 bits for any claim here | SP 800-57 Part 1 Rev. 5 (security-strength time frames); SP 800-131A Rev. 2; constitution 1.2.0 (FUT-SEC-1) | **at most 64 bits** (this note) |
+| Security strength of at least 112 bits through 2030 and 128 bits from 2031; at least 128 bits for any claim here | SP 800-57 Part 1 Rev. 5 (§5.6.3, Table 4, "Security strength time frames"); SP 800-131A Rev. 2; constitution 1.2.0 (FUT-SEC-1) | **at most 64 bits** (this note) |
 | Entropy input with at least as many bits of entropy as the security strength, at instantiation | SP 800-90A Rev. 1 (DRBG instantiation) | 64-bit seed |
 | Reachable secret state of at least twice the security strength | Babbage–Golić time–memory–data trade-off | 2⁶⁴ reachable states per step index |
 | Nonce or IV to separate streams | SP 800-90A (nonce); stream-cipher practice | none |
