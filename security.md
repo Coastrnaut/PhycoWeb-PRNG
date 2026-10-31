@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.4 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.5 (2026-10-31). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -440,6 +440,48 @@ supported.
 | S9 | It is unknown whether the step function is a bijection. If it is not, states can merge and cycles can be shorter. If it is, one state compromise reveals every earlier output, so there is no backtracking resistance either way unless shown otherwise. | not analysed | Not evaluated |
 | S10 | The only cycle evidence is for the all-equal edge seeds: no period ≤ 2¹⁵ in the first 2¹⁶ words. | `design.md` §9 | Limited evidence |
 | S11 | Without the peristaltic rotation and vein-tone feedback (variant v001), the network locks onto the periodic food forcing and fails all 15 SP 800-22 families. The statistical quality comes from two added ARX terms, not from the slime-mold dynamics alone. | `design.md` §8–§9, `research/002/runs.jsonl` | Confirmed (experiment) |
+| S12 | Conductance classes 2 and 3 are in effect unused. Every vein value stays in 0…2³¹, so class 3 is unreachable and class 2 can occur only at exactly D = 2³¹, for one step. SHIFT = 4 never applies and the class is in effect bit 30 of D. Bit 31 of D is set only in that edge case, so the vein-tone XOR in effect never reaches bit 31 of T[k], which the rotation moves to bit 4, 10, 18 or 26 of P′[k]. For S6 this leaves one effective control bit per vein, not two. Details below the table. | `design.md` §4 steps 3–5, [`research/security/vein-class-census.json`](research/security/vein-class-census.json) | Confirmed (proof and experiment) |
+
+**S12 in detail.** In class c = D >> 30 the flux is the pressure difference shifted right by
+SHIFT[c] = c + 1, so |Q| ≤ 2^(30−c). The growth term A >> 2 is then at most 2^(28−c), against a
+decay of D >> 4. Since D − (D >> 4) never decreases as D grows, the top of each class bounds the
+next value:
+
+- from class 0 (D < 2³⁰): D′ ≤ 0x4C000000, about 1.19 × 2³⁰, in class 1;
+- from class 1 (2³⁰ ≤ D < 2³¹): D′ ≤ 2³¹, with equality only when D = 2³¹ − 1 and Q = −2²⁹;
+- from D = 2³¹ (class 2): the decay, 2²⁷, exceeds any class-2 growth (at most 2²⁶), so
+  D′ ≤ 0x7C000000, back in class 1.
+
+All four reset values (0x00010000 << k) are in class 0, so by induction 0 ≤ D ≤ 2³¹ at every
+step. D never wraps modulo 2³², and bit 31 of D is set only when D = 2³¹ exactly. Reaching that
+edge needs |Q| at or near its maximum for a long run of consecutive steps; the largest D in the
+census below was about 1.49 × 2³⁰. Hence SHIFT = 3 applies at most in that edge case and
+SHIFT = 4 never, so the 4:1 shift select of step 3 is in effect 2:1. Outside the edge case the
+vein-tone XOR of step 5 leaves bit 31 of T[k] unchanged, and the rotation by ROT[k] moves that
+bit to bit ROT[k] − 1 of P′[k] (bits 4, 10, 18 and 26), before the disruption XOR.
+THRESH = 0x4D000000, about 1.20 × 2³⁰, lies inside class 1.
+
+The cause is the direction of the shift table. The shift grows with the class, so a larger D gets
+a smaller flux and therefore less growth: a negative feedback that bounds D. `design.md` calls D
+the vein thickness (conductance) and describes the flux as discretized Tero et al. flow, in which
+flux grows with conductance, yet its step 3 calls the low class, which holds the smallest D, a
+"thick vein". The redesign must state which direction is intended
+([research note §5.3](research/security/seed-entropy-bound.md)).
+
+The census ([`research/security/vein_class_census.py`](research/security/vein_class_census.py),
+run on 2026-10-31 on Windows with Python 3.10.11, model SHA-256 `1260142d…`) used the first
+development seed and the two all-equal edge seeds, 200,000 steps each after the 256-step warm-up,
+with four veins per step: 2.4 million vein values.
+
+| Seed | Class 0 | Class 1 | Classes 2 and 3 | Largest D | Class changes |
+|------|---------|---------|-----------------|-----------|---------------|
+| 56053 7029 30841 11050 | 75,445 | 724,555 | 0 | 0x5E4C6AD1 (1.47 × 2³⁰) | 96,215 |
+| 0 0 0 0 | 75,003 | 724,997 | 0 | 0x5D7956A1 (1.46 × 2³⁰) | 95,182 |
+| 65535 65535 65535 65535 | 75,014 | 724,986 | 0 | 0x5F82634F (1.49 × 2³⁰) | 95,792 |
+
+In total, class 0 held 9.4% of the vein values and class 1 90.6%, and bit 31 was never set. A
+vein's class changed about once every 8 steps: class-0 visits lasted about 1.6 steps on average
+and class-1 runs about 15.
 
 For `lut-v1`: its output is the low 8 bits of every vein value D, so half of D is visible at each
 step (L1). The disruption fires on about 99.5% of steps (L2). Every battery rejects it (L3).
@@ -673,8 +715,9 @@ Each would be its own Spec Kit feature, with a spec, an owner review and recorde
 2. **Guess-and-determine and SAT/SMT state recovery** on reduced-width variants (8-bit and 16-bit
    words, with the same structure), then the full width. Report how the number of outputs and the
    solver time scale.
-3. **Slow-variable leakage**: test whether the conductance classes (D >> 30) can be inferred from
-   the output, and whether fixing them makes the step linear enough to solve (S6).
+3. **Slow-variable leakage**: test whether the conductance classes (D >> 30, in effect bit 30 of D;
+   S12) can be inferred from the output, and whether fixing them makes the step linear enough to
+   solve (S6, S12).
 4. **Related-seed and rotational experiments**: rotated seed words, single-bit seed differences
    and rotational pairs (S7, S8).
 5. **Invertibility and cycle structure**: decide whether the step function is a bijection (S9),
@@ -1176,7 +1219,7 @@ Neither option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.4) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.5) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
@@ -1250,6 +1293,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.2 | 2026-10-31 | Constitution 1.2.0, approved by the owner on 2026-10-31, makes FUT-SEC-1 to FUT-SEC-9 binding through its Security Policy and raises the FUT-SEC-1 floor from 112 to 128 bits. Section 4 now quotes the policy's general rules verbatim and summarizes its security-strength rules. Sections 1.2, 6, 12.2, 18, 20.1, 22 and 24 updated to match |
 | 2.3 | 2026-10-31 | Added grid-scaling design requirements FUT-GRID-1 to FUT-GRID-5 for the key-interface redesign (section 20.1, roadmap stage 5a), from Principle III and feature-002 open issue O1 |
 | 2.4 | 2026-10-31 | Added hardware-target requirements FUT-HW-1 to FUT-HW-5 for the owner's Arty A7-100T (0 DSP blocks; DSP use considered and rejected), with board figures checked against the Digilent reference manual (section 20.1) |
+| 2.5 | 2026-10-31 | Recorded S12: conductance classes 2 and 3 are in effect unused, because a larger D gets a smaller flux. Section 9.2 gives the proof and a census by `research/security/vein_class_census.py`; section 12.3 item 3 links it |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

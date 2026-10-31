@@ -1,0 +1,129 @@
+{
+ "finding": "security.md section 9.2, S12",
+ "model_id": "phyco-v2",
+ "model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+ "python": "3.10.11",
+ "platform": "Windows-10-10.0.26200-SP0",
+ "command": "python -I research/security/vein_class_census.py --steps 200000",
+ "warmup": 256,
+ "steps_per_seed": 200000,
+ "seeds": "first dev seed (feature-002 dev set) and the two all-equal edge seeds",
+ "bounds": {
+  "classes": [
+   {
+    "class": 0,
+    "max_abs_q": 1073741824,
+    "max_growth": 268435456,
+    "class_top": "0x3fffffff",
+    "max_next_d": "0x4c000000"
+   },
+   {
+    "class": 1,
+    "max_abs_q": 536870912,
+    "max_growth": 134217728,
+    "class_top": "0x7fffffff",
+    "max_next_d": "0x80000000"
+   },
+   {
+    "class": 2,
+    "max_abs_q": 268435456,
+    "max_growth": 67108864,
+    "class_top": "0xbfffffff",
+    "max_next_d": "0xb8000000"
+   },
+   {
+    "class": 3,
+    "max_abs_q": 134217728,
+    "max_growth": 33554432,
+    "class_top": "0xffffffff",
+    "max_next_d": "0xf2000000"
+   }
+  ],
+  "from_2_31": {
+   "d": "0x80000000",
+   "max_next_d": "0x7c000000"
+  },
+  "reset_values": [
+   "0x10000",
+   "0x20000",
+   "0x40000",
+   "0x80000"
+  ]
+ },
+ "census": [
+  {
+   "seed": [
+    56053,
+    7029,
+    30841,
+    11050
+   ],
+   "class_counts": [
+    75445,
+    724555,
+    0,
+    0
+   ],
+   "class_changes": 96215,
+   "max_d": "0x5e4c6ad1",
+   "max_d_over_2_30": 1.4734,
+   "bit31_set": 0,
+   "disruption_steps": 26916
+  },
+  {
+   "seed": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "class_counts": [
+    75003,
+    724997,
+    0,
+    0
+   ],
+   "class_changes": 95182,
+   "max_d": "0x5d7956a1",
+   "max_d_over_2_30": 1.4605,
+   "bit31_set": 0,
+   "disruption_steps": 27169
+  },
+  {
+   "seed": [
+    65535,
+    65535,
+    65535,
+    65535
+   ],
+   "class_counts": [
+    75014,
+    724986,
+    0,
+    0
+   ],
+   "class_changes": 95792,
+   "max_d": "0x5f82634f",
+   "max_d_over_2_30": 1.4923,
+   "bit31_set": 0,
+   "disruption_steps": 27833
+  }
+ ],
+ "totals": {
+  "vein_values": 2400000,
+  "class_counts": [
+   225462,
+   2174538,
+   0,
+   0
+  ],
+  "class_share": [
+   0.0939,
+   0.9061,
+   0.0,
+   0.0
+  ],
+  "bit31_set": 0
+ },
+ "note": "Structural analysis only: not an acceptance result and not evidence of security."
+}

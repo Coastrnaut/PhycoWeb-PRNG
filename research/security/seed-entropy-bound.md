@@ -198,7 +198,7 @@ layout.
 Open issues and research items from features 001–003 and the security review that the next
 redesign must address. Tick an item only when the redesign's spec, plan or evidence covers it,
 and cite where. Sources: feature-002 final report (O1–O6), feature-003 phase reports,
-security.md §9.2 (S1–S11) and §12.3.
+security.md §9.2 (S1–S12) and §12.3, and the repository review of 2026-10-31 (group E).
 
 **A. Fix in the design**
 
@@ -234,7 +234,7 @@ security.md §9.2 (S1–S11) and §12.3.
 - [ ] Guess-and-determine and SAT/SMT state recovery on 8- and 16-bit variants (§12.3 item 2;
   S6).
 - [ ] Slow-variable leakage: whether conductance classes are visible in the output; hide or speed
-  up those control bits if so (§12.3 item 3; S6).
+  up those control bits if so (§12.3 item 3; S6, S12).
 - [ ] Related-seed and rotational experiments; results feed the key-loading and constant rules
   (§12.3 item 4; S7, S8).
 - [ ] Functional graph and cycle structure on reduced variants (§12.3 item 5; S9, S10).
@@ -248,7 +248,8 @@ security.md §9.2 (S1–S11) and §12.3.
 - [ ] Where the mixing comes from: the slime-mould dynamics or the added ARX terms (S11). This
   sets the cryptanalysis target.
 - [ ] Rule for which operations count as "no hash, cipher or standard PRNG" (feature-002 O2,
-  FR-007).
+  FR-007), including key and nonce loading, and whether a plain counter counts as a standard
+  PRNG.
 - [ ] Throughput goal and measured result (design 1.0: 8.5 × 10⁷ words/s against 10⁸;
   feature-003 dev report, open issue 4).
 - [ ] Certification route named; no FIPS 140-3 or SP 800-90A wording (FUT-SEC-9).
@@ -276,7 +277,58 @@ security.md §9.2 (S1–S11) and §12.3.
 - [ ] On-board throughput counters and bit-exact equivalence with the golden vectors on the Arty
   A7-100T, with power from the board's sensor (FUT-HW-3, FUT-HW-4).
 
-**E. Pending input**
+**E. From the repository review of 2026-10-31**
+
+- [ ] Every conductance class reachable, or the class logic cut to the classes in use: today
+  classes 2 and 3 are in effect unused, because a larger D gets a smaller flux (S12). State which
+  direction the shift table is meant to have. Measure the range and occupancy of every state
+  variable on development seeds: class occupancy, D range, disruption rate and how long each
+  control bit stays fixed.
+- [ ] Carried-over feature-002 requirements re-decided in the new spec, not inherited silently:
+  FR-002 (widths of at most 32 bits; a long counter would exceed it), FR-003 (the public `lut-v1`
+  food table and phase increments, period 128; S2), FR-005 (disruption on 1–50% of steps: keep
+  it, and measured on which keys?) and FR-009 (the 64-bit seed domain, replaced by FUT-SEC-1).
+  FR-007 is in group C.
+- [ ] A written rationale for every constant (ROT, SHIFT, X1 and X3, and THRESH, which was set
+  from measured D quantiles on development seeds) and for the warm-up length; extends FUT-GRID-3
+  and FUT-GRID-4.
+- [ ] Conserved sum in the transport stage: the fluxes cancel around the ring, so
+  Σ T[k] = Σ P{k}* (mod 2³²) before the vein-tone XOR and rotation. Analyse it as a structural
+  relation for cryptanalysis, or remove it by design.
+- [ ] A guaranteed minimum period, for example by widening the phase counters into a long
+  counter, if the FR-007 rule allows it (S9, S10).
+- [ ] One canonical output serialization (word width, byte order, bit order) for every tool and
+  the hardware export. Today the SP 800-22 harness reads big-endian words, most significant bit
+  first, while the C stream writes little-endian words for PractRand and TestU01, plus a
+  bit-reversed copy for TestU01's second orientation.
+- [ ] Inter-stream tests: interleave the outputs of related keys or nonces into one stream and
+  run PractRand on it (FUT-SEC-3, FUT-SEC-5).
+- [ ] Reduced-width versions (8- and 16-bit words) defined by the spec from the same word-width
+  generic in the model and RTL, including how shift and rotation amounts scale, so that results
+  on them transfer (FUT-HW-1; security.md §12.3 items 2 and 5).
+- [ ] Full-speed capture on the board into the 256 MB DDR3L, in bursts: one 32-bit word per clock
+  at 200 MHz is 800 MB/s, against about 12 MB/s over Ethernet. The DDR3L peak is about 1.3 GB/s
+  (16 bits at 333 MHz, double data rate); whether sustained writes keep up is unverified
+  (FUT-HW-4).
+- [ ] Test-time budget: feature-003 attempt 1 streams about 38.5 TiB for each full role and
+  28.4 TiB for the negative control, about 105 TiB in all; the positive control took 7.3 h and
+  the negative 20.1 h on 32 threads. Decide before the freeze which grid sizes get the full
+  batteries and which a reduced set (FUT-GRID-5).
+- [ ] Dieharder: the constitution names it among the broader batteries (Principle IV), and
+  feature 003 left it out of scope. Include it, or record why not.
+- [ ] RTL key-loading interface and reset sequence: serial or parallel key loading, warm-up
+  latency, an output-valid signal, and zeroization of key and state (FUT-HW-5).
+- [ ] State-dependent selections written without branches (masks rather than conditionals) in
+  the C stream and the Python model, with the compiled C checked; the C stream now uses
+  conditional expressions that a compiler may turn into branches (security.md §13).
+- [ ] Principle I's default width ("16-bit signed state, 32-bit output words unless a ratified
+  spec says otherwise") predates the 32-bit state of `phyco-v2`, which its ratified spec allows.
+  Update it by constitution amendment (a PATCH, as a clarification), and state every width in
+  the new spec (FR-002).
+- [ ] TestU01's licence allows non-commercial research use only (security.md §6); a commercial
+  route would need another battery or a licence.
+
+**F. Pending input**
 
 - [ ] Feature-003 battery attempt 1 (PractRand, TestU01) verdict and any failing tests, after the
   owner's result review. Results are a reference only and do not carry over (FUT-SEC-7).
@@ -300,7 +352,7 @@ FUT-HW-1 to FUT-HW-5 and the §5.3 checklist, in research/security/seed-entropy-
 ## 7. Where this finding is recorded
 
 - `.specify/memory/constitution.md` 1.2.0: Security Policy (the binding wording of §5).
-- `security.md` 2.3: §1.2, §4, §5, §6, §9.2 (S1–S5), §12.2, §20 and §20.1, §21, §22, §24.
+- `security.md` 2.5: §1.2, §4, §5, §6, §9.2 (S1–S5), §12.2, §20 and §20.1, §21, §22, §24.
 - `README.md`: §1.1 status and §5.
 - `reports/002-core-dynamics-redesign/phase-report.md`: addendum dated 2026-10-31.
 - `specs/003-extended-batteries-calibration/tasks.md`: T041, T042 and T043 (the feature-003
