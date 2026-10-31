@@ -1,55 +1,51 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 1.1.0
-Bump rationale: MINOR. User-supplied constitution text merged in: four principles and three
-sections added, three principles materially expanded. No principle removed or redefined
-incompatibly, and Principles I–V keep their numbers so existing spec references stay valid.
+Status: DRAFT for owner review, 2026-10-31. Not in force until the repository owner approves it
+and authorizes the commit (Governance; Principle IX). Until then, version 1.1.0 applies.
 
-Modified principles:
-  - I. Integer-Domain, Multiplierless Arithmetic
-      → I. Integer-Domain, Fully Specified Arithmetic (adds: every width, signedness, shift,
-        overflow, truncation, comparison and update order must be defined)
-  - II. Bit-Accurate Reference Model Parity
-      → II. Bit-Accurate Reference Model & Differential Testing (adds: reproducible model tests
-        and Python/VHDL differential tests)
-  - IV. Evidence-Based Randomness Claims
-      → IV. Evidence-Based Claims (adds: statistical success ≠ cryptographic security; no
-        suppressed failures or weakened acceptance criteria)
-  - V. Reproducibility & Determinism
-      → V. Reproducibility, Archival & Provenance (adds: preserve archived variants with
-        SHA-256; record commands, tool versions, outputs, limitations, assumptions)
-  - III. Synchronous, Localized, Vendor-Neutral RTL: unchanged
+Version change: 1.1.0 → 1.2.0
+Bump rationale: MINOR. The Security Policy is materially expanded with binding rules. Every
+change is stricter: no principle or section is removed or redefined, no existing requirement is
+relaxed, and Principles I–IX keep their text and numbers.
 
-Added principles:
-  - VI. Specification Before Implementation
-  - VII. Requirements Traceability
-  - VIII. Human Review Gates
-  - IX. Explicit Authorization for Outward Actions
+Modified principles: none.
 
-Added sections:
-  - Mission
-  - Security Policy
-  - Phase Completion Reporting
+Modified sections:
+  - Security Policy:
+      - secret-generation use also needs (c): the security-strength requirements met;
+      - adds the seed-entropy finding: phyco-v2 (design 1.0) and lut-v1 take a 64-bit seed, so
+        any security level they have is at most 64 bits, below the 112-bit minimum;
+      - adds rules: every new or changed model's specification states its bound; no strength
+        above the bound may be stated; no cryptographic claim, evaluation or certification
+        before FUT-SEC-1 to FUT-SEC-9 are met; meeting them is an algorithm change with a new
+        model ID; cryptanalysis stays unrestricted; later amendments may only make the rules
+        stricter;
+      - adds requirements FUT-SEC-1 to FUT-SEC-9 from research/security/seed-entropy-bound.md
+        §5, worded as MUST statements. FUT-SEC-9 also forbids describing any model as FIPS 140-3
+        approved or as an SP 800-90A DRBG.
+  - Development Workflow & Quality Gates: the Constitution Check also covers the Security
+    Policy. The plans of features 001–003 already include that row.
 
-Removed sections: none
+Added sections: none (the new rules are part of the Security Policy).
+Removed sections: none.
 
 Templates requiring updates:
   - .specify/templates/plan-template.md: ✅ no edit needed (its Constitution Check reads this
-    file at runtime; plans must now check Principles I–IX)
+    file at runtime)
   - .specify/templates/spec-template.md, tasks-template.md: ✅ no edit needed
 
-Impact on existing feature specs/001-integer-lut-perturbation/spec.md (not edited here):
-  - VIII: the spec is an algorithm change and needs a recorded human review before
-    implementation.
-  - V: the floating-point variant (readmee.md listing, plus the deleted MycoPRNG.py,
-    nist_bench.py, nistrng_bench.py, phycoweb_nist_eval.py still in git history) must be
-    archived with SHA-256 hashes. This conflicts with the spec assumption "previously deleted
-    script files are not restored".
-  - I: the spec must state how table values are produced (truncation toward zero vs rounding),
-    the signedness of the saturation comparison (D > 4096), and the exact step/phase update
-    order.
-  - VII: tasks must reference FR/SC identifiers.
+Impact on existing artifacts (not edited here):
+  - No result of features 001–003 changes, and no cryptographic claim exists, so no existing
+    artifact violates the amendment.
+  - specs/002-core-dynamics-redesign/design.md 1.0 does not state its bound and cannot be
+    edited without changing its frozen hash. The bound rule applies to new or changed models;
+    the research note records the bound for design 1.0 and lut-v1.
+  - security.md §4 quotes the Security Policy "verbatim" and needs the amended text.
+  - research/security/seed-entropy-bound.md (§5, §7) and security.md (§20.1, history) should
+    record that FUT-SEC-1 to FUT-SEC-9 are binding from version 1.2.0.
+  - Feature 003 (in progress): its plan was checked against 1.1.0. Its final report (T043)
+    should cite 1.2.0 if the amendment is adopted first.
 
 Follow-up TODOs: none deferred in this document.
 -->
@@ -203,15 +199,72 @@ Rationale: outward-facing actions are hard to reverse and must remain under the 
 
 - Real secret generation (keys, nonces, tokens, salts) MUST use an established cryptographic
   random-number generator (e.g., the operating system CSPRNG or a NIST SP 800-90A DRBG).
-- PhycoWeb-PRNG MUST NOT be recommended or used for secret generation unless it has both
-  (a) a documented, defensible design rationale and (b) independent expert cryptographic review,
-  with both recorded in the repository.
+- PhycoWeb-PRNG MUST NOT be recommended or used for secret generation unless it has all of
+  (a) a documented, defensible design rationale, (b) independent expert cryptographic review,
+  and (c) evidence that it meets the security-strength requirements below, with all three
+  recorded in the repository.
 - Documentation MUST state this restriction wherever usage of the generator is described.
+
+**Security strength and seed entropy.** A deterministic generator's output is fixed by its seed
+and its public algorithm, so no security level can exceed the seed's entropy, however large the
+internal state. `phyco-v2` (design 1.0) and `lut-v1` take a seed of four 16-bit words, 64 bits in
+total, so any security level they have is at most 64 bits. That is below the 112-bit minimum for
+approved cryptographic use (NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2). The derivation is
+in `research/security/seed-entropy-bound.md`.
+
+- The specification of every new or changed generator model MUST state its seed or key entropy
+  in bits, its secret state reachable from the seed, and the upper bound these place on any
+  security level.
+- No artifact MAY state or imply a security strength above a model's bound. A bound is a
+  ceiling, not an achieved level: stating one, such as "at most 64 bits", reports a limitation
+  and is not a claim.
+- No cryptographic claim (a security property such as unpredictability or backtracking
+  resistance, or a security strength in bits) MAY be made for any model, and no cryptographic
+  evaluation or certification intended to support one MAY be pursued, until the model meets
+  FUT-SEC-1 to FUT-SEC-9 below with the evidence recorded in the repository. The claim then
+  still needs owner approval (Principle VIII, gate 3).
+- Meeting FUT-SEC-1 to FUT-SEC-9 is an algorithm change. It needs an approved specification
+  (Principle VI) and a new model ID, and that specification MUST carry FUT-SEC-1 to FUT-SEC-9
+  as requirements traced to tasks and evidence (Principle VII).
+- Cryptanalysis and attack demonstrations that look for weaknesses make no claim and are not
+  restricted by this policy. Their results MUST be reported (Principle IV).
+- Later amendments MAY make these requirements stricter and MUST NOT weaken them.
+
+Requirements before any cryptographic claim, evaluation or certification:
+
+- **FUT-SEC-1 Key entropy.** The generator MUST accept a key with at least 128 bits of entropy.
+  No claimed strength MAY be below 112 bits, and no seed or key search or time–memory trade-off
+  attack MAY cost less than the claimed strength.
+- **FUT-SEC-2 Reachable secret state.** The secret state reachable through key and IV loading
+  MUST be at least twice the claimed strength, in bits (time–memory–data trade-off).
+- **FUT-SEC-3 Stream separation.** If one key may produce more than one stream, a nonce or IV
+  with defined uniqueness rules MUST separate the streams.
+- **FUT-SEC-4 Reseeding.** If prediction resistance is claimed, the generator MUST have a reseed
+  input fed from a validated entropy source (SP 800-90B).
+- **FUT-SEC-5 Initialization analysis.** Key and IV loading and the warm-up MUST be analysed for
+  related-key, related-IV and weak-key behaviour.
+- **FUT-SEC-6 Output limit.** The maximum output per key, and per key and IV, MUST be specified
+  and covered by the analysis.
+- **FUT-SEC-7 Re-validation.** The model MUST have a new model ID, golden vectors and a design
+  freeze, and MUST be evaluated with the complete statistical programme on unused held-out seed
+  sets. Results of earlier models do not carry over.
+- **FUT-SEC-8 Demonstration first.** Before a redesigned key interface is implemented, the
+  64-bit bound MUST be reproduced on a reduced seed domain (for example two seed words fixed,
+  2³² candidates): the seed recovered from three output words, and the cost per candidate
+  measured.
+- **FUT-SEC-9 Certification route.** The target scheme MUST be named, for example independent
+  academic cryptanalysis plus an AIS 20/31-style evaluation. No model MAY be described as
+  FIPS 140-3 approved or as an SP 800-90A DRBG; deployments that need approved random numbers
+  MUST use an approved DRBG (`security.md` §21, Option B).
+
+Rationale: statistical results cannot lift a generator above its seed entropy, and a security
+claim made before these conditions hold would mislead anyone who relies on it.
 
 ## Development Workflow & Quality Gates
 
 - Features follow the Spec Kit flow: specify → (clarify) → human review → plan → tasks →
-  implement. Each plan MUST include a Constitution Check against Principles I–IX.
+  implement. Each plan MUST include a Constitution Check against Principles I–IX and the
+  Security Policy.
 - A change to generator behavior is complete only when all of the following hold:
   1. Human review of the algorithm change recorded (Principle VIII).
   2. Superseded variant archived with SHA-256 hash (Principle V).
@@ -258,4 +311,4 @@ recorded.
 - Existing code or specs that predate an amendment and violate a principle MUST be tracked as
   follow-up items rather than silently grandfathered.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-28 | **Last Amended**: 2026-10-28
+**Version**: 1.2.0 | **Ratified**: 2026-10-28 | **Last Amended**: 2026-10-31
