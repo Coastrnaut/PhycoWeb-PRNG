@@ -153,3 +153,19 @@ recorded. Suggested follow-ups, each a separate feature:
 ## Disclaimer
 
 Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts.
+
+## Addendum (2026-10-31, added after the final review)
+
+This section was added after the owner's final review (T061). The approved text above is
+unchanged.
+
+The security review for `security.md` 2.0 found a limitation of design 1.0 that this report does
+not state: **phyco-v2's seed is four 16-bit words, 64 bits in total. That caps any security level
+at 64 bits, however large the 272-bit internal state. 64 bits is below the 112-bit minimum for
+approved cryptographic use.**
+
+- No result, verdict or open issue of this feature changes, and no security claim was ever made.
+- Any cryptographic claim or certification would need a new key interface, and probably another
+  core redesign.
+- The derivation and the conditional future feature requirements FUT-SEC-1 to FUT-SEC-9 are in
+  `research/security/seed-entropy-bound.md`, summarized in `security.md` §20.1.
