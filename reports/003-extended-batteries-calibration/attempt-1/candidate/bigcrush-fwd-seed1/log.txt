@@ -144,3 +144,1568 @@ bigcrush-fwd-seed1
 
 
 smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r =  9,   d = 2097152,   t =  2,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1394
+p-value of test                       :    0.21
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334514
+  j =  1                              :        599997212
+  j =  2                              :             1394
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:02:52.76
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r =  0,   d = 16384,   t =  3,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1325
+p-value of test                       :    0.85
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334445
+  j =  1                              :        599997350
+  j =  2                              :             1325
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:00.50
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r = 16,   d = 16384,   t =  3,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1273
+p-value of test                       :    0.9934
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334393
+  j =  1                              :        599997454
+  j =  2                              :             1273
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:03:58.01
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r =  0,   d =   64,   t =  7,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1441
+p-value of test                       :    0.02
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334561
+  j =  1                              :        599997118
+  j =  2                              :             1441
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:04.10
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r = 24,   d =   64,   t =  7,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1395
+p-value of test                       :    0.21
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334515
+  j =  1                              :        599997210
+  j =  2                              :             1395
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:01.71
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r =  0,   d =    8,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1331
+p-value of test                       :    0.81
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334451
+  j =  1                              :        599997338
+  j =  2                              :             1331
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:00.65
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r = 27,   d =    8,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1333
+p-value of test                       :    0.80
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334453
+  j =  1                              :        599997334
+  j =  2                              :             1333
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:10.98
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r =  0,   d =    4,   t = 21,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1360
+p-value of test                       :    0.54
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334480
+  j =  1                              :        599997280
+  j =  2                              :             1360
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:08.84
+
+Generator state:
+
+
+
+
+***********************************************************
+Test smarsa_CollisionOver calling smultin_MultinomialOver
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_MultinomialOver test:
+-----------------------------------------------
+   N = 30,  n = 20000000,  r = 28,   d =    4,   t = 21,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellSerial
+       Number of cells = d^t =      4398046511104
+       Expected number per cell =  1 /  219902.33
+       EColl = n^2 / (2k) =  45.47473509
+       Hashing =   TRUE
+
+       Collision test
+
+       CollisionOver:   density = n / k =  1 /  219902.33
+       Expected number of collisions = Mu =      45.47
+
+
+-----------------------------------------------
+Results of CollisionOver test:
+
+POISSON approximation                 :
+Expected number of collisions = N*Mu  :     1364.24
+Observed number of collisions         :     1336
+p-value of test                       :    0.77
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :  131940795334456
+  j =  1                              :        599997328
+  j =  2                              :             1336
+  j =  3                              :                0
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:00.07
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 100,  n = 10000000,  r =  0,    d = 2147483648,    t = 2,    p = 1
+
+
+      Number of cells = d^t = 4611686018427387904
+      Lambda = Poisson mean =      54.2101
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    5421.01
+Total observed number                 :    5323
+p-value of test                       :    0.91
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:42.73
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r =  0,    d = 2097152,    t = 3,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    4336.81
+Total observed number                 :    4419
+p-value of test                       :    0.11
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:10.15
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 30000000,  r = 14,    d = 65536,    t = 4,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     365.9182
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    7318.36
+Total observed number                 :    7366
+p-value of test                       :    0.29
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:50.67
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r =  0,    d = 512,    t = 7,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    4336.81
+Total observed number                 :    4328
+p-value of test                       :    0.55
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:19.80
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r =  7,    d = 512,    t = 7,    p = 1
+
+
+      Number of cells = d^t = 9223372036854775808
+      Lambda = Poisson mean =     216.8404
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    4336.81
+Total observed number                 :    4363
+p-value of test                       :    0.35
+
+
+-----------------------------------------------
+CPU time used                    :  00:01:20.13
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 30000000,  r = 14,    d = 256,    t = 8,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     365.9182
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    7318.36
+Total observed number                 :    7344
+p-value of test                       :    0.38
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:06.30
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 30000000,  r = 22,    d = 256,    t = 8,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     365.9182
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    7318.36
+Total observed number                 :    7177
+p-value of test                       :    0.95
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:06.44
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 30000000,  r =  0,    d = 16,    t = 16,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     365.9182
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    7318.36
+Total observed number                 :    7454
+p-value of test                       :    0.06
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:35.34
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smarsa_BirthdaySpacings test:
+-----------------------------------------------
+   N = 20,  n = 30000000,  r = 26,    d = 16,    t = 16,    p = 1
+
+
+      Number of cells = d^t = 18446744073709551616
+      Lambda = Poisson mean =     365.9182
+
+
+----------------------------------------------------
+Total expected number = N*Lambda      :    7318.36
+Total observed number                 :    7454
+p-value of test                       :    0.06
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:37.42
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N = 30,  n = 6000000,  r =  0,  t = 3,  p = 0,  m = 30,  Torus =  TRUE
+
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :    0.98
+p-value of test                       :    0.36
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :    4.36
+p-value of test                       :  5.9e-3
+
+Test on the Nm values of W_{n,i}(mNP1):    0.66
+p-value of test                       :    0.59
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     900
+Number of jumps of Y                  :     894
+p-value of test                       :    0.57
+
+Stat. AD (mNP2)                       :    2.17
+p-value of test                       :    0.07
+
+Stat. AD after spacings (mNP2-S)      :    1.63
+p-value of test                       :    0.15
+
+-----------------------------------------------
+CPU time used                    :  00:02:16.32
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N = 20,  n = 4000000,  r =  0,  t = 5,  p = 0,  m = 30,  Torus =  TRUE
+
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :    2.13
+p-value of test                       :    0.08
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :    2.42
+p-value of test                       :    0.06
+
+Test on the Nm values of W_{n,i}(mNP1):    0.44
+p-value of test                       :    0.81
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     600
+Number of jumps of Y                  :     595
+p-value of test                       :    0.57
+
+Stat. AD (mNP2)                       :    0.41
+p-value of test                       :    0.84
+
+Stat. AD after spacings (mNP2-S)      :    0.64
+p-value of test                       :    0.61
+
+-----------------------------------------------
+CPU time used                    :  00:01:25.71
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N = 10,  n = 3000000,  r =  0,  t = 9,  p = 0,  m = 30,  Torus =  TRUE
+
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :    0.60
+p-value of test                       :    0.64
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :    1.03
+p-value of test                       :    0.34
+
+Test on the Nm values of W_{n,i}(mNP1):    0.30
+p-value of test                       :    0.94
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     300
+Number of jumps of Y                  :     297
+p-value of test                       :    0.55
+
+Stat. AD (mNP2)                       :    2.13
+p-value of test                       :    0.08
+
+Stat. AD after spacings (mNP2-S)      :    0.26
+p-value of test                       :    0.97
+
+-----------------------------------------------
+CPU time used                    :  00:01:56.84
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+snpair_ClosePairs test:
+-----------------------------------------------
+   N =  5,  n = 2000000,  r =  0,  t = 16,  p = 0,  m = 30,  Torus =  TRUE
+
+
+---------------------------------------
+Test based on the 2 nearest points (NP):
+
+Stat. AD on the N values (NP)         :    0.46
+p-value of test                       :    0.78
+
+
+A2 test based on the spacings between the
+   successive jump times of process Y_n(t):
+
+A2 test on the values of A2 (m-NP)    :    1.95
+p-value of test                       :    0.10
+
+Test on the Nm values of W_{n,i}(mNP1):    0.60
+p-value of test                       :    0.65
+
+Test on the jump times of Y
+   (superposition of Yn):
+
+Expected number of jumps of Y = mN    :     150
+Number of jumps of Y                  :     159
+p-value of test                       :    0.24
+
+Stat. AD (mNP2)                       :    0.48
+p-value of test                       :    0.77
+
+Stat. AD after spacings (mNP2-S)      :    0.87
+p-value of test                       :    0.43
+
+-----------------------------------------------
+CPU time used                    :  00:02:08.61
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 400000000,  r =  0,   d =    8,   k =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    7
+Chi-square statistic                  :    5.60
+p-value of test                       :    0.59
+
+-----------------------------------------------
+CPU time used                    :  00:00:34.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 400000000,  r = 27,   d =    8,   k =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :    7
+Chi-square statistic                  :    7.57
+p-value of test                       :    0.37
+
+-----------------------------------------------
+CPU time used                    :  00:00:40.05
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r =  0,   d =   32,   k =   32
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   18
+Chi-square statistic                  :   29.18
+p-value of test                       :    0.05
+
+-----------------------------------------------
+CPU time used                    :  00:00:33.96
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_SimpPoker test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r = 25,   d =   32,   k =   32
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   18
+Chi-square statistic                  :   15.01
+p-value of test                       :    0.66
+
+-----------------------------------------------
+CPU time used                    :  00:00:39.40
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 200000000,  r =  0,   d =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   54
+Chi-square statistic                  :   40.01
+p-value of test                       :    0.92
+
+-----------------------------------------------
+CPU time used                    :  00:00:42.48
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 200000000,  r = 10,   d =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   54
+Chi-square statistic                  :   50.32
+p-value of test                       :    0.62
+
+-----------------------------------------------
+CPU time used                    :  00:00:46.46
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 200000000,  r = 20,   d =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   54
+Chi-square statistic                  :   44.96
+p-value of test                       :    0.80
+
+-----------------------------------------------
+CPU time used                    :  00:00:46.52
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_CouponCollector test:
+-----------------------------------------------
+   N =  1,  n = 200000000,  r = 27,   d =    8
+
+
+-----------------------------------------------
+Number of degrees of freedom          :   54
+Chi-square statistic                  :   62.52
+p-value of test                       :    0.20
+
+-----------------------------------------------
+CPU time used                    :  00:00:46.46
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  0,   Alpha =        0,   Beta  =   0.0625
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  232
+Chi-square statistic                  :  292.96
+p-value of test                       :  4.1e-3
+
+-----------------------------------------------
+CPU time used                    :  00:00:49.07
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 300000000,  r = 25,   Alpha =        0,   Beta  =  0.03125
+
+
+-----------------------------------------------
+Number of degrees of freedom          :  434
+Chi-square statistic                  :  462.54
+p-value of test                       :    0.17
+
+-----------------------------------------------
+CPU time used                    :  00:01:01.39
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 100000000,  r =  0,   Alpha =        0,   Beta  = 0.0078125
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 1437
+Chi-square statistic                  : 1404.93
+p-value of test                       :    0.72
+
+-----------------------------------------------
+CPU time used                    :  00:01:07.92
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Gap test:
+-----------------------------------------------
+   N =  1,  n = 10000000,  r = 20,   Alpha =        0,   Beta  = 0.000976562
+
+
+-----------------------------------------------
+Number of degrees of freedom          : 7046
+Chi-square statistic                  : 7257.06
+p-value of test                       :    0.04
+
+-----------------------------------------------
+CPU time used                    :  00:01:00.93
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N =  5,  n = 1000000000,  r =  0,   Up = FALSE
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.39
+p-value of test                       :    0.17
+
+Kolmogorov-Smirnov- statistic = D-    :    0.13
+p-value of test                       :    0.78
+
+Anderson-Darling statistic = A2       :    0.73
+p-value of test                       :    0.53
+
+Test on the sum of all N observations
+Number of degrees of freedom          :   30
+Chi-square statistic                  :   25.38
+p-value of test                       :    0.71
+
+-----------------------------------------------
+CPU time used                    :  00:00:46.77
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_Run test:
+-----------------------------------------------
+   N = 10,  n = 1000000000,  r = 15,   Up =  TRUE
+
+
+-----------------------------------------------
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.078
+p-value of test                       :    0.85
+
+Kolmogorov-Smirnov- statistic = D-    :    0.23
+p-value of test                       :    0.30
+
+Anderson-Darling statistic = A2       :    0.87
+p-value of test                       :    0.43
+
+Test on the sum of all N observations
+Number of degrees of freedom          :   60
+Chi-square statistic                  :   72.68
+p-value of test                       :    0.13
+
+-----------------------------------------------
+CPU time used                    :  00:01:51.69
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 1000000000,  r =  5,   t =  3,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =                  6
+       Expected number per cell =  1.6666667e+08
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =  2.5000002e-09,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          :    5
+Value of the statistic                :    4.35
+p-value of test                       :    0.50
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:24.69
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 1000000000,  r =  5,   t =  5,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =                120
+       Expected number per cell =   8333333.3
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =  5.9500005e-08,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          :  119
+Value of the statistic                :  139.42
+p-value of test                       :    0.10
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:43.76
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r =  5,   t =  7,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =               5040
+       Expected number per cell =   99206.349
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =  5.0390004e-06,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 5039
+Value of the statistic                : 5063.35
+p-value of test                       :    0.40
+
+
+-----------------------------------------------
+CPU time used                    :  00:00:39.35
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_Permutation calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N =  1,  n = 500000000,  r = 10,   t = 10,
+       Sparse =  FALSE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =            3628800
+       Expected number per cell =    137.7866
+       Hashing =  FALSE
+
+   For Delta > -1, we use the ChiSquare approximation
+   Correction factor of the ChiSquare: 
+       Delta =     1,    Mu =   0.0036287993,    Sigma =          1
+
+-----------------------------------------------
+Test Results for Delta =   1.0000
+
+Number of degrees of freedom          : 3628799
+Value of the statistic                : 3.63e+6
+p-value of test                       :    0.33
+
+
+-----------------------------------------------
+CPU time used                    :  00:02:08.44
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r =  0,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =        87178291200
+       Expected number per cell =  1 /  4358.9146
+       EColl = n^2 / (2k) =   2294.14912
+       Hashing =   TRUE
+
+       Collision test,    Mu =      2293.9736,    Sigma =    47.8841
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    45879.47
+Observed number of collisions         :    45762
+p-value of test                       :    0.71
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :    1743165869762
+  j =  1                              :        399908478
+  j =  2                              :            45758
+  j =  3                              :                2
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:03:51.56
+
+Generator state:
+
+
+
+
+***********************************************************
+Test sknuth_CollisionPermut calling smultin_Multinomial
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+smultin_Multinomial test:
+-----------------------------------------------
+   N = 20,  n = 20000000,  r = 10,   t = 14,
+       Sparse =   TRUE
+
+       GenerCell = smultin_GenerCellPermut
+       Number of cells = t! =        87178291200
+       Expected number per cell =  1 /  4358.9146
+       EColl = n^2 / (2k) =   2294.14912
+       Hashing =   TRUE
+
+       Collision test,    Mu =      2293.9736,    Sigma =    47.8841
+
+-----------------------------------------------
+Test Results for Collisions
+
+For the total number of collisions, we use
+      the Poisson approximation:
+Expected number of collisions = N*Mu  :    45879.47
+Observed number of collisions         :    45666
+p-value of test                       :    0.84
+
+
+-----------------------------
+Total number of cells containing j balls
+
+  j =  0                              :    1743165869666
+  j =  1                              :        399908669
+  j =  2                              :            45664
+  j =  3                              :                1
+  j =  4                              :                0
+  j =  5                              :                0
+
+-----------------------------------------------
+CPU time used                    :  00:04:03.75
+
+Generator state:
+
+
+
+
+***********************************************************
+HOST = Desktop, Linux
+
+bigcrush-fwd-seed1
+
+
+sknuth_MaxOft test:
+-----------------------------------------------
+   N = 40,  n = 10000000,  r =  0,   d = 100000,   t =  8
+
+      Number of categories = 100000
+      Expected number per category  = 100.00
+
+
+-----------------------------------------------
+Test results for chi2 with 99999 degrees of freedom:
+
+Kolmogorov-Smirnov+ statistic = D+    :    0.12
+p-value of test                       :    0.31
+
+Kolmogorov-Smirnov- statistic = D-    :   0.063
+p-value of test                       :    0.70
+
+Anderson-Darling statistic = A2       :    0.52
+p-value of test                       :    0.73
+
+Test on the sum of all N observations
+Number of degrees of freedom          : 3999960
+Chi-square statistic                  : 4.00e+6
+p-value of test                       :    0.64
+
+
+-----------------------------------------------
+Test results for Anderson-Darling:
+
+Kolmogorov-Smirnov+ statistic = D+    :   0.049
+p-value of test                       :    0.80
+
+Kolmogorov-Smirnov- statistic = D-    :    0.10
+p-value of test                      
