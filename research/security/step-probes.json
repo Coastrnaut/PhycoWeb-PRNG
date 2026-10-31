@@ -1,0 +1,159 @@
+{
+ "findings": "security.md section 9.2, S13 and S14",
+ "model_id": "phyco-v2",
+ "model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+ "python": "3.10.11",
+ "platform": "Windows-10-10.0.26200-SP0",
+ "command": "python -I research/security/step_probes.py",
+ "warmup": 256,
+ "s13_vein_decay": {
+  "seed": [
+   56053,
+   7029,
+   30841,
+   11050
+  ],
+  "steps": 5000,
+  "pairs_tested": 20000,
+  "identical_successors": 20000,
+  "states_with_a_partner": 2102,
+  "share_with_a_partner": 0.4204,
+  "expected_share": 0.4138
+ },
+ "s13_alternating_mode": {
+  "seed": [
+   56053,
+   7029,
+   30841,
+   11050
+  ],
+  "steps": 100000,
+  "all_class_1_states": 67150,
+  "transport_unchanged": 67150,
+  "identical_successors": 21219,
+  "predicted_identical": 21219,
+  "prediction_disagreements": 0,
+  "share_identical": 0.316,
+  "expected_share": 0.3164
+ },
+ "s14_bit_bias": {
+  "seeds": [
+   [
+    56053,
+    7029,
+    30841,
+    11050
+   ],
+   [
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    65535,
+    65535,
+    65535,
+    65535
+   ]
+  ],
+  "steps_per_seed": 200000,
+  "values_per_variable": 2400000,
+  "d_range": [
+   "0x2C250B49",
+   "0x5F82634F"
+  ],
+  "d_ones_frequency_bit31_to_bit0": [
+   0.0,
+   0.9061,
+   0.0939,
+   0.1153,
+   0.3949,
+   0.4998,
+   0.5001,
+   0.5002,
+   0.4994,
+   0.4998,
+   0.5003,
+   0.4998,
+   0.5003,
+   0.5002,
+   0.5004,
+   0.4996,
+   0.5001,
+   0.5003,
+   0.5002,
+   0.5002,
+   0.5003,
+   0.4999,
+   0.4998,
+   0.4996,
+   0.4999,
+   0.4997,
+   0.5001,
+   0.5003,
+   0.5003,
+   0.5,
+   0.4997,
+   0.5003
+  ],
+  "p_ones_frequency_range": [
+   0.4994,
+   0.5005
+  ],
+  "d_bit30_ne_bit29": 1.0,
+  "predicted_differing_share_unrelated_states": 0.4769
+ },
+ "diffusion_from_initial_state": {
+  "seeds": [
+   [
+    56053,
+    7029,
+    30841,
+    11050
+   ],
+   [
+    41278,
+    32039,
+    25293,
+    40850
+   ],
+   [
+    26646,
+    29351,
+    41158,
+    2166
+   ]
+  ],
+  "flips_per_seed": 64,
+  "steps": 256,
+  "output_bits_differing": {
+   "1": 0.2741,
+   "2": 0.5028,
+   "3": 0.4984,
+   "4": 0.5114,
+   "6": 0.5008,
+   "8": 0.4917,
+   "16": 0.5065,
+   "32": 0.5099,
+   "64": 0.4953,
+   "128": 0.4971,
+   "256": 0.5028
+  },
+  "state_bits_differing": {
+   "1": 0.1138,
+   "2": 0.3547,
+   "3": 0.4704,
+   "4": 0.4839,
+   "6": 0.482,
+   "8": 0.4852,
+   "16": 0.4737,
+   "32": 0.4789,
+   "64": 0.4773,
+   "128": 0.4835,
+   "256": 0.4781
+  },
+  "state_plateau_steps_16_to_256": 0.4769
+ },
+ "note": "Structural analysis only: not an acceptance result and not evidence of security."
+}

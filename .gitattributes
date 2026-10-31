@@ -1,5 +1,23 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Fixed line endings for every file whose SHA-256 is recorded in the repository, and for scripts,
+# so that a fresh checkout on any platform reproduces the recorded hashes and runs in WSL.
+# Checked on 2026-10-31 against every hash cited in the repository.
+*.py text eol=lf
+*.ps1 text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.sh text eol=lf
+.claude/skills/** text eol=lf
+.specify/.gitignore text eol=lf
+.specify/templates/** text eol=lf
+specs/002-core-dynamics-redesign/design.md text eol=lf
+reports/003-extended-batteries-calibration/calibration/runs/SHA256SUMS text eol=lf
+reports/003-extended-batteries-calibration/calibration/summary.json text eol=lf
+reports/003-extended-batteries-calibration/calibration/summary.md text eol=lf
+# These two freeze records were written on Windows: their recorded SHA-256 is over CRLF bytes.
+reports/002-core-dynamics-redesign/attempt-1/freeze.json text eol=crlf
+reports/003-extended-batteries-calibration/attempt-1/freeze.json text eol=crlf
 baseline/** -text
 *.hex text eol=lf
 *.bin binary

@@ -198,7 +198,8 @@ layout.
 Open issues and research items from features 001–003 and the security review that the next
 redesign must address. Tick an item only when the redesign's spec, plan or evidence covers it,
 and cite where. Sources: feature-002 final report (O1–O6), feature-003 phase reports,
-security.md §9.2 (S1–S12) and §12.3, and the repository review of 2026-10-31 (group E).
+security.md §9.2 (S1–S14) and §12.3, and the two repository reviews of 2026-10-31 (groups E
+and F).
 
 **A. Fix in the design**
 
@@ -221,7 +222,7 @@ security.md §9.2 (S1–S12) and §12.3, and the repository review of 2026-10-31
   chains of design 1.0 (O1; feature-002 plan.md Complexity Tracking).
 - [ ] Local food source and registered output tree, no grid-wide signals (O1; Principle III).
 - [ ] Invertibility of the step decided by design, with its consequence for backtracking
-  resistance stated (S9).
+  resistance stated. phyco-v2's step is not one-to-one (S9, S13).
 - [ ] Generic, vendor-neutral VHDL with grid size and word width as generics; builds with 0 DSP
   blocks (FUT-HW-1; Principle III).
 - [ ] Fits and meets timing on the Arty A7-100T (XC7A100T-1): largest grid, resource use and
@@ -237,7 +238,8 @@ security.md §9.2 (S1–S12) and §12.3, and the repository review of 2026-10-31
   up those control bits if so (§12.3 item 3; S6, S12).
 - [ ] Related-seed and rotational experiments; results feed the key-loading and constant rules
   (§12.3 item 4; S7, S8).
-- [ ] Functional graph and cycle structure on reduced variants (§12.3 item 5; S9, S10).
+- [ ] Functional graph and cycle structure on reduced variants, including how far states
+  merge (§12.3 item 5; S9, S10, S13).
 - [ ] Linear, differential and machine-learning distinguishers on reduced-step variants
   (§12.3 item 6).
 - [ ] Initialization analysis of key and IV loading and warm-up: related-key, related-IV, weak
@@ -328,7 +330,71 @@ security.md §9.2 (S1–S12) and §12.3, and the repository review of 2026-10-31
 - [ ] TestU01's licence allows non-commercial research use only (security.md §6); a commercial
   route would need another battery or a licence.
 
-**F. Pending input**
+**F. From the second repository review of 2026-10-31**
+
+- [ ] Backtracking: decide between a permutation update with an explicit one-way output, or a
+  many-to-one step whose merging is analysed. Today two local mechanisms merge states (S13); say
+  which is intended and what it gives.
+- [ ] Transport invertible, or its zero modes analysed, at every grid size: the class-1 transport
+  is a diffusion step with a zero mode on the ring, and even-sided grids keep zero modes (S13;
+  FUT-SEC-2, FUT-GRID-1).
+- [ ] Mixing that does not rely on the top bits of D: they are strongly biased (bit 31 never set,
+  bit 30 set 90.6% of the time), so the vein-tone XOR barely changes the top five bits of T[k]
+  (S14). Measure the bit frequencies of every state variable on development seeds.
+- [ ] Output rotations chosen so that the two halves of the output do not align: ROT[1] = 11 and
+  ROT[3] + 16 ≡ 11 (mod 32), so outside disruptions the second half is a sum of two words both
+  rotated by 11, and both of S12's untouched bits land on output bit 10. Nodes 0 and 2 are offset
+  by only 2. State the rule for every grid size (FUT-GRID-4).
+- [ ] Slide resistance: the food phases repeat every 128 steps, so a keyed design that loads key
+  material into D could allow slid pairs. phyco-v2 avoids this only because D never returns to
+  its reset values. A non-repeating counter removes the issue (S2, S10).
+- [ ] Warm-up margin justified: a one-bit seed change reaches its plateau in the state after
+  about 4 steps and in the output after 2, against a warm-up of 256 (about 64×). Derive the new
+  warm-up from measured diffusion with a stated margin (FUT-GRID-3; S14).
+- [ ] Held-out seed sets that cannot be computed before the freeze: today each is SHA-256 of a
+  public string such as "phycoweb-003/heldout-1/i". Use a committed salt revealed after the
+  freeze, or a public randomness-beacon value fixed by date (FUT-SEC-7).
+- [ ] A reproducible positive control: today it is `getrandom`, so its runs cannot be repeated.
+  Add a deterministic control, for example ChaCha20 or AES-CTR with a published key, and keep
+  the OS source as a second control if wanted.
+- [ ] Graded negative controls that show detection power: `lut-v1` fails so grossly that it
+  shows only that the harness runs. Add known-weak generators of increasing quality, for example
+  MT19937, which fails LinearComp in Crush and BigCrush.
+- [ ] SP 800-22 decision rule set to a target false-failure rate: a perfect candidate passes an
+  attempt with probability about 0.629, because of the positive control's 20.7% false failures,
+  the CUSUM and RE/REV correlations and the DFT excess. Any change must keep the rule stricter
+  for the candidate (protocol rules may only become stricter).
+- [ ] PractRand length: every run stops at 2⁴⁰ bytes. Include at least one longer run per grid
+  size, or record why not.
+- [ ] Line endings fixed for every hashed file, extended to VHDL, XDC and Tcl. `.gitattributes`
+  now pins every file with a recorded hash (checked on 2026-10-31); new tools should write
+  explicit LF and, where possible, hash line-ending-normalized content, as
+  `sp80022.source_sha256()` does.
+- [ ] Pinned dependencies: `requirements.txt` still names "Aetheris-PRNG", claims Python 3.8 to
+  3.11+ compatibility, marks scipy optional although `sp80022/special.py` imports it, lists the
+  replaced `nistrng`, and pins nothing.
+- [ ] Full-length hardware equivalence: equivalence covers the first 10⁶ words, while a BigCrush
+  run reads about 3.6 × 10¹¹. Add an on-board CRC-32 fixture checked against the model at 2³²
+  and 2⁴⁰ words; streaming 2⁴⁰ bytes over Ethernet takes about 25 h (FUT-HW-3, FUT-HW-4).
+- [ ] Reference-model speed: the Python model gives about 2 × 10⁵ words/s on 2×2 (measured under
+  load) and would give about 3 × 10³ at 16×16, so the equivalence practice would take about 9 h
+  per size. Plan a faster checked model or a shorter practice (FUT-GRID-5).
+- [ ] Invariants as tests (S12's D bound, S13's merging, conserved sums), and each feedback
+  direction stated and tested, so that a common-mode error in the model and the C stream is
+  caught (security.md §10.2; property-based tests with Hypothesis are not yet done).
+- [ ] Archive `phyco-v2` in `baseline/` when it is superseded (Principle V); `baseline/` holds
+  only `float-v0`.
+- [ ] Record storage: `reports/003-extended-batteries-calibration` is 194 MB in 2,268 files.
+  Decide what is committed, what is compressed and what is kept outside git, before the next
+  attempt.
+- [ ] Output bits per step stated for every grid size (FUT-GRID-1).
+- [ ] Documentation drift corrected: README §1.2 gives Poiseuille flow (Q = D·ΔP/L), which holds
+  for `lut-v1` and is the opposite of `phyco-v2`; §2 presents `lut-v1` as the reference model;
+  the diagram feeds nodes 00 and 01, while `phyco-v2` feeds nodes 0 and 2. The feature-002 phase
+  report (§7) calls the step "invertible-looking ARX", which S13 contradicts; correct it by an
+  addendum.
+
+**G. Pending input**
 
 - [ ] Feature-003 battery attempt 1 (PractRand, TestU01) verdict and any failing tests, after the
   owner's result review. Results are a reference only and do not carry over (FUT-SEC-7).
@@ -352,7 +418,7 @@ FUT-HW-1 to FUT-HW-5 and the §5.3 checklist, in research/security/seed-entropy-
 ## 7. Where this finding is recorded
 
 - `.specify/memory/constitution.md` 1.2.0: Security Policy (the binding wording of §5).
-- `security.md` 2.5: §1.2, §4, §5, §6, §9.2 (S1–S5), §12.2, §20 and §20.1, §21, §22, §24.
+- `security.md` 2.6: §1.2, §4, §5, §6, §9.2 (S1–S5), §12.2, §20 and §20.1, §21, §22, §24.
 - `README.md`: §1.1 status and §5.
 - `reports/002-core-dynamics-redesign/phase-report.md`: addendum dated 2026-10-31.
 - `specs/003-extended-batteries-calibration/tasks.md`: T041, T042 and T043 (the feature-003

@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.5 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.6 (2026-10-31). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -246,8 +246,9 @@ No such claim exists or is planned for the current design, which is bounded at 6
   64-bit seed. After a one-time precomputation of about 2⁶⁴ seed evaluations, each target costs
   about 2⁴³ evaluations with about 2⁴³ stored entries.
 - **No prediction resistance**: there is no reseed input.
-- **Backtracking resistance is unknown**. If the step function is invertible, a single state
-  compromise reveals every earlier output (S9).
+- **Backtracking resistance is unknown**. The step function is not one-to-one (S13), but the
+  states that merge differ only locally, so a state compromise may still reveal earlier output.
+  This has not been analysed (S9).
 
 ------------------------------------------------------------------------
 
@@ -437,10 +438,12 @@ supported.
 | S6 | Veins change slowly (D′ = D + \|Q\|/4 − D/16), and their top two bits choose the flux shift. Slowly varying control bits are a classic target for guess-and-determine attacks. | `design.md` §4 steps 3–4 | Unverified hypothesis |
 | S7 | Several constants are rotation-structured. 0x5A5A5A5A is unchanged by 8-bit rotations, and 0xA5A5A5A5 = rotl(0x5A5A5A5A, 4). The D reset values 0x00010000 << k are 1-bit rotations of each other. Rotational cryptanalysis of ARX designs (Khovratovich and Nikolić, 2010) exploits such constants. | `design.md` §2, §4 | Unverified hypothesis |
 | S8 | Neighbouring seeded pressures share halves: P[k] = (s[k] << 16) \| s[k+1]. Rotating the seed words rotates P. The D reset values, per-node rotations and food positions break the symmetry, but related-seed behaviour is untested. | `design.md` §3 | Unverified hypothesis |
-| S9 | It is unknown whether the step function is a bijection. If it is not, states can merge and cycles can be shorter. If it is, one state compromise reveals every earlier output, so there is no backtracking resistance either way unless shown otherwise. | not analysed | Not evaluated |
+| S9 | It is unknown whether the step function is a bijection. If it is not, states can merge and cycles can be shorter. If it is, one state compromise reveals every earlier output, so there is no backtracking resistance either way unless shown otherwise. S13 settles it: the step is not a bijection. | S13 | Answered: not a bijection (S13) |
 | S10 | The only cycle evidence is for the all-equal edge seeds: no period ≤ 2¹⁵ in the first 2¹⁶ words. | `design.md` §9 | Limited evidence |
 | S11 | Without the peristaltic rotation and vein-tone feedback (variant v001), the network locks onto the periodic food forcing and fails all 15 SP 800-22 families. The statistical quality comes from two added ARX terms, not from the slime-mold dynamics alone. | `design.md` §8–§9, `research/002/runs.jsonl` | Confirmed (experiment) |
 | S12 | Conductance classes 2 and 3 are in effect unused. Every vein value stays in 0…2³¹, so class 3 is unreachable and class 2 can occur only at exactly D = 2³¹, for one step. SHIFT = 4 never applies and the class is in effect bit 30 of D. Bit 31 of D is set only in that edge case, so the vein-tone XOR in effect never reaches bit 31 of T[k], which the rotation moves to bit 4, 10, 18 or 26 of P′[k]. For S6 this leaves one effective control bit per vein, not two. Details below the table. | `design.md` §4 steps 3–5, [`research/security/vein-class-census.json`](research/security/vein-class-census.json) | Confirmed (proof and experiment) |
+| S13 | The step function is not one-to-one, so distinct states merge. (a) The vein decay D − (D >> 4) maps 16m + 15 and 16m + 16 to the same value, so two states that differ only there have the same successor; about 41% of states have such a partner. (b) When all four veins are in class 1, adding (2, −2, 2, −2) to the pressures leaves every transport sum T[k] unchanged, and the successors coincide in about 32% of those states. This settles S9. The merged states differ only locally, so the merging is not evidence of backtracking resistance. Details below the table. | `design.md` §4 steps 3–6, [`research/security/step-probes.json`](research/security/step-probes.json) | Confirmed (proof and experiment) |
+| S14 | The vein values stay close to 2³⁰: after the warm-up every D measured lay between 0.69 × 2³⁰ and 1.49 × 2³⁰. Bit 31 of D was never set, bit 30 was set in 90.6% of values, and bits 29 to 27 in 9.4%, 11.5% and 39.5%; bit 29 was always the complement of bit 30. The vein-tone XOR of step 5 therefore changes the top five bits of T[k] (bits ROT[k] − 1 to ROT[k] − 5 of P′[k]) rarely or predictably, and two unrelated states differ in about 47.7% of their 256 state bits, not 50%. Details below the table. | `design.md` §4 steps 4–5, [`research/security/step-probes.json`](research/security/step-probes.json) | Confirmed (experiment) |
 
 **S12 in detail.** In class c = D >> 30 the flux is the pressure difference shifted right by
 SHIFT[c] = c + 1, so |Q| ≤ 2^(30−c). The growth term A >> 2 is then at most 2^(28−c), against a
@@ -482,6 +485,61 @@ with four veins per step: 2.4 million vein values.
 In total, class 0 held 9.4% of the vein values and class 1 90.6%, and bit 31 was never set. A
 vein's class changed about once every 8 steps: class-0 visits lasted about 1.6 steps on average
 and class-1 runs about 15.
+
+**S13 in detail.** Two separate mechanisms make the step many-to-one.
+
+*(a) Vein decay.* Step 4 computes D′ = D + (A >> 2) − (D >> 4). The map f(D) = D − (D >> 4) is
+not one-to-one: f(16m + 15) = 15m + 15 = f(16m + 16). Take two states that differ only in one
+vein, with the values 16m + 15 and 16m + 16. Step 3 reads only the class D >> 30, which is the
+same for both unless the pair straddles a class boundary. Step 6 compares D with
+THRESH = 0x4D000000, a multiple of 16, so the comparison never separates the pair. Every other
+input is equal, so the successors are equal. A vein has such a partner when its low four bits
+are 0 or 15, so about 1 − (7/8)⁴ = 41.4% of states have at least one.
+
+*(b) Transport zero mode.* In class 1 the flux is Q[k] = asr(P*[k] − P*[k+1], 2). Adding 2v, with
+v = (1, −1, 1, −1), to the pressures changes every pressure difference by ±4, so every Q[k]
+changes by exactly ±1. The transport sum T[k] = P*[k] − Q[k] + Q[k−1] then changes by
++2 − 1 − 1 = 0 for even k and by −2 + 1 + 1 = 0 for odd k, unless a difference wraps past ±2³¹.
+The successors are equal when, in addition, every growth term A >> 2 = |Q| >> 2 is unchanged:
+about (3/4)⁴ = 31.6% of all-class-1 states. Over the integers the class-1 transport is
+T = (I − L/4)P*, where L is the Laplacian of the 4-node ring. Its eigenvalues are 1, ½, ½ and 0,
+so it is a diffusion step with a zero mode. In class 0 the transport I − L/2 has the two zero
+modes (1, 0, −1, 0) and (0, 1, 0, −1); these were not measured. Any larger grid whose transport
+keeps this form keeps zero modes, for example a pattern alternating along one axis of an
+even-sided torus.
+
+The probes ([`research/security/step_probes.py`](research/security/step_probes.py), run on
+2026-10-31 on Windows with Python 3.10.11, model SHA-256 `1260142d…`) used the first development
+seed after the 256-step warm-up:
+
+| Probe | States | Result |
+|-------|--------|--------|
+| (a) every vein of 5,000 states set to the pair 16m + 15, 16m + 16 | 20,000 pairs | 20,000 identical successors; 42.0% of the states had a partner (41.4% expected) |
+| (b) P and P + 2v, all veins in class 1, in 100,000 steps | 67,150 states | T unchanged in all; 21,219 (31.6%) identical successors (31.6% expected); the rule above predicted every case |
+
+Consequences: the step is not a bijection (S9), so the functional graph has trees that feed into
+cycles, and S10 remains open. A merged predecessor differs only in one vein's low bits or by a
+±2 pressure pattern, so it is close to the true predecessor; whether that makes backtracking any
+harder has not been analysed. A design that relies on a one-to-one step must show it at every
+grid size (FUT-SEC-2 and FUT-GRID-1). The feature-002 phase report (§7) calls the step
+"invertible-looking ARX"; that description is wrong.
+
+**S14 in detail.** By S12 every D stays in 0…2³¹. The decay pulls D towards a level set by the
+growth term, and the growth term is bounded by the class-1 flux, so D settles in a band around
+2³⁰. The same probe script took 200,000 steps from each of the three census seeds (2.4 million
+values):
+
+| Bit of D | 31 | 30 | 29 | 28 | 27 | 26 to 0 |
+|----------|----|----|----|----|----|---------|
+| Ones | 0.0% | 90.6% | 9.4% | 11.5% | 39.5% | 49.9–50.0% |
+
+The P words showed 49.9–50.1% ones in every bit. Two independent states differ in a bit with
+ones-frequency p with probability 2p(1 − p). Over the 128 bits of P and the 128 bits of D this
+gives 47.7%. A one-bit seed change (64 flips on each of the first three development seeds)
+reached the same 47.7% of state bits from step 4 onwards, and changed about 50% of the output
+bits from step 2; the warm-up is 256 steps. So the shortfall from 50% is the vein bias, not slow
+diffusion. Because the vein-tone XOR of step 5 rarely changes the top bits of T[k], those bits
+of P′[k] depend on D far less than the other bits do.
 
 For `lut-v1`: its output is the low 8 bits of every vein value D, so half of D is visible at each
 step (L1). The disruption fires on about 99.5% of steps (L2). Every battery rejects it (L3).
@@ -717,11 +775,12 @@ Each would be its own Spec Kit feature, with a spec, an owner review and recorde
    solver time scale.
 3. **Slow-variable leakage**: test whether the conductance classes (D >> 30, in effect bit 30 of D;
    S12) can be inferred from the output, and whether fixing them makes the step linear enough to
-   solve (S6, S12).
+   solve (S6, S12). The top bits of D are strongly biased (S14).
 4. **Related-seed and rotational experiments**: rotated seed words, single-bit seed differences
    and rotational pairs (S7, S8).
-5. **Invertibility and cycle structure**: decide whether the step function is a bijection (S9),
-   and map the functional graph on reduced variants that are small enough to enumerate.
+5. **Merging and cycle structure**: the step function is not a bijection (S13). Measure how
+   far states merge, and map the functional graph on reduced variants that are small enough to
+   enumerate (S9, S10).
 6. **Distinguishers**: linear and differential trail search (MILP or SAT), plus machine-learning
    distinguishers (as in Gohr, 2019) on reduced-step variants. Any advantage found must be
    confirmed with fresh data and a pre-registered test.
@@ -1219,7 +1278,7 @@ Neither option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.5) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.6) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
@@ -1294,6 +1353,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.3 | 2026-10-31 | Added grid-scaling design requirements FUT-GRID-1 to FUT-GRID-5 for the key-interface redesign (section 20.1, roadmap stage 5a), from Principle III and feature-002 open issue O1 |
 | 2.4 | 2026-10-31 | Added hardware-target requirements FUT-HW-1 to FUT-HW-5 for the owner's Arty A7-100T (0 DSP blocks; DSP use considered and rejected), with board figures checked against the Digilent reference manual (section 20.1) |
 | 2.5 | 2026-10-31 | Recorded S12: conductance classes 2 and 3 are in effect unused, because a larger D gets a smaller flux. Section 9.2 gives the proof and a census by `research/security/vein_class_census.py`; section 12.3 item 3 links it |
+| 2.6 | 2026-10-31 | Recorded S13: the step function is not one-to-one (vein-decay pairs and a transport zero mode), which settles S9; and S14: the vein values stay near 2³⁰, so the top bits of D are biased. Evidence from `research/security/step_probes.py`. Sections 5, 9.2 (S9) and 12.3 (items 3 and 5) and the roadmap updated |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,
