@@ -1,1328 +1,1202 @@
-# PhycoWeb-PRNG Security and Cryptographic Validation Strategy
+# PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-**Document:** `security.md`\
-**Project:** PhycoWeb-PRNG\
-**Purpose:** Define an LLM-assisted, evidence-driven strategy for
-evaluating whether a proposed pseudorandom number generator (PRNG) can
-support a cryptographic security claim.\
-**Status:** Research and validation plan --- not a security
-certification.
+- **Document:** `security.md`, version 2.1 (2026-10-31). The change history is in section 25.
+- **Project:** PhycoWeb-PRNG.
+- **Purpose:** This document does three things:
+  - states the security policy for the generator;
+  - defines the evidence-driven programme for deciding whether it could ever support a
+    cryptographic claim;
+  - records the evidence gathered so far in features 001–003.
+- **Governed by:** the [constitution](.specify/memory/constitution.md) v1.1.0, specifically the
+  Security Policy and Principles IV, V, VIII and IX. Where this document and the constitution
+  differ, the constitution applies.
+- **Status:** a research and validation plan. It is not a security certification. **No security
+  property is claimed for any PhycoWeb-PRNG model.**
 
-------------------------------------------------------------------------
-
-## 1. Executive summary
-
-This document defines a validation program for a newly proposed PRNG,
-with particular application to PhycoWeb-PRNG.
-
-The recommended approach is to use a large language model (LLM) as a
-research assistant, verification engineer, test architect,
-adversarial-analysis assistant, and technical reviewer. The LLM must not
-be the authority that declares the algorithm cryptographically secure.
-
-The objective is to determine whether the proposed generator has
-sufficiently well-defined mathematics, correct implementations,
-acceptable statistical behavior, and defensible resistance to relevant
-cryptographic attacks.
-
-The validation program must answer five fundamental questions:
-
-1.  **Mathematical correctness:** Is the algorithm precisely defined,
-    deterministic, and free from implementation ambiguities?
-2.  **Statistical quality:** Do outputs exhibit detectable statistical
-    biases or patterns?
-3.  **Cryptographic strength:** Can an adversary predict future output,
-    reconstruct internal state, or distinguish the output from uniformly
-    random data?
-4.  **Implementation correctness:** Do software and hardware
-    implementations behave exactly as specified?
-5.  **Security assurance:** Is there sufficient independent evidence to
-    justify a clearly scoped security claim?
-
-A generator passing statistical tests is not thereby cryptographically
-secure. Statistical testing is useful for finding defects, but cannot
-establish unpredictability or replace cryptanalysis.
-
-### 1.1 Governing principle
-
-> An LLM can help discover weaknesses, but passing an LLM-generated test
-> suite is not evidence of cryptographic security.
-
-All security conclusions must be grounded in reproducible experiments,
-mathematical arguments, independently checked implementations, and
-appropriately qualified human review.
+> **Do not use PhycoWeb-PRNG to generate keys, nonces, tokens, salts or any other secret.**
+> Use an established cryptographic random-number generator instead: the operating system CSPRNG
+> (for example `os.urandom` or `getrandom()`), or a NIST SP 800-90A DRBG seeded from a validated
+> entropy source. Passing statistical tests does not show cryptographic security. That includes
+> NIST SP 800-22, PractRand and TestU01.
 
 ------------------------------------------------------------------------
 
-## 2. Scope and security terminology
+## 1. Security status at a glance
 
-This plan concerns a deterministic pseudorandom generator and, where
-relevant, a complete random-bit-generator construction that includes an
-entropy source, initialization, reseeding, and output generation.
+### 1.1 Models
 
-These concepts must not be conflated:
+| Model | Source | State | Seed | Statistical evidence | Cryptographic evidence | Role |
+|-------|--------|-------|------|----------------------|------------------------|------|
+| `float-v0` | `baseline/float-v0/` (archived; SHA-256 in `MANIFEST.json`) | floating-point food generator (`np.sin`, `np.cos`) | 4 × 16 bits | Feature-001 screening only, done with the defective `nistrng` 1.2.3 (see the erratum in `reports/001-integer-lut-perturbation/summary.md`) | none | archive only |
+| `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | negative control |
+| `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). PractRand/TestU01 attempt 1 is in progress (feature 003) | none | research candidate |
 
--   **Statistical quality** describes whether observed output passes
-    specified statistical tests.
--   **Unpredictability** concerns an adversary's ability to predict
-    output without knowledge of secret internal state.
--   **State security** concerns resistance to recovering or exploiting
-    internal state.
--   **Backtracking resistance** concerns whether compromise of current
-    state reveals prior outputs.
--   **Prediction resistance** concerns whether an attacker who has
-    observed outputs can predict future outputs, including under
-    specified compromise and reseeding assumptions.
--   **Entropy** measures uncertainty in an input source under a defined
-    model. A deterministic algorithm does not create new entropy.
--   **Cryptographic qualification** is a conclusion supported by a
-    defined security model, adequate analysis, implementation evidence,
-    and any applicable external validation.
+### 1.2 What is and is not established for `phyco-v2`
 
-The project must state exactly what security property is being claimed,
-for which configuration, under which attacker capabilities, and with
-what assumptions.
+- **Established**:
+  - The algorithm is fully specified: every width, signedness, shift, wrap, comparison and
+    update order is defined.
+  - It is integer-only and multiplierless.
+  - It is deterministic and identical on two platforms.
+  - Three implementations written in this project agree bit for bit.
+  - The pre-registered SP 800-22 protocol detected no statistical defect in 100 held-out
+    sequences.
+- **Bounded by the specification**: phyco-v2's seed is four 16-bit words, 64 bits in total.
+  That caps any security strength at **64 bits**, however large the internal state (section 9.2,
+  S1–S3). 64 bits is below the 112-bit minimum for approved cryptographic use (SP 800-57 Part 1,
+  SP 800-131A). Any cryptographic claim or certification would therefore need a new key interface,
+  and probably another core redesign. See the conditional requirements FUT-SEC-1 to FUT-SEC-9
+  (section 20.1) and the research note
+  [`research/security/seed-entropy-bound.md`](research/security/seed-entropy-bound.md).
+- **Not established**: unpredictability, state-recovery resistance, backtracking resistance,
+  prediction resistance (impossible as specified: there is no reseed input), side-channel
+  behaviour, and hardware equivalence. No RTL exists.
+
+### 1.3 Validation phases for `phyco-v2` (status 2026-10-31)
+
+| Phase | Gate | Status | Evidence |
+|-------|------|--------|----------|
+| 0 Specification | frozen and unambiguous | **Met** for design 1.0, at the owner design review on 2026-10-28 (design SHA-256 `a1109bf1…`) | `design.md` §2–§6; tests `test_design_trace`, `test_widths_v2`, `test_purity_v2` |
+| 1 Mathematical and structural analysis | review completed; critical defects resolved | **Not started.** The known structural facts are in section 9.2 | — |
+| 2 Reference implementation | independent implementations agree | **Partly met.** Three in-project implementations agree; none comes from outside the project; there is no VHDL | `vectors/`, `tests/v2_reference.py`, `reports/003-extended-batteries-calibration/streams/equivalence.json` |
+| 3 Statistical validation | campaign completed; anomalies assessed | **In progress.** SP 800-22 PASS; positive control calibrated; PractRand/TestU01 attempt 1 running; structural (level 3) tests not started | `reports/002-core-dynamics-redesign/`, `reports/003-extended-batteries-calibration/` |
+| 4 Cryptanalysis | threat model and attack campaign completed | **Not started.** A draft threat model is in section 5 | — |
+| 5 Hardware validation | RTL matches the model | **Not started.** RTL is pending, with the exceptions recorded as O1 in feature 002 | `design.md` §7 |
+| 6 Independent evaluation | external review and reproduction | **Not started** | — |
+| 7 Security qualification | claims supported by evidence | **Research candidate**; no claim | this document |
+
+To report a weakness, see section 23.
 
 ------------------------------------------------------------------------
 
-## 3. Standards and technical references
+## 2. Executive summary
 
-The validation program should be informed by established cryptographic
-standards rather than standards invented for the proposed algorithm.
+This document defines a validation programme for a newly proposed pseudorandom number generator
+(PRNG). It is applied here to PhycoWeb-PRNG.
 
-  -----------------------------------------------------------------------
-  Reference                           Role in the program
-  ----------------------------------- -----------------------------------
-  NIST SP 800-90A                     Deterministic random bit generator
-                                      mechanisms and security
-                                      requirements
+The programme must answer five questions:
 
-  NIST SP 800-90B                     Entropy-source design,
-                                      characterization, and validation
+1. **Mathematical correctness:** Is the algorithm precisely defined and deterministic, with no
+   implementation ambiguity?
+2. **Statistical quality:** Does the output show detectable statistical biases or patterns?
+3. **Cryptographic strength:** Can an adversary predict future output, reconstruct the internal
+   state, or distinguish the output from uniformly random data?
+4. **Implementation correctness:** Do the software and hardware implementations behave exactly
+   as specified?
+5. **Security assurance:** Is there enough independent evidence to justify a clearly scoped
+   security claim?
 
-  NIST SP 800-90C                     Construction of complete random bit
-                                      generators
+**Statistical testing finds defects. It cannot establish unpredictability.**
 
-  NIST SP 800-22                      Statistical tests for random and
-                                      pseudorandom sequences
+- The Mersenne Twister (MT19937) passes most statistical batteries. Yet its entire internal state
+  can be reconstructed from 624 consecutive 32-bit outputs, after which every later output is
+  known.
+- In 2022 NIST decided to revise SP 800-22. The revision is to clarify the suite's purpose, "in
+  particular rejecting its use for assessing cryptographic random number generators" (section 6).
 
-  NIST FIPS 140-3                     Cryptographic module requirements,
-                                      where applicable
-  -----------------------------------------------------------------------
+### 2.1 Governing principles
+
+> 1. A generator that passes statistical tests is not thereby cryptographically secure.
+> 2. An AI assistant can help discover weaknesses. Passing a test suite that an AI assistant
+>    wrote or ran is not evidence of cryptographic security.
+> 3. A claim is only as strong as its weakest stage. The seed, initialization, transition,
+>    output and implementation all count.
+
+All security conclusions must rest on:
+
+- reproducible experiments;
+- mathematical arguments;
+- independently checked implementations;
+- recorded review by qualified humans (constitution Principle VIII).
+
+------------------------------------------------------------------------
+
+## 3. Scope and security terminology
+
+This plan covers a deterministic pseudorandom generator. Where relevant, it also covers a complete
+random-bit-generator (RBG) construction, which adds an entropy source, initialization, reseeding
+and output generation.
+
+Do not conflate these concepts:
+
+- **Statistical quality**: whether the output passes the stated tests at the stated sample size.
+  It describes the tests, not what an adversary can do.
+- **Indistinguishability (pseudorandomness)**: no efficient algorithm can tell the output from
+  uniform random bits with a non-negligible advantage, provided the seed or key is secret and
+  uniformly chosen.
+- **Next-bit unpredictability**: given any prefix of the output, no efficient algorithm predicts
+  the next bit with probability non-negligibly above 1/2. Yao (1982) showed that, for
+  polynomial-time adversaries, this is equivalent to indistinguishability.
+- **Security strength**, in bits: log₂ of the work of the best attack (SP 800-57 terminology).
+  It can never exceed the entropy of the seed or key. Against time–memory–data trade-offs it can
+  also not exceed about half the size of the secret state (section 12.2).
+- **State compromise**: the attacker learns the full internal state at some time t.
+- **Backtracking resistance** (SP 800-90A): a compromise at time t does not let the attacker
+  recover or distinguish outputs produced *before* t. The AIS 20/31 term is *enhanced backward
+  secrecy*.
+- **Prediction resistance** (SP 800-90A): a compromise at time t does not let the attacker
+  predict outputs produced *after the next reseed with sufficient fresh entropy*. It requires an
+  entropy source and a reseed operation. A purely deterministic generator that is never reseeded
+  cannot have it. The AIS 20/31 term is *enhanced forward secrecy*.
+- **Forward and backward secrecy** (AIS 20/31 classes DRG.1 and DRG.2): future (respectively,
+  earlier) outputs cannot be computed from observed outputs, without state compromise. The AIS
+  "forward secrecy" is unrelated to forward secrecy in key exchange.
+- **Entropy**: uncertainty in an input under a stated model. SP 800-90B measures **min-entropy**,
+  H∞ = −log₂ max p. A deterministic algorithm creates no entropy. Its output never contains more
+  entropy than its seed, which is at most 64 bits for every PhycoWeb-PRNG model.
+- **Seed, key, nonce, personalization string**:
+  - a seed initializes the state;
+  - a key is a secret with full entropy for the claimed strength;
+  - nonces and personalization strings separate instances.
+  - The PhycoWeb-PRNG models have only a 64-bit seed. They have no separate key, nonce,
+    personalization string or reseed interface.
+- **Cryptographic qualification**: a conclusion supported by a defined security model, adequate
+  analysis, implementation evidence and any applicable external validation.
+
+Every claim must state:
+
+- the exact property claimed;
+- the configuration and model version;
+- the attacker's capabilities;
+- the data, time and memory limits;
+- the security strength in bits;
+- the assumptions, above all about the seed's entropy.
+
+------------------------------------------------------------------------
+
+## 4. Security policy and permitted use
+
+The constitution's Security Policy applies verbatim:
+
+- Real secret generation (keys, nonces, tokens, salts) MUST use an established cryptographic
+  random-number generator, such as the operating system CSPRNG or a NIST SP 800-90A DRBG.
+- PhycoWeb-PRNG MUST NOT be recommended or used for secret generation unless it has both (a) a
+  documented, defensible design rationale and (b) an independent expert cryptographic review, with
+  both recorded in the repository.
+- Documentation MUST state this restriction wherever it describes how to use the generator.
+
+In practice:
+
+| Use | Allowed? |
+|-----|----------|
+| Research into the design, statistical behaviour and hardware mapping | yes |
+| Reproducible test patterns and simulations where predictability is harmless | yes. For simulation work, an established non-cryptographic PRNG is usually the better choice |
+| Keys, nonces, IVs, tokens, salts, passwords, session identifiers | **no** |
+| Gambling, lotteries, sampling for audits or anything an adversary benefits from predicting | **no** |
+| Seeding or reseeding another generator used for any of the above | **no** |
+
+Lifting the restriction requires all of the following:
+
+- the evidence in sections 8–15;
+- an owner-approved security claim (Principle VIII, gate 3);
+- an independent expert review recorded in the repository.
+
+No such claim exists or is planned for the current design, which is bounded at 64 bits
+(section 9.2).
+
+------------------------------------------------------------------------
+
+## 5. Threat model (draft for Phase 4)
+
+**Kerckhoffs' principle applies.** The algorithm, the constants and the lookup table are public
+(this repository). Only the seed and the state can be secret.
+
+**Assets:**
+
+- outputs the attacker has not yet seen;
+- earlier outputs;
+- the seed;
+- the internal state;
+- the integrity of the output, meaning it cannot be forced or biased.
+
+| ID | Attacker capability | Typical goals |
+|----|---------------------|---------------|
+| T1 Known output | Sees a contiguous or sparse output stream, and knows the step index modulo 128 (the phase period) | predict, recover the seed or state, distinguish |
+| T2 Related seeds | Sees outputs for seeds with known relations: counters, rotations of the four seed words, single-bit differences | distinguish, recover the seed |
+| T3 State compromise | Learns the full state once | recover earlier outputs, predict later ones |
+| T4 Implementation access | Timing, power, EM or fault injection on a software or FPGA implementation | leak or force the state |
+| T5 Seed influence | Can choose or bias the seed, for example through weak seeding | force degenerate or low-entropy states |
+
+**Generic results** that hold for `phyco-v2` as specified (no experiment needed):
+
+- **Exhaustive seed search** succeeds against T1 in at most 2⁶⁴ trials.
+  - Each trial is 256 warm-up steps plus a few output steps, about 2⁷² steps in all.
+  - At the measured 8.5 × 10⁷ steps/s of the C stream (`reports/003-extended-batteries-calibration/dev/timing.json`),
+    that is about 1.8 million core-years.
+  - That cost is within reach of a well-resourced attacker with dedicated hardware, and the
+    design is meant to be cheap in hardware.
+- **Time–memory trade-off** (Hellman, 1980): the initial state is a fixed function of the
+  64-bit seed. After a one-time precomputation of about 2⁶⁴ seed evaluations, each target costs
+  about 2⁴³ evaluations with about 2⁴³ stored entries.
+- **No prediction resistance**: there is no reseed input.
+- **Backtracking resistance is unknown**. If the step function is invertible, a single state
+  compromise reveals every earlier output (S9).
+
+------------------------------------------------------------------------
+
+## 6. Standards and technical references
+
+The programme follows established standards, not criteria invented for this algorithm. Status was
+checked against the NIST CSRC pages on 2026-10-31.
+
+| Reference | Status | Role | What it means here |
+|-----------|--------|------|--------------------|
+| NIST SP 800-90A Rev. 1 | Final, June 2015. Rev. 2 initial preliminary draft (call for comments) released 4 September 2025, comments closed 4 November 2025. It proposes an XOF (SHAKE) based DRBG and alignment with SP 800-90C | Approved DRBG mechanisms: Hash_DRBG, HMAC_DRBG, CTR_DRBG. Dual_EC_DRBG was withdrawn in Rev. 1 | A custom generator cannot be an approved DRBG. For secrets, use one of these mechanisms |
+| NIST SP 800-90B | Final, January 2018. NIST noted two errata on 29 May 2025, for a future update | Entropy sources: min-entropy estimation (IID and non-IID tracks), restart tests, health tests (repetition count, adaptive proportion) | PhycoWeb-PRNG is deterministic. It is not an entropy source and cannot be validated as one |
+| NIST SP 800-90C | Final, September 2025 | Complete RBG constructions: RBG1, RBG2, RBG3, RBGC | Defines how an approved RBG combines an entropy source and a DRBG. A bio-inspired component would add no assurance to such a construction (section 21) |
+| NIST SP 800-22 Rev. 1a | Final, April 2010. On 19 April 2022 NIST decided to revise it. The revision is to clarify its purpose, "in particular rejecting its use for assessing cryptographic random number generators"; drafting had not started when the decision was announced | Statistical tests | Used here only to detect defects. This project's calibration and DFT cross-check show its limits (section 11.4) |
+| NIST FIPS 140-3 | Approved March 2019 | Cryptographic module validation (CMVP) | An RBG in a validated module must use an approved DRBG, and its entropy source must be validated (ESV programme). A custom generator cannot be approved |
+| NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2 | Final (2020; 2019) | Security strengths; algorithm transitions | 112 bits is the minimum security strength for approved use. `phyco-v2` is bounded at 64 |
+| BSI AIS 20 / AIS 31 | German Common Criteria methodology for RNGs | Functionality classes DRG.1–DRG.4 for deterministic RNGs, PTG.1–PTG.3 for physical true RNGs and NTG.1 for non-physical true RNGs (class names as in the functionality-class proposal; check the current BSI version) | DRG.3 (enhanced backward secrecy) or DRG.4 (adds enhanced forward secrecy through reseeding) would be the bar for any future claim |
+| ISO/IEC 18031 | International standard | Random bit generation | International counterpart to the SP 800-90 series |
+| TestU01 1.2.3 (L'Ecuyer and Simard, ACM TOMS 33(4), 2007) | Used in feature 003 | SmallCrush, Crush, BigCrush | Licence allows non-commercial research use only. Not redistributed here |
+| PractRand 0.96 (C. Doty-Humphrey) | Used in feature 003 | Long-stream testing to 2⁴⁰ bytes | Public domain / free use |
+| NIST STS 2.1.2 | Used as the oracle in features 002–003 | Reference SP 800-22 implementation | Our harness `sp80022` matches it (section 11.2) |
 
 Official references:
 
--   NIST SP 800-90A: https://csrc.nist.gov/pubs/sp/800/90/a/r1/final
--   NIST SP 800-90B: https://csrc.nist.gov/pubs/sp/800/90/b/final
--   NIST SP 800-90C: https://csrc.nist.gov/pubs/sp/800/90/c/final
--   NIST SP 800-22: https://csrc.nist.gov/pubs/sp/800/22/r1/upd1/final
--   NIST FIPS 140-3: https://csrc.nist.gov/pubs/fips/140-3/final
+- NIST SP 800-90A Rev. 1: https://csrc.nist.gov/pubs/sp/800/90/a/r1/final
+- NIST SP 800-90A Rev. 2 (initial preliminary draft): https://csrc.nist.gov/pubs/sp/800/90/a/r2/iprd
+- NIST SP 800-90B: https://csrc.nist.gov/pubs/sp/800/90/b/final
+- NIST SP 800-90C: https://csrc.nist.gov/pubs/sp/800/90/c/final
+- NIST SP 800-22 Rev. 1a: https://csrc.nist.gov/pubs/sp/800/22/r1/upd1/final
+- Decision to revise SP 800-22 Rev. 1a (2022): https://csrc.nist.gov/news/2022/decision-to-revise-nist-sp-800-22-rev-1a
+- NIST FIPS 140-3: https://csrc.nist.gov/pubs/fips/140-3/final
 
-The standards have different scopes:
+Two cautions:
 
--   SP 800-90A addresses deterministic generator mechanisms.
--   SP 800-90B addresses entropy sources.
--   SP 800-90C addresses constructions combining entropy sources and
-    deterministic generators.
--   SP 800-22 provides statistical tests; it does not certify
-    cryptographic unpredictability.
--   FIPS 140-3 concerns cryptographic modules and their validation,
-    where applicable. It is not a general certification of a novel
-    algorithm's security.
-
-A deterministic algorithm with a fixed or predictable seed does not gain
-entropy by generating more output. Its security depends on the entropy
-and secrecy of initialization and reseeding, and on the cryptographic
-properties of its state transition and output functions.
-
-Standards compliance must be evaluated against the current applicable
-revisions and the intended deployment. Merely referencing a standard
-does not establish compliance.
+- **The deployment determines the applicable standard.** Compliance must be checked against
+  the current revision the deployment needs. Citing a standard does not establish compliance.
+- **Being standardized is not a proof of security either.** Dual_EC_DRBG was standardized and
+  later withdrawn.
 
 ------------------------------------------------------------------------
 
-## 4. Overall validation lifecycle and gates
+## 7. Validation lifecycle and gates
 
-The project should use sequential phases with explicit acceptance gates.
-A failed or unresolved earlier gate blocks any claim that depends on it.
+The phases run in sequence, each with an explicit acceptance gate. A failed or unresolved
+earlier gate blocks every claim that depends on it.
 
-  -----------------------------------------------------------------------
-  Phase                   Focus                   Primary gate
-  ----------------------- ----------------------- -----------------------
-  0                       Specification and       Specification frozen
-                          algorithm definition    and unambiguous
+| Phase | Focus | Primary gate |
+|-------|-------|--------------|
+| 0 | Specification and algorithm definition | Specification frozen and unambiguous |
+| 1 | Mathematical and structural analysis | Review completed; critical defects resolved |
+| 2 | Reference implementation verification | Independent implementations agree with the specification |
+| 3 | Statistical validation | Pre-registered campaign completed; anomalies assessed |
+| 4 | Cryptanalysis | Threat model and attack campaign completed; findings assessed |
+| 5 | Hardware validation | Hardware shown to implement the specified algorithm |
+| 6 | Independent security evaluation | External review and reproduction completed |
+| 7 | Security qualification | Claims supported by evidence; limitations stated |
 
-  1                       Mathematical and        Mathematical review
-                          structural analysis     completed; critical
-                                                  defects resolved
+Passing a gate means only that its stated criteria were met. It does not establish any other
+property.
 
-  2                       Reference               Independent
-                          implementation          implementations agree
-                          verification            with specification
+**How gates work in this repository.** Each phase of work is a Spec Kit feature: specify, plan,
+tasks, implement. Each gate is a recorded owner approval in that feature's *Review & Approval*
+table, as required by Principle VIII. So far these gates have been recorded:
 
-  3                       Statistical validation  Statistical campaign
-                                                  completed and anomalies
-                                                  assessed
-
-  4                       Cryptanalysis           Threat model and attack
-                                                  campaign completed;
-                                                  findings assessed
-
-  5                       Hardware validation     Hardware behavior shown
-                                                  to match the specified
-                                                  algorithm
-
-  6                       Independent security    External review and
-                          evaluation              reproduction completed
-
-  7                       Security qualification  Claims supported by
-                                                  evidence and
-                                                  limitations explicitly
-                                                  stated
-  -----------------------------------------------------------------------
-
-Passing a gate means only that its defined acceptance criteria have been
-met. It does not imply that all other security properties have been
-established.
+- spec, plan and task approvals;
+- tool downloads;
+- design reviews;
+- design freezes and battery freezes;
+- result reviews;
+- final reviews.
 
 ------------------------------------------------------------------------
 
-## 5. Phase 0 --- Formal algorithm specification
-
-**LLM role:** Specification analyst.
-
-The LLM should help transform the proposed algorithm into a rigorous
-mathematical specification. It must identify missing definitions and
-assumptions rather than silently choosing interpretations.
+## 8. Phase 0: Formal algorithm specification
 
 The specification must define:
 
--   Complete internal state representation.
--   State dimensions and bit widths.
--   Initialization and seeding.
--   State-transition equations.
--   Output extraction and formatting.
--   Nonlinear operations.
--   Integer overflow and truncation behavior.
--   Signedness.
--   Shift and rotation semantics.
--   Reset and reseed behavior.
--   Invalid-state handling.
--   Any external entropy dependencies.
--   Parameter constraints and supported configurations.
--   Intended output rate and limits, if applicable.
+- the complete internal state, with dimensions and bit widths;
+- initialization and seeding;
+- the state-transition equations and their update order;
+- output extraction and formatting;
+- the nonlinear operations;
+- integer overflow, truncation and signedness;
+- shift (arithmetic or logical) and rotation semantics;
+- comparison semantics (signed or unsigned);
+- reset and reseed behaviour, and invalid-state handling;
+- any dependence on external entropy;
+- parameter constraints, supported configurations, output rate and limits.
 
-For a bio-inspired architecture based on interacting nodes, dynamic vein
-thickness, or network feedback, additionally define:
+For a bio-inspired network of interacting nodes, it must also define:
 
-1.  How each node calculates its next state.
-2.  How neighboring nodes exchange information.
-3.  Whether updates are synchronous or asynchronous.
-4.  Whether node update order affects results.
-5.  Whether the network can enter absorbing or repeating states.
-6.  Whether different initial states converge to common attractors.
-7.  Whether output reveals information about internal node states.
-8.  How food signals or other external inputs are represented and
-    bounded.
-9.  Whether any floating-point operation exists and, if so, how it is
-    specified and implemented.
+1. how each node computes its next state;
+2. how neighbouring nodes exchange information;
+3. whether updates are synchronous, and whether update order matters;
+4. whether the network can enter absorbing or repeating states;
+5. whether different initial states converge to common attractors;
+6. whether the output reveals information about node states;
+7. how food signals and other inputs are represented and bounded;
+8. whether any floating-point operation exists.
 
-### LLM tasks
+**Acceptance criteria:**
 
--   Reconstruct the algorithm from the specification.
--   Identify ambiguous, incomplete, or contradictory definitions.
--   Generate a list of unresolved assumptions.
--   Check that equations, pseudocode, and implementation requirements
-    agree.
--   Produce review questions for a human designer.
+- Two independently developed implementations interpret the specification identically.
+- Every security-relevant operation has exact semantics.
+- No remaining ambiguity affects the transition, output, initialization or analysis.
 
-### Deliverables
+**Status in this repository**
 
--   Formal mathematical specification.
--   State-transition documentation.
--   Output-function specification.
--   Initialization and reseeding specification.
--   State diagram or equivalent representation.
--   Parameter and boundary-condition definitions.
--   List of unresolved assumptions.
--   Algorithm version identifier and change history.
+| Item | `lut-v1` (feature 001) | `phyco-v2` (feature 002) |
+|------|------------------------|--------------------------|
+| Exact semantics | spec FR-007/FR-008 (explicit `wrap32`, floor arithmetic shift, unsigned output) | `design.md` §2 (width, signedness and wrap of every register), §4 (numbered update steps), §6 (allowed operations) |
+| Synchronous update | yes | yes. All primed values are computed from registered values (`design.md` §4, step 7) |
+| Floating point | removed: an integer lookup table replaces `np.sin`/`np.cos` | none; checked by the AST purity test |
+| Food input bounds | 16-bit table values | 16-bit table values, sign-extended to 32 bits |
+| Absorbing states, attractors | disruption fires on about 99.5% of steps (degenerate) | v001 without peristalsis collapses to the periodic attractor; v005 is not analysed beyond the edge seeds (S10) |
+| Version identity | `MODEL_ID = "lut-v1"`, golden vectors | `MODEL_ID = "phyco-v2"`; design 1.0 and model SHA-256 values in every freeze |
 
-### Acceptance criteria
+**Specification gaps that matter for security:**
 
-Two independently developed implementations must be able to interpret
-the specification identically. All security-relevant operations must
-have exact semantics. No unresolved ambiguity may affect the state
-transition, output, initialization, or security analysis.
+- there is no key, nonce, personalization or reseed interface;
+- the seed domain is only 64 bits;
+- no output limit per seed is defined;
+- the `design.md` status line still reads "awaiting owner design review". The approval is
+  recorded in `spec.md`, and the line is left unchanged because editing it would change the
+  frozen hash (feature-002 open issue O5).
 
 ------------------------------------------------------------------------
 
-## 6. Phase 1 --- Mathematical and structural analysis
+## 9. Phase 1: Mathematical and structural analysis
 
-**LLM role:** Mathematical analyst.
+The aim is to find structural properties that undermine unpredictability.
 
-The analysis should investigate whether the algorithm has structural
-properties that undermine cryptographic unpredictability.
+### 9.1 What to analyse
 
-### 6.1 State-space analysis
+**State space:**
 
-Determine:
+- nominal state bits;
+- reachable states, where tractable;
+- invalid and absorbing states;
+- transition collisions and convergence;
+- cycle lengths;
+- whether the transition is a bijection;
+- whether the output function reduces the effective security of the state.
 
--   Nominal number of internal state bits.
--   Number of reachable states, where tractable.
--   Number and nature of invalid states.
--   Presence of absorbing states.
--   State-transition collisions.
--   State convergence.
--   Cycle lengths and period behavior.
--   Whether the transition function is bijective, if relevant.
--   Whether the output function reduces the effective security of the
-    state.
+A nominal state of 2ⁿ states implies neither a period of 2ⁿ nor n bits of security.
 
-A theoretical state space of size (2\^n) does not imply a period of
-(2\^n), nor does it imply (n) bits of effective security.
+**Nonlinearity and algebra:**
 
-### 6.2 Nonlinearity and algebraic structure
+- algebraic degree;
+- linear approximations;
+- differential behaviour;
+- correlation between state and output;
+- decomposition into weakly coupled parts.
 
-Investigate:
+**Reconstruction:** whether outputs reveal node states, initial conditions, later outputs or
+equivalent states.
 
--   Algebraic degree of transition and output functions.
--   Linear approximations.
--   Differential behavior.
--   Nonlinear correlations.
--   Correlation between internal state and output.
--   Whether output leaks information about state.
--   Whether the construction decomposes into simpler independent or
-    weakly coupled components.
+**Structural weaknesses:**
 
-### 6.3 State reconstruction and predictability
+- repeated patterns and short cycles;
+- symmetries and invariant subspaces;
+- weak initialization;
+- predictable attractors;
+- slowly varying state;
+- unintended relations between node updates.
 
-Assess whether output observations could reveal:
+Classify every finding as one of:
 
--   Individual internal node states.
--   Initial conditions.
--   Transition parameters.
--   Subsequent output values.
--   Equivalent or partially equivalent internal states.
+- **Confirmed vulnerability**: proved, or reproduced by experiment.
+- **Strong theoretical concern**: a compelling issue that needs further analysis.
+- **Unverified hypothesis**: plausible, but not demonstrated.
+- **No weakness identified within the analysis performed**: a statement limited to that scope,
+  never proof that no weakness exists.
 
-### 6.4 Structural weakness search
+### 9.2 Known structural facts and concerns (`phyco-v2`, design 1.0)
 
-Search for:
+None of these has been through the Phase 1 review. The classification says how well each one is
+supported.
 
--   Repeated state patterns.
--   Short cycles.
--   Symmetries.
--   Invariant subspaces.
--   Weak initialization conditions.
--   Equivalent states.
--   Predictable attractors.
--   Low-complexity transition behavior.
--   Unintended relationships between node updates.
+| ID | Fact or concern | Basis | Classification |
+|----|-----------------|-------|----------------|
+| S1 | The seed is 4 × 16 bits = 64 bits. The initial state is a fixed function of it: P comes from the seed words, while D and the phases are constants. At any step index, at most 2⁶⁴ states are reachable out of 2²⁷². | `design.md` §3 | Confirmed (by specification) |
+| S2 | The phase counters do not depend on the seed and have period 128. Given the step index, 16 of the 272 state bits and the whole food sequence are public. | `design.md` §2, §4 steps 1–2 | Confirmed (by specification) |
+| S3 | Hence security strength against T1 is at most 64 bits: exhaustive seed search takes about 2⁷² steps, and a time–memory trade-off amortizes it (section 5). | S1, `dev/timing.json`, [`research/security/seed-entropy-bound.md`](research/security/seed-entropy-bound.md) | Confirmed upper bound (generic attack, not executed) |
+| S4 | There is no key, nonce, personalization or reseed input, so prediction resistance is impossible as specified. | `design.md` §3 | Confirmed (by specification) |
+| S5 | Each output word is a 32-bit function of the four P words; D is never output directly. Since 64 seed bits fix the state, about three consecutive words are expected to determine the seed. | `design.md` §5 | Confirmed (counting argument) |
+| S6 | Veins change slowly (D′ = D + \|Q\|/4 − D/16), and their top two bits choose the flux shift. Slowly varying control bits are a classic target for guess-and-determine attacks. | `design.md` §4 steps 3–4 | Unverified hypothesis |
+| S7 | Several constants are rotation-structured. 0x5A5A5A5A is unchanged by 8-bit rotations, and 0xA5A5A5A5 = rotl(0x5A5A5A5A, 4). The D reset values 0x00010000 << k are 1-bit rotations of each other. Rotational cryptanalysis of ARX designs (Khovratovich and Nikolić, 2010) exploits such constants. | `design.md` §2, §4 | Unverified hypothesis |
+| S8 | Neighbouring seeded pressures share halves: P[k] = (s[k] << 16) \| s[k+1]. Rotating the seed words rotates P. The D reset values, per-node rotations and food positions break the symmetry, but related-seed behaviour is untested. | `design.md` §3 | Unverified hypothesis |
+| S9 | It is unknown whether the step function is a bijection. If it is not, states can merge and cycles can be shorter. If it is, one state compromise reveals every earlier output, so there is no backtracking resistance either way unless shown otherwise. | not analysed | Not evaluated |
+| S10 | The only cycle evidence is for the all-equal edge seeds: no period ≤ 2¹⁵ in the first 2¹⁶ words. | `design.md` §9 | Limited evidence |
+| S11 | Without the peristaltic rotation and vein-tone feedback (variant v001), the network locks onto the periodic food forcing and fails all 15 SP 800-22 families. The statistical quality comes from two added ARX terms, not from the slime-mold dynamics alone. | `design.md` §8–§9, `research/002/runs.jsonl` | Confirmed (experiment) |
 
-### Deliverable
-
-A mathematical weakness assessment. Every finding must be classified as
-one of:
-
--   **Confirmed vulnerability:** supported by a mathematical proof or
-    reproducible experiment.
--   **Strong theoretical concern:** a compelling issue requiring further
-    analysis.
--   **Unverified hypothesis:** a plausible issue not yet demonstrated.
--   **No weakness identified within the analysis performed:** a
-    scope-limited statement, never proof that no weakness exists.
+For `lut-v1`: its output is the low 8 bits of every vein value D, so half of D is visible at each
+step (L1). The disruption fires on about 99.5% of steps (L2). Every battery rejects it (L3).
+lut-v1 is used only as the negative control.
 
 ------------------------------------------------------------------------
 
-## 7. Phase 2 --- Independent reference implementation
+## 10. Phase 2: Reference and independent implementations
 
-**LLM role:** Software verification engineer.
+The integer-exact Python reference model is the executable form of the frozen specification. It
+is the golden model for any RTL (Principle II). There should be at least three implementations:
 
-Develop an integer-exact Python reference implementation. It should be
-the executable interpretation of the frozen mathematical specification,
-not an informal approximation.
+| Implementation | Purpose |
+|----------------|---------|
+| Python reference model | Executable specification and test oracle |
+| Independent implementation, sharing no transition code | Catch common-mode and interpretation errors |
+| VHDL implementation | The target hardware behaviour |
 
-Maintain at least three implementation artifacts where appropriate:
+### 10.1 Test coverage
 
-  -----------------------------------------------------------------------
-  Implementation                      Purpose
-  ----------------------------------- -----------------------------------
-  Python reference model              Executable specification and test
-                                      oracle
+Test vectors and properties must cover:
 
-  Independent Python implementation   Detect common-mode errors and
-                                      interpretation mistakes
+- minimum, maximum and boundary values;
+- all-zero and all-one seeds;
+- single-bit seeds;
+- overflow and truncation;
+- shift and rotation boundaries;
+- signed and unsigned behaviour;
+- reset and repeated initialization;
+- long runs;
+- invalid parameters and states;
+- every supported configuration.
 
-  VHDL implementation                 Target hardware behavior
-  -----------------------------------------------------------------------
+Use property-based testing (for example Hypothesis) to explore states and parameters widely.
 
-The independent implementation should not simply import or reuse the
-reference transition code. Shared code can cause the same defect to
-appear in both implementations and go undetected.
+### 10.2 Status in this repository
 
-### 7.1 Test coverage
+- **Python reference models**: `phycoweb/model.py` (lut-v1) and `phycoweb/model_v2.py`
+  (phyco-v2). Their tests include:
+  - AST purity tests (no floating point, multiplication, division or modulo);
+  - width tests (5,002 states for phyco-v2);
+  - golden vectors (`vectors/`, 2 × 10,000 words for phyco-v2);
+  - seed-domain tests.
+  - Results are identical on Windows 11 (Python 3.10.11, numpy 2.2.6) and Ubuntu on WSL2
+    (Python 3.14.4, numpy 2.5.4). Both run on the same x86-64 CPU, so other architectures, such
+    as ARM, are untested.
+- **Second and third implementations of phyco-v2**:
+  - `tests/v2_reference.py` is a literal transcription of `design.md` §3–§5, written separately
+    from the model with generic helpers. `test_design_trace` compares the two step by step.
+  - `fast/phyco_stream.c` is the C stream used for the batteries. It is bit-exact with the
+    Python models for both generators: on 200,030,000 words (golden vectors plus the first 10⁶
+    words of all 100 dev seeds), and on the first 10⁶ words of every held-out seed at the start of
+    each battery attempt.
+- **lut-v1 against float-v0**: bit-exact in every stage except the perturbation source, on 2
+  seeds × 10,000 words plus 5,000 random states and edge states. A mutation check caught 6 of 6
+  mutants.
+- **Common-mode caveat**: all three phyco-v2 implementations were written in this project, by the
+  same AI coding agent, from the same design document. They catch transcription errors, but not
+  a misreading of the specification they all share. An implementation by someone outside the
+  project is still needed.
+- **Not yet done**: property-based testing with Hypothesis; any VHDL.
 
-Generate test vectors and properties covering:
+### 10.3 Semantics that must agree across languages
 
--   Minimum and maximum input values.
--   All-zero initialization, if permitted.
--   All-one initialization, if permitted.
--   Single-bit initial states.
--   Boundary values.
--   Overflow and truncation conditions.
--   Shift and rotation boundaries.
--   Signed and unsigned behavior.
--   Reset sequences.
--   Repeated initialization.
--   Long-running sequences.
--   Invalid parameter and state handling.
--   All supported configurations.
+The prior feasibility assessment raised two concerns: floating-point contamination in the food
+generator, and differences between Python and VHDL shift semantics.
 
-Use property-based testing to explore a large range of states and
-parameters.
+- **Floating point**: resolved by feature 001.
+- **Shift semantics**: resolved at the specification level, and shown in a second language (C).
+  The VHDL column below is guidance; no VHDL exists yet.
 
-### 7.2 Recommended tools
+| Operation | Python reference | C stream (`fast/phyco_stream.c`) | VHDL guidance (`numeric_std`) |
+|-----------|------------------|----------------------------------|-------------------------------|
+| Wrap mod 2³² | `& 0xFFFFFFFF` | `uint32_t` arithmetic | addition on `unsigned(31 downto 0)` |
+| Arithmetic right shift | `>>` on a signed Python int (floor) | logical shift plus sign fill, constant amounts only | `shift_right` on `signed` |
+| Logical right shift | `>>` on a non-negative int | `>>` on `uint32_t` | `shift_right` on `unsigned` |
+| Rotate left | helper | `(x << r) \| (x >> (32 − r))` with constant r | `rotate_left` on `unsigned` |
+| Unsigned compare (`D > THRESH`) | `>` on 0…2³²−1 | `>` on `uint32_t` | `>` on `unsigned` |
+| Sign extension 16 → 32 | OR 0xFFFF0000 if bit 15 is set | the same | `resize` of a `signed(15 downto 0)` |
 
--   Python
--   `pytest`
--   Hypothesis
--   SymPy
--   Python arbitrary-precision integers
--   GHDL
--   cocotb
+A difference in overflow, signedness, truncation, shift, update order or representation makes a
+different algorithm. Principle II requires Python/VHDL differential tests of at least 10,000 words
+per seed once RTL exists.
 
-### 7.3 PhycoWeb-specific requirement
+**Acceptance criteria:**
 
-The prior feasibility assessment identified potential floating-point
-contamination in the food generator and differences between Python and
-VHDL shift semantics. These issues must be resolved before statistical
-or cryptographic results are treated as meaningful.
-
-A difference in overflow, signedness, truncation, shift behavior, update
-ordering, or numeric representation can result in a different algorithm.
-
-### Acceptance criteria
-
--   Reference and independent implementations agree on specified test
-    vectors.
--   Boundary and property-based tests pass.
--   All differences are investigated and resolved.
--   The exact source revision and configuration are recorded.
--   The implementation is demonstrably consistent with the mathematical
-    specification.
-
-------------------------------------------------------------------------
-
-## 8. Phase 3 --- Statistical validation
-
-**LLM role:** Statistical test engineer.
-
-The objective is to identify detectable statistical defects, not to
-prove cryptographic security.
-
-### 8.1 Testing hierarchy
-
-**Level 1 --- Basic statistical properties**
-
--   Monobit frequency.
--   Runs.
--   Serial correlation.
--   Bit distribution.
--   Autocorrelation.
--   Block frequency.
--   Entropy estimates, interpreted according to their assumptions.
-
-**Level 2 --- Established statistical batteries**
-
--   NIST SP 800-22.
--   TestU01: SmallCrush, Crush, and BigCrush.
--   PractRand.
-
-**Level 3 --- Structural and adversarial statistical tests**
-
--   State-dependent output tests.
--   Cross-stream correlation.
--   Seed sensitivity.
--   Output correlation under related seeds.
--   Long-period and cycle investigations.
--   Tests conditioned on selected initial states.
--   Tests across parameter configurations.
--   Tests designed around the algorithm's specific structure.
-
-### 8.2 LLM automation responsibilities
-
-The LLM may help automate:
-
-1.  Test configuration.
-2.  Dataset generation scripts.
-3.  Test execution orchestration.
-4.  Result parsing.
-5.  Anomaly identification.
-6.  Failure reproduction.
-7.  Comparison between algorithm revisions.
-8.  Report generation.
-
-The LLM must not fabricate results or infer that tests passed without
-inspecting actual execution output.
-
-### 8.3 Statistical interpretation
-
-Do not interpret a collection of passing p-values as proof of
-randomness. Statistical tests have false-positive and false-negative
-behavior. Multiple testing requires appropriate interpretation and,
-where applicable, correction or a predeclared testing strategy.
-
-For each test, retain:
-
--   Algorithm revision and configuration.
--   Initial seed or seed-generation method.
--   Output sample size.
--   Test configuration and parameters.
--   Test software version.
--   Raw and summarized results.
--   P-values and pass/fail counts.
--   Failure locations and diagnostics.
--   Reproduction instructions.
--   Any exclusions or reruns, with justification.
-
-### Acceptance criteria
-
-The predeclared statistical campaign has been executed, anomalies have
-been investigated, and results are reproducible. Passing this phase
-supports only a statistical assessment, not a cryptographic security
-conclusion.
+- the implementations agree on the vectors and properties;
+- every difference is investigated and resolved;
+- the source revision and configuration are recorded;
+- consistency with the specification is demonstrated.
 
 ------------------------------------------------------------------------
 
-## 9. Phase 4 --- Cryptographic attack and resistance evaluation
+## 11. Phase 3: Statistical validation
 
-**LLM role:** Adversarial cryptanalyst.
+The aim is to find detectable statistical defects. It does not prove cryptographic security.
 
-This phase evaluates whether the generator withstands attackers
-attempting to predict or distinguish its output under a clearly defined
-threat model.
+### 11.1 Testing hierarchy
 
-The LLM should act as an adversary, not as an advocate for the design.
+| Level | Content | Status for `phyco-v2` |
+|-------|---------|-----------------------|
+| 1 Basic properties | frequency, runs, serial correlation, bit distribution, autocorrelation, block frequency, entropy estimates (read according to their assumptions) | covered inside SP 800-22 |
+| 2 Established batteries | NIST SP 800-22; TestU01 SmallCrush, Crush, BigCrush; PractRand (Dieharder optional) | SP 800-22 done; PractRand/TestU01 attempt 1 in progress |
+| 3 Structural and adversarial | state-dependent output, cross-stream correlation, seed sensitivity, related seeds (T2), long-period and cycle studies, tests conditioned on chosen initial states, tests aimed at the design's own structure (S6–S8) | not started |
 
-### 9.1 Attack families
+### 11.2 Test-tool validation (lesson from features 001–002)
 
-  -----------------------------------------------------------------------
-  Attack class                        Objective
-  ----------------------------------- -----------------------------------
-  State recovery                      Recover internal state from output
+The test tool must be validated too:
 
-  Prediction                          Predict future output
+- **nistrng 1.2.3** had defects. Its Binary Matrix Rank test changed its input in place. Its
+  `Result.score` is a mean. Its Non-Overlapping Template test used a single template and returned
+  p = 1 in every run. These defects made the feature-001 screening unreliable: see the erratum,
+  `scripts/repro_nistrng_defects.py` and `harness/nistrng-defects.json`.
+- **The project's harness `sp80022` 1.0.0** (SHA-256 `1563526e…`) replaced it. It was validated
+  against the SP 800-22 worked examples, Appendix B, and NIST STS 2.1.2: 0 mismatches at ±1e-6
+  (`reports/002-core-dynamics-redesign/harness/`).
 
-  Backtracking                        Recover previous output after state
-                                      compromise
+### 11.3 Pre-registered protocol (features 002–003)
 
-  Distinguishing                      Distinguish candidate output from
-                                      uniform random data
+Every acceptance result in this repository comes from a protocol that was fixed before the data
+existed:
 
-  Differential                        Exploit behavior under related
-                                      initial states or inputs
+- **Seed separation.** Tuning, exploration and setup use `dev` seeds only. Held-out sets are
+  identified by SHA-256 fingerprints. Development tools refuse held-out seeds (exit 2), and each
+  held-out set is used exactly once.
+- **Freeze.** Before each attempt, a freeze record pins:
+  - the model, design, harness, source and binary SHA-256 values;
+  - the tool versions;
+  - the commands;
+  - the thresholds.
 
-  Algebraic                           Solve state-transition or output
-                                      equations
+  The owner approves it, and the runner refuses to start without that approval.
+- **Controls.**
+  - Positive control: the OS CSPRNG. If it fails, the attempt is INCONCLUSIVE and the candidate
+    is not evaluated. The held-out set still counts as used.
+  - Negative control: lut-v1. If it does not fail, the attempt is INCONCLUSIVE, because the tests
+    have not shown they can discriminate.
+- **Limited attempts.** Three for SP 800-22 (feature 002), two for the batteries (feature 003).
+  A second battery attempt is allowed only after INCONCLUSIVE or INVALID.
+- **Stricter only.** Rules may change only before results exist, with owner approval, and only
+  to make the protocol stricter. No test may be removed or loosened (feature-002 FR-014,
+  feature-003 FR-015).
+- **Report everything.** Every run is reported, including failures and incomplete runs. A
+  re-score from the saved logs must reproduce every verdict (`scripts/rescore_attempt.py`,
+  `scripts/battery_rescore.py`).
+- **Multiple testing.** The battery rule is a Bonferroni threshold over every reported p-value:
+  min(p, 1 − p) ≤ 0.005 / S, with S = 101,210, giving 4.94 × 10⁻⁸. Any PractRand FAIL grade or
+  TestU01 `eps` row also counts as a failure.
 
-  Correlation                         Identify dependencies between
-                                      outputs or streams
+### 11.4 Results to date
 
-  Reduced-state                       Find structural weaknesses in
-                                      smaller variants
+| Item | Result | Evidence |
+|------|--------|----------|
+| SP 800-22 acceptance attempt 1 (`heldout-1`, 100 × 2²¹ bits) | **PASS**: phyco-v2 passed 15/15 families, the positive control passed, lut-v1 failed 11/15. The re-score was identical | `reports/002-core-dynamics-redesign/attempt-1/` |
+| Positive-control calibration (1,000 runs of OS data) | Chance failure rate under the feature-002 rules: **20.7% (95% CI 18.2–23.3%)**. A perfect candidate passes an attempt only **63%** of the time (CI 59–67%) | `reports/003-extended-batteries-calibration/calibration/` |
+| DFT cross-check | Our DFT agrees with STS 2.1.2 on 1,000 fresh sequences. The test's own variance constant is about 6% too small: E[d²] = 1.062 (CI 1.053–1.071), and it rejects 1.23% of random sequences at α = 0.01 | `calibration/dft-crosscheck.md` |
+| Battery dev rehearsal (1 dev seed; not evidence) | phyco-v2 had no failures in PractRand to 1 TiB or in SmallCrush, Crush and BigCrush in both bit orders | `reports/003-extended-batteries-calibration/dev/` |
+| Battery attempt 1 (`heldout-1` battery set) | Started 2026-10-30. The positive control passed (70 of 70 runs). The negative control failed as required (section 11.5). The candidate runs are in progress. **The verdict needs the owner result review (T038) and is not stated here** | `reports/003-extended-batteries-calibration/attempt-1/` |
 
-  Initialization                      Exploit weak seeds or
-                                      initialization procedures
+### 11.5 Negative control (lut-v1) in battery attempt 1, not yet reviewed
 
-  Reseeding                           Investigate reseed behavior and
-                                      recovery properties
+- **PractRand**: all 10 seeds stopped at the first checkpoint (2²⁷ bytes) with FAIL grades.
+- **SmallCrush**: 12–15 of 15 statistics at `eps` in every run.
+- **Crush**: 123–132 of 144 in every run.
+- **BigCrush**: 147–154 of 160 in every run.
 
-  Side-channel                        Investigate timing, power,
-                                      electromagnetic, or other
-                                      implementation leakage
-  -----------------------------------------------------------------------
+### 11.6 Interpretation rules
 
-### 9.2 Prediction resistance
+- A set of passing p-values is not proof of randomness. Every test has false-positive and
+  false-negative behaviour.
+- Multiple testing needs a pre-declared rule, and that rule must itself be calibrated. Feature
+  003 measured it: the feature-002 rules fail a perfect generator about one time in five.
+- **Selection bias**: 5 variants and 12 runs were tried on dev seeds before phyco-v2 was chosen
+  (feature-002 O6). Only held-out attempts are unbiased.
+- Statistical success says nothing about S1–S9.
 
-Give an attacker a sequence of generated output bits and ask it to
-predict future bits without access to internal state.
+For every test, record:
 
-Define the attacker's observations, computational budget, success
-metric, and baseline in advance. Evaluate whether prediction performance
-is significantly better than the appropriate random baseline, accounting
-for sample size and statistical uncertainty.
-
-### 9.3 State recovery
-
-Provide varying amounts of output and attempt to reconstruct the
-complete internal state or enough state information to predict
-subsequent output.
-
-Record whether recovery is exact, partial, or merely correlated, and
-quantify the required observations and computation.
-
-### 9.4 Backtracking resistance
-
-Determine whether compromise of the current state permits reconstruction
-of previously generated output. State the assumptions about state
-compromise and any intervening reseeding.
-
-### 9.5 Distinguishing attacks
-
-Construct a reproducible experiment in which an attacker receives
-samples from either the candidate generator or a uniform random source
-and attempts to identify the source.
-
-Measure advantage over chance and report confidence intervals, sample
-requirements, and computational costs. Avoid claiming that a finite
-experiment proves indistinguishability.
-
-### 9.6 Reduced-state attacks
-
-Create smaller variants by reducing node count, node width, or state
-dimensions. Investigate whether weaknesses become visible.
-
-Reduced-state experiments are useful for discovering structural
-problems, but results must not be extrapolated into unsupported claims
-about the full-size construction. Explain what structural feature, if
-any, appears to scale.
-
-### 9.7 Attack report requirements
-
-Every attack investigation must include:
-
-1.  Attack description.
-2.  Target security property.
-3.  Attacker capabilities and assumptions.
-4.  Required observations or inputs.
-5.  Mathematical analysis.
-6.  Executable attack implementation, where applicable.
-7.  Experimental results.
-8.  Computational and data complexity.
-9.  Reproduction instructions.
-10. Security implications and limitations.
-
-A proposed attack is not a confirmed vulnerability until it is
-mathematically demonstrated or supported by reproducible evidence. An
-unsuccessful attack is not proof of security.
+- the algorithm revision and configuration;
+- the seed or seed derivation;
+- the sample size;
+- the test parameters and tool version;
+- the raw output and the p-values;
+- the failure locations;
+- the reproduction commands;
+- any exclusion or re-run, with its justification.
 
 ------------------------------------------------------------------------
 
-## 10. Phase 5 --- Hardware implementation validation
+## 12. Phase 4: Cryptographic attack and resistance evaluation
 
-**LLM role:** Hardware verification engineer.
+This phase tests whether the generator withstands attackers trying to predict or distinguish its
+output, under the threat model in section 5. Whoever does it, human or AI, acts as an adversary,
+not as an advocate for the design.
 
-Software security findings cannot automatically be transferred to
-hardware. The FPGA implementation must be shown to implement the exact
-algorithm that was evaluated.
+### 12.1 Attack families
 
-The hardware validation program should include:
+| Attack class | Objective |
+|--------------|-----------|
+| Seed exhaustion and time–memory trade-off | Recover the seed by search or precomputation (S1–S3) |
+| State recovery, including guess-and-determine | Recover the state from output (S5, S6) |
+| Prediction | Predict future output |
+| Backtracking | Recover earlier output after a state compromise (S9) |
+| Distinguishing | Tell the output from uniform data |
+| Differential and related-seed | Exploit related seeds or inputs (S8) |
+| Rotational | Exploit rotation-structured constants in an ARX design (S7) |
+| Algebraic, SAT and SMT | Solve the transition and output equations |
+| Linear and correlation | Find linear approximations, or dependencies between outputs or streams |
+| Reduced-state | Find structure in smaller variants that may scale |
+| Initialization and weak seeds | Exploit the seed mapping, warm-up, or degenerate seeds (T5) |
+| Reseeding | Not applicable as specified (S4); required for any prediction-resistance claim |
+| Side-channel and fault | Timing, power, EM or fault leakage (section 13) |
 
--   Bit-exact Python/VHDL comparison.
--   Simulation across boundary conditions.
--   Reset and initialization verification.
--   State-transition verification.
--   Synthesis and implementation checks.
--   Timing analysis.
--   Resource utilization analysis.
--   Power consumption analysis.
--   Glitch and switching behavior analysis.
--   Side-channel leakage assessment appropriate to the threat model.
+### 12.2 Generic bounds every claim must respect
 
-The LLM may generate cocotb testbenches, analyze GHDL output, and
-compare implementation artifacts with the specification.
+- **Seed or key size**: security strength ≤ the entropy of the seed. For phyco-v2 that is
+  64 bits; any claim needs FUT-SEC-1 (section 20.1).
+- **State size**: the Babbage–Golić time–memory–data trade-off breaks a generator whose secret
+  state is smaller than about twice the claimed strength. For a 128-bit claim, the secret state
+  must have at least 256 bits that are actually reachable. phyco-v2 has 256 secret bits
+  nominally, but only 2⁶⁴ reachable states per step index (S1).
+- **Output volume**: a claim must state how much output per seed it covers.
 
-### Acceptance criteria
+### 12.3 Proposed first investigations for PhycoWeb-PRNG
 
--   VHDL behavior matches the reference model over agreed test vectors
-    and properties.
--   Reset, initialization, and boundary behavior are verified.
--   Synthesis results and tool versions are recorded.
--   Any hardware-specific deviations are investigated.
--   Side-channel claims are limited to what has actually been measured
-    and assessed.
+Each would be its own Spec Kit feature, with a spec, an owner review and recorded results.
+
+1. **Demonstrate the seed bound** on a reduced seed domain, for example two seed words fixed and
+   2³² candidates. Recover the seed from three output words and measure the cost per candidate.
+   This turns S3 from a generic argument into a reproduced result.
+2. **Guess-and-determine and SAT/SMT state recovery** on reduced-width variants (8-bit and 16-bit
+   words, with the same structure), then the full width. Report how the number of outputs and the
+   solver time scale.
+3. **Slow-variable leakage**: test whether the conductance classes (D >> 30) can be inferred from
+   the output, and whether fixing them makes the step linear enough to solve (S6).
+4. **Related-seed and rotational experiments**: rotated seed words, single-bit seed differences
+   and rotational pairs (S7, S8).
+5. **Invertibility and cycle structure**: decide whether the step function is a bijection (S9),
+   and map the functional graph on reduced variants that are small enough to enumerate.
+6. **Distinguishers**: linear and differential trail search (MILP or SAT), plus machine-learning
+   distinguishers (as in Gohr, 2019) on reduced-step variants. Any advantage found must be
+   confirmed with fresh data and a pre-registered test.
+
+For each one, define in advance:
+
+- the attacker's observations;
+- the computational budget;
+- the success metric;
+- the random baseline.
+
+Report the advantage with confidence intervals. A finite experiment never proves
+indistinguishability.
+
+### 12.4 Attack report requirements
+
+1. Attack description and target property.
+2. Attacker capabilities and assumptions (T1–T5).
+3. Required observations and inputs.
+4. Mathematical analysis.
+5. Executable implementation, where applicable.
+6. Experimental results.
+7. Data, time and memory complexity.
+8. Reproduction instructions and exact revisions.
+9. Security implications and limitations.
+
+A proposed attack is not a confirmed vulnerability until it is proved mathematically or
+reproduced. An unsuccessful attack is not proof of security.
+
+------------------------------------------------------------------------
+
+## 13. Phase 5: Hardware implementation validation
+
+Software findings do not transfer to hardware automatically. The FPGA design must be shown to
+implement exactly the evaluated algorithm.
+
+The hardware programme includes:
+
+- bit-exact Python/VHDL comparison (Principle II: at least 10,000 words per seed);
+- simulation across boundary conditions;
+- reset and initialization checks;
+- synthesis with 0 DSP blocks and vendor-neutral code (Principle III);
+- timing analysis against the ≥ 200 MHz target;
+- resource and power analysis;
+- glitch and switching behaviour;
+- side-channel and fault assessment matched to the threat model.
+
+**Status:** no RTL exists. The open RTL-pending items, recorded as O1 in feature 002 and in the
+`design.md` §7 checklist, are:
+
+- a fixed 4-node ring, where Principle III requires a parameterizable grid;
+- about 7 serial 32-bit carry chains per step, which puts the 200 MHz target at risk;
+- the food source and the output tap, which are not neighbour-to-neighbour signals.
+
+**Side channels and faults (not evaluated).**
+
+- **Values that depend on the state**: the sign tests, the absolute value, the class-selected
+  flux shift and the threshold-triggered disruption XOR.
+- **In hardware**, these are multiplexers and need not leak through timing, but power and EM have
+  not been studied.
+- **In software**, the C stream writes them as conditional expressions, which a compiler may turn
+  into branches. That stream is a test tool, not for secrets.
+- **Fault injection** on the threshold comparison could force or suppress disruptions. This is an
+  unverified hypothesis.
+
+**Acceptance criteria:**
+
+- VHDL matches the reference model on the agreed vectors and properties;
+- reset, initialization and boundaries are verified;
+- synthesis results and tool versions are recorded;
+- deviations are investigated;
+- side-channel claims are limited to what was measured.
 
 Simulation equivalence alone does not establish side-channel resistance.
 
 ------------------------------------------------------------------------
 
-## 11. Phase 6 --- Independent cryptographic evaluation
+## 14. Phase 6: Independent cryptographic evaluation
 
-**LLM role:** Independent reviewer.
+The reviewer receives:
 
-At this stage, the reviewing LLM should challenge the work rather than
-assist in defending it.
+- the specification, with exact revisions;
+- the source code and test vectors;
+- the statistical, attack and hardware reports, with the attack code;
+- the threat model;
+- the claims and assumptions;
+- the known limitations and unresolved findings.
 
-Provide the reviewer with:
+The reviewer looks for:
 
--   Mathematical specification.
--   Source code and exact revision identifiers.
--   Test vectors.
--   Statistical reports.
--   Attack reports and attack code.
--   Hardware verification reports.
--   Threat model.
--   Security claims and assumptions.
--   Known limitations and unresolved findings.
+- inconsistencies between claims and evidence;
+- unsupported assumptions;
+- missing attack classes;
+- common-mode implementation errors;
+- statistical method errors;
+- overstated conclusions;
+- unexamined parameters;
+- differences between the evaluated design and the deployment.
 
-Ask it to identify:
+A second AI review is not independent cryptanalysis. The Security Policy requires a review by
+independent experts in PRNGs, cryptographic primitives and hardware security, recorded in the
+repository. The reviewers should reproduce the important findings themselves.
 
--   Inconsistencies between claims and evidence.
--   Unsupported assumptions.
--   Missing attack classes.
--   Common-mode implementation errors.
--   Statistical methodology errors.
--   Overstated conclusions.
--   Unexamined parameter choices.
--   Differences between the evaluated design and proposed deployment.
-
-A second LLM review is not equivalent to independent cryptanalysis. The
-project should obtain external review from cryptographers experienced in
-PRNGs, cryptographic primitives, and hardware security.
-
-The independent reviewer should attempt to reproduce important findings
-and assess the security argument without relying solely on the
-development team's conclusions.
+**Status:** not started.
 
 ------------------------------------------------------------------------
 
-## 12. Phase 7 --- Security qualification
+## 15. Phase 7: Security qualification
 
-The final decision must distinguish research progress from evidence
-supporting a cryptographic security claim.
+| Classification | Meaning |
+|----------------|---------|
+| Research candidate | Defined and under evaluation |
+| Statistically evaluated | Pre-registered statistical campaign completed; significant anomalies assessed |
+| Cryptographically evaluated | Threat model and substantial cryptanalysis completed |
+| Cryptographically qualified | Claim supported by independent evidence and the applicable validation |
 
-  -----------------------------------------------------------------------
-  Classification                      Meaning
-  ----------------------------------- -----------------------------------
-  Research candidate                  Algorithm is defined and undergoing
-                                      evaluation
+**Current classification:**
 
-  Statistically evaluated             Statistical campaign completed and
-                                      significant anomalies assessed
+- `float-v0`: archived, not evaluated further.
+- `lut-v1`: rejected statistically; used as the negative control.
+- `phyco-v2`: research candidate, with statistical evaluation in progress. It could at most
+  become "statistically evaluated" when feature 003 closes.
 
-  Cryptographically evaluated         Threat model and substantial
-                                      cryptanalysis completed
+**Rules for any qualification:**
 
-  Cryptographically qualified         Security claim supported by
-                                      appropriate independent evidence
-                                      and applicable validation
-  -----------------------------------------------------------------------
-
-A custom algorithm should not be called cryptographically secure merely
-because it reaches the third classification.
-
-Qualification must identify the exact algorithm version, configuration,
-intended use, security properties, assumptions, limitations, and
-external reviews. Standards compliance or formal module validation may
-be required for particular deployments.
+- A custom algorithm is not called cryptographically secure merely because it reaches the third
+  classification.
+- A qualification states the exact version, configuration, intended use, properties,
+  assumptions, limitations and external reviews.
+- Under FIPS 140-3, a custom generator cannot be an approved RBG at all (section 6). For
+  deployments that need approval, "qualified" is only reachable along Option B (section 21).
 
 ------------------------------------------------------------------------
 
-## 13. LLM-assisted validation team
+## 16. AI-assisted work in this repository
 
-Use a multi-agent architecture rather than relying on one LLM to perform
-every task. Agents should have separate responsibilities, prompts, and
-deliverables.
+### 16.1 How AI assistance has been used (features 001–003)
 
-  -----------------------------------------------------------------------
-  Agent                               Responsibility
-  ----------------------------------- -----------------------------------
-  Lead validation agent               Coordinates work, tracks evidence,
-                                      enforces gates
+- **Process.** Work follows the Spec Kit flow: specify, plan, tasks, implement. An AI coding
+  agent drafts the documents, writes code and runs the tools. The repository owner approves at
+  the recorded gates: spec, plan, tasks, downloads, design and battery freezes, and results.
+- **Rules.** The agent is bound by the constitution exactly as a human contributor is:
+  - it stops at gates (Principle VIII);
+  - it never commits, pushes or publishes (Principle IX);
+  - it reports every result, including failures (Principle IV).
+- **Verdicts.** Verdicts are computed by code (`protocol/`, `scripts/`), not by the agent's
+  narrative, and re-scoring reproduces them from saved logs.
 
-  Specification agent                 Mathematical definitions and
-                                      ambiguity detection
+### 16.2 Roles
 
-  Mathematics agent                   State-space, transitions,
-                                      invariants, and structural analysis
+Separate responsibilities reduce shared blind spots. Any role can be taken by a human or by an AI
+session with its own instructions.
 
-  Implementation agent                Python reference model and
-                                      independent tests
+| Role | Responsibility | Taken in features 001–003 by |
+|------|----------------|------------------------------|
+| Lead and evidence tracking | Gate status, traceability, phase reports | AI agent; owner approval |
+| Specification | Definitions, ambiguity detection | AI agent; owner review |
+| Implementation | Reference model, second implementations, tests | AI agent |
+| Statistics | Batteries, protocol, calibration | AI agent; owner freeze and result review |
+| Mathematics | State space, invariants, structure | not yet staffed |
+| Cryptanalysis | Attacks under the threat model | not yet staffed |
+| Hardware | VHDL, simulation, synthesis | not yet staffed |
+| Independent reviewer | Challenge every claim | not yet staffed (section 14) |
+| Evidence auditor | Check that reports match executions and revisions | partly: re-score scripts and claims checks |
 
-  Statistics agent                    Statistical batteries and anomaly
-                                      analysis
+Different AI sessions or models reduce some shared biases, but they do not give true
+independence. Agreement between implementations written by one agent from one document is
+weaker evidence than agreement with an implementation written by someone else.
 
-  Cryptanalysis agent                 Adversarial attacks and
-                                      security-property evaluation
+### 16.3 Controls against false conclusions
 
-  Hardware agent                      VHDL, simulation, synthesis, and
-                                      hardware testing
+| Control | Requirement | Mechanism in this repository |
+|---------|-------------|------------------------------|
+| Reproducibility | Every finding has reproducible evidence | Scripts with fixed seeds; commands recorded in every report; re-score scripts |
+| Source traceability | Claims cite an equation or specification section | FR/SC identifiers (Principle VII); `design.md` section references |
+| Executable verification | Claims are checked by code | Purity, width, trace and vector tests; oracle comparison with STS |
+| Independent implementation | No shared transition code | `tests/v2_reference.py`, `fast/phyco_stream.c` (common-mode caveat, section 10.2) |
+| Adversarial review | Every security claim has a matching attack investigation | none yet, so no security claim is made |
+| Evidence separation | Measured results kept apart from theory | Classification in section 9; dev rehearsals labelled "not evidence" |
+| Version control | Every result tied to exact revisions | `git_head` and SHA-256 values in every freeze and run record |
+| Human approval | Acceptance needs recorded human review | Review & Approval tables (Principle VIII) |
+| Claims discipline | No security wording beyond the evidence | Verbatim disclaimer from `protocol/disclaimer.py` in every report; claims check before final reviews |
 
-  Security reviewer                   Challenges claims and conclusions
+**Strict rules:**
 
-  Evidence auditor                    Reproducibility, traceability, and
-                                      report integrity
-  -----------------------------------------------------------------------
+- A generated report is not proof that tests ran.
+- A generated attack explanation is not proof that an attack worked.
+- A generated security argument is not proof of unpredictability.
+- A passing simulation is not proof of side-channel resistance.
+- A phase is never marked passed because its documents exist.
+- Tool output, logs, artifacts and revisions must support every claim of execution. Where
+  evidence is missing, the status is "not evaluated", "inconclusive" or "blocked".
 
-### 13.1 Agent independence
+### 16.4 Instructions for a cryptanalysis session
 
-Agents should not all share the same assumptions.
-
-For example:
-
--   The specification agent defines the algorithm.
--   The implementation agent independently implements it.
--   The mathematics agent investigates structural weaknesses.
--   The cryptanalysis agent assumes the algorithm may be vulnerable and
-    attempts to break it.
--   The security reviewer challenges the conclusions of all other
-    agents.
--   The evidence auditor checks that reported results correspond to
-    actual executions and exact source revisions.
-
-Using different LLMs or configurations can reduce some common reasoning
-biases, but does not eliminate them or provide true independence.
-
-### 13.2 Lead-agent responsibilities
-
-The lead agent should:
-
--   Maintain the phase and gate status.
--   Assign bounded tasks to specialist agents.
--   Require machine-readable or structured result artifacts.
--   Track unresolved findings.
--   Prevent downstream claims when upstream gates are blocked.
--   Preserve links between claims, tests, code, and evidence.
--   Produce a final report that distinguishes measured facts,
-    mathematical arguments, hypotheses, and unknowns.
-
-------------------------------------------------------------------------
-
-## 14. Preventing LLM hallucinations and false security conclusions
-
-The following controls are mandatory.
-
-  -----------------------------------------------------------------------
-  Control                             Requirement
-  ----------------------------------- -----------------------------------
-  Reproducibility                     Every finding must have
-                                      reproducible evidence
-
-  Source traceability                 Every mathematical claim references
-                                      an equation or specification
-                                      section
-
-  Executable verification             Claims are checked using
-                                      independent code where possible
-
-  Independent implementation          Avoid shared code between reference
-                                      and verification models
-
-  Adversarial review                  Security claims have corresponding
-                                      attack investigations
-
-  Evidence separation                 Measured results are distinguished
-                                      from theoretical claims
-
-  Version control                     Every result is tied to an exact
-                                      algorithm revision
-
-  Human approval                      Security acceptance requires
-                                      qualified human review
-  -----------------------------------------------------------------------
-
-Strict rules:
-
--   A generated statistical report is not proof that tests ran.
--   A generated attack explanation is not proof that an attack
-    succeeded.
--   A generated security argument is not proof of unpredictability.
--   A passing simulation is not proof of hardware side-channel
-    resistance.
--   An LLM must not mark a phase passed merely because it generated the
-    requested documents.
--   Tool output, logs, test artifacts, and source revisions must support
-    all claims of execution.
-
-The LLM should be instructed to say "not evaluated," "inconclusive," or
-"blocked" when evidence is missing.
-
-------------------------------------------------------------------------
-
-## 15. Recommended repository organization
-
-A proposed repository layout is:
-
-``` text
-PhycoWeb-PRNG/
-|
-|-- specs/
-|   |-- algorithm/
-|   |   |-- mathematical_specification.md
-|   |   |-- state_transition.md
-|   |   |-- output_function.md
-|   |   `-- initialization.md
-|   |
-|   |-- security/
-|   |   |-- threat_model.md
-|   |   |-- security_requirements.md
-|   |   `-- security_claims.md
-|   |
-|   `-- validation/
-|       |-- validation_plan.md
-|       `-- acceptance_criteria.md
-|
-|-- reference/
-|   |-- python_model/
-|   `-- independent_model/
-|
-|-- hardware/
-|   |-- vhdl/
-|   |-- testbenches/
-|   `-- cocotb/
-|
-|-- validation/
-|   |-- mathematical/
-|   |-- state_space/
-|   |-- statistical/
-|   |-- cryptanalysis/
-|   |-- implementation/
-|   `-- hardware/
-|
-|-- attacks/
-|   |-- state_recovery/
-|   |-- prediction/
-|   |-- distinguishing/
-|   |-- differential/
-|   `-- reduced_state/
-|
-|-- scripts/
-|   |-- run_validation.py
-|   |-- run_statistical_tests.py
-|   |-- run_attack_suite.py
-|   |-- compare_implementations.py
-|   `-- generate_report.py
-|
-|-- agents/
-|   |-- specification_agent.md
-|   |-- mathematics_agent.md
-|   |-- implementation_agent.md
-|   |-- statistical_agent.md
-|   |-- cryptanalysis_agent.md
-|   |-- hardware_agent.md
-|   `-- security_reviewer.md
-|
-|-- evidence/
-|   |-- test_vectors/
-|   |-- statistical_results/
-|   |-- attack_results/
-|   |-- hardware_results/
-|   `-- validation_reports/
-|
-`-- docs/
-    |-- validation_summary.md
-    `-- security_assessment.md
-```
-
-This is a suggested organization. Existing repository conventions and
-Spec-Kit structure should be preserved where practical rather than
-duplicated unnecessarily.
-
-------------------------------------------------------------------------
-
-## 16. Python validation orchestration
-
-A Python orchestration script should control test execution and gate
-status. The LLM may help author and maintain the scripts, but the
-scripts and test tools---not the LLM's narrative---must determine
-whether a test completed and whether its defined assertions passed.
-
-Conceptual example:
-
-``` python
-def validate_prng():
-    specification = validate_specification()
-
-    if not specification.passed:
-        return "BLOCKED: Specification"
-
-    mathematics = run_mathematical_analysis()
-
-    if not mathematics.passed:
-        return "BLOCKED: Mathematical analysis"
-
-    reference = verify_reference_implementations()
-
-    if not reference.passed:
-        return "BLOCKED: Implementation"
-
-    statistics = run_statistical_batteries()
-
-    cryptanalysis = run_attack_suite()
-
-    hardware = verify_hardware_implementation()
-
-    return generate_evidence_report(
-        mathematics=mathematics,
-        reference=reference,
-        statistics=statistics,
-        cryptanalysis=cryptanalysis,
-        hardware=hardware,
-    )
-```
-
-This is a workflow illustration, not a complete executable
-implementation. Production orchestration must define structured result
-schemas, error handling, timeouts, resource limits, artifact hashes, and
-explicit gate policies.
-
-Statistical, cryptographic, and hardware results must remain separate
-assessments. Passing one cannot override failure in another.
-
-------------------------------------------------------------------------
-
-## 17. Agent prompt: cryptanalysis agent
-
-The following is a starting system instruction for the cryptanalysis
-agent.
-
-``` text
-# Cryptanalysis Agent — System Instructions
+```text
+# Cryptanalysis — Instructions
 
 ## Role
+You are an independent cryptanalyst evaluating PhycoWeb-PRNG (phyco-v2,
+specs/002-core-dynamics-redesign/design.md 1.0). Your objective is to find
+weaknesses, not to show that the generator works.
 
-You are an independent cryptographic cryptanalyst tasked with
-evaluating a newly proposed pseudorandom number generator.
-
-Your objective is to discover weaknesses, not to demonstrate
-that the generator works.
-
-## Primary responsibilities
-
-1. Analyze the mathematical state transition function.
-2. Identify state-space limitations.
-3. Search for invariant states and short cycles.
-4. Investigate output correlations.
-5. Develop state-recovery attacks.
-6. Develop future-output prediction attacks.
-7. Investigate backtracking resistance.
-8. Develop distinguishing experiments.
-9. Investigate weaknesses in initialization and reseeding.
-10. Analyze reduced-state versions for structural weaknesses.
+## Responsibilities
+1. Analyse the state transition and output functions.
+2. Identify state-space limits, invariant states and short cycles.
+3. Investigate output correlations and slowly varying state.
+4. Develop seed-recovery, state-recovery and prediction attacks.
+5. Investigate backtracking behaviour and related-seed behaviour.
+6. Build distinguishing experiments with pre-declared metrics.
+7. Analyse reduced-state variants that keep the structure.
 
 ## Mandatory rules
+- Never assume the generator is secure, and never treat statistical
+  success as evidence of security.
+- Never claim an attack succeeds without executable or mathematical
+  evidence. Never invent results.
+- Separate confirmed findings from hypotheses (security.md section 9.1).
+- State the attacker capabilities (T1-T5), complexities and limits.
+- Record the exact revisions and every parameter needed to reproduce.
+- Follow the repository constitution: work from an approved spec, use
+  dev seeds only for exploration, never use held-out seed sets, ask
+  the owner before any download, and never commit, push or publish.
 
-- Never assume the algorithm is cryptographically secure.
-- Never interpret statistical test success as proof of security.
-- Never claim an attack succeeds without executable or
-  mathematical evidence.
-- Never invent experimental results.
-- Distinguish theoretical vulnerabilities from experimentally
-  confirmed vulnerabilities.
-- Identify assumptions and computational limitations.
-- Record all parameters required to reproduce an attack.
-- Identify the exact algorithm revision under examination.
-
-## Required output
-
-For each investigation, produce:
-
-1. Attack description.
-2. Target security property.
-3. Attacker capabilities.
-4. Required observations or inputs.
-5. Mathematical analysis.
-6. Executable attack implementation, where applicable.
-7. Experimental results.
-8. Computational complexity.
-9. Reproducibility instructions.
-10. Security implications.
+## Output per investigation
+Attack description; target property; attacker capabilities; required
+observations; analysis; code; results; data, time and memory complexity;
+reproduction steps; implications and limitations.
 
 ## Final objective
-
-Attempt to disprove the cryptographic security claims of the
-proposed generator.
-
-A lack of discovered vulnerabilities must be reported as an
-absence of identified attacks within the scope of the
-investigation, not as proof of security.
+Attempt to disprove any security claim. If no attack is found, report
+"no attack identified within the scope of this investigation", never
+"secure".
 ```
 
-### 17.1 Other agent assignments
+The other roles get similar short instructions:
 
-**Mathematics agent**
-
-> Determine whether the state transition function is bijective, whether
-> the output function leaks internal state, and whether the system
-> contains invariant or absorbing states. Provide mathematical
-> derivations and executable verification where possible.
-
-**Statistical agent**
-
-> Develop a reproducible statistical testing campaign. Identify test
-> assumptions, sample-size requirements, multiple-testing
-> considerations, anomalous results, and limitations. Never equate
-> statistical passing with cryptographic security.
-
-**Independent reviewer**
-
-> Assume that the security claims made by the development team are
-> incorrect until independently supported. Identify unsupported
-> assumptions, methodological errors, missing attack classes, and
-> contradictions in the evidence.
+- **Mathematics**: decide whether the transition is a bijection, whether the output leaks state,
+  and whether invariant or absorbing states exist. Give derivations and executable checks.
+- **Statistics**: run a pre-registered, reproducible campaign. State test assumptions, sample
+  sizes, the multiple-testing rule and its calibration, anomalies and limits.
+- **Independent reviewer**: assume the development team's claims are wrong until independently
+  supported.
 
 ------------------------------------------------------------------------
 
-## 18. Specific priorities for PhycoWeb-PRNG
+## 17. Evidence management and reporting
 
-The prior PhycoWeb-PRNG feasibility assessment identified three major
-concerns:
+### 17.1 Mechanisms already in use
 
-1.  Mathematical ambiguities in the existing four-node architecture.
-2.  Potentially insufficient state space.
-3.  Floating-point contamination in the food generator and differences
-    between Python and VHDL shift semantics.
+- **Freeze records**: for example `attempt-1/freeze.json` in features 002 and 003. They contain
+  the model, design, harness, source, binary and tool SHA-256 values, the commands, the
+  thresholds and the owner approval fields. The runners validate them and refuse otherwise.
+- **Seed-set fingerprints**: development tools refuse held-out seeds, and each set is used once.
+- **Archive inventory**: `baseline/float-v0/MANIFEST.json` (Principle V).
+- **Run records**: per-run JSON with input hashes. These include the calibration
+  `runs/SHA256SUMS` and the battery `stream.sha256` files.
+- **Local-only data**: the positive-control byte files (`data/controls/*.bin`) are git-ignored,
+  and only their SHA-256 values are committed. Others can re-run the controls but cannot re-score
+  those exact bytes.
+- **Re-score**: verdicts are recomputed from saved logs. The results were identical on Windows,
+  and within floating-point rounding on WSL.
+- **Phase completion reports** (constitution): these list:
+  - files created or modified;
+  - requirements addressed;
+  - exact commands and results;
+  - open issues;
+  - security concerns;
+  - a recommendation to proceed, revise or stop.
 
-These issues should be the first targets of the validation program.
+### 17.2 Every evidence record should include
 
-  -----------------------------------------------------------------------
-  Priority                Investigation           Expected result
-  ----------------------- ----------------------- -----------------------
-  Critical                Resolve mathematical    Unambiguous algorithm
-                          ambiguities             
+- a unique identifier, and the date and time of execution;
+- the algorithm version, specification version and git commit;
+- tool and dependency versions, the operating system and the hardware;
+- the exact command and configuration;
+- the inputs, or the seed derivation;
+- output paths with SHA-256 values;
+- the exit status and assertions;
+- the result classification;
+- the analyst and the reviewer, with the review status;
+- known limitations.
 
-  Critical                Determine effective     State-space report
-                          reachable state space   
+Preserve raw tool output, not only summaries.
 
-  Critical                Eliminate or formally   Exact numeric semantics
-                          specify floating-point  
-                          dependencies            
+### 17.3 Final reports required before any security decision
 
-  Critical                Resolve Python/VHDL     Bit-exact reference
-                          semantic differences    model
+1. Algorithm specification and change history.
+2. Threat model and security requirements.
+3. Mathematical and state-space analysis.
+4. Reference implementation verification.
+5. Statistical testing.
+6. Cryptanalysis and attacks.
+7. Hardware verification.
+8. Independent review.
+9. Security assessment and qualification decision.
 
-  High                    Investigate state       Cycle analysis
-                          convergence and         
-                          attractors              
+Each must keep these apart:
 
-  High                    Investigate             Correlation assessment
-                          output/state            
-                          correlations            
-
-  High                    Attempt state           Attack report
-                          reconstruction          
-
-  High                    Evaluate prediction     Prediction experiments
-                          resistance              
-
-  High                    Evaluate distinguishing Distinguishing report
-                          attacks                 
-
-  Medium                  Complete statistical    Statistical assessment
-                          batteries               
-
-  Medium                  Verify FPGA             Hardware equivalence
-                          implementation          report
-
-  Final                   Independent             Security assessment
-                          cryptographic review    
-  -----------------------------------------------------------------------
-
-### 18.1 Architectural decision: new primitive or established construction
-
-Investigate two architectural directions before committing to a security
-claim.
-
-**Option A --- New cryptographic primitive**
-
-The bio-inspired architecture itself must provide the cryptographic
-security properties. This requires a rigorous security model and
-extensive cryptanalysis. Novelty and complexity do not establish
-security.
-
-**Option B --- Bio-inspired mechanism combined with an established
-cryptographic construction**
-
-A bio-inspired mechanism could contribute to state generation or another
-carefully specified component that is subsequently processed by an
-established cryptographic primitive.
-
-This may offer a more practical engineering path, but it does not
-automatically make the complete construction secure. The entropy,
-initialization, state-generation mechanism, composition, and use of the
-established primitive all require analysis.
-
-For applications generating cryptographic keys or other
-security-critical random values, the preferred engineering approach is
-to use an established, appropriately instantiated DRBG and validated
-entropy source rather than rely on an unreviewed custom generator.
-
-The project should evaluate both directions without assuming either is
-secure.
+- demonstrated facts;
+- mathematical arguments;
+- experimental observations;
+- unverified hypotheses;
+- unsuccessful attacks;
+- untested areas;
+- residual risks.
 
 ------------------------------------------------------------------------
 
-## 19. Recommended local LLM and tool environment
+## 18. Repository organization
 
-For a local development workflow using Hermes with LM Studio, the LLM
-can serve as the primary research and orchestration assistant. Exact
-compatibility and model capabilities should be verified in the actual
-environment.
+Security work follows the existing Spec Kit layout. It does not use a separate tree.
 
-  Component            Responsibility
-  -------------------- --------------------------------------------
-  Hermes / LM Studio   Agent orchestration and reasoning
-  Python               Mathematical and experimental verification
-  SymPy                Symbolic mathematical analysis
-  Hypothesis           Property-based testing
-  NumPy / SciPy        Numerical and statistical analysis
-  NIST STS             Statistical test suite
-  TestU01              Advanced statistical testing
-  PractRand            Long-stream statistical testing
-  GHDL                 VHDL simulation
-  cocotb               Hardware verification
-  Git                  Version control and evidence traceability
+```text
+PhycoWeb-PRNG/
+|-- .specify/memory/constitution.md   governing principles (v1.1.0)
+|-- specs/NNN-<feature>/              spec, plan, research, data model, tasks, design
+|-- reports/NNN-<feature>/            evidence, phase reports, freezes, attempts
+|-- phycoweb/                         reference models (lut-v1, phyco-v2) and the LUT
+|-- baseline/                         archived variants with SHA-256 manifest
+|-- sp80022/                          validated SP 800-22 harness
+|-- protocol/                         seed sets, freezes, battery rules, disclaimer
+|-- scripts/                          runners, re-score, generators, cross-checks
+|-- fast/                             C streams and the TestU01 driver
+|-- tests/                            unit tests, fixtures, independent transcription
+|-- vectors/                          golden output vectors
+|-- research/                         exploration logs and variants (dev seeds only)
+|-- data/                             LUT data; local-only control bytes (git-ignored)
+`-- security.md                       this document
+```
 
-Keep test execution deterministic where appropriate and independent of
-LLM-generated conclusions. The LLM may generate scripts, launch approved
-tests, inspect results, and propose new investigations. It must not be
-responsible for fabricating or independently asserting results that were
-not produced by the tools.
+Future security work fits the same pattern:
 
-Record tool versions, operating environment, configuration, and command
-lines to support reproducibility.
-
-------------------------------------------------------------------------
-
-## 20. Development roadmap
-
-  -----------------------------------------------------------------------
-  Stage                   Work                    Deliverable
-  ----------------------- ----------------------- -----------------------
-  1                       Establish validation    Validation framework
-                          framework, security     specification
-                          objectives, threat      
-                          model, agents, evidence 
-                          repository, and gates   
-
-  2                       Resolve mathematical    Frozen algorithm
-                          ambiguities, define     specification
-                          integer semantics,      
-                          analyze reachable state 
-                          space, define           
-                          initialization and      
-                          output                  
-
-  3                       Build reference and     Verified reference
-                          independent             implementation
-                          implementations, test   
-                          vectors, and            
-                          Python/VHDL comparison  
-
-  4                       Execute NIST STS,       Statistical validation
-                          TestU01, PractRand, and report
-                          custom structural tests 
-
-  5                       Execute state-recovery, Cryptanalysis report
-                          prediction,             
-                          distinguishing,         
-                          differential, and       
-                          algebraic               
-                          investigations          
-
-  6                       Perform VHDL            Hardware validation
-                          simulation, hardware    report
-                          equivalence, synthesis, 
-                          and side-channel        
-                          investigations          
-
-  7                       Obtain independent      Final security
-                          review, reproduce       assessment
-                          findings, and assess    
-                          claims                  
-  -----------------------------------------------------------------------
-
-The roadmap is sequential at the gate level. Some work may be conducted
-in parallel for research purposes, but downstream conclusions remain
-blocked when required upstream definitions or implementations are
-unresolved.
+- a threat-model and security-claims feature (`specs/NNN-…`);
+- cryptanalysis features, with attack code under `research/NNN/` or `scripts/` and results under
+  `reports/NNN-…/`;
+- an RTL feature, with VHDL and testbenches in a new `hardware/` directory, created by its spec.
 
 ------------------------------------------------------------------------
 
-## 21. Evidence management and reporting
+## 19. Tool environment
 
-Every validation result should be reproducible and traceable.
+The tools actually used in features 001–003:
 
-At minimum, each evidence record should include:
+| Tool | Version | Use |
+|------|---------|-----|
+| Python | 3.10.11 (Windows 11); 3.14.4 (Ubuntu on WSL2) | reference models, harness, protocol, analysis |
+| numpy / scipy | 2.2.6 / 1.15.3 (Windows); 2.5.4 / 1.18.1 (WSL) | integer arrays and FFT; scipy for analysis only |
+| `sp80022` | 1.0.0 (SHA-256 `1563526e…`) | SP 800-22 harness |
+| NIST STS | 2.1.2 (WSL) | reference oracle |
+| PractRand | 0.96 | long-stream battery |
+| TestU01 | 1.2.3 (non-commercial licence; not redistributed) | SmallCrush, Crush, BigCrush |
+| gcc | 15.2.0 (WSL) | fast streams, TestU01 driver, tool builds |
+| git | — | version control and provenance |
 
--   Unique evidence identifier.
--   Date and time of execution.
--   Algorithm version or Git commit.
--   Specification version.
--   Source-code revision.
--   Tool and dependency versions.
--   Operating system and relevant hardware.
--   Exact command or test configuration.
--   Input data or seed-generation procedure.
--   Output artifact paths and cryptographic hashes.
--   Exit status and test assertions.
--   Result classification.
--   Analyst or agent identity.
--   Reviewer and review status.
--   Known limitations.
+Planned for later phases, not yet installed or used:
 
-Use immutable or access-controlled storage for final evidence where
-practical. Preserve raw outputs rather than retaining only LLM-generated
-summaries.
+- Hypothesis, for property-based tests;
+- GHDL and cocotb, for VHDL simulation and testbenches;
+- SAT and SMT solvers (for example CryptoMiniSat, Z3);
+- SageMath, for algebraic analysis.
 
-### 21.1 Required final reports
+Each download needs the owner's explicit permission (file name, source and size), and the
+versions are recorded in the feature that uses it.
 
-1.  Algorithm specification and change history.
-2.  Threat model and security requirements.
-3.  Mathematical and state-space analysis.
-4.  Reference implementation verification report.
-5.  Statistical testing report.
-6.  Cryptanalysis and attack report.
-7.  Hardware verification report.
-8.  Independent review report.
-9.  Security assessment and qualification decision.
-
-The final report must distinguish:
-
--   Demonstrated facts.
--   Mathematical arguments.
--   Experimental observations.
--   Unverified hypotheses.
--   Unsuccessful attack attempts.
--   Untested areas.
--   Residual risks and assumptions.
+The tools, not an assistant's narrative, decide whether a test completed and whether its
+assertions passed. Record the tool versions, the environment, the configuration and the exact
+command lines.
 
 ------------------------------------------------------------------------
 
-## 22. Final recommendation
+## 20. Priorities for PhycoWeb-PRNG
 
-The project should establish three separate research objectives.
+The prior feasibility assessment named three concerns:
 
-### Scientific objective
+1. mathematical ambiguities in the four-node architecture;
+2. a potentially insufficient state space;
+3. floating point in the food generator, and differences between Python and VHDL shift
+   semantics.
 
-Demonstrate that the bio-inspired architecture produces well-defined,
-complex, reproducible state transitions.
+Their status, and that of the investigations that follow from them:
 
-### Engineering objective
+| Priority | Investigation | Status (2026-10-31) | Evidence or next step |
+|----------|---------------|---------------------|-----------------------|
+| Critical | Resolve mathematical ambiguities | **Resolved** for lut-v1 and phyco-v2 | feature 001 FR-007/FR-008; `design.md` §2–§6 |
+| Critical | Remove floating point | **Resolved**: integer lookup table; AST purity tests | feature 001; `test_purity`, `test_purity_v2` |
+| Critical | Python/VHDL semantic differences | **Resolved in the specification**, and bit-exact in C; VHDL pending | section 10.3; `streams/equivalence.json` |
+| Critical | Effective reachable state space | **Open.** Upper bound: 2⁶⁴ states per step index | section 9.2 S1–S3 |
+| Critical | Seed and key interface (new) | **Open.** 64 bits bounds every claim. A fix (a ≥ 128-bit key, plus a reseed input for prediction resistance) is an algorithm change and needs a new spec and owner review (Principles VI, VIII) | section 9.2 S1–S4 |
+| High | Convergence and attractors | **Partly**: v001 collapse observed; disruption rate 13.5–13.8%; edge-seed period check only | `design.md` §9 |
+| High | Output/state correlation | Not started | section 12.3 item 3 |
+| High | State reconstruction | Not started | section 12.3 items 1–2 |
+| High | Prediction resistance | Not applicable as specified (S4) | — |
+| High | Distinguishing attacks | Statistical batteries only | section 12.3 item 6 |
+| Medium | Statistical batteries | SP 800-22 done; PractRand/TestU01 attempt 1 in progress | section 11.4 |
+| Medium | FPGA implementation | Not started (O1) | section 13 |
+| Final | Independent cryptographic review | Not started | section 14 |
 
-Demonstrate that the architecture can be implemented consistently and
-efficiently in Python and synthesizable VHDL.
+### 20.1 Future feature requirements, if cryptographic certification is pursued
 
-### Cryptographic objective
+The main finding of this review: **phyco-v2's seed is four 16-bit words, 64 bits in total. That
+caps any security level at 64 bits, however large the internal state, which is below the 112-bit
+minimum for approved cryptographic use.** The derivation, the measured cost and the full
+requirement text are in
+[`research/security/seed-entropy-bound.md`](research/security/seed-entropy-bound.md).
 
-Establish, through mathematical analysis and independent cryptanalysis,
-whether the resulting construction provides meaningful cryptographic
-security under a clearly defined threat model.
+These requirements apply **only if the owner decides to pursue a cryptographic claim, evaluation
+or certification**. They are not scheduled. Meeting them is an algorithm change (Principles VI and
+VIII), and probably another core redesign with a new model ID.
 
-Success in the scientific and engineering objectives must not be
-interpreted as success in the cryptographic objective.
+| ID | Requirement (summary) |
+|----|-----------------------|
+| FUT-SEC-1 | A key with at least 128 bits of entropy, never less than 112. No seed or key search, and no trade-off attack, cheaper than the claimed strength |
+| FUT-SEC-2 | Reachable secret state of at least twice the claimed strength |
+| FUT-SEC-3 | A nonce or IV with uniqueness rules, if a key can have more than one stream |
+| FUT-SEC-4 | A reseed input from a validated entropy source, if prediction resistance is claimed |
+| FUT-SEC-5 | Analysis of key and IV loading and of the warm-up (related-key, related-IV, weak keys) |
+| FUT-SEC-6 | A specified maximum output per key, and per key and IV |
+| FUT-SEC-7 | A new model ID, vectors, freeze, and the full statistical programme on unused held-out sets |
+| FUT-SEC-8 | First, reproduce the 64-bit bound on a reduced seed domain (section 12.3, item 1) |
+| FUT-SEC-9 | A named certification route. FIPS 140-3 approval is not available to a custom generator (Option B only, section 21) |
 
-The recommended next development artifact is a Spec-Kit feature
-specification titled **LLM-Assisted Cryptographic Validation
-Framework**. It should define the agents, validation phases, Python
-orchestration, test suites, evidence requirements, and security
-acceptance gates for PhycoWeb-PRNG.
+**A wider seed alone is probably not enough**, for these reasons:
 
-The desired outcome is not merely a collection of randomness tests. It
-is a reproducible research and security-validation program capable of
-discovering weaknesses, preserving evidence, challenging assumptions,
-and supporting a carefully scoped security decision.
+- the seed fills only the P words, while D and the phases start from constants;
+- loading key material into D changes the vein dynamics that feature 002 tuned (feature-002
+  FR-005);
+- there is no nonce or reseed input;
+- key and IV loading needs its own analysis.
 
-**Final security rule:** Until the algorithm has undergone adequate
-independent cryptanalysis and the complete construction satisfies its
-stated security requirements, classify it as an experimental research
-candidate---not a cryptographically secure PRNG.
+Details are in §4 of the research note.
+
+------------------------------------------------------------------------
+
+## 21. Architectural decision: new primitive or established construction
+
+**Option A: a new cryptographic primitive.** The bio-inspired architecture itself must provide
+the security. This requires:
+
+- a security model;
+- a key or seed interface that matches the claimed strength (at least 128 bits, with a secret
+  state of at least 256 reachable bits, section 12.2);
+- a reseed design if prediction resistance is claimed;
+- extensive independent cryptanalysis.
+
+Novelty and complexity establish nothing.
+
+**Option B: a bio-inspired mechanism alongside an established construction.** An approved DRBG,
+seeded from a validated entropy source, provides the security (SP 800-90A/B/C). The bio-inspired
+generator could only be an additional, non-security input or a research component.
+
+- It is deterministic, so it adds no entropy, and it cannot count as an entropy source.
+- The composition must still be analysed so that it cannot weaken the approved construction.
+
+For keys and other security-critical values, the preferred engineering choice is an established,
+correctly instantiated DRBG with a validated entropy source, not an unreviewed custom generator.
+Neither option is assumed secure.
+
+------------------------------------------------------------------------
+
+## 22. Roadmap
+
+| Stage | Work | Status |
+|-------|------|--------|
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.1.0; this document 2.0) |
+| 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
+| 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
+| 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
+| 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
+| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9, probably a new core design with a new model ID | Conditional; not scheduled (section 20.1) |
+| 6 | Cryptanalysis: state recovery, related seeds, rotational, algebraic, distinguishers | Not started |
+| 7 | RTL: VHDL, differential tests, synthesis, side channels | Not started (O1) |
+| 8 | Independent review, reproduction, qualification decision | Not started |
+
+The roadmap is sequential at the gate level. Research may run in parallel, but downstream
+conclusions stay blocked while upstream definitions or implementations are unresolved.
+
+------------------------------------------------------------------------
+
+## 23. Reporting a weakness
+
+Weaknesses, attacks and errors in this document are welcome. Report them through the
+repository's issue tracker, and include:
+
+- the model ID and version (for example `phyco-v2`, design 1.0), and the git commit;
+- the property you believe is violated, and the attacker capabilities (section 5);
+- the seeds, data volumes and exact commands;
+- code or data that reproduces the result.
+
+PhycoWeb-PRNG must not protect secrets (section 4), so public reports are appropriate. The owner
+reviews each report. Confirmed findings are recorded with the classification in section 9.1 and
+traced into a spec.
+
+------------------------------------------------------------------------
+
+## 24. Final recommendation
+
+The project pursues three separate objectives:
+
+- **Scientific**: show that the bio-inspired architecture produces well-defined, complex,
+  reproducible state transitions.
+- **Engineering**: show that it can be implemented consistently and efficiently in Python and
+  synthesizable VHDL.
+- **Cryptographic**: establish, through mathematical analysis and independent cryptanalysis,
+  whether a construction based on it provides meaningful security under a stated threat model.
+
+Success in the first two must not be read as success in the third. As specified, `phyco-v2`
+cannot meet the cryptographic objective, because its 64-bit seed caps any security strength at
+64 bits. Any cryptographic work therefore starts with a new, owner-approved specification of the
+key and reseed interface, meeting requirements FUT-SEC-1 to FUT-SEC-9 (section 20.1). That is
+probably another core redesign. The work then follows sections 9–15.
+
+The next security-related artifact recommended for this repository is a Spec Kit feature for the
+threat model and security claims. It would:
+
+- adopt section 5;
+- state that no claim is made for design 1.0;
+- schedule the investigations in section 12.3, starting with the reduced-domain seed recovery.
+
+**Final security rule:** classify PhycoWeb-PRNG as an experimental research candidate, not a
+cryptographically secure PRNG, until both of the following hold:
+
+- the algorithm has undergone adequate independent cryptanalysis;
+- the complete construction satisfies its stated security requirements.
+
+------------------------------------------------------------------------
+
+## 25. Document history
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | before feature 001 (git `64e7e3d`) | Initial validation strategy |
+| 2.0 | 2026-10-31 | Replaced the tool-environment section with the tools actually used. Corrected the definitions of prediction and backtracking resistance (SP 800-90A) and added the AIS 20/31 terms. Checked the standards' status (SP 800-90C final 2025; SP 800-90A Rev. 2 draft; the 2022 SP 800-22 revision decision). Added the security status, threat model, structural facts S1–S11 and generic bounds. Aligned every phase with the evidence from features 001–003 (specification, implementations, harness validation, pre-registered protocol, calibration, DFT cross-check, battery attempt status). Replaced the proposed directory tree with the actual layout. Added AI-assistance practice, weakness reporting and priority status |
+| 2.1 | 2026-10-31 | Recorded the main finding, the 64-bit seed bound, as conditional future feature requirements FUT-SEC-1 to FUT-SEC-9 (section 20.1, roadmap stage 5a). Added the research note `research/security/seed-entropy-bound.md` |
+
+> Passing statistical batteries does not show cryptographic security. This generator must not be
+> used to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts.
