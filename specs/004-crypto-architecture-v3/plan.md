@@ -148,7 +148,8 @@ within the 66 h of R7; each vector file in at most an hour; model speed measured
 protocols, their seed sets, or any frozen file, `fast/phyco_stream.c` and `fast/Makefile`
 included (its LF pin leaves its bytes unchanged, R18); development inputs only; the protocol
 only becomes stricter; no key-loading code before the FUT-SEC-8 review; heavy runs never
-overlap; no download beyond the approved files of R19; the agent never commits or pushes.
+overlap; no download beyond the approved files of R19; the agent commits only locally, under the
+owner's standing authorization, and never pushes.
 
 **Scale/Scope**: three claimable sizes (b = 1,024, 4,096 and 16,384 bits at w = 32), research
 size 2×2 (3×3 only with a three-colour schedule); at most six candidates; 3 × 2³² sweep
@@ -170,7 +171,7 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 | VI. Specification before implementation | Spec and plan approved 2026-11-01; tasks await approval. Candidates are research objects under the approved rules; the reference model is written from the design document after selection, and the design is frozen only after the owner design review | Pass |
 | VII. Requirements traceability | Tasks will cite FR and SC identifiers; the spec's traceability tables map FUT-SEC, FUT-GRID and FUT-HW; the final report lists every requirement without evidence as open | Pass (enforced in tasks) |
 | VIII. Human review gates | Plan approval; downloads (every file of R19 approved on 2026-11-01, any other file separately); FUT-SEC-8 review; go-ahead for the second transcription; owner design review; design freeze; final result review | Pass |
-| IX. Outward actions | The agent never commits, pushes or publishes; downloads only with per-file permission; sending the review package is the owner's action | Pass |
+| IX. Outward actions | The agent makes local commits only under the owner's standing authorization and never pushes, tags, releases or publishes; downloads only with per-file permission; sending the review package is the owner's action | Pass |
 | Security Policy | FUT-SEC-1 to FUT-SEC-9 carried and traced (FR-049); key 256 bits and reachable secret state ≥ 256 bits at every claimable size (FR-009, FR-010); no claim, only a target at L1; restriction stated wherever use is described (FR-050) | Pass |
 | Technical constraints | Python 3.8+ for the model (standard library only); numpy with explicit dtypes; scipy for analysis only; a test checks that the model imports no analysis dependency. Adds C tooling for the sweep | Justified (Complexity Tracking) |
 | Workflow and phase reporting | This plan has its Constitution Check; the change-completion items still open at the end (statistical evaluation, RTL) are reported (FR-052); every phase ends with the constitution's report | Pass |

@@ -124,11 +124,22 @@ automated checks cannot assess.
 
 ### IX. Explicit Authorization for Outward Actions
 
-- No contributor or agent MAY commit, push, publish, tag, or release without explicit
-  authorization from the repository owner for that specific action.
-- Authorization for one action does not extend to later or different actions.
+- No contributor or agent MAY push, publish, tag, or release without explicit authorization from
+  the repository owner for that specific action.
+- No contributor or agent MAY commit without the owner's explicit authorization. For local
+  commits only, the owner MAY give an agent a standing authorization, which holds until the
+  owner withdraws it. Under it, the agent commits after each task or Spec Kit command, and about
+  every 30 minutes during longer work, always at a consistent checkpoint, never in the middle of
+  a set of related edits.
+- An instruction not to commit, given for a task, overrides a standing authorization for that
+  task, and no standing authorization covers a commit that amends this constitution (Governance).
+- Commit messages MUST NOT carry a co-author line naming an AI tool.
+- Authorization for one action does not extend to later or different actions; a standing
+  authorization for local commits is the only exception, and it covers nothing else.
 
 Rationale: outward-facing actions are hard to reverse and must remain under the owner's control.
+A local commit stays on the owner's machine until it is pushed, so a standing authorization keeps
+the history current without loosening control over anything that leaves the machine.
 
 ## Technical Constraints
 
@@ -250,8 +261,8 @@ recorded.
 - This constitution supersedes conflicting guidance in other repository documents, including the
   README and agent bootstrapping directives.
 - Amendments MUST be made via `/speckit-constitution` (or an equivalent edit), reviewed by the
-  repository owner, and committed only with explicit authorization (Principle IX), stating the
-  version change and rationale.
+  repository owner, and committed only with the owner's explicit authorization for that commit,
+  never under a standing one (Principle IX), stating the version change and rationale.
 - Versioning follows semantic versioning: MAJOR for removing or redefining a principle in a
   backward-incompatible way; MINOR for adding a principle/section or materially expanding
   guidance; PATCH for clarifications and wording fixes.
@@ -261,4 +272,4 @@ recorded.
 - Existing code or specs that predate an amendment and violate a principle MUST be tracked as
   follow-up items rather than silently grandfathered.
 
-**Version**: 1.2.0 | **Ratified**: 2026-10-28 | **Last Amended**: 2026-10-31
+**Version**: 1.3.0 | **Ratified**: 2026-10-28 | **Last Amended**: 2026-11-01
