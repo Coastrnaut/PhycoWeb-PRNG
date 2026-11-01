@@ -1,14 +1,15 @@
-# Assertion Outlines: the Proof Programme and the Scrutiny Game
+# Assertion Outlines: the Proof Programme, the Scrutiny Game and AI-Drafted VHDL
 
 Date: 2026-10-31.
 
 **Status:** a proposal for owner review, drafted by the AI coding agent. These outlines argue for
 plans. They are not results, and none of them is a security claim. The policy is in
-[`security.md`](../security.md) 2.7 and the constitution 1.2.0
+[`security.md`](../security.md) 2.8 and the constitution 1.2.0
 ([`.specify/memory/constitution.md`](../.specify/memory/constitution.md)), which prevails. The
 experiment of Outlines B and C is described in
-[`research/engagement/scrutiny-game.md`](engagement/scrutiny-game.md), and the next steps for
-both are in [`next.md`](../next.md).
+[`research/engagement/scrutiny-game.md`](engagement/scrutiny-game.md), the rules that Outline D
+argues for are in [`research/hardware/vhdl-genai.md`](hardware/vhdl-genai.md), and the next
+steps for all of them are in [`next.md`](../next.md).
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,
@@ -42,8 +43,8 @@ above, played as chess.
 
 Two habits keep these outlines honest:
 
-- every source says how it was checked (§7): full text, abstract or publisher's record, or only
-  other people's summaries;
+- every source says how it was checked (§8): full text, abstract or publisher's record, a
+  project's own documentation, or only other people's summaries;
 - every outline ends with its **counter-evidence and limits**, because a representative picture
   includes the parts that disagree.
 
@@ -267,11 +268,92 @@ statistical sense: it is predictable, on purpose, to anyone holding the seed. Th
 not exist yet. And public scrutiny is an outward action: nothing in this outline is posted, run or
 announced without the owner's authorization for that specific action (Principle IX).
 
-## 5. What the first draft taught us
+## 5. Outline D: VHDL and generative AI, fast drafts and strict judges
 
-The topic arrived with three example outlines. They were a generous start, and checking a
-generous start is exactly what reviewers are for, so here is what the check found. No blame
-attaches: published science wobbles too, as the first row shows.
+How the project will use language models for RTL, argued from the field's evidence and from the
+project's own model. The rules it argues for are in section 5 of
+[`research/hardware/vhdl-genai.md`](hardware/vhdl-genai.md) (the hardware note), and
+security.md 2.8 §13 adopts the essential ones. No RTL exists yet, so every claim here is about a
+plan.
+
+**Claim D1. Language models can draft VHDL, but they cannot yet be trusted to judge it.**
+
+1. Because VHDL is the hardware language they know less well.
+   - *Evidence:* VHDL-Eval (Vijayaraghavan et al., 2024), 202 problems with self-verifying
+     testbenches: the models tested struggled with VHDL, and the authors compared zero-shot
+     prompting, in-context learning and parameter-efficient fine-tuning as remedies. Abstract.
+2. Because they lose their way where real designs live: across files and down hierarchies.
+   - *Evidence:* VHDL-REPOBENCH (Vijayaraghavan et al., 2026), about 100 repositories, 2,500
+     files and 500 testbenches: moderate accuracy at line and block level, considerably lower on
+     multi-file reasoning, hierarchy and generating a module from its specification. Abstract.
+3. Because what they lack is data, and the data is only now being gathered.
+   - *Evidence:* VHDLBench (Sakhreliya and Franklin, ISQED 2026) attributes the difficulty mainly
+     to missing training data, and 7B models fine-tuned on its 39,000 files from 356
+     repositories beat their base models. Abstract.
+4. Because a first draft has errors that a model, left alone, may misdiagnose.
+   - *Evidence:* Sigasi (30 July 2026): generated HDL rarely finishes in one attempt, and a model
+     may answer an unresolved reference by inventing a declaration or recreating an existing
+     component, so the vendor puts deterministic analysis in the loop. A vendor's article about
+     its own tool. Docs.
+
+**Claim D2. Deterministic tools and an independent oracle can turn fast drafts into evidence.**
+
+1. Because compiler feedback lets a model repair most of its own syntax errors.
+   - *Evidence:* RTLFixer (Tsai, Liu and Ren, DAC 2024): about 55% of the errors in
+     model-written Verilog were syntax errors, and with retrieval and ReAct prompting on compiler
+     feedback it fixed about 98.5% of the compilation errors in 212 erroneous implementations.
+     Abstract.
+2. Because a testbench can be judged by whether it catches deliberately broken designs.
+   - *Evidence:* AutoBench (Qiu et al., MLCAD 2024): its Eval2 runs a generated testbench against
+     mutants of the golden design; on 156 problems, AutoBench reached 44.81% Eval2 pass@1
+     against 28.46% for direct generation. Full text.
+3. Because flows now write a circuit and its testbench from one specification, so the judge has
+   to come from somewhere else.
+   - *Evidence:* Xu, Li and Schlichtmann (2026) survey front-end design moving from local
+     assistance to agentic execution, with circuits and testbenches generated from a shared
+     specification. Abstract.
+4. Because two independent open simulators can now disagree before a person has to.
+   - *Evidence:* NVC, an open simulator independent of GHDL, runs nearly all of VHDL-2008
+     except PSL by default, and cocotb drives both (GHDL 2.0 or later, experimentally; NVC
+     from 1.11.0), so one Python testbench can ask both. Docs.
+
+**Claim D3. VHDL is becoming a verification language too, and the project should follow it
+carefully: portable VHDL-2008 with explicit types now, newer features only when every tool has
+them.**
+
+1. Because the standard itself now puts verification in its name.
+   - *Evidence:* IEEE P1076, whose project authorization request was approved on 26 March 2026,
+     is titled "Standard for Verification and Hardware Design Language (VHDL)" and brings 1076.2,
+     1076.3, 1076.4 and 1164 into one document. Record.
+2. Because VHDL-2019 changed the size of a basic type, so code that leans on INTEGER means
+   different things in different versions.
+   - *Evidence:* VHDL-2019 raised the minimum range of INTEGER from 32 to 64 bits, according to
+     Sigasi's VHDL-2019 overview and AMD's Vivado synthesis guide (UG901); the standard's text
+     was not read. Docs.
+3. Because support for VHDL-2019 is still uneven.
+   - *Evidence:* NVC, which runs nearly all of VHDL-2008, still treats VHDL-2019 as
+     experimental. Docs.
+4. Because the project's own model has corners that a careless choice of type would cut.
+   - *Evidence:* S12 allows a vein value of `phyco-v2` to reach exactly 2³¹, for one step. There
+     a VHDL-2008 INTEGER overflows, a signed comparison with the foraging threshold gives the
+     opposite answer, and conductance class 2, otherwise unused, is exercised
+     (`phycoweb/model_v2.py`; the hardware note, §5.2). Proof (S12) and reading of the model.
+
+**Counter-evidence and limits.** Most of the strongest results are for Verilog, and that they
+carry over to VHDL is assumed, not shown. Benchmark numbers age as fast as the models do, and the
+vendor article is the vendor's account of its own product. A design that passes every
+deterministic check can still be wrong about timing, power and side channels, which only
+measurement shows (security.md §13). Tools are not infallible judges either: this project has
+already met one that lied (`nistrng`, Claim A3), which is why the hardware note's rule R2 adds a
+second simulator once its download is approved. And this outline was drafted by a language model,
+which has an obvious interest in Claim D2 and an equally obvious duty to Claim D1.
+
+## 6. What the first drafts taught us
+
+The topic arrived with three example outlines, and the VHDL material for Outline D with claims of
+its own. They were a generous start, and checking a generous start is exactly what reviewers are
+for, so here is what the check found. No blame attaches: published science wobbles too, as the
+first row shows.
 
 | Example evidence | What it turned out to be | Used here? |
 |------------------|--------------------------|------------|
@@ -282,8 +364,11 @@ attaches: published science wobbles too, as the first row shows.
 | Martin and Lefcourt (1983); Kuiper, Martin and Olinger (1993) | Humor as a moderator of stress, and as coping; not checked here, and not needed by these outlines | No |
 | Cognitive services that "accurately" recognise emotions | Contradicted by the evidence of Claim C1 | Argued the opposite |
 | Sarcasm and self-deprecation as safe ways to engage | Mixed: sarcasm raises conflict without trust (Huang et al., 2015), and self-defeating humor lowers enjoyment (Ceha et al., 2021) | Tested as arms, with safeguards |
+| VHDL-Instruct, a dataset of 18,500 circuits | The paper exists (FORGE '26, by its Crossref record), but the count could not be checked: the publisher's page refused automated access, and the record has no abstract | Named, without the count (hardware note §2.1) |
+| Repair loops with GHDL or Sigasi in them | Shown with compiler feedback for Verilog (RTLFixer, 2024); described for VHDL by a vendor for its own tool (Sigasi, 2026); GHDL validates VHDL benchmarks (VHDLSuite) rather than repairing designs | Yes, with an independent oracle (D2) |
+| An automotive safety system-on-chip with lockstep processors, ECC wrappers and a watchdog | A functional-safety design, outside this project's question | Left out at the owner's request |
 
-## 6. Checklist for a new outline
+## 7. Checklist for a new outline
 
 - [ ] Exactly three claims, each one a reasonable person could dispute.
 - [ ] Exactly four reasons per claim, each passing the *because* test.
@@ -295,12 +380,13 @@ attaches: published science wobbles too, as the first row shows.
 - [ ] The Truth: does the outline invite a push on every square, and would its author lose one
   gracefully?
 
-## 7. Sources
+## 8. Sources
 
-Checked on 2026-10-31. *Abstract* means the abstract or the publisher's record was read.
-*Record* means only the bibliographic details and the instrument's description were checked.
-*Secondary* means the findings were checked only in other people's summaries, so the full text
-must be read before a specification quotes figures.
+Checked on 2026-10-31. *Full text* means the paper itself was read. *Abstract* means the abstract
+or the publisher's record was read. *Record* means only the bibliographic details and the
+instrument's description were checked. *Secondary* means the findings were checked only in other
+people's summaries, so the full text must be read before a specification quotes figures. *Docs*
+means a project's or vendor's own pages were read, directly or in a search tool's extract.
 
 Cryptography:
 
@@ -378,3 +464,30 @@ Methods, ethics and law:
   capabilities that infer emotional states. Secondary: press coverage quoting Microsoft.
 - Nosek, B. A., Ebersole, C. R., DeHaven, A. C., & Mellor, D. T. (2018). The preregistration
   revolution. *PNAS*, 115(11), 2600–2606. doi:10.1073/pnas.1708274114. Abstract.
+
+VHDL, hardware and AI-assisted design (§9 of the hardware note lists the rest):
+
+- AMD. Vivado Design Suite User Guide: Synthesis (UG901), 2023.1, "64-bit Integers". Docs.
+- cocotb and NVC documentation, on simulator support and on VHDL-2008 and VHDL-2019 coverage.
+  Docs.
+- Drazic, P., Senouci, B., & Benatallah, B. (2026). VHDL-Instruct: training open dataset for LLMs
+  benchmarking and HDL code generation. *FORGE '26*. doi:10.1145/3793655.3793710. Record
+  (Crossref).
+- IEEE Standards Association. P1076, Standard for Verification and Hardware Design Language
+  (VHDL); project authorization request approved on 26 March 2026. Record.
+- Qiu, R., Zhang, G. L., Drechsler, R., Schlichtmann, U., & Li, B. (2024). AutoBench: automatic
+  testbench generation and evaluation using LLMs for HDL design. *MLCAD 2024*; arXiv:2407.03891.
+  Full text.
+- Sakhreliya, A., & Franklin, M. (2026). VHDLBench: a dataset with rich contextual relationships
+  for training custom LLMs. *ISQED 2026*. Abstract.
+- Sigasi (30 July 2026). Can AI generate HDL? Vendor article; and Sigasi's VHDL-2019 overview.
+  Docs.
+- Tsai, Y.-D., Liu, M., & Ren, H. (2024). RTLFixer: automatically fixing RTL syntax errors with
+  large language models. *DAC 2024*; arXiv:2311.16543. Abstract.
+- Vijayaraghavan, P., et al. (2024). VHDL-Eval: a framework for evaluating large language models
+  in VHDL code generation. *LAD 2024*; arXiv:2406.04379. Abstract.
+- Vijayaraghavan, P., Malhotra, A., Jadhav, A., Degan, E., & Mukherjee, V. (2026).
+  VHDL-REPOBENCH: a repository-level benchmark for evaluating large language models on VHDL
+  design generation. arXiv:2610.05380. Abstract.
+- Xu, K., Li, B., & Schlichtmann, U. (2026). LLM for EDA in front-end design: challenges and
+  opportunities. arXiv:2607.09616. Abstract.

@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.7 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.8 (2026-10-31). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -1036,6 +1036,27 @@ The hardware programme includes:
 - deviations are investigated;
 - side-channel claims are limited to what was measured.
 
+**AI-assisted RTL (from version 2.8).** An RTL or testbench file drafted or repaired with an AI
+tool is untrusted until deterministic tools have judged it. For such files:
+
+- expected values come only from the reference model, its golden vectors and the independent C
+  implementation, never from the drafting tool, and are never edited to make a test pass;
+- every draft passes analysis, a synthesis check and bit-exact simulation before review, and a
+  second, independent simulator is recommended;
+- a testbench counts only after it has failed on a recorded catalogue of seeded mutants of the
+  design, with every surviving mutant explained;
+- state words and arithmetic use `numeric_std` types of explicit width and signedness, never
+  INTEGER, whose minimum range differs between VHDL-2008 and VHDL-2019;
+- the vectors include the model's known edge states, such as a vein value of exactly 2³¹ in
+  `phyco-v2` (S12), from constructed states where seeds do not reach them;
+- the session that drafts a design does not write the only testbench that judges it;
+- the tool, model, date and review status of each such file are recorded with the feature's
+  evidence (section 17.2), and code that matches a known library has that library's licence
+  checked.
+
+The reasons and sources are in section 5 of
+[`research/hardware/vhdl-genai.md`](research/hardware/vhdl-genai.md).
+
 Simulation equivalence alone does not establish side-channel resistance.
 
 ------------------------------------------------------------------------
@@ -1159,6 +1180,7 @@ weaker evidence than agreement with an implementation written by someone else.
 | Source traceability | Claims cite an equation or specification section | FR/SC identifiers (Principle VII); `design.md` section references |
 | Executable verification | Claims are checked by code | Purity, width, trace and vector tests; oracle comparison with STS |
 | Independent implementation | No shared transition code | `tests/v2_reference.py`, `fast/phyco_stream.c` (common-mode caveat, section 10.2) |
+| AI-drafted RTL and testbenches | Drafts are judged by tools against an independent oracle | The rules of section 13 (from version 2.8); no RTL exists yet |
 | Adversarial review | Every security claim has a matching attack investigation | none yet, so no security claim is made |
 | Evidence separation | Measured results kept apart from theory | Classification in section 9; dev rehearsals labelled "not evidence" |
 | Version control | Every result tied to exact revisions | `git_head` and SHA-256 values in every freeze and run record |
@@ -1171,6 +1193,7 @@ weaker evidence than agreement with an implementation written by someone else.
 - A generated attack explanation is not proof that an attack worked.
 - A generated security argument is not proof of unpredictability.
 - A passing simulation is not proof of side-channel resistance.
+- A testbench that has never failed is not proof that a design is correct.
 - A phase is never marked passed because its documents exist.
 - Tool output, logs, artifacts and revisions must support every claim of execution. Where
   evidence is missing, the status is "not evaluated", "inconclusive" or "blocked".
@@ -1348,7 +1371,11 @@ The tools actually used in features 001–003:
 Planned for later phases, not yet installed or used:
 
 - Hypothesis, for property-based tests;
-- GHDL and cocotb, for VHDL simulation and testbenches;
+- GHDL and NVC, for VHDL simulation; VUnit or cocotb, for testbenches; VHDL-LS, for analysis
+  while editing; the GHDL plugin for Yosys with SymbiYosys, for synthesis checks and formal
+  properties; GTKWave, for waveforms; Vivado for FUT-HW-2, with openXC7 as an optional open
+  cross-check of fit (see [`research/hardware/vhdl-genai.md`](research/hardware/vhdl-genai.md)
+  section 3);
 - SAT and SMT solvers (for example CryptoMiniSat, Z3);
 - SageMath, for algebraic analysis.
 
@@ -1516,7 +1543,7 @@ No option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.7) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.8) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
@@ -1604,6 +1631,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.5 | 2026-10-31 | Recorded S12: conductance classes 2 and 3 are in effect unused, because a larger D gets a smaller flux. Section 9.2 gives the proof and a census by `research/security/vein_class_census.py`; section 12.3 item 3 links it |
 | 2.6 | 2026-10-31 | Recorded S13: the step function is not one-to-one (vein-decay pairs and a transport zero mode), which settles S9; and S14: the vein values stay near 2³⁰, so the top bits of D are biased. Evidence from `research/security/step_probes.py`. Sections 5, 9.2 (S9) and 12.3 (items 3 and 5) and the roadmap updated |
 | 2.7 | 2026-10-31 | Applied §7.3 of the research note `research/security/crypto-redesign-strategy.md`. Recorded S15: the bound of S12 holds from every state, so a 2×2 design with design-1.0 veins has at most about 2²⁵² secret states, below FUT-SEC-2; evidence from `research/security/vein_descent.py`. Added a claim level per model (sections 1.1 and 1.3); definitions for a keyed design, a claim template and the AIS class names by version (3); threat-model rows T6–T11 (5); SP 800-232, eSTREAM, ISO/IEC 29192 and BSI TR-02102-1 as comparison references, and the checked AIS 20/31 version (6); the design phase and a recommended external design review (7); design-rationale requirements (8); attack classes, generic bounds, tool validation and a best-attack register (12.1, 12.2, 12.5, 12.6); the claim ladder and claim register in place of the classifications (15); instructions per model ID (16.4); the open FUT-SEC-2 and FUT-GRID-2 decision (20, 20.1); Options A1–A3 and C (21); features 004–009 in stage 5a (22); and the next feature, with its prompt in `next.md` (24) |
+| 2.8 | 2026-10-31 | Added rules for AI-assisted RTL and testbenches (section 13), from the research note `research/hardware/vhdl-genai.md`: expected values only from the model, its vectors and the C implementation; deterministic checks before review; testbenches checked against seeded mutants; explicit `numeric_std` types, and the model's edge states in the vectors; no shared author for a design and its only testbench; provenance and licence records. Added the matching control and strict rule (16.3) and the planned VHDL tools (19). Stricter only; no RTL exists yet |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

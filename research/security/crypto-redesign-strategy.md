@@ -9,7 +9,10 @@ and is meant as the input for the next Spec Kit feature (§9.2). Once approved, 
 suggested feature description in §6 of that note. security.md 2.7 applies §7.3 of this note and
 records S15 (§3.3); the prompts to run next are in [next.md](../../next.md). Outline A of
 [`research/assertion-outlines.md`](../assertion-outlines.md) restates this note's argument as an
-assertion outline: three claims, four reasons each, one piece of evidence per reason.
+assertion outline: three claims, four reasons each, one piece of evidence per reason. Outline D
+there, with the hardware note
+[`research/hardware/vhdl-genai.md`](../hardware/vhdl-genai.md), proposes rules for AI-assisted
+VHDL, which security.md 2.8 adopts in its section 13.
 
 **Governed by:** the [constitution](../../.specify/memory/constitution.md) 1.2.0, above all its
 Security Policy. Where this note and the constitution differ, the constitution applies.
@@ -329,6 +332,10 @@ Rounds are added by the rule and never removed once results exist. Any change is
   stage; fixed latency and constant time; zeroization of the whole state; no key read-back.
   Absorption and output use a registered input and output tree over the rate lanes, as
   FUT-GRID-1 already allows for the output.
+- **Specified for translation** (security.md 2.8 §13): the design document states the width,
+  signedness and shift kind of every operation and lists the model's edge states, so that an RTL
+  draft, by a person or an AI tool, has nothing to guess
+  ([hardware note](../hardware/vhdl-genai.md) §5).
 - **Reduced variants**: word widths 8, 16 and 32, fewer rounds and smaller grids, all from the same
   generics, each with its own variant ID. The production interface refuses them, as the
   development tools refuse held-out seeds.
@@ -364,7 +371,7 @@ random baseline) and reported as security.md §12.4 requires.
 | Machine learning | Distinguishers as in Gohr (2019), confirmed on fresh data | reduced rounds | rounds reached |
 | Statistics | Reduced-round sweep on development keys, to find the last round the batteries detect; then the held-out programme (FUT-SEC-7) | all sizes | R_dist input; L3 |
 | Side channels and faults | Constant time by construction; the board tests of FUT-HW-5 | C, VHDL, board | FUT-HW-5 record |
-| Implementations | Independent C; VHDL in GHDL; formal or exhaustive equivalence on reduced widths; long-run CRC on the board | all sizes | L4 |
+| Implementations | Independent C; VHDL in GHDL, and in NVC if approved; mutation-checked testbenches (security.md §13); formal or exhaustive equivalence on reduced widths; long-run CRC on the board | all sizes | L4 |
 
 ### 6.3 Best-attack register
 
@@ -377,8 +384,12 @@ R divided by the rounds of the best attack. A claim is never stronger than the w
 Each download needs the owner's permission (name, source, size), and its licence must allow use in
 a GPL-3.0 project. Candidates: the SAT solvers CaDiCaL, Kissat and CryptoMiniSat; Z3; OR-Tools
 CP-SAT; HiGHS or SCIP for MILP; CryptoSMT and CASCADA for ARX trail search; SageMath for algebra;
-Hypothesis for property tests; GHDL and cocotb for VHDL; Cryptol and SAW for a formal
-specification and code equivalence. Solver runs are heavy and must never overlap battery runs.
+Hypothesis for property tests; Cryptol and SAW for a formal specification and code equivalence.
+For VHDL ([hardware note](../hardware/vhdl-genai.md) §3): GHDL and NVC for simulation, VUnit or
+cocotb for testbenches, VHDL-LS for analysis while editing, the GHDL plugin for Yosys with
+SymbiYosys for synthesis checks and formal properties, and openXC7 as an open cross-check of fit
+beside Vivado. Solver, synthesis, place-and-route and formal runs are heavy and must never
+overlap battery runs.
 
 ## 7. Guidelines for security.md updates
 
@@ -444,7 +455,7 @@ functionality classes (2024) was found but not read, so its list of classes is u
 2. Run `/speckit-converge` on feature 003; it runs automatically at that point.
 3. The owner decides the questions in §8.4, or leaves them to `/speckit-clarify`.
 4. Optionally, amend the constitution (§9.1).
-5. The owner approves this note and the security.md 2.7 changes.
+5. The owner approves this note and the security.md 2.7 and 2.8 changes.
 
 ### 8.2 Features
 
@@ -452,7 +463,7 @@ functionality classes (2024) was found but not read, so its list of classes is u
 |---------|------|--------------|-------|------|
 | 004 Cryptographic architecture and phyco-v3 design | Reach L1, start L2 | FUT-SEC-8 demonstration; security target; mode; Π with its inverse; reduced variants; rationale; Python model; vectors and known-answer tests; structural evidence; first proven bounds | spec, plan, tasks; design review; ⛔ design freeze | a frozen design, or stop |
 | 005 Internal cryptanalysis | Complete L2 | validated tools; the pre-registered campaign (§6.2); best-attack register; reduced-round battery sweep; margin | campaign freeze; ⛔ result review | margin rule met, or a new model ID, or stop |
-| 006 Implementations and equivalence | L4 for software and RTL | independent C, from outside the project if possible; generic VHDL (FUT-HW-1); GHDL equivalence; long-run CRC; formal equivalence where feasible | ⛔ RTL start (Principle VIII gate 2) | equivalence evidence |
+| 006 Implementations and equivalence | L4 for software and RTL | independent C, from outside the project if possible; generic VHDL (FUT-HW-1), under the AI-assisted RTL rules of security.md §13; GHDL equivalence, and NVC if approved; mutation-checked testbenches; long-run CRC; formal equivalence where feasible | ⛔ RTL start (Principle VIII gate 2) | equivalence evidence |
 | 007 Statistical re-validation | L3 | held-out key sets per size; calibrated rules; a deterministic positive control; graded negative controls (group F) | ⛔ battery freeze; ⛔ result review | a verdict per size |
 | 008 Hardware validation | FUT-HW-2 to FUT-HW-5 | Arty A7-100T fit, timing, throughput, power, on-board equivalence, board security tests | ⛔ RTL review | board evidence |
 | 009 External review and claim decision | L5, then L6 | review package (security.md §14); independent review recorded; publication and reduced-round challenges, if the owner authorizes each (Principle IX); a public analysis period; the claim decision | ⛔ publication; ⛔ claim (gate 3) | a scoped claim, or none |
@@ -476,7 +487,8 @@ report (Principle VII).
 - protocol: "protocol: development keys only before the freeze; every variant logged;
   stricter-only";
 - hardware readiness: "hardware: carry chains per stage, constant time, zeroization, grid
-  generics, FUT-GRID-1..5, FUT-HW-1..5";
+  generics, the width, signedness and shift kind of every operation, FUT-GRID-1..5,
+  FUT-HW-1..5";
 - reproducibility: "reproducibility: commands, versions, hashes, deterministic outputs, line
   endings".
 
@@ -513,7 +525,7 @@ Security Policy and FUT-SEC-1 to FUT-SEC-9 are unchanged, and may only become st
 ### 9.2 Feature 004 (`/speckit-specify`)
 
 The same text is in [next.md](../../next.md) §4, which is the copy to use if the two ever
-differ. It was updated for security.md 2.7 (S15, and the sections it adds).
+differ. It was updated for security.md 2.7 (S15, and the sections it adds), and cites 2.8.
 
 ```text
 Cryptographic redesign of PhycoWeb-PRNG, part 1: the security target, a permutation-based
@@ -564,7 +576,7 @@ FUT-SEC-7's held-out statistical programme is delivered by a later feature and s
 feature's report. Re-decide every carried-over feature-002 requirement (FR-001 to FR-009),
 including the FR-007 rule on standard primitives and standard modes. Out of scope: RTL, the
 held-out statistical programme, the full cryptanalysis campaign, external review, publication and
-any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.7
+any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.8
 (sections 3, 5, 8, 9.2, 12, 15, 20.1 and 21), and research/security/seed-entropy-bound.md
 section 5 with the section 5.3 checklist groups A to G.
 ```
@@ -583,18 +595,27 @@ section 5 with the section 5.3 checklist groups A to G.
   outside the project if possible, and a generic, vendor-neutral VHDL core with grid size and word
   width as generics and 0 DSP blocks (FUT-HW-1), bit-exact with the Python model in GHDL on the
   golden vectors and known-answer tests (Principle II), plus formal or exhaustive equivalence on
-  reduced widths and a long-run CRC check. RTL starts only after the owner's approval
+  reduced widths and a long-run CRC check. Any RTL or testbench drafted with an AI tool follows
+  security.md section 13 and research/hardware/vhdl-genai.md section 5: expected values only
+  from the Python model, the golden vectors and the C implementation; numeric_std types of
+  explicit width and signedness, never INTEGER, for state words; every draft analysed, checked
+  for synthesis and simulated bit-exact, in NVC as well as GHDL if the owner approves its
+  download; testbenches shown to fail on a recorded catalogue of seeded mutants before their
+  passes count; the drafting session never writing the only testbench that judges its design;
+  and provenance recorded for every drafted file. RTL starts only after the owner's approval
   (Principle VIII gate 2). No security claim."
 - **007**: "Statistical re-validation of phyco-v3 (FUT-SEC-7): the complete programme (SP 800-22,
   PractRand, TestU01, and Dieharder or a recorded reason) on unused held-out key sets per supported
   size, 4x4 first, with decision rules calibrated before the freeze, a deterministic positive
   control (for example ChaCha20 with a published key) and graded negative controls; pre-registered
   and stricter-only. Passing shows that no defect was found, not security."
-- **008**: "Hardware validation of phyco-v3 on the Arty A7-100T (FUT-HW-2 to FUT-HW-5): post-route
-  resources and timing at 4x4 and at the largest grid that fits, on-board throughput and power,
-  on-board equivalence with the golden vectors and a long-run CRC, and the board security tests
-  (constant time, no key read-back, zeroization, fault behaviour), with side channels recorded as
-  untested without measurement equipment."
+- **008**: "Hardware validation of phyco-v3 on the Arty A7-100T (FUT-HW-2 to FUT-HW-5): Vivado
+  post-route resources and timing at 4x4 and at the largest grid that fits, with an optional
+  open-flow fit (openXC7) as a cross-check that never replaces Vivado's timing; on-board
+  throughput and power, on-board equivalence with the golden vectors and a long-run CRC, and the
+  board security tests (constant time, no key read-back, zeroization, fault behaviour), with side
+  channels recorded as untested without measurement equipment. Synthesis and place-and-route
+  runs never overlap battery runs."
 - **009**: "External review and claim decision for phyco-v3: assemble the review package of
   security.md section 14, obtain and record review by independent experts (Security Policy (b)),
   and, only if the owner authorizes each outward action, publish the design and reduced-round
@@ -618,6 +639,13 @@ section 5 with the section 5.3 checklist groups A to G.
 | Fault countermeasures in hardware (duplicated rounds, state parity) | later | With FUT-HW-5 |
 | Nonce-misuse behaviour documented | medium | Two streams with the same key and nonce are identical |
 | A scenario game on public scrutiny, with humor and emotional intelligence (experiment E1) | medium | Could help find and keep the reviewers that L5 needs; makes no claim; involves people, so ethics approval comes first ([next.md](../../next.md) §7) |
+| Two simulators must agree (GHDL and NVC) | high | A simulator bug then has to repeat itself in an independent tool to hide an RTL bug ([hardware note](../hardware/vhdl-genai.md) §6) |
+| Mutation-checked testbenches | high | A testbench counts only after it fails on seeded mutants of the design, as in AutoBench's Eval2; the kill rate goes into the phase report (security.md §13) |
+| cocotb with the Python model as the live oracle | high | No expected value is copied by hand; GHDL support is experimental, NVC from 1.11.0 |
+| Constructed-state vectors for the corners of phyco-v2: D = 2³¹ and the class-3 states | high | For roadmap stage 7: at D = 2³¹ a VHDL-2008 INTEGER overflows, a signed comparison flips and class 2 is used ([hardware note](../hardware/vhdl-genai.md) §5.2) |
+| Formal properties on reduced widths (SymbiYosys, with PSL through the GHDL plugin for Yosys) | medium | Zeroization, fixed latency and equivalence; PSL support is partial |
+| An open-flow fit (openXC7) beside Vivado | medium | Vivado stays the reference for FUT-HW-2; a disagreement is a finding to explain |
+| An E1 card from the first RTL-versus-model mismatch | low | Written only after the cause is found and recorded ([scrutiny game](../engagement/scrutiny-game.md) §3) |
 
 Rejected ideas, with reasons:
 
@@ -630,6 +658,10 @@ Rejected ideas, with reasons:
 - **Emotion recognition from faces or voices to steer E1**: not valid (Barrett et al., 2019),
   biased (Rhue, 2018), and prohibited in education institutions by the EU AI Act; players report
   their own feelings instead ([assertion outlines](../assertion-outlines.md), Claim C1).
+- **Accepting AI-drafted RTL because it compiles and its own testbench passes**: compiling proves
+  only that it is a design, and a testbench from the same session shares its misreading of the
+  specification ([hardware note](../hardware/vhdl-genai.md) §2;
+  [assertion outlines](../assertion-outlines.md), Claim D2).
 
 ## 11. Risks and expectations
 
@@ -676,3 +708,5 @@ Rejected ideas, with reasons:
   property).
 - NIST SP 800-90A Rev. 2 (initial preliminary draft, 2025) and SP 800-232 (final, 13 August 2025;
   checked on the NIST CSRC page on 2026-10-31, security.md 2.7 §6).
+- For VHDL and AI-assisted design, the sources in §9 of the
+  [hardware note](../hardware/vhdl-genai.md).

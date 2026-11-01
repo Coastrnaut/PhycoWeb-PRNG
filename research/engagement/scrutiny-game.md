@@ -76,6 +76,13 @@ nobody in particular. Each card ends with what the project did, so players also 
 works in cryptography: the finding is recorded, the claim is withdrawn or never made, and the
 next design is built so that the same mistake cannot happen twice.
 
+One card is reserved and stays face down until it happens: **The first mismatch**, the day the
+VHDL dealer deals a different card from the Python model. It is written only after the cause is
+found and recorded (feature 006; security.md §13), and it practises owning a shared mistake
+without blame, whether the culprit was a person, a simulator or the AI assistant that drafted the
+line. The odds of drawing it are good: in hardware, the first mismatch is less a risk than a
+tradition.
+
 ## 4. The guide's humor styles
 
 There are four styles. People write every line, reviewers check it for kindness, and the pilot
@@ -114,7 +121,7 @@ Rules for every arm:
 | Participant codes and any tokens | the operating-system CSPRNG | They are secrets (Security Policy) |
 | Characters and humor lines in the pilot | people, then reviewers | Language-model humor repeats itself (Jentzsch & Kersting, 2023), and a controlled experiment needs controlled lines |
 | Free-text characters, later and only if wanted | a language model held to each arm's style guide, with every output logged and a manipulation check | Phase 4 only (§10). A local model is preferred; an external service only with consent, a data agreement and no personal data |
-| Dealing live at an event | the VHDL implementation on the Arty A7-100T | Only after ⛔ RTL start and equivalence evidence (Principle VIII, gate 2; level L4). It must deal exactly the hand the Python model deals from the same seed |
+| Dealing live at an event | the VHDL implementation on the Arty A7-100T | Only after ⛔ RTL start and equivalence evidence (Principle VIII, gate 2; level L4). It must deal exactly the hand the Python model deals from the same seed, and any of its RTL drafted with an AI tool follows the rules of security.md §13 ([`research/hardware/vhdl-genai.md`](../hardware/vhdl-genai.md)) |
 
 The study seed comes from the operating-system CSPRNG and is published in the pre-registration.
 It is neither a development seed nor a held-out seed, and nothing from E1 feeds any acceptance
@@ -241,5 +248,5 @@ solver run has the CPU.
 
 ## 12. Sources
 
-Every source cited here is listed, with how it was checked on 2026-10-31, in §7 of
+Every source cited here is listed, with how it was checked on 2026-10-31, in §8 of
 [`research/assertion-outlines.md`](../assertion-outlines.md).
