@@ -6,18 +6,38 @@
 
 Exit codes, as in feature 003: **0** success; **1** completed with a failing or non-PASS verdict
 (by design); **2** refused by a guard (wrong namespace or index, missing approval, budget
-exhausted, a fourth candidate, a size out of order, an operation list not in the log, an
-environment that does not match its pins, lock held, hash mismatch, broken log chain, existing
-record), and nothing is written; **3** tool or I/O error, a recorded tool defect included.
-`REP=reports/004-crypto-architecture-v3`. Every record is written through `protocol/evidence.py`
-([data-model.md](../data-model.md) §1).
+exhausted, a fourth candidate, a size out of order, an operation list not in the log, an environment
+that does not match its pins, code not committed at HEAD, lock held, hash mismatch, broken log
+chain, existing record), and nothing is written; **3** tool or I/O error, a recorded tool defect
+included. `REP=reports/004-crypto-architecture-v3`. Every record is written through
+`protocol/evidence.py` ([data-model.md](../data-model.md) §1).
+
+**Reproduction.** Every script that writes evidence or generated files also runs as
+`--reproduce RECORD` (data model §1): it runs the recorded command's configuration with its output
+directory replaced by `$REP/reproductions/<record_id>/<n>/`, n = 1, 2, … for successive
+reproductions of that record, and writes a `reproduction` record there: the original's ID and
+SHA-256, each compared field with its outcome, the reported fields, and `match` or `differs`. It
+appends nothing to the candidate log, charges no budget row and is not a re-run under research R7,
+so it can neither replace evidence nor add any; the Budget and Order of sizes guards, which concern
+evidence, do not refuse it, and every other guard applies, so a search that reached its cap is not
+reproduced (Trail tools). It is a heavy run where research R7 says so: it takes the lock and
+projects first, its projection charged to no row. A difference is a finding, exit 1. `fut_sec8.py
+--reproduce` is this mode for the demonstration, under the conditions of its section.
 
 ## Guards shared by every script
 
 - **Environment**: `protocol/evidence.py` checks at start that the interpreter and the
   installed packages match research R1 and the pins of `requirements.txt` for that platform,
   and exits 2 on any mismatch. A changed environment needs R1 updated first, with the owner's
-  approval.
+  approval. `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed counts
+  by exact integer arithmetic and imports only the standard library and `protocol/` (its section,
+  below).
+- **Committed code**: a run that writes evidence exits 2 unless every source file in its
+  `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
+  authorization to commit makes routine; data and report files may still be dirty, and the record
+  lists the dirty paths. A binary is rebuilt from committed source, its hash reported only, and a
+  test checks each record's `code_sha256` entries against the blobs at its `git_head` (FR-053;
+  research R16).
 - **Inputs**: only the namespaces `dev` and `control` of `protocol/devinputs_v3.py`, and for
   US1 the feature-002 `dev` set; anything else exits 2 (FR-040). `control` serves only uniform
   controls and `dev` is never a control: each evidence kind's namespace is fixed in code, not
@@ -125,7 +145,9 @@ Neither of the other two modes is a demonstration attempt:
   `model_v2`, in seconds, with no sweep. Exit 1 on any disagreement.
 - `--reproduce RECORD` is allowed only after the FUT-SEC-8 result review, and exits 2 before
   it. It re-runs the sweep as a heavy run and writes a `fut-sec-8-reproduction` record, compared
-  field by field with the original (data model §4). It can neither replace the demonstration
+  field by field with the original under data model §1's rule: the demonstration's fields listed
+  there are compared, its timings and the binary's hash reported only, and `design_sha256`, which no
+  FUT-SEC-8 code reads, is not compared (data model §4). It can neither replace the demonstration
   record nor change the review, and a difference is a finding, exit 1.
 
 ## `scripts/archive_phyco_v2.py`
@@ -142,6 +164,7 @@ between a copy, its manifest hash and its live source.
 
 ```text
 validate_tool.py --tool NAME --known KNOWN_ID --out-dir $REP/validation
+validate_tool.py --reproduce RECORD
 ```
 
 Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `s15`,
@@ -150,7 +173,9 @@ Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `
 record (data model §7). Exit 1 if not re-found. A published value needs its source recorded
 (the entry of `$REP/downloads.json`, or a value the owner provides with its source, and the
 paper's table and value) or exits 2. After a failed validation, the re-validation names a
-second known result of the tool's kind as well as the first.
+second known result of the tool's kind as well as the first. `--reproduce RECORD` runs that record's
+validation again, as the introduction describes, and compares the fields data model §1 lists for a
+validation.
 
 For the bias test's validation, `validate_tool.py` draws the 100 synthetic sets of class 5 at each
 size from numpy's `Generator(PCG64(s))`, with s = `protocol.devinputs_v3.synthetic_seed(n, j)` (data
@@ -161,12 +186,15 @@ in the same environment draws the sets again and compares (research R3, R4).
 
 ```text
 evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] [--project] --out-dir DIR
+evidence_v3.py --reproduce RECORD
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
 `invariant`, `degree` or `bound` (with `--bound-kind differential|linear --method M`). The
 candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model
-§5 or §6 and its raw outputs, and appends an `evidence` entry to the candidate log. The counts
+§5 or §6 and its raw outputs, and appends an `evidence` entry to the candidate log; with
+`--reproduce RECORD` it runs that record's configuration as the introduction describes, writes only
+its `reproduction` record and appends nothing. The counts
 are those of research R4 and R13 and cannot be lowered by an option: a `frequency` run covers
 both input sets, and an `avalanche` run the flip set and the related-key, related-nonce and
 rotational sets. An `avalanche` run needs the candidate's `dependency` record at the same size,
@@ -185,6 +213,7 @@ recorded tool defect in the control's own code (data model §5).
 d4_choice.py --log research/004/candidates.jsonl --out $REP/d4/choice.json
 d4_choice.py --tie --log research/004/candidates.jsonl --out $REP/d4/tie.json
 d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json
+d4_choice.py --reproduce RECORD
 ```
 
 Computes the D4 choice of research R6 from saved bound records. Exits 2 if `choice.json` exists, if
@@ -204,6 +233,7 @@ round_rule.py --candidate ID           # writes candidates/<ID>/round-rule.json
 round_rule.py --select                 # writes $REP/freeze/selection.json
 round_rule.py --close                  # writes the candidate log's set-closed entry
 round_rule.py --choose ID --seen SHA256 --by NAME   # writes $REP/freeze/selection-tie-choice.json
+round_rule.py --reproduce RECORD       # a round-rule or selection record (introduction)
 ```
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
@@ -220,17 +250,23 @@ selects the declined candidate again, the outcome is a stop, exit 1. The decline
 once, for one further candidate, and `--close` writes a second `set-closed` entry before `--select`
 runs again. `--choose`, run by the owner after a tie in `selection.json`, writes
 `freeze/selection-tie-choice.json` with the choice, who, when and `seen_sha256`, and exits 2 if that
-hash differs from `selection.json`'s, if no tie exists or if a choice exists.
+hash differs from `selection.json`'s, if no tie exists or if a choice exists. `round-rule.json` and
+`selection.json` keep fixed names: before one changes, `protocol/evidence.py` keeps its current
+content as `versions/<sha256>.json` beside it, and the new content holds `previous_sha256` (data
+model introduction).
 
 ## `scripts/mode_limits_v3.py`
 
 ```text
 mode_limits_v3.py --out $REP/security-target/limits.json
+mode_limits_v3.py --reproduce RECORD
 ```
 
 Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴ and
 N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
-`theorem` is `unverified` until its paper has been read.
+`theorem` is `unverified` until its paper has been read. `limits.json` keeps its fixed name: before
+it changes, its current content is kept as `security-target/versions/<sha256>.json`, and the new
+content holds `previous_sha256` (data model introduction).
 
 ## Generators of constants and vectors
 
@@ -238,15 +274,19 @@ N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds 
 gen_constants_v3.py [--check]                    # writes phycoweb/constants_v3.py
 gen_vectors_v3.py [--check] [--variant ID ...]   # writes vectors/phyco-v3/ (research R8)
 gen_constructed_v3.py [--check]                  # writes the constructed-state vectors
+gen_vectors_v3.py --reproduce RECORD            # each generator: one sidecar entry (below)
 ```
 
 Each writes only deterministic content, under the format rules of the data model's
 introduction. The command (script and arguments, relative to the repository root), the
 interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to
-the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run (data model §11),
-which `--check` does not compare. `gen_constants_v3.py` also writes each constant table as
-`vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory and exits 1 on any
-byte difference. After the freeze, writing over a frozen file exits 2.
+the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run with its `record_id` (data
+model §11), which `--check` does not compare. `gen_constants_v3.py` also writes each constant table
+as `vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory and exits 1 on any
+byte difference. After the freeze, writing over a frozen file exits 2. `--reproduce RECORD`
+(introduction) re-runs the sidecar entry with that `record_id` into
+`$REP/reproductions/<record_id>/<n>/` and compares every file it writes with the committed one, byte
+for byte, writing over no generated file and adding nothing to the sidecar.
 
 They run in three steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
@@ -298,6 +338,20 @@ example R_f from the per-round flag "every output bit depends on every input bit
 local-only outputs are present, it also re-derives each committed summary from them. Its output
 lists both checks per kind, and it verifies the inventory of superseded operation lists
 (data model §3).
+
+It recomputes each verdict under the rules in force at the protocol change-log entry its record
+cites and, where a later stricter change applies (FR-044), also under the current rules; both are
+listed, and a disagreement in either is reported. A cited file kept under a fixed name is resolved
+from its `versions/` (data model introduction).
+
+It is exempt from the environment guard (Guards, above): it recomputes verdicts from committed
+counts by exact integer arithmetic (data model §5), with the verdict functions of
+`protocol/evidence.py` that the scripts which wrote the records call, so that it runs the frozen
+code that produced each verdict (FR-043), and it imports only the standard library and those
+`protocol/` modules that do the same, which a test checks. It writes a `recheck` record under
+`$REP/rechecks/` holding the interpreter, the platform and the full `pip freeze` it ran with, and
+says when that environment is not one of research R1's. A reproduction that re-runs evidence stays
+limited to R1's two environments; SC-017's fresh clone is this re-check, as quickstart F3 runs it.
 
 ## `scripts/repair_log.py`
 

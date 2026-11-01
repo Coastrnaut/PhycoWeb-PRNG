@@ -8,7 +8,15 @@ All records are JSON (UTF-8, LF line endings, sorted keys), written by one modul
 `protocol/evidence.py`. Paths are under `reports/004-crypto-architecture-v3/` unless stated, and
 files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`;
 `protocol/evidence.py` refuses any other suffix there (research R16, R18). A record is never
-overwritten: a repeat run writes a new record with a new identifier, and the old one stays.
+overwritten: a repeat run writes a new record with a new identifier, and the old one stays. The
+stated exceptions are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
+`freeze/selection.json`, `security-target/parameters.json` and `limits.json`, the environment
+records, `downloads.json` and `review-package/MANIFEST.json`. Before one changes,
+`protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
+the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
+re-check resolves either from the versions (research R16). The freeze record changes only by the
+owner's approval, which `design_freeze.py approve` writes into it, its draft checked by
+`draft_sha256` (section 13).
 
 **Format rules** for every record and generated file (FR-036, FR-053), so that another
 implementation can write byte-identical files:
@@ -39,20 +47,22 @@ implementation can write byte-identical files:
 | Field | Type | Rule |
 |-------|------|------|
 | `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`; unique; part of the file name |
-| `kind` | str | one of the kinds of sections 4–11, `projection` or `lock-cleared` (below) |
+| `kind` | str | one of the kinds of sections 4–11, `projection`, `lock-cleared`, `reproduction` or `recheck` (below) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str | `phyco-v2` for US1 and for tool validation on it; otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version and hash; `none` before it exists |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
-| `git_head`, `git_dirty` | str, bool | as in the feature-002 and feature-003 records |
-| `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C source and its binary. A self-written tool's version is its hash (FR-039). With `git_dirty` often true, these hashes, not `git_head`, identify the code |
+| `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
+| `protocol_seq`, `protocol_line_sha256` | int, hex | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256; `none` before the log exists |
+| `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`) |
+| `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head` (research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record, `environment-windows.json` or `environment-wsl.json` (research R1) |
+| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
 | `inputs` | object | namespace (`dev` or `control`; for US1 the feature-002 `dev` set), kind, index range, fingerprint (R3) |
-| `outputs` | list | `{path, sha256, bytes, committed}`, and `uncompressed_sha256` for a `.gz` file; `committed` false for local-only files (R16); a committed file has one of the suffixes of the introduction |
+| `outputs` | list | `{path, sha256, bytes, committed, deterministic}`, and `uncompressed_sha256` for a `.gz` file; `committed` false for local-only files, written under `data/local/004/<record_id>/` and never under this directory (R16); `deterministic` false for an output that is not, such as a raw solver log with timings, whose `sha256` and `bytes` a reproduction reports only; a committed file has one of the suffixes of the introduction and at most 10 MB, and `protocol/evidence.py` refuses a larger one, naming it |
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
 | `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
 | `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
@@ -94,18 +104,53 @@ the class.
   run it projects.
   A projection record is not evidence: the order of sizes counts evidence records only (research
   R7), so a probe at a larger size runs before the run it projects.
-- **Reproduction.** A reproduction of a record compares these fields with the original and reports
-  every other field only: `kind`, `model_id`, `variant_id`, `design_sha256`, each source file's
-  entry in `code_sha256`, `inputs`, each output's `sha256` and `bytes` (not its path),
-  `exit_status`, `assertions`, `status`, `classification`, and the fields of its kind. Deterministic
-  kinds (vectors, constants, dependency matrices, counts, digests) thus match byte for byte, and
-  searches and solver runs by their values and verdicts. A different source hash makes it a new run,
-  not a reproduction, and a binary's hash is reported only. Two kinds of output are compared by
-  content instead: a `p_values` file, whose p-values must agree within a relative tolerance of 10⁻⁶
-  and never decide a verdict, the reproduction listing any outside it; and a `.gz` file, by its
-  `uncompressed_sha256`. The verdict is recomputed under the spec version the original cites
-  (`spec-versions/<sha256>.md`), so a later spec change cannot alter it, and the environment is
-  either of research R1's two, as recorded.
+- **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its
+  path and SHA-256, and the re-check resolves either from `<dir>/versions/`.
+- **Re-check records.** `recheck_004.py` writes a `recheck` record, `rechecks/<record_id>.json`,
+  which holds in place of `environment` the interpreter, the platform and the full `pip freeze` it
+  ran with, and says when that environment is not one of research R1's: the re-check is exempt from
+  the environment guard (cli contract).
+- **Reproduction.** A reproduction of a record is run by its script's `--reproduce RECORD` mode (cli
+  contract) and writes its outputs and a `reproduction` record into
+  `reproductions/<record_id>/<n>/`, n = 1, 2, … for successive reproductions of that record. The
+  record holds the original's ID and SHA-256, each compared field with its outcome, the reported
+  fields, and `match` or `differs`. A reproduction appends nothing to the candidate log, charges no
+  budget row and is not a re-run under research R7, so it can neither replace evidence nor add any,
+  and a difference is a finding. It compares these fields with the original and reports every other
+  field only: `kind`, `model_id`, `variant_id`, each source file's entry in `code_sha256`, `inputs`,
+  each deterministic output's `sha256` and `bytes` (not its path), `exit_status`, `assertions`,
+  `status`, `classification`, and the fields the table below lists for its kind, `design_sha256`
+  among them only where the table says so. Timings and the raw solver log are never compared.
+  Deterministic kinds (vectors, constants, dependency matrices, counts, digests) thus match byte for
+  byte, and searches and solver runs by their values and verdicts. A different source hash makes it
+  a new run, not a reproduction, and a binary's hash is reported only. A `p_values` file is compared
+  by its values, in either format, decompressed first, and its `uncompressed_sha256` is reported
+  only: two p-values agree when their difference is at most 10⁻⁶ times the larger of their
+  magnitudes, or when both are below 2⁻¹⁰²², the smallest normal double, so that a 0 beside a
+  subnormal agrees; values outside are listed, and none decides a verdict (section 5, "Exact
+  verdicts"). Every other `.gz` file is compared by its `uncompressed_sha256`. The verdict is
+  recomputed under the spec version, the research version and the protocol change-log entry the
+  original cites (`spec-versions/`, `research-versions/`, section 18), so a later change cannot
+  alter it, and the environment is either of research R1's two, as recorded.
+
+**Fields compared, per kind** (FR-053). A reproduction compares the fields of the Reproduction
+bullet above that its original holds, and those this table lists for its kind; it reports the rest.
+Timings (seconds, steps or calls per second, projected and used hours, measured speed) and the raw
+solver log are never compared. `design_sha256` is compared only for a kind whose code reads the
+design document, which the table names; for every other kind it is reported, and `none` stays
+`none`. Any other script that reads the design document is added to this table before its first run.
+
+| Kind | Also compared | Reported only |
+|------|---------------|---------------|
+| Demonstration (section 4) | `targets`, `revealed`, `observed`, `vector_check`, `matches`, `assumption`, `listed`, `recovered`, `model_sha256`; of `tool`, the source's SHA-256; of `cost`, the steps per candidate and the total steps | of `cost`, the seconds, the steps per second and the extrapolation; the rest of `tool` (the binary's hash, compiler, flags, threads); `report`, which restates the compared fields with timings; `design_sha256` |
+| Structural evidence (section 5: `inverse`, `bijectivity`, `dependency`, `symmetry`, `invariant`, `degree`) | the fields of its row in section 5 | the projected and used hours, the measured speed; `design_sha256` |
+| Statistical evidence (section 5: `frequency`, `avalanche`, `control`) | the fields of its row and the items of security.md §11.6 above: counts, critical counts and fired bits byte for byte, and the p-values by value | as for structural evidence |
+| Trail bound (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap | of `budget`, the hours used; the raw solver log; `design_sha256` |
+| Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
+| D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
+| Constant tables (section 11; `gen_constants_v3.py`) | every file it writes, byte for byte, and `design_sha256`, since its restatement check reads the design document (research R15) | the sidecar entry's command, interpreter, platform, speed and time |
+| Vectors and constructed states (section 11; `gen_vectors_v3.py`, `gen_constructed_v3.py`) | every file it writes, byte for byte | as for the constant tables, and `design_sha256` |
+| Projection (above) | nothing beyond the common fields | the measured speed and the projected hours |
 
 ## 2. Development inputs (`protocol/devinputs_v3.py`; FR-040, R3)
 
@@ -153,7 +198,7 @@ takes `data/log-append.lock` and checks the chain first (R16).
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
 | `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves. A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
-| `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2) |
+| `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width (16 first) and tie order (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, measure, rounds and tie order; and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
 | `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
@@ -231,8 +276,10 @@ The record is the search tool's validation record (security.md §12.5), and secu
 best-attack register row for exhaustive seed search cites it (FR-003).
 
 A `fut-sec-8-reproduction` record (`fut-sec-8/reproduction-<record_id>.json`) is written only
-by `fut_sec8.py --reproduce`, after the FUT-SEC-8 result review. It holds the same fields and
-is compared field by field with the demonstration record, under section 1's comparison rule.
+by `fut_sec8.py --reproduce`, after the FUT-SEC-8 result review. It holds the same fields and is
+compared field by field with the demonstration record, under section 1's comparison rule: the fields
+its table lists for the demonstration are compared, the timings of `cost` and the binary's hash are
+reported only, and `design_sha256`, which no FUT-SEC-8 code reads, is not compared.
 It is not a demonstration attempt: it can neither replace the demonstration record nor change
 the review, and a difference is a finding. `fut_sec8.py --verify` re-checks every listed match
 and every recovered seed with `model_v2`, with no sweep.
@@ -273,10 +320,10 @@ and every recovered seed with `model_v2`, with no sweep.
 | `bound` | a rational as a "p/q" string, and its −log₂. A floating-point solver value becomes the rational by rounding in the direction that weakens the bound: a weight is rounded down, never up |
 | `method` | for example `active-box count`, `exhaustive table`, `milp`, `branch-and-bound` |
 | `tool`, `validation` | the tool, and the ID and SHA-256 of the validation record of its exact hash, whose `created_utc` must be earlier (FR-039; SC-007); a tool used outside its validated kind writes `not evaluated` |
-| `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such; the record states that its status rests on those tolerances (R12) |
+| `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such; the record states that its status rests on those tolerances (R12); the raw solver log is an output marked not deterministic, which a reproduction reports only (section 1) |
 | `scope` | "single trails under the usual independence assumptions; clustering into differentials and linear hulls, and key-dependent effects, open for feature 005" |
 | `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash (R12); an ARX search at w = 16 or 32 counts only after it |
-| `budget` | hours used and the cap; only a proven result gives a `bound` (R12), and a capped or timed-out search has `status` `inconclusive` and no `bound` |
+| `budget` | hours used, a timing that a reproduction reports only (section 1), and the cap; only a proven result gives a `bound` (R12), and a capped or timed-out search has `status` `inconclusive` and no `bound` |
 
 A bound from a tool not yet validated never counts; a trail it finds is an unverified hypothesis
 (section 5).
@@ -352,16 +399,17 @@ choice and both records' SHA-256.
 
 ## 9. Round rule, eligibility and selection
 
-`candidates/<id>/round-rule.json`, per claimable size: `R_f`, `R_b`, `R_bound` (with its bound
-records), `R_dist` (with its evidence records, the `degree` records among them), `delta` = 2, `R`,
-and `eligible` with each item of FR-018 to FR-031 and FR-037 and its evidence, decided for every
-candidate before selection: FR-026's figures from its `cost` record per claimable size
-(`candidates/<id>/cost-<record_id>.json`, written by `research/004/tools/costmodel.py` from the
+`candidates/<id>/round-rule.json`, a fixed-name file (introduction), per claimable size: `R_f`,
+`R_b`, `R_bound` (with its bound records), `R_dist` (with its evidence records, the `degree` records
+among them), `delta` = 2, `R`, and `eligible` with each item of FR-018 to FR-031 and FR-037 and its
+evidence, decided for every candidate before selection: FR-026's figures from its `cost` record per
+claimable size (`candidates/<id>/cost-<record_id>.json`, written by
+`research/004/tools/costmodel.py` from the
 operation list, P and R); FR-027's semantics from the operation list's own declarations, which the
 framework requires for every operation; FR-030's mapping from the candidate's `mapping` log entry.
 The design document restates them for the selected candidate, and the owner design review checks
-that the two agree. `selection.json`, written only after the candidate log's `set-closed` entry
-(section 3): the eligible candidates of the
+that the two agree. `selection.json`, a fixed-name file too, written only after the candidate log's
+`set-closed` entry (section 3): the eligible candidates of the
 chosen family, or of the other family if it has none, or of both families if D4 was not
 computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule outcome with its
 reason. After a decline at the owner design review that ends in a further candidate, `--select` runs
@@ -376,7 +424,7 @@ tie" holds the date, the choice and both records' SHA-256.
 
 ## 10. Size profile and security target (`security-target/`)
 
-`parameters.json`, one row per supported size:
+`parameters.json`, a fixed-name file (introduction), one row per supported size:
 
 - `n`, `w`, `lanes_per_node` (2), `b`, `c`, `r`, `variant_id`, and `R`. A research variant's R
   carries its reason: the round rule's value where its inputs exist at that variant, or a
@@ -413,11 +461,11 @@ tie" holds the date, the choice and both records' SHA-256.
   an upper bound (R5). Beside them, `throughput_goal` (10⁸; R5), which is reported and never an
   eligibility rule.
 
-`limits.json`: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), the theorem (paper, theorem number, `verified` or
-`unverified`); the limits per instantiation, per request and per key, each in calls of Π, the
-theorem's unit, which is primary, and in bits at every claimable size (a request of n bits
-takes ⌈n/r⌉ output calls plus one forget call, and instantiate's calls are stated); every other
-online quantity the bound counts with its limit; `u`; the two allowed ways of choosing nonces,
+`limits.json`, a fixed-name file too: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), the theorem (paper, theorem
+number, `verified` or `unverified`); the limits per instantiation, per request and per key, each in
+calls of Π, the theorem's unit, which is primary, and in bits at every claimable size (a request of
+n bits takes ⌈n/r⌉ output calls plus one forget call, and instantiate's calls are stated); every
+other online quantity the bound counts with its limit; `u`; the two allowed ways of choosing nonces,
 and for random nonces the collision term q²/2¹²⁹ in the bound and the random-nonce
 instantiation limit, at most 2³², which the model applies to every key whatever its nonces (R9); the
 bound at the limits and the doubling check of R9.
@@ -431,7 +479,7 @@ bound at the limits and the doubling check of R9.
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
-| `MANIFEST.json` | the sidecar: one entry per generator run with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it |
+| `MANIFEST.json` | the sidecar: one entry per generator run with its `record_id`, which a generator's `--reproduce` names (cli contract), the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it |
 
 The header of a mode vector file reads, for example:
 
@@ -490,12 +538,13 @@ The freeze runs in five steps (FR-043): (1) the owner commits the feature files;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
 never performs (spec FR-043). Dirty means a tracked file modified or an untracked file not
-ignored; ignored files (the locks, local-only outputs) do not count, and local-only outputs are in
-the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and every hash and checks the
-format rules; it exits 1 if anything but the approval fields changed or a hash does not match, and 2
-while `status` is `draft`. After approval the frozen files must not change: a fix to a verdict
-script is a new file, so that the re-check (FR-065) runs the code that produced the verdicts. The
-approval status of the design document and the rationale stays outside the frozen files (FR-034).
+ignored; ignored files (the locks, the local-only outputs under `data/local/`) do not count, and
+local-only outputs are in the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and
+every hash and checks the format rules; it exits 1 if anything but the approval fields changed or a
+hash does not match, and 2 while `status` is `draft`. After approval the frozen files must not
+change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code that
+produced the verdicts. The approval status of the design document and the rationale stays outside
+the frozen files (FR-034).
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
 
@@ -549,8 +598,10 @@ security.md §15's L1 gate since version 2.13 (FR-012); the spec approval record
 Every item of security.md §14, each with its path, `git_head` and SHA-256 with its kind, plus
 the known limitations and the unresolved findings. An existing `text=auto` file is hashed over
 its LF-normalized content and marked `lf-normalized`, so the hash is the same on every
-checkout, and no existing file's pin changes (R18). Assembling the package is in scope; sending
-it is the owner's action.
+checkout, and no existing file's pin changes (R18). The manifest is a fixed-name file
+(introduction): a rebuilt package keeps the earlier manifest as
+`review-package/versions/<sha256>.json`. Assembling the package is in scope; sending it is the
+owner's action.
 
 ## 17. State transitions
 
@@ -564,7 +615,9 @@ it is the owner's action.
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
 - **Design document**: draft versions 0.x; the version the owner design review approves; frozen
-  as 1.0. After the freeze any change is a new model ID (FR-028).
+  as 1.0. After the freeze any change is a new model ID (FR-028). A record's `design_sha256` names
+  the version its run saw, and a reproduction compares it only for the kinds whose code reads the
+  document (section 1), so a later draft does not make an earlier record differ.
 - **Gates** (spec Review & Approval table): `_pending_` to Approved or Declined, with date and
   notes; one row per download approval.
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
@@ -588,9 +641,12 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
 
-A change applies to every candidate, those already evaluated included. The log's first entries,
-written when it is created, are the answered rows of every checklist round answered before the log
-is created, by the lists "Rows that change the protocol" of
+A change applies to every candidate, those already evaluated included. Every record cites the log's
+last entry when its run started (`protocol_seq`, `protocol_line_sha256`; section 1), and
+`recheck_004.py` recomputes each verdict under the rules in force at that entry and, where a later
+stricter change applies, also under the current rules, listing both; a disagreement in either is
+reported. The log's first entries, written when it is created, are the answered rows of every
+checklist round answered before the log is created, by the lists "Rows that change the protocol" of
 [checklist-choices.md](./checklist-choices.md), in round order: one entry per listed row, whose
 applied change altered the text of a pre-registered rule, whatever its kind, the 42 rows tagged
 Stricter or Settle (19 and 23) among them. Each cites its row ID and the rules it is listed under,

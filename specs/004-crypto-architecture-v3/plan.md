@@ -287,8 +287,9 @@ tests/
 ├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze;
 │                             # no key loaded into any state before the FUT-SEC-8 review (FR-001);
 │                             # every seed-set load is dev-only (FR-040)
-├── test_records_004.py       # one light command per kind re-run as recorded; two worker counts;
-│                             # the attribute pin and byte-order mark of every hashed path (FR-053)
+├── test_records_004.py       # --reproduce of one light command per light kind (R7); the two-worker
+│                             # test, marked heavy; the attribute pin and byte-order mark of every
+│                             # hashed path (FR-053)
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
@@ -301,6 +302,7 @@ reports/004-crypto-architecture-v3/
 ├── environment-wsl.json
 ├── downloads.json            # the downloads manifest (R19)
 ├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
+├── research-versions/        # every research.md version a record cites, by SHA-256 (R16)
 ├── fut-sec-8/                # demonstration record, tool check, review, any reproduction
 ├── validation/               # tool validation records
 ├── controls/                 # uniform controls, one record per test and size,
@@ -310,6 +312,8 @@ reports/004-crypto-architecture-v3/
 ├── security-target/          # bound at the limits, generic-bound table
 ├── freeze/                   # freeze record
 ├── review-package/
+├── reproductions/            # one directory per reproduced record and reproduction (R16)
+├── rechecks/                 # the re-check's records (FR-065)
 ├── provenance.jsonl          # FR-067
 └── phase-report.md
 ```
@@ -322,8 +326,9 @@ source and binary.
 
 ## Phases and gates (for /speckit-tasks)
 
-1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks
-   (R16, R18; the pins for `reports/004-crypto-architecture-v3/**` and `*.gz` were added on
+1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks and for
+   `data/local/`, where local-only outputs go (R16, R18; the pins for
+   `reports/004-crypto-architecture-v3/**` and `*.gz` were added on
    2026-11-01); the Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
    installed; the downloads manifest `downloads.json`, one entry per file fetched (R19); the
    environment records of both platforms (R1); corrected `requirements.txt`;

@@ -99,11 +99,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - One environment record per platform, `environment-windows.json` and `environment-wsl.json`
     under `reports/004-crypto-architecture-v3/`, is written at setup and on any change: the
     Windows build, the WSL distribution and version, Python, gcc, make and the full
-    `pip freeze`. Each evidence record cites its environment record's SHA-256 (data-model §1).
+    `pip freeze`. Each evidence record cites its environment record's SHA-256 (data-model §1). Both
+    keep fixed names: before one changes, its current content is kept as `versions/<sha256>.json`
+    beside it, and the new record holds `previous_sha256` (R16).
   - `protocol/evidence.py` checks at start that the interpreter and the installed packages
-    match this section and the pins for that platform (R18), and exits 2 on any mismatch. A
-    changed environment needs this section updated first, with the owner's approval.
-  - A reproduction may run in either environment, whichever made the original. It compares the
+    match this section and the pins for that platform (R18), and exits 2 on any mismatch. A changed
+    environment needs this section updated first, with the owner's approval.
+    `scripts/recheck_004.py` alone is exempt, since it imports only the standard library and
+    `protocol/` (R16).
+  - A reproduction that re-runs evidence may run in either environment, whichever made the original,
+    and in no other; the re-check of R16 may run anywhere. It compares the
     fields data-model §1 lists, and every other field, `command`, `config`, `parallelism`, the
     analyst and the reviewer included, is reported only, since each may differ between environments
     or analysts.
@@ -219,9 +224,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     with its critical values, so scipy's tails decide nothing; scipy still computes the
     p-values reported.
     A reproduction compares the counts, the critical counts and the verdicts byte for byte, and the
-    p-values within a relative tolerance of 10⁻⁶, listing any outside it; a p-value never decides a
-    verdict, and a `p_values` file's hash may differ between the two environments of R1
-    (data-model §1).
+    p-values by value, decompressed first in either format: two p-values agree when their difference
+    is at most 10⁻⁶ times the larger of their magnitudes, or when both are below 2⁻¹⁰²², the
+    smallest normal double, so that a 0 beside a subnormal agrees. It lists any outside; a p-value
+    never decides a verdict, and a `p_values` file's hash and `uncompressed_sha256` may differ
+    between the two environments of R1 and are reported only (data-model §1).
   - **Avalanche test.** FR-037 asks for it; using it as a source of R_dist is stricter than the
     spec. For each flipped input bit j in a set F, N_a = 2¹³ test states x (kind `state`, R3);
     after every round r = 1…R_cur the difference Π^r(x) ⊕ Π^r(x ⊕ e_j) is counted bit by bit,
@@ -521,7 +528,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     with the failure and counted towards the stop rule. A search that reached its cap is never run
     again, with another tool or another version of the same one, except as this one re-run after a
     recorded tool defect, and a speed-up is not a defect (R12). A uniform control is run again only
-    after a recorded tool defect in the control's own code (R4).
+    after a recorded tool defect in the control's own code (R4). A reproduction (R16) is not a
+    re-run: it writes only its `reproduction` record, appends nothing to the candidate log and
+    charges no row, so it can neither replace evidence nor add any.
   - **Stricter changes during a candidate's runs.** A stricter change of a rule is applied first
     by recomputing the verdicts from saved outputs. New measurements it needs, such as more
     inputs, are a new measurement of the same kind under the changed rule, not a re-run: the
@@ -558,7 +567,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     heavy run takes the lock of R16, never overlaps another heavy run or any battery run, projects
     first and records `heavy_run` true (FR-045). The examples that FR-045 and the cli contract list
     are cases of this rule, and a test checks that every budgeted kind and every script with a
-    worker option takes the lock.
+    worker option takes the lock. Every other kind is light: one this section does not budget that
+    runs with one worker in under 10 minutes, such as the constants, the vectors and the constructed
+    states, `mode_limits_v3.py`, the round rule, the D4 choice, the claim register and the re-check.
+    The tests of User Story 4, R16 and FR-061 reproduce the light kinds, and a budgeted kind is
+    reproduced only on request, as a heavy run (R16). FR-053's test with two worker counts is a
+    heavy run: it runs a stated test operation list, takes the lock, projects first, charges no
+    candidate and is not evidence. The test suite marks it heavy, so the suite passes only while no
+    heavy run holds the lock, and otherwise fails naming the lock.
   - **Projection before every heavy run.** A timing run of at most 60 s on the candidate itself
     projects the run's hours from the counts of R4, R8 and R13. It is a `projection` record
     (data-model §1), like any timing probe: its inputs are the first inputs of the run it
@@ -1115,19 +1131,25 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     counts and p-values are JSON or gzip-compressed JSON, never `.npy`, and a solver's log is
     `.txt`, since `*.log` is ignored; `protocol/evidence.py` refuses any other suffix there (R18).
   - Records up to 10 MB, compressed with gzip, are committed. Larger outputs, such as full
-    dependency matrices at 16×16 (about 32 MB per round and direction), stay local. Their
-    SHA-256 and the regenerating command are committed, together with per-round summaries. A
-    local-only output must come from a deterministic command, so that its committed SHA-256 can
-    be checked by regenerating it, and the record states that command's cost (heavy or not,
-    hours projected). An output that is not deterministic, such as a solver log with timings,
+    dependency matrices at 16×16 (about 32 MB per round and direction), stay local, under
+    `data/local/004/<record_id>/` and never under `reports/004-crypto-architecture-v3/`:
+    `.gitignore` gains `data/local/` (R18), and each record's `outputs` gives their paths with
+    `committed` false. `protocol/evidence.py` refuses a committed output above 10 MB, naming it; a
+    test fails if any path under `data/local/` is tracked or a committed output exceeds 10 MB, and
+    `git add` refuses an ignored path without `-f`, so a local-only output is not staged by
+    accident. Their SHA-256 and the regenerating command are committed, together with per-round
+    summaries. A local-only output must come from a deterministic command, so that its committed
+    SHA-256 can be checked by regenerating it, and the record states that command's cost (heavy or
+    not, hours projected). An output that is not deterministic, such as a solver log with timings,
     is never local-only: it is committed, compressed, or its verdict rests on a committed
     deterministic summary.
   - **Compressed files.** Every `.gz` file is written by `gzip.compress(data, compresslevel=9,
     mtime=0)`, so its header holds no file name and a zero time; on the probe of 2026-11-01 the two
     environments of R1 then wrote identical bytes. Its raw hash is over the compressed bytes, and
     its record also holds the SHA-256 of the uncompressed content, which a reproduction compares,
-    since another zlib may compress differently. A test checks the header of every committed `.gz`
-    file.
+    since another zlib may compress differently; a `p_values` file is compared by its values
+    instead, its `uncompressed_sha256` reported only (data-model §1). A test checks the header of
+    every committed `.gz` file.
   - **Hashes.** Each hash is recorded beside its kind, `raw` or `lf-normalized`. Every new file
     is hashed over its raw bytes and is pinned to LF or `binary` (R18), so its raw and
     normalized content agree on every checkout. An existing `text=auto` file is hashed over its
@@ -1136,22 +1158,57 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     Every digest is written as 64 lower-case hex digits. `lf-normalized` means each CR LF pair
     replaced by LF on the file's bytes, as Git normalizes, with a lone CR kept; it is never computed
     from a file read in text mode, whose universal newlines also turn a lone CR into LF.
-  - **Spec versions.** The first time a record cites a spec hash, `protocol/evidence.py` stores a
-    copy of that spec as `reports/004-crypto-architecture-v3/spec-versions/<sha256>.md`,
+  - **Spec and research versions.** The first time a record cites a spec hash,
+    `protocol/evidence.py` stores a copy of that spec as
+    `reports/004-crypto-architecture-v3/spec-versions/<sha256>.md`,
     committed with the records, so every `spec_sha256` names content that is kept, whether or
-    not a commit holds it (data-model §1).
-  - **Reproduction.** A reproduction compares the fields data-model §1 lists and reports every other
-    field only; a different source hash makes it a new run, not a reproduction. Its verdict is
-    recomputed under the spec version the original cites (`spec-versions/<sha256>.md`), so a later
-    spec change cannot alter it.
+    not a commit holds it (data-model §1). Every version of research.md that a record cites by
+    `research_sha256` is kept the same way, as `research-versions/<sha256>.md`, since the values
+    that decide verdicts live there. Every record also holds `protocol_seq` and
+    `protocol_line_sha256`, the protocol change log's last entry when the run started (`none` before
+    the log exists).
+  - **Code at HEAD.** A run that writes evidence exits 2 unless every source file in its
+    `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
+    authorization to commit makes routine. Data and report files may still be dirty, and the record
+    lists the dirty paths; a binary is rebuilt from committed source, its hash reported only. Each
+    record's code is then found at its `git_head`, and a test checks each `code_sha256` entry
+    against the blob at that commit.
+  - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
+    `freeze/selection.json`, `security-target/parameters.json` and `limits.json`, the environment
+    records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to
+    "never overwritten" (data-model introduction): before one changes, `protocol/evidence.py` keeps
+    its current content as `<dir>/versions/<sha256>.json` beside it, and the new content holds
+    `previous_sha256`. A record that cites one gives its path and SHA-256, and the re-check resolves
+    either from the versions.
+  - **Reproduction.** Every script that writes evidence or generated files has a mode
+    `--reproduce RECORD`, which runs the recorded command's configuration with its output directory
+    replaced by `reproductions/<record_id>/<n>/` and writes a `reproduction` record there: the
+    original's ID and SHA-256, each compared field with its outcome, the reported fields, and
+    `match` or `differs`. It appends nothing to the candidate log, charges no budget row and is not
+    a re-run under R7, so it can neither replace evidence nor add any; it is a heavy run where R7
+    says so, and a difference is a finding, exit 1. It compares the fields data-model §1 lists for
+    its kind and reports every other field only, timings and raw solver logs among them; a different
+    source hash makes it a new run, not a reproduction. A `p_values` file is compared by its values,
+    within the tolerance data-model §1 defines, and decides nothing; every other `.gz` file is
+    compared by its `uncompressed_sha256`. Its verdict is recomputed under the spec version, the
+    research version and the protocol change-log entry the original cites
+    (`spec-versions/<sha256>.md`, `research-versions/<sha256>.md`), so a later change cannot alter
+    it. The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`.
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs and compares it with
     the recorded verdict (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
     committed files, so the committed per-round summaries must suffice, for example R_f from the
     per-round flag "every output bit depends on every input bit". Local-only outputs serve only
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
-    it lists both checks per kind. This re-check is the routine test of User Story 4. Full
-    re-runs are listed per kind with their cost: light kinds always, heavy kinds on request, one
-    at a time (FR-045).
+    it lists both checks per kind. This re-check is the routine test of User Story 4. It recomputes
+    each verdict under the rules in force at the protocol change-log entry its record cites and,
+    where a later stricter change applies (FR-044), also under the current rules, listing both; a
+    disagreement in either is reported. It is exempt from the environment guard of R1: it recomputes
+    verdicts from committed counts by exact integer arithmetic (data-model §5) and imports only the
+    standard library and those `protocol/` modules that do the same, which a test checks. Its
+    `recheck` record holds the interpreter, platform and full `pip freeze` it ran with, and says
+    when that environment is not one of R1's; a reproduction that re-runs evidence stays in R1's two
+    environments. Full re-runs are reproductions (above), listed per kind with their cost: the light
+    kinds of R7 always, a heavy kind only on request, one at a time, as a heavy run (FR-045).
   - Heavy runs take an exclusive lock, `data/heavy-run.lock`, which `.gitignore` gains, and
     refuse to start while another process holds it (FR-045).
   - **Writers of the hash-chained logs** (checklist D4): `research/004/candidates.jsonl`,
@@ -1274,6 +1331,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `.gitattributes` also gains `*.mk text eol=lf` and `Makefile text eol=lf`, which cover the new
     `fast/seed_search.mk` and keep feature 003's `fast/Makefile` LF on a fresh checkout. Its bytes
     do not change: Git already holds it with LF line endings (checklist F12).
+  - `.gitignore` gains, at setup (plan phase 1), the two locks of R16, `data/heavy-run.lock` and
+    `data/log-append.lock`, and `data/local/`, where local-only outputs are written (R16), so that
+    none of them shows in `git status` or counts as dirty.
   - `requirements.txt` loses its stale header and pins the two tested environments with
     markers: `numpy==2.2.6; python_version < "3.14"`, `numpy==2.5.4; python_version >= "3.14"`,
     the same for scipy (1.15.3 and 1.18.1), and `nistrng==1.2.3` in both. With Hypothesis
@@ -1351,7 +1411,8 @@ run from inside that directory, Python reading it runs with `-I`, and its SHA-25
 recorded against its row.
 
 A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds one
-entry per file of these tables: its name, source, size, SHA-256, download date and local path.
-A validation record's `source` cites the manifest entry, with the paper's table and value
-(data-model §7). If a paper's value cannot be obtained, the tool it validates stays unvalidated
-and its results `not evaluated` (R12); the owner may provide the value with its source.
+entry per file of these tables: its name, source, size, SHA-256, download date and local path. It
+keeps that fixed name: before it changes, its current content is kept as `versions/<sha256>.json`
+beside it (R16). A validation record's `source` cites the manifest entry, with the paper's table and
+value (data-model §7). If a paper's value cannot be obtained, the tool it validates stays
+unvalidated and its results `not evaluated` (R12); the owner may provide the value with its source.

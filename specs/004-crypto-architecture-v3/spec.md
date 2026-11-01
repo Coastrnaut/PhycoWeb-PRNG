@@ -358,10 +358,11 @@ round count. They need the design (User Story 3).
 
 **Independent Test**: Run the re-check of FR-065, which recomputes every verdict from the saved
 outputs, and check that each tool's validation record is older than its first counted result.
-Full re-runs are listed per kind with their cost: the light kinds are re-run with their
-recorded commands and compared as FR-053 defines (deterministic kinds byte for byte, searches
-and solver runs by their values and verdicts); the heavy kinds are re-run only on request, one
-at a time.
+Full re-runs are reproductions, listed per kind with their cost: each light kind of research R7 is
+reproduced by its script's `--reproduce` mode, which runs the recorded command into a directory of
+its own, appends nothing to the candidate log and compares as FR-053 defines (deterministic kinds
+byte for byte, searches and solver runs by their values and verdicts); a heavy kind is reproduced
+only on request, one at a time, as a heavy run.
 
 **Acceptance Scenarios**:
 
@@ -521,7 +522,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   checked by regenerating it, and its record states that command's cost (heavy or not, hours
   projected). An output that is not deterministic, such as a solver log with timings, is never
   local-only: it is committed, compressed, or its verdict rests on a committed deterministic
-  summary (research R16).
+  summary. Local-only outputs are written under `data/local/004/<record_id>/`, which `.gitignore`
+  ignores, never under the reports directory, and a committed output above 10 MB is refused
+  (research R16).
 - **An edge state that no key reaches**: it still gets a constructed-state vector, and the record
   says that no key reaches it, as no seed reaches class 3 in `phyco-v2` (vhdl-genai.md §5.2).
 - **The second transcription disagrees with the model**: the disagreement is a finding. Its cause
@@ -1440,8 +1443,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   document, the first outcome, stays possible instead; or a stop. Each is logged with its reasons.
   Any change after the owner design review (R raised, a
   new finding, a corrected document) makes a new design-document version: the rationale is
-  revised, the review is repeated for the changed parts and recorded in a row of its own, and
-  the review package is rebuilt. The freeze runs in this order: (1) the owner commits the
+  revised, the review is repeated for the changed parts and recorded in a row of its own, and the
+  review package is rebuilt, its earlier manifest kept as `review-package/versions/<sha256>.json`
+  (data-model introduction). The freeze runs in this order: (1) the owner commits the
   feature files (Principle IX); (2) `design_freeze.py create` runs with `git_dirty` false and
   writes the record as `draft`; (3) the owner's approval is written into it by `design_freeze.py
   approve`, run by the owner, which changes the status and adds who, when and the wording, and
@@ -1452,10 +1456,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   them, even when asked in general terms. `design_freeze.py approve` prints `draft_sha256` and
   refuses unless standard input is an interactive terminal and the owner types its first 16 hex
   digits, and the record keeps that confirmation (data-model §13). Dirty means a
-  tracked file modified or an untracked file not ignored; ignored files (the locks, local-only
-  outputs) do not count, and local-only outputs are in the record by SHA-256 anyway. The freeze
-  record MUST hold the SHA-256 of the design document, `rationale.md`, the model, the vectors
-  (constructed-state vectors included), the scripts that generate the constants and the
+  tracked file modified or an untracked file not ignored; ignored files (the locks, the local-only
+  outputs under `data/local/`) do not count, and local-only outputs are in the record by SHA-256
+  anyway. The freeze record MUST hold the SHA-256 of the design document, `rationale.md`, the model,
+  the vectors (constructed-state vectors included), the scripts that generate the constants and the
   vectors, the selected operation list, `research/004/ir.py` with its tools, and the scripts
   that compute verdicts (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `recheck_004.py`,
   `protocol/devinputs_v3.py`, `protocol/evidence.py`); R with every input of the round rule and
@@ -1493,7 +1497,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   by recomputing verdicts from saved outputs; a new measurement it needs, such as more inputs, is a
   new measurement of the same kind under the changed rule, not a re-run: the old records stay, and
   the new hours count against the same budget row. Every firing already recorded stands, so a
-  stricter change can only raise R or make a candidate ineligible, never undo a raise. If the
+  stricter change can only raise R or make a candidate ineligible, never undo a raise. Every record
+  cites the change log's last entry when its run started, and the re-check recomputes each verdict
+  under the rules in force at that entry and, where a later stricter change applies, also under the
+  current rules, listing both (FR-065; data-model §1). If the
   row cannot hold the new run, that evidence is inconclusive and the candidate ineligible at
   that size, as for any spent budget; a budget lowered below the hours already used leaves zero
   hours, results so far stand, and no further run of that row starts. After a stop, a later
@@ -1519,7 +1526,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-045**: Heavy runs MUST NOT overlap one another or any battery run (security.md §12.5). A
   heavy run is any run that is of a kind research R7 budgets, uses more than one worker process or
   thread, or is projected to take, or last took, more than 10 minutes; the FUT-SEC-8 sweep,
-  exhaustive bijectivity and solver runs are examples. Every heavy run takes the heavy-run lock,
+  exhaustive bijectivity and solver runs are examples. Every other kind is light, as research R7
+  lists them, and FR-053's test with two worker counts is a heavy run that charges no candidate.
+  Every heavy run takes the heavy-run lock,
   projects its hours first and records `heavy_run` true, and a test checks that every budgeted kind
   and every script with a worker option takes the lock. A stale lock, left by a crash or a reboot,
   is removed only by `scripts/clear_lock.py`, once its holder is shown gone, and the removal is
@@ -1607,20 +1616,32 @@ freeze hashes and the baseline manifest; run the claim-register test.
   make that checkable:
   - **Reproducible, per kind.** Deterministic kinds (vectors, constants, dependency matrices,
     counts, digests) reproduce byte for byte; searches and solver runs reproduce their values
-    and verdicts. A reproduction compares the fields data-model §1 lists (`kind`, `model_id`,
-    `variant_id`, `design_sha256`, each source file's entry in `code_sha256`, `inputs`, each
-    output's `sha256` and `bytes`, `exit_status`, `assertions`, `status`, `classification` and the
-    fields of its kind) and reports every other field only; a different source hash makes it a new
-    run, not a reproduction. The verdict is recomputed under the spec version the original cites,
-    and the environment is either of the two of research R1, as recorded.
+    and verdicts. A reproduction is run by the script's `--reproduce RECORD` mode and writes a
+    `reproduction` record of its own; it appends nothing to the candidate log, charges no budget row
+    and is not a re-run under research R7, so it can neither replace evidence nor add any, and a
+    difference is a finding. It compares the fields data-model §1 lists per kind (`kind`,
+    `model_id`, `variant_id`, each source file's entry in `code_sha256`, `inputs`, each
+    deterministic output's `sha256` and `bytes`, `exit_status`, `assertions`, `status`,
+    `classification` and the fields of its kind, and `design_sha256` only for the kinds whose code
+    reads the design document) and reports every other field only, timings and raw solver logs among
+    them; a different source hash makes it a new run, not a reproduction. A `p_values` file is
+    compared by its values, within the tolerance data-model §1 defines, and decides nothing. The
+    verdict is recomputed under the spec version, the research version and the protocol change-log
+    entry the original cites, and the environment is either of the two of research R1, as recorded.
   - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
     The model hash is that of the candidate's operation list before selection and that of
-    `model_v3.py` after it. With `git_dirty` often true, the hashes, not `git_head`, identify
-    the code.
+    `model_v3.py` after it. Code is committed before every evidence run; `git_dirty` may be true for
+    data and reports only, and the record lists the dirty paths: a run that writes evidence exits 2
+    unless every source file in its `code_sha256` matches HEAD, committed and unmodified, which
+    constitution 1.3.0's standing authorization to commit makes routine, and a binary is rebuilt
+    from committed source, its hash reported only. Each record's code is then found at its
+    `git_head`, and a test checks each `code_sha256` entry against the blob at that commit.
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
-    count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test
-    runs one light kind with two worker counts and compares the outputs.
+    count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs
+    a stated test operation list with two worker counts and compares the outputs. That test is a
+    heavy run (research R7): it takes the lock, projects first, charges no candidate and is not
+    evidence.
   - **Hashes and line endings.** Each recorded hash says beside it whether it is over the raw
     bytes or over LF-normalized content (`raw` or `lf-normalized`). Every new file whose hash
     is recorded is hashed over its raw bytes and MUST have a pinned line ending in
@@ -1629,7 +1650,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`, and
     `protocol/evidence.py` refuses any other suffix there. Every `.gz` file is written by
     `gzip.compress(data, compresslevel=9, mtime=0)`, and its record also holds the SHA-256 of the
-    uncompressed content, which a reproduction compares (data-model §1).
+    uncompressed content, which a reproduction compares for every `.gz` file but a `p_values` file,
+    whose values it compares instead (data-model §1).
     An existing `text=auto` file that a new record hashes, such as `security.md` or `README.md`,
     is hashed over its LF-normalized content, and no existing pin changes. The CRLF-pinned
     freeze records of features 002 and 003 keep their recorded hashes over CRLF bytes. A test
@@ -1736,15 +1758,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `git_dirty`; tool and dependency versions, operating system and hardware; the exact command
   and configuration, runnable as written (the interpreter by its full path, the Windows Python
   or `~/.venvs/phycoweb/bin/python` in WSL; the working directory, which is the repository
-  root; paths relative to it), with a test that re-runs one light command of each kind exactly
-  as recorded; the SHA-256 of every code file the run used (`code_sha256`: the script, the
+  root; paths relative to it), with a test that reproduces one light command of each light kind
+  (research R7) exactly as recorded, through the script's `--reproduce` mode (FR-053); the SHA-256
+  of every code file the run used (`code_sha256`: the script, the
   `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
-  source and its binary); the inputs or their derivation; output paths with SHA-256; the exit status
-  and assertions; the classification (FR-060); the analyst and the reviewer, with the review
-  status; known limitations; and the disclaimer, which feature 003's provenance records lacked
-  (feature-003 phase report, open issue 3). A statistical measurement, such as the bias rule's,
-  MUST also record the items of security.md §11.6. Raw tool output MUST be kept, not only
-  summaries.
+  source and its binary), each source file committed at HEAD before the run and a binary rebuilt
+  from committed source (FR-053); the inputs or their derivation; output paths with SHA-256, and for
+  each whether it is deterministic (a raw solver log is not, and a reproduction reports its hash
+  only); the exit status and assertions; the classification (FR-060); the analyst and the reviewer,
+  with the review status; known limitations; and the disclaimer, which feature 003's provenance
+  records lacked (feature-003 phase report, open issue 3). A statistical measurement, such as the
+  bias rule's, MUST also record the items of security.md §11.6. Raw tool output MUST be kept, not
+  only summaries.
 - **FR-062**: The final report and the design rationale MUST keep apart demonstrated facts,
   mathematical arguments, experimental observations, unverified hypotheses, unsuccessful
   attacks, untested areas and residual risks (security.md §17.3). In the rationale each
@@ -1780,8 +1805,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   every verdict is recomputable on a fresh clone: the committed per-round summaries suffice
   (for example, R_f from the per-round flag "every output bit depends on every input bit"), and
   local-only outputs serve only to re-derive a committed summary, which the re-check also does
-  when they are present; it lists both checks per kind. The re-check is the routine
-  reproduction test (User Story 4), and it runs the frozen verdict scripts (FR-043).
+  when they are present; it lists both checks per kind. The re-check is the routine reproduction
+  test (User Story 4), and it runs the frozen verdict scripts (FR-043): the verdict functions it
+  applies are those of `protocol/evidence.py`, which the scripts that wrote the records call. It
+  recomputes each verdict under the rules in force at the protocol change-log entry its record cites
+  and, where a later stricter change applies (FR-044), also under the current rules, both listed; a
+  disagreement in either is reported. It is exempt from the environment guard, since it recomputes
+  verdicts from committed counts by exact integer arithmetic (data-model §5) and imports only the
+  standard library and those `protocol/` modules that do the same, which a test checks; its
+  `recheck` record holds the interpreter, platform and full `pip freeze` it ran with, and says when
+  that environment is not one of research R1's.
 - **FR-066**: This feature MUST prepare what feature 005's copy of the cryptanalysis
   instructions needs (security.md §16.4; strategy note G13): the model ID and design-document
   version for its placeholders, `phyco-v3`'s threat-model rows (FR-008), its table of structural
@@ -2285,8 +2318,9 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   model at 100% of the steps of the committed vectors.
 - **SC-017**: 100% of evidence records hold every field of security.md §17.2 and the disclaimer,
   100% of findings carry a classification of security.md §9.1 and every other record `none`, each
-  computed by code (FR-060), and the re-check scripts
-  reproduce 100% of the verdicts on a fresh clone from committed files alone (FR-065).
+  computed by code (FR-060), and the re-check reproduces 100% of the verdicts on a fresh clone from
+  committed files alone, on any machine, since it is exempt from the environment guard (FR-065); a
+  reproduction that re-runs evidence stays in research R1's two environments.
 - **SC-018**: The claim-register test reports 0 disagreements between the register, README,
   security.md and the disclaimers, 0 uses of forbidden wording outside the rules that forbid
   it, and 0 strengths stated without "target" or a quoted rule outside the register's
