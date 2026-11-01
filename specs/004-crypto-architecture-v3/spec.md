@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-01
 
-**Status**: Draft
+**Status**: Approved for planning (2026-11-01); design-freeze and result reviews pending
 
 **Input**: User description (verbatim):
 
@@ -154,7 +154,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 
 | Gate | Reviewer | Date | Decision | Notes |
 |------|----------|------|----------|-------|
-| Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | _pending_ | _pending_ | _pending_ | Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), if not recorded before |
+| Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session, with D1–D10 as clarified on 2026-11-01 (section "Clarifications"); the pre-registered design protocol may only become stricter (FR-044). Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), not recorded before |
 | Plan approval | _pending_ | _pending_ | _pending_ | |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | One row per approval |
