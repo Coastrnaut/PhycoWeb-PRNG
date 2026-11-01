@@ -37,7 +37,8 @@ shown as `<…>` are fixed by the design document.
 
 Supported values: n = 2…16 where the design document's update schedule covers n (even n, and
 odd n only with a three-colour schedule); w ∈ {4, 8, 16, 32}, with w = 4 at 2×2 only; R from 1
-to the frozen R; c a multiple of w with 0 < c < b, and c = 256 at every claimable size.
+to the frozen R; c a multiple of w and of 16 with 0 < c < b, and c = 256 at every claimable
+size (research R14).
 
 ## Permutation (research interface)
 
@@ -62,20 +63,21 @@ g = Generator(variant_id)               # runs the start-up self-test (FR-059)
 g.instantiate(key, nonce, pers=b"")     # key 32 bytes, nonce 16 bytes, pers ≤ <max> bytes
 out = g.generate(nbits)                 # canonical serialization (FR-015); forget runs inside
 g.reseed(data)                          # data ≤ <max> bytes; treated as attacker-chosen (T9)
-g.zeroize()                             # whole state, counters and key binding cleared
+g.zeroize()                             # clears the whole state; the object is then unusable
 ```
 
 | Rule | Contract |
 |------|----------|
 | Variant | `Generator` accepts only `PRODUCTION_VARIANTS`; any other ID raises `VariantRefused` (SC-010) |
 | Start-up self-test | the constructor runs the known-answer self-test of FR-059, whose inputs and expected output come from the committed vectors (frozen at the freeze), then zeroizes the whole state; on failure it raises `SelfTestError` and the object stays unusable |
-| Call sequence | `generate` or `reseed` before `instantiate`, or after `zeroize`, raises `CallSequenceError`; `instantiate` may be called again with a new nonce |
+| Call sequence | `generate` or `reseed` before `instantiate`, and any call after `zeroize`, raise `CallSequenceError`; `zeroize` is final, so a new key needs a new `Generator`; `instantiate` may be called again with the bound key and a new nonce |
 | Forget | runs inside every `generate`, after its last output block, so it can never be skipped (FR-013) |
 | Output | `generate(nbits)` returns `nbits / 8` bytes in the design document's serialization; nbits a positive multiple of 32, otherwise `ValueError`; `words32(out)` splits it into 32-bit words as the vector files list them |
 | Per-request limit | nbits above min(per-instantiation limit, 2¹⁹) raises `LimitExceeded`, with no output and no state change |
 | Per-instantiation limit | output that would pass the limit raises `LimitExceeded`, with no output and no state change; a new nonce is needed; `reseed` never resets a counter |
-| Per-key limit | a `Generator` is bound to the key of its first `instantiate`; a different key raises `KeyMismatch`; output under all its nonces counts against the per-key limit (`LimitExceeded` beyond it); `zeroize` ends the binding |
-| Keys u | a parameter of the bound, stated in the security target; one object cannot observe it |
+| Other limits | every other online quantity the theorem's bound counts (for example calls of Π per key, instantiations per key, reseeds per instantiation) has the design document's limit and a counter; a call that would pass one raises `LimitExceeded`, with no output and no state change (research R9) |
+| Per-key limit | a `Generator` is bound to the key of its first `instantiate`; a different key raises `KeyMismatch`, with no state change; output under all its nonces counts against the per-key limit (`LimitExceeded` beyond it); the binding and the counters are never reset, since `zeroize` ends the object |
+| Keys u, and limits across objects | u is a parameter of the bound, stated in the security target. Across objects, processes and devices, the per-key limits and u are usage rules that the design document states for the caller; the model enforces them only within one object |
 | Nonce reuse | the same key, nonce and personalization string give the same output; stated behaviour (T7), not detected |
 | Lengths | a key other than 32 bytes, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` |
 
@@ -86,18 +88,22 @@ FR-002).
 ## Research duplex
 
 ```text
-d = ResearchDuplex(variant_id)          # any supported variant with a capacity, reduced included
+d = ResearchDuplex(variant_id)          # any supported keyed variant, reduced ones included
 ```
 
 The same calls and rules as `Generator`, on any supported variant, for evidence on reduced
-variants. It is not the production interface: it is named in the model's docstring as research
-only, and `Generator` never delegates to it.
+variants, except the lengths: a key of c/8 bytes and a nonce of c/16 bytes for the variant's
+capacity c, so 32 and 16 bytes at every claimable size (research R14). Other lengths raise
+`ValueError`. A keyless variant, whose key and nonce leave no room in the state for the padding
+and domain bits, raises `VariantRefused`; only the permutation interface applies to it. It is
+not the production interface: it is named in the model's docstring as research only, and
+`Generator` never delegates to it.
 
 ## Exceptions
 
 | Exception | Base | Raised when |
 |-----------|------|-------------|
-| `VariantRefused` | `ValueError` | an unsupported or reduced variant at `Generator`; an unsupported value anywhere |
+| `VariantRefused` | `ValueError` | an unsupported or reduced variant at `Generator`; a keyless variant at `ResearchDuplex`; an unsupported value anywhere |
 | `CallSequenceError` | `RuntimeError` | a call out of the order above |
 | `LimitExceeded` | `ValueError` | a request or total beyond a limit |
 | `KeyMismatch` | `ValueError` | `instantiate` with a key other than the bound one |

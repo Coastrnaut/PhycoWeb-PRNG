@@ -12,10 +12,11 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 ## Prerequisites
 
-- Spec approved (done 2026-11-01); plan approved (pending).
+- Spec approved (done 2026-11-01); plan approved (done 2026-11-01); tasks approved (pending).
 - For P and U: nothing else; WSL with gcc 15 and make is present.
-- For V (published values), T (theorem papers) and AIS 20/31 3.0: the owner's permission for
-  each file, or values the owner provides with their source.
+- For V (published values), T (theorem papers) and AIS 20/31 3.0: the files of research R19,
+  whose downloads the owner approved on 2026-11-01 (`169.pdf` and `47270450.pdf` through the
+  owner's browser), or values the owner provides with their source.
 - For E with key loading, M and F: the FUT-SEC-8 result review approved.
 - For X: the owner's recorded go-ahead for the separate session.
 
@@ -27,6 +28,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | P1 | `python scripts/archive_phyco_v2.py --check` | 0 mismatches between copies, manifest and live files (SC-012) |
 | P2 | `python -c "from protocol import devinputs_v3 as d; print(d.key(0).hex())"` | 64 hex digits; fingerprints checked at import |
 | P3 | any evidence script with an input namespace other than `dev` or `control` | exit 2, nothing written (FR-040) |
+| P4 | append to the candidate log while another process holds `data/log-append.lock` | exit 2 after 10 s, nothing appended (R16) |
 
 ## FUT-SEC-8 (US1)
 
@@ -34,7 +36,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 |------|---------|----------|
 | U1 | `make -C fast -f seed_search.mk` (WSL) | builds `fast/build/seed_search` with `-Werror`; `fast/build/phyco_stream` untouched |
 | U2 | `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` | exit 0: 2 × 10,000 words match |
-| U3 | **heavy**: `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8` | all 3 targets recovered; matches after one, two and three words beside about 1, 2⁻³² and 2⁻⁶⁴; under an hour (SC-001) |
+| U3 | **heavy**: `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8` | all 3 targets recovered; matches after one, two and three words beside about 1, 2⁻³² and 2⁻⁶⁴; under an hour (SC-001); progress lines from the main thread only (R2) |
 | U4 | run U3 again | exit 2 (one pass per target) |
 | U5 | owner review recorded in the spec | key-loading guard passes from then on (FR-003) |
 
@@ -50,7 +52,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | Step | Command | Expected |
 |------|---------|----------|
 | T1 | `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json` | bound at most ε = 2⁻⁶⁴ at the limits, doubling check passes; `theorem` `unverified` until its paper is read |
-| T2 | reviewer reads `security-target/parameters.json` against security.md §12.2 | 0 violations at every claimable size (SC-003) |
+| T2 | reviewer reads `security-target/parameters.json` against security.md §12.2 | 0 violations at every claimable size (SC-003); keyed reduced variants with a c-bit key and a c/2-bit nonce, checked at s = c/2 (R14) |
 
 ## Candidates and evidence (E, US4)
 
@@ -58,10 +60,11 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 |------|---------|----------|
 | E1 | `python scripts/evidence_v3.py --candidate cand-A1 --kind inverse --out-dir $REP/candidates/cand-A1` | `pass` at every supported size and variant (SC-004) |
 | E2 | **heavy**: `wpy scripts/evidence_v3.py --candidate cand-A1 --kind bijectivity --size 2 --width 4 --out-dir …` | 2³² distinct outputs (SC-004) |
-| E3 | `evidence_v3.py … --kind control --size 4`, then **heavy** `--kind frequency --size 4` | the control does not fire; a frequency record with its counts and p-values |
-| E4 | `python scripts/d4_choice.py --log research/004/candidates.jsonl --out $REP/d4/choice.json`; run it again | the choice with its inputs; the second run exits 2 |
+| E3 | `evidence_v3.py … --kind control --size 4`; `--kind frequency --size 4 --project`; then **heavy** `--kind frequency --size 4` and `--kind avalanche --size 4` | the control does not fire; the projection fits the budget row (R7); frequency and avalanche records with every input and difference set of R4, counts, p-values, projected and used hours, and 0 disagreements between the avalanche counts and the dependency matrices |
+| E4 | `python scripts/d4_choice.py --log research/004/candidates.jsonl --out $REP/d4/choice.json`; run it again | the choice with its inputs and `outcome`; the second run exits 2; after an exact tie, `--tie` writes `d4/tie.json` once both values of R at 4×4 exist |
 | E5 | `python scripts/round_rule.py --candidate cand-A1`, then `--select` | R per claimable size with every input cited (SC-005, SC-008); a selection, or exit 1 for a stop |
 | E6 | log a fourth candidate of one family | exit 2 (SC-011) |
+| E7 | `evidence_v3.py … --kind frequency --size 8` before that candidate's 4×4 frequency run has finished | exit 2: sizes run in order (R7) |
 
 ## Model and vectors (M, US3)
 
@@ -71,7 +74,8 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | M2 | `python scripts/gen_vectors_v3.py --check` on Windows; `wpy scripts/gen_vectors_v3.py --check` in WSL | exit 0 on both (SC-009) |
 | M3 | `python scripts/gen_constructed_v3.py --check` | exit 0 (SC-016) |
 | M4 | `python -c "from phycoweb.model_v3 import Generator; Generator('phyco-v3/n2-w16-R8-c64')"` | `VariantRefused` (SC-010) |
-| M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, call-sequence errors, boundaries (FR-058) |
+| M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, call-sequence errors including any call after `zeroize`, boundaries (FR-058) |
+| M6 | `python -c "from phycoweb.model_v3 import ResearchDuplex as D; D('phyco-v3/n2-w16-R8-c64').instantiate(bytes(32), bytes(16))"` | `ValueError`: that variant takes an 8-byte key and a 4-byte nonce (R14) |
 
 ## Second transcription (X)
 

@@ -35,9 +35,9 @@ one stays.
 
 Statistical records (section 5, `frequency`, `avalanche` and `control`) also hold the items of
 security.md §11.6: `sample_size`, `test_parameters`, `raw_counts` (path and SHA-256),
-`p_values` (path and SHA-256), `failure_locations` (every fired bit with its round count and
-direction) and `exclusions_and_reruns` (each with its justification; empty unless a tool defect
-is recorded).
+`p_values` (path and SHA-256), `failure_locations` (every fired bit with its round count,
+direction and input or difference set) and `exclusions_and_reruns` (each with its
+justification; empty unless a tool defect is recorded).
 
 ## 2. Development inputs (`protocol/devinputs_v3.py`; FR-040, R3)
 
@@ -51,11 +51,13 @@ is recorded).
 | `load(ns, kind, allow, ...)` | checks the fingerprint, refuses a namespace not in `allow` (`PermissionError`; scripts exit 2) |
 
 The empty personalization string is a named input of its own. Indices are decimal without
-leading zeros. The module imports only `hashlib`.
+leading zeros. The module imports only `hashlib`. A keyed reduced variant of capacity c takes the
+first c/8 bytes of `key(i)` and the first c/16 bytes of `nonce(i)` (R3, R14).
 
 ## 3. Candidate log (`research/004/candidates.jsonl`; FR-041, SC-011)
 
-One JSON object per line, append-only, each entry chained to the one before it.
+One JSON object per line, append-only, each entry chained to the one before it. Every append
+takes `data/log-append.lock` and checks the chain first (R16).
 
 | Field | Rule |
 |-------|------|
@@ -67,7 +69,7 @@ One JSON object per line, append-only, each entry chained to the one before it.
 | `oplist_sha256` | hash of the candidate's operation-list module (R11) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics |
 | `evidence` | record IDs |
-| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7 |
+| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, and each heavy run's projected and used hours |
 | `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `selected` or `not selected`, with the reason |
 | `date_utc` | ISO 8601 |
 
@@ -110,8 +112,8 @@ best-attack register row for exhaustive seed search cites it (FR-003).
 | `inverse` | sizes and variants; the 16 vector inputs and 2¹⁰ test states; both directions | `pass` if 0 mismatches |
 | `bijectivity` | variant 2×2, w = 4; 2³² inputs; ones in the output bitmap; bitmap SHA-256 | `pass` if 2³² distinct outputs |
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
-| `frequency` | N = 2²⁰, S = 2b, threshold 0.005/S; per round count and direction the smallest p-value and the fired bits | fires or not; raises R_dist |
-| `avalanche` | N_a = 2¹², the flip set F, S_A = 2·\|F\|·b; as for `frequency` | fires or not; raises R_dist |
+| `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits | fires or not; raises R_dist |
+| `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
 | `control` | the test it controls, its counts, whether it fired | if it fired, that size's bias evidence is `inconclusive` |
 | `symmetry` | patterns and symmetries checked; symmetries that fix a pattern | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state | `pass` if none |
@@ -139,25 +141,32 @@ best-attack register row for exhaustive seed search cites it (FR-003).
 
 `entered` (candidate IDs with their log `seq`), `width` (16 or 8), `r_star`; per scored
 candidate `W_D` and `W_L` as rationals, `luts` (R5) and the score; `representatives`;
-`chosen_family`; `tie_breaks_applied`; `bound_records`. Written once by `scripts/d4_choice.py`
-from saved bound records; a second run that would change it is refused.
+`outcome` (`chosen`, `chosen by default`, `tie` or `not computable`, R6); `chosen_family`;
+`tie_breaks_applied`; `bound_records`. Written once by `scripts/d4_choice.py` from saved bound
+records; a second run that would change it is refused. After a tie, `d4/tie.json` is written
+once by `d4_choice.py --tie`, with both values of R at 4×4, or the ineligibility that decided it.
 
 ## 9. Round rule, eligibility and selection
 
 `candidates/<id>/round-rule.json`, per claimable size: `R_f`, `R_b`, `R_bound` (with its bound
 records), `R_dist` (with its evidence records), `delta` = 2, `R`, and `eligible` with each item
 of FR-018 to FR-031 and FR-037 and its evidence. `selection.json`: the eligible candidates of the
-chosen family, or of the other family if it has none; R at 4×4; any tie and the owner's recorded
-choice; or the stop-rule outcome with its reason.
+chosen family, or of the other family if it has none, or of both families if D4 was not
+computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule outcome with its
+reason.
 
 ## 10. Size profile and security target (`security-target/`)
 
 `parameters.json`, one row per supported size: `n`, `w`, `lanes_per_node` (2), `b`, `c`, `r`,
-`R`, `key_entropy_bits` (256), `reachable_secret_state_bits`, `bound_bits`, `status` (`claimable`
-or `research`), `variant_id`, and the generic-bound checks of FR-010 with 0 violations required
-at every claimable size. `limits.json`: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), the theorem (paper,
-theorem number, `verified` or `unverified`), the limits per instantiation, per request and per
-key, `u`, the bound at the limits and the doubling check of R9.
+`R`, `key_entropy_bits` and `nonce_bits` (c and c/2: 256 and 128 at every claimable size, 0 for
+a keyless variant; R14), `reachable_secret_state_bits`, `bound_bits`, `status` (`claimable` or
+`research`), `variant_id`, and the generic-bound checks of FR-010, at s = c/2 for a keyed
+reduced variant, with 0 violations required at every claimable size. At claimable sizes a row
+also holds `throughput_implied`, in 32-bit words per second at 200 MHz (FR-026), beside
+`throughput_goal` (10⁸; R5), which is reported and never an eligibility rule. `limits.json`:
+`epsilon` (2⁻⁶⁴), `N` (2¹²⁸), the theorem (paper, theorem number, `verified` or `unverified`),
+the limits per instantiation, per request and per key, every other online quantity the bound
+counts with its limit, `u`, the bound at the limits and the doubling check of R9.
 
 ## 11. Vectors (`vectors/phyco-v3/`; FR-036, FR-054)
 
@@ -196,9 +205,11 @@ the round rule (record IDs); tool versions; `git_head`; `git_dirty`, which must 
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
 
-One line per file drafted or repaired with an AI tool: `path`, `sha256`, `tool` and `model`,
-`session`, `date_utc`, `task_id`, `review_status`. The entries for `phycoweb/model_v3.py` and
-`tests/v3_reference.py` must name different sessions (FR-057).
+One line per file drafted or repaired with an AI tool: `seq` and `prev_sha256`, chained as the
+candidate log is (section 3), `path`, `sha256`, `tool` and `model`, `session`, `date_utc`,
+`task_id`, `review_status`. Every append takes `data/log-append.lock` and checks the chain first
+(R16). The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name different
+sessions (FR-057).
 
 ## 15. Claim and evidence register (`protocol/claims.json`; FR-069)
 
@@ -221,6 +232,6 @@ action.
 - **Design document**: draft versions 0.x; the version the owner design review approves; frozen
   as 1.0. After the freeze any change is a new model ID (FR-028).
 - **Gates** (spec Review & Approval table): `_pending_` to Approved or Declined, with date and
-  notes; one row per approved download.
+  notes; one row per download approval.
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
   or a fired control; `blocked` while a gate it needs is pending; otherwise the computed verdict.

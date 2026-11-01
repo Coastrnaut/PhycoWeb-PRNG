@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.9 (2026-11-01). The change history is in section 25.
+- **Document:** `security.md`, version 2.10 (2026-11-01). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -1547,13 +1547,13 @@ No option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.9) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.10) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 PASS (003, reviewed 2026-11-01) |
 | 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
-| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–009 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; proposed, not yet approved. The first prompt is in [`next.md`](next.md). Its requirements are binding (constitution 1.2.0, section 20.1) |
-| 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Not started |
+| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–009 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; approved by the owner on 2026-11-01, with the strategy note and the 2.7 to 2.9 changes, when the feature-004 spec was approved. Its requirements are binding (constitution 1.2.0, section 20.1) |
+| 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | In progress: spec and plan approved 2026-11-01 |
 | 5a.2 | Feature 005: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
 | 5a.3 | Feature 006: an independent C implementation and generic VHDL, with equivalence evidence; ⛔ RTL start (L4) | Not started |
 | 5a.4 | Feature 007: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3) | Not started |
@@ -1637,6 +1637,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.7 | 2026-10-31 | Applied §7.3 of the research note `research/security/crypto-redesign-strategy.md`. Recorded S15: the bound of S12 holds from every state, so a 2×2 design with design-1.0 veins has at most about 2²⁵² secret states, below FUT-SEC-2; evidence from `research/security/vein_descent.py`. Added a claim level per model (sections 1.1 and 1.3); definitions for a keyed design, a claim template and the AIS class names by version (3); threat-model rows T6–T11 (5); SP 800-232, eSTREAM, ISO/IEC 29192 and BSI TR-02102-1 as comparison references, and the checked AIS 20/31 version (6); the design phase and a recommended external design review (7); design-rationale requirements (8); attack classes, generic bounds, tool validation and a best-attack register (12.1, 12.2, 12.5, 12.6); the claim ladder and claim register in place of the classifications (15); instructions per model ID (16.4); the open FUT-SEC-2 and FUT-GRID-2 decision (20, 20.1); Options A1–A3 and C (21); features 004–009 in stage 5a (22); and the next feature, with its prompt in `next.md` (24) |
 | 2.8 | 2026-10-31 | Added rules for AI-assisted RTL and testbenches (section 13), from the research note `research/hardware/vhdl-genai.md`: expected values only from the model, its vectors and the C implementation; deterministic checks before review; testbenches checked against seeded mutants; explicit `numeric_std` types, and the model's edge states in the vectors; no shared author for a design and its only testbench; provenance and licence records. Added the matching control and strict rule (16.3) and the planned VHDL tools (19). Stricter only; no RTL exists yet |
 | 2.9 | 2026-11-01 | Recorded the reviewed battery verdict (feature 003, attempt 1: PASS, accepted by the owner on 2026-11-01) in sections 1.1–1.3, 11.1, 11.4, 11.5 and the roadmap, and the stricter PractRand rule for saturated lines (section 11.3). No claim level changes |
+| 2.10 | 2026-11-01 | Recorded the owner's approval, on 2026-11-01 with the feature-004 spec, of the strategy note `research/security/crypto-redesign-strategy.md` and of the 2.7 to 2.9 changes, and the owner's approval of the feature-004 plan the same day: roadmap rows 5a and 5a.1. No requirement or claim level changes |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

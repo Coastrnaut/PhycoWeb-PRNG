@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-01
 
-**Status**: Approved for planning (2026-11-01); design-freeze and result reviews pending
+**Status**: Spec and plan approved (2026-11-01); tasks approval, reviews and design freeze pending
 
 **Input**: User description (verbatim):
 
@@ -155,9 +155,9 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Gate | Reviewer | Date | Decision | Notes |
 |------|----------|------|----------|-------|
 | Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session, with D1–D10 as clarified on 2026-11-01 (section "Clarifications"); the pre-registered design protocol may only become stricter (FR-044). Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), not recorded before |
-| Plan approval | _pending_ | _pending_ | _pending_ | |
+| Plan approval | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session: plan.md and its design artifacts, research.md R1–R19 with every choice answered as recommended and its eleven changes applied, data-model.md, the two contracts, quickstart.md and checklists/redesign-inputs.md. From this approval the values the plan fixes belong to the pre-registered design protocol and may only become stricter (FR-044). The six `/speckit-checklist` passes of the strategy note (§8.3) run next, before `/speckit-tasks` |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
-| Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | One row per approval |
+| Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |

@@ -2,12 +2,14 @@
 
 Date: 2026-10-31.
 
-**Status:** a proposal for owner review, drafted by the AI coding agent. It is not independent
+**Status:** drafted by the AI coding agent, and approved by the owner on 2026-11-01 together with
+the security.md 2.7 to 2.9 changes, in the "Spec approval" row of the feature-004 spec
+([`spec.md`](../../specs/004-crypto-architecture-v3/spec.md)). It is not independent
 cryptographic advice (security.md §16), makes no security claim and changes no requirement. It
 builds on [security.md](../../security.md) 2.6 and [seed-entropy-bound.md](seed-entropy-bound.md),
-and is meant as the input for the next Spec Kit feature (§9.2). Once approved, it supersedes the
-suggested feature description in §6 of that note. security.md 2.7 applies §7.3 of this note and
-records S15 (§3.3); the prompts to run next are in [next.md](../../next.md). Outline A of
+and is the input for feature 004 (§9.2). With that approval it supersedes the suggested feature
+description in §6 of that note. security.md 2.7 applies §7.3 of this note and records S15
+(§3.3); the prompts to run next are in [next.md](../../next.md). Outline A of
 [`research/assertion-outlines.md`](../assertion-outlines.md) restates this note's argument as an
 assertion outline: three claims, four reasons each, one piece of evidence per reason. Outline D
 there, with the hardware note

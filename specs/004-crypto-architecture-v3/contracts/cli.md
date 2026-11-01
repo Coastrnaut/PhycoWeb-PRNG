@@ -6,9 +6,10 @@
 
 Exit codes, as in feature 003: **0** success; **1** completed with a failing or non-PASS verdict
 (by design); **2** refused by a guard (wrong namespace, missing approval, budget exhausted, a
-fourth candidate, lock held, hash mismatch, existing record), and nothing is written; **3** tool
-or I/O error. `REP=reports/004-crypto-architecture-v3`. Every record is written through
-`protocol/evidence.py` ([data-model.md](../data-model.md) §1).
+fourth candidate, a size out of order, lock held, hash mismatch, broken log chain, existing
+record), and nothing is written; **3** tool or I/O error, a recorded tool defect included.
+`REP=reports/004-crypto-architecture-v3`. Every record is written through `protocol/evidence.py`
+([data-model.md](../data-model.md) §1).
 
 ## Guards shared by every script
 
@@ -17,13 +18,24 @@ or I/O error. `REP=reports/004-crypto-architecture-v3`. Every record is written 
 - **Heavy runs** (`seed_search` sweeps, exhaustive bijectivity, trail searches, the frequency and
   avalanche tests): take `data/heavy-run.lock` with an exclusive create; if it exists, exit 2.
   The lock holds the PID, command and start time and is removed on exit (FR-045).
+- **Hash-chained logs**: every append to `research/004/candidates.jsonl` or `$REP/provenance.jsonl`
+  takes `data/log-append.lock` by exclusive create, checks the chain up to the last line,
+  appends one line chained to it and releases the lock. It exits 2, appending nothing, if the
+  lock is not free within 10 s or the chain is broken (research R16).
+- **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
+  candidate at the next smaller claimable size has finished without making it ineligible
+  (research R7).
 - **Order of US1**: any script that loads a key into a `phyco-v3` state exits 2 unless the
   "FUT-SEC-8 result review" row of the spec's Review & Approval table reads Approved (FR-003);
   `tests/test_protocol_004.py` fails if `phycoweb/model_v3.py` defines key loading before that.
 - **Tool validation**: a result of a tool without a `re-found` validation record of its kind is
   written with `status` `not evaluated` and never counts (FR-039).
 - **Budget**: a script refuses work on a candidate whose budget row is spent (R7), exit 2, and a
-  search that reaches its per-instance cap writes `inconclusive`.
+  search that reaches its per-instance cap writes `inconclusive`. A heavy run first projects its
+  hours on the candidate (at most 60 s) and exits 2, writing nothing, if the projection does not
+  fit the hours left in its row.
+- **Trail tools**: once the feature's first trail search has started, a trail tool without an
+  earlier `re-found` record is refused, exit 2 (research R12).
 
 ## `fast/build/seed_search` (C, WSL; built by `make -C fast -f seed_search.mk`)
 
@@ -38,7 +50,9 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
   For every (s₂, s₃) it runs the 256-step warm-up and compares the first output words, dropping
   a candidate at its first mismatch.
 - Output: one JSON object on stdout with the counts after one, two and three words, every
-  three-word match, total steps, seconds, steps per second and threads. Progress goes to stderr.
+  three-word match, total steps, seconds, steps per second and threads. Progress goes to stderr,
+  every SECONDS, written only by the main thread from counters that the worker threads update;
+  the workers write nothing (research R2).
 
 ## `scripts/fut_sec8.py` (WSL)
 
@@ -76,23 +90,31 @@ published value needs its source recorded (paper, table, value) or exits 2.
 ## `scripts/evidence_v3.py`
 
 ```text
-evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] --out-dir DIR
+evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] [--project] --out-dir DIR
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`,
 `symmetry`, `invariant` or `bound` (with `--bound-kind differential|linear --method M`). The
 candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model
 §5 or §6 and its raw outputs, and appends an `evidence` entry to the candidate log. The counts
-are those of research R4 and R13 and cannot be lowered by an option.
+are those of research R4 and R13 and cannot be lowered by an option: a `frequency` run covers
+both input sets, and an `avalanche` run the flip set and the related-key, related-nonce and
+rotational sets. An `avalanche` run needs the candidate's `dependency` record at the same size,
+or exits 2; a disagreement with its matrices writes the record with `status` `inconclusive` and
+a tool-defect entry, and exits 3. `--project` prints the projected hours against the budget row
+and writes nothing.
 
 ## `scripts/d4_choice.py`
 
 ```text
 d4_choice.py --log research/004/candidates.jsonl --out $REP/d4/choice.json
+d4_choice.py --tie --log research/004/candidates.jsonl --out $REP/d4/tie.json
 ```
 
 Computes the D4 choice of research R6 from saved bound records. Exits 2 if `choice.json`
-exists or if no entered set is recorded.
+exists or if no entered set is recorded. After an exact tie, `--tie` writes `tie.json` once,
+when R at 4×4 exists for both representatives or one of them is ineligible; before that, or if
+`tie.json` exists, it exits 2.
 
 ## `scripts/round_rule.py`
 

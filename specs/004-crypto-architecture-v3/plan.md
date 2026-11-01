@@ -21,8 +21,8 @@ The feature runs in the spec's order, and each step needs the one before it:
 2. **Security target (US2)**: chapter 1 of the design document states the properties sought,
    s = 128, the 256-bit key and 128-bit nonce, threats T1–T11, every generic bound per size, and
    the keyed-duplex theorem with its preconditions. The output limits follow from the theorem at
-   a target advantage of 2⁻⁶⁴ (R9, R10). Reading each theorem paper is a download that needs
-   permission; R19 lists each file with its source, size and licence.
+   a target advantage of 2⁻⁶⁴ (R9, R10). Reading each theorem paper is a download; the owner
+   approved every file of R19, as listed with its source, size and licence, on 2026-11-01.
 3. **Design (US3)**: every candidate Π is written once as an operation list made only of
    invertible updates, so it is bijective by construction (R11). From that list come the
    evaluators, the inverse, dependency matrices, the cost model and the trail models. After
@@ -31,8 +31,9 @@ The feature runs in the spec's order, and each step needs the one before it:
    transcription from a separate session (R17).
 4. **Evidence (US4)**: tools first re-find known results (S12–S15 and the FUT-SEC-8 recovery on
    `phyco-v2`; published SPECK32, PRESENT and SPARKLE values, R12). Then structural checks
-   (R13), the frequency and avalanche tests (R4) and trail bounds within a fixed budget per
-   candidate (R7). The D4 score (R5, R6), the round rule and the stop rule decide.
+   (R13), the frequency and avalanche tests, related-key, related-nonce and rotational
+   differences included (R4), and trail bounds, within a fixed budget per candidate and size by
+   size from 4×4 (R7). The D4 score (R5, R6), the round rule and the stop rule decide.
 5. **Review and freeze (US5)**: design rationale, review package, ⛔ owner design review,
    external review recorded as done or not arranged, ⛔ design freeze, then the final report
    with FUT-SEC-7 open for feature 007.
@@ -45,9 +46,9 @@ design protocol and may only become stricter (FR-044).
 | Item left to the plan | Value fixed here | Research | Stricter means |
 |-----------------------|------------------|----------|----------------|
 | Development inputs (FR-040) | Key, nonce, personalization string, reseed input and test state i = SHA-256 of the ASCII string `phycoweb-004/dev/<kind>/<i>` (test states: `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>`); uniform controls under `phycoweb-004/control/`; the loader refuses every other namespace; fingerprints checked at load; no held-out set | R3 | no change at all |
-| Inputs per bias measurement (bias rule) | N = 2²⁰ instantiation states per claimable size, through Π and Π⁻¹, S = 2b bits per round count; the avalanche measurement of FR-037 also feeds R_dist: N_a = 2¹³ states per flipped bit, threshold 0.005/(128·S_A) with S_A = 2·\|F\|·b, so it adds at most 0.005 per size to the chance of a false firing; controls with the same counts | R4 | N, N_a and F only grow |
+| Inputs per bias measurement (bias rule) | Two sets of N = 2²⁰ instantiation states per claimable size, key i with nonce i and key 0 with nonce i, through Π and Π⁻¹, S = 4b bits per round count; the avalanche measurement of FR-037 also feeds R_dist: N_a = 2¹³ states per flipped bit, per key or nonce bit flipped in instantiation states and per rotation amount, threshold 0.005/(128·S_A) with S_A = (2·\|F\| + 384 + 2(w − 1))·b, so it adds at most 0.005 per size to the chance of a false firing; each avalanche run cross-checked against the exact dependency matrices; controls with the same counts | R4 | N, N_a, F and the sets only grow |
 | Operation-count cost model (D4) | 6-input LUTs per node and round: 0 for rotations, constant shifts and wiring; w per bitwise word operation with fan-in k ≤ 6; w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no fusion | R5 | no change after the first score |
-| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind, only after a recorded tool defect, inside the budget | R7 | every budget only falls |
+| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind, only after a recorded tool defect, inside the budget; each kind of evidence at 4×4, then 8×8, then 16×16 | R7 | every budget only falls |
 | Vector lengths at large sizes (FR-036) | The same at every size: 16 Π and Π⁻¹ inputs with 4 traced round by round; 2 development keys × 10,000 words for the mode; a SHA-256 digest of 2²⁰ words; no shortening at 8×8 or 16×16 | R8 | lengths only grow |
 | Target advantage for the output limits (FR-007) | ε = 2⁻⁶⁴ at N = 2¹²⁸ offline evaluations of Π or Π⁻¹, with every online quantity at its limit; per-request cap 2¹⁹ bits | R9 | ε and the cap only fall; N only rises |
 
@@ -69,6 +70,26 @@ projection before every heavy run (R7), listed every download with its name, sou
 licence (R19), and brought the status of the strategy note and of security.md §22 up to date
 (security.md 2.10).
 
+A choice for every research item now opens [research.md](./research.md) ("Choices for owner
+review"), with the recommended option first. On 2026-11-01 the owner chose every recommended
+option and approved every download of R19. The eleven changes, each traced to an item of the
+seed-entropy note's redesign checklist or to a requirement behind it
+([checklists/redesign-inputs.md](./checklists/redesign-inputs.md)), are applied:
+
+| Change | Research | Checklist |
+|--------|----------|-----------|
+| Only the sweep's main thread writes progress | R2 | D4 |
+| A second frequency input set, key 0 with nonce i, so S = 4b | R4 | FUT-SEC-3 |
+| Related-key, related-nonce and rotational differences in the avalanche test, before the freeze | R4 | B4, B7, E7 |
+| Every avalanche run cross-checked against the exact dependency matrices | R4, R13 | F9 |
+| A throughput goal of 10⁸ words/s at 200 MHz, reported, not an eligibility rule | R5 | C3 |
+| Each kind of evidence at 4×4, then 8×8, then 16×16 | R7 | FUT-GRID-5, D8 |
+| A c-bit key and a c/2-bit nonce for keyed reduced variants | R14, R3 | A7, FUT-GRID-2 |
+| The LFSR classed as a published design method (wording) | R15 | C2 |
+| Constants held in a ROM at each food node | R15, R5 | A11 |
+| A lock and a chain check for every append to the hash-chained logs, the provenance log now chained as well | R16, R18 | D4 |
+| `*.mk` and `Makefile` pinned to LF | R18 | F12 |
+
 The plan also settles the spec's edge case on large records: up to 10 MB compressed is
 committed, larger outputs stay local with their SHA-256 and the regenerating command (R16).
 
@@ -81,16 +102,17 @@ Python (gcc 15.2.0 in WSL).
 
 **Primary Dependencies**: no new ones. numpy 2.2.6 / 2.5.4 for batch evaluation and dependency
 matrices (explicit `uint64` dtypes); scipy 1.15.3 / 1.18.1 for exact binomial tails and
-`scipy.optimize.milp` (HiGHS) for active-box counting, analysis only. Optional tools and papers
-are candidates only (R19); each download needs the owner's permission for that file.
+`scipy.optimize.milp` (HiGHS) for active-box counting, analysis only. The owner approved every
+download of R19 on 2026-11-01, the papers and the Hypothesis wheels; any other file needs its
+own permission.
 
 **Storage**: JSON and gzip JSON records under `reports/004-crypto-architecture-v3/`; the
-hash-chained candidate log `research/004/candidates.jsonl`; vectors under `vectors/phyco-v3/`;
-local-only large outputs listed by hash (R16).
+hash-chained candidate log `research/004/candidates.jsonl` and provenance log, each appended
+under a lock; vectors under `vectors/phyco-v3/`; local-only large outputs listed by hash (R16).
 
 **Testing**: `python -W ignore -m unittest discover -s tests -t .` on both platforms; WSL-only
-tests (the C tool) skip cleanly on Windows; property-based tests only if Hypothesis 6.168.5 is
-approved (R19; FR-058).
+tests (the C tool) skip cleanly on Windows; property-based tests with Hypothesis 6.168.5, whose
+download the owner approved on 2026-11-01 (R19; FR-058).
 
 **Target Platform**: Windows 11 and Ubuntu on WSL2, i9-14900K, 32 logical CPUs, 31 GiB RAM.
 The design targets the Arty A7-100T at 200 MHz, which this feature does not build for.
@@ -100,13 +122,14 @@ RTL.
 
 **Performance Goals**: FUT-SEC-8 under 1 h of wall time for three targets; each candidate
 within the 66 h of R7; each vector file in at most an hour; model speed measured and recorded
-(FR-036).
+(FR-036); the implied throughput reported beside a goal of 10⁸ 32-bit words per second at
+200 MHz (R5).
 
 **Constraints**: no change to `phyco-v2`, `lut-v1`, `sp80022`, the feature-002 and feature-003
 protocols, their seed sets, or any frozen file, `fast/phyco_stream.c` and `fast/Makefile`
-included; development inputs only; the protocol only becomes stricter; no key-loading code
-before the FUT-SEC-8 review; heavy runs never overlap; no download without per-file permission;
-the agent never commits or pushes.
+included (its LF pin leaves its bytes unchanged, R18); development inputs only; the protocol
+only becomes stricter; no key-loading code before the FUT-SEC-8 review; heavy runs never
+overlap; no download beyond the approved files of R19; the agent never commits or pushes.
 
 **Scale/Scope**: three claimable sizes (b = 1,024, 4,096 and 16,384 bits at w = 32), research
 size 2×2 (3×3 only with a three-colour schedule); at most six candidates; 3 × 2³² sweep
@@ -125,9 +148,9 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 | III. Synchronous, localized RTL | No RTL. The design rules serve it: all state registered, neighbour links only on a folded torus, no multiplication (0 DSP), generics n and w, at most two carry chains per stage (FR-018, FR-025) | N/A (designed for; see Complexity Tracking for the absorption and output trees) |
 | IV. Evidence-based claims | No claim. The bias rule, its control and its counts are fixed before any measurement (R4); every result is reported; no re-run except after a recorded tool defect; findings classified (FR-060); disclaimer everywhere. SP 800-22 and the held-out programme belong to feature 007, so FUT-SEC-7 stays open | Pass |
 | V. Reproducibility, archival, provenance | Inputs from public strings (R3); every record holds the §17.2 fields (R16); `phyco-v2` archived with SHA-256 in `baseline/phyco-v2/` (FR-042); pinned requirements and line endings (R18); a re-check script recomputes every verdict | Pass |
-| VI. Specification before implementation | Spec approved 2026-11-01; this plan awaits approval. Candidates are research objects under the approved rules; the reference model is written from the design document after selection, and the design is frozen only after the owner design review | Pass |
+| VI. Specification before implementation | Spec and plan approved 2026-11-01; tasks await approval. Candidates are research objects under the approved rules; the reference model is written from the design document after selection, and the design is frozen only after the owner design review | Pass |
 | VII. Requirements traceability | Tasks will cite FR and SC identifiers; the spec's traceability tables map FUT-SEC, FUT-GRID and FUT-HW; the final report lists every requirement without evidence as open | Pass (enforced in tasks) |
-| VIII. Human review gates | Plan approval, each download, FUT-SEC-8 review, go-ahead for the second transcription, owner design review, design freeze, final result review | Pass |
+| VIII. Human review gates | Plan approval; downloads (every file of R19 approved on 2026-11-01, any other file separately); FUT-SEC-8 review; go-ahead for the second transcription; owner design review; design freeze; final result review | Pass |
 | IX. Outward actions | The agent never commits, pushes or publishes; downloads only with per-file permission; sending the review package is the owner's action | Pass |
 | Security Policy | FUT-SEC-1 to FUT-SEC-9 carried and traced (FR-049); key 256 bits and reachable secret state ≥ 256 bits at every claimable size (FR-009, FR-010); no claim, only a target at L1; restriction stated wherever use is described (FR-050) | Pass |
 | Technical constraints | Python 3.8+ for the model (standard library only); numpy with explicit dtypes; scipy for analysis only; a test checks that the model imports no analysis dependency. Adds C tooling for the sweep | Justified (Complexity Tracking) |
@@ -135,11 +158,16 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 
 **Post-design re-check**: research R1–R19, the data model and the contracts add no new
 violation. What they add is stricter than the spec or settles what it leaves open: the avalanche
-measurement as a source of R_dist (R4); reflections, compositions and word rotations in the
-symmetry check (R13); a fixed moment for the D4 choice, with rules for a tie and for no scored
-family (R6); a per-request cap, a final zeroize and a counter for every online quantity (R9); a
-fixed set of trail tools (R12); and a projection before every heavy run (R7). The numpy
-interpreter of the operation lists is analysis code that the model never imports (R11, R17).
+measurement as a source of R_dist, with related-key, related-nonce and rotational differences
+and a cross-check against the dependency matrices, and a second, fixed-key frequency input set
+(R4); reflections, compositions and word rotations in the symmetry check (R13); a fixed moment
+for the D4 choice, with rules for a tie and for no scored family (R6); a per-request cap, a final
+zeroize and a counter for every online quantity (R9); a fixed set of trail tools (R12); a
+projection before every heavy run, and sizes in order (R7); keys of reduced variants (R14);
+constants held at each food node (R15); and a lock for every append to a hash-chained log
+(R16). The numpy interpreter of the operation lists is analysis code that the model never
+imports (R11, R17). The constant ROMs at the food nodes remove the grid-wide data path that one
+central LFSR would need, so the absorption and output trees stay Principle III's only exception.
 
 ## Project Structure
 
@@ -149,13 +177,15 @@ interpreter of the operation lists is analysis code that the model never imports
 specs/004-crypto-architecture-v3/
 ├── spec.md                  # approved 2026-11-01
 ├── plan.md                  # this file
-├── research.md              # R1–R19
+├── research.md              # R1–R19, opening with the choices, answered 2026-11-01
 ├── data-model.md
 ├── quickstart.md
 ├── contracts/
 │   ├── model-v3-api.md      # the model's interface, call sequence and refusals
 │   └── cli.md               # every new script and tool, with exit codes
-├── checklists/requirements.md
+├── checklists/
+│   ├── requirements.md
+│   └── redesign-inputs.md   # the seed-entropy note's §5.3, item by item (FR-048)
 ├── design.md                # written in tasks; the phyco-v3 design document, frozen
 ├── rationale.md             # written in tasks; the design rationale (security.md §8)
 └── tasks.md                 # /speckit-tasks
@@ -175,7 +205,7 @@ phycoweb/
 protocol/
 ├── devinputs_v3.py           # new: development inputs and uniform controls (R3)
 ├── evidence.py               # new: the one writer of evidence records (R16)
-├── candidates.py             # new: append-only, hash-chained candidate log (FR-041)
+├── candidates.py             # new: hash-chained candidate log, appended under a lock (FR-041, R16)
 ├── design_freeze.py          # new: freeze create and validate (FR-043)
 ├── claims.json               # new: claim and evidence register (FR-069)
 └── disclaimer.py             # gains DESIGN_DISCLAIMER; DISCLAIMER unchanged (FR-068)
@@ -213,7 +243,7 @@ tests/
 ├── test_vectors_v3.py
 ├── test_v3_transcription.py  # model against tests/v3_reference.py, step by step
 ├── v3_reference.py           # second transcription, separate session (FR-057)
-├── test_protocol_004.py      # candidate log, budgets, stop rule, freeze
+├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
@@ -240,23 +270,27 @@ source and binary.
 
 ## Phases and gates (for /speckit-tasks)
 
-1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` lock entry; corrected
-   `requirements.txt`; `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints;
-   `protocol/evidence.py`; the provenance log; the `phyco-v2` archive (FR-042). (The status of
-   the strategy note and of security.md §22 rows 5a and 5a.1 was updated during planning, in
-   security.md 2.10.)
-2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check; the sweep, a heavy run →
-   demonstration record → ⛔ **FUT-SEC-8 result review**. No key-loading code before it.
+1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks
+   (R16, R18); the Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
+   installed; corrected `requirements.txt`; `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py`
+   with fingerprints; `protocol/evidence.py`; the provenance log; the `phyco-v2` archive
+   (FR-042). (The status of the strategy note and of security.md §22 rows 5a and 5a.1 was
+   updated during planning, in security.md 2.10.)
+2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check, with progress written by the
+   main thread only (R2); the sweep, a heavy run → demonstration record → ⛔ **FUT-SEC-8 result
+   review**. No key-loading code before it.
 3. **Tool validation**: re-find S12–S15 and the FUT-SEC-8 recovery on `phyco-v2`; trail tools
-   on published values, ⛔ **download permission** for each paper of R19 unless the owner
-   provides the values. The set of trail tools is fixed when the first trail search starts (R12).
+   on published values, from the papers of R19, whose downloads the owner approved on
+   2026-11-01 (`47270450.pdf` through the owner's browser), or from values the owner provides.
+   The set of trail tools is fixed when the first trail search starts (R12).
 4. **US2 security target**: design document chapter 1, the mode chapter with every
-   precondition, `mode_limits_v3.py` at ε = 2⁻⁶⁴. ⛔ **download permission** for the theorem
-   papers and AIS 20/31 3.0 (R19).
+   precondition, `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and AIS 20/31 3.0 come
+   from the approved downloads of R19, `169.pdf` through the owner's browser.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
    choice; production-width bounds, structural checks, frequency and avalanche tests; R by the
-   round rule; eligibility; the stop rule. One heavy run at a time, each projected first (R7).
+   round rule; eligibility; the stop rule. One heavy run at a time, each projected first, and
+   each kind of evidence at 4×4, then 8×8, then 16×16 (R7).
 6. **US3 model and vectors**: the design document complete; constants; `model_v3.py`; vectors
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
 7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes
@@ -264,8 +298,11 @@ source and binary.
 8. **US5**: rationale; security.md 2.11 with the §20.1 decision; review package; ⛔ **owner
    design review**; external review recorded as done or not arranged; the owner commits the
    feature files (Principle IX); ⛔ **design freeze**; L1 recorded when its gate passes.
-9. **Polish**: README; claim-register test; re-check of every verdict; final phase report → ⛔
-   **final result review**.
+9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
+   checklist group F corrected, and an addendum to the feature-002 phase report, whose
+   "invertible-looking ARX" S13 contradicts (FR-051); claim-register test; re-check of every
+   verdict; final phase report, citing the evidence for every redesign-checklist item this
+   feature covers (FR-048) → ⛔ **final result review**.
 
 ## Risks
 
@@ -275,11 +312,13 @@ source and binary.
 - **Theorem mismatch**: forget or reseed may not match a published theorem exactly. The call
   then takes the theorem's form, or the feature stops; a mode without a theorem is never adopted
   (R10).
-- **Downloads not approved**: without the papers the mode chapter stays "unverified" and L1
-  cannot be recorded; without published values the trail tools stay unvalidated (R19). Two of
-  the papers sit on hosts that refuse scripted requests, so they need the owner's browser.
-- **Run times**: from a timing probe (R4), the frequency and avalanche tests take about 3 h per
-  candidate at R = 32, exhaustive bijectivity about 1 h and a long-run digest under a minute.
+- **Downloads**: every file of R19 was approved on 2026-11-01, but two of the papers sit on
+  hosts that refuse scripted requests, so they wait for the owner's browser. Without a paper the
+  mode chapter stays "unverified" and L1 cannot be recorded, or a trail tool stays unvalidated
+  (R19).
+- **Run times**: from a timing probe (R4), the frequency and avalanche tests take about 3.8 h per
+  candidate at R = 32 (7.7 h at R = 64), exhaustive bijectivity about 1 h and a long-run digest
+  under a minute.
   Each heavy run is projected on the candidate itself first and starts only if it fits its
   budget row (R7); counts and lengths are never reduced to fit.
 - **False raises of R**: the spec's bias rule bounds its error per size and round count, so on a
