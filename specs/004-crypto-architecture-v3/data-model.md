@@ -143,7 +143,7 @@ takes `data/log-append.lock` and checks the chain first (R16).
 | `family` | `ARX` or `Boolean` (D4) |
 | `event` | `proposed`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair` |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2) |
-| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width and tie order (R15); and the reduced variants used as evidence (widths, sizes, round counts, capacities). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
+| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width and tie order (R15); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
 | `budget_used_h` | `{trails, structural, statistics}` with the caps of R7; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
 | `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) |
@@ -344,12 +344,14 @@ record's SHA-256, and it never changes.
   most what the theorem allows at ε, R9's doubling check), multi-target search, key plus nonce,
   capacity, quantum search (k/2 ≥ s, which holds with equality at k = 256 and s = 128), and the
   stated behaviour on nonce reuse, with its test.
-- At claimable sizes, `throughput_implied`, in 32-bit words per second at 200 MHz (FR-026): the
-  lesser of r/(P·R) bits per cycle and the output interface's `interface_bits_per_cycle`, both
-  reported; per stated request size (the 2¹⁹-bit cap and 4,096 words), counting each request's
-  output calls plus its forget call, with instantiate's calls spread over a stated number of
-  requests per instantiation; and `rate_before_forget` beside it as an upper bound (R5). Beside
-  them, `throughput_goal` (10⁸; R5), which is reported and never an eligibility rule.
+- At claimable sizes, `throughput_implied`, in 32-bit words per second at 200 MHz (FR-026): computed
+  from the rate r/(P·R + ⌈r/i⌉) bits per cycle, where i is the output interface's
+  `interface_bits_per_cycle`, since the next call starts only after the consumer has taken the block
+  (FR-025), with r/(P·R) and i reported beside it; per stated request size (the 2¹⁹-bit cap and
+  4,096 words), counting each request's output calls plus its forget call, with instantiate's calls
+  spread over a stated number of requests per instantiation; and `rate_before_forget` beside it as
+  an upper bound (R5). Beside them, `throughput_goal` (10⁸; R5), which is reported and never an
+  eligibility rule.
 
 `limits.json`: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), the theorem (paper, theorem number, `verified` or
 `unverified`); the limits per instantiation, per request and per key, each in calls of Π, the

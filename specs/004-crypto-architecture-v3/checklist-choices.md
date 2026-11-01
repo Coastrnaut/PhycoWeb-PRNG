@@ -8,20 +8,21 @@ Feature `004-crypto-architecture-v3`. Date: 2026-11-01. Each row below gives the
 the 306 items in the six checklists that `/speckit-checklist` generated after plan approval, with
 the recommended option first: the 206 items of the first run and the 29 that the re-run of
 2026-11-01 found in the text those answers changed, all answered and applied, and the 71 that the
-second re-run of 2026-11-01 found over the complete documents and the repository, not yet answered.
-The 32 items marked `[Conflict]` come first, the 15 of the second re-run before the 4 of the re-run
-and the 13 of the first run: where two texts disagree, every other item would be checked against a
-moving target until they agree. The second re-run's 56 other items follow in a section of their own,
-then the re-run's 25, then the 193 other items of the first run, checklist by checklist.
+second re-run of 2026-11-01 found over the complete documents and the repository, answered the same
+day. The 32 items marked `[Conflict]` come first, the 15 of the second re-run before the 4 of the
+re-run and the 13 of the first run: where two texts disagree, every other item would be checked
+against a moving target until they agree. The second re-run's 56 other items follow in a section of
+their own, then the re-run's 25, then the 193 other items of the first run, checklist by checklist.
 
 No option was written into the spec, the plan, research.md or any other document before the owner
-answered its round, and none of the second re-run's options has been written yet. This document
-ticks no checklist item: ticking stays with the reviewer, as each checklist's "Review Ownership"
-note says, and PRO-045 asks how the ticks of 2026-11-01 are recorded.
+answered its round. This document ticks no checklist item: ticking stays with the reviewer, as each
+checklist's "Review Ownership" note says, and PRO-045 asks how the ticks of 2026-11-01 are recorded.
 
-**Status: 235 rows answered, "all recommended" (owner), the 206 of the first run and the 29 of the
-re-run, both on 2026-11-01; the 71 rows of the second re-run await the owner's answer.** Option A of
-every answered row is applied where its Changes cell names a document: the spec, plan.md,
+**Status: all 306 rows answered, "all recommended" (owner), on 2026-11-01: the 206 of the first run,
+the 29 of the re-run and the 71 of the second re-run.** The 71 rows of the second re-run are being
+applied checklist by checklist, and each checklist's rows are committed once they are written into
+every document they name. Option A of every row of the first run and the re-run is applied where its
+Changes cell names a document: the spec, plan.md,
 research.md, data-model.md, the two contracts, quickstart.md, security.md (versions 2.11 and 2.12)
 and `.gitattributes`. A row that also names a later feature or a document not yet written (the
 design document, a test, the final report) is held there by the spec requirement its Changes cell
@@ -29,9 +30,9 @@ names.
 
 ## How to answer
 
-- The first run and the re-run were answered "all recommended" on 2026-11-01. The second re-run's 71
-  rows await an answer: "all recommended", letters by ID, for example "HW-043 B, REP-052 B, the rest
-  recommended", or an option in the owner's own words.
+- All three rounds were answered "all recommended" on 2026-11-01, the second re-run's 71 rows
+  included. An answer could also have given letters by ID, for example "HW-043 B, REP-052 B, the
+  rest recommended", or an option in the owner's own words.
 - After each answer, the changes each chosen option names are applied with their reasons. The six
   checklists are then re-read against the changed text, and the reviewer ticks an item once the text
   it asks for is in place.
@@ -77,7 +78,7 @@ names.
 
 The 32 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
 
-From the second re-run of 2026-11-01, not yet answered, in checklist order:
+From the second re-run of 2026-11-01, answered the same day, "all recommended", in checklist order:
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -129,8 +130,8 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 
 The 56 items other than conflicts that the second re-run of 2026-11-01 found over the complete
 documents and the repository, in checklist order: 6 security, 5 design-rationale, 9 analysis, 6
-protocol, 13 hardware and 17 reproducibility. They await the owner's answer, as do the 15 conflicts
-above.
+protocol, 13 hardware and 17 reproducibility. They were answered on 2026-11-01, "all recommended",
+as were the 15 conflicts above.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -496,7 +497,7 @@ Of the 71 rows of the second re-run, 15 are conflicts and 56 come from its other
 5 design-rationale, 9 analysis, 6 protocol, 13 hardware and 17 reproducibility. By kind, their
 recommendations are 26 Add, 20 Align, 14 Clarify, 10 Settle and 1 Stricter. No recommended option
 loosens the protocol; five alternatives are marked "looser": SEC-048 B, RAT-043 B, ANA-039 B,
-ANA-040 B and REP-036 B. Once the rows are answered, the chosen options are written into the
-documents their Changes cells name, each with its reason; the protocol changes among them are
-recorded as FR-044 requires, by the rule PRO-047 settles; the six checklists are re-read; and
-`/speckit-tasks` follows, up to the ⛔ tasks approval.
+ANA-040 B and REP-036 B. The owner answered "all recommended" the same day, and the chosen options
+are being written into the documents their Changes cells name, each with its reason; the protocol
+changes among them are recorded as FR-044 requires, by the rule PRO-047 settles; the six checklists
+are re-read; and `/speckit-tasks` follows, up to the ⛔ tasks approval.

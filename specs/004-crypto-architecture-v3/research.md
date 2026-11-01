@@ -345,9 +345,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (R entries per call type, times the number of distinct constant streams), the word width and
     the total bits.
   - An operation shared by two nodes counts once, at the node that computes it.
-  - **Stages.** One pipeline stage is one colour phase and takes one clock cycle, so a round of
-    P phases takes P cycles (P = 2 for a red-black schedule). Carry chains are counted per phase
-    (R11).
+  - **Stages.** One pipeline stage is one colour phase and takes one clock cycle, so a round of P
+    phases takes P cycles, P being the number of phases in one round of the candidate's operation
+    list at that size (a colour visited twice counts twice; P = 2 for a red-black schedule that
+    visits each colour once), recorded in the candidate's log entry. Carry chains are counted per
+    phase (R11).
   - Serial carry chains per round = the most additions on any dependency path within one round
     (the D4 tie-break). Per pipeline stage the count must be at most two serial w-bit carry
     chains (FR-025). A subtraction counts as one chain, as an addition does. A public counter
@@ -361,23 +363,28 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Flip-flops (2w per node, plus pipeline registers) are reported but not scored.
   - Cost per output bit (FR-026) = LUTs per node and round × n² × P·R / r, in LUT-cycles per
     output bit, for an implementation that computes one phase per clock cycle.
-  - **Size estimate.** From the cost model, the design document estimates LUTs and flip-flops
-    per claimable size (LUTs per node and round × n² for the stages built, plus a stated
-    allowance for the trees and ROMs; 2w·n² state flip-flops plus pipeline registers) against
-    the device's 63,400 LUTs and 126,800 flip-flops, and names the largest size expected to
-    fit, as an estimate that feature 008 checks.
+  - **Size estimate.** From the cost model, the design document estimates LUTs, flip-flops and block
+    RAM per claimable size, each part with its own figure (the nodes and stages, LUTs per node and
+    round × n² for the stages built; the trees; the ROMs; the output buffer of r bits with its
+    read-out; the key registers and the key-loading buffer; the replicated counters; the limit
+    counters; the self-test's stored key, nonce and expected output; 2w·n² state flip-flops plus
+    pipeline registers; block RAM, expected to be 0 unless a ROM is mapped to it) against the
+    device's 63,400 LUTs and 126,800 flip-flops, and names the largest size expected to fit, as an
+    estimate that feature 008 checks part by part against Vivado's hierarchical utilization report
+    (FR-026).
   - **Throughput goal** (checklist C3): 10⁸ 32-bit words per second at the 200 MHz target, at
     every claimable size. It is the goal feature 003 set for the C stream, which design 1.0
     missed at 8.5 × 10⁷. The design document reports FR-026's implied throughput beside it; the
-    goal is reported, never an eligibility rule. The implied throughput is the lesser of
-    r/(P·R) bits per cycle and the output interface's bits per cycle, a width the design
-    document states per size (for example 32 bits per cycle, as the vector files list words, or
-    a stated wider bus); both are reported. It is stated for stated request sizes, the 2¹⁹-bit
+    goal is reported, never an eligibility rule. The implied rate is r/(P·R + ⌈r/i⌉) bits per cycle
+    for an output interface of i bits per cycle, a width the design document states per size (for
+    example 32 bits per cycle, as the vector files list words, or a stated wider bus), since the
+    next call starts only after the consumer has taken the block (FR-025); r/(P·R) and i are
+    reported beside it. It is stated for stated request sizes, the 2¹⁹-bit
     cap and 4,096 words, counting each request's output calls plus its forget call, with
     instantiate's calls spread over a stated number of requests per instantiation; the rate
-    before forget calls is reported beside it as an upper bound. At 4×4 with P = 2, the rate
-    before forget calls is 0.75 × 10⁸ words per second at R = 32 and 0.375 × 10⁸ at R = 64,
-    below the goal.
+    before forget calls is reported beside it as an upper bound. At 4×4 with P = 2 and i = 32, the
+    rate before forget calls is 768 bits per 88 cycles, about 0.55 × 10⁸ words per second, at R =
+    32, and 768 bits per 152 cycles, about 0.32 × 10⁸, at R = 64, both below the goal.
   - `research/004/tools/costmodel.py` computes every number from the operation list, and a test
     checks the table above on hand-counted examples, written with their SHA-256 and entered in the
     provenance log before `costmodel.py` is drafted (R13; data-model §14).
@@ -670,8 +677,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     these two forms is refused before any test.
   - A round is a sequence of phases (colour classes), and the updates within one phase read no
     lane that another update of the same phase writes. A phase is a pipeline stage for FR-025:
-    it takes one clock cycle, so a round of P phases takes P cycles, and carry chains are
-    counted per phase (R5).
+    it takes one clock cycle, so a round of P phases takes P cycles, and carry chains are counted
+    per phase (R5). A round may visit a colour class more than once, so P counts phases, not
+    colours; in a three-colour schedule the classes form a proper colouring of the torus (R14).
   - **Channels.** A channel is one w-bit word passed from a node to a neighbour in one phase. A
     node receives at most four channels per phase, for example one from each neighbour or two
     from each of two, counted from the operation list, the linear layer between boxes included
@@ -878,7 +886,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Colour schedule.** The schedule is a function of n's parity, computed at elaboration from
     one stated rule (two colours for even n, three for odd n), so an odd n is the same core with
     another generic value. Without such a rule, odd sizes are unsupported, with the reason
-    (FR-018).
+    (FR-018). For odd n the rule gives a proper colouring of the torus, wrap-around links included,
+    at every odd n from 3 to 15, checked link by link by a committed test: (i + j) mod 3 fails
+    across the wrap at n = 7 and 13, while c(i, j) = (f(i) + f(j)) mod 3, with f a proper
+    3-colouring of the n-cycle such as f(k) = k mod 2 for k < n − 1 and f(n − 1) = 2, holds at every
+    odd n (FR-018).
   - **Keyed variants per size.** The list of supported sizes names each size's keyed variants:
     the production variant at every claimable size, and at 2×2 at least one keyed reduced
     variant, such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce (quickstart M6). A
@@ -967,13 +979,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     in the script. A size without a table cannot be built until one is generated by the same
     script.
   - **Where the constants live** (checklist A11): each food node holds its own constants, its
-    column of the table, in a small ROM indexed by the round counter, so no data signal crosses
-    the grid. Per supported size, the design document reports the number of food nodes, the ROM
-    depth at each (R entries per call type, times the number of distinct constant streams), the
-    word width and the total bits (R5). The clock uses the device's clock network. Reset is
-    synchronous and reaches the nodes through a registered fan-out tree whose latency is part of
-    the reset sequence (FR-025). The round and phase counters are replicated, one copy at each
-    food node or node, all started by that reset and running in lockstep, so no counter value
+    column of the table, in a small ROM indexed by the round counter and, where the call types draw
+    on distinct streams, by the call type that travels with the start signal (FR-025), so no data
+    signal crosses the grid. Per supported size, the design document reports the number of food
+    nodes, the ROM depth at each (R entries per call type, times the number of distinct constant
+    streams), the word width and the total bits (R5). The core takes its clock as an input, on the
+    device's clock network; clock generation belongs to feature 008's board wrapper (FR-025). Reset
+    is synchronous and reaches the nodes through a registered fan-out tree whose latency is part of
+    the reset sequence, and every zeroization trigger drives the same tree (FR-025). The round and
+    phase counters are replicated, one copy at
+    each food node or node, all started by that reset and running in lockstep, so no counter value
     crosses the grid (plan, Complexity Tracking). The LFSR exists only in the script; the
     hardware holds its output as a fixed table.
 - **Stricter means**: the rule does not change once fixed; the refused list and the relations
