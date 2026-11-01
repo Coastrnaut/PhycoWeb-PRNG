@@ -15,112 +15,112 @@ quality. It does not mean implementation work is complete.
 
 ## Commands and records
 
-- [ ] CHK001 Is "reproducible" (FR-053) defined per kind of record: byte-identical outputs for
+- [x] CHK001 Is "reproducible" (FR-053) defined per kind of record: byte-identical outputs for
   deterministic kinds (vectors, constants, dependency matrices, counts), the same values and
   verdict for searches and solver runs, with the fields excluded from a comparison named
   (identifiers, timestamps, timings, platform) and the environment in which it must reproduce?
   [Clarity, Spec §FR-053, §User Story 4 Independent Test; data-model §1]
-- [ ] CHK002 Is User Story 4's "Re-run every evidence script with its recorded command" scoped
+- [x] CHK002 Is User Story 4's "Re-run every evidence script with its recorded command" scoped
   against the cost of the heavy runs (up to about 16.5 days of runs, research R7), for example
   with FR-065's re-check from saved outputs as the routine test and full re-runs named per kind,
   and are the two statements consistent? [Consistency, Spec §User Story 4 Independent Test,
   §FR-065; research R7, R16]
-- [ ] CHK003 Is it stated how a run that may happen only once, such as the FUT-SEC-8 sweep, can be
+- [x] CHK003 Is it stated how a run that may happen only once, such as the FUT-SEC-8 sweep, can be
   reproduced by a reviewer without counting as a repeat, given that `scripts/fut_sec8.py` exits 2
   on a second run unless `--repeat-after-defect` names a recorded tool defect? [Conflict,
   Spec §FR-053, §Pre-registered Design Protocol "FUT-SEC-8 demonstration"; cli contract
   "scripts/fut_sec8.py"]
-- [ ] CHK004 Is a recorded command required to be runnable as written: the interpreter named
+- [x] CHK004 Is a recorded command required to be runnable as written: the interpreter named
   (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), the working directory recorded,
   and paths relative to the repository root? [Clarity, Spec §FR-053, §FR-061; quickstart;
   data-model §1]
-- [ ] CHK005 Does every evidence record hold the SHA-256 of the code it ran (the script, the tool,
+- [x] CHK005 Does every evidence record hold the SHA-256 of the code it ran (the script, the tool,
   the candidate's module under `research/004/candidates/` and `research/004/ir.py`), as the
   demonstration record does for `fast/seed_search.c` and its binary (data-model §4), and is the
   "version" of a self-written tool (FR-039) defined as such a hash, given that FR-053's "model
   hash" has no field among data-model §1's common fields, no `phyco-v3` model exists before
   selection, and `git_dirty` will often be true while only the owner commits? [Gap,
   Spec §FR-053, §FR-039, §FR-061; data-model §1, §4; constitution Principle IX]
-- [ ] CHK006 Is it stated how a record's `spec_sha256` is resolved to a version of the spec, given
+- [x] CHK006 Is it stated how a record's `spec_sha256` is resolved to a version of the spec, given
   that the spec changes during the feature (its Review & Approval rows) and may be uncommitted
   when a run starts, so that the hash can name content that no commit holds? [Gap, Spec §FR-061;
   data-model §1; research R18]
 
 ## Versions and environments
 
-- [ ] CHK007 Is each environment stated in full (Windows build, WSL distribution and version,
+- [x] CHK007 Is each environment stated in full (Windows build, WSL distribution and version,
   Python, gcc and make, and every installed package with its version), beyond research R1's
   Python, numpy, scipy and gcc versions, so that a third party can rebuild the two environments?
   [Completeness, Spec §FR-053; research R1, R18]
-- [ ] CHK008 Is a check required before an evidence script runs that the interpreter and the
+- [x] CHK008 Is a check required before an evidence script runs that the interpreter and the
   installed packages match research R1 and the pins of `requirements.txt`, with a mismatch
   refused or recorded in the record? [Gap, Spec §FR-053; research R1, R18; cli contract "Guards
   shared by every script"]
-- [ ] CHK009 Are FR-035's "supported Python versions" listed, given that only 3.10.11 and 3.14.4
+- [x] CHK009 Are FR-035's "supported Python versions" listed, given that only 3.10.11 and 3.14.4
   are tested, that the constitution asks for Python 3.8+ while research R17 checks only the 3.8
   grammar as "a best-effort check", and that the markers research R18 plans for
   `requirements.txt` (`python_version < "3.14"`) also admit 3.11 to 3.13? [Clarity,
   Spec §FR-035; research R17, R18; constitution "Technical Constraints"]
-- [ ] CHK010 Are Hypothesis tests required to run derandomized or with a recorded seed, and with
+- [x] CHK010 Are Hypothesis tests required to run derandomized or with a recorded seed, and with
   the example database disabled or ignored, so that the test suite gives the same result on every
   run and a failure can be replayed? [Gap, Spec §FR-058, §FR-053; research R17]
-- [ ] CHK011 Are the solver options that decide a bound fixed and recorded (gap tolerance, the
+- [x] CHK011 Are the solver options that decide a bound fixed and recorded (gap tolerance, the
   proven dual bound rather than the best solution found, feasibility and integrality tolerances,
   threads), and is a floating-point bound rounded in the conservative direction before it becomes
   the rational of data-model §6? [Clarity, Spec §FR-038, §FR-053; data-model §6; research R12]
 
 ## Hashes and stored outputs
 
-- [ ] CHK012 Is it stated where research R19's "its SHA-256 and size are recorded against its
+- [x] CHK012 Is it stated where research R19's "its SHA-256 and size are recorded against its
   row" is written for each downloaded paper and wheel (the committed table, a downloads
   manifest, or the tool validation record, whose `source` names only the download-approval row),
   so that a later reader can tell which copy of a paper a validation value came from? [Clarity,
   Spec §FR-046; research R19; data-model §7]
-- [ ] CHK013 Is every local-only output required to be deterministic, so that its committed
+- [x] CHK013 Is every local-only output required to be deterministic, so that its committed
   SHA-256 can be checked by running its regenerating command, and is that command's cost (a heavy
   run or not) recorded beside it? [Clarity, Spec §Edge Cases "Large evidence records"; research
   R16]
-- [ ] CHK014 Is it stated which verdicts the re-check recomputes from committed per-round
+- [x] CHK014 Is it stated which verdicts the re-check recomputes from committed per-round
   summaries alone and which need a local-only output regenerated first, so that SC-017's "100% of
   the verdicts" can be met on a fresh clone? [Coverage, Spec §FR-065, §SC-017; research R16]
 
 ## Deterministic outputs
 
-- [ ] CHK015 Is it stated where each generated file records its command, measured speed and
+- [x] CHK015 Is it stated where each generated file records its command, measured speed and
   generation time (data-model §11; cli contract), given that `--check` regenerates in memory and
   fails on any byte difference, and that these fields differ between runs and between Windows and
   Linux (SC-009)? [Conflict, Spec §FR-036, §SC-009; data-model §11; cli contract "Generators of
   constants and vectors"]
-- [ ] CHK016 Is it stated that the model reads no clock, random source, environment variable or
+- [x] CHK016 Is it stated that the model reads no clock, random source, environment variable or
   platform property, and that the generators of constants and vectors read them only to record
   the generation time, speed and platform, so that FR-035's determinism rests on a stated rule
   and not only on the vectors agreeing? [Clarity, Spec §FR-035; research R17]
-- [ ] CHK017 Is a canonical order required for every list in a record or a vector file (fired
+- [x] CHK017 Is a canonical order required for every list in a record or a vector file (fired
   bits, symmetries, listed matches, evidence IDs), so that no output depends on set iteration,
   hash randomization, thread completion order or the number of workers, and are settings that
   could change an output (`PYTHONHASHSEED`, thread and worker counts) recorded? [Gap,
   Spec §FR-053; data-model §1, §4, §5]
-- [ ] CHK018 Is agreement required between the numpy batch interpreter, any C evaluator of
+- [x] CHK018 Is agreement required between the numpy batch interpreter, any C evaluator of
   research R7, the scalar interpreter and, after selection, the model, on stated reference outputs
   at every width, given that the frequency and avalanche evidence runs on the batch interpreter
   and that R7 checks a C evaluator "on the committed vectors", which exist only after selection?
   [Gap, Spec §FR-035; research R4, R7, R11]
-- [ ] CHK019 Is the bias rule's "computed exactly" (research R4) defined, for example as exact
+- [x] CHK019 Is the bias rule's "computed exactly" (research R4) defined, for example as exact
   rational arithmetic or as an integer critical count derived once and recorded, given that the
   plan names scipy's binomial tails, which are computed in floating point and may differ between
   scipy 1.15.3 and 1.18.1 near the threshold 0.005/S? [Ambiguity, Spec §Pre-registered Design
   Protocol "Bias rule", §FR-065; plan "Technical Context"; research R4]
-- [ ] CHK020 Is the byte string hashed for the long-run digest defined (the canonical
+- [x] CHK020 Is the byte string hashed for the long-run digest defined (the canonical
   serialization of FR-015, or the `%08X` lines of the vector files with their line endings), so
   that another implementation, such as feature 006's C stream or the hardware export of FR-015,
   can reproduce the digest from its own output? [Clarity, Spec §FR-015, §FR-036; data-model
   §11; research R8]
-- [ ] CHK021 Is the textual format of every vector file and record fully specified (hex case and
+- [x] CHK021 Is the textual format of every vector file and record fully specified (hex case and
   width, lane order, separators, the header's grammar; for JSON the separators, indentation,
   float format and final newline besides the sorted keys), so that another implementation can
   write byte-identical files and not only equal values? [Clarity, Spec §FR-036; data-model
   introduction, §11]
-- [ ] CHK022 Is it stated whether SC-009's "on both Windows and Linux" covers the constants
+- [x] CHK022 Is it stated whether SC-009's "on both Windows and Linux" covers the constants
   (SC-006) and the constructed-state vectors (SC-016), which have their own generators, given
   that the quickstart runs `gen_vectors_v3.py --check` on both platforms but the checks of the
   constants and the constructed states (M1, M3) on Windows only? [Coverage, Spec §SC-006,
@@ -128,23 +128,23 @@ quality. It does not mean implementation work is complete.
 
 ## Line endings and encoding
 
-- [ ] CHK023 Is it stated, per kind of file, whether its SHA-256 is taken over the raw bytes or
+- [x] CHK023 Is it stated, per kind of file, whether its SHA-256 is taken over the raw bytes or
   over LF-normalized content (FR-053's "where possible"), and is the choice recorded beside each
   hash, so that `design_freeze.py validate` and the re-check compute the same value? [Clarity,
   Spec §FR-053; research R16, R18; data-model §13]
-- [ ] CHK024 Does research R18's list of pins cover every kind of new file whose hash is recorded,
+- [x] CHK024 Does research R18's list of pins cover every kind of new file whose hash is recorded,
   for example the raw tool output that FR-061 keeps (solver logs, text and CSV files), and the
   gzip-compressed records that research R16 commits, which need `binary` rather than Git's guess
   under `* text=auto`? [Coverage, Spec §FR-053, §FR-061; research R16, R18]
-- [ ] CHK025 Does FR-053's pin rule, which names only new files, also cover an existing file that a
+- [x] CHK025 Does FR-053's pin rule, which names only new files, also cover an existing file that a
   new manifest or record hashes (for example in the review package), given that files such as
   `security.md` and `README.md` are `text=auto` and are checked out with CRLF on Windows?
   [Coverage, Spec §FR-053, §FR-063; data-model §16; research R18]
-- [ ] CHK026 Is a repeatable check required that every file whose hash is recorded has an explicit
+- [x] CHK026 Is a repeatable check required that every file whose hash is recorded has an explicit
   line-ending rule in `.gitattributes`, replacing the one-off check noted there on 2026-10-31, so
   that a missing pin is found before a fresh checkout changes a hash? [Measurability,
   Spec §FR-053; research R18]
-- [ ] CHK027 Is the encoding of every new text file stated beside its line ending (UTF-8 without a
+- [x] CHK027 Is the encoding of every new text file stated beside its line ending (UTF-8 without a
   byte-order mark), since only the JSON records have a stated encoding, a byte-order mark changes
   a file's hash, and some Windows tools, Windows PowerShell 5.1 among them, write a byte-order
   mark or another encoding by default? [Gap, Spec §FR-053; data-model introduction]
@@ -154,7 +154,7 @@ quality. It does not mean implementation work is complete.
 Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
 They are open like every other item; the reviewer ticks them.
 
-- [ ] CHK028 Are the file kinds that may be committed under `reports/004-crypto-architecture-v3/`
+- [x] CHK028 Are the file kinds that may be committed under `reports/004-crypto-architecture-v3/`
   listed, or does every binary format written there get a `binary` rule (for example the
   `raw_counts` and `p_values` files, which data-model §1 names only by path and SHA-256), given that
   `reports/004-crypto-architecture-v3/** text eol=lf` makes every file there text unless a later
@@ -164,7 +164,7 @@ They are open like every other item; the reviewer ticks them.
   byte-exact also corrected for the two vector copies, which the later `*.hex text eol=lf` line
   governs (harmless while their sources stay LF)? [Coverage, research R16, R18; data-model §1; Spec
   §FR-053]
-- [ ] CHK029 Is the random source of the bias test's 100 synthetic sets of binomial counts specified
+- [x] CHK029 Is the random source of the bias test's 100 synthetic sets of binomial counts specified
   (for example a stated generator seeded from a public string under research R3's prefix, with a
   stated order of draws), given that research R3, frozen at plan approval, requires every use, the
   tool validation included, to take its inputs from its derivation, whose table has no kind for
@@ -172,27 +172,27 @@ They are open like every other item; the reviewer ticks them.
   Without it, the validation record's 82-to-97 result cannot be reproduced, and nothing shows that
   the sets were not drawn again after a result was seen. [Conflict, research R3, R4; Spec §FR-039,
   §FR-040; data-model §2, §7]
-- [ ] CHK030 Does the reproduction rule's list of excluded fields cover every field that
+- [x] CHK030 Does the reproduction rule's list of excluded fields cover every field that
   legitimately differs between research R1's two environments or between analysts, such as
   `command`, which holds the interpreter's full path, `config`, which holds the working directory
   and the repository root, `parallelism`, and `analyst`, `reviewer` and `review_status`, and is it
   stated whether `spec_sha256` must match once the spec has changed, or are the compared fields
   listed instead, so that a record made on Windows can be reproduced in WSL? [Consistency,
   data-model §1 "Reproduction"; Spec §FR-053; research R1]
-- [ ] CHK031 Is it stated how a reproduction compares the reported p-values (byte for byte, within a
+- [x] CHK031 Is it stated how a reproduction compares the reported p-values (byte for byte, within a
   stated tolerance, or not at all), given that a `frequency` or `avalanche` record holds the
   smallest p-value per set beside a `p_values` file listed by its SHA-256, that floats are written
   with `repr`, that the p-values come from scipy 1.15.3 on Windows and 1.18.1 in WSL, and that only
   the verdicts rest on exact integer critical counts? [Clarity, data-model §1 "Reproduction", §5,
   introduction "Format rules"; research R1, R4; plan "Technical Context"]
-- [ ] CHK032 Are the hashed bytes defined exactly where a hash is not over a whole file's raw bytes:
+- [x] CHK032 Are the hashed bytes defined exactly where a hash is not over a whole file's raw bytes:
   the chain's "SHA-256 of the previous line's bytes" (the line as stored, with or without its final
   LF, and the letter case of the digest written, given that the format rules make hex upper case
   while a digest's usual form is lower case), and research R16's `lf-normalized` content (CR LF to
   LF only, as Git normalizes, or also a lone CR, as Python's universal newlines do), so that another
   implementation computes and writes the same values? [Clarity, data-model §3, §14, §18,
   introduction "Format rules"; research R16; cli contract "Hash-chained logs"]
-- [ ] CHK033 Is the order in which the self-test data and the vectors are generated specified, given
+- [x] CHK033 Is the order in which the self-test data and the vectors are generated specified, given
   that the start-up self-test's inputs and expected output come from the committed vectors, which
   the model generates, that a `Generator` runs the self-test in its constructor, and that the model
   may import only the standard library and `phycoweb.constants_v3` (for example the vectors written
@@ -202,7 +202,7 @@ They are open like every other item; the reviewer ticks them.
   variants, for which no expected output is stated? [Gap, Spec §FR-059, §FR-036; model contract
   "Module rules", "Generator", "Research duplex"; cli contract "Generators of constants and
   vectors"]
-- [ ] CHK034 Is the byte format of a gzip-compressed record fixed (modification time 0, no stored
+- [x] CHK034 Is the byte format of a gzip-compressed record fixed (modification time 0, no stored
   file name, a stated compression level), or are its hash and its byte-for-byte reproduction defined
   over the uncompressed content, given that every new file is hashed over its raw bytes (research
   R16), that the format rules cover only text, JSON and hex, and that a gzip header holds a

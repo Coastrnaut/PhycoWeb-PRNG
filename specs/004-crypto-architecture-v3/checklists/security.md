@@ -16,165 +16,165 @@ quality. It does not mean implementation work is complete.
 
 ## Key
 
-- [ ] CHK001 Is FR-006's 256-bit key stated to apply to the production parameter sets,
+- [x] CHK001 Is FR-006's 256-bit key stated to apply to the production parameter sets,
   consistently with research R14, where a keyed reduced variant of capacity c takes a c-bit key
   and a c/2-bit nonce, and is each reduced variant's bound (s = c/2) stated so that it cannot be
   read as a claimable strength? [Consistency, Spec §FR-006, §FR-032; research R14]
-- [ ] CHK002 Does the assumption FR-006 requires about the key's source say what the source must
+- [x] CHK002 Does the assumption FR-006 requires about the key's source say what the source must
   provide (256 bits of entropy, uniform, secret), and that it must itself be an established
   cryptographic generator, so that no PhycoWeb-PRNG model can serve as the key source?
   [Assumption, Spec §FR-006; constitution, Security Policy]
 
 ## Nonce and other public inputs
 
-- [ ] CHK003 Are FUT-SEC-3's "defined uniqueness rules" stated beyond "at most once per key": how
+- [x] CHK003 Are FUT-SEC-3's "defined uniqueness rules" stated beyond "at most once per key": how
   a caller may produce nonces (a counter or random values) and, for random nonces, the collision
   probability at the per-key instantiation limit? [Clarity, Spec §FR-006; FUT-SEC-3]
-- [ ] CHK004 Is it specified whether a `Generator`, which holds its key, detects a nonce repeated
+- [x] CHK004 Is it specified whether a `Generator`, which holds its key, detects a nonce repeated
   within the same object, or whether nonce reuse is only stated behaviour (T7) in every case?
   [Gap, Spec §FR-006, §Edge Cases "Nonce reuse"; model contract]
-- [ ] CHK005 Does FR-009's list of public parts that are never counted as secret include the
+- [x] CHK005 Does FR-009's list of public parts that are never counted as secret include the
   nonce, the personalization string and reseed inputs, which FR-016 treats as attacker-chosen?
   [Completeness, Spec §FR-009, §FR-016]
 
 ## Capacity and absorption
 
-- [ ] CHK006 Is it specified how the key and nonce enter the state (placed in the initial state,
+- [x] CHK006 Is it specified how the key and nonce enter the state (placed in the initial state,
   as the full-state keyed duplex of research R10 assumes, or absorbed as blocks), and whether
   later inputs are absorbed over the rate only (FR-018) or over the full state, with each choice
   listed among the theorem's preconditions? [Consistency, Spec §FR-013, §FR-018; research R10]
-- [ ] CHK007 Is the injectivity that FR-014 requires to be shown given a form (a proof in the
+- [x] CHK007 Is the injectivity that FR-014 requires to be shown given a form (a proof in the
   design document, an exhaustive check over input lengths, or both) and an acceptance criterion,
   covering the case where call types draw on distinct constant streams (FR-023)?
   [Measurability, Spec §FR-014, §FR-023]
 
 ## Reachable secret state
 
-- [ ] CHK008 Is "secret state reachable from the key" defined precisely enough to verify FR-009's
+- [x] CHK008 Is "secret state reachable from the key" defined precisely enough to verify FR-009's
   per-size values: which bits count (the capacity part, or the whole state before the first
   output), at which moment, and whether the value is proven or counted? [Clarity, Spec §FR-009,
   §FR-010; FUT-SEC-2]
-- [ ] CHK009 Is the reachable secret state required to stay at least 2s after every forget and
+- [x] CHK009 Is the reachable secret state required to stay at least 2s after every forget and
   reseed call, as well as after instantiate? [Coverage, Spec §FR-009, §FR-013, §FR-016]
-- [ ] CHK010 Is FUT-GRID-2's text "FUT-SEC-1 and FUT-SEC-2 MUST hold at every supported size,
+- [x] CHK010 Is FUT-GRID-2's text "FUT-SEC-1 and FUT-SEC-2 MUST hold at every supported size,
   including the smallest" recorded as a decided conflict (FR-017; security.md §20.1), with the
   reason the D3 decision does not weaken FUT-SEC-1 or FUT-SEC-2, rather than marked "Met at
   every claimable size" alone? [Conflict, Spec §FR-017, §Security Policy traceability;
   seed-entropy note §5.1]
-- [ ] CHK011 Is it stated that every supported size has at least one keyed variant, so that
+- [x] CHK011 Is it stated that every supported size has at least one keyed variant, so that
   FUT-GRID-2's "key and IV loading defined for every supported size" holds although some
   reduced-capacity variants are keyless? [Coverage, research R14; seed-entropy note §5.1]
 
 ## Output limits and the mode's bound
 
-- [ ] CHK012 Does FR-007 cover every online quantity the theorem's bound counts (calls of Π,
+- [x] CHK012 Does FR-007 cover every online quantity the theorem's bound counts (calls of Π,
   instantiations per key, reseeds per instantiation), as research R9 and the model contract do,
   or only output volume and u? [Completeness, Spec §FR-007; research R9]
-- [ ] CHK013 Are the output limits required in one stated unit (bits, rate blocks or calls of
+- [x] CHK013 Are the output limits required in one stated unit (bits, rate blocks or calls of
   Π), with the conversion between units given, so that the per-instantiation, per-request and
   per-key limits can be compared and tested? [Clarity, Spec §FR-007]
-- [ ] CHK014 Does the security target state that u and the per-key limits are usage rules the
+- [x] CHK014 Does the security target state that u and the per-key limits are usage rules the
   caller must keep across objects, processes and devices, since no single object can enforce
   them? [Gap, Spec §FR-004, §FR-007; research R9; model contract]
-- [ ] CHK015 Are the generic bounds that FR-010 only requires to be "stated" (output volume,
+- [x] CHK015 Are the generic bounds that FR-010 only requires to be "stated" (output volume,
   quantum search under T11, behaviour on nonce reuse) given acceptance criteria that could fail,
   for example the key length under Grover's search compared with s? [Measurability,
   Spec §FR-010]
-- [ ] CHK016 Is the cost unit of "costs less than 2¹²⁸" fixed in the spec (evaluations of Π or
+- [x] CHK016 Is the cost unit of "costs less than 2¹²⁸" fixed in the spec (evaluations of Π or
   Π⁻¹, as research R9 assumes, or time or data), and used the same way in FR-005, in FR-004's
   "structural distinguisher below 2¹²⁸" and in the round rule's R_dist? [Consistency,
   Spec §FR-004, §FR-005, §Pre-registered Design Protocol "Round rule"; research R9]
-- [ ] CHK017 Is backtracking resistance defined with the moment of compromise (between calls, or
+- [x] CHK017 Is backtracking resistance defined with the moment of compromise (between calls, or
   within a request) and the exposure it allows, the current request's earlier blocks back to the
   last forget call, in the security target and not only in research R9? [Completeness,
   Spec §FR-004, §FR-013; research R9]
-- [ ] CHK018 Is "reseeding MUST NOT weaken any property sought" made verifiable, for example by
+- [x] CHK018 Is "reseeding MUST NOT weaken any property sought" made verifiable, for example by
   requiring that the mode theorem covers attacker-chosen reseed inputs and listing that as a
   precondition? [Measurability, Spec §FR-013, §FR-016]
 
 ## FUT-SEC-1 to FUT-SEC-9 by specification
 
-- [ ] CHK019 Is "met by specification" defined: which artefact must state what (a cited section
+- [x] CHK019 Is "met by specification" defined: which artefact must state what (a cited section
   of the design document), who accepts it (the owner design review), and how it differs from
   "met by evidence"? [Clarity, Spec §Security Policy traceability, §SC-002]
-- [ ] CHK020 Does SC-002 agree with the traceability table and FR-049? SC-002 counts FUT-SEC-1 to
+- [x] CHK020 Does SC-002 agree with the traceability table and FR-049? SC-002 counts FUT-SEC-1 to
   FUT-SEC-6 as met by specification, while the table marks FUT-SEC-4 "Not applicable" and FR-049
   keeps FUT-SEC-5's attack analysis open. [Conflict, Spec §SC-002, §FR-049, §Security Policy
   traceability]
-- [ ] CHK021 Is FUT-SEC-1's time–memory trade-off clause traced to the generic bounds that answer
+- [x] CHK021 Is FUT-SEC-1's time–memory trade-off clause traced to the generic bounds that answer
   it (key plus nonce at least 2s; reachable secret state at least 2s), with the attack named?
   [Traceability, Spec §FR-010; constitution FUT-SEC-1]
-- [ ] CHK022 Is FUT-SEC-5 (related-key, related-IV and weak-key behaviour) split explicitly into
+- [x] CHK022 Is FUT-SEC-5 (related-key, related-IV and weak-key behaviour) split explicitly into
   what this feature delivers (key loading specified, diffusion through instantiation, the
   first-order related-key and related-nonce differences of research R4) and what feature 005
   delivers, with weak-key classes beyond FR-058's boundary tests assigned, and the first-order
   test's limits stated so that it is not read as the analysis itself? [Clarity, Spec §FR-049,
   §FR-058; research R4]
-- [ ] CHK023 Does FUT-SEC-9 count as met by specification while D8's functionality class is
+- [x] CHK023 Does FUT-SEC-9 count as met by specification while D8's functionality class is
   unconfirmed, and are the open item's owner and closing condition (AIS 20/31 version 3.0 read)
   stated? [Ambiguity, Spec §FR-011, §Assumptions "AIS 20/31"]
 
 ## Claim wording and the claim register
 
-- [ ] CHK024 Is the line between the allowed "proven bound" (FR-038, FR-050) and the forbidden
+- [x] CHK024 Is the line between the allowed "proven bound" (FR-038, FR-050) and the forbidden
   "proven secure" drawn precisely enough for the claim-register test to decide each use?
   [Clarity, Spec §FR-050, §FR-069]
-- [ ] CHK025 Is it specified how the claim-register test recognises a target that is not labelled
+- [x] CHK025 Is it specified how the claim-register test recognises a target that is not labelled
   as a target, such as "128-bit security" or a bound written without "target"? [Measurability,
   Spec §FR-050, §FR-069, §SC-018]
-- [ ] CHK026 Do the requirements forbid presenting the frequency and avalanche results, or any
+- [x] CHK026 Do the requirements forbid presenting the frequency and avalanche results, or any
   battery result, as evidence of security rather than as inputs to R_dist, and forbid wording
   that implies prediction resistance (D7)? [Coverage, Spec §FR-004, §FR-050, §Pre-registered
   Design Protocol "Bias rule"; constitution IV]
-- [ ] CHK027 Is the design-form disclaimer of FR-068 stated to be the exact text at the top of the
+- [x] CHK027 Is the design-form disclaimer of FR-068 stated to be the exact text at the top of the
   spec that FR-050 requires, so that the two requirements cannot produce two different
   disclaimers? [Consistency, Spec §FR-050, §FR-068]
-- [ ] CHK028 Does the claim-register test's scope cover code comments and docstrings, which SC-015
+- [x] CHK028 Does the claim-register test's scope cover code comments and docstrings, which SC-015
   names, as well as README, security.md and the hand-written documents? [Consistency,
   Spec §FR-069, §SC-015]
-- [ ] CHK029 Is it stated how values borrowed from standards (SP 800-90A's 2¹⁹-bit request cap,
+- [x] CHK029 Is it stated how values borrowed from standards (SP 800-90A's 2¹⁹-bit request cap,
   FR-006's entropy-input wording) are cited without implying conformance to SP 800-90A or
   SP 800-90B? [Clarity, Spec §FR-006, §FR-011; research R9]
-- [ ] CHK030 Is it stated that constant time by construction (FR-020) is a property of the
+- [x] CHK030 Is it stated that constant time by construction (FR-020) is a property of the
   design's sequence of operations, not of the Python model or the C tools, whose timing is not
   claimed? [Clarity, Spec §FR-020, §FR-035]
-- [ ] CHK031 Is it specified how the claim register records that L2 is started but not reached,
+- [x] CHK031 Is it specified how the claim register records that L2 is started but not reached,
   without implying a level above L1? [Clarity, Spec §Context, §FR-012, §FR-069]
 
 ## The Security Policy's order and gates
 
-- [ ] CHK032 Is each claim level this feature can record (L0, L1, the start of L2) tied to a named
+- [x] CHK032 Is each claim level this feature can record (L0, L1, the start of L2) tied to a named
   gate and its evidence, with the gate that records L1 in the Review & Approval table, and does
   the spec say what happens to L1 when a theorem paper cannot be read (the "unverified" status of
   research R10)? [Gap, Spec §FR-012, §FR-013, §Review & Approval; research R10]
-- [ ] CHK033 Is "instantiation (key-loading) code" defined clearly enough to decide whether work
+- [x] CHK033 Is "instantiation (key-loading) code" defined clearly enough to decide whether work
   done before the FUT-SEC-8 review crosses that gate (the development-input loader, research
   operation lists, the design document's key-loading text)? [Clarity, Spec §FR-001, §FR-003;
   plan "Phases and gates" 1–5]
-- [ ] CHK034 Is the external design review distinguished from an evaluation "intended to support
+- [x] CHK034 Is the external design review distinguished from an evaluation "intended to support
   a claim", which the Security Policy defers until FUT-SEC-1 to FUT-SEC-9 are met with evidence?
   [Clarity, Spec §Context "External review", §FR-043, §FR-063; constitution, Security Policy]
-- [ ] CHK035 Does the spec state that, with FUT-SEC-7 and FUT-SEC-5's analysis open at the end, no
+- [x] CHK035 Does the spec state that, with FUT-SEC-7 and FUT-SEC-5's analysis open at the end, no
   claim, cryptographic evaluation or certification may follow from this feature alone, and which
   features must close each gap first? [Completeness, Spec §FR-049, §FR-052; constitution,
   Security Policy]
-- [ ] CHK036 Is it stated which security-target parameters (s, the key and nonce lengths, c, ε, u
+- [x] CHK036 Is it stated which security-target parameters (s, the key and nonce lengths, c, ε, u
   and the output limits) fall under FR-044's stricter-only rule, as the plan's ε and request cap
   do? [Gap, Spec §FR-005 to FR-007, §FR-015, §FR-044; plan "Values this plan fixes"]
-- [ ] CHK037 Is the Security Policy's new-model-ID rule stated at every point where the design
+- [x] CHK037 Is the Security Policy's new-model-ID rule stated at every point where the design
   could change after evidence exists: after the freeze, and when feature 005 raises R_dist?
   [Coverage, Spec §FR-028, §Pre-registered Design Protocol "Round rule", §Edge Cases]
 
 ## Scenario and edge-case coverage
 
-- [ ] CHK038 Are zeroization requirements defined for every path that leaves key-dependent state
+- [x] CHK038 Are zeroization requirements defined for every path that leaves key-dependent state
   behind (a refused request, a key mismatch, a failed self-test, an exception within a call),
   not only for the zeroize call? [Coverage, Spec §FR-025, §FR-059; model contract]
-- [ ] CHK039 Are FR-025's "no read-back path for key or state" and FR-033's refusal of reduced
+- [x] CHK039 Are FR-025's "no read-back path for key or state" and FR-033's refusal of reduced
   variants stated for the model's interfaces in the spec, naming the research interfaces (the
   research duplex, the permutation functions) as the only places where state is visible and
   reduced variants run? [Gap, Spec §FR-025, §FR-033; model contract]
-- [ ] CHK040 Does FR-008 name a minimum set of assets for a keyed design (the key, the capacity
+- [x] CHK040 Does FR-008 name a minimum set of assets for a keyed design (the key, the capacity
   part, the outputs before a forget call, the nonce-uniqueness record), or leave the whole list
   to the design document? [Completeness, Spec §FR-008]
 
@@ -183,23 +183,23 @@ quality. It does not mean implementation work is complete.
 Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
 They are open like every other item; the reviewer ticks them.
 
-- [ ] CHK041 Are construction-time failures given their own rows in the model contract's
+- [x] CHK041 Are construction-time failures given their own rows in the model contract's
   failure-path table, given that a refused variant, a wrong key length or a failed self-test leaves
   no object, so that neither "nothing changes, and the object stays usable" nor "the object is
   unusable" can apply, and is the order of the constructor's checks (variant, key length, self-test)
   stated so that each refusal raises one stated exception? [Consistency, model contract "Generator",
   "Failure paths"; Spec §FR-025, §FR-058]
-- [ ] CHK042 Is "clears the key" given a meaning the model can meet and a test can check, given that
+- [x] CHK042 Is "clears the key" given a meaning the model can meet and a test can check, given that
   Python cannot overwrite an immutable `bytes` key in place: for example the stored copy held as a
   `bytearray`, overwritten with zeros and then dropped, with the caller's own copy outside the rule,
   and stated as a discipline as constant time is? [Clarity, model contract "Generator", "Module
   rules"; Spec §FR-025, §FR-058]
-- [ ] CHK043 Is it stated how the per-key limit of 2³² random-nonce instantiations is enforced,
+- [x] CHK043 Is it stated how the per-key limit of 2³² random-nonce instantiations is enforced,
   given that a `Generator` cannot tell a random nonce from a counter value: one instantiation
   counter at the smaller limit for every key, a nonce mode declared at construction, or a usage rule
   for the caller beside the per-key limits across objects? [Ambiguity, Spec §FR-006, §FR-007;
   research R9; model contract "Other limits"]
-- [ ] CHK044 Is FUT-SEC-5's "Met by specification for its specified part" consistent with the
+- [x] CHK044 Is FUT-SEC-5's "Met by specification for its specified part" consistent with the
   traceability definitions, given that this part includes diffusion through instantiation and
   research R4's first-order related-key and related-nonce differences, which are measured and so met
   by evidence, while met by specification means that nothing remains to measure? [Consistency, Spec

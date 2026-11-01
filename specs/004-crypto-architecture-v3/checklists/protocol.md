@@ -15,34 +15,34 @@ quality. It does not mean implementation work is complete.
 
 ## Development inputs only
 
-- [ ] CHK001 Does FR-040's "Only development keys, nonces and inputs, derived from public strings
+- [x] CHK001 Does FR-040's "Only development keys, nonces and inputs, derived from public strings
   by a rule fixed in the plan" agree with the inputs the spec requires that are not hashed from
   `phycoweb-004/` strings: FR-058's all-zero, all-one and single-bit keys and nonces, FR-054's
   chosen states, the avalanche test's flipped and rotated inputs, and feature 002's `dev` seeds
   for FUT-SEC-8? Or is a class of constructed inputs defined, each derived by a stated rule from
   development inputs or constants? [Conflict, Spec §FR-040, §FR-054, §FR-058, §Pre-registered
   Design Protocol "FUT-SEC-8 demonstration"; research R3, R4; data-model §1]
-- [ ] CHK002 Is the scope of the development-only rule stated consistently, "in this feature"
+- [x] CHK002 Is the scope of the development-only rule stated consistently, "in this feature"
   (FR-040) against "before the freeze" (strategy note §8.3), and does it cover the work after the
   freeze: the re-check of every verdict, the L1 gate and the final report? [Consistency,
   Spec §FR-040; strategy note §8.3]
-- [ ] CHK003 Is research R3's "a measurement with N inputs uses i = 0…N − 1" required for every
+- [x] CHK003 Is research R3's "a measurement with N inputs uses i = 0…N − 1" required for every
   use of development inputs (vectors, constructed states from development keys, the D4 scoring,
   tool validation), so that no index can be picked after its output is seen? [Coverage,
   research R3, R8; Spec §FR-054]
-- [ ] CHK004 Is the use of each namespace restricted, `control` only for the uniform controls and
+- [x] CHK004 Is the use of each namespace restricted, `control` only for the uniform controls and
   `dev` never as a control, and is the namespace each evidence script may load fixed per kind of
   evidence rather than chosen per run? [Clarity, research R3; data-model §2]
-- [ ] CHK005 Is it required that every tool of this feature that reads feature 002's or 003's seed
+- [x] CHK005 Is it required that every tool of this feature that reads feature 002's or 003's seed
   sets, such as the FUT-SEC-8 driver, refuses their held-out sets (exit 2), as security.md §11.3
   requires of development tools, given that the plan's loader covers only the `phycoweb-004/`
   namespaces? [Coverage, Spec §FR-040, §Pre-registered Design Protocol "FUT-SEC-8
   demonstration"; security.md §11.3; research R3]
-- [ ] CHK006 Is it stated how runs that are not evidence are classed and recorded (the planning
+- [x] CHK006 Is it stated how runs that are not evidence are classed and recorded (the planning
   timing probe of research R4, and the 60-second projection runs of R7 on the candidate itself),
   with their inputs, and whether their partial outputs may be looked at before the run they
   project? [Gap, Spec §Pre-registered Design Protocol "Development inputs"; research R4, R7]
-- [ ] CHK007 Is it stated whether statistical batteries (SP 800-22, PractRand, TestU01) may be run
+- [x] CHK007 Is it stated whether statistical batteries (SP 800-22, PractRand, TestU01) may be run
   on candidates with development keys in this feature, and, if they may, whether their results
   must be logged and whether they may influence the choice, given that the statistical programme
   belongs to feature 007 and statistical success is not evidence of security? [Gap,
@@ -50,61 +50,61 @@ quality. It does not mean implementation work is complete.
 
 ## Held-out sets and their transfer to feature 007
 
-- [ ] CHK008 Is "before its freeze" in FR-040 resolved to one freeze, the design freeze of
+- [x] CHK008 Is "before its freeze" in FR-040 resolved to one freeze, the design freeze of
   `phyco-v3` or feature 007's own protocol freeze, and is it stated which of them held-out keys
   must postdate, given that keys computable before the design freeze could bias the design as
   well as the statistics? [Ambiguity, Spec §FR-040; security.md §11.3]
-- [ ] CHK009 Is "cannot be computed before its freeze" defined well enough to be carried, for
+- [x] CHK009 Is "cannot be computed before its freeze" defined well enough to be carried, for
   example as derived from data that does not exist until that freeze, such as its record's hash,
   so that feature 007 inherits a checkable requirement rather than an intent? [Clarity,
   Spec §FR-040]
-- [ ] CHK010 Is it specified where the requirement is carried to feature 007 (an open item of the
+- [x] CHK010 Is it specified where the requirement is carried to feature 007 (an open item of the
   final report, security.md §22 row 5a.4, the claim register), so that its transfer can be
   checked at the final result review? [Measurability, Spec §FR-040, §FR-052; security.md §22]
 
 ## Every candidate and variant logged
 
-- [ ] CHK011 Does FR-041 require every variant to be logged (each variant ID used, each round
+- [x] CHK011 Does FR-041 require every variant to be logged (each variant ID used, each round
   count measured, each fix to a candidate's operation list), as the strategy note's "every variant
   logged" asks, or only every candidate design, with variants left to data-model §3?
   [Consistency, Spec §FR-041, §Pre-registered Design Protocol "Stop rule"; data-model §3;
   strategy note §8.3]
-- [ ] CHK012 Is it required that a design enters the log before any tool runs on it, so that the
+- [x] CHK012 Is it required that a design enters the log before any tool runs on it, so that the
   stop rule's definition of a candidate, "a distinct design of Π with its own entry in the
   candidate log", cannot leave out a design that was tried and dropped without an entry? [Gap,
   Spec §Pre-registered Design Protocol "Stop rule", §FR-041]
-- [ ] CHK013 Is "a distinct design of Π" given a criterion that decides whether a change (rotation
+- [x] CHK013 Is "a distinct design of Π" given a criterion that decides whether a change (rotation
   amounts, the constant rule, the nonlinear box, the round structure, the colour schedule, a
   correction of the operation list) makes a new candidate or a variant of the same one, so that
   several designs cannot be logged as one to stay within three per family? [Clarity,
   Spec §Pre-registered Design Protocol "Stop rule"; data-model §3; research R11]
-- [ ] CHK014 Is a record required for every run started on a candidate or variant, aborted runs
+- [x] CHK014 Is a record required for every run started on a candidate or variant, aborted runs
   and runs later found hit by a tool defect included, and must the log cite each one whether or
   not it is "used as evidence" (FR-036), as security.md §11.3's "report everything" requires?
   [Completeness, Spec §FR-036, §FR-041; security.md §11.3; data-model §1]
-- [ ] CHK015 Is User Story 5's scenario 2 ("every candidate that produced evidence is in the log")
+- [x] CHK015 Is User Story 5's scenario 2 ("every candidate that produced evidence is in the log")
   consistent with FR-041 ("every candidate design"), which also covers a candidate dropped before
   any evidence, and does the scenario also test the converse, that every record a log entry cites
   exists? [Consistency, Spec §FR-041, §User Story 5 scenario 2]
-- [ ] CHK016 Is the mapping from the selected candidate's ID and variant IDs to `phyco-v3` and its
+- [x] CHK016 Is the mapping from the selected candidate's ID and variant IDs to `phyco-v3` and its
   variant IDs required to be recorded (in the log's `selected` entry or the freeze record), so
   that evidence recorded under `cand-…` variant IDs can be traced to the frozen design, as User
   Story 5's scenario 2 compares the log with the model's variant IDs? [Gap, Spec §User Story 5
   scenario 2; research R14; data-model §1, §3]
-- [ ] CHK017 Are the superseded versions of a candidate's operation list (after a correction), and
+- [x] CHK017 Are the superseded versions of a candidate's operation list (after a correction), and
   the operation lists of candidates not selected, required to be kept unchanged with their
   SHA-256 in a committed inventory, as Principle V requires of every superseded variant, so that
   each `oplist_sha256` in the log stays checkable? [Gap, Spec §FR-041; constitution Principle V;
   data-model §3]
-- [ ] CHK018 Is a recovery path specified for a broken chain in either hash-chained log (who may
+- [x] CHK018 Is a recovery path specified for a broken chain in either hash-chained log (who may
   repair it, how the break and the repair are recorded, whether entries after the break count),
   given that a writer that finds the chain broken appends nothing? [Exception Flow, research R16;
   data-model §3, §14]
-- [ ] CHK019 Is it specified where and when "the owner's recorded choice" that ends a tie (the D4
+- [x] CHK019 Is it specified where and when "the owner's recorded choice" that ends a tie (the D4
   choice and the selection) is recorded, with the evidence the owner saw, so that the last
   tie-break can be audited? [Clarity, Spec §Pre-registered Design Protocol "Nonlinearity choice
   rule", "Eligibility and selection"; data-model §8, §9]
-- [ ] CHK020 Are the reasons for which a candidate may be dropped limited to those the rules name
+- [x] CHK020 Are the reasons for which a candidate may be dropped limited to those the rules name
   (a failed inverse or bijectivity test, ineligibility, the stop rule), or may a candidate be
   logged as `rejected` for any recorded reason, which would let a choice outside the rules decide
   the freeze? [Clarity, Spec §Edge Cases "A candidate fails an inverse or bijectivity test",
@@ -112,42 +112,42 @@ quality. It does not mean implementation work is complete.
 
 ## Stricter-only changes
 
-- [ ] CHK021 Is "stricter" given a direction for each rule of the spec's protocol section that
+- [x] CHK021 Is "stricter" given a direction for each rule of the spec's protocol section that
   has none (eligibility, selection, tool validation, the FUT-SEC-8 demonstration's search and
   budget), as research.md gives one for each value it marks protocol, with the direction stated
   as the one that makes the conclusion more conservative (a higher R, fewer eligible
   candidates)? [Clarity, Spec §FR-044, §Pre-registered Design Protocol; research R3–R9, R12,
   R13]
-- [ ] CHK022 Is the stricter direction of the bias rule stated, given that a lower threshold makes
+- [x] CHK022 Is the stricter direction of the bias rule stated, given that a lower threshold makes
   it fire less often, and so gives a smaller R, and that adding an input set (the plan's "the
   sets only grow") lowers the per-bit threshold 0.005/S, so that a bias the earlier sets detect
   may no longer fire? [Ambiguity, Spec §Pre-registered Design Protocol "Bias rule"; plan "Values
   this plan fixes"; research R4]
-- [ ] CHK023 Does FR-044 require the owner's approval for a stricter change, as security.md §11.3
+- [x] CHK023 Does FR-044 require the owner's approval for a stricter change, as security.md §11.3
   does for the protocols of features 002 and 003 ("with owner approval"), or may the agent make a
   stricter change alone? [Consistency, Spec §FR-044; security.md §11.3]
-- [ ] CHK024 Is one place named where every protocol change is recorded, with its date, reason,
+- [x] CHK024 Is one place named where every protocol change is recorded, with its date, reason,
   approver and the results it precedes (the spec's Clarifications, the plan's tables, the
   candidate log or a change log of its own), so that FR-044's "recorded with its reason before
   any result it affects" can be checked? [Gap, Spec §FR-044]
-- [ ] CHK025 Is it specified how a stricter change made after some candidates have results
+- [x] CHK025 Is it specified how a stricter change made after some candidates have results
   applies: to every candidate, those already evaluated included, with the results known at the
   time recorded, so that tightening a rule cannot remove one candidate while another passes?
   [Gap, Spec §FR-044, §FR-041, §Pre-registered Design Protocol "Eligibility and selection"]
-- [ ] CHK026 Is it stated how measuring again under a stricter rule fits the limit of one re-run
+- [x] CHK026 Is it stated how measuring again under a stricter rule fits the limit of one re-run
   per kind of evidence "only after a recorded tool defect" and budgets that may only fall, and
   what a candidate's status is when a lowered budget is below the hours it has already used?
   [Conflict, Spec §FR-044, §Pre-registered Design Protocol "Stop rule"; research R7]
-- [ ] CHK027 Does FR-044 say whether settling a case the protocol leaves undefined is an allowed
+- [x] CHK027 Does FR-044 say whether settling a case the protocol leaves undefined is an allowed
   change, such as the plan's rules for an exact D4 tie and for no scored family, and "a
   representative found ineligible first loses the tie", given that such a rule is neither stricter
   nor looser? [Ambiguity, Spec §FR-044, §Pre-registered Design Protocol "Nonlinearity choice
   rule"; research R6]
-- [ ] CHK028 Do the plan's "no change after the first score" (the cost model, R5; the D4 rule, R6)
+- [x] CHK028 Do the plan's "no change after the first score" (the cost model, R5; the D4 rule, R6)
   and the Plan approval row's "From this approval ... may only become stricter" agree on whether
   these rules may change between plan approval and the first score? [Consistency, plan "Values
   this plan fixes"; Spec §Review & Approval, §FR-044; research R5, R6]
-- [ ] CHK029 Is "tool defect" defined by a criterion that must be recorded before a re-run (a
+- [x] CHK029 Is "tool defect" defined by a criterion that must be recorded before a re-run (a
   failed validation, a disagreement with the dependency matrices, a crash), so that a disliked
   result alone cannot justify one, as Principle IV forbids running again until passing?
   [Clarity, Spec §Edge Cases "The demonstration misses its target"; research R4, R7; constitution
@@ -155,31 +155,31 @@ quality. It does not mean implementation work is complete.
 
 ## The freeze and after it
 
-- [ ] CHK030 Does the freeze record pin, beside the files FR-043 lists, the state of the candidate
+- [x] CHK030 Does the freeze record pin, beside the files FR-043 lists, the state of the candidate
   log and the provenance log (last `seq` and line hash), the selected candidate's operation list
   and `research/004/ir.py`, on which the evidence was computed, and the evidence records behind R
   by hash rather than by ID? [Gap, Spec §FR-043; data-model §13; research R11]
-- [ ] CHK031 Is the order of the freeze steps specified (the owner's commit, the freeze record
+- [x] CHK031 Is the order of the freeze steps specified (the owner's commit, the freeze record
   created with `git_dirty` false, the approval written into it, the commit of the record), and is
   it stated what counts as dirty, local-only records and lock files included or not? [Clarity,
   Spec §FR-043; data-model §13; research R16]
-- [ ] CHK032 Is it specified which frozen file is authoritative if the frozen design document and
+- [x] CHK032 Is it specified which frozen file is authoritative if the frozen design document and
   the frozen model are later found to disagree, and whether correcting either needs a new model ID
   even when the design is unchanged? [Edge Case, Spec §FR-043, §FR-056, §Edge Cases "A
   distinguisher on more rounds turns up before the freeze"]
-- [ ] CHK033 Are the scripts that compute verdicts (eligibility, selection, the D4 choice, the
+- [x] CHK033 Are the scripts that compute verdicts (eligibility, selection, the D4 choice, the
   re-check) and the development-input module required to stay unchanged after the freeze, or be
   hashed in its record, so that FR-065's recomputation uses the code that produced the verdicts?
   [Gap, Spec §FR-043, §FR-065; plan "Project Structure"]
 
 ## Exceptions and the stop
 
-- [ ] CHK034 Is the outcome of a declined owner design review specified (a revision of the same
+- [x] CHK034 Is the outcome of a declined owner design review specified (a revision of the same
   candidate, a further candidate within the stop rule, or a stop), with how each is logged, given
   that FR-041 requires the frozen candidate to be the one the rules select and that throughput is
   reported, never an eligibility rule? [Exception Flow, Spec §FR-041, §FR-043, §Review &
   Approval]
-- [ ] CHK035 Is it stated what may follow a stop: whether a later feature with its own protocol
+- [x] CHK035 Is it stated what may follow a stop: whether a later feature with its own protocol
   may evaluate further candidates, and whether it must count this feature's candidates in its
   selection bias? [Gap, Spec §Pre-registered Design Protocol "Stop rule", §FR-044; security.md
   §21]
@@ -189,27 +189,27 @@ quality. It does not mean implementation work is complete.
 Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
 They are open like every other item; the reviewer ticks them.
 
-- [ ] CHK036 Is the `settled` direction defined the same way in FR-044 (allowed only before any
+- [x] CHK036 Is the `settled` direction defined the same way in FR-044 (allowed only before any
   result it affects exists, with the owner's approval, and never looser than any reading of the
   existing text) and in data-model §18 and research R16 ("a value fixed before its first use"),
   whose wording drops the never-looser condition, so that each entry's `direction` records a claim
   that can be checked? [Consistency, Spec §FR-044; data-model §18; research R16]
-- [ ] CHK037 Is it specified how the owner's approval is written into the draft freeze record (a
+- [x] CHK037 Is it specified how the owner's approval is written into the draft freeze record (a
   command, or the fields that may change: `status`, who, when and the wording), and what `validate`
   checks about it, for example that nothing else changed since `create` and that the record still
   follows the format rules, so that step (3) of the freeze cannot alter a frozen hash unnoticed?
   [Gap, data-model §13; cli contract `design_freeze.py`; Spec §FR-043]
-- [ ] CHK038 Is it stated which answered rows of checklist-choices.md become the protocol change
+- [x] CHK038 Is it stated which answered rows of checklist-choices.md become the protocol change
   log's first entries (the 28 rows tagged Stricter or Settle, 17 and 11, or also the Add and Clarify
   rows that change a pre-registered rule, such as a known result added to tool validation), and what
   `last_record_id` holds when no evidence record exists yet? [Clarity, data-model §18; Spec §FR-044,
   §Clarifications; plan "Values this plan fixes"]
-- [ ] CHK039 Is recovery from a stale lock specified for `data/heavy-run.lock` ("removed on exit")
+- [x] CHK039 Is recovery from a stale lock specified for `data/heavy-run.lock` ("removed on exit")
   and `data/log-append.lock`, when a crash, a killed process or a reboot leaves one behind: who may
   remove it, how the holder is shown to be gone (the PID and start time the heavy-run lock holds),
   and how the removal is recorded, since every later run or append exits 2 until then? [Gap,
   Recovery; cli contract "Heavy runs", "Hash-chained logs"; research R16; Spec §FR-045]
-- [ ] CHK040 Is it stated where the owner's go-ahead for a log repair is recorded and what
+- [x] CHK040 Is it stated where the owner's go-ahead for a log repair is recorded and what
   `repair_log.py --approval REF` names (a row of the spec's approval table, a change-log entry or a
   commit), so that the script can tell a recorded go-ahead from an arbitrary string and refuse a
   repair without one? [Gap, cli contract `repair_log.py`; research R16]

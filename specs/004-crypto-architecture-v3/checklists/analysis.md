@@ -16,133 +16,133 @@ quality. It does not mean implementation work is complete.
 
 ## Tool validation before any counted result
 
-- [ ] CHK001 Do FR-039 ("before any negative result ... counts"), the protocol's "a tool's result
+- [x] CHK001 Do FR-039 ("before any negative result ... counts"), the protocol's "a tool's result
   counts only after its validation record exists" and SC-007 ("100% of counted tool results")
   agree on whether a positive result, such as a found trail that raises R_dist, needs a prior
   validation record? [Conflict, Spec §FR-039, §SC-007, §Pre-registered Design Protocol "Tool
   validation"]
-- [ ] CHK002 Is a known result named for every tool whose verdict counts (the dependency matrices,
+- [x] CHK002 Is a known result named for every tool whose verdict counts (the dependency matrices,
   the symmetry check, exhaustive bijectivity, the avalanche test, the cost model), not only for
   the tools FR-039 lists (seed search, merging, vein bounds, bias, trail search)? [Coverage,
   Spec §FR-039; research R5, R13]
-- [ ] CHK003 Is the acceptance criterion for "re-finding" a published result defined for each
+- [x] CHK003 Is the acceptance criterion for "re-finding" a published result defined for each
   validation target of research R12: the exact value, the trail itself or only its weight, and
   over which rounds? [Clarity, Spec §FR-039; research R12]
-- [ ] CHK004 Is it stated why each validation target is of the same kind as its use (SPECK32's
+- [x] CHK004 Is it stated why each validation target is of the same kind as its use (SPECK32's
   16-bit words for searches at w = 8, 16 and 32 and on a 64-bit box; PRESENT's S-box layer for a
   χ-like layer), or which further check covers the difference? [Assumption, Spec §FR-039;
   research R12]
-- [ ] CHK005 Is "older than" in SC-007 defined by a recorded timestamp or by the order of entries
+- [x] CHK005 Is "older than" in SC-007 defined by a recorded timestamp or by the order of entries
   in a hash-chained log, so that it can be checked after the fact? [Measurability,
   Spec §SC-007; research R16]
-- [ ] CHK006 Is it specified when a validated tool must be validated again: after a code change, a
+- [x] CHK006 Is it specified when a validated tool must be validated again: after a code change, a
   dependency upgrade, a new word width or a new kind of model? [Gap, Spec §FR-039; research R12]
-- [ ] CHK007 Is the path after a failed validation specified: whether the defect may be fixed and
+- [x] CHK007 Is the path after a failed validation specified: whether the defect may be fixed and
   the tool validated again, how many attempts are allowed, and whether results computed before
   the failure are withdrawn? [Coverage, Spec §Edge Cases "A tool fails its validation";
   research R7]
-- [ ] CHK008 Is it stated what happens if a validation target's published value cannot be
+- [x] CHK008 Is it stated what happens if a validation target's published value cannot be
   obtained (a paper unavailable): which tools then stay unvalidated, and whether any candidate can
   still establish R_bound? [Dependency, Spec §FR-039; research R12, R19]
 
 ## Pre-registered metrics and thresholds
 
-- [ ] CHK009 Do the spec's Plan approval row and the plan ("the values the plan fixes", its table
+- [x] CHK009 Do the spec's Plan approval row and the plan ("the values the plan fixes", its table
   of six) agree with research.md's opening ("the values marked protocol") on which values became
   protocol at plan approval, given that R6's D4 choice, R12's fixed tool set and R13's counts are
   marked protocol but are not in the plan's table? [Consistency, Spec §FR-044, §Review &
   Approval; plan "Values this plan fixes"; research R6, R12, R13]
-- [ ] CHK010 Does the eligibility rule say what "passes every structural test (FR-037)" means for
+- [x] CHK010 Does the eligibility rule say what "passes every structural test (FR-037)" means for
   the frequency and avalanche measurements, which raise R_dist rather than pass or fail, and does
   it require R_dist, R_f and R_b to be established at every claimable size, as research R4
   assumes when inconclusive bias evidence makes a candidate ineligible? [Ambiguity,
   Spec §Pre-registered Design Protocol "Eligibility and selection", §FR-037; research R4]
-- [ ] CHK011 Is it stated when a solver-computed bound counts as "proven" for R_bound: only when
+- [x] CHK011 Is it stated when a solver-computed bound counts as "proven" for R_bound: only when
   the solver proves a lower bound on the weight within its cap, with an incomplete search giving
   no bound? [Clarity, Spec §FR-038, §Pre-registered Design Protocol "Round rule";
   research R7, R12]
-- [ ] CHK012 Is it stated whether a bound established at one claimable size may be carried to a
+- [x] CHK012 Is it stated whether a bound established at one claimable size may be carried to a
   larger size by a stated argument (for example per-node active-box counting), or must be
   computed at every size, since R_bound must hold "at that size"? [Clarity, Spec §Pre-registered
   Design Protocol "Round rule"; research R12]
-- [ ] CHK013 Is FR-029's "computed exactly" consistent with research R13's structural
+- [x] CHK013 Is FR-029's "computed exactly" consistent with research R13's structural
   propagation, which over-approximates dependence, and is it stated that full structural
   dependence is necessary but not sufficient for full diffusion? [Consistency, Spec §FR-029;
   research R13]
-- [ ] CHK014 Is the case of more than 128 measured round counts at one size covered, since the
+- [x] CHK014 Is the case of more than 128 measured round counts at one size covered, since the
   avalanche threshold's factor of 128 bounds false firings only up to 128 round counts?
   [Edge Case, research R4]
-- [ ] CHK015 Is the invariant check's verdict defined for a form that holds on most but not all
+- [x] CHK015 Is the invariant check's verdict defined for a form that holds on most but not all
   test states (a probabilistic invariant), or only for forms that hold on every test state?
   [Edge Case, Spec §FR-037; research R13]
-- [ ] CHK016 Is it stated how a firing is reported given the family-wise rate of chance firings
+- [x] CHK016 Is it stated how a firing is reported given the family-wise rate of chance firings
   (about 21% at R = 32, 23% with the avalanche test): as a distinguisher that raises R, with the
   rate stated beside it, and never measured again to remove it? [Clarity, Spec §FR-028,
   §Pre-registered Design Protocol "Bias rule"; research R4]
-- [ ] CHK017 Is the selection bias that FR-041 requires the final report to state given a form,
+- [x] CHK017 Is the selection bias that FR-041 requires the final report to state given a form,
   for example the number of candidates and evaluations the frozen one was chosen from and how the
   error rates of the bias rule compound over them? [Measurability, Spec §FR-041;
   security.md §11.6]
-- [ ] CHK018 Is the choice of r* (the largest common round count, at least 2) justified as a
+- [x] CHK018 Is the choice of r* (the largest common round count, at least 2) justified as a
   measure of per-round strength at the production width, given that trail weight per round is
   often not constant over the first rounds? [Assumption, Spec §Pre-registered Design Protocol
   "Nonlinearity choice rule"; research R6]
 
 ## Budgets and the stop rule
 
-- [ ] CHK019 Is the outcome "ineligible within budget" reproducible by others, given that the
+- [x] CHK019 Is the outcome "ineligible within budget" reproducible by others, given that the
   budget is wall-clock hours on one machine and the engine may be made faster during the feature?
   [Measurability, Spec §Pre-registered Design Protocol "Stop rule"; research R7]
-- [ ] CHK020 Is it specified how a budget row is shared between the three claimable sizes, so that
+- [x] CHK020 Is it specified how a budget row is shared between the three claimable sizes, so that
   4×4 and 8×8 cannot use up the hours that 16×16, with the largest trail models, needs?
   [Gap, research R7; plan "Risks"]
-- [ ] CHK021 Is a budget or cap stated for tool validation runs, the D4 choice's reduced-width
+- [x] CHK021 Is a budget or cap stated for tool validation runs, the D4 choice's reduced-width
   searches and the FUT-SEC-8 tool check, or is it stated which of them count against a
   candidate's budget? [Gap, Spec §FR-039; research R6, R7]
-- [ ] CHK022 Is "evaluated" defined for the stop rule's count of three candidates per family: from
+- [x] CHK022 Is "evaluated" defined for the stop rule's count of three candidates per family: from
   the candidate's first log entry, its first score, or its first heavy run? [Clarity,
   Spec §Pre-registered Design Protocol "Stop rule", §FR-041]
-- [ ] CHK023 Is the limit of one re-run per kind of evidence stated per candidate and size, and is
+- [x] CHK023 Is the limit of one re-run per kind of evidence stated per candidate and size, and is
   it specified what a second tool defect in the same kind of evidence means for the candidate?
   [Edge Case, research R4, R7]
 
 ## Baselines and controls
 
-- [ ] CHK024 Is "agree with the random baseline" quantified for the FUT-SEC-8 match counts, for
+- [x] CHK024 Is "agree with the random baseline" quantified for the FUT-SEC-8 match counts, for
   example a Poisson test of the one-word count at a stated level, and is the response to a
   disagreement specified? [Measurability, Spec §User Story 1, §Pre-registered Design Protocol
   "FUT-SEC-8 demonstration"]
-- [ ] CHK025 Is the assumption behind the FUT-SEC-8 baseline stated (output words uniform and
+- [x] CHK025 Is the assumption behind the FUT-SEC-8 baseline stated (output words uniform and
   independent across candidates), together with what a deviation caused by `phyco-v2`'s known
   biases would mean? [Assumption, Spec §Pre-registered Design Protocol "FUT-SEC-8
   demonstration"; security.md §9.2]
-- [ ] CHK026 Is the null model stated for every comparison with a baseline: p = 1/2 for each
+- [x] CHK026 Is the null model stated for every comparison with a baseline: p = 1/2 for each
   avalanche and rotational difference bit, as it is for the frequency test, and "no form or
   difference survives" for the invariant checks? [Clarity, research R4, R13]
-- [ ] CHK027 Are the uniform controls of the avalanche test specified as fully as the frequency
+- [x] CHK027 Are the uniform controls of the avalanche test specified as fully as the frequency
   test's (their derivation, count and threshold), and is it stated whether a control is run again
   after a re-run caused by a tool defect? [Completeness, Spec §Pre-registered Design Protocol
   "Bias rule"; research R3, R4]
-- [ ] CHK028 Is it stated what counts as detection power for the bias tool before it is used on a
+- [x] CHK028 Is it stated what counts as detection power for the bias tool before it is used on a
   candidate (re-finding S14 on `phyco-v2`), with the smallest bias the validation must detect
   compared with the sensitivity table of research R4? [Measurability, Spec §FR-039;
   research R4]
 
 ## Reduced variants from the same generics
 
-- [ ] CHK029 Is "from the same generics" defined: which parts of Π may change with w and n (the
+- [x] CHK029 Is "from the same generics" defined: which parts of Π may change with w and n (the
   rotation amounts by the scaling rule, the constants by the same rule, the colour schedule) and
   which may not (the structure of the operation list), so that a reduced variant is the same
   design? [Clarity, Spec §FR-024, §FR-032; research R11, R14]
-- [ ] CHK030 Is it stated which verdicts may rest on reduced variants (the D4 score, exhaustive
+- [x] CHK030 Is it stated which verdicts may rest on reduced variants (the D4 score, exhaustive
   bijectivity at 2×2, w = 4) and which must come from the production width at each claimable size
   (R_bound, R_f and R_b, the bias evidence), with the reason a reduced-variant result transfers?
   [Clarity, Spec §FR-032, §FR-038, §Pre-registered Design Protocol "Round rule"; research R6,
   R13]
-- [ ] CHK031 Is the set of reduced variants used as evidence fixed before their results (widths,
+- [x] CHK031 Is the set of reduced variants used as evidence fixed before their results (widths,
   sizes, round counts and capacities), or may a variant be added after a result, and must the
   reason for each be logged? [Gap, Spec §FR-032, §FR-036, §FR-041]
-- [ ] CHK032 Are the reduced variants' own bounds and statuses required in the size profile in a
+- [x] CHK032 Are the reduced variants' own bounds and statuses required in the size profile in a
   form that keeps them apart from claimable sizes (key entropy c, s = c/2, status `research`)?
   [Consistency, Spec §FR-009, §FR-032; data-model §10]
 
@@ -151,22 +151,22 @@ quality. It does not mean implementation work is complete.
 Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
 They are open like every other item; the reviewer ticks them.
 
-- [ ] CHK033 Are the known results this feature writes itself (the small operation list and its
+- [x] CHK033 Are the known results this feature writes itself (the small operation list and its
   hand-derived dependency matrices, the map with collisions, the variant with a planted gap, the
   hand-counted examples of research R5) required to be written and committed, with their SHA-256,
   before the code of the tool they validate exists, so that no tool is validated against
   expectations derived from its own output? [Gap, Spec §FR-039; research R5, R13; data-model §7]
-- [ ] CHK034 Is "what must match" stated for the known results that are not published values (the
+- [x] CHK034 Is "what must match" stated for the known results that are not published values (the
   vein bounds of S12 and S15, both merging mechanisms of S13, S14's bias, the FUT-SEC-8 recovery and
   the structural tools' known results), as data-model §7 states it for published trails and tables,
   so that `re-found` or `not re-found` follows from a stated comparison? [Measurability, Spec
   §FR-039, §SC-007; data-model §7; research R12, R13]
-- [ ] CHK035 Is "heavy run" defined by a rule rather than by examples, given that FR-045 names the
+- [x] CHK035 Is "heavy run" defined by a rule rather than by examples, given that FR-045 names the
   FUT-SEC-8 sweep, exhaustive bijectivity and solver runs, the cli contract adds trail searches and
   the frequency and avalanche tests, and runs such as the exhaustive box tables at w = 8 (16-bit
   boxes) appear in neither list, while only heavy runs take the lock and are projected first?
   [Ambiguity, Spec §FR-045; cli contract "Heavy runs", "Budget"; research R7; quickstart E3]
-- [ ] CHK036 Is the order-of-sizes guard stated to exempt the timing probes at 8×8 and 16×16 that a
+- [x] CHK036 Is the order-of-sizes guard stated to exempt the timing probes at 8×8 and 16×16 that a
   4×4 heavy run's projection needs (projection records, whose outputs are discarded unread), or does
   it refuse them as evidence of that kind at the larger sizes until the 4×4 run has finished, so
   that no 4×4 heavy run could start? [Conflict, cli contract "Order of sizes", "Budget"; research

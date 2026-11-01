@@ -16,144 +16,144 @@ quality. It does not mean implementation work is complete.
 
 ## Components and their roles
 
-- [ ] CHK001 Is the set of components whose role the rationale must justify enumerated (the
+- [x] CHK001 Is the set of components whose role the rationale must justify enumerated (the
   lanes, the coupling function, the vein accumulator, the colour schedule, the linear layer
   between boxes, the food nodes, rotations, round constants, padding, domain separators, forget,
   the absorption and output trees), or left to the design document? [Completeness,
   Spec §FR-030, §FR-034; security.md §8]
-- [ ] CHK002 Does the spec require the converse of FR-034's walk through the attack classes:
+- [x] CHK002 Does the spec require the converse of FR-034's walk through the attack classes:
   every component tied to at least one attack class, bound or functional need, so that a
   component kept only for the metaphor is labelled as such? [Coverage, Spec §FR-030, §FR-034]
-- [ ] CHK003 Is a minimum set of security.md §12.1 attack classes required to name a resisting
+- [x] CHK003 Is a minimum set of security.md §12.1 attack classes required to name a resisting
   design feature in this feature (for example slide, invariant subspace, rotational and
   rotational-XOR, inverse direction and mode), or may any class be marked open for feature 005?
   [Clarity, Spec §FR-034; security.md §12.1]
-- [ ] CHK004 Are the colour-schedule rules stated in the spec, as research R11 states them (within
+- [x] CHK004 Are the colour-schedule rules stated in the spec, as research R11 states them (within
   one phase no update reads a lane that another update of that phase writes; a three-colour
   schedule from the same generics for odd n), so that the bijectivity argument rests on a stated
   rule? [Completeness, Spec §FR-019, §Edge Cases "Odd grid sizes"; research R11]
-- [ ] CHK005 Is FR-021's "keep it biased" tied to a measurable criterion, the bias rule's
+- [x] CHK005 Is FR-021's "keep it biased" tied to a measurable criterion, the bias rule's
   threshold or the S14 measure, so that the rationale's full-range argument can be checked?
   [Measurability, Spec §FR-021, §Pre-registered Design Protocol "Bias rule"]
-- [ ] CHK006 Is the design document required to answer security.md §8's eight network questions
+- [x] CHK006 Is the design document required to answer security.md §8's eight network questions
   for the duplex as it is, for example question 6, where the output is the rate lanes
   themselves, and question 4, where the cycle structure of Π takes the place of absorbing states?
   [Clarity, Spec §FR-034; security.md §8]
 
 ## The nonlinear component and its bounds
 
-- [ ] CHK007 Is "exhaustive where the width allows" given a threshold (box width and rounds), and
+- [x] CHK007 Is "exhaustive where the width allows" given a threshold (box width and rounds), and
   is the method stated for the 64-bit ARX-box at w = 32, where exhaustive tables are out of
   reach? [Clarity, Spec §FR-022, §FR-038]
-- [ ] CHK008 Are the properties of the local linear layer between ARX-boxes that the active-box
+- [x] CHK008 Are the properties of the local linear layer between ARX-boxes that the active-box
   count relies on (a branch number, or which boxes a difference must activate) required to be
   stated and justified in the rationale? [Gap, Spec §FR-022; research R6]
-- [ ] CHK009 Does the spec require an algebraic-degree argument for the Boolean family, whose
+- [x] CHK009 Does the spec require an algebraic-degree argument for the Boolean family, whose
   degree the strategy note says "grows slowly and needs its own margin", or do the round rule's
   terms cover low-degree attacks (cube, zero-sum) only through R_dist? [Gap, Spec §FR-022,
   §Pre-registered Design Protocol "Round rule"; strategy note §5.2]
-- [ ] CHK010 Is the rationale required to state the alternatives considered (the other family,
+- [x] CHK010 Is the rationale required to state the alternatives considered (the other family,
   each dropped candidate with its reason from the candidate log) and the D4 result with its
   inputs, not only the design chosen? [Completeness, Spec §FR-034, §FR-041, §User Story 5]
 
 ## Constants
 
-- [ ] CHK011 Is it specified what "reproduces no published primitive's constants" is checked
+- [x] CHK011 Is it specified what "reproduces no published primitive's constants" is checked
   against (a list of published polynomials and constant sets, with their sources), so that the
   check can fail? [Measurability, Spec §Re-decided feature-002 requirements "FR-007";
   research R15]
-- [ ] CHK012 Is the moment at which the constant rule (polynomial, seed, reading order) is fixed
+- [x] CHK012 Is the moment at which the constant rule (polynomial, seed, reading order) is fixed
   stated, before the first candidate is scored or before the freeze, and is every remaining
   freedom in it, such as the seed, bound to a rule rather than a choice? [Gap, Spec §FR-023,
   §FR-044; research R15]
-- [ ] CHK013 Is the rotation-amount search required to be fixed before it runs (the space, the
+- [x] CHK013 Is the rotation-amount search required to be fixed before it runs (the space, the
   ranking measure, the rounds, the width, the tie order) and its full ranking recorded, so that
   "chosen by the trail bounds they give" cannot become a choice made after the fact?
   [Clarity, Spec §FR-024; research R15]
-- [ ] CHK014 Is it stated at which width the rotation amounts are chosen, and whether the scaling
+- [x] CHK014 Is it stated at which width the rotation amounts are chosen, and whether the scaling
   rule to the other widths must keep the property they were chosen for, given that reduced-width
   bounds feed the D4 choice? [Consistency, Spec §FR-024, §FR-032; research R6, R14]
-- [ ] CHK015 Is "differ in every round and at every food node" defined: distinct values only, or
+- [x] CHK015 Is "differ in every round and at every food node" defined: distinct values only, or
   also not rotations or complements of one another, which rotational and rotational-XOR attacks
   exploit? [Clarity, Spec §FR-023; research R13; security.md §12.1]
-- [ ] CHK016 Are the number of food nodes and their placement rule required per size, with the
+- [x] CHK016 Are the number of food nodes and their placement rule required per size, with the
   reason for them (for example how soon every round's constants reach every node), rather than
   only "placed by a stated rule"? [Completeness, Spec §FR-018, §FR-023]
-- [ ] CHK017 Are the padding constants and domain separators among the constants whose rule and
+- [x] CHK017 Are the padding constants and domain separators among the constants whose rule and
   reason the rationale must state, or does the requirement cover only round constants and
   rotation amounts? [Completeness, Spec §FR-014, §FR-023, §FR-034]
 
 ## Round count
 
-- [ ] CHK018 Is "the resulting margin" that the rationale must state defined (for example
+- [x] CHK018 Is "the resulting margin" that the rationale must state defined (for example
   R − R_dist, R − R_bound and R / max(R_f, R_b) per claimable size), and is the sufficiency of
   Δ = 2 argued, given that the bounds of FR-038 are single-trail bounds? [Clarity,
   Spec §FR-034, §FR-038, §Pre-registered Design Protocol "Round rule"; security.md §8]
-- [ ] CHK019 Is "round" defined in the spec (for example one pass over every colour phase, as in
+- [x] CHK019 Is "round" defined in the spec (for example one pass over every colour phase, as in
   research R11), so that R, R_f, R_b, R_bound and r/R all count the same unit? [Clarity,
   Spec §FR-026, §FR-029, §Pre-registered Design Protocol "Round rule"; research R11]
-- [ ] CHK020 Is it stated that R may differ between claimable sizes, and is the rationale
+- [x] CHK020 Is it stated that R may differ between claimable sizes, and is the rationale
   required to explain its growth with n (the strategy note ties full diffusion to the grid
   diameter)? [Clarity, Spec §FR-018, §FR-028; strategy note §4]
-- [ ] CHK021 Is the round count of each research variant (2×2, reduced widths, fewer rounds)
+- [x] CHK021 Is the round count of each research variant (2×2, reduced widths, fewer rounds)
   required to be stated with its reason, since the round rule fixes R only at claimable sizes?
   [Gap, Spec §FR-032, §Pre-registered Design Protocol "Round rule"]
-- [ ] CHK022 Is the warm-up justified from the dependency evidence: the number of rounds between
+- [x] CHK022 Is the warm-up justified from the dependency evidence: the number of rounds between
   key loading and the first output, compared with R_f, so that FR-029's full dependence before
   the first output is shown and not assumed? [Measurability, Spec §FR-029; FUT-GRID-3]
-- [ ] CHK023 Is it specified whether the rationale is revised and reviewed again when the round
+- [x] CHK023 Is it specified whether the rationale is revised and reviewed again when the round
   rule raises R after the owner design review but before the freeze, for example after a late
   distinguisher? [Coverage, Spec §Edge Cases, §FR-043]
 
 ## The inverse Π⁻¹
 
-- [ ] CHK024 Is Π⁻¹ required to be written out in the design document at the same level of
+- [x] CHK024 Is Π⁻¹ required to be written out in the design document at the same level of
   detail as Π (every step, the reverse order of the colour phases and constants, each operation's
   width, signedness and update order), not only derived by a tool from the operation list, and
   is its role stated (R_b, inverse-direction attacks, the exposure within one request) with
   Π⁻¹ outside the production interface? [Completeness, Spec §FR-019, §FR-027, §FR-033;
   research R11]
-- [ ] CHK025 Are the inverse tests' inputs defined in the spec by count and source (SC-004's
+- [x] CHK025 Are the inverse tests' inputs defined in the spec by count and source (SC-004's
   "test inputs"; FR-037's "fixed and development inputs"), or only in research R13 (16 vector
   inputs and 2¹⁰ test states)? [Consistency, Spec §FR-037, §SC-004; research R13]
-- [ ] CHK026 Is it stated what an inverse or bijectivity failure means for a candidate that is
+- [x] CHK026 Is it stated what an inverse or bijectivity failure means for a candidate that is
   bijective by construction: a defect of the operation list, of a tool or of a transcription, or
   a rejected candidate that counts towards the budget? [Edge Case, Spec §Edge Cases, §FR-019;
   research R11, R13]
 
 ## The slime-mould mapping
 
-- [ ] CHK027 Is "rest on the mapping" defined in a way a reviewer can apply, for example that every
+- [x] CHK027 Is "rest on the mapping" defined in a way a reviewer can apply, for example that every
   security statement in the rationale cites a bound, an analysis or the mode theorem, and the
   mapping text contains no security statement? [Clarity, Spec §FR-030; security.md §8]
-- [ ] CHK028 Is a check named that would find a security argument resting on the mapping (an item
+- [x] CHK028 Is a check named that would find a security argument resting on the mapping (an item
   of the owner design review, or a wording rule of FR-069's test), so that FR-030's prohibition
   is verifiable? [Measurability, Spec §FR-030, §FR-069, §User Story 5]
-- [ ] CHK029 Is the positive side of the mapping required: what it does contribute (names,
+- [x] CHK029 Is the positive side of the mapping required: what it does contribute (names,
   structure, the explanation of each component), so that security.md §8's "does and does not
   contribute" is answered both ways? [Completeness, Spec §FR-030; security.md §8]
-- [ ] CHK030 Are chaos and Lyapunov-exponent arguments the only kinds named as forbidden, or are
+- [x] CHK030 Are chaos and Lyapunov-exponent arguments the only kinds named as forbidden, or are
   related ones covered too, such as ergodicity, emergent complexity, "biological
   unpredictability" and battery results offered as evidence of mixing? [Coverage, Spec §FR-030;
   strategy note §5.1]
-- [ ] CHK031 Are FR-030's list of failed mechanisms (S2, S5–S7, S11–S15) and FR-051's lessons
+- [x] CHK031 Are FR-030's list of failed mechanisms (S2, S5–S7, S11–S15) and FR-051's lessons
   table (S1–S15) consistent, with the reason S1, S3, S4 and S8–S10 are left out of FR-030 stated?
   [Consistency, Spec §FR-030, §FR-051]
-- [ ] CHK032 Is "show how each failed mechanism is replaced" given acceptance criteria: for each,
+- [x] CHK032 Is "show how each failed mechanism is replaced" given acceptance criteria: for each,
   the rule of Π that replaces it and the evidence (FR-037, FR-039) that the failure does not
   recur, rather than a description through the mapping? [Measurability, Spec §FR-030, §FR-037,
   §FR-039]
 
 ## Structure, status and review of the rationale
 
-- [ ] CHK033 Does FR-034 place the design rationale inside the versioned design document, which
+- [x] CHK033 Does FR-034 place the design rationale inside the versioned design document, which
   FR-043 freezes, or beside it, as the plan's separate `rationale.md` does, and is the rationale
   frozen in either case? [Conflict, Spec §FR-034, §FR-043; plan "Project Structure"]
-- [ ] CHK034 Is it specified how the rationale marks the kind of each statement (FR-062's
+- [x] CHK034 Is it specified how the rationale marks the kind of each statement (FR-062's
   demonstrated facts, mathematical arguments, observations, hypotheses, unsuccessful attacks,
   untested areas and residual risks), by section or by label, so that a reviewer can tell an
   argument from an observation? [Clarity, Spec §FR-062]
-- [ ] CHK035 Is the review status of each AI-drafted argument in the rationale required to be
+- [x] CHK035 Is the review status of each AI-drafted argument in the rationale required to be
   visible, beside the argument or in its provenance record, so that the owner design review can
   tell a draft from reviewed text? [Clarity, Spec §FR-064, §FR-067]
 
@@ -162,23 +162,23 @@ quality. It does not mean implementation work is complete.
 Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
 They are open like every other item; the reviewer ticks them.
 
-- [ ] CHK036 Is FR-023's "differ" relation (no two constants of one call of Π equal, equal up to a
+- [x] CHK036 Is FR-023's "differ" relation (no two constants of one call of Π equal, equal up to a
   word rotation, complements of one another, or rotations of complements) given a rule for the
   reduced widths, where it cannot hold: w-bit words fall into only 4 classes under rotation and
   complement at w = 4 and 20 at w = 8 (counted exhaustively), fewer than the constants one call
   needs once R times the number of food nodes exceeds them? [Conflict, Spec §FR-023, §FR-018;
   research R13, R15]
-- [ ] CHK037 Are the constant rule's open values given (the polynomial's degree, the order in which
+- [x] CHK037 Are the constant rule's open values given (the polynomial's degree, the order in which
   polynomials are enumerated, the public seed value), or is the record that fixes them before the
   first score named, for example a `settled` entry of the protocol change log, so that "fixed before
   the first candidate is scored" can be checked while the design document that states them comes
   only after selection? [Gap, Spec §FR-023, §FR-044; research R15; plan "Values this plan fixes"]
-- [ ] CHK038 Is the refused list of polynomials and constant sets frozen together with the constant
+- [x] CHK038 Is the refused list of polynomials and constant sets frozen together with the constant
   rule before the first score, given that it must hold the constants of "every design the rationale
   cites", a set known only when the rationale is written after selection, so that a later citation
   could make the polynomial already chosen a refused one? [Conflict, research R15; Spec §FR-023,
   §FR-044]
-- [ ] CHK039 Is the design document required to state how the 2×2 torus differs from the larger
+- [x] CHK039 Is the design document required to state how the 2×2 torus differs from the larger
   sizes, where a node's opposite neighbours coincide so that its four links join only two distinct
   nodes (FR-018's "two from each of two"), and how that difference bears on reading 2×2 evidence,
   such as exhaustive bijectivity at w = 4, as evidence about the claimable sizes? [Gap, Spec
