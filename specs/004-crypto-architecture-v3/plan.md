@@ -342,9 +342,9 @@ source and binary.
    AIS 20/31 3.0 come from the approved downloads of R19, `169.pdf` through the owner's browser.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
-   choice; production-width bounds, structural checks, frequency and avalanche tests; R by the
-   round rule; eligibility; the stop rule. One heavy run at a time, each projected first, and
-   each kind of evidence at 4×4, then 8×8, then 16×16 (R7).
+   choice; production-width bounds, structural checks with the `degree` records, frequency and
+   avalanche tests; R by the round rule; eligibility; the stop rule. One heavy run at a time, each
+   projected first, and each kind of evidence at 4×4, then 8×8, then 16×16 (R7).
 6. **US3 model and vectors**: the design document complete; constants; `model_v3.py`; vectors
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
 7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes

@@ -443,8 +443,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Neither family scored.** No family is chosen, and the record says that D4 was not
     computable. Selection then takes the eligible candidate with the smallest R at 4×4 from
     either family, with a tie going to the owner's recorded choice; the stop rule still applies.
-  - **Rotation amounts** are chosen at this width (R15), with the scaling rule to every other
-    width stated before the search. R_bound at w = 32 is computed with the scaled amounts, and
+  - **Rotation amounts** are chosen at this width (R15). Each candidate's amounts are searched first
+    at 16, the width this rule tries first, with the width recorded in its log entry before the
+    search. If this rule then fixes the width at 8, every entered candidate's amounts are searched
+    again at 8, with the same recorded space of amounts, ranking measure, rounds and tie order, as a
+    new log entry, and the scores at 8 use the amounts found at 8; no choice is involved, since this
+    rule fixes the width. The scaling rule to every other width is stated before the search. R_bound
+    at w = 32 is computed with the scaled amounts, and
     the rationale reports whether the ranking held after scaling, without choosing again.
   - The D4 record states r* (data-model §8).
 - **Stricter means**: the rule has no stricter direction, so in effect it does not change from
@@ -502,8 +507,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     "did not finish within the recorded budget on the machine of R1 with that engine", a fact
     about the run and not a property of the candidate; the final report says so.
   - **What else is charged.** Validation runs charge no candidate and have their own cap of 8 h
-    per instance, as a search instance does. The D4 reduced-width searches are trail searches
-    on their candidate and count against its trail row. The FUT-SEC-8 vector check and sweep
+    per instance, as a search instance does. The D4 reduced-width searches are trail searches on
+    their candidate and count against its trail row, and so do the rotation-amount searches of R15,
+    at each width searched: each instance is capped at 8 h, and its projection reserves hours like
+    any other run. The FUT-SEC-8 vector check and sweep
     fall under the demonstration's own budget row (spec, Pre-registered Design Protocol).
   - **Order of sizes.** Each kind of evidence runs at 4×4, then 8×8, then 16×16. A larger size
     starts only when the smaller one's run of that kind has finished without making the
@@ -849,11 +856,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     binomial test at the bias rule's level, 0.005 divided by the number of forms and round
     counts tested, fails the check as a probabilistic invariant and raises R_dist at that round
     count.
-  - **Algebraic degree**: for every candidate, and essential for the Boolean family, the
-    rationale gives upper bounds on the algebraic degree of r rounds of Π and of Π⁻¹, and the
-    round counts below which a degree-based distinguisher (zero-sum, cube) costs less than 2¹²⁸
-    by those bounds. Such a distinguisher is a distinguisher of the round rule and raises R_dist
-    like any other.
+  - **Algebraic degree**: for every candidate, and essential for the Boolean family, a `degree`
+    record per claimable size, for Π and for Π⁻¹, computed in plan phase 5 after the other
+    structural checks and before the frequency and avalanche tests. Each round's degree comes from
+    the operation list: from each box's or S-box's truth table where its width allows, otherwise
+    from the stated degree of each operation, for example w − 1 for a w-bit addition. The degree of
+    r rounds is bounded by the product of the per-round degrees, capped at b − 1, which needs no
+    search tool. A zero-sum over a cube of dimension d + 1 then costs 2^(d + 1), so every round
+    count whose bound d is at most 126 is a distinguisher of the round rule and raises R_dist like
+    any other. The derivation is validated under FR-039 on a known result (below), and the rationale
+    cites the records.
   - **Known results.** Each structural tool re-finds a known result before its results count
     (R12; data-model §7):
 
@@ -864,10 +876,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Exhaustive bijectivity | a known permutation (2³² ones in the bitmap) and a stated map with collisions (fewer) |
     | Avalanche test | a planted gap: a stated variant that leaves one lane unmixed |
     | Cost model (R5) | R5's hand-counted examples |
+| Degree bound | the exact degree of a stated small operation list, for example one box at w = 4, over a few rounds, from its truth table |
 
     Each known result this feature writes itself, the small operation list with its hand-derived
-    matrices, the map with collisions, the variant with a planted gap and R5's hand-counted
-    examples, is written with its SHA-256 and entered in the provenance log (data-model §14) before
+    matrices, the map with collisions, the variant with a planted gap, R5's hand-counted examples
+    and the small operation list of known degree, is written with its SHA-256 and entered in the
+    provenance log (data-model §14) before
     the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry. The
     validation record cites both entries, and a test checks their order and that the hashes still
     match. What must match is stated per known result in data-model §7.
@@ -960,17 +974,37 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     strategy note, the spec, the plan, this document and security.md name, and the standard
     polynomials of degree 64 and 128: CMAC's R₆₄ and R₁₂₈ (SP 800-38B), GCM's (SP 800-38D), and the
     CRC-64 polynomials of ISO 3309 and ECMA-182. The check fails if the chosen polynomial is listed,
-    or if the constant table contains a listed sequence, also under word rotation or complement. A
-    design the rationale cites later is added when it is cited, and the check runs again: a match
-    fails it and blocks the design freeze (FR-043), and the rule is never changed to escape it. The
+    or if a table contains a listed sequence. Each listed constant set is read as one bit string,
+    its words in published order and most significant bit first, and a match is a run of consecutive
+    table words of at least 64 bits (16 words at w = 4, 8 at w = 8, 4 at w = 16 and 2 at w = 32)
+    equal to as many consecutive w-bit words of a listed string read from any multiple of w, also
+    after one word rotation or the complement applied to every word. The check covers every table
+    the script writes, one per supported (n, w), and each call type's stream. Its record states the
+    chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so a
+    failure shows reuse rather than chance. An addition to the list is proposed by the agent and
+    approved by the owner as a stricter change in the protocol change log, since the list only
+    grows, with the list's new SHA-256. Designs that the spec, the plan, this document or
+    security.md name later are added when named, as the rationale's citations are, and the check
+    runs again. A match makes each candidate whose polynomial or table it touches fail FR-023, an
+    eligibility item, so that candidate is `ineligible` and the rules select among the others; a
+    match in the shared polynomial touches every candidate and ends in a stop. The rule is never
+    changed to escape a match. A match found after the freeze is a finding recorded at once in
+    security.md and the report (FR-051), and `phyco-v3` stays as frozen. The
     standard polynomials matter: a plain search in ascending order finds x⁶⁴ + x⁴ + x³ + x + 1 first
     (computed on 2026-11-01), which is CMAC's R₆₄, a MAC's constant that re-decided feature-002
     FR-007 forbids, and also the CRC-64 polynomial of ISO 3309.
   - **Rotation amounts** come from a stated search over the possible amounts, ranked by the
-    trail bounds they give, with ties to the smallest amounts in a stated order. The search runs
-    at the D4 width (R6), with the scaling rule to every other width stated before it; every
-    scaled amount lies in 1 to w − 1 (R14). Before the search runs, the candidate's log entry
-    records its space of amounts, ranking measure, rounds, width and tie order. The full
+    trail bounds they give, with ties to the smallest amounts in a stated order. The search runs at
+    the D4 width (R6): first at 16, the width R6 tries first, and again at 8, with the same recorded
+    space of amounts, ranking measure, rounds and tie order, as a new log entry, if R6's rule fixes
+    the D4 width at 8, so that the scores at 8 use the amounts found at 8. The scaling rule to every
+    other width is stated before it, and every scaled amount lies in 1 to w − 1 (R14). Its searches
+    are trail searches on the candidate and count against its 48 h row, each instance capped at 8 h
+    (R7). A point whose search reaches its cap has no bound and ranks below every point with both
+    bounds, in the stated tie order among such points, and the full ranking records each point's
+    bounds or `inconclusive`. If no point has both bounds at the search width, the candidate has no
+    amounts there, so it is not scored at that width (R6). Before the search runs, the candidate's
+    log entry records its space of amounts, ranking measure, rounds, width and tie order. The full
     ranking is a committed record, and the amounts chosen are its first entry.
   - **Tables per size.** The frozen `phycoweb/constants_v3.py` holds one table per supported
     (n, w), and the script also writes each as JSON beside the vectors,
@@ -992,8 +1026,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     crosses the grid (plan, Complexity Tracking). The LFSR exists only in the script; the
     hardware holds its output as a fixed table.
 - **Stricter means**: the rule does not change once fixed; the refused list and the relations
-  checked between constants may only grow, and a later addition to the list that matches fails the
-  check and blocks the freeze, never a change of the rule.
+  checked between constants may only grow, and a later addition to the list that matches makes each
+  candidate it touches fail FR-023, never a change of the rule.
   - **How the LFSR is classed** (checklist C2): under feature-002 FR-007 as the spec re-decides
     it (D6), the LFSR is a published design method that yields a fixed table, not a standard
     PRNG in Π: no key, nonce or state enters it.
@@ -1187,7 +1221,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     this feature, README and security.md included, for the wording FR-050 forbids, "random", "truly
     random", "randomness" and "high-entropy" among it (Principle IV). "Near" and "beside" in its
     rules mean the same sentence or table row, and every flagged line, a rule's own line included,
-    passes only through an allow-list entry with its reason (data-model §15).
+    passes only through an allow-list entry with its reason (data-model §15). Inside the mapping
+    chapter it matches FR-030's list as whole words, ignoring case, with their inflections, and a
+    test runs that rule on sample sentences that must and must not be flagged.
 - **Rationale**: these are the spec's named fixes (checklist groups E and F). Markers keep one
   file correct for both environments.
 - **Alternatives**: two requirements files (more drift).

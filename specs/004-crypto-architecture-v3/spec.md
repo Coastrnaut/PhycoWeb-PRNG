@@ -181,7 +181,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`d4/tie.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`selection.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
 | Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes |
-| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, which the rules must then select; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
+| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
@@ -871,17 +871,38 @@ freeze hashes and the baseline manifest; run the claim-register test.
   integer whose bits are c's coefficients; the first primitive one not on the refused list of
   re-decided feature-002 FR-007; the bits of ASCII `PhycoWeb` as the seed; and R15's reading order.
   They are recorded as `settled` entries of the protocol change log before the first candidate is
-  scored. The refused list is frozen with the rule, its SHA-256 in the same entry; a design cited
-  later is added to it and the check runs again, and a match fails the check and blocks the design
-  freeze (FR-043), never changing the rule. The design document restates the values, and the script
+  scored. The refused list is frozen with the rule, its SHA-256 in the same entry. A match is a run
+  of consecutive table words of at least 64 bits (16 words at w = 4, 8 at w = 8, 4 at w = 16 and 2
+  at w = 32) equal to as many consecutive w-bit words of a listed constant set, read as one bit
+  string (its words in published order, most significant bit first) from any multiple of w, also
+  after one word rotation or the complement applied to every word; the check covers every table the
+  script writes, one per supported (n, w), and each call type's stream, and its record states the
+  chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so that a
+  failure shows reuse rather than chance (research R15). An addition to the list is proposed by the
+  agent and approved by the owner as a stricter change in the protocol change log, with the list's
+  new SHA-256, since the list only grows (FR-044); designs that the spec, the plan, research.md or
+  security.md name later are added when named, as the rationale's citations are, and the check runs
+  again. A match makes each candidate whose polynomial or table it touches fail this requirement, an
+  eligibility item, so that candidate is `ineligible` and the rules select among the others; a match
+  in the shared polynomial touches every candidate and ends in a stop. The rule is never changed to
+  escape a match. A match found after the freeze is a finding recorded at once (FR-051), and
+  `phyco-v3` stays as frozen. The design document restates the values, and the script
   checks that the two agree. The script writes one table per supported (n, w) (FR-018); every
   constant of Π and the mode, padding constants and domain separators included, has its rule and
   reason in the rationale (FR-034).
 - **FR-024**: Rotation amounts and every other per-node constant MUST be generated by stated
   rules, chosen by the trail bounds they give, with no non-trivial grid symmetry and with a
-  stated scaling to every word width (FUT-GRID-4). They are chosen at the D4 width (16, or else
-  8; research R6), where both bounds are computed, with the scaling rule to every other width
-  stated before the search. Before the search runs, the candidate's log entry records the space
+  stated scaling to every word width (FUT-GRID-4). They are chosen at the D4 width, where both
+  bounds are computed: each candidate's amounts are searched first at 16, the width research R6
+  tries first, with the width recorded in its log entry before the search, and if R6's rule then
+  fixes the D4 width at 8, every entered candidate's amounts are searched again at 8, with the same
+  recorded space of amounts, ranking measure, rounds and tie order, as a new log entry, and the
+  scores at 8 use the amounts found at 8. No choice is involved, since R6's rule fixes the width.
+  The scaling rule to every other width is stated before the search. Both searches are trail
+  searches on the candidate and count against its trail row (research R7); a point whose search
+  reaches its cap has no bound and ranks below every point with both bounds, and a candidate with no
+  point that has both bounds at the search width has no amounts there and is not scored at that
+  width (research R15). Before the search runs, the candidate's log entry records the space
   of amounts, the ranking measure, the rounds, the width and the tie order; the full ranking is
   a committed record, and the amounts chosen are its first entry. R_bound at w = 32 is computed
   with the scaled amounts, and the rationale reports whether the ranking held after scaling,
@@ -1043,7 +1064,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   be 0 unless a ROM is mapped to it. The total is compared with the XC7A100T's 63,400 LUTs and
   126,800 flip-flops, naming the largest size expected to fit, as an estimate that feature 008
   checks part by part against Vivado's hierarchical utilization report. Measured throughput belongs
-  to features 006 and 008 (FUT-HW-3).
+  to features 006 and 008 (FUT-HW-3). For eligibility, every candidate's figures are computed before
+  selection by the cost model from its operation list, P and R, as a `cost` record per size; the
+  design document restates them for the selected candidate (Pre-registered Design Protocol,
+  "Eligibility and selection").
 - **FR-027**: The design document MUST state the width, signedness, wrap rule, shift kind and
   comparison semantics of every operation, the update order, the direction of every data flow
   between neighbours, and the edge states of the model (Principle I; security.md §8 and §13), so
@@ -1059,7 +1083,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   lanes and nodes is stated. Truncation is stated too: the last output block of a request whose
   length is not a multiple of r keeps its first bits in FR-015's serialization order and
   discards the rest, and the padding rule fixes partial input blocks (FR-014). Nothing rounds,
-  since nothing divides.
+  since nothing divides. For eligibility, every candidate's semantics are read before selection from
+  its operation list's own declarations, which the framework requires for every operation (research
+  R11), and the design document restates them for the selected candidate.
 - **FR-028**: The round count R of every claimable size MUST be the value the pre-registered
   round rule gives at the freeze. R is computed per claimable size and may differ between sizes;
   the rationale explains its growth with n by the grid's diameter and the R_f and R_b found per
@@ -1086,27 +1112,41 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-030**: The design document MUST state the slime-mould mapping of every component
   (pressure and vein lanes, flux coupling, vein accumulation, food nodes, peristaltic rotations)
   and show how each failed `phyco-v2` mechanism (S2, S5–S7, S11–S15) is replaced: for each, it
-  names the rule of Π that replaces it and the evidence record (FR-037, FR-039) showing that the
-  failure does not recur, for example S13's merging against bijectivity by construction and the
-  exhaustive check, and S12 and S14 against the full-range rule and the bias rule; the final
-  report's lessons table cites the same records (FR-051). FR-030 covers the mechanisms of the
+  names the rule of Π that replaces it and the evidence record, or the section and test where the
+  answer is by specification, named per row. A record of FR-037, FR-038 or FR-039 is cited where a
+  measurement or search shows that the failure does not recur (S2, S7, S12–S15, S8's rotational
+  pairs, and S11's trail-bound records with the D4 choice record), for example S13's merging against
+  bijectivity by construction and the exhaustive check, and S12 and S14 against the full-range rule
+  and the bias rule. Where the answer is a property of the specification, the design document's
+  section that states it and the test that checks it are cited (S1 and S3 the key and the security
+  target, S4 the mode, S5 the full call's rate output, FR-015, S6 the fixed operations, FR-020, S9
+  and S10 bijectivity by construction and the generic bound). The final report's lessons table cites
+  the same evidence (FR-051). FR-030 covers the mechanisms of the
   step function. The others are answered elsewhere: S1 and S3 (the seed bound) by the key and
   the security target, S4 (no key, nonce or reseed) by the mode, S8 (seed words shared between
   pressures) by key loading and the rotational pairs of research R4, and S9 and S10 (bijection
   and cycles) by bijectivity by construction and the generic bound. The mapping chapter states
   what the mapping contributes (names, the structure of lanes and nodes, each component's place
-  in the metaphor) and what it does not (any security property), answering security.md §8 both
-  ways. Every component names at least one attack class it resists, a bound it supports or a
-  functional need (bijectivity, locality, hardware cost); one with none is labelled "kept for
-  the mapping only", with its cost stated, or is removed. No security argument MAY rest on the
-  mapping, or on chaos, Lyapunov exponents, ergodicity, emergent complexity, biological
-  unpredictability, or battery results offered as evidence of mixing or security (strategy note
-  §5.1 and §10). Every security statement in the rationale cites a bound record, an analysis,
-  the mode theorem or a structural proof; the mapping chapter contains no security statement,
-  and none cites it. A statement whose only support is the mapping is a finding. Two checks find
-  one: an item of the owner design review, "no security statement rests on the mapping", and a
-  rule of the claim-register test (FR-069) that flags security wording (secure, strength,
-  resist, unpredictable, chaos, Lyapunov, ergodic) inside the mapping chapter.
+  in the metaphor) and what it does not, in the fixed sentence below, answering security.md §8 both
+  ways. For eligibility, every candidate's mapping is an entry of its own in the candidate log,
+  written before its first score, naming each component's place in the metaphor and the attack
+  class, bound or need it serves; the mapping chapter restates it for the selected candidate, and
+  the owner design review checks that the two agree. Every component names at least one attack class
+  it resists, a bound it supports or a functional need (bijectivity, locality, hardware cost); one
+  with none is labelled "kept for the mapping only", with its cost stated, or is removed. No
+  security argument MAY rest on the mapping, or on chaos, Lyapunov exponents, ergodicity, emergent
+  complexity, biological unpredictability, or battery results offered as evidence of mixing or
+  security (strategy note §5.1 and §10). Every security statement in the rationale cites a bound
+  record, an analysis, the mode theorem or a structural proof; the mapping chapter contains no
+  security statement, and none cites it. A statement whose only support is the mapping is a finding.
+  Two checks find one: an item of the owner design review, "no security statement rests on the
+  mapping", and a rule of the claim-register test (FR-069) that flags security wording inside the
+  mapping chapter: whole words, ignoring case, from this list with its inflections: security,
+  secure, securely, insecure, strength, strengths, strong, resist, resists, resisted, resisting,
+  resistance, resistant, unpredictable, unpredictability, chaos, chaotic, Lyapunov, ergodic,
+  ergodicity. The one negative statement the chapter must make is fixed text, held by one allow-list
+  entry with that reason: "The slime-mould mapping contributes no security property." Any other
+  match in the chapter is flagged, and a test runs the rule on sample sentences of both kinds.
 - **FR-031**: The threshold-triggered disruption (Frustrated Foraging) MUST be removed from Π
   (D5); the food forcing becomes round-constant injection.
 
@@ -1163,10 +1203,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     evidence addresses: differential and linear (trail bounds), slide (round constants),
     invariant subspace (invariant checks, constants), rotational and rotational-XOR (symmetry
     checks, the rotational pairs of research R4), the inverse direction (R_b, Π⁻¹ in the bias
-    rule) and the mode's generic attacks (the theorem). For every candidate (it matters most for
-    the Boolean family) it gives upper bounds on the algebraic degree of r rounds of Π and Π⁻¹,
-    and the round counts below which a degree-based distinguisher (zero-sum, cube) costs less
-    than 2¹²⁸ by those bounds; such a distinguisher raises R_dist (round rule).
+    rule) and the mode's generic attacks (the theorem). For every candidate (it matters most for the
+    Boolean family) it cites the candidate's `degree` records, computed per candidate and claimable
+    size in plan phase 5, before the round rule (research R13): upper bounds on the algebraic degree
+    of r rounds of Π and Π⁻¹, from the operation list, and the round counts whose bound d is at most
+    126, for which a zero-sum over a cube of dimension d + 1 costs 2^(d + 1), less than 2¹²⁸; each
+    such round count raises R_dist (round rule).
   - **Network questions.** Each of the eight questions is answered for the duplex as designed,
     and a question that does not fit gets the reason: for question 6, the output is the rate
     lanes themselves; for question 4, the cycle structure of Π takes the place of absorbing
@@ -1332,9 +1374,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `ineligible` only for the rules' reasons (a failed inverse or bijectivity test, a failed
   eligibility item, a spent budget); it may be withdrawn before its first tool run for any
   recorded reason and still counts, and the log writer refuses any other decision. The
-  candidate frozen MUST be the one the pre-registered rules select; the owner design review
-  cannot put another eligible candidate in its place, and throughput is never a reason to
-  decline. A stricter change of the protocol applies to every candidate, those already
+  candidate frozen MUST be the one the pre-registered rules select; the owner design review cannot
+  put another eligible candidate in its place, and throughput is never a reason to decline. After a
+  decline that ends in a further candidate, the rules select again over the whole set, the declined
+  candidate included, and if they select it again the outcome is a stop (FR-043). A stricter change
+  of the protocol applies to every candidate, those already
   evaluated included: each one's verdicts are recomputed under the new rule from saved outputs
   where possible (FR-044). The final report MUST state the selection bias of choosing among
   candidates on development inputs (security.md §11.6): the candidates logged and evaluated per
@@ -1351,8 +1395,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   cited as an evaluation (section "Context"). A decline at the owner design review states its
   reasons and ends in one of: a revision of the design document or rationale (same candidate,
   new version, review repeated); a fix that leaves the design unchanged, logged under the
-  candidate; a further candidate within the stop rule, which the rules must then select; or a
-  stop. Each is logged with its reasons. Any change after the owner design review (R raised, a
+  candidate; a further candidate within the stop rule: the declined candidate stays eligible and in
+  the set, the further one is entered and evaluated like any other, and `round_rule.py --select`
+  runs again over the whole set; if the rules select the further candidate it goes to the review,
+  and if they select the declined one again the outcome is a stop, logged with the review's reasons,
+  since the declined candidate is never brought back to the review unchanged and a revision of its
+  document, the first outcome, stays possible instead; or a stop. Each is logged with its reasons.
+  Any change after the owner design review (R raised, a
   new finding, a corrected document) makes a new design-document version: the rationale is
   revised, the review is repeated for the changed parts and recorded in a row of its own, and
   the review package is rebuilt. The freeze runs in this order: (1) the owner commits the
@@ -1407,7 +1456,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     tested under its new S or S_A in addition, so R can only rise;
   - the stop rule: budgets and the candidate limit only fall;
   - the constant rule (FR-023): fixed, with its refused list, before the first candidate is scored,
-    no change after; the refused list only grows, and a later addition that matches fails the check;
+    no change after; the refused list only grows, each addition proposed by the agent and approved
+    by the owner as a stricter change with the list's new SHA-256, and a later addition that matches
+    makes each candidate it touches fail FR-023;
   - the security-target parameters: s, the key and nonce lengths and c only rise; ε only falls
     and N only rises; u, every output limit and the per-request cap only fall;
   - the values the plan fixes: as the plan's table "Values this plan fixes" states for each.
@@ -1462,13 +1513,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-051**: A new version of security.md, with a history entry, MUST give `phyco-v3` its own
   section (a table of structural facts, best-attack register rows for its first bounds, and a
   lessons table that links all fifteen of S1–S15 to the rules of Π or the parts of the design
-  that answer them (FR-030), citing the evidence records that the final report's lessons table
-  cites), a row in §1.1, a validation-phase table like §1.3, the §20.1 decision (recorded in
+  that answer them (FR-030), citing for each the evidence record, or the section and test where the
+  answer is by specification, as the final report's lessons table does), a row in §1.1, a
+  validation-phase table like §1.3, the §20.1 decision (recorded in
   2.11 on 2026-11-01; FR-017), the claim-register entry, the status of roadmap stage 5a.1 and
   a mention in §23. security.md keeps policy, status and registers, and derivations and other
   per-model detail go to research notes or reports (strategy note G16 and §7.1). A finding that
   breaks the target on the full rounds MUST be recorded at once, with a history entry and a
-  README update (strategy note §7.1, rule 5), and the standards rows of security.md §6 MUST be
+  README update (strategy note §7.1, rule 5), as MUST a match of FR-023's refused list found after
+  the freeze, with `phyco-v3` staying as frozen, and the standards rows of security.md §6 MUST be
   re-checked and dated (rule 8). README MUST state the status of `phyco-v3`, and the documentation
   drift listed in checklist group F MUST be corrected. The new security.md version keeps the
   constitution version that 2.13 names, 1.3.0, in its header, §4, §18's tree and §22's stage 1.
@@ -1706,8 +1759,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - "compliant", "conforms" and "approved" near a standard's name, outside the design
     document's one statement that `phyco-v3` conforms to no standard (FR-011);
   - a claim level above the register's `claim_level` in any document (FR-012);
-  - security wording (secure, strength, resist, unpredictable, chaos, Lyapunov, ergodic) and the
-    arguments FR-030 forbids, inside the mapping chapter (FR-030);
+  - security wording, whole words from FR-030's list with their inflections, ignoring case, and the
+    arguments FR-030 forbids, inside the mapping chapter, where only FR-030's one fixed negative
+    statement passes, through its allow-list entry (FR-030);
   - "constant time" beside the model (FR-020);
   - "random", "truly random", "randomness" and "high-entropy", in every scanned line (Principle IV;
     FR-050). Standing entries let the allowed uses stand, one fixed phrase each with its reason: the
@@ -1772,8 +1826,9 @@ design, never a value of the rule (FR-032).
 - R_dist: the largest number of rounds of Π or Π⁻¹ for which this feature's evidence shows a
   distinguisher costing less than 2¹²⁸ evaluations of Π or Π⁻¹ (FR-004): incomplete diffusion,
   a bias that meets the bias rule below, a probabilistic invariant (FR-037), a trail found with
-  probability or squared correlation above 2⁻¹²⁸, or a degree-based distinguisher (zero-sum,
-  cube) that the rationale's algebraic-degree bounds admit (FR-034). Feature 005's campaign may
+  probability or squared correlation above 2⁻¹²⁸, or a degree-based distinguisher (zero-sum, cube)
+  that the candidate's `degree` records admit, computed per candidate and claimable size before this
+  rule is applied (FR-034; research R13). Feature 005's campaign may
   raise R_dist; a higher R is then a new model ID (FR-028).
 - Δ = 2. It may only be raised.
 
@@ -1808,7 +1863,11 @@ added.
 
 **Eligibility and selection.** A candidate is eligible for the freeze only if it passes every
 structural test (FR-037), has an established R_bound at every claimable size, and meets FR-018 to
-FR-031. "Passes" means that every measurement is conclusive (its controls did not fire and no
+FR-031, each item decided for every candidate before selection from its operation list and records
+(data-model §9): FR-026's figures from its `cost` record per size, FR-027's semantics from its
+operation list's declarations and FR-030's mapping from its log entry; the design document restates
+them for the selected candidate, and the owner design review checks that the two agree. "Passes"
+means that every measurement is conclusive (its controls did not fire and no
 tool defect is left unresolved), whatever R_dist it gives, and that R_dist, R_f, R_b and
 R_bound are established at every claimable size; inconclusive bias evidence at a size makes the
 candidate ineligible. Of the eligible candidates of the chosen family, or of the other family if
@@ -1852,7 +1911,7 @@ and the candidate limit only fall.
 | FR-004 | Keep the bio-inspired structure, including a threshold-triggered disruption | Revised: the structure stays as a documented mapping (FR-030), without the threshold-triggered disruption | D5; FR-020 |
 | FR-005 | Disruption on 1–50% of steps | Withdrawn with the disruption | D5 |
 | FR-006 | 32-bit unsigned output words from the generator's own state | Revised: the output is the rate part after a full call of Π, in one canonical serialization | FR-015; S5 |
-| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants. The script holds a committed list of the polynomials and constant sets it refuses, each with its source, frozen with the constant rule before the first candidate is scored: those of the reference designs of research R12 and of every design the strategy note, the spec, the plan, research.md and security.md name, and the standard polynomials of degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's, and the CRC-64 polynomials of ISO 3309 and ECMA-182). A design the rationale cites later is added when cited. The check fails if the chosen polynomial is listed, or if the constant table contains a listed sequence, also under word rotation or complement; a failure after the first score blocks the design freeze, and the rule is never changed to escape it | Checklist group C; feature-002 O2 |
+| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants. The script holds a committed list of the polynomials and constant sets it refuses, each with its source, frozen with the constant rule before the first candidate is scored: those of the reference designs of research R12 and of every design the strategy note, the spec, the plan, research.md and security.md name, and the standard polynomials of degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's, and the CRC-64 polynomials of ISO 3309 and ECMA-182). A design that the rationale, the spec, the plan, research.md or security.md names later is added when named, as a stricter change the owner approves (FR-044). The check fails if the chosen polynomial is listed, or if a table contains a listed sequence: a run of consecutive table words of at least 64 bits equal to consecutive words of a listed constant set read from any multiple of w, also after one word rotation or the complement of every word, over every table and each call type's stream (FR-023). A match makes each candidate it touches ineligible, one in the shared polynomial ends in a stop, a match after the freeze is a finding (FR-051), and the rule is never changed to escape it | Checklist group C; feature-002 O2 |
 | FR-008 | Bit-exact model; golden vectors for at least 2 development seeds × 10,000 words; an RTL-consumable description; RTL out of scope | Kept and extended to every size (FR-035, FR-036); RTL out of scope | Principle II; FUT-GRID-5 |
 | FR-009 | Seed domain of four integers in 0…65535 | Replaced by a 256-bit key and a 128-bit nonce (FR-006); `phyco-v2` keeps its seed domain | FUT-SEC-1; S1 |
 

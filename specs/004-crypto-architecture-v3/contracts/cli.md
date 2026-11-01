@@ -157,8 +157,8 @@ in the same environment draws the sets again and compares (research R3, R4).
 evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] [--project] --out-dir DIR
 ```
 
-KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`,
-`symmetry`, `invariant` or `bound` (with `--bound-kind differential|linear --method M`). The
+KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
+`invariant`, `degree` or `bound` (with `--bound-kind differential|linear --method M`). The
 candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model
 §5 or §6 and its raw outputs, and appends an `evidence` entry to the candidate log. The counts
 are those of research R4 and R13 and cannot be lowered by an option: a `frequency` run covers
@@ -191,7 +191,13 @@ round_rule.py --select                 # writes $REP/freeze/selection.json
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
 ID. `--select` applies eligibility, the fallback to the other family and the stop rule; exit 1 if
-the outcome is a stop.
+the outcome is a stop. Eligibility is decided for every candidate from its own records (data model
+§9): FR-026's figures from its `cost` record per size, written by `research/004/tools/costmodel.py`
+from the operation list, P and R; FR-027's semantics from the operation list's declarations;
+FR-030's mapping from its `mapping` log entry. A missing item fails eligibility. After a decline at
+the owner design review that ends in a further candidate, `--select` runs again over the whole set,
+the declined candidate included, and writes `selection-2.json`, citing `selection.json`; if it
+selects the declined candidate again, the outcome is a stop, exit 1.
 
 ## `scripts/mode_limits_v3.py`
 

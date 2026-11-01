@@ -141,11 +141,11 @@ takes `data/log-append.lock` and checks the chain first (R16).
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair` |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2) |
-| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width and tie order (R15); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
+| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width (16 first) and tie order (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, measure, rounds and tie order; and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
-| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
+| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
 | `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) |
 | `variant_map` | on the `selected` entry: the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it |
 | `date_utc` | ISO 8601 |
@@ -168,6 +168,13 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   unchanged to `research/004/candidates/<id>/superseded/<sha256>.py`, and the committed
   inventory `research/004/candidates/superseded.json` lists every hash and path, so every
   `oplist_sha256` in the log stays checkable. The re-check verifies the inventory.
+- **Decline at the owner design review.** The declined candidate stays eligible and in the set, and
+  the decline's reasons are logged under it. A further candidate, within the stop rule, is entered
+  and evaluated like any other, and `round_rule.py --select` runs again over the whole set: if the
+  rules select the further candidate, it goes to the review; if they select the declined one again,
+  the outcome is a stop, logged with the review's reasons. The declined candidate is never brought
+  back to the review unchanged; a revision of its document, the decline's first outcome, stays
+  possible instead (spec FR-043).
 - **Repair.** A broken chain is repaired only with the owner's go-ahead, the Approved row "Log
   repair <n>" of the spec's Review & Approval table, which `repair_log.py --approval` names (R16).
   The broken file is kept unchanged with its SHA-256, and `scripts/repair_log.py` appends a `repair`
@@ -223,6 +230,7 @@ and every recovered seed with `model_v2`, with no sweep.
 | `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; a re-run after a tool defect runs its control again first, with the same counts | if it fired, that size's bias evidence is `inconclusive` |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order; symmetries that fix a pattern; the relations checked between the constants of one call (R13) | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
+| `degree` | per claimable size, for Π and Π⁻¹: each round's degree bound from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, for example w − 1 for a w-bit addition); the bound d for r rounds, the product of the per-round degrees capped at b − 1; the round counts with d ≤ 126 (R13) | each such round count raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
 
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
@@ -269,10 +277,11 @@ same kind and of the tool's exact hash exists.
   For the known results that are not published values, what must match is exact equality for every
   deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
   S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; each structural tool's
-  counts and matrices, entry by entry; R5's counts; and FUT-SEC-8's three seeds and its vector
-  check. A measured fraction, such as S13's 41% and 32% or S14's bit frequencies, matches when the
-  tool's count lies in the binomial interval around the recorded fraction, for the tool's sample
-  size, with at most 0.005 in each tail. Anything else is `not re-found`.
+  counts and matrices, entry by entry; the degree bound's exact degree; R5's counts; and FUT-SEC-8's
+  three seeds and its vector check. A measured fraction, such as S13's 41% and 32% or S14's bit
+  frequencies, matches when the tool's count lies in the binomial interval around the recorded
+  fraction, for the tool's sample size, with at most 0.005 in each tail. Anything else is `not
+  re-found`.
 - **After a failed validation**, the record of the next attempt holds the defect, its cause and
   the fix, and the re-validation re-finds a second known result of its kind as well as the
   first, named in the defect record before the fix runs. Every attempt is a record of its own.
@@ -284,7 +293,8 @@ same kind and of the tool's exact hash exists.
   The sets are class 5 of section 2, and the record holds the numpy version and each set's SHA-256.
 - **Self-written known results.** Each known result this feature writes itself (the small operation
   list with its hand-derived matrices, the map with collisions, the variant with a planted gap, R5's
-  hand-counted examples) is written with its SHA-256 and entered in the provenance log (section 14)
+  hand-counted examples, the small operation list of known degree) is written with its SHA-256 and
+  entered in the provenance log (section 14)
   before the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry.
   The validation record cites both entries, and a test checks their order and that the hashes still
   match.
@@ -307,13 +317,22 @@ with the date, the choice and the record's SHA-256, and it never changes.
 ## 9. Round rule, eligibility and selection
 
 `candidates/<id>/round-rule.json`, per claimable size: `R_f`, `R_b`, `R_bound` (with its bound
-records), `R_dist` (with its evidence records), `delta` = 2, `R`, and `eligible` with each item
-of FR-018 to FR-031 and FR-037 and its evidence. `selection.json`: the eligible candidates of the
+records), `R_dist` (with its evidence records, the `degree` records among them), `delta` = 2, `R`,
+and `eligible` with each item of FR-018 to FR-031 and FR-037 and its evidence, decided for every
+candidate before selection: FR-026's figures from its `cost` record per claimable size
+(`candidates/<id>/cost-<record_id>.json`, written by `research/004/tools/costmodel.py` from the
+operation list, P and R); FR-027's semantics from the operation list's own declarations, which the
+framework requires for every operation; FR-030's mapping from the candidate's `mapping` log entry.
+The design document restates them for the selected candidate, and the owner design review checks
+that the two agree. `selection.json`: the eligible candidates of the
 chosen family, or of the other family if it has none, or of both families if D4 was not
 computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule outcome with its
-reason. The owner's choice in a tie is made only after `selection.json` exists, recorded in the
-record and in the Review & Approval row "Selection tie" with the date, the choice and the
-record's SHA-256, and it never changes.
+reason. After a decline at the owner design review that ends in a further candidate, `--select` runs
+again over the whole set, the declined candidate included, and writes `selection-2.json`, citing
+`selection.json`, which stays; selecting the declined candidate again is a stop, with the review's
+reasons (section 3). The owner's choice in a tie is made only after `selection.json` exists,
+recorded in the record and in the Review & Approval row "Selection tie" with the date, the choice
+and the record's SHA-256, and it never changes.
 
 ## 10. Size profile and security target (`security-target/`)
 
@@ -478,8 +497,9 @@ security.md §15's L1 gate since version 2.13 (FR-012); the spec approval record
   statement; random nonces as a usage rule; the random baseline and the uniform controls of the
   tests; "an established cryptographic random-number generator" in the disclaimer; security.md §6's
   rows, which state a standard's own status; and the spec's FR-025 sentence on zeroization in the
-  model, which says what the model does not promise. Any other flagged line needs an entry of its
-  own.
+  model, which says what the model does not promise; and the mapping chapter's one fixed negative
+  statement (FR-030). Inside the mapping chapter the rule matches FR-030's list as whole words,
+  ignoring case, with their inflections. Any other flagged line needs an entry of its own.
 
 ## 16. Review package (`review-package/MANIFEST.json`; FR-063)
 
@@ -533,4 +553,6 @@ altered the text of a pre-registered rule, whatever its tag: the 31 rows tagged 
 known result for the bias tool. Each cites its row ID and takes `stricter`, in the rule's stated
 direction, or `settled`. The list is fixed by row ID before the log is created. Among them, the
 constant rule's values (research R15) and the SHA-256 of its refused list are `settled` entries
-written before the first candidate is scored. The spec's Clarifications point to the log.
+written before the first candidate is scored. Every later addition to the refused list is a
+`stricter` entry, proposed by the agent and approved by the owner, with the list's new SHA-256. The
+spec's Clarifications point to the log.
