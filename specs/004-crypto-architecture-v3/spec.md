@@ -522,8 +522,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   before the freeze; a correction to the design document is a new version of it.
 - **Evidence is missing for a result**: the status is "not evaluated", "inconclusive" or
   "blocked" (security.md §16.3). A generated report is not proof that a test ran.
-- **The bias rule fires on its uniform control**: the bias evidence of that size is
-  inconclusive, and the rule is not loosened (Principle IV).
+- **The bias rule fires on its uniform control**: the bias evidence of that size is inconclusive for
+  every candidate, since the control's one record per test and size serves them all, so none is
+  eligible at that size and the feature recommends stopping (stop rule), citing the control record.
+  The control inputs are never redrawn or replaced, and the rule is not loosened (Principle IV).
 - **Property-based testing is not approved**: the boundary and fixed tests stand alone, and the
   gap is recorded as an open item (FR-058).
 - **An AI session offers a review**: it is recorded as an AI review, never as the external design
@@ -1168,8 +1170,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   on reduced variants; R_bound, R_f, R_b and the bias evidence come from the production width
   at each claimable size. A reduced-variant result transfers as evidence about the design, by
   the same generics, never as a value of the round rule. At 2×2, where a node's opposite neighbours
-  coincide (FR-018), a result transfers only for properties that do not depend on the neighbourhood,
-  such as bijectivity and the tools' validation; 2×2's R_f, R_b, symmetries and invariants are facts
+  coincide (FR-018), a result transfers only for properties that do not depend on the neighbourhood:
+  bijectivity, and the validation of tools whose behaviour does not depend on it (box and S-box
+  tables, the bijectivity bitmap, the cost model's counts). The dependency propagation is validated
+  on its stated small operation list at 3×3 and 4×4, with hand-derived matrices at each, and the
+  symmetry check, beside S7's result, on stated lists with planted torus symmetries (a translation,
+  a rotation by 90° and a reflection) at n = 3 and 4, which it must find, and one with none, which
+  it must clear (research R13); 2×2's R_f, R_b, symmetries and invariants are facts
   about 2×2 alone, never evidence about a claimable size. The reduced variants a candidate uses
   as evidence (widths, sizes, round counts, capacities) are logged in its `parameters` before
   its first tool run; one added later is logged with its reason before its first run, and
@@ -1294,7 +1301,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a search that times out gives no bound and is recorded as `inconclusive`. The solver options
   that decide a bound are fixed and recorded (a MIP gap of 0, the feasibility and integrality
   tolerances, the thread count and the 8 h limit), and a floating-point bound becomes an exact
-  rational by rounding in the direction that weakens it, a weight rounded down, never up. A
+  rational by rounding in the direction that weakens it, a weight rounded down, never up. Every MILP
+  bound record states that its status rests on the solver's built-in tolerances, and the design
+  document and the final report say so beside R_bound. A bound that sets R_bound is confirmed where
+  an exact method exists, by the exhaustive tables at w = 4 and 8; at 16 and 32, where no exact
+  method exists without a further tool, and so at the production width R_bound comes from, it is
+  reported as proven by the solver within its tolerances, a limitation each such record states. A
   bound established at one claimable size is carried to a larger size only by a proof in the
   design document that holds for every claimable n (for example that every r-round trail at
   n×n activates at least as many boxes as at 4×4), checked by computing it at 8×8; otherwise
@@ -1303,30 +1315,42 @@ freeze hashes and the baseline manifest; run the claim-register test.
   re-find a known result of its kind (security.md §12.5): on `phyco-v2`, the FUT-SEC-8
   recovery, both merging mechanisms of S13, the vein bounds of S12 and S15, and the bias of S14;
   for trail search, a published optimal trail of a reference design. Every tool whose verdict
-  counts has one: the symmetry check re-finds S7's rotation structure of `phyco-v2`'s
-  constants; the dependency propagation re-finds the hand-derived matrices of a stated small
-  operation list; exhaustive bijectivity re-finds a known permutation (2³² distinct outputs) and
-  a stated map with collisions (fewer); the avalanche test re-finds a planted gap, a stated
-  variant that leaves one lane unmixed; and the cost model re-finds the hand-counted examples
-  of research R5. The bias tool's validation also shows its detection power: on 100 sets of
+  counts has one: the symmetry check re-finds S7's rotation structure of `phyco-v2`'s constants and
+  the planted torus symmetries of stated lists at n = 3 and 4, and clears a list with none; the
+  dependency propagation re-finds the hand-derived matrices of a stated small operation list at 3×3
+  and 4×4; exhaustive bijectivity re-finds a known permutation (2³² distinct outputs) and
+  a stated map with collisions (fewer); the avalanche test re-finds a planted gap, a stated variant
+  that leaves one lane unmixed, and its validation record also shows, without new inputs, that its
+  verdict function fires exactly on the counts at or beyond its two critical values and that its
+  power at research R4's δ_A is at least 0.9; the cost model re-finds the hand-counted examples of
+  research R5; and the degree bound re-finds the exact degree of a stated small operation list
+  (research R13). The bias tool's validation also shows its detection power: on 100 sets of
   synthetic binomial counts with a planted bias at the 90%-power values of research R4 (0.0030,
   0.0031 and 0.0033 at the three sizes), its firing rate lies within a stated binomial interval
   around 90%. The synthetic sets are constructed inputs of research R3's class 5, fixed by a public
   rule before first use, hashed and never redrawn. Each known result this feature writes itself (the
-  small operation list with its hand-derived matrices, the map with collisions, the variant with a
-  planted gap, research R5's hand-counted examples) is written with its SHA-256 and entered in the
+  small operation lists with their hand-derived matrices, the lists with planted symmetries and the
+  one with none, the map with collisions, the variant with a planted gap, research R5's hand-counted
+  examples, the small operation list of known degree) is written with its SHA-256 and entered in the
   provenance log before the tool it validates is drafted; the validation record cites both entries,
   and a test checks their order and that the hashes still match (data-model §7, §14). What must
   match is stated per known result (data-model §7): exact equality for every deterministic fact, and
   for a measured fraction a count in the binomial interval around the recorded fraction at the
   tool's sample size, with at most 0.005 in each tail; anything else is `not re-found`. Each known
   result is of the kind of its use, or a cross-check covers the difference: the ARX search
-  reproduces the exhaustive box tables at w = 4 and 8 (boxes of 8 and 16 bits) before it counts at
-  w = 16 and 32, and the active-S-box counter reproduces the exhaustive trail optima of a χ-like
-  candidate at w = 4; a tool used outside its validated kind writes `not evaluated`. A tool is
+  reproduces the exhaustive box tables of each ARX candidate's ARX-box at w = 4 and 8 (boxes of 8
+  and 16 bits) before its searches at w = 16 and 32 count, and the active-S-box counter reproduces
+  the exhaustive trail optima of each Boolean candidate's nonlinear layer at w = 4, whatever its
+  form, each once per candidate and tool version and charged to that candidate's trail row (research
+  R7, R12); a tool used outside its validated kind writes `not evaluated`. A tool is
   validated again after any change to its code (its SHA-256 differs), a dependency upgrade, or a use
   at a word width, operation set or kind of model outside its validated kind, and each counted
-  result cites the validation record of the tool's exact hash. Each tool's version, licence and
+  result cites the validation record of the tool's exact hash. The trail tools are a fixed set once
+  the first trail search starts, named by research R12's rows (ARX search, active-S-box counting,
+  long-trail active-box counting, exhaustive tables): a fixed or faster version of a named tool is
+  the same tool and, re-validated, may serve searches not yet run, and a search that reached its cap
+  is never run again, with another tool or another version, except as the one re-run after a
+  recorded tool defect (research R7); a speed-up is not a defect. Each tool's version, licence and
   validation MUST be recorded at its first use; a self-written tool's version is the SHA-256 of its
   code. A positive result is never dropped for want of validation: a trail or distinguisher from a
   tool not yet validated is recorded as an unverified hypothesis (FR-060) and blocks the candidate's
@@ -1537,12 +1561,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   FUT-GRID-5's validation of 4×4 first to features 006 and 008: in simulation before 8×8 and 16×16,
   and on the board before each larger claimable size that fits the XC7A100T (FR-036). The report
   reads 2×2 evidence only for properties that do not depend on the neighbourhood, such as
-  bijectivity and the tools' validation, and states 2×2's R_f, R_b, symmetries and invariants as
-  facts about 2×2 alone, never as evidence about a claimable size (FR-032). Its open items for
-  feature 008 also name each measurement FUT-HW-3 asks for: words per second by on-chip counters at
-  the achieved clock, per claimable size that fits, compared with the C stream, and power through
-  the board's VCCINT current sensor and the XADC, beside Vivado's estimate; this feature supplies
-  only the implied throughput (FR-026).
+  bijectivity and the validation of tools whose behaviour does not depend on it (box and S-box
+  tables, the bijectivity bitmap, the cost model's counts), and states 2×2's R_f, R_b, symmetries
+  and invariants as facts about 2×2 alone, never as evidence about a claimable size (FR-032). Its
+  open items for feature 008 also name each measurement FUT-HW-3 asks for: words per second by
+  on-chip counters at the achieved clock, per claimable size that fits, compared with the C stream,
+  and power through the board's VCCINT current sensor and the XADC, beside Vivado's estimate; this
+  feature supplies only the implied throughput (FR-026).
 
 **Reproducibility**
 
@@ -1669,7 +1694,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   as in security.md §9.1: confirmed vulnerability, strong theoretical concern, unverified
   hypothesis, or no weakness identified within the analysis performed. A negative result MUST be
   worded as limited to its scope, and a proposed attack MUST NOT be reported as a vulnerability
-  until it is proved or reproduced (security.md §12.4).
+  until it is proved or reproduced (security.md §12.4). The classification is computed by code from
+  data-model §1's table by kind and outcome (FR-065), and a reviewer may add only a note: a record
+  without a finding holds `none`; a firing, or a trail found by a validated tool, that raises R is a
+  confirmed vulnerability of the reduced rounds it covers, worded with its round count and the
+  stated family-wise chance of a false firing, since a possible weakness only raises R; a test that
+  does not fire is "no weakness identified within the analysis performed", with its scope; and a
+  finding of a tool not yet validated stays an unverified hypothesis, `blocked`.
 - **FR-061**: Every evidence record MUST hold the fields of security.md §17.2: a unique
   identifier, and the date and time; the model ID, design-document version, `git_head` and
   `git_dirty`; tool and dependency versions, operating system and hardware; the exact command
@@ -1710,8 +1741,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   recorded in the provenance log with its review status, which the owner design review
   updates; the frozen text carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the inverse, bijectivity,
-  dependency, bias, symmetry, invariant and bound checks; eligibility and selection) MUST be
-  computed by code from saved outputs and be recomputable by a re-check script, never taken from
+  dependency, bias, symmetry, invariant and bound checks; eligibility and selection) and every
+  record's classification (FR-060) MUST be computed by code from saved outputs and be recomputable
+  by a re-check script, never taken from
   a narrative (security.md §16.1). No phase, test or gate MAY be recorded as passed because its
   documents exist; where evidence is missing, the status MUST be "not evaluated",
   "inconclusive" or "blocked" (security.md §16.3). The re-check needs only committed files, so
@@ -1832,6 +1864,15 @@ design, never a value of the rule (FR-032).
   raise R_dist; a higher R is then a new model ID (FR-028).
 - Δ = 2. It may only be raised.
 
+At each size the kinds of evidence run in this order: trail bounds (R_bound), then the structural
+checks (R_f, R_b, symmetries, invariants and the `degree` records), then the frequency test, then
+the avalanche test (plan phase 5; research R4). The bias tests start at the R the earlier kinds
+give, max(2 · R_dist, R_bound + Δ, 2 · max(R_f, R_b)), and R rises as research R4 says. Any later
+rise, from either bias test, a reproduction's finding or a stricter change, extends every bias test
+already run at that size to the new R, as a new measurement of the same kind charged to the 12 h row
+(research R7); if the row cannot hold it, that size's bias evidence is inconclusive and the
+candidate `ineligible`.
+
 *Stricter means*: Δ only rises, and sources of R_dist are only added.
 
 **Bias rule.** At each size and round count, a state bit's frequency of ones counts as a
@@ -1843,7 +1884,9 @@ the same number of uniform states, derived from public strings by SHA-256 as the
 inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md
 §11.6). A firing is reported as a distinguisher at its round count that raises R, with the
 family-wise rate of chance firings stated beside it (FR-028), and it is never measured again to
-remove it. *Stricter means*: only a change that can add firings and never remove one. Every
+remove it. At each size it runs after the trail bounds and the structural checks, from the R they
+give, and a later rise of R extends it to the new R (round rule). *Stricter means*: only a change
+that can add firings and never remove one. Every
 firing recorded under the rule then in force stands, and a larger N, N_a or F, or a new set, is
 tested under its new S or S_A in addition, so R can only rise.
 
@@ -2200,7 +2243,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   vector, reproduced on both platforms of SC-009, and the second transcription agrees with the
   model at 100% of the steps of the committed vectors.
 - **SC-017**: 100% of evidence records hold every field of security.md §17.2 and the disclaimer,
-  100% of findings carry a classification of security.md §9.1, and the re-check scripts
+  100% of findings carry a classification of security.md §9.1 and every other record `none`, each
+  computed by code (FR-060), and the re-check scripts
   reproduce 100% of the verdicts on a fresh clone from committed files alone (FR-065).
 - **SC-018**: The claim-register test reports 0 disagreements between the register, README,
   security.md and the disclaimers, 0 uses of forbidden wording outside the rules that forbid

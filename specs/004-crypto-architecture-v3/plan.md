@@ -302,6 +302,8 @@ reports/004-crypto-architecture-v3/
 ├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
 ├── fut-sec-8/                # demonstration record, tool check, review, any reproduction
 ├── validation/               # tool validation records
+├── controls/                 # uniform controls, one record per test and size,
+│                             # shared by every candidate (R4)
 ├── candidates/<id>/          # evidence per candidate
 ├── d4/                       # the D4 choice and its inputs
 ├── security-target/          # bound at the limits, generic-bound table
@@ -343,8 +345,10 @@ source and binary.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
    choice; production-width bounds, structural checks with the `degree` records, frequency and
-   avalanche tests; R by the round rule; eligibility; the stop rule. One heavy run at a time, each
-   projected first, and each kind of evidence at 4×4, then 8×8, then 16×16 (R7).
+   avalanche tests, in that order at each size, the bias tests starting at the R the earlier kinds
+   give and extended to every later rise of R (R4); R by the round rule; eligibility; the stop rule.
+   One heavy run at a time, each projected first, and each kind of evidence at 4×4, then 8×8, then
+   16×16 (R7).
 6. **US3 model and vectors**: the design document complete; constants; `model_v3.py`; vectors
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
 7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes

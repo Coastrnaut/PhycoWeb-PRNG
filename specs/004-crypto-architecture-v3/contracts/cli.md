@@ -69,18 +69,24 @@ record), and nothing is written; **3** tool or I/O error, a recorded tool defect
   written with `status` `not evaluated` and never counts; a trail or distinguisher it finds is
   recorded as an unverified hypothesis, `blocked`, which blocks the candidate's eligibility
   until a validated tool, or direct evaluation with the validated exact models, settles it
-  (data model §5). A tool is validated again after any change to its code (its SHA-256
-  differs), a dependency upgrade, or a use at a word width, operation set or kind of model
-  outside its validated kind; until then its results are `not evaluated`.
+  (data model §5). A tool is validated again after any change to its code (its SHA-256 differs), a
+  dependency upgrade, or a use at a word width, operation set or kind of model outside its validated
+  kind; until then its results are `not evaluated`. A re-validated version of a tool in the fixed
+  set may serve searches not yet run, never a search that reached its cap (Trail tools).
 - **Budget**: a script refuses work on a candidate whose budget row is spent (R7), exit 2, and a
   search that reaches its per-instance cap writes `inconclusive`. A heavy run first projects its
   hours on the candidate (at most 60 s), writing a `projection` record (data model §1), and
-  exits 2, writing no evidence, unless its projection, plus the projections (probes only) of
-  the same kind of run at every larger claimable size, fits the hours left in its row. A probe
+  exits 2, writing no evidence, unless its projection, plus the probes of every run its row still
+  needs (its own kind at every larger claimable size, and every other kind of the row at every
+  claimable size, in the row's fixed order of research R7), fits the hours left in its row. A probe
   writes nothing but its `projection` record, and its time counts against the row of the run it
   projects (data model §1).
-- **Trail tools**: once the feature's first trail search has started, a trail tool without an
-  earlier `re-found` record is refused, exit 2 (research R12).
+- **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
+  exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
+  active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has
+  an earlier `re-found` record. A search that reached its cap is refused, exit 2, with any tool or
+  version, except as research R7's one re-run after a recorded tool defect; a speed-up is not a
+  defect (research R12).
 
 ## `fast/build/seed_search` (C, WSL; built by `make -C fast -f seed_search.mk`)
 
@@ -167,8 +173,11 @@ rotational sets. An `avalanche` run needs the candidate's `dependency` record at
 or exits 2; a disagreement with its matrices writes the record with `status` `inconclusive` and
 a tool-defect entry, and exits 3. Every run started writes a record, even if aborted
 (`inconclusive` or `blocked`, with the reason). `--project` runs the timing probe of research
-R7, writes a `projection` record and prints the projected hours against the budget row; it
-writes no evidence.
+R7, writes a `projection` record and prints the projected hours against the budget row; it writes no
+evidence. A `control` run belongs to no candidate: it runs once per test and size, before that
+test's first use at that size by any candidate, writes its record under `$REP/controls/`, which
+serves every candidate, and exits 2 if that record exists, except for the one re-run after a
+recorded tool defect in the control's own code (data model §5).
 
 ## `scripts/d4_choice.py`
 

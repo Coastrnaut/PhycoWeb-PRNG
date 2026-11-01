@@ -55,9 +55,9 @@ implementation can write byte-identical files:
 | `outputs` | list | `{path, sha256, bytes, committed}`, and `uncompressed_sha256` for a `.gz` file; `committed` false for local-only files (R16); a committed file has one of the suffixes of the introduction |
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
 | `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
-| `classification` | str | one of the four classes of security.md §9.1 (FR-060) |
+| `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
 | `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` stays `pending` until a review is recorded |
-| `limitations` | list[str] | known limitations, and the scope of any negative result |
+| `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
 | `heavy_run` | bool | true if the run held the heavy-run lock (FR-045) |
 | `disclaimer` | str | `protocol.disclaimer.DESIGN_DISCLAIMER`, verbatim (FR-068) |
 
@@ -67,6 +67,17 @@ security.md §11.6: `sample_size`, `test_parameters`, `raw_counts` (path and SHA
 (every fired bit with its round count, direction and input or difference set) and
 `exclusions_and_reruns` (each citing the recorded tool defect, one of the kinds of research R7, with
 its evidence; empty unless a tool defect is recorded).
+
+**Classification** by kind and outcome, computed by code (FR-060, FR-065). security.md §9.1
+classifies findings, so a record without one holds `none`; a reviewer may add a note, never change
+the class.
+
+| Kind and outcome | `classification` |
+|------------------|------------------|
+| No finding: vectors, constants, projections, validations, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| A firing, or a trail found by a validated tool, that raises R (a possible weakness only raises R; section 5) | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and the stated family-wise chance of a false firing |
+| A test that does not fire | `no weakness identified within the analysis performed`, with its scope |
+| A finding of a tool not yet validated | `unverified hypothesis`, with `status` `blocked` |
 
 - **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or
   `lf-normalized` (research R16).
@@ -227,7 +238,7 @@ and every recovered seed with `model_v2`, with no sweep.
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
 | `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
 | `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
-| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; a re-run after a tool defect runs its control again first, with the same counts | if it fired, that size's bias evidence is `inconclusive` |
+| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired. One record per test and size, `controls/<test>-<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order; symmetries that fix a pattern; the relations checked between the constants of one call (R13) | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
 | `degree` | per claimable size, for Π and Π⁻¹: each round's degree bound from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, for example w − 1 for a w-bit addition); the bound d for r rounds, the product of the per-round degrees capped at b − 1; the round counts with d ≤ 126 (R13) | each such round count raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
@@ -254,8 +265,9 @@ and every recovered seed with `model_v2`, with no sweep.
 | `bound` | a rational as a "p/q" string, and its −log₂. A floating-point solver value becomes the rational by rounding in the direction that weakens the bound: a weight is rounded down, never up |
 | `method` | for example `active-box count`, `exhaustive table`, `milp`, `branch-and-bound` |
 | `tool`, `validation` | the tool, and the ID and SHA-256 of the validation record of its exact hash, whose `created_utc` must be earlier (FR-039; SC-007); a tool used outside its validated kind writes `not evaluated` |
-| `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such |
+| `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such; the record states that its status rests on those tolerances (R12) |
 | `scope` | "single trails under the usual independence assumptions; clustering into differentials and linear hulls, and key-dependent effects, open for feature 005" |
+| `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash (R12); an ARX search at w = 16 or 32 counts only after it |
 | `budget` | hours used and the cap; only a proven result gives a `bound` (R12), and a capped or timed-out search has `status` `inconclusive` and no `bound` |
 
 A bound from a tool not yet validated never counts; a trail it finds is an unverified hypothesis
@@ -276,12 +288,13 @@ same kind and of the tool's exact hash exists.
   re-found`.
   For the known results that are not published values, what must match is exact equality for every
   deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
-  S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; each structural tool's
-  counts and matrices, entry by entry; the degree bound's exact degree; R5's counts; and FUT-SEC-8's
-  three seeds and its vector check. A measured fraction, such as S13's 41% and 32% or S14's bit
-  frequencies, matches when the tool's count lies in the binomial interval around the recorded
-  fraction, for the tool's sample size, with at most 0.005 in each tail. Anything else is `not
-  re-found`.
+  S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; the planted torus
+  symmetries of the stated lists at n = 3 and 4 found, and none on the list without one; each
+  structural tool's counts and matrices, entry by entry; the degree bound's exact degree; R5's
+  counts; and FUT-SEC-8's three seeds and its vector check. A measured fraction, such as S13's 41%
+  and 32% or S14's bit frequencies, matches when the tool's count lies in the binomial interval
+  around the recorded fraction, for the tool's sample size, with at most 0.005 in each tail.
+  Anything else is `not re-found`.
 - **After a failed validation**, the record of the next attempt holds the defect, its cause and
   the fix, and the re-validation re-finds a second known result of its kind as well as the
   first, named in the defect record before the fix runs. Every attempt is a record of its own.
@@ -291,8 +304,17 @@ same kind and of the tool's exact hash exists.
   binomial counts with one bit planted at the 90%-power biases it fires in 82 to 97 of the 100
   sets.
   The sets are class 5 of section 2, and the record holds the numpy version and each set's SHA-256.
+- **The avalanche test** (R4): the planted gap of R13 re-found; its verdict function, applied to
+  every count 0 to N_a of one difference bit, fires exactly on the counts at or beyond the two
+  critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
+  computed exactly from the binomial distribution, is at least 0.9. One record per size covers the
+  flip set, the related-key and related-nonce set and the rotational pairs.
+- **Cross-checks between kinds** (R12) are records of the candidate they run on, once per candidate
+  and tool version, charged to its trail row; a failed one is a tool defect. The validations on
+  published values stay validation records, charged to no candidate.
 - **Self-written known results.** Each known result this feature writes itself (the small operation
-  list with its hand-derived matrices, the map with collisions, the variant with a planted gap, R5's
+  lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted torus symmetries and
+  the one with none, the map with collisions, the variant with a planted gap, R5's
   hand-counted examples, the small operation list of known degree) is written with its SHA-256 and
   entered in the provenance log (section 14)
   before the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry.
