@@ -51,14 +51,19 @@ record), and nothing is written; **3** tool or I/O error, a recorded tool defect
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
+- **Approvals**: every guard that reads the spec's Review & Approval table (Order of US1, below;
+  `design_freeze.py create`; `repair_log.py`) reads it as committed at HEAD, never the working tree,
+  and exits 2 while the working tree's table differs from HEAD's. The rows that open a guard are set
+  to Approved and committed by the owner (the note under that table), so an uncommitted row opens
+  none, and the owner's review at each ⛔ gate lists the approval commits since the last gate.
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
   exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table reads
-  Approved (FR-001, FR-003). Key loading is code that loads a key into such a state: the mode's
-  instantiate in the model, the research duplex, and any script that runs instantiate, such as
-  the instantiation states of research R4. It is not the development-input loader, which
-  derives keys but loads none, nor a keyless operation list of Π, nor the design document's
-  text. `tests/test_protocol_004.py` fails if `phycoweb/model_v3.py` or a candidate defines key
-  loading before that.
+  Approved at HEAD (Approvals, above; FR-001, FR-003). Key loading is code that loads a key into
+  such a state: the mode's instantiate in the model, the research duplex, and any script that runs
+  instantiate, such as the instantiation states of research R4. It is not the development-input
+  loader, which derives keys but loads none, nor a keyless operation list of Π, nor the design
+  document's text. `tests/test_protocol_004.py` fails if `phycoweb/model_v3.py` or a candidate
+  defines key loading before that.
 - **Tool validation**: one rule for every counted result, positive or negative (FR-039). A
   result of a tool without a `re-found` validation record of its kind and of its exact hash is
   written with `status` `not evaluated` and never counts; a trail or distinguisher it finds is
@@ -239,7 +244,8 @@ local-only outputs, do not count. The record holds what data model §13 lists: a
 scripts, every evidence record behind R by ID and by SHA-256, and the last `seq` and line
 SHA-256 of the candidate log, the provenance log and the protocol change log.
 
-`create` exits 2 if the owner design review row is not Approved, if the external review row is
+`create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
+owner design review row is not Approved, if the external review row is
 neither done nor "not arranged", or if `git_dirty` is true. `create` stores `draft_sha256`, the
 SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
 the owner, changes `status` from `draft` to `approved`, adds `approved_by`, `approved_utc` and

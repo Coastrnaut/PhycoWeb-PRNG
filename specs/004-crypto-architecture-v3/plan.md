@@ -336,9 +336,10 @@ source and binary.
    on published values, from the papers of R19, whose downloads the owner approved on
    2026-11-01 (`47270450.pdf` through the owner's browser), or from values the owner provides.
    The set of trail tools is fixed when the first trail search starts (R12).
-4. **US2 security target**: design document chapter 1, the mode chapter with every
-   precondition, `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and AIS 20/31 3.0 come
-   from the approved downloads of R19, `169.pdf` through the owner's browser.
+4. **US2 security target**: design document chapter 1, drafted here and marked "draft, under review"
+   until the security-target review of phase 8, which cites records that exist only after phase 5;
+   the mode chapter with every precondition, `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and
+   AIS 20/31 3.0 come from the approved downloads of R19, `169.pdf` through the owner's browser.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
    choice; production-width bounds, structural checks, frequency and avalanche tests; R by the
@@ -348,10 +349,15 @@ source and binary.
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
 7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes
    `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
-8. **US5**: rationale; the security.md version of FR-051 (2.11 already records the §20.1
+8. **US5**: first the security-target review, with its Review & Approval row, after the selection
+   and before the owner design review: it cites the selected candidate's records of FR-029's
+   diffusion through instantiation and of R4's first-order differences, and closes FR-011's
+   functionality class; L1 recorded when its gate passes (security.md §15, 2.13: the FUT-SEC-8
+   result review and the security-target review); then the rationale; the security.md version of
+   FR-051 (2.11 already records the §20.1
    decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design
    review**; external review recorded as done or not arranged; the owner commits the feature
-   files (Principle IX); ⛔ **design freeze**; L1 recorded when its gate passes.
+   files (Principle IX); ⛔ **design freeze**.
 9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
    checklist group F corrected, and an addendum to the feature-002 phase report, whose
    "invertible-looking ARX" S13 contradicts (FR-051); claim-register test; re-check of every

@@ -1183,8 +1183,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `DISCLAIMER` stays unchanged. The claim test compares every document's copy with the
     constant. No freeze of features 002 or 003 pins this file.
   - The claim and evidence register is `protocol/claims.json`. `tests/test_claims.py` checks
-    README, security.md §1.1 and §15, and the disclaimers against it, and scans for the wording
-    FR-050 forbids outside the rules that forbid it.
+    README, security.md §1.1 and §15, and the disclaimers against it, and scans every document of
+    this feature, README and security.md included, for the wording FR-050 forbids, "random", "truly
+    random", "randomness" and "high-entropy" among it (Principle IV). "Near" and "beside" in its
+    rules mean the same sentence or table row, and every flagged line, a rule's own line included,
+    passes only through an allow-list entry with its reason (data-model §15).
 - **Rationale**: these are the spec's named fixes (checklist groups E and F). Markers keep one
   file correct for both environments.
 - **Alternatives**: two requirements files (more drift).

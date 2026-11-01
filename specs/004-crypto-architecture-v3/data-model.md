@@ -342,7 +342,8 @@ record's SHA-256, and it never changes.
 - The generic-bound checks of FR-010, at s = c/2 for a keyed reduced variant, each a check that
   can fail, with 0 violations required at every claimable size: output volume (every limit at
   most what the theorem allows at ε, R9's doubling check), multi-target search, key plus nonce,
-  capacity, quantum search (k/2 ≥ s, which holds with equality at k = 256 and s = 128), and the
+  capacity, quantum search (T11 as single-target key search only, FR-008: k/2 ≥ s, which holds with
+  equality and no margin at k = 256 and s = 128, recorded as met with equality), and the
   stated behaviour on nonce reuse, with its test.
 - At claimable sizes, `throughput_implied`, in 32-bit words per second at 200 MHz (FR-026): computed
   from the rate r/(P·R + ⌈r/i⌉) bits per cycle, where i is the output interface's
@@ -450,8 +451,9 @@ the owner design review updates, so that the frozen text carries no status (FR-0
 
 One entry per model ID (`float-v0`, `lut-v1`, `phyco-v2`, `phyco-v3`): `claim_level` (L0…L5),
 `in_progress`, `claim` (`no claim`), `bound` (for example "at most 64 bits" for `phyco-v2`),
-`evidence` (record paths), `updated`. `phyco-v3` starts at L0 and moves to L1 only after its
-gate (FR-012).
+`evidence` (record paths), `updated`. `phyco-v3` starts at L0 and moves to L1 only when the spec's
+"L1 recorded" row reads Approved, after the FUT-SEC-8 result review and the security-target review,
+security.md §15's L1 gate since version 2.13 (FR-012); the spec approval recorded no level.
 
 - `claim_level` keeps the highest level reached (L0 or L1 in this feature). `in_progress` names
   a level started and not reached, L2, with its start date and "not reached". The claim test
@@ -462,12 +464,22 @@ gate (FR-012).
   first-order related-key and related-nonce differences, and stays open for feature 005's analysis
   (FR-049). L1's "FUT-SEC-1 to FUT-SEC-6 met by specification" (security.md §15) is decided on this
   one reading: the security-target review accepts the design document's section on key loading and
-  cites the evidence records of the measured part, which exist by then, so nothing remains to
-  measure.
+  cites the selected candidate's evidence records of the measured part, which exist by then, since
+  the review is the first step of plan phase 8, after the selection, so nothing remains to measure.
 - `allow_list`: the lines the claim test would flag that may stand, each with its path, its
   text and its reason. The test flags any strength (a number of bits beside "security",
-  "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence
-  or row carries "target" or quotes a rule; a flagged line passes only through this list.
+  "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence or row
+  carries "target" or quotes a rule. It also flags "random", "truly random", "randomness" and
+  "high-entropy" in every line it scans, since Principle IV forbids describing the generator so
+  beyond what committed evidence supports. "Near" and "beside" in its rules mean the same sentence
+  or table row. A flagged line passes only through this list, a rule's own text included, one entry
+  per rule line. Standing entries, one fixed phrase each with its reason, let these uses stand: the
+  project's name, PhycoWeb-PRNG; "random permutation" and "ideal permutation" in a bound's
+  statement; random nonces as a usage rule; the random baseline and the uniform controls of the
+  tests; "an established cryptographic random-number generator" in the disclaimer; security.md §6's
+  rows, which state a standard's own status; and the spec's FR-025 sentence on zeroization in the
+  model, which says what the model does not promise. Any other flagged line needs an entry of its
+  own.
 
 ## 16. Review package (`review-package/MANIFEST.json`; FR-063)
 

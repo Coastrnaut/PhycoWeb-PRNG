@@ -1,13 +1,13 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.12 (2026-11-01). The change history is in section 25.
+- **Document:** `security.md`, version 2.13 (2026-11-01). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
   - defines the evidence-driven programme for deciding whether it could ever support a
     cryptographic claim;
   - records the evidence gathered so far in features 001–003.
-- **Governed by:** the [constitution](.specify/memory/constitution.md) v1.2.0, specifically the
+- **Governed by:** the [constitution](.specify/memory/constitution.md) v1.3.0, specifically the
   Security Policy and Principles IV, V, VIII and IX. Where this document and the constitution
   differ, the constitution applies.
 - **Status:** a research and validation plan. It is not a security certification. **No security
@@ -212,7 +212,7 @@ Evidence:     the records of levels L1 to L5
 
 ## 4. Security policy and permitted use
 
-The constitution's Security Policy (version 1.2.0) applies. Its three general rules, verbatim:
+The constitution's Security Policy (version 1.3.0) applies. Its three general rules, verbatim:
 
 - Real secret generation (keys, nonces, tokens, salts) MUST use an established cryptographic
   random-number generator (e.g., the operating system CSPRNG or a NIST SP 800-90A DRBG).
@@ -287,7 +287,11 @@ No such claim exists or is planned for the current design, which is bounded at 6
 
 T6–T11 were added in version 2.7 for a keyed design, which does not exist yet: `phyco-v2` has no
 key, nonce or reseed input. A spec that introduces a key interface adopts them, or states why
-one does not apply.
+one does not apply. Feature 004 adopts T11 for `phyco-v3` only as single-target key search, k/2 ≥ s,
+which a 256-bit key meets with equality and no margin at s = 128, since its 128-bit target is a
+classical one; multi-target quantum key search, quantum attacks on the capacity through queries to
+the public permutation and every other quantum generic attack are excluded for that reason and left
+open for feature 005 (feature-004 FR-008).
 
 **Generic results** that hold for `phyco-v2` as specified (no experiment needed):
 
@@ -918,7 +922,8 @@ The rows from Slide to Mode were added in version 2.7 for a permutation-based re
   generically after about 2^(c/2) calls of the permutation, so c ≥ 2s: at least 256 bits for
   s = 128.
 - **Quantum search** (optional threat T11): Grover's algorithm finds a k-bit key with about
-  2^(k/2) quantum evaluations. A 256-bit key keeps a margin.
+  2^(k/2) quantum evaluations. A 256-bit key meets k/2 = 128 with equality and no margin;
+  multi-target quantum search falls below it for u > 1.
 - **Nonce reuse**: a deterministic generator gives the same output for the same key and nonce.
   A claim states the nonce rule and the behaviour on reuse (T7).
 
@@ -1106,7 +1111,7 @@ qualified), because "substantial cryptanalysis" could not be checked.
 | Level | Name | Evidence required | Gate |
 |-------|------|-------------------|------|
 | L0 | Research candidate | specification; no claim | — |
-| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | spec approval |
+| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | FUT-SEC-8 result review and security-target review (feature-004 FR-012) |
 | L2 | Internally analysed | design rationale (section 8); structural proofs; proven trail bounds; an internal attack campaign with validated tools (section 12.5); a reduced-round statistical margin | design freeze; result review |
 | L3 | Statistically re-validated | the complete statistical programme on unused held-out key sets, per supported size (FUT-SEC-7) | battery freeze; result review |
 | L4 | Implementations verified | an implementation from outside the project; VHDL equivalent to the model (FUT-HW-1, FUT-HW-4) | RTL start (Principle VIII gate 2) |
@@ -1333,7 +1338,7 @@ Security work follows the existing Spec Kit layout. It does not use a separate t
 
 ```text
 PhycoWeb-PRNG/
-|-- .specify/memory/constitution.md   governing principles (v1.2.0)
+|-- .specify/memory/constitution.md   governing principles (v1.3.0)
 |-- specs/NNN-<feature>/              spec, plan, research, data model, tasks, design
 |-- reports/NNN-<feature>/            evidence, phase reports, freezes, attempts
 |-- phycoweb/                         reference models (lut-v1, phyco-v2) and the LUT
@@ -1556,7 +1561,7 @@ No option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.12) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.3.0; this document 2.13) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 PASS (003, reviewed 2026-11-01) |
@@ -1649,6 +1654,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.10 | 2026-11-01 | Recorded the owner's approval, on 2026-11-01 with the feature-004 spec, of the strategy note `research/security/crypto-redesign-strategy.md` and of the 2.7 to 2.9 changes, and the owner's approval of the feature-004 plan the same day: roadmap rows 5a and 5a.1. No requirement or claim level changes |
 | 2.11 | 2026-11-01 | Recorded the owner's decision on FUT-SEC-2 and FUT-GRID-2 at 2×2, option 1, taken on 2026-11-01 in the approved feature-004 spec (D3, FR-017), with the reason it weakens neither requirement (sections 9.2 and 20.1). Roadmap rows 5a.3 to 5a.5 now carry two feature-004 requirements: FUT-GRID-5's validation of 4×4 before 8×8 and 16×16 to features 006 and 008, and the checkable derivation of the held-out keys to feature 007 (feature-004 FR-040). From the owner's answers to the feature-004 checklist choices (SEC-010, PRO-010, HW-035). No claim level changes |
 | 2.12 | 2026-11-01 | Roadmap row 5a.5 carries feature 004's corrected order of sizes for the board: 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-HW-2), and a size that does not fit stays covered by feature 006's simulation. This corrects the wording 2.11 carried, which could have required a size the device cannot hold. From the owner's answers to the feature-004 checklist re-run (HW-041). FUT-GRID-5, FUT-HW-2 and every claim level are unchanged |
+| 2.13 | 2026-11-01 | Names constitution 1.3.0, which the owner approved on 2026-11-01, in the header, section 4, the tree of section 18 and roadmap stage 1. Version 1.3.0 amended only Principle IX, so the Security Policy that section 4 quotes is unchanged. The statements of what happened under 1.2.0 stay (sections 1 and 20, and roadmap row 5a), as do section 16.1, which describes features 001–003, and the review prompt's "never commit, push or publish", since review sessions hold no standing authorization. The L1 gate of section 15 reads "FUT-SEC-8 result review and security-target review" in place of "spec approval", and its evidence is unchanged: the feature-004 spec approval of 2026-11-01 started the design work and recorded no level, and `phyco-v3` stays at L0 until feature 004 records L1. Section 12.2 states that a 256-bit key meets k/2 = 128 with equality and no margin and that multi-target quantum search falls below it for u > 1, and section 5 records that feature 004 adopts T11 only as single-target key search. From the owner's answers to the second re-run of the feature-004 checklists (SEC-048, SEC-051, SEC-052). No requirement is weakened and no claim level changes |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

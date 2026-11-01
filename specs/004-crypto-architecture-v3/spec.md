@@ -180,8 +180,9 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
 | D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`d4/tie.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`selection.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
+| Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, which the rules must then select; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
-| L1 recorded (FUT-SEC-8 result review and the design document's security-target chapter reviewed; FR-012) | _pending_ | _pending_ | _pending_ | L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
+| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
@@ -190,6 +191,16 @@ A repair of a broken log chain (research R16) needs a row of its own in this tab
 <n>", added when the break is found: it names the log, the `seq` of the break and the date, and the
 owner sets it to Approved and commits it. `scripts/repair_log.py --approval` names that row, and the
 script refuses the repair unless the row reads Approved at HEAD and names the same log and position.
+
+The rows that open a guard (FUT-SEC-8 result review, D4 tie, Selection tie, Owner design review,
+Design freeze and each "Log repair <n>") are set to Approved and committed by the owner, as "Log
+repair <n>" is. Any other approval is written by the agent only on the owner's explicit word for
+that row, quoted with its date in the row's notes. Every guard that reads this table reads it as
+committed at HEAD and exits 2 while the working tree's table differs from HEAD's (cli contract,
+"Approvals"). The agent commits under the owner's standing authorization (constitution 1.3.0,
+Principle IX), and its commits carry no AI co-author line, so the history cannot show who wrote or
+committed a row; the owner's review at each ⛔ gate therefore lists the approval commits since the
+last gate.
 
 ## Decisions Taken as Defaults
 
@@ -532,6 +543,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   in the model, the research duplex, and any script that runs instantiate, such as the
   instantiation states of research R4. It does not include the development-input loader, which
   derives keys but loads none, keyless operation lists of Π, or the text of the design document.
+  Writing instantiation code waits for the "FUT-SEC-8 result review" row, which the owner sets to
+  Approved and commits (FR-003).
 - **FR-002**: The demonstration record MUST give every match after one, two and three words
   beside the expected number, the cost per candidate in generator steps and in time, the total
   cost, the extrapolation to all 2⁶⁴ seeds, the machine and commands, and the SHA-256 of the
@@ -541,8 +554,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-003**: The owner MUST review the result (⛔ gate) before any instantiation code (FR-001)
   is written, for `phyco-v3` or for any candidate. The result is the search tool's validation
   record (security.md §12.5), and the best-attack register row for exhaustive seed search
-  (security.md §12.6) MUST cite it. The evidence scripts' guard refuses to run instantiation
-  code before the review is recorded, and a test checks the guard.
+  (security.md §12.6) MUST cite it. The review is recorded when the owner sets the "FUT-SEC-8 result
+  review" row to Approved and commits it (the note under the Review & Approval table). The evidence
+  scripts' guard reads that row as committed at HEAD and refuses to run instantiation code unless it
+  reads Approved there, or while the working tree's table differs from HEAD's; a test checks the
+  guard.
 
 **Security target (L1; FUT-SEC-1 to FUT-SEC-6, FUT-SEC-9)**
 
@@ -603,7 +619,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   position of every output block it observes. T4 is adopted as constant time by construction
   (FR-020); power, electromagnetic and fault-injection attacks and the behaviour on reset and
   clock glitches are deferred to feature 008, with the risk stated: a state read by a probe, or
-  changed by a fault, in mid-request exposes that request back to its last forget call.
+  changed by a fault, in mid-request exposes that request back to its last forget call. The 128-bit
+  target is a classical one, so against T11 this feature covers only single-target key search, k/2 ≥
+  s, which k = 256 meets with equality and no margin at s = 128 (FR-010). Multi-target quantum key
+  search, which in some cost models costs about 2^((k − log₂ u)/2) and so falls below 2^s for every
+  u > 1, quantum attacks on the capacity through queries to the public Π, and every other quantum
+  generic attack are excluded for that reason and listed open for feature 005.
 - **FR-009**: For every supported size, the specification MUST state the key entropy, the secret
   state reachable from the key, and the bound these place on any security level (Security
   Policy; FUT-GRID-2). The secret state reachable from the key is the set of state bits that no
@@ -620,25 +641,36 @@ freeze hashes and the baseline manifest; run the claim-register test.
   §12.2: strength at most the key entropy; reachable secret state at least 2s at every call
   boundary (FR-009); output volume stated, with every limit at most what the theorem allows at
   ε (the doubling check of research R9); multi-target search, k − log₂ u ≥ s within the stated
-  u; key plus nonce at least 2s; capacity c ≥ 2s; quantum search (T11), k/2 ≥ s, which holds
-  with equality at k = 256 and s = 128; behaviour on nonce reuse stated (edge case "Nonce
+  u; key plus nonce at least 2s; capacity c ≥ 2s; quantum search (T11), single-target only (FR-008),
+  k/2 ≥ s, which holds with equality and no margin at k = 256 and s = 128 and is recorded in the
+  size profile as met with equality; behaviour on nonce reuse stated (edge case "Nonce
   reuse"), with its test. Each is a check in the size profile (`parameters.json`) that can fail.
 - **FR-011**: The certification route MUST be named (FUT-SEC-9; D8); naming it meets FUT-SEC-9
   by specification. The functionality class within AIS 20/31 version 3.0 stays an open item,
-  written "class unconfirmed" beside the route, until the approved download (research R19) is
-  read and the class is confirmed or changed in the design document, at the security-target
-  review. No artifact MAY describe `phyco-v3`, or any model, as FIPS 140-3 approved or as an
+  written "class unconfirmed" beside the route, until the download the owner allowed (research R19)
+  is read and the class is confirmed or changed in the design document, at the security-target
+  review, the first step of plan phase 8 (FR-012). No artifact MAY describe `phyco-v3`, or any
+  model, as FIPS 140-3 approved or as an
   SP 800-90A DRBG. A value taken from a standard is cited as that standard's value (for example
   "the value SP 800-90A uses for its largest request"), never as compliance, and the design
   document states once that `phyco-v3` conforms to no standard; the claim-register test
-  (FR-069) flags "compliant", "conforms" and "approved" near a standard's name outside that
-  statement.
+  (FR-069) flags "compliant", "conforms" and "approved" near a standard's name, that is in the same
+  sentence or table row, and that statement, like every flagged line, passes only through an
+  allow-list entry with its reason.
 - **FR-012**: The claim template of security.md §3 MUST be filled in for `phyco-v3` as a target
   and marked "target, not a claim". The claim register (security.md §15) MUST record `phyco-v3`
   at L0, then at L1 once its gate has passed and FUT-SEC-8 and the security-target chapter of
-  the design document have been reviewed, and with "no claim" at every level. The L1 gate is a
-  row of its own in the Review & Approval table; it reads "blocked", naming the missing paper,
-  while any theorem the mode chapter uses is "unverified" (research R10). For L1, FUT-SEC-4 is
+  the design document have been reviewed, and with "no claim" at every level. The chapter is drafted
+  in plan phase 4 and marked "draft, under review". Its review, the security-target review, has a
+  Review & Approval row of its own and is the first step of phase 8, after the selection and before
+  the owner design review: it cites the selected candidate's records of FR-029's diffusion through
+  instantiation and of research R4's first-order differences, which exist only after phase 5, and
+  closes FR-011's functionality class. The L1 gate of security.md §15 reads "FUT-SEC-8 result review
+  and security-target review" (version 2.13), and L1 is recorded in a row of its own, "L1 recorded",
+  once both reviews read Approved; that row reads "blocked", naming the missing paper, while any
+  theorem the mode chapter uses is "unverified" (research R10). The spec approval of 2026-11-01
+  started the design work and recorded no level, so the register keeps `phyco-v3` at L0 until "L1
+  recorded" reads Approved. For L1, FUT-SEC-4 is
   met by statement, since it applies only if prediction resistance is claimed and D7 does not
   seek it, and FUT-SEC-5 is met by specification for key loading and by evidence for diffusion
   through instantiation (FR-029) and research R4's first-order related-key and related-nonce
@@ -692,8 +724,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   bits of its last block in that order and discards the rest (FR-027). Every digest of output,
   such as the long-run digest of the vectors, is taken over this serialization as raw bytes
   (4·2²⁰ bytes for 2²⁰ words of 32 bits), never over a text rendering of it.
-- **FR-016**: The reseed input MUST be treated as chosen by the attacker (T9) unless it comes
-  from a validated SP 800-90B source, and reseeding MUST NOT weaken any property sought. To make
+- **FR-016**: The reseed input MUST be treated as chosen by the attacker (T9), and reseeding MUST
+  NOT weaken any property sought. This feature has no validated entropy source and seeks no
+  prediction resistance (D7), so no source is excepted; a later feature that brings a validated
+  entropy source and seeks prediction resistance states its own rule under its own protocol. To make
   that verifiable, the mode chapter MUST map reseed to the theorem's absorption call with
   attacker-chosen input and list that mapping as a precondition, "unverified" until the paper
   is read (research R10); the reachable secret state after each reseed is at least 2s (FR-009);
@@ -974,7 +1008,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     In the model, zeroization overwrites the object's own `bytearray` copy of the key with zeros in
     place and drops it, and drops the state's integers, which Python cannot overwrite; as with
     constant time, this is a discipline that governs what the object keeps, not what Python's memory
-    may still hold, and the caller's own copy of the key is outside it (model contract).
+    may still hold, and the caller's own copy of the key is outside it (model contract). That
+    sentence says what the model does not promise, so it stands through an allow-list entry of the
+    claim test (FR-069).
   - **Usage rules across resets.** A reset or a zeroization returns the device to a state that
     accepts a new key, since a device cannot end itself as an object can. The per-key limits
     and counters then restart, so across resets they are usage rules for the caller, as across
@@ -1413,14 +1449,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the block directly under this spec's title (FR-068), MUST use only the vocabulary of
   security.md §15 ("proven bound", "best known attack", "no attack found within budget", "not
   evaluated"), and MUST label every target as a target. No artifact MAY describe `phyco-v3`, or
-  any model, as secure, proven secure or unbreakable, or state a security strength as achieved.
-  "Proven" may appear only with its object named in the same sentence or table row (a trail
-  bound, a theorem's bound on an advantage) and its record cited; "proven" or "provably" never
-  takes the design, the generator or a security property as its object. Frequency, avalanche
-  and battery results are reported only as inputs to R_dist or as statistics, never as evidence
-  of security or of mixing beyond what they measured, and no text implies prediction resistance
-  (D7). The claim-register test (FR-069) treats every other use as a finding. Wherever the use
-  of `phyco-v3` is described, the restriction of security.md §4 MUST be stated.
+  any model, as secure, proven secure, unbreakable, random, truly random or high-entropy, or credit
+  it with randomness, or state a security strength as achieved: Principle IV names "random" and
+  "high-entropy" beside "cryptographically secure", and the uses that stay allowed are those of
+  FR-069's standing allow-list entries. "Proven" may appear only with its object named in the same
+  sentence or table row (a trail bound, a theorem's bound on an advantage) and its record cited;
+  "proven" or "provably" never takes the design, the generator or a security property as its object.
+  Frequency, avalanche and battery results are reported only as inputs to R_dist or as statistics,
+  never as evidence of security or of mixing beyond what they measured, and no text implies
+  prediction resistance (D7). The claim-register test (FR-069) treats every other use as a finding.
+  Wherever the use of `phyco-v3` is described, the restriction of security.md §4 MUST be stated.
 - **FR-051**: A new version of security.md, with a history entry, MUST give `phyco-v3` its own
   section (a table of structural facts, best-attack register rows for its first bounds, and a
   lessons table that links all fifteen of S1–S15 to the rules of Π or the parts of the design
@@ -1431,8 +1469,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   per-model detail go to research notes or reports (strategy note G16 and §7.1). A finding that
   breaks the target on the full rounds MUST be recorded at once, with a history entry and a
   README update (strategy note §7.1, rule 5), and the standards rows of security.md §6 MUST be
-  re-checked and dated (rule 8). README MUST state the status of `phyco-v3`, and the
-  documentation drift listed in checklist group F MUST be corrected.
+  re-checked and dated (rule 8). README MUST state the status of `phyco-v3`, and the documentation
+  drift listed in checklist group F MUST be corrected. The new security.md version keeps the
+  constitution version that 2.13 names, 1.3.0, in its header, §4, §18's tree and §22's stage 1.
 - **FR-052**: The final phase report MUST follow the constitution's Phase Completion Reporting,
   MUST state which items of the constitution's change-completion list remain open (the
   statistical evaluation in feature 007; the RTL), MUST state the risks of strategy note §11 as
@@ -1649,10 +1688,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   test MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the
   register and that hand-written documents carry the disclaimer of FR-068, and MUST report any
   use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
-  feature-003 T041). Its scope is every document of this feature and the comments and
+  feature-003 T041). Its scope is every document of this feature, README and security.md included,
+  since FR-051 changes both, and the comments and
   docstrings of every file it adds or changes (`phycoweb/`, `protocol/`, `scripts/`,
-  `research/004/`, `tests/` and `fast/seed_search.c`). Its rules flag the following, and a
-  flagged line passes only through an allow-list entry in the register, each with its reason:
+  `research/004/`, `tests/` and `fast/seed_search.c`). Its rules flag the following, where "near"
+  and "beside" mean the same sentence or table row, as they do for "target". A flagged line, a
+  rule's own text included, passes only through an allow-list entry in the register, each with its
+  reason, so "outside the rules that forbid it" is met by one entry per rule line; security.md §6's
+  rows, which state a standard's own status, and FR-025's sentence on zeroization in the model,
+  which says what the model does not promise, have entries with those reasons:
   - a strength not labelled as a target: a number of bits beside "security", "strength" or
     "secure", or a cost such as 2¹²⁸ beside "security", unless the same sentence or row carries
     "target" or quotes a rule;
@@ -1664,7 +1708,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - a claim level above the register's `claim_level` in any document (FR-012);
   - security wording (secure, strength, resist, unpredictable, chaos, Lyapunov, ergodic) and the
     arguments FR-030 forbids, inside the mapping chapter (FR-030);
-  - "constant time" beside the model (FR-020).
+  - "constant time" beside the model (FR-020);
+  - "random", "truly random", "randomness" and "high-entropy", in every scanned line (Principle IV;
+    FR-050). Standing entries let the allowed uses stand, one fixed phrase each with its reason: the
+    project's name, PhycoWeb-PRNG; "random permutation" and "ideal permutation" in a bound's
+    statement; random nonces as a usage rule; the random baseline and the uniform controls of the
+    tests; and "an established cryptographic random-number generator" in the disclaimer. Any other
+    flagged line needs an entry of its own (data-model §15).
 
 ### Pre-registered Design Protocol
 
@@ -2084,9 +2134,9 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **SC-014**: 9 of 9 carried-over feature-002 requirements and every item of the §5.3 checklist
   have a recorded disposition.
 - **SC-015**: No report, document, code comment or docstring (in the files FR-069 scans)
-  describes `phyco-v3`, or any model, as cryptographically secure, proven secure or
-  unbreakable, or states a security strength as achieved, and every report carries the
-  disclaimer.
+  describes `phyco-v3`, or any model, as cryptographically secure, proven secure, unbreakable,
+  random, truly random or high-entropy (FR-050), or states a security strength as achieved, and
+  every report carries the disclaimer.
 - **SC-016**: 100% of the edge states the design document lists have a constructed-state
   vector, reproduced on both platforms of SC-009, and the second transcription agrees with the
   model at 100% of the steps of the committed vectors.
@@ -2119,7 +2169,7 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   downloads, each needing permission. If none is approved, bounds come from self-written
   exhaustive or branch-and-bound searches, validated in the same way (FR-039). Analysis tools
   are never imported by the core model.
-- **AIS 20/31 version 3.0** (D8) is among the downloads the owner approved (research R19), and
+- **AIS 20/31 version 3.0** (D8) is among the downloads the owner allowed (research R19), and
   none has been made yet. Until it is read, the route stays named with "class unconfirmed"
   beside it, an open item closed at the security-target review once the class is confirmed or
   changed in the design document (FR-011).
