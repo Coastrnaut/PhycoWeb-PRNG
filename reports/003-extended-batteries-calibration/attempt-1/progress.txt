@@ -410,3 +410,8 @@
 2026-10-31T19:25:21 candidate practrand-fwd-seed0 start
 2026-10-31T19:30:51 candidate practrand-fwd-seed1 exit 0
 2026-10-31T19:30:51 candidate practrand-fwd-seed8 start
+2026-10-31T20:15:47 candidate bigcrush-fwd-seed8 exit 0
+2026-10-31T20:19:52 candidate bigcrush-rev-seed8 exit 0
+2026-10-31T20:20:43 candidate bigcrush-rev-seed9 exit 0
+2026-10-31T20:20:43 candidate practrand-fwd-seed5 start
+2026-10-31T20:40:55 candidate bigcrush-fwd-seed9 exit 0
