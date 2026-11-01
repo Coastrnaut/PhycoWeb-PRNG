@@ -455,7 +455,7 @@ functionality classes (2024) was found but not read, so its list of classes is u
 2. Run `/speckit-converge` on feature 003; it runs automatically at that point.
 3. The owner decides the questions in §8.4, or leaves them to `/speckit-clarify`.
 4. Optionally, amend the constitution (§9.1).
-5. The owner approves this note and the security.md 2.7 and 2.8 changes.
+5. The owner approves this note and the security.md 2.7 to 2.9 changes.
 
 ### 8.2 Features
 
@@ -525,7 +525,7 @@ Security Policy and FUT-SEC-1 to FUT-SEC-9 are unchanged, and may only become st
 ### 9.2 Feature 004 (`/speckit-specify`)
 
 The same text is in [next.md](../../next.md) §4, which is the copy to use if the two ever
-differ. It was updated for security.md 2.7 (S15, and the sections it adds), and cites 2.8.
+differ. It was updated for security.md 2.7 (S15, and the sections it adds), and cites 2.9.
 
 ```text
 Cryptographic redesign of PhycoWeb-PRNG, part 1: the security target, a permutation-based
@@ -576,7 +576,7 @@ FUT-SEC-7's held-out statistical programme is delivered by a later feature and s
 feature's report. Re-decide every carried-over feature-002 requirement (FR-001 to FR-009),
 including the FR-007 rule on standard primitives and standard modes. Out of scope: RTL, the
 held-out statistical programme, the full cryptanalysis campaign, external review, publication and
-any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.8
+any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.9
 (sections 3, 5, 8, 9.2, 12, 15, 20.1 and 21), and research/security/seed-entropy-bound.md
 section 5 with the section 5.3 checklist groups A to G.
 ```
