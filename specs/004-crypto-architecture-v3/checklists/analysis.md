@@ -146,6 +146,32 @@ quality. It does not mean implementation work is complete.
   form that keeps them apart from claimable sizes (key entropy c, s = c/2, status `research`)?
   [Consistency, Spec §FR-009, §FR-032; data-model §10]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK033 Are the known results this feature writes itself (the small operation list and its
+  hand-derived dependency matrices, the map with collisions, the variant with a planted gap, the
+  hand-counted examples of research R5) required to be written and committed, with their SHA-256,
+  before the code of the tool they validate exists, so that no tool is validated against
+  expectations derived from its own output? [Gap, Spec §FR-039; research R5, R13; data-model §7]
+- [ ] CHK034 Is "what must match" stated for the known results that are not published values (the
+  vein bounds of S12 and S15, both merging mechanisms of S13, S14's bias, the FUT-SEC-8 recovery and
+  the structural tools' known results), as data-model §7 states it for published trails and tables,
+  so that `re-found` or `not re-found` follows from a stated comparison? [Measurability, Spec
+  §FR-039, §SC-007; data-model §7; research R12, R13]
+- [ ] CHK035 Is "heavy run" defined by a rule rather than by examples, given that FR-045 names the
+  FUT-SEC-8 sweep, exhaustive bijectivity and solver runs, the cli contract adds trail searches and
+  the frequency and avalanche tests, and runs such as the exhaustive box tables at w = 8 (16-bit
+  boxes) appear in neither list, while only heavy runs take the lock and are projected first?
+  [Ambiguity, Spec §FR-045; cli contract "Heavy runs", "Budget"; research R7; quickstart E3]
+- [ ] CHK036 Is the order-of-sizes guard stated to exempt the timing probes at 8×8 and 16×16 that a
+  4×4 heavy run's projection needs (projection records, whose outputs are discarded unread), or does
+  it refuse them as evidence of that kind at the larger sizes until the 4×4 run has finished, so
+  that no 4×4 heavy run could start? [Conflict, cli contract "Order of sizes", "Budget"; research
+  R7; data-model §1]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy

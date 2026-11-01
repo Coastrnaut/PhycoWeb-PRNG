@@ -9,9 +9,10 @@ turns out differently. No such fallback may loosen a rule. The plan's table "Val
 fixes" lists every value marked protocol here, so one list names them all.
 
 The answers to the checklist choices ([checklist-choices.md](./checklist-choices.md), "all
-recommended", 2026-11-01) are applied in the sections below. Each that changes a protocol value
-is stricter, or settles a value before its first use, and becomes an entry of the protocol
-change log `research/004/protocol-changes.jsonl` when that log is created (FR-044).
+recommended", 2026-11-01), those of the first run and those of the re-run the same day, are applied
+in the sections below. Each that changes a protocol value is stricter, or settles an open case by
+its most conservative reading before any result it affects, and becomes an entry of the protocol
+change log `research/004/protocol-changes.jsonl` when that log is created (FR-044; data-model §18).
 
 > This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
 > to generate secrets; use an established cryptographic random-number generator for keys,
@@ -97,6 +98,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `protocol/evidence.py` checks at start that the interpreter and the installed packages
     match this section and the pins for that platform (R18), and exits 2 on any mismatch. A
     changed environment needs this section updated first, with the owner's approval.
+  - A reproduction may run in either environment, whichever made the original. It compares the
+    fields data-model §1 lists, and every other field, `command`, `config`, `parallelism`, the
+    analyst and the reviewer included, is reported only, since each may differ between environments
+    or analysts.
 - **Rationale**: these are the environments of security.md §19, so no new tool is needed to
   start. There is no C compiler on Windows. Two Python versions on two platforms test FR-035's
   determinism across platforms and versions.
@@ -166,6 +171,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     3. the avalanche flips x ⊕ e_j, the key and nonce bit flips and the word rotations of
        development inputs, for every j, bit and k the rule names (R4);
     4. feature 002's `dev` seeds for FUT-SEC-8 (R2), the one external development set.
+    5. synthetic counts, for the bias test's validation only (R4): set j = 0…99 at each size draws
+       from numpy's `Generator(PCG64(s))`, where s is the first 16 bytes of SHA-256 of
+       `phycoweb-004/dev/synthetic/n<n>/<j>` read as a big-endian integer: one `binomial(N, 1/2)`
+       count per tested bit, in the test's bit order, except the planted bit at position j mod S,
+       drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033).
+       `protocol/devinputs_v3.py` stays standard-library only and gives `synthetic_seed(n, j)`;
+       `validate_tool.py` draws the counts. The validation record holds the numpy version and each
+       set's SHA-256, and a reproduction in the same environment draws the sets again and compares
+       them.
 
     A constructed input takes its index from its rule. No value or index is picked after any
     output is seen.
@@ -197,6 +211,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `research/004/tools/critical_counts.json` (data-model §5). The verdict compares each count
     with its critical values, so scipy's tails decide nothing; scipy still computes the
     p-values reported.
+    A reproduction compares the counts, the critical counts and the verdicts byte for byte, and the
+    p-values within a relative tolerance of 10⁻⁶, listing any outside it; a p-value never decides a
+    verdict, and a `p_values` file's hash may differ between the two environments of R1
+    (data-model §1).
   - **Avalanche test.** FR-037 asks for it; using it as a source of R_dist is stricter than the
     spec. For each flipped input bit j in a set F, N_a = 2¹³ test states x (kind `state`, R3);
     after every round r = 1…R_cur the difference Π^r(x) ⊕ Π^r(x ⊕ e_j) is counted bit by bit,
@@ -244,6 +262,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     synthetic binomial counts with one bit planted at the 90%-power biases above (0.0030, 0.0031
     and 0.0033 at the three sizes) it fires in 82 to 97 of the 100 sets, the binomial interval
     around 90% with at most 0.005 in each tail. Synthetic counts cost nothing to draw.
+    They are R3's constructed class 5, drawn by a public rule from seeds fixed before first use,
+    hashed and never redrawn.
   - **Sensitivity**, computed for this plan with scipy 1.15.3, for the bias |f − 1/2| of one bit
     that fires with probability 1/2 (and 0.9):
 
@@ -353,7 +373,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     before forget calls is 0.75 × 10⁸ words per second at R = 32 and 0.375 × 10⁸ at R = 64,
     below the goal.
   - `research/004/tools/costmodel.py` computes every number from the operation list, and a test
-    checks the table above on hand-counted examples.
+    checks the table above on hand-counted examples, written with their SHA-256 and entered in the
+    provenance log before `costmodel.py` is drafted (R13; data-model §14).
 - **Stricter means**: the parts that the D4 score and its tie-breaks use (the LUT table, L and
   the carry chains per round) have no stricter direction, so in effect they do not change from
   plan approval, and "no change once the first candidate is scored" is the later of two locks.
@@ -475,6 +496,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     starts only when the smaller one's run of that kind has finished without making the
     candidate ineligible, so a candidate that fails at 4×4 spends none of its 16×16 hours
     (FUT-GRID-5; checklist D8).
+    The order counts evidence only: a probe writes nothing but its `projection` record, which is not
+    evidence, so the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before it, while
+    evidence of that kind at a larger size still waits for the smaller size's run.
+  - **Heavy runs.** A heavy run is any run that is of a kind this section budgets, uses more than
+    one worker process or thread, or is projected to take, or last took, more than 10 minutes. Every
+    heavy run takes the lock of R16, never overlaps another heavy run or any battery run, projects
+    first and records `heavy_run` true (FR-045). The examples that FR-045 and the cli contract list
+    are cases of this rule, and a test checks that every budgeted kind and every script with a
+    worker option takes the lock.
   - **Projection before every heavy run.** A timing run of at most 60 s on the candidate itself
     projects the run's hours from the counts of R4, R8 and R13. It is a `projection` record
     (data-model §1), like any timing probe: its inputs are the first inputs of the run it
@@ -556,6 +586,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     collision probability, at most q²/2¹²⁹ for q instantiations, becomes a term of the bound;
     random nonces get their own per-key instantiation limit, at most 2³², so the term stays
     within ε.
+    A `Generator` cannot tell a random nonce from a counter value, so it holds every key at this
+    smaller limit whatever nonces the caller uses: one instantiation counter per object, and the
+    instantiate past the limit raises `LimitExceeded` and ends the object, as the other per-key
+    limits do. Across objects with one key, the same limit is a usage rule for the caller, stated
+    with the other per-key limits.
   - The bound is increasing in N, so it then holds for every adversary below the target strength.
   - The per-request limit is the smaller of the per-instantiation limit and 2¹⁹ bits, the largest
     request SP 800-90A allows its DRBGs. Within one request, a compromised state reveals the
@@ -712,6 +747,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     trail search, the weight of the optimal trail, not the trail itself, since several trails
     can share a weight; for the S-box tables, every entry; for PRESENT, the stated minimum. Any
     difference is a failed validation.
+    For a known result that is not a published value (S12 to S15, the FUT-SEC-8 recovery, and the
+    known results of the structural tools and the cost model, R13), data-model §7 states the
+    comparison: exact equality for every deterministic fact, and for a measured fraction a count in
+    the binomial interval around the recorded fraction at the tool's sample size, with at most 0.005
+    in each tail; anything else is `not re-found`.
   - **Cross-checks between kinds.** The ARX search must reproduce the exhaustive box tables at
     w = 4 and 8 (boxes of 8 and 16 bits) before it counts at w = 16 and 32, and the active-S-box
     counter must reproduce the exhaustive trail optima of a χ-like candidate at w = 4. A tool
@@ -774,6 +814,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Constants within a call**: no two constants of one call of Π are equal, equal up to a word
     rotation by k = 1…w − 1, complements of one another, or rotations of complements. The
     constant script checks this beside the symmetry checks (R15).
+    The rule's reading order skips any word that is periodic (equal to its own rotation by some
+    k = 1…w − 1) or related in one of these ways to a constant already taken in the same call (R15),
+    so these relations hold by construction wherever one call needs no more constants than there are
+    aperiodic classes under rotation and complement: 2 at w = 4, 16 at w = 8 and 2048 at w = 16,
+    counted exhaustively on 2026-11-01, and far more at w = 32, so at every claimable size. Where a
+    call needs more, as at 2×2 with w = 4 once one call needs three, the record of taken classes
+    starts afresh each time every class has been used once, the script records every repeat, the
+    size profile marks the variant, every check of this section still runs, and no claim covers it
+    (D3). A periodic word is skipped because a word rotation maps it to itself; and without the skip
+    even w = 16 would fail by chance, since 128 constants read plainly hold about 4 related pairs
+    (4.86 × 10⁻⁴ per pair).
   - **Invariants**: on 2¹⁰ test states, after one round and after a full call: the sums modulo
     2^w and the XORs of the pressure lanes and of the vein lanes, and the same over each colour
     of the checkerboard (even n); and the S13 transport mode of
@@ -799,6 +850,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Exhaustive bijectivity | a known permutation (2³² ones in the bitmap) and a stated map with collisions (fewer) |
     | Avalanche test | a planted gap: a stated variant that leaves one lane unmixed |
     | Cost model (R5) | R5's hand-counted examples |
+
+    Each known result this feature writes itself, the small operation list with its hand-derived
+    matrices, the map with collisions, the variant with a planted gap and R5's hand-counted
+    examples, is written with its SHA-256 and entered in the provenance log (data-model §14) before
+    the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry. The
+    validation record cites both entries, and a test checks their order and that the hashes still
+    match. What must match is stated per known result in data-model §7.
 - **Stricter means**: counts may only rise; symmetries, constant relations, forms and sources of
   R_dist may only be added.
 - **Rationale**: structural dependency is the standard full-diffusion measure. Checking that it
@@ -855,21 +913,41 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 
 - **Decision**: round constants come from a maximal-length LFSR whose polynomial and seed the
   design document states. `scripts/gen_constants_v3.py` checks that the polynomial is primitive,
-  reads the sequence in a stated order over (round, food node), checks that within one call of
-  Π no two constants are equal, equal up to a word rotation by k = 1…w − 1, complements of one
-  another, or rotations of complements (R13), runs the symmetry checks of R13, and writes
+  reads the sequence in a stated order over (call type, round, food node), checks that within one
+  call of Π no two constants are equal, equal up to a word rotation by k = 1…w − 1, complements of
+  one another, or rotations of complements (R13), runs the symmetry checks of R13, and writes
   `phycoweb/constants_v3.py`. The design document states whether the call types draw on
   distinct constant streams (FR-023).
   - **The rule, fixed early** (**protocol**): the polynomial, seed, reading order and whether
     the call types draw on distinct streams are fixed by one stated rule before the first
     candidate is scored, and each candidate's instance of it before its first tool run,
-    recorded in the candidate log's `parameters` (data-model §3). The polynomial is the first
-    primitive polynomial of the stated degree, in a stated order, that is not on the refused
-    list below, and the seed is a fixed public value.
+    recorded in the candidate log's `parameters` (data-model §3). Its values follow; they become
+    `settled` entries of the protocol change log before the first candidate is scored
+    (data-model §18).
+  - **The values** (**protocol**, settled on 2026-11-01). Degree 64; the polynomials x⁶⁴ + c(x) with
+    c(0) = 1, taken in ascending order of the integer whose bits are c's coefficients; the first
+    primitive one not on the frozen refused list below. Fibonacci form s(t + 64) = Σᵢ cᵢ·s(t + i)
+    over GF(2), i = 0…63, with s(0)…s(63) the bits of ASCII `PhycoWeb`, most significant first
+    (0x506879636F576562, 32 of 64 bits set), and output from s(64) on. Each table is read from the
+    start of the output, w bits per word, most significant bit first, in the order call type (if the
+    streams are distinct), round, food node, skipping any word that is periodic or related to a
+    constant already taken in the same call (R13); where a call needs more constants than there are
+    aperiodic classes, the record of taken classes starts afresh each time every class has been used
+    once, and every repeat is recorded. The design document restates these values, and the script
+    checks that the two agree.
   - **Refused constants.** The script holds a committed list of the polynomials and constant
-    sets it refuses, each with its source: at least those of the reference designs of R12 and
-    of every design the rationale cites. The check fails if the chosen polynomial is listed, or
-    if the constant table contains a listed sequence, also under word rotation or complement.
+    sets it refuses, each with its source, frozen with the rule before the first candidate is
+    scored, its SHA-256 in the change-log entry that fixes the rule. It holds the polynomials and
+    constant sets of R12's reference designs (SPECK32, PRESENT, SPARKLE) and of every design the
+    strategy note, the spec, the plan, this document and security.md name, and the standard
+    polynomials of degree 64 and 128: CMAC's R₆₄ and R₁₂₈ (SP 800-38B), GCM's (SP 800-38D), and the
+    CRC-64 polynomials of ISO 3309 and ECMA-182. The check fails if the chosen polynomial is listed,
+    or if the constant table contains a listed sequence, also under word rotation or complement. A
+    design the rationale cites later is added when it is cited, and the check runs again: a match
+    fails it and blocks the design freeze (FR-043), and the rule is never changed to escape it. The
+    standard polynomials matter: a plain search in ascending order finds x⁶⁴ + x⁴ + x³ + x + 1 first
+    (computed on 2026-11-01), which is CMAC's R₆₄, a MAC's constant that re-decided feature-002
+    FR-007 forbids, and also the CRC-64 polynomial of ISO 3309.
   - **Rotation amounts** come from a stated search over the possible amounts, ranked by the
     trail bounds they give, with ties to the smallest amounts in a stated order. The search runs
     at the D4 width (R6), with the scaling rule to every other width stated before it; every
@@ -893,7 +971,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     crosses the grid (plan, Complexity Tracking). The LFSR exists only in the script; the
     hardware holds its output as a fixed table.
 - **Stricter means**: the rule does not change once fixed; the refused list and the relations
-  checked between constants may only grow.
+  checked between constants may only grow, and a later addition to the list that matches fails the
+  check and blocks the freeze, never a change of the rule.
   - **How the LFSR is classed** (checklist C2): under feature-002 FR-007 as the spec re-decides
     it (D6), the LFSR is a published design method that yields a fixed table, not a standard
     PRNG in Π: no key, nonce or state enters it.
@@ -914,6 +993,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Every evidence record is JSON with the fields of security.md §17.2, the §11.6 items for
     statistical measurements, and the design-form disclaimer (FR-068), written by one module,
     `protocol/evidence.py`. Paths are under `reports/004-crypto-architecture-v3/`.
+    Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`: raw
+    counts and p-values are JSON or gzip-compressed JSON, never `.npy`, and a solver's log is
+    `.txt`, since `*.log` is ignored; `protocol/evidence.py` refuses any other suffix there (R18).
   - Records up to 10 MB, compressed with gzip, are committed. Larger outputs, such as full
     dependency matrices at 16×16 (about 32 MB per round and direction), stay local. Their
     SHA-256 and the regenerating command are committed, together with per-round summaries. A
@@ -922,15 +1004,28 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     hours projected). An output that is not deterministic, such as a solver log with timings,
     is never local-only: it is committed, compressed, or its verdict rests on a committed
     deterministic summary.
+  - **Compressed files.** Every `.gz` file is written by `gzip.compress(data, compresslevel=9,
+    mtime=0)`, so its header holds no file name and a zero time; on the probe of 2026-11-01 the two
+    environments of R1 then wrote identical bytes. Its raw hash is over the compressed bytes, and
+    its record also holds the SHA-256 of the uncompressed content, which a reproduction compares,
+    since another zlib may compress differently. A test checks the header of every committed `.gz`
+    file.
   - **Hashes.** Each hash is recorded beside its kind, `raw` or `lf-normalized`. Every new file
     is hashed over its raw bytes and is pinned to LF or `binary` (R18), so its raw and
     normalized content agree on every checkout. An existing `text=auto` file is hashed over its
     LF-normalized content. The CRLF-pinned freeze records of features 002 and 003 keep their
     recorded hashes over CRLF bytes.
+    Every digest is written as 64 lower-case hex digits. `lf-normalized` means each CR LF pair
+    replaced by LF on the file's bytes, as Git normalizes, with a lone CR kept; it is never computed
+    from a file read in text mode, whose universal newlines also turn a lone CR into LF.
   - **Spec versions.** The first time a record cites a spec hash, `protocol/evidence.py` stores a
     copy of that spec as `reports/004-crypto-architecture-v3/spec-versions/<sha256>.md`,
     committed with the records, so every `spec_sha256` names content that is kept, whether or
     not a commit holds it (data-model §1).
+  - **Reproduction.** A reproduction compares the fields data-model §1 lists and reports every other
+    field only; a different source hash makes it a new run, not a reproduction. Its verdict is
+    recomputed under the spec version the original cites (`spec-versions/<sha256>.md`), so a later
+    spec change cannot alter it.
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs and compares it with
     the recorded verdict (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
     committed files, so the committed per-round summaries must suffice, for example R_f from the
@@ -943,27 +1038,41 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     refuse to start while another process holds it (FR-045).
   - **Writers of the hash-chained logs** (checklist D4): `research/004/candidates.jsonl`,
     `provenance.jsonl` and the protocol change log `research/004/protocol-changes.jsonl` are
-    chained, each line holding the SHA-256 of the line before it (data-model §3, §14 and §18).
-    Every append takes a second lock, `data/log-append.lock`, by exclusive create, which
-    `.gitignore` also gains. Holding it, the writer checks the chain up to the last line,
-    appends one line chained to it and releases the lock. A writer that cannot take the lock
-    within 10 s, or finds the chain broken, exits 2 and appends nothing, so two scripts never
-    chain to the same last line.
+    chained, each line holding the SHA-256 of the previous line's UTF-8 bytes as stored, its final
+    LF included (data-model §3, §14 and §18). Every append takes a second lock,
+    `data/log-append.lock`, by exclusive create, which `.gitignore` also gains. Holding it, the
+    writer checks the chain up to the last line, appends one line chained to it and releases the
+    lock. A writer that cannot take the lock within 10 s, or finds the chain broken, exits 2 and
+    appends nothing, so two scripts never chain to the same last line.
+  - **Stale locks.** Both locks hold the PID and that process's start time, the environment
+    (`windows` or `wsl`), the host, the command and the time the lock was taken. A script that finds
+    a lock exits 2, naming the lock and whether its holder still runs, checked in the lock's
+    environment. Only `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request,
+    removes one, and only when no process with that PID and start time runs; it writes a
+    `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
+    A heavy run that died holding the lock then gets the `inconclusive` record that every started
+    run writes (data-model §1).
   - **Protocol change log.** Each change of a pre-registered rule is one entry: the date, the
-    rule, the old and new text, the reason, the direction (stricter, or settling a value before
-    its first use), the approver, the last record ID that existed before it, so that "before any
-    result it affects" can be checked, and the results known at the time (FR-044). The spec's
-    Clarifications point to it.
-  - **A broken chain** is repaired only with the owner's recorded go-ahead. The broken file is
-    kept unchanged with its SHA-256; `scripts/repair_log.py` writes a `repair` entry with the
-    break's position, its cause and what was restored. Entries after the break count only where
-    the records they cite corroborate them, and the final report states the repair.
+    rule, the old and new text, the reason, the direction, `stricter` in the rule's stated direction
+    or `settled`, which fixes a case the protocol leaves open, only before any result
+    it affects exists, with the owner's approval, and never looser than any reading of the existing
+    text; the readings compared for a settled case; the approver, the last record ID that existed
+    before it, so that "before any result it affects" can be checked, and the results known at the
+    time (FR-044). The spec's Clarifications point to it.
+  - **A broken chain** is repaired only with the owner's go-ahead, recorded as a row "Log
+    repair <n>" of the spec's Review & Approval table that names the log, the `seq` of the break and
+    the date, reads Approved and is committed; `repair_log.py --approval` names that row, and the
+    script exits 2 unless the row reads Approved at HEAD and names the same log and position. The
+    broken file is kept unchanged with its SHA-256; `scripts/repair_log.py` writes a `repair` entry
+    with the break's position, its cause and what was restored. Entries after the break count only
+    where the records they cite corroborate them, and the final report states the repair.
   - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files;
     (2) `design_freeze.py create` runs with `git_dirty` false and writes the record as `draft`;
-    (3) the owner's approval is written into it; (4) the owner commits the record;
-    (5) `validate` exits 0. Dirty means a tracked file modified or an untracked file not
-    ignored. Ignored files, the locks and the local-only outputs, do not count, and local-only
-    outputs are in the record by SHA-256 anyway.
+    (3) the owner runs `design_freeze.py approve`, which writes the approval into it and changes
+    nothing else (data-model §13); (4) the owner commits the record; (5) `validate`, which
+    recomputes `draft_sha256` and every hash, exits 0. Dirty means a tracked file modified or an
+    untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
+    and local-only outputs are in the record by SHA-256 anyway.
 - **Rationale**: the edge case on large records leaves the choice to the plan. 10 MB keeps the
   repository small; hashes keep every local record checkable.
 - **Alternatives**: commit everything (hundreds of MB of matrices); keep only summaries (the
@@ -973,7 +1082,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 ## R17. The model, the second transcription and the tests (FR-035, FR-057, FR-058)
 
 - **Decision**:
-  - `phycoweb/model_v3.py` imports only the standard library and `phycoweb/constants_v3.py`. It is
+  - `phycoweb/model_v3.py` imports only the standard library, `phycoweb/constants_v3.py` and
+    `phycoweb/selftest_v3.py`, the two data modules the generators write (data-model §11). It is
     integer-only and branch-free on data. It is marked model-only, RTL-pending, with model ID
     `phyco-v3` and the variant IDs of R14. A test parses it with
     `ast.parse(source, feature_version=(3, 8))`, a best-effort check of the constitution's
@@ -1009,7 +1119,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `fast/phyco_stream.c`, `fast/lut_table.h`, `specs/002-core-dynamics-redesign/design.md` and
     both `vectors/phyco-v2_*.hex`, with `MANIFEST.json` holding each file's SHA-256, source path
     and `git_head`. A new `scripts/archive_phyco_v2.py` writes it; the feature-001 script is left
-    unchanged. `baseline/** -text` already keeps the copies byte-exact.
+    unchanged. `baseline/** -text` already keeps the copies byte-exact, except the two vector
+    copies, which the later `*.hex text eol=lf` line governs, as `git check-attr` showed on
+    2026-11-01; that is harmless while their sources stay LF, as they are.
   - `.gitattributes` gains `text eol=lf` for every Markdown file under
     `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the spec among
     them, since every record holds the spec's SHA-256 (data-model §1); and for
@@ -1018,9 +1130,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `reports/004-crypto-architecture-v3/**/*.jsonl`, the provenance log among them.
   - `.gitattributes` holds `reports/004-crypto-architecture-v3/** text eol=lf`, which covers
     solver logs, CSV and text outputs, followed by `*.gz binary`, so that compressed records are
-    never treated as text. Later lines take precedence, and `*.bin binary` already follows it.
-    Both lines were added when the checklist choices were applied (2026-11-01); the 1,000
-    tracked `.gz` files of feature 003 were already stored as binary, so none changes.
+    never treated as text. Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`,
+    `.txt` and `.gz` (R16), so the rule never makes a binary file text: a solver's log is `.txt`,
+    since `*.log` is ignored, and `protocol/evidence.py` refuses any other suffix. Later lines take
+    precedence, and `*.bin binary` already follows it. Both lines were added when the checklist
+    choices were applied (2026-11-01); the 1,000 tracked `.gz` files of feature 003 were already
+    stored as binary, so none changes.
   - **Hashes and pins.** A new record or the review package hashes an existing `text=auto` file
     over its LF-normalized content and says so (`lf-normalized`, R16), so the hash is the same
     on every checkout, and no existing file's pin changes. A test lists every path whose hash a

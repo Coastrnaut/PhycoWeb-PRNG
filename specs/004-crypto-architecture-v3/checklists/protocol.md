@@ -184,6 +184,36 @@ quality. It does not mean implementation work is complete.
   selection bias? [Gap, Spec §Pre-registered Design Protocol "Stop rule", §FR-044; security.md
   §21]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK036 Is the `settled` direction defined the same way in FR-044 (allowed only before any
+  result it affects exists, with the owner's approval, and never looser than any reading of the
+  existing text) and in data-model §18 and research R16 ("a value fixed before its first use"),
+  whose wording drops the never-looser condition, so that each entry's `direction` records a claim
+  that can be checked? [Consistency, Spec §FR-044; data-model §18; research R16]
+- [ ] CHK037 Is it specified how the owner's approval is written into the draft freeze record (a
+  command, or the fields that may change: `status`, who, when and the wording), and what `validate`
+  checks about it, for example that nothing else changed since `create` and that the record still
+  follows the format rules, so that step (3) of the freeze cannot alter a frozen hash unnoticed?
+  [Gap, data-model §13; cli contract `design_freeze.py`; Spec §FR-043]
+- [ ] CHK038 Is it stated which answered rows of checklist-choices.md become the protocol change
+  log's first entries (the 28 rows tagged Stricter or Settle, 17 and 11, or also the Add and Clarify
+  rows that change a pre-registered rule, such as a known result added to tool validation), and what
+  `last_record_id` holds when no evidence record exists yet? [Clarity, data-model §18; Spec §FR-044,
+  §Clarifications; plan "Values this plan fixes"]
+- [ ] CHK039 Is recovery from a stale lock specified for `data/heavy-run.lock` ("removed on exit")
+  and `data/log-append.lock`, when a crash, a killed process or a reboot leaves one behind: who may
+  remove it, how the holder is shown to be gone (the PID and start time the heavy-run lock holds),
+  and how the removal is recorded, since every later run or append exits 2 until then? [Gap,
+  Recovery; cli contract "Heavy runs", "Hash-chained logs"; research R16; Spec §FR-045]
+- [ ] CHK040 Is it stated where the owner's go-ahead for a log repair is recorded and what
+  `repair_log.py --approval REF` names (a row of the spec's approval table, a change-log entry or a
+  commit), so that the script can tell a recorded go-ahead from an arbitrary string and refuse a
+  repair without one? [Gap, cli contract `repair_log.py`; research R16]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy

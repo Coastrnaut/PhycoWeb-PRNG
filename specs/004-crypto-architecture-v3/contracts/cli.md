@@ -28,17 +28,29 @@ record), and nothing is written; **3** tool or I/O error, a recorded tool defect
   `tests/test_protocol_004.py` checks every such call.
 - **Operation lists**: every tool refuses an operation list whose SHA-256 has no `proposed` or
   `correction` entry in the candidate log, exit 2 (FR-041).
-- **Heavy runs** (`seed_search` sweeps, exhaustive bijectivity, trail searches, the frequency and
-  avalanche tests): take `data/heavy-run.lock` with an exclusive create; if it exists, exit 2.
-  The lock holds the PID, command and start time and is removed on exit (FR-045).
+- **Heavy runs**: a heavy run is any run that is of a kind research R7 budgets, uses more than one
+  worker process or thread, or is projected to take, or last took, more than 10 minutes;
+  `seed_search` sweeps, exhaustive bijectivity, trail searches and the frequency and
+  avalanche tests are examples. Every heavy run takes `data/heavy-run.lock` with an exclusive
+  create, projects first (Budget, below) and records `heavy_run` true. If the lock exists, it
+  exits 2, naming the lock and whether its holder still runs, checked in the lock's environment.
+  The lock holds the PID and that process's start time, the environment (`windows` or `wsl`), the
+  host, the command and the time it was taken, and is removed on exit; only `scripts/clear_lock.py`
+  removes a stale one (below). A test checks that every budgeted kind and every script with a worker
+  option takes the lock (FR-045; research R7, R16).
 - **Hash-chained logs**: every append to `research/004/candidates.jsonl`,
   `research/004/protocol-changes.jsonl` or `$REP/provenance.jsonl` takes
   `data/log-append.lock` by exclusive create, checks the chain up to the last line, appends one
-  line chained to it and releases the lock. It exits 2, appending nothing, if the lock is not
-  free within 10 s or the chain is broken (research R16).
+  line chained to it, whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes as
+  stored, its final LF included (data model §3), and releases the lock. The lock holds the same
+  fields as the heavy-run lock, and only `scripts/clear_lock.py` removes a stale one. It exits 2,
+  appending nothing, if the lock is not free within 10 s, naming the lock and whether its holder
+  still runs, or if the chain is broken (research R16).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
-  (research R7).
+  (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
+  nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
+  the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
   exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table reads
   Approved (FR-001, FR-003). Key loading is code that loads a key into such a state: the mode's
@@ -59,7 +71,9 @@ record), and nothing is written; **3** tool or I/O error, a recorded tool defect
   search that reaches its per-instance cap writes `inconclusive`. A heavy run first projects its
   hours on the candidate (at most 60 s), writing a `projection` record (data model §1), and
   exits 2, writing no evidence, unless its projection, plus the projections (probes only) of
-  the same kind of run at every larger claimable size, fits the hours left in its row.
+  the same kind of run at every larger claimable size, fits the hours left in its row. A probe
+  writes nothing but its `projection` record, and its time counts against the row of the run it
+  projects (data model §1).
 - **Trail tools**: once the feature's first trail search has started, a trail tool without an
   earlier `re-found` record is refused, exit 2 (research R12).
 
@@ -126,6 +140,11 @@ record (data model §7). Exit 1 if not re-found. A published value needs its sou
 (the entry of `$REP/downloads.json`, or a value the owner provides with its source, and the
 paper's table and value) or exits 2. After a failed validation, the re-validation names a
 second known result of the tool's kind as well as the first.
+
+For the bias test's validation, `validate_tool.py` draws the 100 synthetic sets of class 5 at each
+size from numpy's `Generator(PCG64(s))`, with s = `protocol.devinputs_v3.synthetic_seed(n, j)` (data
+model §2). The validation record holds the numpy version and each set's SHA-256, and a reproduction
+in the same environment draws the sets again and compares (research R3, R4).
 
 ## `scripts/evidence_v3.py`
 
@@ -195,16 +214,25 @@ which `--check` does not compare. `gen_constants_v3.py` also writes each constan
 `vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory and exits 1 on any
 byte difference. After the freeze, writing over a frozen file exits 2.
 
+They run in three steps, each generator's `--check` passing before the next step (data model §11):
+(1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
+`ResearchDuplex`, which runs no self-test, and also writes `phycoweb/selftest_v3.py`, the
+self-test's inputs and expected output, copied from the vectors, so its `--check` covers that file
+too; (3) `Generator` imports `phycoweb.selftest_v3` and runs its self-test from it. Tests check that
+`Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
+`selftest_v3.py` with the vectors (data model §13).
+
 ## `scripts/design_freeze.py`
 
 ```text
 design_freeze.py create                 # writes $REP/freeze/freeze.json with status draft
-design_freeze.py validate               # recomputes every hash
+design_freeze.py approve --by NAME --wording TEXT   # the owner's approval; changes nothing else
+design_freeze.py validate               # recomputes draft_sha256 and every hash
 ```
 
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files; (2) `create`
-runs with `git_dirty` false and writes the record as `draft`; (3) the owner's approval is
-written into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
+runs with `git_dirty` false and writes the record as `draft`; (3) the owner runs `approve`, which
+writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others
 `rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the verdict
@@ -212,8 +240,12 @@ scripts, every evidence record behind R by ID and by SHA-256, and the last `seq`
 SHA-256 of the candidate log, the provenance log and the protocol change log.
 
 `create` exits 2 if the owner design review row is not Approved, if the external review row is
-neither done nor "not arranged", or if `git_dirty` is true. `validate` exits 1 on any hash
-mismatch, and 2 while `status` is `draft`.
+neither done nor "not arranged", or if `git_dirty` is true. `create` stores `draft_sha256`, the
+SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
+the owner, changes `status` from `draft` to `approved`, adds `approved_by`, `approved_utc` and
+`approval_wording`, and changes nothing else. `validate` recomputes `draft_sha256` and every hash
+and checks the format rules; it exits 1 if anything but the approval fields changed or a hash does
+not match, and 2 while `status` is `draft` (data model §13).
 
 ## `scripts/recheck_004.py`
 
@@ -235,11 +267,24 @@ lists both checks per kind, and it verifies the inventory of superseded operatio
 repair_log.py --log LOG --approval REF
 ```
 
-Repairs a broken hash chain in one of the three logs, only with the owner's recorded go-ahead,
-which `--approval` cites; without it, exit 2. The broken file is kept unchanged with its
-SHA-256, and a `repair` entry records the break's position, its cause and what was restored.
-Entries after the break count only where the records they cite corroborate them, and the final
-report states the repair (research R16).
+Repairs a broken hash chain in one of the three logs, only with the owner's go-ahead: `--approval`
+names the row "Log repair <n>" of the spec's Review & Approval table, and the script reads the spec
+at HEAD and exits 2 unless that row reads Approved and names the same log and the `seq` of the
+break. The broken file is kept unchanged with its SHA-256, and a `repair` entry records the break's
+position, its cause and what was restored. Entries after the break count only where the records they
+cite corroborate them, and the final report states the repair (research R16).
+
+## `scripts/clear_lock.py`
+
+```text
+clear_lock.py LOCK                      # data/heavy-run.lock or data/log-append.lock
+```
+
+Run by the owner or at the owner's request. It removes LOCK only when it can show, in the
+lock's environment, that no process with the PID and start time the lock holds still runs;
+otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record under
+`$REP/locks/` with the lock's content and, for the heavy-run lock, the `inconclusive` record
+of the run that died holding it (data model §1; research R16).
 
 ## `scripts/check_claims.py`
 

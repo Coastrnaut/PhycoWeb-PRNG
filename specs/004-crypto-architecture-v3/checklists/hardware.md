@@ -186,6 +186,36 @@ quality. It does not mean implementation work is complete.
   (research R11), so that an RTL mismatch can be located to one stage? [Completeness,
   Spec §FR-036, §FR-056; data-model §11; research R11]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK038 Is FR-025's second latency figure, "from the last key word accepted to the first output
+  valid", consistent with the split the model contract now makes (the key loaded once and held, each
+  `instantiate` taking a nonce and using the stored key), or should it run from the last nonce or
+  personalization word of an instantiate, with key loading a call of its own with its own cycle
+  count? [Consistency, Spec §FR-025, §FR-020; model contract "Generator"]
+- [ ] CHK039 Is "an error path" among the hardware zeroization triggers defined, naming the
+  conditions in the RTL that count as an error after the state has changed, as distinct from a
+  refused request that changes nothing, given that the model's counterpart, an exception after the
+  state changed, has no direct equivalent in hardware? [Clarity, Spec §FR-025 "Zeroization"; model
+  contract "Failure paths"]
+- [ ] CHK040 Is the recovery after a failed start-up self-test specified for the device: whether a
+  later reset runs the self-test again and the device may then be used if it passes, or whether the
+  failure stays latched until a stated action, and whether the failure is visible on an output or
+  status signal rather than only as calls refused? [Gap, Recovery; Spec §FR-059, §FR-025]
+- [ ] CHK041 Is the carried rule "the board validates 4×4 before 8×8 and 16×16" (FUT-GRID-5;
+  security.md §22 row 5a.5) reconciled with FUT-HW-2's "at 4×4 and at the largest grid that fits",
+  so that feature 008 is never required to validate a size the XC7A100T cannot hold, with FR-026's
+  LUT and flip-flop estimate named as the input that decides which sizes the board takes?
+  [Consistency, Spec §FR-036, §FR-056, §FR-026; security.md §20.1, §22]
+- [ ] CHK042 Is it specified how a stall (ready low) reaches every node and every replicated round
+  and phase counter on the same cycle, for example as a clock enable through a registered fan-out
+  tree with a stated latency, or by output buffering so that the core never stalls in mid-call,
+  given that the counters run in lockstep and no counter value crosses the grid? [Gap, Spec §FR-025
+  "Flow control", "Key loading and reset"; plan Complexity Tracking]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the

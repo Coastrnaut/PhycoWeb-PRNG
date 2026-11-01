@@ -178,6 +178,33 @@ quality. It does not mean implementation work is complete.
   part, the outputs before a forget call, the nonce-uniqueness record), or leave the whole list
   to the design document? [Completeness, Spec §FR-008]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK041 Are construction-time failures given their own rows in the model contract's
+  failure-path table, given that a refused variant, a wrong key length or a failed self-test leaves
+  no object, so that neither "nothing changes, and the object stays usable" nor "the object is
+  unusable" can apply, and is the order of the constructor's checks (variant, key length, self-test)
+  stated so that each refusal raises one stated exception? [Consistency, model contract "Generator",
+  "Failure paths"; Spec §FR-025, §FR-058]
+- [ ] CHK042 Is "clears the key" given a meaning the model can meet and a test can check, given that
+  Python cannot overwrite an immutable `bytes` key in place: for example the stored copy held as a
+  `bytearray`, overwritten with zeros and then dropped, with the caller's own copy outside the rule,
+  and stated as a discipline as constant time is? [Clarity, model contract "Generator", "Module
+  rules"; Spec §FR-025, §FR-058]
+- [ ] CHK043 Is it stated how the per-key limit of 2³² random-nonce instantiations is enforced,
+  given that a `Generator` cannot tell a random nonce from a counter value: one instantiation
+  counter at the smaller limit for every key, a nonce mode declared at construction, or a usage rule
+  for the caller beside the per-key limits across objects? [Ambiguity, Spec §FR-006, §FR-007;
+  research R9; model contract "Other limits"]
+- [ ] CHK044 Is FUT-SEC-5's "Met by specification for its specified part" consistent with the
+  traceability definitions, given that this part includes diffusion through instantiation and
+  research R4's first-order related-key and related-nonce differences, which are measured and so met
+  by evidence, while met by specification means that nothing remains to measure? [Consistency, Spec
+  §Security Policy traceability "FUT-SEC-5", §SC-002; research R4]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy

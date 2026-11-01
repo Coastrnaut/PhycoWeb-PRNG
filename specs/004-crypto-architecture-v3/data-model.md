@@ -5,9 +5,10 @@
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
 All records are JSON (UTF-8, LF line endings, sorted keys), written by one module,
-`protocol/evidence.py`. Paths are under `reports/004-crypto-architecture-v3/` unless stated. A
-record is never overwritten: a repeat run writes a new record with a new identifier, and the old
-one stays.
+`protocol/evidence.py`. Paths are under `reports/004-crypto-architecture-v3/` unless stated, and
+files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`;
+`protocol/evidence.py` refuses any other suffix there (research R16, R18). A record is never
+overwritten: a repeat run writes a new record with a new identifier, and the old one stays.
 
 **Format rules** for every record and generated file (FR-036, FR-053), so that another
 implementation can write byte-identical files:
@@ -18,9 +19,17 @@ implementation can write byte-identical files:
 - JSON has sorted keys and `ensure_ascii=False`, with two-space indentation in a `.json` file
   and one object per line in a `.jsonl` log. Rationals are "p/q" strings. Floats appear only in
   reported statistics and are written with `repr`.
-- Hex is upper case and zero-padded to the word's width, with lanes in the design document's
-  order. A vector file's header is `# key=value` fields in a fixed order, separated by single
-  spaces (section 11).
+- Hex words of vectors and states are upper case and zero-padded to the word's width, with lanes in
+  the design document's order. Every digest is written as 64 lower-case hex digits, as the existing
+  records already are. A vector file's header is `# key=value` fields in a fixed order, separated by
+  single spaces (section 11).
+- A `.gz` file is written by `gzip.compress(data, compresslevel=9, mtime=0)`, so its header holds no
+  file name and a zero time. Its raw hash is over the compressed bytes, and its output entry also
+  holds `uncompressed_sha256`, the SHA-256 of its content, which a reproduction compares (research
+  R16).
+- `lf-normalized` content is the file's bytes with each CR LF pair replaced by LF, as Git
+  normalizes, a lone CR kept; it is never computed from a file read in text mode, whose universal
+  newlines also turn a lone CR into LF.
 - Every list is sorted by a stated key: fired bits by round count, direction, set and bit;
   matches by candidate value; IDs lexicographically; symmetries in a stated enumeration order.
   Nothing depends on set iteration, hash randomization, thread completion or worker count.
@@ -30,7 +39,7 @@ implementation can write byte-identical files:
 | Field | Type | Rule |
 |-------|------|------|
 | `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`; unique; part of the file name |
-| `kind` | str | one of the kinds of sections 4–11, or `projection` (below) |
+| `kind` | str | one of the kinds of sections 4–11, `projection` or `lock-cleared` (below) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str | `phyco-v2` for US1 and for tool validation on it; otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version and hash; `none` before it exists |
@@ -43,7 +52,7 @@ implementation can write byte-identical files:
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
 | `inputs` | object | namespace (`dev` or `control`; for US1 the feature-002 `dev` set), kind, index range, fingerprint (R3) |
-| `outputs` | list | `{path, sha256, bytes, committed}`; `committed` false for local-only files (R16) |
+| `outputs` | list | `{path, sha256, bytes, committed}`, and `uncompressed_sha256` for a `.gz` file; `committed` false for local-only files (R16); a committed file has one of the suffixes of the introduction |
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
 | `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
 | `classification` | str | one of the four classes of security.md §9.1 (FR-060) |
@@ -54,27 +63,38 @@ implementation can write byte-identical files:
 
 Statistical records (section 5, `frequency`, `avalanche` and `control`) also hold the items of
 security.md §11.6: `sample_size`, `test_parameters`, `raw_counts` (path and SHA-256),
-`p_values` (path and SHA-256), `failure_locations` (every fired bit with its round count,
-direction and input or difference set) and `exclusions_and_reruns` (each citing the recorded
-tool defect, one of the kinds of research R7, with its evidence; empty unless a tool defect is
-recorded).
+`p_values` (path and SHA-256), each JSON or gzip-compressed JSON, never `.npy`, `failure_locations`
+(every fired bit with its round count, direction and input or difference set) and
+`exclusions_and_reruns` (each citing the recorded tool defect, one of the kinds of research R7, with
+its evidence; empty unless a tool defect is recorded).
 
 - **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or
   `lf-normalized` (research R16).
 - **Every run writes a record.** A run started on a candidate or a variant writes a record even
   if aborted (`inconclusive` or `blocked`, with the reason). A run later found hit by a tool
   defect keeps its record, with the defect noted.
+  A heavy run that died holding its lock gets that `inconclusive` record when
+  `scripts/clear_lock.py` clears the lock, which also writes a `lock-cleared` record under `locks/`
+  with the lock's content (research R16).
 - **Projection records.** A `projection` record (research R7) is written for every 60 s
   projection and every timing probe: the run it projects and its budget row, its inputs (the
   first inputs of that run), the measured speed and the projected hours. Its outputs other than
   timing are discarded unread, and the record says so. Its time counts against the row of the
   run it projects.
-- **Reproduction.** A reproduction of a record compares it with the original: deterministic
-  kinds (vectors, constants, dependency matrices, counts, digests) byte for byte, searches and
-  solver runs by their values and verdicts. The comparison excludes `record_id`,
-  `created_utc`, timings, `platform`, `versions` and `environment` where the environment
-  differs, `git_head` and `git_dirty`, and the environment is either of research R1's two, as
-  recorded.
+  A projection record is not evidence: the order of sizes counts evidence records only (research
+  R7), so a probe at a larger size runs before the run it projects.
+- **Reproduction.** A reproduction of a record compares these fields with the original and reports
+  every other field only: `kind`, `model_id`, `variant_id`, `design_sha256`, each source file's
+  entry in `code_sha256`, `inputs`, each output's `sha256` and `bytes` (not its path),
+  `exit_status`, `assertions`, `status`, `classification`, and the fields of its kind. Deterministic
+  kinds (vectors, constants, dependency matrices, counts, digests) thus match byte for byte, and
+  searches and solver runs by their values and verdicts. A different source hash makes it a new run,
+  not a reproduction, and a binary's hash is reported only. Two kinds of output are compared by
+  content instead: a `p_values` file, whose p-values must agree within a relative tolerance of 10⁻⁶
+  and never decide a verdict, the reproduction listing any outside it; and a `.gz` file, by its
+  `uncompressed_sha256`. The verdict is recomputed under the spec version the original cites
+  (`spec-versions/<sha256>.md`), so a later spec change cannot alter it, and the environment is
+  either of research R1's two, as recorded.
 
 ## 2. Development inputs (`protocol/devinputs_v3.py`; FR-040, R3)
 
@@ -84,6 +104,7 @@ recorded).
 | `NAMESPACES` | `dev`, `control`; nothing else is accepted |
 | `key(i)`, `nonce(i)`, `pers(i, m)`, `reseed(i)` | 32, 16, min(m, 32) and 32 bytes from SHA-256 of `phycoweb-004/<ns>/<kind>/<i>` |
 | `state(n, w, i)` | b = 2w·n² bits from the digests of `phycoweb-004/<ns>/state/n<n>w<w>/<i>/<j>`, j = 0, 1, …, read into lanes as R3 states |
+| `synthetic_seed(n, j)` | the first 16 bytes of SHA-256 of `phycoweb-004/dev/synthetic/n<n>/<j>`, read as a big-endian integer: the seed of synthetic set j at size n (class 5 below) |
 | `FINGERPRINTS` | per namespace and kind, and per (n, w) for `state`: SHA-256 of the hex values for i = 0…99, one per line, LF |
 | `load(ns, kind, allow, ...)` | checks the fingerprint, refuses a namespace not in `allow` and any index outside the use's declared range i = 0…N − 1 (`PermissionError`; scripts exit 2) |
 
@@ -107,6 +128,7 @@ no value or index is picked after any output is seen.
 | 2 | edge states | the design document's list (FR-054) |
 | 3 | derived from development inputs | the avalanche flips x ⊕ e_j, the key and nonce bit flips and the word rotations, for every j, bit and k the rule names (R4) |
 | 4 | feature 002's `dev` seeds | for FUT-SEC-8 only (R2), the one external development set |
+| 5 | synthetic counts | for the bias test's validation only (R4): set j = 0…99 at each size from numpy's `Generator(PCG64(synthetic_seed(n, j)))`; one `binomial(N, 1/2)` count per tested bit, in the test's bit order, except the planted bit at position j mod S, drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033); `validate_tool.py` draws the counts, and the validation record holds the numpy version and each set's SHA-256 (section 7) |
 
 ## 3. Candidate log (`research/004/candidates.jsonl`; FR-041, SC-011)
 
@@ -116,7 +138,7 @@ takes `data/log-append.lock` and checks the chain first (R16).
 | Field | Rule |
 |-------|------|
 | `seq` | 0, 1, 2, … with no gaps |
-| `prev_sha256` | SHA-256 of the previous line's bytes; 64 zeros for `seq` 0 |
+| `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
 | `event` | `proposed`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair` |
@@ -146,9 +168,10 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   unchanged to `research/004/candidates/<id>/superseded/<sha256>.py`, and the committed
   inventory `research/004/candidates/superseded.json` lists every hash and path, so every
   `oplist_sha256` in the log stays checkable. The re-check verifies the inventory.
-- **Repair.** A broken chain is repaired only with the owner's recorded go-ahead. The broken
-  file is kept unchanged with its SHA-256, and `scripts/repair_log.py` appends a `repair` entry
-  with the break's position, its cause and what was restored. Entries after the break count
+- **Repair.** A broken chain is repaired only with the owner's go-ahead, the Approved row "Log
+  repair <n>" of the spec's Review & Approval table, which `repair_log.py --approval` names (R16).
+  The broken file is kept unchanged with its SHA-256, and `scripts/repair_log.py` appends a `repair`
+  entry with the break's position, its cause and what was restored. Entries after the break count
   only where the records they cite corroborate them, and the final report states the repair
   (R16).
 
@@ -204,7 +227,8 @@ and every recovered seed with `model_v2`, with no sweep.
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
   arithmetic over the binomial distribution (R4). It is committed, and scipy's p-values are
-  reported only.
+  reported only: a reproduction compares them within a relative tolerance of 10⁻⁶, and counts,
+  critical counts and verdicts byte for byte (section 1).
 - **Validation cited.** Every counted record holds `validation`, the ID and SHA-256 of the
   validation record of the tool's exact hash, whose `created_utc` is earlier (FR-039; SC-007).
 - **Unvalidated tools.** A trail or distinguisher found by a tool not yet validated is recorded
@@ -242,6 +266,13 @@ same kind and of the tool's exact hash exists.
   the weight of the optimal trail, not the trail itself; for the S-box tables, every entry; for
   PRESENT, the stated minimum of active S-boxes over 5 rounds. Any difference is `not
   re-found`.
+  For the known results that are not published values, what must match is exact equality for every
+  deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
+  S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; each structural tool's
+  counts and matrices, entry by entry; R5's counts; and FUT-SEC-8's three seeds and its vector
+  check. A measured fraction, such as S13's 41% and 32% or S14's bit frequencies, matches when the
+  tool's count lies in the binomial interval around the recorded fraction, for the tool's sample
+  size, with at most 0.005 in each tail. Anything else is `not re-found`.
 - **After a failed validation**, the record of the next attempt holds the defect, its cause and
   the fix, and the re-validation re-finds a second known result of its kind as well as the
   first, named in the defect record before the fix runs. Every attempt is a record of its own.
@@ -250,6 +281,13 @@ same kind and of the tool's exact hash exists.
 - **The bias test** (R4): S14's bias re-found on `phyco-v2`, and on 100 sets of synthetic
   binomial counts with one bit planted at the 90%-power biases it fires in 82 to 97 of the 100
   sets.
+  The sets are class 5 of section 2, and the record holds the numpy version and each set's SHA-256.
+- **Self-written known results.** Each known result this feature writes itself (the small operation
+  list with its hand-derived matrices, the map with collisions, the variant with a planted gap, R5's
+  hand-counted examples) is written with its SHA-256 and entered in the provenance log (section 14)
+  before the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry.
+  The validation record cites both entries, and a test checks their order and that the hashes still
+  match.
 - **A value that cannot be obtained** leaves the tool unvalidated and its results `not
   evaluated`, unless the owner provides the value with its source (R12, R19).
 
@@ -318,8 +356,9 @@ record's SHA-256, and it never changes.
 theorem's unit, which is primary, and in bits at every claimable size (a request of n bits
 takes ⌈n/r⌉ output calls plus one forget call, and instantiate's calls are stated); every other
 online quantity the bound counts with its limit; `u`; the two allowed ways of choosing nonces,
-and for random nonces the collision term q²/2¹²⁹ in the bound and their own per-key
-instantiation limit, at most 2³² (R9); the bound at the limits and the doubling check of R9.
+and for random nonces the collision term q²/2¹²⁹ in the bound and the random-nonce
+instantiation limit, at most 2³², which the model applies to every key whatever its nonces (R9); the
+bound at the limits and the doubling check of R9.
 
 ## 11. Vectors (`vectors/phyco-v3/`; FR-036, FR-054)
 
@@ -329,7 +368,7 @@ instantiation limit, at most 2³² (R9); the bound at the limits and the doublin
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
-| `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15) |
+| `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar: one entry per generator run with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it |
 
 The header of a mode vector file reads, for example:
@@ -344,6 +383,14 @@ so that `--check` can compare them byte for byte; everything that differs betwee
 platforms goes to the sidecar `MANIFEST.json` (R8). A variant directory name is the variant ID
 with `/` replaced by `_`.
 
+**Order of generation** (FR-036, FR-059): three steps, each generator's `--check` passing in this
+order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
+vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes
+`phycoweb/selftest_v3.py`, the self-test's inputs and expected output, copied from the vectors.
+(3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. Tests check that
+`Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
+`selftest_v3.py` with the vectors (section 13).
+
 ## 12. Baseline archive (`baseline/phyco-v2/MANIFEST.json`; FR-042)
 
 As `baseline/float-v0/MANIFEST.json`: `created_utc`, `git_head`, and `files`, each with
@@ -356,40 +403,46 @@ copy against its manifest hash and its live source (SC-012).
 
 - **Hashes**, each with its kind (`raw` or `lf-normalized`, R16): the design document (with
   its version); `rationale.md`, versioned with it; `phycoweb/model_v3.py`;
-  `phycoweb/constants_v3.py`, with its table per supported (n, w); every vector file, including
-  the constructed-state vectors and the constant tables beside them; the scripts that generate
-  the constants and the vectors; the selected operation list; `research/004/ir.py` with its
-  tools; and the scripts that compute verdicts: `evidence_v3.py`, `round_rule.py`,
-  `d4_choice.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and `protocol/evidence.py`.
+  `phycoweb/constants_v3.py`, with its table per supported (n, w); `phycoweb/selftest_v3.py`
+  (section 11); every vector file, including the constructed-state vectors and the constant tables
+  beside them; the scripts that generate the constants and the vectors; the selected operation list;
+  `research/004/ir.py` with its tools; and the scripts that compute verdicts: `evidence_v3.py`,
+  `round_rule.py`, `d4_choice.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
+  `protocol/evidence.py`.
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the
   protocol change log.
 - **Selection**: the `variant_map` of the `selected` entry (section 3), with the operation
   list's SHA-256.
-- Tool versions; `git_head`; `git_dirty`, which must be false; `status` `draft` until the owner
-  approves, then `approved` with who, when and the wording.
+- Tool versions; `git_head`; `git_dirty`, which must be false; `draft_sha256`, written by `create`:
+  the SHA-256 of the record's canonical JSON without that field and the approval fields; and
+  `status`, `draft` until the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
+  run by the owner, changes `status` to `approved`, adds `approved_by`, `approved_utc` and
+  `approval_wording`, and changes nothing else.
 
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files;
 (2) `design_freeze.py create` runs with `git_dirty` false and writes the record as `draft`;
-(3) the owner's approval is written into it; (4) the owner commits the record; (5) `validate`
-exits 0. Dirty means a tracked file modified or an untracked file not ignored; ignored files
-(the locks, local-only outputs) do not count, and local-only outputs are in the record by
-SHA-256 anyway. `validate` recomputes every hash. After approval the frozen files must not
-change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code
-that produced the verdicts. The approval status of the design document and the rationale
-stays outside the frozen files (FR-034).
+(3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
+record; (5) `validate` exits 0. Dirty means a tracked file modified or an untracked file not
+ignored; ignored files (the locks, local-only outputs) do not count, and local-only outputs are in
+the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and every hash and checks the
+format rules; it exits 1 if anything but the approval fields changed or a hash does not match, and 2
+while `status` is `draft`. After approval the frozen files must not change: a fix to a verdict
+script is a new file, so that the re-check (FR-065) runs the code that produced the verdicts. The
+approval status of the design document and the rationale stays outside the frozen files (FR-034).
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
 
 One line per file drafted or repaired with an AI tool: `seq` and `prev_sha256`, chained as the
-candidate log is (section 3), `path`, `section`, `sha256`, `tool` and `model`, `session`,
-`date_utc`, `task_id`, `review_status`. Every append takes `data/log-append.lock` and checks the
-chain first (R16), and a broken chain is repaired as in section 3. The entries for
-`phycoweb/model_v3.py` and `tests/v3_reference.py` must name different sessions (FR-057).
-`section` names a part of a file: each AI-drafted section of the rationale has its own entry
-with its review status, which the owner design review updates, so that the frozen text carries
-no status (FR-034).
+candidate log is (section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`,
+`section`, `sha256`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`. Every
+append takes `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired
+as in section 3. The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
+different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
+its own, with its SHA-256, before the first entry of the tool it validates. `section` names a part
+of a file: each AI-drafted section of the rationale has its own entry with its review status, which
+the owner design review updates, so that the frozen text carries no status (FR-034).
 
 ## 15. Claim and evidence register (`protocol/claims.json`; FR-069)
 
@@ -403,8 +456,12 @@ gate (FR-012).
   checks that no document states a level above `claim_level`.
 - `fut_sec`, for `phyco-v3`: each FUT-SEC requirement's status in the terms of the spec's
   traceability table. FUT-SEC-4 is met by statement (D7); FUT-SEC-5 is met by specification for
-  its specified part and open for feature 005's analysis (FR-049). L1's "FUT-SEC-1 to
-  FUT-SEC-6 met by specification" (security.md §15) is decided on this one reading.
+  key loading, and by evidence for diffusion through instantiation (FR-029) and research R4's
+  first-order related-key and related-nonce differences, and stays open for feature 005's analysis
+  (FR-049). L1's "FUT-SEC-1 to FUT-SEC-6 met by specification" (security.md §15) is decided on this
+  one reading: the security-target review accepts the design document's section on key loading and
+  cites the evidence records of the measured part, which exist by then, so nothing remains to
+  measure.
 - `allow_list`: the lines the claim test would flag that may stand, each with its path, its
   text and its reason. The test flags any strength (a number of bits beside "security",
   "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence
@@ -447,12 +504,19 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `date_utc` | ISO 8601 |
 | `rule` | the pre-registered rule changed, by its name in the spec's protocol or its research section |
 | `old_text`, `new_text` | the rule's text before and after |
-| `reason` | why it changed |
-| `direction` | `stricter`, in the rule's stated stricter direction, or `settled`, a value fixed before its first use |
+| `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md |
+| `direction` | `stricter`, in the rule's stated stricter direction, or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044) |
+| `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
 | `approver` | the owner, with the approval's date |
-| `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked |
-| `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7) |
+| `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
+| `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
 
-A change applies to every candidate, those already evaluated included. The changes chosen with
-the checklist answers of 2026-11-01 become the log's first entries when it is created, and the
-spec's Clarifications point to it.
+A change applies to every candidate, those already evaluated included. The log's first entries,
+written when it is created, are one per answered row of
+[checklist-choices.md](./checklist-choices.md), of both runs of 2026-11-01, whose applied change
+altered the text of a pre-registered rule, whatever its tag: the 31 rows tagged Stricter or Settle
+(18 and 13), and the Add, Align and Clarify rows that changed such a rule, for example ANA-028's
+known result for the bias tool. Each cites its row ID and takes `stricter`, in the rule's stated
+direction, or `settled`. The list is fixed by row ID before the log is created. Among them, the
+constant rule's values (research R15) and the SHA-256 of its refused list are `settled` entries
+written before the first candidate is scored. The spec's Clarifications point to the log.

@@ -149,6 +149,68 @@ quality. It does not mean implementation work is complete.
   a file's hash, and some Windows tools, Windows PowerShell 5.1 among them, write a byte-order
   mark or another encoding by default? [Gap, Spec §FR-053; data-model introduction]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK028 Are the file kinds that may be committed under `reports/004-crypto-architecture-v3/`
+  listed, or does every binary format written there get a `binary` rule (for example the
+  `raw_counts` and `p_values` files, which data-model §1 names only by path and SHA-256), given that
+  `reports/004-crypto-architecture-v3/** text eol=lf` makes every file there text unless a later
+  `*.bin`, `*.gz` or `*.hex` line applies (`git check-attr` gives `text: set` for a `.npy` file
+  there), and that committing a binary file as text turns each CR LF pair into LF and changes its
+  hash? Is research R18's statement that `baseline/** -text` keeps the archived `phyco-v2` copies
+  byte-exact also corrected for the two vector copies, which the later `*.hex text eol=lf` line
+  governs (harmless while their sources stay LF)? [Coverage, research R16, R18; data-model §1; Spec
+  §FR-053]
+- [ ] CHK029 Is the random source of the bias test's 100 synthetic sets of binomial counts specified
+  (for example a stated generator seeded from a public string under research R3's prefix, with a
+  stated order of draws), given that research R3, frozen at plan approval, requires every use, the
+  tool validation included, to take its inputs from its derivation, whose table has no kind for
+  random draws, and that its closed class of constructed inputs does not list synthetic counts?
+  Without it, the validation record's 82-to-97 result cannot be reproduced, and nothing shows that
+  the sets were not drawn again after a result was seen. [Conflict, research R3, R4; Spec §FR-039,
+  §FR-040; data-model §2, §7]
+- [ ] CHK030 Does the reproduction rule's list of excluded fields cover every field that
+  legitimately differs between research R1's two environments or between analysts, such as
+  `command`, which holds the interpreter's full path, `config`, which holds the working directory
+  and the repository root, `parallelism`, and `analyst`, `reviewer` and `review_status`, and is it
+  stated whether `spec_sha256` must match once the spec has changed, or are the compared fields
+  listed instead, so that a record made on Windows can be reproduced in WSL? [Consistency,
+  data-model §1 "Reproduction"; Spec §FR-053; research R1]
+- [ ] CHK031 Is it stated how a reproduction compares the reported p-values (byte for byte, within a
+  stated tolerance, or not at all), given that a `frequency` or `avalanche` record holds the
+  smallest p-value per set beside a `p_values` file listed by its SHA-256, that floats are written
+  with `repr`, that the p-values come from scipy 1.15.3 on Windows and 1.18.1 in WSL, and that only
+  the verdicts rest on exact integer critical counts? [Clarity, data-model §1 "Reproduction", §5,
+  introduction "Format rules"; research R1, R4; plan "Technical Context"]
+- [ ] CHK032 Are the hashed bytes defined exactly where a hash is not over a whole file's raw bytes:
+  the chain's "SHA-256 of the previous line's bytes" (the line as stored, with or without its final
+  LF, and the letter case of the digest written, given that the format rules make hex upper case
+  while a digest's usual form is lower case), and research R16's `lf-normalized` content (CR LF to
+  LF only, as Git normalizes, or also a lone CR, as Python's universal newlines do), so that another
+  implementation computes and writes the same values? [Clarity, data-model §3, §14, §18,
+  introduction "Format rules"; research R16; cli contract "Hash-chained logs"]
+- [ ] CHK033 Is the order in which the self-test data and the vectors are generated specified, given
+  that the start-up self-test's inputs and expected output come from the committed vectors, which
+  the model generates, that a `Generator` runs the self-test in its constructor, and that the model
+  may import only the standard library and `phycoweb.constants_v3` (for example the vectors written
+  through an interface that runs no self-test, then the expected outputs copied into the constants,
+  with each generator's `--check` passing in that order)? Is it also stated whether
+  `ResearchDuplex`, which has "the same calls and rules as `Generator`", runs a self-test at reduced
+  variants, for which no expected output is stated? [Gap, Spec §FR-059, §FR-036; model contract
+  "Module rules", "Generator", "Research duplex"; cli contract "Generators of constants and
+  vectors"]
+- [ ] CHK034 Is the byte format of a gzip-compressed record fixed (modification time 0, no stored
+  file name, a stated compression level), or are its hash and its byte-for-byte reproduction defined
+  over the uncompressed content, given that every new file is hashed over its raw bytes (research
+  R16), that the format rules cover only text, JSON and hex, and that a gzip header holds a
+  modification time and may hold the file name? A probe on 2026-11-01 found `gzip.compress` writing
+  the current time under the Windows Python 3.10.11 and 0 under the WSL Python 3.14.4, and
+  `gzip.GzipFile` writing the time and the file name under both. [Gap, research R16; data-model
+  introduction "Format rules", §1 "Reproduction"; Spec §FR-053]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the

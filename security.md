@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.11 (2026-11-01). The change history is in section 25.
+- **Document:** `security.md`, version 2.12 (2026-11-01). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -1556,7 +1556,7 @@ No option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.11) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.12) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 PASS (003, reviewed 2026-11-01) |
@@ -1566,7 +1566,7 @@ No option is assumed secure.
 | 5a.2 | Feature 005: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
 | 5a.3 | Feature 006: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |
 | 5a.4 | Feature 007: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v3`'s design freeze and feature 007's protocol freeze, for example SHA-256 over feature 007's protocol freeze record with a public string; feature 007 states the derivation, and a test re-derives it (feature-004 FR-040) | Not started |
-| 5a.5 | Feature 008: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4 before 8×8 and 16×16 (FUT-GRID-5); may run alongside 007 | Not started |
+| 5a.5 | Feature 008: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-GRID-5, FUT-HW-2); a size that does not fit is listed in feature 008's spec with its reason and stays covered by feature 006's simulation; may run alongside 007 | Not started |
 | 5a.6 | Feature 009: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |
 | 6 | Cryptanalysis: state recovery, related seeds, rotational, algebraic, distinguishers | Not started |
 | 7 | RTL: VHDL, differential tests, synthesis, side channels | Not started (O1) |
@@ -1648,6 +1648,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.9 | 2026-11-01 | Recorded the reviewed battery verdict (feature 003, attempt 1: PASS, accepted by the owner on 2026-11-01) in sections 1.1–1.3, 11.1, 11.4, 11.5 and the roadmap, and the stricter PractRand rule for saturated lines (section 11.3). No claim level changes |
 | 2.10 | 2026-11-01 | Recorded the owner's approval, on 2026-11-01 with the feature-004 spec, of the strategy note `research/security/crypto-redesign-strategy.md` and of the 2.7 to 2.9 changes, and the owner's approval of the feature-004 plan the same day: roadmap rows 5a and 5a.1. No requirement or claim level changes |
 | 2.11 | 2026-11-01 | Recorded the owner's decision on FUT-SEC-2 and FUT-GRID-2 at 2×2, option 1, taken on 2026-11-01 in the approved feature-004 spec (D3, FR-017), with the reason it weakens neither requirement (sections 9.2 and 20.1). Roadmap rows 5a.3 to 5a.5 now carry two feature-004 requirements: FUT-GRID-5's validation of 4×4 before 8×8 and 16×16 to features 006 and 008, and the checkable derivation of the held-out keys to feature 007 (feature-004 FR-040). From the owner's answers to the feature-004 checklist choices (SEC-010, PRO-010, HW-035). No claim level changes |
+| 2.12 | 2026-11-01 | Roadmap row 5a.5 carries feature 004's corrected order of sizes for the board: 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-HW-2), and a size that does not fit stays covered by feature 006's simulation. This corrects the wording 2.11 carried, which could have required a size the device cannot hold. From the owner's answers to the feature-004 checklist re-run (HW-041). FUT-GRID-5, FUT-HW-2 and every claim level are unchanged |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

@@ -8,8 +8,8 @@
 
 **Created**: 2026-11-01
 
-**Status**: Spec and plan approved (2026-11-01); checklist choices answered and applied
-(2026-11-01); tasks approval, reviews and design freeze pending
+**Status**: Spec and plan approved (2026-11-01); checklist choices of the first run and of the
+re-run answered and applied (2026-11-01); tasks approval, reviews and design freeze pending
 
 **Input**: User description (verbatim):
 
@@ -159,6 +159,13 @@ and the design document leaves an implementer, human or model, nothing to guess.
   case by its most conservative reading (FR-044). Each is recorded with its reason before any
   result exists, as the first entries of the protocol change log
   `research/004/protocol-changes.jsonl` when that log is created.
+- Q: Which options of [checklist-choices.md](./checklist-choices.md) apply to the 29 items that the
+  re-run of the six checklists found on 2026-11-01 in the text the first answers changed? → A: All
+  recommended (owner, 2026-11-01). They are applied to this spec, the plan and its design artifacts,
+  and security.md (version 2.12). Every change they make to the pre-registered design protocol is
+  stricter or settles an open case by its most conservative reading (FR-044). Each is recorded with
+  its reason before any result exists, among the first entries of the protocol change log;
+  data-model §18 states which answered rows those are.
 
 ## Review & Approval *(Constitution Principle VIII)*
 
@@ -167,6 +174,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session, with D1–D10 as clarified on 2026-11-01 (section "Clarifications"); the pre-registered design protocol may only become stricter (FR-044). Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), not recorded before |
 | Plan approval | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session: plan.md and its design artifacts, research.md R1–R19 with every choice answered as recommended and its eleven changes applied, data-model.md, the two contracts, quickstart.md and checklists/redesign-inputs.md. From this approval the values the plan fixes belong to the pre-registered design protocol and may only become stricter (FR-044). The six `/speckit-checklist` passes of the strategy note (§8.3) run next, before `/speckit-tasks` |
 | Checklist choices ([checklist-choices.md](./checklist-choices.md): the 206 open items of the six `/speckit-checklist` checklists) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md and `.gitattributes`. Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044). The checklists are re-read against the changed text; ticking stays with the reviewer |
+| Checklist choices, re-run ([checklist-choices.md](./checklist-choices.md): the 29 items the re-run of the six checklists found on 2026-11-01) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md and security.md (2.12). Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are re-read against the changed text; ticking stays with the reviewer |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
@@ -177,6 +185,11 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
+
+A repair of a broken log chain (research R16) needs a row of its own in this table, "Log repair
+<n>", added when the break is found: it names the log, the `seq` of the break and the date, and the
+owner sets it to Approved and commits it. `scripts/repair_log.py --approval` names that row, and the
+script refuses the repair unless the row reads Approved at HEAD and names the same log and position.
 
 ## Decisions Taken as Defaults
 
@@ -560,16 +573,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   counter per key, never repeated or wrapped, kept by the caller across objects and devices; or
   random 128-bit nonces, whose collision probability, at most q²/2¹²⁹ for q instantiations, is
   a term of the mode's bound, with a per-key limit of at most 2³² instantiations so that the
-  term stays within ε (FR-007). An optional personalization string MUST have a stated maximum
-  length and MUST NOT replace the nonce. The behaviour on a repeated nonce MUST be stated (T7).
-  A keyed reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
+  term stays within ε (FR-007). The generator cannot tell a random nonce from a counter value, so
+  this limit applies to every key whatever its nonces: one instantiation counter per object, and
+  across objects a usage rule (research R9). An optional personalization string MUST have a stated
+  maximum length and MUST NOT replace the nonce. The behaviour on a repeated nonce MUST be stated
+  (T7). A keyed reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
   size-profile row states s = c/2 as a bound on that variant only, with status `research` and
   "no claim" (FR-032).
 - **FR-007**: The security target MUST specify the maximum output per instantiation (key and
   nonce), per generate request and per key across all nonces, the maximum number of keys u
   that it covers, and every other online quantity the theorem's bound counts (calls of Π,
-  instantiations per key, with their own limit when nonces are random (FR-006), and reseeds per
-  instantiation), each with a limit and a counter, and each derived from the mode's theorem at
+  instantiations per key, held at the random-nonce limit whatever the nonces (FR-006), and reseeds
+  per instantiation), each with a limit and a counter, and each derived from the mode's theorem at
   s = 128 with the target advantage stated (FUT-SEC-6). Every limit is stated in the theorem's
   unit, calls of Π, and also in bits at every claimable size: a request of n bits takes ⌈n/r⌉
   output calls plus one forget call, and the calls instantiate takes are stated. The production
@@ -623,12 +638,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   row of its own in the Review & Approval table; it reads "blocked", naming the missing paper,
   while any theorem the mode chapter uses is "unverified" (research R10). For L1, FUT-SEC-4 is
   met by statement, since it applies only if prediction resistance is claimed and D7 does not
-  seek it, and FUT-SEC-5 is met by specification for its specified part (key loading, diffusion
-  through instantiation, the first-order differences of research R4) and stays open for feature
-  005's analysis (FR-049); the register records the same split. The register's `claim_level`
-  holds the highest level reached (L0 or L1), and a separate `in_progress` field names L2 with
-  its start date, that of the first counted trail-bound record, and "not reached"; the
-  claim-register test checks that no document states a level above `claim_level`.
+  seek it, and FUT-SEC-5 is met by specification for key loading and by evidence for diffusion
+  through instantiation (FR-029) and research R4's first-order related-key and related-nonce
+  differences, whose records the security-target review cites, so that nothing remains to measure,
+  and stays open for feature 005's analysis (FR-049); the register records the same split. The
+  register's `claim_level` holds the highest level reached (L0 or L1), and a separate `in_progress`
+  field names L2 with its start date, that of the first counted trail-bound record, and "not
+  reached"; the claim-register test checks that no document states a level above `claim_level`.
 
 **Mode (D1)**
 
@@ -692,7 +708,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   flow only between direct neighbours, with at most four channels per node: a channel is one
   w-bit word passed from a node to a neighbour in one phase, and a node receives at most four
   per phase (one from each neighbour, or two from each of two), counted from the operation list
-  with the linear layer between boxes included. Round constants MUST enter at local food nodes,
+  with the linear layer between boxes included. At 2×2 a node's opposite neighbours coincide, so its
+  four links join two distinct nodes, two channels from each, and a translation by one node is its
+  own inverse; the size profile states this, and 2×2 evidence counts only for properties that do not
+  depend on the neighbourhood (FR-032, FR-052). Round constants MUST enter at local food nodes,
   placed by a stated rule (FUT-GRID-4); absorption and output MUST use registered trees over the
   rate lanes only. The torus MUST be realisable as a folded torus, so that every link, the
   wrap-around links included, joins neighbouring nodes of the layout (Principle III; strategy
@@ -714,12 +733,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   R13); the ROM depth at each food node (R entries per call type, times the number of distinct
   constant streams) and the word width, with the total bits reported, which the cost model does
   not score (research R5); and each tree's fan-in per stage, depth, registered stages and
-  latency in cycles. The trees' latency enters the reset-to-first-output latency (FR-025) and
+  latency in cycles. The trees' latency enters the instantiate latency (FR-025) and
   the throughput (FR-026), and the timing justification Principle III asks for is an argument
   in the design document (a register at every stage, a fan-in bounded by a stated number),
   referenced from the plan's Complexity Tracking. The frozen `phycoweb/constants_v3.py` holds
   one constant table per supported (n, w), and the constant script also writes each as JSON
-  beside the vectors, frozen with them; feature 006 turns them into packages and the RTL selects
+  beside the vectors, with the count of words its reading order skipped and every repeat of a class
+  (FR-023), frozen with them; feature 006 turns them into packages and the RTL selects
   one by its generics, while the LFSR that generates them stays in the script. A size without a
   table cannot be built until the same script generates one.
 - **FR-019**: Π MUST be bijective by construction, with every round a composition of steps that
@@ -739,10 +759,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   rejected ideas). Public values are the variant, the call type and the lengths of the
   personalization string, of the reseed input and of every request; a reseed input's length is
   public even when its content is secret, as the threat model states. A cycle count may depend
-  on public values and on nothing else, and the design document gives, per call (instantiate,
-  generate of n bits with its forget, reseed of m bytes, a refused request, zeroization, the
-  start-up self-test), a formula in cycles from the variant and the public lengths only,
-  counting the cycles with ready high (FR-025); feature 008 compares measured counts with them
+  on public values and on nothing else, and the design document gives, per call (key loading,
+  instantiate, generate of n bits with its forget, reseed of m bytes, a refused request,
+  zeroization, the start-up self-test), a formula in cycles from the variant and the public lengths
+  only, counting the cycles with ready high, the output buffer's hand-over and the start signal's
+  fan-out latency included (FR-025); feature 008 compares measured counts with them
   (FUT-HW-5). Constant time by construction is a property of the design's sequence of
   operations and of a hardware implementation of it. For each implementation it means: in
   hardware, a cycle count fixed by public values; in feature 006's C, no branch or memory index
@@ -777,15 +798,27 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (FUT-GRID-4; S2, S7). "Differ" means that within one call of Π no two constants are equal,
   equal up to a word rotation by k = 1…w − 1, complements of one another, or rotations of
   complements; the constant script checks this beside the symmetry checks of research R13. The
-  design document MUST state whether the call types (instantiate, generate, forget, reseed) draw
-  on distinct constant streams as part of domain separation (FR-014; strategy note §10), with
-  the reason, and the mode theorem's preconditions MUST still hold. The rule (its polynomial,
-  seed, reading order, and distinct streams per call type or not) is fixed by one stated rule
-  before the first candidate is scored, and each candidate's instance of it before that
-  candidate's first tool run, recorded in its log entry's `parameters`. The polynomial is the
-  first primitive polynomial of the stated degree, in a stated order, that is not on the list
-  of published constants of re-decided feature-002 FR-007, and the seed is a fixed public
-  value. The script writes one table per supported (n, w) (FR-018); every constant of Π and the
+  rule's reading order skips any word that is periodic (equal to its own rotation by some
+  k = 1…w − 1) or related in one of these ways to a constant already taken in the same call, so
+  "differ" holds by construction wherever one call needs no more constants than there are aperiodic
+  classes under rotation and complement: 2 at w = 4, 16 at w = 8, 2048 at w = 16 and far more at
+  w = 32, so at every claimable size. Where a call needs more, as at 2×2 with w = 4, the record of
+  taken classes starts afresh each time every class has been used once, the script records every
+  repeat, the size profile marks the variant, every check of research R13 still runs, and no claim
+  covers it (D3). The design document MUST state whether the call types (instantiate, generate,
+  forget, reseed) draw on distinct constant streams as part of domain separation (FR-014; strategy
+  note §10), with the reason, and the mode theorem's preconditions MUST still hold. The rule (its
+  polynomial, seed, reading order, and distinct streams per call type or not) is fixed by one stated
+  rule before the first candidate is scored, and each candidate's instance of it before that
+  candidate's first tool run, recorded in its log entry's `parameters`. Research R15 fixes its
+  values: degree 64; the polynomials x⁶⁴ + c(x) with c(0) = 1, in ascending order of the integer
+  whose bits are c's coefficients; the first primitive one not on the refused list of re-decided
+  feature-002 FR-007; the bits of ASCII `PhycoWeb` as the seed; and R15's reading order. They are
+  recorded as `settled` entries of the protocol change log before the first candidate is scored. The
+  refused list is frozen with the rule, its SHA-256 in the same entry; a design cited later is added
+  to it and the check runs again, and a match fails the check and blocks the design freeze (FR-043),
+  never changing the rule. The design document restates the values, and the script checks that the
+  two agree. The script writes one table per supported (n, w) (FR-018); every constant of Π and the
   mode, padding constants and domain separators included, has its rule and reason in the
   rationale (FR-034).
 - **FR-024**: Rotation amounts and every other per-node constant MUST be generated by stated
@@ -823,7 +856,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
     research-only, are the only places that show state (FR-033); Python cannot make memory
     unreadable, so this rule concerns the interface.
   - **Key loading and reset.** The design document specifies the key-loading interface and the
-    reset sequence: serial or parallel key loading, the latency from reset to the first output,
+    reset sequence: serial or parallel key loading, the three latencies stated below,
     an output-valid signal, and the zeroization of key and state. The key-loading interface is
     generic in c: a c-bit key and a c/2-bit nonce (research R14), 256 and 128 bits at every
     claimable size; keyless variants have none, and FUT-GRID-2's key loading "for every
@@ -831,26 +864,40 @@ freeze hashes and the baseline manifest; run the claim-register test.
     device's clock network. Reset is synchronous and reaches the nodes through a registered
     fan-out tree whose latency is part of the reset sequence, and the round and phase counters
     are replicated, one copy at each food node or node, all started by that reset and running
-    in lockstep, so that no counter value crosses the grid. The latency is given as two figures
+    in lockstep, so that no counter value crosses the grid. The latency is given as three figures
     in cycles, fixed by public values: from reset released to the self-test done and the state
-    zeroized (ready for a key), and from the last key word accepted to the first output valid,
-    the trees' latency included (FR-018).
+    zeroized (ready for a key); key loading, from the last key word accepted to the key held, a call
+    of its own whose cycle count joins FR-020's list; and instantiate, from the last nonce or
+    personalization word accepted to the first output valid, the trees' latency included (FR-018).
   - **Flow control.** Each interface (key loading, absorption, output) uses valid and ready.
-    While the consumer stalls, the core holds its state and output and resumes the same
-    sequence, so a call's cycle count depends on stalls, which the consumer sets in public, and
-    never on secret data; the cycle formulas of FR-020 count cycles with ready high.
+    The core never stalls in mid-call: output leaves through a buffer of one block (r bits), and the
+    next call starts only after the consumer has taken the block, so a stall, which the consumer
+    sets in public, holds only the buffer and delays the next call, and no cycle count depends on
+    secret data. The start signal reaches the nodes and the replicated counters through a registered
+    fan-out tree with one stated latency to every node, as reset does, so lockstep holds. The
+    buffer's size and the tree's latency enter the cycle formulas of FR-020, which count cycles with
+    ready high, and the plan's Complexity Tracking.
   - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees,
     the key-loading buffer, the held key and the output register, and returns the round, phase
     and limit counters to their reset values. Its triggers are reset, an explicit zeroize, a
     failed self-test, an error path and a per-key limit reached, each with its latency in
-    cycles and output-valid low throughout. Every path that leaves key-dependent state behind
+    cycles and output-valid low throughout. An error path is a condition the RTL detects after the
+    state has changed: the design document lists every such condition, each of which zeroizes,
+    raises the error signal and needs a new key, or states that there is none, since with valid and
+    ready a bad request is refused before anything changes; reset and clock glitches stay with
+    feature 008 (FR-008). Every path that leaves key-dependent state behind
     is specified and tested (FR-058): a refused request changes nothing, and the object or
-    device stays usable; a failed self-test zeroizes and leaves it unusable; an exception after
-    the state has changed zeroizes the whole state and ends the object, so no half-updated
-    state survives; and a call refused at a per-key limit zeroizes and ends the object, since
-    nothing more may be done with that key. After reset or zeroization, output-valid stays low
-    and the output register holds zeros until an instantiate completes, and a generate request
-    before then is refused with an error signal, as the model raises `CallSequenceError`.
+    device stays usable; a failed self-test zeroizes and leaves it unusable, the device until the
+    next reset, which runs the self-test again (FR-059), while in the model no object exists
+    (FR-058); an exception after the state has changed zeroizes the whole state and ends the object,
+    so no half-updated state survives; and a call refused at a per-key limit zeroizes and ends the
+    object, since nothing more may be done with that key. After reset or zeroization, output-valid
+    stays low and the output register holds zeros until an instantiate completes, and a generate
+    request before then is refused with an error signal, as the model raises `CallSequenceError`. In
+    the model, zeroization overwrites the object's own `bytearray` copy of the key with zeros in
+    place and drops it, and drops the state's integers, which Python cannot overwrite; as with
+    constant time, this is a discipline that governs what the object keeps, not what Python's memory
+    may still hold, and the caller's own copy of the key is outside it (model contract).
   - **Usage rules across resets.** A reset or a zeroization returns the device to a state that
     accepts a new key, since a device cannot end itself as an object can. The per-key limits
     and counters then restart, so across resets they are usage rules for the caller, as across
@@ -959,7 +1006,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   marked as reduced. The D4 score (by its rule) and exhaustive bijectivity (2×2, w = 4) may rest
   on reduced variants; R_bound, R_f, R_b and the bias evidence come from the production width
   at each claimable size. A reduced-variant result transfers as evidence about the design, by
-  the same generics, never as a value of the round rule. The reduced variants a candidate uses
+  the same generics, never as a value of the round rule. At 2×2, where a node's opposite neighbours
+  coincide (FR-018), a result transfers only for properties that do not depend on the neighbourhood,
+  such as bijectivity and the tools' validation; 2×2's R_f, R_b, symmetries and invariants are facts
+  about 2×2 alone, never evidence about a claimable size. The reduced variants a candidate uses
   as evidence (widths, sizes, round counts, capacities) are logged in its `parameters` before
   its first tool run; one added later is logged with its reason before its first run, and
   every result on it is reported, used or not.
@@ -1037,9 +1087,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   does not compare; the measured speed is stated there. Every run started on a candidate or a
   variant writes a record, even if aborted (`inconclusive` or `blocked`, with the reason); a
   run later found hit by a tool defect keeps its record, with the defect noted. FUT-GRID-5's
-  validation of an intermediate size before 16×16 is carried to features 006 and 008: the RTL
-  and the board validate 4×4 before 8×8 and 16×16, in the order of sizes of research R7
-  (FR-052, FR-056).
+  validation of an intermediate size before 16×16 is carried to features 006 and 008: feature 006's
+  RTL simulation runs 4×4 before 8×8 and 16×16, and feature 008's board runs 4×4 first, then each
+  larger claimable size that fits the XC7A100T, in order, the largest that fits last
+  (FUT-HW-2; FR-052, FR-056). FR-026's LUT and flip-flop estimate predicts the fit and Vivado's
+  post-route report decides it; a size that does not fit is listed in feature 008's spec with its
+  reason and stays covered by simulation. The generators run in a fixed order, each `--check`
+  passing before the next: the constant tables; then the vectors, written through `pi` and
+  `ResearchDuplex`, which runs no self-test, together with `phycoweb/selftest_v3.py`, the
+  self-test's inputs and expected output copied from them; and only then `Generator`, which imports
+  it and runs the self-test (FR-059; data-model §11).
 
 **Structural evidence and bounds**
 
@@ -1091,22 +1148,30 @@ freeze hashes and the baseline manifest; run the claim-register test.
   of research R5. The bias tool's validation also shows its detection power: on 100 sets of
   synthetic binomial counts with a planted bias at the 90%-power values of research R4 (0.0030,
   0.0031 and 0.0033 at the three sizes), its firing rate lies within a stated binomial interval
-  around 90%. Each known result is of the kind of its use, or a cross-check covers the
-  difference: the ARX search reproduces the exhaustive box tables at w = 4 and 8 (boxes of 8
-  and 16 bits) before it counts at w = 16 and 32, and the active-S-box counter reproduces the
-  exhaustive trail optima of a χ-like candidate at w = 4; a tool used outside its validated
-  kind writes `not evaluated`. A tool is validated again after any change to its code (its
-  SHA-256 differs), a dependency upgrade, or a use at a word width, operation set or kind of
-  model outside its validated kind, and each counted result cites the validation record of the
-  tool's exact hash. Each tool's version, licence and validation MUST be recorded at its first
-  use; a self-written tool's version is the SHA-256 of its code. A positive result is never
-  dropped for want of validation: a trail or distinguisher from a tool not yet validated is
-  recorded as an unverified hypothesis (FR-060) and blocks the candidate's eligibility until a
-  validated tool, or a direct evaluation of the trail with the validated exact models, settles
-  it; if confirmed, it raises R_dist. A possible weakness can therefore only raise R or block,
-  never vanish. A tool whose validation target's value cannot be obtained stays unvalidated,
-  and its results are `not evaluated` (edge cases). Validation runs charge no candidate and
-  have their own cap of 8 h per instance; the D4 reduced-width searches count against their
+  around 90%. The synthetic sets are constructed inputs of research R3's class 5, fixed by a public
+  rule before first use, hashed and never redrawn. Each known result this feature writes itself (the
+  small operation list with its hand-derived matrices, the map with collisions, the variant with a
+  planted gap, research R5's hand-counted examples) is written with its SHA-256 and entered in the
+  provenance log before the tool it validates is drafted; the validation record cites both entries,
+  and a test checks their order and that the hashes still match (data-model §7, §14). What must
+  match is stated per known result (data-model §7): exact equality for every deterministic fact, and
+  for a measured fraction a count in the binomial interval around the recorded fraction at the
+  tool's sample size, with at most 0.005 in each tail; anything else is `not re-found`. Each known
+  result is of the kind of its use, or a cross-check covers the difference: the ARX search
+  reproduces the exhaustive box tables at w = 4 and 8 (boxes of 8 and 16 bits) before it counts at
+  w = 16 and 32, and the active-S-box counter reproduces the exhaustive trail optima of a χ-like
+  candidate at w = 4; a tool used outside its validated kind writes `not evaluated`. A tool is
+  validated again after any change to its code (its SHA-256 differs), a dependency upgrade, or a use
+  at a word width, operation set or kind of model outside its validated kind, and each counted
+  result cites the validation record of the tool's exact hash. Each tool's version, licence and
+  validation MUST be recorded at its first use; a self-written tool's version is the SHA-256 of its
+  code. A positive result is never dropped for want of validation: a trail or distinguisher from a
+  tool not yet validated is recorded as an unverified hypothesis (FR-060) and blocks the candidate's
+  eligibility until a validated tool, or a direct evaluation of the trail with the validated exact
+  models, settles it; if confirmed, it raises R_dist. A possible weakness can therefore only raise R
+  or block, never vanish. A tool whose validation target's value cannot be obtained stays
+  unvalidated, and its results are `not evaluated` (edge cases). Validation runs charge no candidate
+  and have their own cap of 8 h per instance; the D4 reduced-width searches count against their
   candidate's trail budget, and the FUT-SEC-8 vector check and sweep against the
   demonstration's own budget.
 
@@ -1114,10 +1179,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 - **FR-040**: Only development keys, nonces and inputs, derived from public strings, or from
   fixed constants and development inputs, by a rule fixed in the plan, MAY be used; the closed
-  class of constructed inputs (research R3; data-model §2) is the only use of the second kind,
-  and no value or index is picked after any output is seen. This holds for the whole feature,
-  the freeze and everything after it included: no held-out key set MAY be created or used in
-  this feature at any time. Every tool of this feature that reads feature 002's or 003's seed
+  class of constructed inputs (research R3; data-model §2) is the only use of the second kind, its
+  class 5, the bias tool's synthetic counts, drawn from seeds that are themselves derived from
+  public strings, and no value or index is picked after any output is seen. This holds for the whole
+  feature, the freeze and everything after it included: no held-out key set MAY be created or used
+  in this feature at any time. Every tool of this feature that reads feature 002's or 003's seed
   sets loads only feature 002's `dev` set and exits 2 on any held-out set, as security.md §11.3
   requires of development tools, and a test checks every such call. No statistical battery
   (SP 800-22, PractRand, TestU01 or any other) runs on a candidate or on `phyco-v3` in this
@@ -1170,11 +1236,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   revised, the review is repeated for the changed parts and recorded in a row of its own, and
   the review package is rebuilt. The freeze runs in this order: (1) the owner commits the
   feature files (Principle IX); (2) `design_freeze.py create` runs with `git_dirty` false and
-  writes the record as `draft`; (3) the owner's approval is written into it (⛔ gate); (4) the
-  owner commits the record; (5) `design_freeze.py validate` exits 0. Dirty means a tracked file
-  modified or an untracked file not ignored; ignored files (the locks, local-only outputs) do
-  not count, and local-only outputs are in the record by SHA-256 anyway. The freeze record MUST
-  hold the SHA-256 of the design document, `rationale.md`, the model, the vectors
+  writes the record as `draft`; (3) the owner's approval is written into it by `design_freeze.py
+  approve`, run by the owner, which changes the status and adds who, when and the wording, and
+  nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
+  having checked against the draft's SHA-256 that nothing but the approval changed. Dirty means a
+  tracked file modified or an untracked file not ignored; ignored files (the locks, local-only
+  outputs) do not count, and local-only outputs are in the record by SHA-256 anyway. The freeze
+  record MUST hold the SHA-256 of the design document, `rationale.md`, the model, the vectors
   (constructed-state vectors included), the scripts that generate the constants and the
   vectors, the selected operation list, `research/004/ir.py` with its tools, and the scripts
   that compute verdicts (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `recheck_004.py`,
@@ -1194,12 +1262,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   scored family and for a representative found ineligible first were settled that way, at plan
   approval. Every change is recorded in the protocol change log,
   `research/004/protocol-changes.jsonl`, chained and locked like the candidate log, with per
-  entry the date, the rule, the old and new text, the reason, the direction (below), the
-  approver, the last record ID that existed before it, so that "before any result it affects"
-  can be checked, and the results known at the time of the change. A stricter change applies
-  to every candidate, those already evaluated included. It is applied first by recomputing
-  verdicts from saved outputs; a new measurement it needs, such as more inputs, is a new
-  measurement of the same kind under the changed rule, not a re-run: the old records stay, and
+  entry the date, the rule, the old and new text, the reason, the direction (below), the readings
+  compared for a settled case, the approver, the last record ID that existed before it, so that
+  "before any result it affects" can be checked, and the results known at the time of the change. A
+  stricter change applies to every candidate, those already evaluated included. It is applied first
+  by recomputing verdicts from saved outputs; a new measurement it needs, such as more inputs, is a
+  new measurement of the same kind under the changed rule, not a re-run: the old records stay, and
   the new hours count against the same budget row. Every firing already recorded stands, so a
   stricter change can only raise R or make a candidate ineligible, never undo a raise. If the
   row cannot hold the new run, that evidence is inconclusive and the candidate ineligible at
@@ -1217,12 +1285,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
     recorded under the rule then in force stands, and a larger N, N_a or F, or a new set, is
     tested under its new S or S_A in addition, so R can only rise;
   - the stop rule: budgets and the candidate limit only fall;
-  - the constant rule (FR-023): fixed before the first candidate is scored, no change after;
+  - the constant rule (FR-023): fixed, with its refused list, before the first candidate is scored,
+    no change after; the refused list only grows, and a later addition that matches fails the check;
   - the security-target parameters: s, the key and nonce lengths and c only rise; ε only falls
     and N only rises; u, every output limit and the per-request cap only fall;
   - the values the plan fixes: as the plan's table "Values this plan fixes" states for each.
-- **FR-045**: Heavy runs (the FUT-SEC-8 sweep, exhaustive bijectivity, solver runs) MUST NOT
-  overlap one another or any battery run (security.md §12.5).
+- **FR-045**: Heavy runs MUST NOT overlap one another or any battery run (security.md §12.5). A
+  heavy run is any run that is of a kind research R7 budgets, uses more than one worker process or
+  thread, or is projected to take, or last took, more than 10 minutes; the FUT-SEC-8 sweep,
+  exhaustive bijectivity and solver runs are examples. Every heavy run takes the heavy-run lock,
+  projects its hours first and records `heavy_run` true, and a test checks that every budgeted kind
+  and every script with a worker option takes the lock. A stale lock, left by a crash or a reboot,
+  is removed only by `scripts/clear_lock.py`, once its holder is shown gone, and the removal is
+  recorded (cli contract).
 - **FR-046**: Every download MUST have the owner's permission for that file (name, source,
   size), and its licence MUST allow use in a GPL-3.0 project. Downloaded files MUST be treated as
   untrusted. Code reused from a library, or generated code that closely matches published code,
@@ -1282,7 +1357,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (features 005 to 009), no claim, evaluation or certification may follow from this feature
   alone, and list each gap with its feature, as security.md §22 rows 5a.2 to 5a.6 name them.
   Its open items carry FR-040's requirement on held-out keys in its checkable form, and
-  FUT-GRID-5's validation of 4×4 before 8×8 and 16×16 to features 006 and 008 (FR-036).
+  FUT-GRID-5's validation of 4×4 first to features 006 and 008: in simulation before 8×8 and 16×16,
+  and on the board before each larger claimable size that fits the XC7A100T (FR-036). The report
+  reads 2×2 evidence only for properties that do not depend on the neighbourhood, such as
+  bijectivity and the tools' validation, and states 2×2's R_f, R_b, symmetries and invariants as
+  facts about 2×2 alone, never as evidence about a claimable size (FR-032).
 
 **Reproducibility**
 
@@ -1292,9 +1371,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   make that checkable:
   - **Reproducible, per kind.** Deterministic kinds (vectors, constants, dependency matrices,
     counts, digests) reproduce byte for byte; searches and solver runs reproduce their values
-    and verdicts. A comparison excludes `record_id`, `created_utc`, timings, `platform`,
-    `versions` where the environment differs, `git_head` and `git_dirty`, and the environment
-    is either of the two of research R1, as recorded.
+    and verdicts. A reproduction compares the fields data-model §1 lists (`kind`, `model_id`,
+    `variant_id`, `design_sha256`, each source file's entry in `code_sha256`, `inputs`, each
+    output's `sha256` and `bytes`, `exit_status`, `assertions`, `status`, `classification` and the
+    fields of its kind) and reports every other field only; a different source hash makes it a new
+    run, not a reproduction. The verdict is recomputed under the spec version the original cites,
+    and the environment is either of the two of research R1, as recorded.
   - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
     The model hash is that of the candidate's operation list before selection and that of
     `model_v3.py` after it. With `git_dirty` often true, the hashes, not `git_head`, identify
@@ -1307,7 +1389,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     bytes or over LF-normalized content (`raw` or `lf-normalized`). Every new file whose hash
     is recorded is hashed over its raw bytes and MUST have a pinned line ending in
     `.gitattributes` (LF, or `binary`), so that its raw and normalized content agree on every
-    checkout: `reports/004-crypto-architecture-v3/**` is pinned to LF, and `*.gz` to `binary`.
+    checkout: `reports/004-crypto-architecture-v3/**` is pinned to LF, and `*.gz` to `binary`. Files
+    committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`, and
+    `protocol/evidence.py` refuses any other suffix there. Every `.gz` file is written by
+    `gzip.compress(data, compresslevel=9, mtime=0)`, and its record also holds the SHA-256 of the
+    uncompressed content, which a reproduction compares (data-model §1).
     An existing `text=auto` file that a new record hashes, such as `security.md` or `README.md`,
     is hashed over its LF-normalized content, and no existing pin changes. The CRLF-pinned
     freeze records of features 002 and 003 keep their recorded hashes over CRLF bytes. A test
@@ -1344,10 +1430,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   disagree, the frozen model and vectors are the expected values, and the correction is a new
   model ID (FR-028). The final report MUST map each of the hardware note's rules R1–R12, and the
   AI-assisted RTL rules of security.md §13, to the requirement of this feature that applies it
-  or to feature 006 or 008, which carries it. The mapping carries two rules of this feature:
+  or to feature 006 or 008, which carries it. The mapping carries three rules of this feature:
   constructed-state vectors run on the RTL in simulation only, loaded by the testbench, while
-  the board's equivalence check (FUT-HW-4) uses the vectors a key reaches; and the RTL and the
-  board validate 4×4 before 8×8 and 16×16 (FUT-GRID-5; FR-036).
+  the board's equivalence check (FUT-HW-4) uses the vectors a key reaches; 4×4 first, in feature
+  006's simulation before 8×8 and 16×16 and on feature 008's board before each larger claimable size
+  that fits the XC7A100T (FUT-GRID-5, FUT-HW-2; FR-036); and the self-test's `selftest_fail` output,
+  latched until the next reset, which feature 008 tests (FR-059).
 - **FR-057**: A second transcription of Π, Π⁻¹ and the mode MUST be written from the design
   document alone, in a session separate from the one that wrote the model and importing no code
   from it, and MUST agree with the model step by step on the vectors before the freeze, as
@@ -1366,23 +1454,30 @@ freeze hashes and the baseline manifest; run the claim-register test.
   every zeroization path of FR-025 (a refused request, a failed self-test, an exception after
   the state has changed, a call refused at a per-key limit), the refusal of a generate request
   after reset or zeroization until an instantiate completes, and that the key, given once at
-  construction, is never compared with another (FR-013). Property-based tests (for example with
+  construction, is never compared with another (FR-013). A failed construction, by a refused
+  variant, a wrong key length or a failed self-test, leaves no object: the constructor checks in
+  that order, and each refusal is tested with an input that would also fail every later check, so
+  the order shows. After `zeroize`, the key buffer the object held reads all zeros and the object no
+  longer refers to it (model contract). Property-based tests (for example with
   Hypothesis) MUST be added if the owner approves the download; otherwise their absence MUST be
   recorded as an open item. They run under a settings profile registered by the test package,
   with `derandomize=True` and `database=None`, so that every run tries the same examples and a
   failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
   the reset sequence of FR-025, whose stated latency includes it: its inputs, taken from the
-  frozen vectors, its expected output, its behaviour on failure, and the zeroization of the
+  frozen vectors (which the vector script copies, in the model, into `phycoweb/selftest_v3.py`;
+  FR-036), its expected output, its behaviour on failure, and the zeroization of the
   whole state after it, before the first instantiate. The self-test runs instantiate with the
   key and nonce 0 of the frozen vectors, then a generate long enough that every node, every
   lane, every constant ROM entry of the calls run, both trees and the counters take part, then
   a reseed if the design has one. It compares the output with the expected output stated per
-  claimable size from the frozen vectors and then zeroizes; on failure it zeroizes and blocks
-  every call. Its cycle count is stated (FR-020), and the reset latency of FR-025 runs from
-  reset released to the self-test done and the state zeroized. Features 006 and 008 implement it
-  in the RTL (strategy note §10; D10). It is not a FIPS 140-3 self-test and MUST NOT be
-  described as one (FR-011).
+  claimable size from the frozen vectors and then zeroizes; on failure it zeroizes, blocks
+  every call and sets a `selftest_fail` output, latched until the next reset; every reset runs the
+  self-test again, and a pass clears the latch, as a new `Generator` runs it again in the model. The
+  design document lists the output with the ports, and feature 008 tests it. Its cycle count is
+  stated (FR-020), and the reset latency of FR-025 runs from reset released to the self-test done
+  and the state zeroized. Features 006 and 008 implement it in the RTL (strategy note §10; D10). It
+  is not a FIPS 140-3 self-test and MUST NOT be described as one (FR-011).
 
 **Findings, evidence and review (security.md §9.1, §14, §16 and §17)**
 
@@ -1611,11 +1706,11 @@ and the candidate limit only fall.
 |-------------------------|---------------------|-------------------------|--------|
 | FR-001 | Integer operations only: add, subtract, XOR, AND, OR, NOT, constant shifts and rotations, comparisons, table lookups, conditional selection; no multiplication, division, modulo or power | Kept and made stricter: in Π and the mode's datapath only add, subtract, XOR, AND, OR, NOT, constant shifts and constant rotations; no multiplication, division, modulo or power; no table lookup, comparison or selection on secret data; comparisons only on public counters such as the output limits; no arithmetic shift, signed comparison or sign extension without the justification of FR-055 | Fixed operations and constant time (FR-020); no signedness corners (FR-055); S6, S12 |
 | FR-002 | Every value at most 32 bits, with signedness, wrap and comparison semantics stated | Kept for every datapath word (w = 32; reduced widths 4, 8 and 16). A public counter wider than 32 bits, such as an output-limit counter, is held as 32-bit words with a stated carry rule; it counts as a carry chain where it sits on a stage's path, and not when it is registered on a path of its own (FR-025) | Principle I; checklist group E |
-| FR-003 | Keep the `lut-v1` table, phase increments and quarter-period offset | Dropped: round constants by a stated rule, never repeated within a call, replace the public 128-step forcing | S2; slide attacks (group F) |
+| FR-003 | Keep the `lut-v1` table, phase increments and quarter-period offset | Dropped: round constants by a stated rule, never repeated within a call wherever the aperiodic classes allow, as at every claimable size (FR-023), replace the public 128-step forcing | S2; slide attacks (group F) |
 | FR-004 | Keep the bio-inspired structure, including a threshold-triggered disruption | Revised: the structure stays as a documented mapping (FR-030), without the threshold-triggered disruption | D5; FR-020 |
 | FR-005 | Disruption on 1–50% of steps | Withdrawn with the disruption | D5 |
 | FR-006 | 32-bit unsigned output words from the generator's own state | Revised: the output is the rate part after a full call of Π, in one canonical serialization | FR-015; S5 |
-| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants. The script holds a committed list of the polynomials and constant sets it refuses, each with its source: at least those of the reference designs of research R12 and of every design the rationale cites. The check fails if the chosen polynomial is listed, or if the constant table contains a listed sequence, also under word rotation or complement | Checklist group C; feature-002 O2 |
+| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants. The script holds a committed list of the polynomials and constant sets it refuses, each with its source, frozen with the constant rule before the first candidate is scored: those of the reference designs of research R12 and of every design the strategy note, the spec, the plan, research.md and security.md name, and the standard polynomials of degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's, and the CRC-64 polynomials of ISO 3309 and ECMA-182). A design the rationale cites later is added when cited. The check fails if the chosen polynomial is listed, or if the constant table contains a listed sequence, also under word rotation or complement; a failure after the first score blocks the design freeze, and the rule is never changed to escape it | Checklist group C; feature-002 O2 |
 | FR-008 | Bit-exact model; golden vectors for at least 2 development seeds × 10,000 words; an RTL-consumable description; RTL out of scope | Kept and extended to every size (FR-035, FR-036); RTL out of scope | Principle II; FUT-GRID-5 |
 | FR-009 | Seed domain of four integers in 0…65535 | Replaced by a 256-bit key and a 128-bit nonce (FR-006); `phyco-v2` keeps its seed domain | FUT-SEC-1; S1 |
 
@@ -1635,7 +1730,7 @@ states that the condition does not hold. The Evidence column cites the section o
 | FUT-SEC-2 Reachable secret state | FR-009, FR-010, FR-015, FR-017 | Parameter table per size; the 2×2 decision | Met by specification at every claimable size |
 | FUT-SEC-3 Stream separation | FR-006, FR-014 | Nonce rule; domain separation | Met by specification |
 | FUT-SEC-4 Reseeding | FR-004, FR-016 | Prediction resistance not sought (D7) | Met by statement: it applies only if prediction resistance is claimed, and D7 does not seek it |
-| FUT-SEC-5 Initialization analysis | FR-013, FR-014, FR-029, FR-049 | Key loading specified; diffusion through instantiation; the first-order related-key and related-nonce differences of research R4, reported as "a single-difference avalanche measurement, not a related-key analysis" | Met by specification for its specified part; related-key and related-IV attacks beyond first order, weak-key classes and key-dependent effects open for feature 005 (FR-049) |
+| FUT-SEC-5 Initialization analysis | FR-013, FR-014, FR-029, FR-049 | Key loading specified; diffusion through instantiation; the first-order related-key and related-nonce differences of research R4, reported as "a single-difference avalanche measurement, not a related-key analysis" | Met by specification for key loading, and by evidence for diffusion through instantiation (FR-029) and research R4's first-order related-key and related-nonce differences; related-key and related-IV attacks beyond first order, weak-key classes and key-dependent effects open for feature 005 (FR-049) |
 | FUT-SEC-6 Output limit | FR-007 | Limits derived from the theorem; refusal beyond them | Met by specification |
 | FUT-SEC-7 Re-validation | FR-035, FR-036, FR-043 | New model ID, vectors, design freeze | Partly met; the statistical programme open for feature 007 |
 | FUT-SEC-8 Demonstration first | FR-001 to FR-003 | Demonstration record and its review | Done |
@@ -1828,10 +1923,11 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Demonstration record**: targets, revealed words, matches after one, two and three words, cost
   per candidate, total, extrapolation, machine, commands, hashes.
 - **Design freeze record**: hashes of the design document, `rationale.md`, model, vectors
-  (constructed-state vectors included), the constant and vector scripts, the selected operation
-  list, `research/004/ir.py` and the verdict scripts; R and its inputs; the last `seq` and line
-  hash of each log; tool versions; `git_head`, `git_dirty`; status (`draft`, then approved) and
-  the owner's approval (FR-043).
+  (constructed-state vectors included) with the self-test data copied from them, the constant and
+  vector scripts, the selected operation list, `research/004/ir.py` and the verdict scripts; R and
+  its inputs; the last `seq` and line hash of each log; tool versions; `git_head`, `git_dirty`; the
+  draft's SHA-256; status (`draft`, then approved) and the owner's approval, written by
+  `design_freeze.py approve` (FR-043).
 - **Baseline archive**: the `phyco-v2` files, with SHA-256 and source, in a manifest.
 - **Constructed-state vector**: the edge state, how it was constructed, whether any key reaches
   it, inputs, outputs, SHA-256.
@@ -1841,8 +1937,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Claim and evidence register**: model ID, claim level, claim or "no claim", bound, evidence
   records, and the allow-list of flagged lines, each with its reason (FR-069).
 - **Protocol change log**: one chained, append-only entry per change of a pre-registered rule:
-  date, rule, old and new text, reason, direction, approver, the last record ID before it and
-  the results known then (FR-044).
+  date, rule, old and new text, reason, direction, the readings compared for a settled case,
+  approver, the last record ID before it and the results known then (FR-044).
 - **Review package**: the items of security.md §14, with exact revisions.
 
 ## Success Criteria *(mandatory)*
@@ -1855,8 +1951,9 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **SC-002**: 9 of 9 FUT-SEC requirements are traced to requirements, tasks and evidence, with
   the statuses of table "Security Policy traceability" in the terms it defines: FUT-SEC-1,
   FUT-SEC-2, FUT-SEC-3, FUT-SEC-6 and FUT-SEC-9 are met by specification; FUT-SEC-4 is met by
-  statement (D7); FUT-SEC-5 is met by specification for its specified part, with its analysis
-  open for feature 005 (FR-049); FUT-SEC-8 is done; and FUT-SEC-7 is listed as open.
+  statement (D7); FUT-SEC-5 is met by specification for key loading and by evidence for diffusion
+  through instantiation and the first-order related-key and related-nonce differences, with its
+  analysis open for feature 005 (FR-049); FUT-SEC-8 is done; and FUT-SEC-7 is listed as open.
 - **SC-003**: Every claimable size satisfies every generic bound of security.md §12.2, with 0
   violations, every check of `parameters.json` that can fail passes (each output limit at most
   what the theorem allows at ε, k/2 ≥ s, and the stated nonce-reuse behaviour with its test),
@@ -1869,13 +1966,15 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   equals the round rule's value, with every input cited.
 - **SC-006**: The committed script reproduces 100% of the constants on both platforms of
   SC-009; within one call no two constants are equal, equal up to a word rotation, complements
-  of one another, or rotations of complements; and 0 non-trivial grid translations or rotations
-  preserve any constant pattern at any supported size.
+  of one another, or rotations of complements, wherever the aperiodic classes cover the call, as at
+  every claimable size, and every repeat elsewhere is recorded (FR-023); and 0 non-trivial grid
+  translations or rotations preserve any constant pattern at any supported size.
 - **SC-007**: 100% of counted tool results have a validation record older than they are: its
   `created_utc` is earlier, and the counted record cites its ID and SHA-256. Every counted tool
   has a known result (FR-039): S12, S13, S14, S15 and the FUT-SEC-8 recovery are re-found on
   `phyco-v2`, a published optimal trail is re-found, and the symmetry, dependency, bijectivity,
-  avalanche and cost-model checks re-find their stated known results.
+  avalanche and cost-model checks re-find their stated known results, each by the comparison
+  data-model §7 states for it.
 - **SC-008**: Every claimable size has an established R_bound from recorded trail bounds, each
   citing its method, tool and validation.
 - **SC-009**: 100% of the generated files (the vectors, known-answer tests, constants and

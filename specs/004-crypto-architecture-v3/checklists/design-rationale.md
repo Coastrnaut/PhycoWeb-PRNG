@@ -157,6 +157,33 @@ quality. It does not mean implementation work is complete.
   visible, beside the argument or in its provenance record, so that the owner design review can
   tell a draft from reviewed text? [Clarity, Spec §FR-064, §FR-067]
 
+## Re-run after the checklist answers (2026-11-01)
+
+Items found when the checklist was run again over the text changed by the answers of 2026-11-01.
+They are open like every other item; the reviewer ticks them.
+
+- [ ] CHK036 Is FR-023's "differ" relation (no two constants of one call of Π equal, equal up to a
+  word rotation, complements of one another, or rotations of complements) given a rule for the
+  reduced widths, where it cannot hold: w-bit words fall into only 4 classes under rotation and
+  complement at w = 4 and 20 at w = 8 (counted exhaustively), fewer than the constants one call
+  needs once R times the number of food nodes exceeds them? [Conflict, Spec §FR-023, §FR-018;
+  research R13, R15]
+- [ ] CHK037 Are the constant rule's open values given (the polynomial's degree, the order in which
+  polynomials are enumerated, the public seed value), or is the record that fixes them before the
+  first score named, for example a `settled` entry of the protocol change log, so that "fixed before
+  the first candidate is scored" can be checked while the design document that states them comes
+  only after selection? [Gap, Spec §FR-023, §FR-044; research R15; plan "Values this plan fixes"]
+- [ ] CHK038 Is the refused list of polynomials and constant sets frozen together with the constant
+  rule before the first score, given that it must hold the constants of "every design the rationale
+  cites", a set known only when the rationale is written after selection, so that a later citation
+  could make the polynomial already chosen a refused one? [Conflict, research R15; Spec §FR-023,
+  §FR-044]
+- [ ] CHK039 Is the design document required to state how the 2×2 torus differs from the larger
+  sizes, where a node's opposite neighbours coincide so that its four links join only two distinct
+  nodes (FR-018's "two from each of two"), and how that difference bears on reading 2×2 evidence,
+  such as exhaustive bijectivity at w = 4, as evidence about the claimable sizes? [Gap, Spec
+  §FR-018, §FR-032; research R13, R14]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
