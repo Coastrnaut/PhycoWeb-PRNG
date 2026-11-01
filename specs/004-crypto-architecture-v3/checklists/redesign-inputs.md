@@ -46,13 +46,16 @@ every recommended option of [research.md](../research.md), "Choices for owner re
   FR-028 (the round rule); research R13.
 - [x] A9 Per-node constants by rule, with no translational or rotational symmetry. Covered:
   FR-023, FR-024; research R13 and R15.
-- [x] A10 Step designed for 200 MHz. Covered: FR-025 (at most one or two serial carry chains per
-  pipeline stage); research R5.
+- [x] A10 Step designed for 200 MHz. Covered: FR-025 (at most two serial w-bit carry chains per
+  pipeline stage, and each stage's estimated delay against the 5 ns of 200 MHz and the LUT levels
+  on its longest path, as estimates that feature 008's post-route timing checks); research R5.
 - [x] A11 Local food source and registered output tree; no grid-wide signals. Covered: FR-018
   (constants enter at local food nodes; registered absorption and output trees); plan, Complexity
   Tracking; research R15, where each food node holds its own constants in a ROM indexed by the
-  round counter, and only the clock, reset and the round and phase counters are global (choice
-  R15.2). The first draft implied one central LFSR, whose output would cross the grid.
+  round counter (choice R15.2). The clock uses the device's clock network; reset and the start
+  signal reach the nodes through registered fan-out trees, and the round and phase counters are
+  replicated and run in lockstep, so no counter value crosses the grid (FR-025). The first draft
+  implied one central LFSR, whose output would cross the grid.
 - [x] A12 Invertibility decided, with its consequence for backtracking. Covered: FR-019
   (bijective by construction), FR-013 (forget after every request), FR-004 (backtracking
   resistance across forget).
@@ -215,11 +218,11 @@ every recommended option of [research.md](../research.md), "Choices for owner re
 | FUT-SEC-7 Re-validation | FR-035, FR-036, FR-043 | Partly; the statistical programme carried to 007 |
 | FUT-SEC-8 Demonstration first | FR-001 to FR-003 | Covered |
 | FUT-SEC-9 Certification route | FR-011 | Covered |
-| FUT-GRID-1 Parameterized size | FR-018, FR-032 | Covered |
+| FUT-GRID-1 Parameterized size | FR-018, FR-032 | Partly: the generics cover n = 2…16 in the model and the supported sizes are listed; n = 5, 6, 7 and 9…15 are open items with their reason (FR-018) |
 | FUT-GRID-2 Key fills the state at every size | FR-009, FR-017; research R14 | Covered: a 256-bit key at every claimable size, and a c-bit key with a c/2-bit nonce at every keyed reduced variant (choice R14.2) |
 | FUT-GRID-3 Mixing across the grid | FR-015, FR-029 | Covered, output taps included: the output is the whole rate part after a full call of Π |
 | FUT-GRID-4 Per-node constants by rule | FR-023, FR-024, FR-031 | Covered; the clause on the disruption does not apply, since the disruption is removed (D5) |
-| FUT-GRID-5 Validation per size | FR-032, FR-033, FR-036 | Covered for variant IDs and vectors; the statistics per size carried to 007 |
+| FUT-GRID-5 Validation per size | FR-032, FR-033, FR-036, FR-052, FR-056 | Covered for variant IDs and vectors; the statistics per size carried to 007, and the validation of 4×4 first carried to 006 (in simulation, before 8×8 and 16×16) and 008 (on the board, before each larger claimable size that fits the XC7A100T) |
 | FUT-HW-1 Generic VHDL | FR-018, FR-020, FR-027, FR-055, FR-056 | Prepared; carried to 006 |
 | FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Designed for; carried to 008 |
 | FUT-HW-3 Performance on the board | FR-026 | Carried to 006 and 008 |
@@ -233,3 +236,7 @@ as they stand after the owner's answers of 2026-11-01. A7, A11, B4 and C3 were p
 choices R14.2, R15.2, R4.5 and R5.2 were applied. Every FUT requirement is traced in the spec.
 "Met" includes the items carried to features 005 to 008, whose specs must take them up, and
 E14, which is the owner's.
+
+Re-checked on 2026-11-01 after the answers to both checklist runs: every item still holds. The
+notes of A10 and A11 now follow FR-025 as it stands, FUT-GRID-1 reads Partly, as in the spec's
+table "Security Policy traceability", and FUT-GRID-5 names the order carried to 006 and 008.

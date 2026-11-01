@@ -39,7 +39,8 @@
   (the basis of the FUT-SEC-8 search tool, stated as an assumption), SHA-256 records, and
   `.gitattributes` and `requirements.txt` (repository files that checklist group F asks to fix)
   are fixed project conventions or the subject of the feature, so naming them is not treated as
-  an implementation detail. No language, framework or code structure is chosen for new work.
+  an implementation detail. No language, framework or code structure is chosen for new work,
+  beyond the constraints that iteration 3 records.
 - The stakeholders are the repository owner and cryptographic reviewers. The cryptographic
   vocabulary is the subject matter and is defined in security.md §3, §5 and §12.
 - The request bundles seven scope items, hence, in iteration 1, 53 functional requirements in ten
@@ -68,3 +69,29 @@
   endings only, with no trailing spaces; FR-001 to FR-069 and SC-001 to SC-020 are numbered
   without gaps; every FR, SC and decision cited exists; the forbidden wording appears only in
   the rules that forbid it.
+- Iteration 3 (2026-11-01), after the clarification of D1–D10, the plan and the owner's answers
+  to both runs of checklist choices (235 rows, each answered with its recommended option): the
+  spec now pre-registers how evidence is produced, recorded and reproduced, and how the
+  reference model handles its key, and names what that needs. Among the names: the model's
+  interface (`Generator`, `ResearchDuplex`, `CallSequenceError`) and the `bytearray` copy of the
+  key that zeroization overwrites (FR-025); the modules the model's import test bans (FR-035);
+  record formats and settings, such as `gzip.compress(data, compresslevel=9, mtime=0)` and the
+  test with `git check-attr text eol` (FR-053), and `derandomize=True` and `database=None` for
+  the property-based tests (FR-058); the paths, scripts and subcommands that write, lock and
+  freeze records (FR-041, FR-043 to FR-045), and `scripts/repair_log.py --approval` in section
+  "Review & Approval"; and VHDL's `unsigned(w − 1 downto 0)` (FR-027). SC-003, SC-007 and SC-009
+  name the file, the field and the platform their checks read: `parameters.json`, `created_utc`
+  and WSL.
+- These names fix what a record holds, which settings make an output reproducible and where a
+  check looks, all before any result exists; they choose no language, framework or code
+  structure for new work beyond what a record cites or a test checks. They are therefore treated
+  as pre-registered protocol, not as implementation detail. By the owner's decision of 2026-11-01
+  the three items on implementation details ("No implementation details (languages, frameworks,
+  APIs)", "Success criteria are technology-agnostic", "No implementation details leak into
+  specification") are read this way and stay checked, and all 16 items pass.
+- Measurable checks done for iteration 3: every prose line is at most 100 characters; LF line
+  endings only, with no trailing spaces and no byte-order mark; FR-001 to FR-069 and SC-001 to
+  SC-020 are each defined once, in order, and every FR, SC and decision D1–D10 cited exists; no
+  [NEEDS CLARIFICATION] marker remains; "secure", "unbreakable" and "provably" appear only in
+  the rules that forbid them (FR-030, FR-050, FR-069, SC-015), and every other "proven" names
+  its object.

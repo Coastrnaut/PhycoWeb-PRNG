@@ -33,7 +33,12 @@ approved every download in R19's two tables (R19.1). The eleven changes are appl
 sections below, in plan.md, data-model.md, both contracts, quickstart.md and the checklist. The
 rows stay as they were offered, and the sections they name hold the decisions. One row's wording
 was corrected after the answer, not its choice: R5.2 now credits the 10⁸ words/s goal to feature
-003, which set it for the C stream.
+003, which set it for the C stream. Two decisions were refined later by checklist answers, in
+their sections and not in their rows: R11.2's C evaluator is checked on the candidate's committed
+reference outputs for R8's 16 Π inputs before its first run, not on the `phyco-v3` vectors, which
+exist only after selection (R7, R11); and R15.2's round and phase counters are no longer global
+but replicated and running in lockstep, while reset and the start signal reach the nodes through
+registered fan-out trees (R15; FR-025).
 
 | ID | Choice | Recommended | Other options |
 |----|--------|-------------|---------------|
@@ -183,8 +188,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 
     A constructed input takes its index from its rule. No value or index is picked after any
     output is seen.
-  - No held-out set exists. Feature 007 defines held-out keys that cannot be computed before its
-    freeze; this requirement is carried to it (FR-040).
+  - No held-out set exists. Feature 007 defines the held-out keys, and FR-040 carries a checkable
+    form to it: the keys are derived from data that does not exist until the later of
+    `phyco-v3`'s design freeze and feature 007's protocol freeze, and a test re-derives them.
   - SHA-256 here is protocol bookkeeping. It never appears in Π, the mode or key loading (D6).
 - **Stricter means**: nothing may change; the rule is frozen at plan approval.
 - **Rationale**: the same pattern as feature 002 (`phycoweb-002/<set>/<i>`), with a feature prefix
