@@ -1,0 +1,5584 @@
+{
+ "attempt": 1,
+ "seed_set": "heldout-1",
+ "S": 101210,
+ "equivalence": {
+  "all_match": true,
+  "words_per_seed": 1000000,
+  "mismatching": []
+ },
+ "roles": {
+  "positive": {
+   "status": "run",
+   "outcome": {
+    "threshold": 4.940223298093074e-08,
+    "fails": false,
+    "failing_runs": [],
+    "incomplete_runs": [],
+    "runs": [
+     {
+      "run": "practrand-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     }
+    ],
+    "n_pvalues": 101210
+   }
+  },
+  "negative": {
+   "status": "run",
+   "outcome": {
+    "threshold": 4.940223298093074e-08,
+    "fails": true,
+    "failing_runs": [
+     "practrand-fwd-seed0",
+     "smallcrush-fwd-seed0",
+     "smallcrush-rev-seed0",
+     "crush-fwd-seed0",
+     "crush-rev-seed0",
+     "bigcrush-fwd-seed0",
+     "bigcrush-rev-seed0",
+     "practrand-fwd-seed1",
+     "smallcrush-fwd-seed1",
+     "smallcrush-rev-seed1",
+     "crush-fwd-seed1",
+     "crush-rev-seed1",
+     "bigcrush-fwd-seed1",
+     "bigcrush-rev-seed1",
+     "practrand-fwd-seed2",
+     "smallcrush-fwd-seed2",
+     "smallcrush-rev-seed2",
+     "crush-fwd-seed2",
+     "crush-rev-seed2",
+     "bigcrush-fwd-seed2",
+     "bigcrush-rev-seed2",
+     "practrand-fwd-seed3",
+     "smallcrush-fwd-seed3",
+     "smallcrush-rev-seed3",
+     "crush-fwd-seed3",
+     "crush-rev-seed3",
+     "bigcrush-fwd-seed3",
+     "bigcrush-rev-seed3",
+     "practrand-fwd-seed4",
+     "smallcrush-fwd-seed4",
+     "smallcrush-rev-seed4",
+     "crush-fwd-seed4",
+     "crush-rev-seed4",
+     "bigcrush-fwd-seed4",
+     "bigcrush-rev-seed4",
+     "practrand-fwd-seed5",
+     "smallcrush-fwd-seed5",
+     "smallcrush-rev-seed5",
+     "crush-fwd-seed5",
+     "crush-rev-seed5",
+     "bigcrush-fwd-seed5",
+     "bigcrush-rev-seed5",
+     "practrand-fwd-seed6",
+     "smallcrush-fwd-seed6",
+     "smallcrush-rev-seed6",
+     "crush-fwd-seed6",
+     "crush-rev-seed6",
+     "bigcrush-fwd-seed6",
+     "bigcrush-rev-seed6",
+     "practrand-fwd-seed7",
+     "smallcrush-fwd-seed7",
+     "smallcrush-rev-seed7",
+     "crush-fwd-seed7",
+     "crush-rev-seed7",
+     "bigcrush-fwd-seed7",
+     "bigcrush-rev-seed7",
+     "practrand-fwd-seed8",
+     "smallcrush-fwd-seed8",
+     "smallcrush-rev-seed8",
+     "crush-fwd-seed8",
+     "crush-rev-seed8",
+     "bigcrush-fwd-seed8",
+     "bigcrush-rev-seed8",
+     "practrand-fwd-seed9",
+     "smallcrush-fwd-seed9",
+     "smallcrush-rev-seed9",
+     "crush-fwd-seed9",
+     "crush-rev-seed9",
+     "bigcrush-fwd-seed9",
+     "bigcrush-rev-seed9"
+    ],
+    "incomplete_runs": [],
+    "runs": [
+     {
+      "run": "practrand-fwd-seed0",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 393,
+      "rule2": 384,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 136,
+      "rule2": 0,
+      "rule3": 126,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 140,
+      "rule2": 0,
+      "rule3": 125,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 148,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed0",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed1",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 300,
+      "rule2": 294,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+12,13-9U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+12,13-9U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 142,
+      "rule2": 0,
+      "rule3": 132,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 142,
+      "rule2": 0,
+      "rule3": 132,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 158,
+      "rule2": 0,
+      "rule3": 154,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed1",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 158,
+      "rule2": 0,
+      "rule3": 154,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed2",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 379,
+      "rule2": 369,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 139,
+      "rule2": 0,
+      "rule3": 125,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 137,
+      "rule2": 0,
+      "rule3": 126,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 153,
+      "rule2": 0,
+      "rule3": 147,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed2",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed3",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 369,
+      "rule2": 365,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 138,
+      "rule2": 0,
+      "rule3": 126,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 136,
+      "rule2": 0,
+      "rule3": 125,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 156,
+      "rule2": 0,
+      "rule3": 152,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed3",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 156,
+      "rule2": 0,
+      "rule3": 152,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed4",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 385,
+      "rule2": 375,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 13,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 12,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 134,
+      "rule2": 0,
+      "rule3": 123,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 135,
+      "rule2": 0,
+      "rule3": 124,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 149,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed4",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed5",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 226,
+      "rule2": 222,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+12,13-9U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+12,13-9U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 142,
+      "rule2": 0,
+      "rule3": 132,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 142,
+      "rule2": 0,
+      "rule3": 132,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 159,
+      "rule2": 0,
+      "rule3": 154,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed5",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed6",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 367,
+      "rule2": 367,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 140,
+      "rule2": 0,
+      "rule3": 130,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 141,
+      "rule2": 0,
+      "rule3": 130,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 157,
+      "rule2": 0,
+      "rule3": 153,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed6",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 157,
+      "rule2": 0,
+      "rule3": 152,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed7",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 385,
+      "rule2": 377,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 139,
+      "rule2": 0,
+      "rule3": 128,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 138,
+      "rule2": 0,
+      "rule3": 128,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 150,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed7",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed8",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 299,
+      "rule2": 297,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+8,13-6U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+9,13-7U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+10,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+11,13-8U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 15,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 141,
+      "rule2": 0,
+      "rule3": 131,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 142,
+      "rule2": 0,
+      "rule3": 132,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 158,
+      "rule2": 0,
+      "rule3": 154,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed8",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 158,
+      "rule2": 0,
+      "rule3": 154,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "practrand-fwd-seed9",
+      "fails": true,
+      "complete": false,
+      "stopped_early": true,
+      "rule1": 381,
+      "rule2": 375,
+      "rule3": 0,
+      "rule1_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule2_first": [
+       {
+        "test": "BCFN(2+0,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+1,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+2,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+3,13-3U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       },
+       {
+        "test": "BCFN(2+4,13-4U)",
+        "checkpoint": 27,
+        "p": 0.0,
+        "q": 0.0,
+        "grade": "FAIL !!!!!!!!"
+       }
+      ],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 15,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "smallcrush-rev-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 14,
+      "rule2": 0,
+      "rule3": 14,
+      "rule1_first": [
+       {
+        "test": "BirthdaySpacings",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Collision",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "Gap",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SimpPoker",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CouponCollector",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  BirthdaySpacings                 eps",
+       "2  Collision                        eps",
+       "3  Gap                              eps",
+       "4  SimpPoker                        eps",
+       "5  CouponCollector                  eps"
+      ]
+     },
+     {
+      "run": "crush-fwd-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 139,
+      "rule2": 0,
+      "rule3": 128,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "crush-rev-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 139,
+      "rule2": 0,
+      "rule3": 127,
+      "rule1_first": [
+       {
+        "test": "SerialOver, t = 2",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, t = 4",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 4",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, t = 2                eps",
+       "2  SerialOver, t = 4                eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 4             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-fwd-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 151,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     },
+     {
+      "run": "bigcrush-rev-seed9",
+      "fails": true,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 155,
+      "rule2": 0,
+      "rule3": 150,
+      "rule1_first": [
+       {
+        "test": "SerialOver, r = 0",
+        "index": 0,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "SerialOver, r = 22",
+        "index": 1,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 2,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 2",
+        "index": 3,
+        "p": 0,
+        "q": 0
+       },
+       {
+        "test": "CollisionOver, t = 3",
+        "index": 4,
+        "p": 0,
+        "q": 0
+       }
+      ],
+      "rule2_first": [],
+      "rule3_first": [
+       "1  SerialOver, r = 0                eps",
+       "2  SerialOver, r = 22               eps",
+       "3  CollisionOver, t = 2             eps",
+       "4  CollisionOver, t = 2             eps",
+       "5  CollisionOver, t = 3             eps"
+      ]
+     }
+    ],
+    "n_pvalues": 10242
+   }
+  },
+  "candidate": {
+   "status": "run",
+   "outcome": {
+    "threshold": 4.940223298093074e-08,
+    "fails": false,
+    "failing_runs": [],
+    "incomplete_runs": [],
+    "runs": [
+     {
+      "run": "practrand-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed0",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed1",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed2",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed3",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed4",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed5",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed6",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed7",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed8",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "practrand-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "smallcrush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "crush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-fwd-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     },
+     {
+      "run": "bigcrush-rev-seed9",
+      "fails": false,
+      "complete": true,
+      "stopped_early": false,
+      "rule1": 0,
+      "rule2": 0,
+      "rule3": 0,
+      "rule1_first": [],
+      "rule2_first": [],
+      "rule3_first": []
+     }
+    ],
+    "n_pvalues": 101210
+   }
+  }
+ },
+ "verdict": "PASS",
+ "reason": "candidate did not fail",
+ "started": "2026-10-30T08:54:16",
+ "elapsed_s": 135985.5,
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

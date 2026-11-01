@@ -224,11 +224,11 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
   (draft, empty approval). (FR-011)
 - [X] T034 ⛔ [US2] **Owner battery freeze approval** for attempt 1 (requires T011 and T032).
   Record approval in freeze.json and spec.md. (FR-010, FR-011, SC-005; Principle VIII)
-- [ ] T035 [US2] Run `battery_attempt.py --attempt 1` in WSL in the background (1–3 days); log
+- [X] T035 [US2] Run `battery_attempt.py --attempt 1` in WSL in the background (1–3 days); log
   progress and any interruption in `$REP/attempt-1/` (an interrupted required run makes the
   attempt INCONCLUSIVE; no restart of a run). (FR-012, FR-014, SC-004)
-- [ ] T036 [US2] `battery_rescore.py --attempt 1` → `rescore.json`, identical required. (SC-006)
-- [ ] T037 [US2] Write `$REP/attempt-1/phase-report.md`: verdict, both controls, every failing
+- [X] T036 [US2] `battery_rescore.py --attempt 1` → `rescore.json`, identical required. (SC-006)
+- [X] T037 [US2] Write `$REP/attempt-1/phase-report.md`: verdict, both controls, every failing
   result, suspicious results, timings, open issues, disclaimer. (FR-014, FR-016, SC-004)
 - [ ] T038 ⛔ [US2] **Owner result review** of attempt 1. Record in spec.md. (Principle VIII)
 - [ ] T039 [US2] Only if attempt 1 is INCONCLUSIVE or INVALID: repeat T033–T038 for attempt 2 on
