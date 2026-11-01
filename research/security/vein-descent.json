@@ -1,0 +1,71 @@
+{
+ "finding": "security.md section 9.2, S15",
+ "model_id": "phyco-v2",
+ "model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+ "python": "3.10.11",
+ "platform": "Windows-10-10.0.26200-SP0",
+ "command": "python -I research/security/vein_descent.py",
+ "bounds": {
+  "above_2_31": [
+   {
+    "class": 2,
+    "max_growth": 67108864,
+    "min_decay": 134217728,
+    "min_drop_per_step": 67108864
+   },
+   {
+    "class": 3,
+    "max_growth": 33554432,
+    "min_decay": 201326592,
+    "min_drop_per_step": 167772160
+   }
+  ],
+  "min_drop_per_step": 67108864,
+  "steps_bound_simple": 32,
+  "envelope_from_2_32_minus_1": [
+   "0xffffffff",
+   "0xf2000000",
+   "0xe4e00000",
+   "0xd8920000",
+   "0xcd08e000",
+   "0xc2385200",
+   "0xb814cce0",
+   "0xb0938012",
+   "0xa98a4811",
+   "0xa2f1a390",
+   "0x9cc28957",
+   "0x96f660c2",
+   "0x9186fab6",
+   "0x8c6e8b0b",
+   "0x87a7a25b",
+   "0x832d2836",
+   "0x7efa55b3"
+  ],
+  "steps_bound_envelope": 16
+ },
+ "model_check": {
+  "starts": 2000,
+  "rng": "random.Random(15)",
+  "steps_per_start": 64,
+  "tail_starts": 100,
+  "tail_steps": 1000,
+  "vein_steps_above_2_31_checked": 62982,
+  "steps_not_dropping_by_2_26": 0,
+  "steps_below_d_minus_decay": 0,
+  "max_steps_until_all_veins_at_most_2_31": 14,
+  "steps_after_entry": 205270,
+  "steps_after_entry_with_a_vein_above_2_31": 0
+ },
+ "state_bound": {
+  "secret_bits_nominal_2x2": 256,
+  "log2_states_after_entry_at_most": 252.0,
+  "s14_d_range": [
+   "0x2C250B49",
+   "0x5F82634F"
+  ],
+  "s14_values_per_vein_over_2_30": 0.8026,
+  "log2_estimate_from_s14_range": 246.73,
+  "log2_needed_by_fut_sec_2_for_128_bits": 256
+ },
+ "note": "Structural analysis only: not an acceptance result and not evidence of security."
+}

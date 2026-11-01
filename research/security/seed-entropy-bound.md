@@ -198,14 +198,15 @@ layout.
 Open issues and research items from features 001–003 and the security review that the next
 redesign must address. Tick an item only when the redesign's spec, plan or evidence covers it,
 and cite where. Sources: feature-002 final report (O1–O6), feature-003 phase reports,
-security.md §9.2 (S1–S14) and §12.3, and the two repository reviews of 2026-10-31 (groups E
+security.md §9.2 (S1–S15) and §12.3, and the two repository reviews of 2026-10-31 (groups E
 and F).
 
 **A. Fix in the design**
 
 - [ ] Key of at least 128 bits; no strength claimed below 128 (FUT-SEC-1; S1, S3).
 - [ ] Secret state reachable from the key at least twice the claimed strength, probably with key
-  material in D as well as P (FUT-SEC-2; S1).
+  material in D as well as P (FUT-SEC-2; S1). With the design-1.0 vein update a 2×2 ring cannot
+  reach it, so decide the FUT-SEC-2 and FUT-GRID-2 conflict at 2×2 (security.md §20.1; S15).
 - [ ] Public parts of the state (phase counters, food sequence) excluded from the secret-state
   count (FUT-SEC-2; S2).
 - [ ] Nonce or IV for stream separation, and a reseed input if prediction resistance is claimed
@@ -401,6 +402,10 @@ and F).
 
 ## 6. Suggested feature description, for `/speckit-specify` when the owner decides
 
+Superseded on 2026-10-31 by the feature-004 prompt in [next.md](../../next.md) §4, which follows
+the strategy note [crypto-redesign-strategy.md](crypto-redesign-strategy.md). The original
+suggestion is kept below for the record.
+
 ```text
 Cryptographic key interface for PhycoWeb-PRNG: replace the 64-bit seed with a key of at least
 128 bits, plus a nonce for stream separation and, if claimed, a reseed input, so that seed
@@ -418,7 +423,7 @@ FUT-HW-1 to FUT-HW-5 and the §5.3 checklist, in research/security/seed-entropy-
 ## 7. Where this finding is recorded
 
 - `.specify/memory/constitution.md` 1.2.0: Security Policy (the binding wording of §5).
-- `security.md` 2.6: §1.2, §4, §5, §6, §9.2 (S1–S5), §12.2, §20 and §20.1, §21, §22, §24.
+- `security.md` 2.7: §1.2, §4, §5, §6, §9.2 (S1–S5, S15), §12.2, §20 and §20.1, §21, §22, §24.
 - `README.md`: §1.1 status and §5.
 - `reports/002-core-dynamics-redesign/phase-report.md`: addendum dated 2026-10-31.
 - `specs/003-extended-batteries-calibration/tasks.md`: T041, T042 and T043 (the feature-003

@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.6 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.7 (2026-10-31). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -25,11 +25,11 @@
 
 ### 1.1 Models
 
-| Model | Source | State | Seed | Statistical evidence | Cryptographic evidence | Role |
-|-------|--------|-------|------|----------------------|------------------------|------|
-| `float-v0` | `baseline/float-v0/` (archived; SHA-256 in `MANIFEST.json`) | floating-point food generator (`np.sin`, `np.cos`) | 4 × 16 bits | Feature-001 screening only, done with the defective `nistrng` 1.2.3 (see the erratum in `reports/001-integer-lut-perturbation/summary.md`) | none | archive only |
-| `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | negative control |
-| `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). PractRand/TestU01 attempt 1 is in progress (feature 003) | none | research candidate |
+| Model | Source | State | Seed | Statistical evidence | Cryptographic evidence | Claim level (section 15) | Role |
+|-------|--------|-------|------|----------------------|------------------------|--------------------------|------|
+| `float-v0` | `baseline/float-v0/` (archived; SHA-256 in `MANIFEST.json`) | floating-point food generator (`np.sin`, `np.cos`) | 4 × 16 bits | Feature-001 screening only, done with the defective `nistrng` 1.2.3 (see the erratum in `reports/001-integer-lut-perturbation/summary.md`) | none | L0; no claim | archive only |
+| `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | L0; no claim | negative control |
+| `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). PractRand/TestU01 attempt 1 is in progress (feature 003) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
 
 ### 1.2 What is and is not established for `phyco-v2`
 
@@ -58,13 +58,13 @@
 | Phase | Gate | Status | Evidence |
 |-------|------|--------|----------|
 | 0 Specification | frozen and unambiguous | **Met** for design 1.0, at the owner design review on 2026-10-28 (design SHA-256 `a1109bf1…`) | `design.md` §2–§6; tests `test_design_trace`, `test_widths_v2`, `test_purity_v2` |
-| 1 Mathematical and structural analysis | review completed; critical defects resolved | **Not started.** The known structural facts are in section 9.2 | — |
+| 1 Mathematical and structural analysis | review completed; critical defects resolved | **Started.** S12–S15 are recorded with proofs and committed scripts, not yet reviewed; the other facts in section 9.2 come from the specification and feature 002 | `research/security/` |
 | 2 Reference implementation | independent implementations agree | **Partly met.** Three in-project implementations agree; none comes from outside the project; there is no VHDL | `vectors/`, `tests/v2_reference.py`, `reports/003-extended-batteries-calibration/streams/equivalence.json` |
 | 3 Statistical validation | campaign completed; anomalies assessed | **In progress.** SP 800-22 PASS; positive control calibrated; PractRand/TestU01 attempt 1 running; structural (level 3) tests not started | `reports/002-core-dynamics-redesign/`, `reports/003-extended-batteries-calibration/` |
 | 4 Cryptanalysis | threat model and attack campaign completed | **Not started.** A draft threat model is in section 5 | — |
 | 5 Hardware validation | RTL matches the model | **Not started.** RTL is pending, with the exceptions recorded as O1 in feature 002 | `design.md` §7 |
 | 6 Independent evaluation | external review and reproduction | **Not started** | — |
-| 7 Security qualification | claims supported by evidence | **Research candidate**; no claim | this document |
+| 7 Security qualification | claims supported by evidence | **L0, research candidate**; no claim (section 15) | this document |
 
 To report a weakness, see section 23.
 
@@ -139,9 +139,10 @@ Do not conflate these concepts:
   predict outputs produced *after the next reseed with sufficient fresh entropy*. It requires an
   entropy source and a reseed operation. A purely deterministic generator that is never reseeded
   cannot have it. The AIS 20/31 term is *enhanced forward secrecy*.
-- **Forward and backward secrecy** (AIS 20/31 classes DRG.1 and DRG.2): future (respectively,
-  earlier) outputs cannot be computed from observed outputs, without state compromise. The AIS
-  "forward secrecy" is unrelated to forward secrecy in key exchange.
+- **Forward and backward secrecy** (AIS 20/31 classes DRG.1 and DRG.2, as named in version 2.0
+  of the functionality classes; section 6): future (respectively, earlier) outputs cannot be
+  computed from observed outputs, without state compromise. The AIS "forward secrecy" is
+  unrelated to forward secrecy in key exchange.
 - **Entropy**: uncertainty in an input under a stated model. SP 800-90B measures **min-entropy**,
   H∞ = −log₂ max p. A deterministic algorithm creates no entropy. Its output never contains more
   entropy than its seed, which is at most 64 bits for every PhycoWeb-PRNG model.
@@ -162,6 +163,48 @@ Every claim must state:
 - the data, time and memory limits;
 - the security strength in bits;
 - the assumptions, above all about the seed's entropy.
+
+**Definitions for a keyed design.** No PhycoWeb-PRNG model has a key yet. A model meant to
+support a claim states each property it seeks as a bound on an adversary's advantage. An
+adversary A queries an oracle and outputs one bit. Its advantage is
+Adv(A) = |Pr[A outputs 1, real generator] − Pr[A outputs 1, ideal oracle]|, a function of its
+resources: time t (evaluations of the primitive), data σ (output bits, or calls of the
+primitive), the number of keys u, and the nonces per key.
+
+- **Keystream (PRG) security**: the real oracle generates output under a uniform secret key, for
+  nonces that A chooses and never repeats; the ideal oracle returns uniform bits.
+- **Multi-user security**: the same with u independent keys, A choosing the key of each query.
+- **Backtracking resistance**: A also receives the full state after a forget or reseed call of
+  its choice. The output produced before that call must stay indistinguishable from uniform.
+- **Prediction resistance**, only with a reseed input (FUT-SEC-4): A receives the full state, a
+  reseed with enough fresh min-entropy follows, and the output after it must stay
+  indistinguishable from uniform.
+- **Nonce misuse**: the behaviour on a repeated nonce is stated, never assumed safe. A keystream
+  generator gives the same output for the same key and nonce.
+- **The permutation assumption**: a mode proof bounds the advantage when its permutation is
+  ideal. A claim built on it states only that no attack on the real permutation below the
+  claimed strength is known, never that the permutation is ideal (section 12.6).
+
+A claim of s-bit strength means that every attack within the stated limits needs work of about
+2^s or more to reach a constant advantage. The claim states the bound ε(t, σ, u) that shows it.
+
+**Claim template.** A claim, if one is ever approved (level L6, section 15), fills in every
+field:
+
+```text
+Model:        model ID, design version, grid size, rounds; SHA-256 of the design
+Property:     keystream security, multi-user security, backtracking resistance or
+              prediction resistance
+Attacker:     capabilities from section 5 (T1 to T11); the nonce rule
+Limits:       output bits per key and nonce, and per key; number of keys u
+Strength:     s bits, from the named theorem and its bound ε(t, σ, u), assuming no attack
+              on the permutation below 2^s (best-attack register, section 12.6)
+Assumptions:  the key is uniform and secret, with its stated entropy; the entropy source
+              for reseeds, if any
+Not claimed:  everything else, including FIPS 140-3 approval and any side-channel
+              resistance that was not measured
+Evidence:     the records of levels L1 to L5
+```
 
 ------------------------------------------------------------------------
 
@@ -222,7 +265,7 @@ No such claim exists or is planned for the current design, which is bounded at 6
 
 - outputs the attacker has not yet seen;
 - earlier outputs;
-- the seed;
+- the seed, or the key of a keyed design;
 - the internal state;
 - the integrity of the output, meaning it cannot be forced or biased.
 
@@ -233,6 +276,16 @@ No such claim exists or is planned for the current design, which is bounded at 6
 | T3 State compromise | Learns the full state once | recover earlier outputs, predict later ones |
 | T4 Implementation access | Timing, power, EM or fault injection on a software or FPGA implementation | leak or force the state |
 | T5 Seed influence | Can choose or bias the seed, for example through weak seeding | force degenerate or low-entropy states |
+| T6 Chosen nonces (keyed design) | Chooses the nonce and personalization string of each instantiation; nonces are unique per key | distinguish, recover the key |
+| T7 Nonce misuse (keyed design) | Repeats a nonce under one key, by error or by force | distinguish, recover the key or the state |
+| T8 Many users (keyed design) | Attacks u keys at once and wins if any one falls | recover any one key, with less work per key |
+| T9 Chosen absorbed input (keyed design) | Chooses or influences input absorbed into the state: personalization, additional input, reseed input | force state collisions or weak states |
+| T10 Compromise around forget and reseed (keyed design) | Learns the full state just before or just after a forget or reseed call | recover earlier output, predict later output |
+| T11 Quantum (optional) | Has a quantum computer: Grover search of a k-bit key in about 2^(k/2) evaluations, and quantum queries where the oracle allows them | recover the key, distinguish |
+
+T6–T11 were added in version 2.7 for a keyed design, which does not exist yet: `phyco-v2` has no
+key, nonce or reseed input. A spec that introduces a key interface adopts them, or states why
+one does not apply.
 
 **Generic results** that hold for `phyco-v2` as specified (no experiment needed):
 
@@ -255,7 +308,8 @@ No such claim exists or is planned for the current design, which is bounded at 6
 ## 6. Standards and technical references
 
 The programme follows established standards, not criteria invented for this algorithm. Status was
-checked against the NIST CSRC pages on 2026-10-31.
+checked on 2026-10-31 against the NIST CSRC pages and, for the BSI and ISO rows, the publishers'
+pages. The ECRYPT site was unreachable that day, so the eSTREAM row rests on secondary sources.
 
 | Reference | Status | Role | What it means here |
 |-----------|--------|------|--------------------|
@@ -265,8 +319,12 @@ checked against the NIST CSRC pages on 2026-10-31.
 | NIST SP 800-22 Rev. 1a | Final, April 2010. On 19 April 2022 NIST decided to revise it. The revision is to clarify its purpose, "in particular rejecting its use for assessing cryptographic random number generators"; drafting had not started when the decision was announced | Statistical tests | Used here only to detect defects. This project's calibration and DFT cross-check show its limits (section 11.4) |
 | NIST FIPS 140-3 | Approved March 2019 | Cryptographic module validation (CMVP) | An RBG in a validated module must use an approved DRBG, and its entropy source must be validated (ESV programme). A custom generator cannot be approved |
 | NIST SP 800-57 Part 1 Rev. 5; SP 800-131A Rev. 2 | Final (2020; 2019) | Security strengths; algorithm transitions | 112 bits is the minimum security strength for approved use, accepted for applying protection only through 2030; from 2031 the minimum is 128 bits. The constitution's floor for any claim is 128 bits (FUT-SEC-1). `phyco-v2` is bounded at 64 |
-| BSI AIS 20 / AIS 31 | German Common Criteria methodology for RNGs | Functionality classes DRG.1–DRG.4 for deterministic RNGs, PTG.1–PTG.3 for physical true RNGs and NTG.1 for non-physical true RNGs (class names as in the functionality-class proposal; check the current BSI version) | DRG.3 (enhanced backward secrecy) or DRG.4 (adds enhanced forward secrecy through reseeding) would be the bar for any future claim |
+| BSI AIS 20 / AIS 31 | German Common Criteria methodology for RNGs. The current mathematical-technical reference is version 3.0 of the functionality-class proposal, dated 17 September 2024 | Functionality classes DRG.1–DRG.4 for deterministic RNGs, PTG.1–PTG.3 for physical true RNGs and NTG.1 for non-physical true RNGs, as named in version 2.0 (2011). Version 3.0 was not read here, and a conference comparison of the current classes names only DRG.2–DRG.4, PTG.2, PTG.3 and NTG.1; read it before FUT-SEC-9 is answered | DRG.3 (enhanced backward secrecy) or DRG.4 (adds enhanced forward secrecy through reseeding) would be the bar for any future claim |
 | ISO/IEC 18031 | International standard | Random bit generation | International counterpart to the SP 800-90 series |
+| NIST SP 800-232 | Final, 13 August 2025 | Ascon-based lightweight cryptography: Ascon-AEAD128, Ascon-Hash256, Ascon-XOF128 and Ascon-CXOF128, all built on one 320-bit permutation | Comparison reference: a standardized permutation-based design for constrained hardware, the kind of architecture recommended for a redesign (section 21). It is not an RBG standard |
+| eSTREAM portfolio (ECRYPT) | Final portfolio 2008, revised in September 2008. Not a standard | Stream ciphers selected after four years of public analysis. Profile 1 (software, 128-bit keys): HC-128, Rabbit, Salsa20/12, SOSEMANUK. Profile 2 (hardware, 80-bit keys): Grain v1, MICKEY 2.0, Trivium | Comparison reference for hardware keystream generators, and for how long public review takes |
+| ISO/IEC 29192 | Part 3 (stream ciphers): edition 1, 2012, last confirmed in 2024 | Lightweight cryptography. Part 3 specifies the keystream generators Enocoro and Trivium | Comparison reference for lightweight keystream generators |
+| BSI TR-02102-1 | Version 2026-01 | Recommended cryptographic mechanisms and key lengths, updated yearly | Comparison reference for key lengths and mechanism choices |
 | TestU01 1.2.3 (L'Ecuyer and Simard, ACM TOMS 33(4), 2007) | Used in feature 003 | SmallCrush, Crush, BigCrush | Licence allows non-commercial research use only. Not redistributed here |
 | PractRand 0.96 (C. Doty-Humphrey) | Used in feature 003 | Long-stream testing to 2⁴⁰ bytes | Public domain / free use |
 | NIST STS 2.1.2 | Used as the oracle in features 002–003 | Reference SP 800-22 implementation | Our harness `sp80022` matches it (section 11.2) |
@@ -280,6 +338,11 @@ Official references:
 - NIST SP 800-22 Rev. 1a: https://csrc.nist.gov/pubs/sp/800/22/r1/upd1/final
 - Decision to revise SP 800-22 Rev. 1a (2022): https://csrc.nist.gov/news/2022/decision-to-revise-nist-sp-800-22-rev-1a
 - NIST FIPS 140-3: https://csrc.nist.gov/pubs/fips/140-3/final
+- NIST SP 800-232: https://csrc.nist.gov/pubs/sp/800/232/final
+- BSI TR-02102, all parts: https://bsi.bund.de/dok/TR-02102-en
+- BSI functionality classes for random number generators, version 3.0 (2024):
+  https://bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.html
+- ISO/IEC 29192-3:2012: https://www.iso.org/standard/56426.html
 
 Two cautions:
 
@@ -297,7 +360,7 @@ earlier gate blocks every claim that depends on it.
 
 | Phase | Focus | Primary gate |
 |-------|-------|--------------|
-| 0 | Specification and algorithm definition | Specification frozen and unambiguous |
+| 0 | Specification, design and design rationale | Specification frozen and unambiguous. For a model meant to support a claim, also a complete design rationale (section 8) and an external design review before the freeze (recommended; see below) |
 | 1 | Mathematical and structural analysis | Review completed; critical defects resolved |
 | 2 | Reference implementation verification | Independent implementations agree with the specification |
 | 3 | Statistical validation | Pre-registered campaign completed; anomalies assessed |
@@ -308,6 +371,15 @@ earlier gate blocks every claim that depends on it.
 
 Passing a gate means only that its stated criteria were met. It does not establish any other
 property.
+
+**External design review (recommended).** A flaw that a cryptographer would see at once can
+otherwise surface only after implementation and battery runs. Before the design freeze of any
+model meant to support a cryptographic claim, an independent cryptographer should review its
+specification and design rationale, and the review should be recorded in the feature's *Review
+& Approval* table. The constitution does not yet require this; an optional amendment would add
+it to Principle VIII (research note
+[`crypto-redesign-strategy.md`](research/security/crypto-redesign-strategy.md) §9.1, and
+[`next.md`](next.md)). Until then, a freeze without it is recorded as such.
 
 **How gates work in this repository.** Each phase of work is a Spec Kit feature: specify, plan,
 tasks, implement. Each gate is a recorded owner approval in that feature's *Review & Approval*
@@ -373,7 +445,24 @@ For a bio-inspired network of interacting nodes, it must also define:
 - no output limit per seed is defined;
 - the `design.md` status line still reads "awaiting owner design review". The approval is
   recorded in `spec.md`, and the line is left unchanged because editing it would change the
-  frozen hash (feature-002 open issue O5).
+  frozen hash (feature-002 open issue O5);
+- there is no design rationale in the sense below.
+
+**Design rationale (Security Policy (a)).** The specification of any model meant to support a
+claim comes with a design rationale that states:
+
+- the security target, the threat model and the claim template (sections 3 and 5);
+- the mode, the theorem it relies on, and how each precondition of the theorem is met;
+- the role of every component and why it is there, including what the slime-mold mapping does
+  and does not contribute;
+- the sources of nonlinearity and their proven bounds;
+- diffusion in both directions;
+- every constant, with the rule that generates it;
+- the round-count rule and the resulting margin;
+- the known limitations, and the attacks the design was built to resist.
+
+`phyco-v2` has no such rationale: `design.md` §8 explains why it is slime-mold dynamics
+(feature-002 FR-007), not why it would resist attack.
 
 ------------------------------------------------------------------------
 
@@ -444,6 +533,7 @@ supported.
 | S12 | Conductance classes 2 and 3 are in effect unused. Every vein value stays in 0…2³¹, so class 3 is unreachable and class 2 can occur only at exactly D = 2³¹, for one step. SHIFT = 4 never applies and the class is in effect bit 30 of D. Bit 31 of D is set only in that edge case, so the vein-tone XOR in effect never reaches bit 31 of T[k], which the rotation moves to bit 4, 10, 18 or 26 of P′[k]. For S6 this leaves one effective control bit per vein, not two. Details below the table. | `design.md` §4 steps 3–5, [`research/security/vein-class-census.json`](research/security/vein-class-census.json) | Confirmed (proof and experiment) |
 | S13 | The step function is not one-to-one, so distinct states merge. (a) The vein decay D − (D >> 4) maps 16m + 15 and 16m + 16 to the same value, so two states that differ only there have the same successor; about 41% of states have such a partner. (b) When all four veins are in class 1, adding (2, −2, 2, −2) to the pressures leaves every transport sum T[k] unchanged, and the successors coincide in about 32% of those states. This settles S9. The merged states differ only locally, so the merging is not evidence of backtracking resistance. Details below the table. | `design.md` §4 steps 3–6, [`research/security/step-probes.json`](research/security/step-probes.json) | Confirmed (proof and experiment) |
 | S14 | The vein values stay close to 2³⁰: after the warm-up every D measured lay between 0.69 × 2³⁰ and 1.49 × 2³⁰. Bit 31 of D was never set, bit 30 was set in 90.6% of values, and bits 29 to 27 in 9.4%, 11.5% and 39.5%; bit 29 was always the complement of bit 30. The vein-tone XOR of step 5 therefore changes the top five bits of T[k] (bits ROT[k] − 1 to ROT[k] − 5 of P′[k]) rarely or predictably, and two unrelated states differ in about 47.7% of their 256 state bits, not 50%. Details below the table. | `design.md` §4 steps 4–5, [`research/security/step-probes.json`](research/security/step-probes.json) | Confirmed (experiment) |
+| S15 | The bound of S12 holds from every starting state, not only from the reset values. While D > 2³¹ (class 2 or 3), the decay D >> 4 is at least 2²⁷ and the growth A >> 2 at most 2²⁶, so D falls by at least 2²⁶ per step and never wraps. Every vein is at most 2³¹ within 16 steps, and S12 then keeps it there. Any 2×2 design that keeps the design-1.0 vein update, however its key is loaded, therefore has at most 2¹²⁸ · (2³¹ + 1)⁴ ≈ 2²⁵² secret states after 16 steps, below the 2²⁵⁶ that FUT-SEC-2 needs for a 128-bit claim; the range measured for S14 suggests about 2²⁴⁷. This conflicts with FUT-GRID-2 at 2×2 (section 20.1). The bound of S1 for `phyco-v2` itself is unchanged. Details below the table. | `design.md` §4 steps 3–4, S12, [`research/security/vein-descent.json`](research/security/vein-descent.json) | Confirmed (proof and experiment) |
 
 **S12 in detail.** In class c = D >> 30 the flux is the pressure difference shifted right by
 SHIFT[c] = c + 1, so |Q| ≤ 2^(30−c). The growth term A >> 2 is then at most 2^(28−c), against a
@@ -540,6 +630,45 @@ reached the same 47.7% of state bits from step 4 onwards, and changed about 50% 
 bits from step 2; the warm-up is 256 steps. So the shortfall from 50% is the vein bias, not slow
 diffusion. Because the vein-tone XOR of step 5 rarely changes the top bits of T[k], those bits
 of P′[k] depend on D far less than the other bits do.
+
+**S15 in detail.** The induction of S12 starts from the reset values, which are all in class 0. A
+keyed design that keeps the design-1.0 vein update could start anywhere, for example with key
+material loaded into D, so the bound must hold from every state. It does. The growth of each vein
+depends only on its own class (step 3 reads c[k] = D[k] >> 30), so each vein is bounded on its
+own:
+
+- class 2 above 2³¹ (2³¹ < D < 3 × 2³⁰, SHIFT = 3): growth at most 2²⁶, decay at least 2²⁷;
+- class 3 (D ≥ 3 × 2³⁰, SHIFT = 4): growth at most 2²⁵, decay at least 3 × 2²⁶;
+- so while D > 2³¹, D − (D >> 4) ≤ D′ ≤ D − 2²⁶: D falls by at least 2²⁶ per step and never
+  wraps modulo 2³².
+
+From D ≤ 2³² − 1 every vein is therefore at most 2³¹ within 32 steps. A sharper bound iterates
+the largest value that any vein above 2³¹ and at most x can reach in one step; within a class the
+next value never decreases as D grows, so the top of each class gives it. From x = 2³² − 1 this
+envelope falls to 0x7EFA55B3, below 2³¹, in 16 steps, so every vein from every start is at most
+2³¹ within 16 steps. From then on the induction of S12 keeps every D in 0…2³¹.
+
+The check ([`research/security/vein_descent.py`](research/security/vein_descent.py), run on
+2026-10-31 on Windows with Python 3.10.11, model SHA-256 `1260142d…`) ran the reference model
+from 2,000 arbitrary states with every vein above 2³¹, five of them fixed edge cases, for 64
+steps each, and 100 of them for 1,000 steps more:
+
+| Check | Result |
+|-------|--------|
+| Every step of a vein above 2³¹ gave D − (D >> 4) ≤ D′ ≤ D − 2²⁶ | 62,982 of 62,982 |
+| Steps until all four veins were at most 2³¹ | at most 14 (bound: 16) |
+| Steps after that with a vein above 2³¹ | 0 of 205,270 |
+
+Consequences. A 2×2 ring with one 32-bit pressure and one 32-bit vein per node has exactly 256
+secret bits. After 16 steps each vein takes at most 2³¹ + 1 values, so the secret state takes at
+most 2¹²⁸ · (2³¹ + 1)⁴ ≈ 2²⁵² values, whatever the key interface. The range measured for S14,
+about 0.80 × 2³⁰ values per vein, suggests about 2²⁴⁷, and the merging of S13 can only shrink
+the set further. FUT-SEC-2 needs at least 2²⁵⁶ reachable secret states for a 128-bit claim, so
+the design-1.0 vein update rules out a 128-bit claim at 2×2. With two 32-bit words per node, 2×2
+leaves no slack under any update: every state would have to be reachable, and a duplex mode with
+a 256-bit capacity would have no rate left. FUT-GRID-2 requires FUT-SEC-1 and FUT-SEC-2 at every
+supported size, including the smallest, so the two requirements conflict at 2×2. The decision is
+open (section 20.1). For `phyco-v2` itself, S1 still applies: at most 2⁶⁴ states.
 
 For `lut-v1`: its output is the low 8 bits of every vein value D, so half of D is visible at each
 step (L1). The disruption fires on about 99.5% of steps (L2). Every battery rejects it (L3).
@@ -751,7 +880,19 @@ not as an advocate for the design.
 | Reduced-state | Find structure in smaller variants that may scale |
 | Initialization and weak seeds | Exploit the seed mapping, warm-up, or degenerate seeds (T5) |
 | Reseeding | Not applicable as specified (S4); required for any prediction-resistance claim |
+| Slide | Exploit a step or round function that repeats, for example the 128-step food period (S2) |
+| Invariant subspace and nonlinear invariant | Find sets or Boolean functions that the step or round maps onto themselves (compare the zero mode of S13) |
+| Integral and division property | Find balanced or constant sums over structured sets of inputs |
+| Cube and zero-sum | Exploit a low algebraic degree after few rounds or steps |
+| Impossible differential | Rule out key or state candidates with differentials of probability zero |
+| Boomerang and differential-linear | Combine two short trails into a longer distinguisher |
+| Rotational-XOR | Rotational pairs with an XOR offset, which survive round constants (S7) |
+| Inverse direction | Attack a permutation from its output side, through its inverse |
+| Mode | Exploit the padding, domain separation, nonce handling, forget and reseed calls or output limits of a mode |
 | Side-channel and fault | Timing, power, EM or fault leakage (section 13) |
+
+The rows from Slide to Mode were added in version 2.7 for a permutation-based redesign
+(section 21). Most of them also apply to `phyco-v2`.
 
 ### 12.2 Generic bounds every claim must respect
 
@@ -762,6 +903,19 @@ not as an advocate for the design.
   must have at least 256 bits that are actually reachable. phyco-v2 has 256 secret bits
   nominally, but only 2⁶⁴ reachable states per step index (S1).
 - **Output volume**: a claim must state how much output per seed it covers.
+- **Multi-target key search**: against u keys, some key falls after about 2^k / u trials, so a
+  k-bit key gives at most k − log₂ u bits against an attacker who needs any one of them (T8). A
+  256-bit key keeps 128 bits for up to 2¹²⁸ keys.
+- **Key and nonce trade-offs**: if key and nonce together have fewer than 2s bits, a
+  time–memory–data trade-off over many streams costs less than 2^s (Hong and Sarkar, 2005). For
+  s = 128, key plus nonce must have at least 256 bits.
+- **Capacity (birthday) bound**: a sponge or duplex with capacity c can be distinguished
+  generically after about 2^(c/2) calls of the permutation, so c ≥ 2s: at least 256 bits for
+  s = 128.
+- **Quantum search** (optional threat T11): Grover's algorithm finds a k-bit key with about
+  2^(k/2) quantum evaluations. A 256-bit key keeps a margin.
+- **Nonce reuse**: a deterministic generator gives the same output for the same key and nonce.
+  A claim states the nonce rule and the behaviour on reuse (T7).
 
 ### 12.3 Proposed first investigations for PhycoWeb-PRNG
 
@@ -809,6 +963,34 @@ indistinguishability.
 
 A proposed attack is not a confirmed vulnerability until it is proved mathematically or
 reproduced. An unsuccessful attack is not proof of security.
+
+### 12.5 Tool validation
+
+A negative result from an analysis tool counts only after the tool has re-found known results:
+
+- on `phyco-v2` and its reduced variants: the seed bound on a reduced domain (FUT-SEC-8), the
+  merging of S13, the bounded veins of S12 and S15, and the bias of S14;
+- for trail search: a published optimal trail of a reference cipher.
+
+This is the lesson of `nistrng` and of the STS oracle comparison (section 11.2). Record each
+tool's version, licence and validation result with its first use. Every download needs the
+owner's permission, and solver runs, which are heavy, never overlap battery runs.
+
+### 12.6 Best-attack register
+
+For each model meant to support a claim, this register keeps one row per attack class: the
+rounds reached out of R, the complexity (time, data, memory), the source (internal or external,
+with a reference), the date and the margin. The margin is R divided by the rounds of the best
+attack. A claim is never stronger than its weakest row, and an attack below the claimed strength
+withdraws the claim at once (section 15).
+
+| Model | Attack class | Reach | Complexity | Source | Date | Margin |
+|-------|--------------|-------|------------|--------|------|--------|
+| `phyco-v2` | Exhaustive seed search (T1) | full generator | about 2⁷² steps: 2⁶⁴ seeds × (256 warm-up steps plus a few output steps); not executed | generic, S3 (section 5) | 2026-10-31 | none: 64 bits is below the 128-bit floor |
+| `phyco-v2` | Time–memory trade-off (T1) | full generator | one-time precomputation of about 2⁶⁴ seed evaluations, then about 2⁴³ per target with 2⁴³ stored entries; not executed | generic (Hellman, 1980; section 5) | 2026-10-31 | none |
+
+`phyco-v2` has no rounds, so a margin is not defined for it; the rows record why it can carry no
+claim.
 
 ------------------------------------------------------------------------
 
@@ -890,28 +1072,47 @@ repository. The reviewers should reproduce the important findings themselves.
 
 ## 15. Phase 7: Security qualification
 
-| Classification | Meaning |
-|----------------|---------|
-| Research candidate | Defined and under evaluation |
-| Statistically evaluated | Pre-registered statistical campaign completed; significant anomalies assessed |
-| Cryptographically evaluated | Threat model and substantial cryptanalysis completed |
-| Cryptographically qualified | Claim supported by independent evidence and the applicable validation |
+Each model carries one claim level. A level is reached only when its evidence is recorded and its
+gate is passed, and only in order. Version 2.7 replaced the four classifications used before
+(research candidate, statistically evaluated, cryptographically evaluated, cryptographically
+qualified), because "substantial cryptanalysis" could not be checked.
 
-**Current classification:**
+| Level | Name | Evidence required | Gate |
+|-------|------|-------------------|------|
+| L0 | Research candidate | specification; no claim | — |
+| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | spec approval |
+| L2 | Internally analysed | design rationale (section 8); structural proofs; proven trail bounds; an internal attack campaign with validated tools (section 12.5); a reduced-round statistical margin | design freeze; result review |
+| L3 | Statistically re-validated | the complete statistical programme on unused held-out key sets, per supported size (FUT-SEC-7) | battery freeze; result review |
+| L4 | Implementations verified | an implementation from outside the project; VHDL equivalent to the model (FUT-HW-1, FUT-HW-4) | RTL start (Principle VIII gate 2) |
+| L5 | Independently reviewed | review by independent experts recorded in the repository (Security Policy (b)); a public analysis period with no attack below the claimed strength on the full rounds | external review |
+| L6 | Scoped claim | an owner-approved claim that fills in the template of section 3 | Principle VIII gate 3 |
 
-- `float-v0`: archived, not evaluated further.
-- `lut-v1`: rejected statistically; used as the negative control.
-- `phyco-v2`: research candidate, with statistical evaluation in progress. It could at most
-  become "statistically evaluated" when feature 003 closes.
+The order follows the Security Policy: no evaluation meant to support a claim may be pursued until
+FUT-SEC-1 to FUT-SEC-9 are met. Work at L1 and L2 is design work and weakness search, which the
+policy allows and requires to be reported. External review meant to support a claim (L5) starts
+only after L1–L4 have recorded evidence.
 
-**Rules for any qualification:**
+**Claim register.** A model's claim is worded only here; other sections cite only its level:
 
-- A custom algorithm is not called cryptographically secure merely because it reaches the third
-  classification.
-- A qualification states the exact version, configuration, intended use, properties,
-  assumptions, limitations and external reviews.
+- `float-v0`: L0; no claim. Archived, not evaluated further.
+- `lut-v1`: L0; no claim. Rejected statistically; used as the negative control.
+- `phyco-v2`: L0; no claim. It cannot reach L1, because its 64-bit seed is below FUT-SEC-1
+  (S1–S3). Its statistical evaluation (Phase 3) may be completed when feature 003 closes; that
+  changes no level.
+
+**Rules for every level:**
+
+- No level, L6 included, makes a custom algorithm "cryptographically secure". L6 carries exactly
+  its scoped claim.
+- A claim states the exact version, configuration, intended use, properties, assumptions,
+  limitations and external reviews.
+- An attack below the claimed strength withdraws the claim at once, with a history entry and a
+  README update. Upgrades follow the ladder and its gates.
+- A later version may narrow a claim, never widen it without new evidence (stricter only).
+- Wording: "proven bound", "best known attack", "no attack found within budget", "not
+  evaluated". Never "secure", "unbreakable" or "proven secure".
 - Under FIPS 140-3, a custom generator cannot be an approved RBG at all (section 6). For
-  deployments that need approval, "qualified" is only reachable along Option B (section 21).
+  deployments that need approval, a claim is only reachable along Option B (section 21).
 
 ------------------------------------------------------------------------
 
@@ -980,7 +1181,8 @@ weaker evidence than agreement with an implementation written by someone else.
 # Cryptanalysis — Instructions
 
 ## Role
-You are an independent cryptanalyst evaluating PhycoWeb-PRNG (phyco-v2,
+You are an independent cryptanalyst evaluating PhycoWeb-PRNG model
+<MODEL_ID>, design <DESIGN_DOCUMENT> <VERSION> (for phyco-v2:
 specs/002-core-dynamics-redesign/design.md 1.0). Your objective is to find
 weaknesses, not to show that the generator works.
 
@@ -992,6 +1194,8 @@ weaknesses, not to show that the generator works.
 5. Investigate backtracking behaviour and related-seed behaviour.
 6. Build distinguishing experiments with pre-declared metrics.
 7. Analyse reduced-state variants that keep the structure.
+8. For a keyed design: attack key and nonce loading, the mode, and the
+   permutation in both directions (security.md sections 5 and 12.1).
 
 ## Mandatory rules
 - Never assume the generator is secure, and never treat statistical
@@ -999,11 +1203,12 @@ weaknesses, not to show that the generator works.
 - Never claim an attack succeeds without executable or mathematical
   evidence. Never invent results.
 - Separate confirmed findings from hypotheses (security.md section 9.1).
-- State the attacker capabilities (T1-T5), complexities and limits.
+- State the attacker capabilities (T1-T11), complexities and limits.
 - Record the exact revisions and every parameter needed to reproduce.
 - Follow the repository constitution: work from an approved spec, use
-  dev seeds only for exploration, never use held-out seed sets, ask
-  the owner before any download, and never commit, push or publish.
+  development seeds or keys only for exploration, never use held-out
+  sets, ask the owner before any download, and never commit, push or
+  publish.
 
 ## Output per investigation
 Attack description; target property; attacker capabilities; required
@@ -1015,6 +1220,10 @@ Attempt to disprove any security claim. If no attack is found, report
 "no attack identified within the scope of this investigation", never
 "secure".
 ```
+
+Each model ID gets its own copy of these instructions in the feature that analyses it, with the
+placeholders filled in, and with that model's threat-model rows, structural facts and best-attack
+register (section 12.6) as inputs.
 
 The other roles get similar short instructions:
 
@@ -1168,7 +1377,7 @@ Their status, and that of the investigations that follow from them:
 | Critical | Resolve mathematical ambiguities | **Resolved** for lut-v1 and phyco-v2 | feature 001 FR-007/FR-008; `design.md` §2–§6 |
 | Critical | Remove floating point | **Resolved**: integer lookup table; AST purity tests | feature 001; `test_purity`, `test_purity_v2` |
 | Critical | Python/VHDL semantic differences | **Resolved in the specification**, and bit-exact in C; VHDL pending | section 10.3; `streams/equivalence.json` |
-| Critical | Effective reachable state space | **Open.** Upper bound: 2⁶⁴ states per step index | section 9.2 S1–S3 |
+| Critical | Effective reachable state space | **Open.** Upper bound: 2⁶⁴ states per step index. Any 2×2 design that keeps the design-1.0 vein update has at most about 2²⁵² secret states, below FUT-SEC-2 (S15) | section 9.2 S1–S3, S15 |
 | Critical | Seed and key interface (new) | **Open.** 64 bits bounds every claim. A fix (a ≥ 128-bit key, plus a reseed input for prediction resistance) is an algorithm change and needs a new spec and owner review (Principles VI, VIII) | section 9.2 S1–S4 |
 | High | Convergence and attractors | **Partly**: v001 collapse observed; disruption rate 13.5–13.8%; edge-seed period check only | `design.md` §9 |
 | High | Output/state correlation | Not started | section 12.3 item 3 |
@@ -1233,6 +1442,18 @@ Security Policy (full text in §5.1 of the research note):
 | FUT-GRID-4 | Per-node constants generated by a stated rule that avoids translational and rotational symmetry (S7); disruption behaviour re-established per size |
 | FUT-GRID-5 | Vectors and statistical evaluation per supported size; validate an intermediate size such as 4×4 before 16×16 |
 
+**Open decision: FUT-SEC-2 and FUT-GRID-2 at 2×2.** S15 shows that a 2×2 ring with two 32-bit
+words per node cannot reach 2²⁵⁶ secret states with the design-1.0 vein update, and has no slack
+with any update: a duplex mode with a 256-bit capacity would have no rate left. FUT-GRID-2
+requires FUT-SEC-1 and FUT-SEC-2 at every supported size, including the smallest. The owner
+decides, at the latest in the spec that introduces the key interface, between:
+
+1. **Recommended:** sizes too small for the claim, 2×2 included, are reduced research variants
+   outside every claim, and the claimable sizes start at 4×4. This narrows what can be claimed.
+2. A wider node state, for example four 32-bit lanes per node, so that 2×2 holds 512 bits.
+
+Until the owner decides, both requirements stand as written.
+
 **Hardware target.** Security and performance must be testable on the owner's Digilent Arty
 A7-100T (AMD Artix-7 XC7A100TCSG324-1), using LUTs, flip-flops and block RAM only, with 0 DSP
 blocks as the constitution requires. DSP blocks were considered and rejected by the owner on
@@ -1261,6 +1482,20 @@ the security. This requires:
 
 Novelty and complexity establish nothing.
 
+Option A has three forms (research note
+[`crypto-redesign-strategy.md`](research/security/crypto-redesign-strategy.md) §4):
+
+- **A1**: a new state-evolving keystream generator, as `phyco-v2` is today. It is the hardest to
+  analyse and has no reduction; `phyco-v2` shows the failure modes (S11–S15).
+- **A2, the recommended route for any claim**: a new keyless permutation used in a mode with a
+  published security proof, such as a keyed duplex (instantiate, generate, forget, optional
+  reseed). The proof reduces every property to one assumption, that the permutation has no
+  structural distinguisher below the claimed strength, and the cryptanalysis attacks that
+  assumption. Bijectivity by construction removes S13, and FUT-SEC-2 becomes a capacity of at
+  least 256 bits (section 12.2).
+- **A3**: a new block cipher in counter mode. It adds a key schedule, a second source of
+  weakness.
+
 **Option B: a bio-inspired mechanism alongside an established construction.** An approved DRBG,
 seeded from a validated entropy source, provides the security (SP 800-90A/B/C). The bio-inspired
 generator could only be an additional, non-security input or a research component.
@@ -1268,9 +1503,12 @@ generator could only be an additional, non-security input or a research componen
 - It is deterministic, so it adds no entropy, and it cannot count as an entropy source.
 - The composition must still be analysed so that it cannot weaken the approved construction.
 
+**Option C: stop.** Keep PhycoWeb-PRNG as a documented non-cryptographic research generator.
+This is a legitimate outcome; the research value remains.
+
 For keys and other security-critical values, the preferred engineering choice is an established,
 correctly instantiated DRBG with a validated entropy source, not an unreviewed custom generator.
-Neither option is assumed secure.
+No option is assumed secure.
 
 ------------------------------------------------------------------------
 
@@ -1278,12 +1516,18 @@ Neither option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.6) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.7) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
 | 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
-| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, probably a new core design with a new model ID | Conditional; not scheduled. Its requirements are binding (constitution 1.2.0, section 20.1) |
+| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–009 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; proposed, not yet approved. The first prompt is in [`next.md`](next.md). Its requirements are binding (constitution 1.2.0, section 20.1) |
+| 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Not started |
+| 5a.2 | Feature 005: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
+| 5a.3 | Feature 006: an independent C implementation and generic VHDL, with equivalence evidence; ⛔ RTL start (L4) | Not started |
+| 5a.4 | Feature 007: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3) | Not started |
+| 5a.5 | Feature 008: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5); may run alongside 007 | Not started |
+| 5a.6 | Feature 009: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |
 | 6 | Cryptanalysis: state recovery, related seeds, rotational, algebraic, distinguishers | Not started |
 | 7 | RTL: VHDL, differential tests, synthesis, side channels | Not started (O1) |
 | 8 | Independent review, reproduction, qualification decision | Not started |
@@ -1327,12 +1571,17 @@ key and reseed interface, meeting requirements FUT-SEC-1 to FUT-SEC-9, which the
 makes binding (section 20.1). That is probably another core redesign. The work then follows
 sections 9–15.
 
-The next security-related artifact recommended for this repository is a Spec Kit feature for the
-threat model and security claims. It would:
+The next security-related artifact recommended for this repository is feature 004, whose prompt
+is in [`next.md`](next.md). It would:
 
-- adopt section 5;
+- adopt section 5, extended for keys and nonces, as its threat model, and specify the security
+  target as requirements, not claims;
 - state that no claim is made for design 1.0;
-- schedule the investigations in section 12.3, starting with the reduced-domain seed recovery.
+- start with the reduced-domain seed recovery (section 12.3 item 1, FUT-SEC-8);
+- specify a permutation-based design (Option A2, section 21) up to a frozen design.
+
+If the owner does not pursue a claim (Option C), a smaller feature for the threat model and the
+investigations in section 12.3 on `phyco-v2` remains the recommendation.
 
 **Final security rule:** classify PhycoWeb-PRNG as an experimental research candidate, not a
 cryptographically secure PRNG, until both of the following hold:
@@ -1354,6 +1603,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.4 | 2026-10-31 | Added hardware-target requirements FUT-HW-1 to FUT-HW-5 for the owner's Arty A7-100T (0 DSP blocks; DSP use considered and rejected), with board figures checked against the Digilent reference manual (section 20.1) |
 | 2.5 | 2026-10-31 | Recorded S12: conductance classes 2 and 3 are in effect unused, because a larger D gets a smaller flux. Section 9.2 gives the proof and a census by `research/security/vein_class_census.py`; section 12.3 item 3 links it |
 | 2.6 | 2026-10-31 | Recorded S13: the step function is not one-to-one (vein-decay pairs and a transport zero mode), which settles S9; and S14: the vein values stay near 2³⁰, so the top bits of D are biased. Evidence from `research/security/step_probes.py`. Sections 5, 9.2 (S9) and 12.3 (items 3 and 5) and the roadmap updated |
+| 2.7 | 2026-10-31 | Applied §7.3 of the research note `research/security/crypto-redesign-strategy.md`. Recorded S15: the bound of S12 holds from every state, so a 2×2 design with design-1.0 veins has at most about 2²⁵² secret states, below FUT-SEC-2; evidence from `research/security/vein_descent.py`. Added a claim level per model (sections 1.1 and 1.3); definitions for a keyed design, a claim template and the AIS class names by version (3); threat-model rows T6–T11 (5); SP 800-232, eSTREAM, ISO/IEC 29192 and BSI TR-02102-1 as comparison references, and the checked AIS 20/31 version (6); the design phase and a recommended external design review (7); design-rationale requirements (8); attack classes, generic bounds, tool validation and a best-attack register (12.1, 12.2, 12.5, 12.6); the claim ladder and claim register in place of the classifications (15); instructions per model ID (16.4); the open FUT-SEC-2 and FUT-GRID-2 decision (20, 20.1); Options A1–A3 and C (21); features 004–009 in stage 5a (22); and the next feature, with its prompt in `next.md` (24) |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,
