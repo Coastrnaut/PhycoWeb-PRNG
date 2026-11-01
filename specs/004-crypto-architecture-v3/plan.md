@@ -41,16 +41,27 @@ The feature runs in the spec's order, and each step needs the one before it:
 ### Values this plan fixes before first use
 
 The spec leaves these values to the plan. From plan approval they belong to the pre-registered
-design protocol and may only become stricter (FR-044).
+design protocol and may only become stricter (FR-044). The first six rows are the values the
+owner asked the plan to fix. The next four list the other values that research.md marks
+protocol, so that one list names them all: the plan approval covered research.md, so these rows
+record those values and change nothing, except that the constant rule's early fixing is one of
+the stricter checklist answers of 2026-11-01. The last row lists the spec's security
+parameters with their directions. Every change from now on is an entry of the protocol change
+log `research/004/protocol-changes.jsonl` (data-model §18).
 
 | Item left to the plan | Value fixed here | Research | Stricter means |
 |-----------------------|------------------|----------|----------------|
-| Development inputs (FR-040) | Key, nonce, personalization string, reseed input and test state i = SHA-256 of the ASCII string `phycoweb-004/dev/<kind>/<i>` (test states: `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>`); uniform controls under `phycoweb-004/control/`; the loader refuses every other namespace; fingerprints checked at load; no held-out set | R3 | no change at all |
-| Inputs per bias measurement (bias rule) | Two sets of N = 2²⁰ instantiation states per claimable size, key i with nonce i and key 0 with nonce i, through Π and Π⁻¹, S = 4b bits per round count; the avalanche measurement of FR-037 also feeds R_dist: N_a = 2¹³ states per flipped bit, per key or nonce bit flipped in instantiation states and per rotation amount, threshold 0.005/(128·S_A) with S_A = (2·\|F\| + 384 + 2(w − 1))·b, so it adds at most 0.005 per size to the chance of a false firing; each avalanche run cross-checked against the exact dependency matrices; controls with the same counts | R4 | N, N_a, F and the sets only grow |
-| Operation-count cost model (D4) | 6-input LUTs per node and round: 0 for rotations, constant shifts and wiring; w per bitwise word operation with fan-in k ≤ 6; w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no fusion | R5 | no change after the first score |
-| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind, only after a recorded tool defect, inside the budget; each kind of evidence at 4×4, then 8×8, then 16×16 | R7 | every budget only falls |
-| Vector lengths at large sizes (FR-036) | The same at every size: 16 Π and Π⁻¹ inputs with 4 traced round by round; 2 development keys × 10,000 words for the mode; a SHA-256 digest of 2²⁰ words; no shortening at 8×8 or 16×16 | R8 | lengths only grow |
-| Target advantage for the output limits (FR-007) | ε = 2⁻⁶⁴ at N = 2¹²⁸ offline evaluations of Π or Π⁻¹, with every online quantity at its limit; per-request cap 2¹⁹ bits | R9 | ε and the cap only fall; N only rises |
+| Development inputs (FR-040) | Key, nonce, personalization string, reseed input and test state i = SHA-256 of the ASCII string `phycoweb-004/dev/<kind>/<i>` (test states: `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>`); uniform controls under `phycoweb-004/control/`; the loader refuses every other namespace and any index outside a use's declared range; fingerprints checked at load; no held-out set. Beside the derivation, a closed class of constructed inputs fixed by public rules before first use (R3; data-model §2) | R3 | the derivation does not change |
+| Inputs per bias measurement (bias rule) | Two sets of N = 2²⁰ instantiation states per claimable size, key i with nonce i and key 0 with nonce i, through Π and Π⁻¹, S = 4b bits per round count; the avalanche measurement of FR-037 also feeds R_dist: N_a = 2¹³ states per flipped bit, per key or nonce bit flipped in instantiation states and per rotation amount, threshold 0.005/(128·S_A) with S_A = (2·\|F\| + 384 + 2(w − 1))·b, so it adds at most 0.005 per size to the chance of a false firing; each avalanche run cross-checked against the exact dependency matrices; controls with the same counts; verdicts from integer critical counts | R4 | only a change that can add firings and never remove one: N, N_a, F and the sets only grow, every recorded firing stands, and a larger N, N_a or F, or a new set, is tested in addition, so R can only rise |
+| Operation-count cost model (D4) | 6-input LUTs per node and round: 0 for rotations, constant shifts and wiring; w per bitwise word operation with fan-in k ≤ 6; w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no fusion | R5 | no stricter direction, so in effect no change from plan approval, and none after the first score. FR-026's reported figures decide nothing; a correction to them, such as counting P cycles per round, is a change-log entry |
+| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind per candidate, only after a recorded tool defect, inside the budget; each kind of evidence at 4×4, then 8×8, then 16×16; a run starts only if its projection, with the probes of the larger sizes, fits its row | R7 | every budget and the candidate limit only fall; a budget lowered below the hours used leaves zero hours |
+| Vector lengths at large sizes (FR-036) | The same at every size: 16 Π and Π⁻¹ inputs with 4 traced phase by phase; 2 development keys × 10,000 words for the mode; a SHA-256 digest of 2²⁰ words over their 4·2²⁰ raw bytes; no shortening at 8×8 or 16×16 | R8 | lengths only grow |
+| Target advantage for the output limits (FR-007) | ε = 2⁻⁶⁴ at N = 2¹²⁸ offline evaluations of Π or Π⁻¹, with every online quantity at its limit; per-request cap 2¹⁹ bits; random nonces limited to at most 2³² instantiations per key | R9 | ε only falls and N only rises; u, every output limit and the cap only fall |
+| The D4 choice (FR-022) | Once, by code, over the entered set recorded before the first score; at 4×4 and the widest reduced width, 16 or else 8, with a common r* ≥ 2; score (min(W_D, W_L)/r*)/L, compared exactly; an exact tie waits for R at 4×4; one family scored, chosen by default; none, the smallest R at 4×4 | R6 | no stricter direction, so in effect no change from plan approval, and none after the first score |
+| The trail tools (FR-038, FR-039) | The tools with a `re-found` validation record when the first trail search starts, none added later; a known result per tool, cross-checks between kinds and re-validation triggers | R12 | known results, cross-checks and triggers only added; the set stays fixed |
+| Structural checks (FR-019, FR-029, FR-037) | Inverse on the 16 vector inputs and 2¹⁰ test states; exhaustive bijectivity at 2×2, w = 4; exact dependency; symmetries with reflections, compositions and word rotations; invariants on 2¹⁰ states | R13 | counts only rise; symmetries, constant relations, forms and sources of R_dist only added |
+| The constant rule (FR-023) | The first primitive polynomial of the stated degree, in a stated order, not on the refused list; a fixed public seed; the reading order and the streams per call type, fixed before the first candidate is scored, each candidate's instance before its first tool run | R15 | no change once fixed; the refused list and the relations checked only grow |
+| Security parameters (FR-005, FR-006, FR-015) | s = 128; a 256-bit key and a 128-bit nonce; c = 256 at every claimable size (D2, D3) | R9, R14 | s, the key and nonce lengths and c only rise |
 
 ### Other choices, answered on review
 
@@ -61,7 +72,7 @@ checking. All five are kept, and three gain rules:
 |--------|--------|----------|
 | Per-request cap | Kept: the smaller of the per-instantiation limit and 2¹⁹ bits, SP 800-90A's largest request. A state compromised in mid-request exposes the request's earlier blocks through Π⁻¹, back to the last forget call, and the cap bounds that window | R9 |
 | One moment for the D4 choice | Kept: once, by code, over the entered set recorded before the first score. Added: an exact tie waits for R at 4×4 of both representatives, because the spec's first tie-break needs it; if neither family has a scored candidate, selection takes the eligible candidate with the smallest R at 4×4 from either family | R6 |
-| One key per `Generator` | Kept and tightened: zeroize is final, and every online quantity the bound counts has a limit and a counter. Across objects, processes and devices, the per-key limits and u are usage rules the design document states for the caller | R9; model contract |
+| One key per `Generator` | Kept and tightened: zeroize is final, and every online quantity the bound counts has a limit and a counter. Across objects, processes and devices, the per-key limits and u are usage rules the design document states for the caller. Since the checklist answers of 2026-11-01, the key is taken at construction, `Generator(variant_id, key)`, and `instantiate(nonce, pers=b"")` uses the stored copy: no key is ever compared, and `KeyMismatch` is gone | R9; model contract |
 | Checks beyond the spec | Kept. The avalanche measurement is FR-037's own; feeding R_dist is the stricter part. Its threshold now covers up to 128 round counts per size, with N_a = 2¹³, so it fires by chance less often (a false raise of R at R = 32 falls from about 38% to 23%) and still detects smaller biases (0.037 instead of 0.047 at 4×4). The symmetry check keeps reflections and compositions and adds word rotations | R4, R13 |
 | A separate build file | Kept: `fast/seed_search.mk`. The feature-003 freeze hashes the stream's source and binary, not `fast/Makefile`, but a new target there could rebuild the frozen binary | R2 |
 
@@ -101,14 +112,16 @@ keep to Python 3.8 grammar. C99 for `fast/seed_search.c` and any exhaustive chec
 Python (gcc 15.2.0 in WSL).
 
 **Primary Dependencies**: no new ones. numpy 2.2.6 / 2.5.4 for batch evaluation and dependency
-matrices (explicit `uint64` dtypes); scipy 1.15.3 / 1.18.1 for exact binomial tails and
-`scipy.optimize.milp` (HiGHS) for active-box counting, analysis only. The owner approved every
-download of R19 on 2026-11-01, the papers and the Hypothesis wheels; any other file needs its
-own permission.
+matrices (explicit `uint64` dtypes); scipy 1.15.3 / 1.18.1 for the p-values reported and
+`scipy.optimize.milp` (HiGHS) for active-box counting, analysis only. The bias verdicts compare
+counts with integer critical counts derived by exact integer arithmetic and committed, so
+scipy's tails decide nothing (R4). The owner approved every download of R19 on 2026-11-01, the
+papers and the Hypothesis wheels; any other file needs its own permission.
 
 **Storage**: JSON and gzip JSON records under `reports/004-crypto-architecture-v3/`; the
-hash-chained candidate log `research/004/candidates.jsonl` and provenance log, each appended
-under a lock; vectors under `vectors/phyco-v3/`; local-only large outputs listed by hash (R16).
+hash-chained candidate log `research/004/candidates.jsonl`, provenance log and protocol change
+log, each appended under a lock; vectors under `vectors/phyco-v3/`, with the sidecar
+`MANIFEST.json`; local-only large outputs listed by hash (R16).
 
 **Testing**: `python -W ignore -m unittest discover -s tests -t .` on both platforms; WSL-only
 tests (the C tool) skip cleanly on Windows; property-based tests with Hypothesis 6.168.5, whose
@@ -145,7 +158,7 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 |-----------|-------|--------|
 | I. Integer, fully specified arithmetic | Π and the mode use only addition and subtraction modulo 2^w, XOR, AND, OR, NOT, constant rotations and logical shifts (re-decided feature-002 FR-001), all sign-free (FR-055). The 32-bit unsigned lanes are ratified by the spec (D3, FR-018), as Principle I allows. No floating point in the model; numpy and scipy only in analysis. The design document states width, signedness, wrap rule, shift kind and order of every operation (FR-027) | Pass |
 | II. Bit-accurate reference model | `phycoweb/model_v3.py` is the golden model, marked model-only, RTL-pending (FR-035); golden vectors and known-answer tests per size, 2 keys × 10,000 words for the mode (R8); a second transcription agrees step by step (FR-057) | Pass |
-| III. Synchronous, localized RTL | No RTL. The design rules serve it: all state registered, neighbour links only on a folded torus, no multiplication (0 DSP), generics n and w, at most two carry chains per stage (FR-018, FR-025) | N/A (designed for; see Complexity Tracking for the absorption and output trees) |
+| III. Synchronous, localized RTL | No RTL. The design rules serve it: all state registered, neighbour links only on a folded torus, no multiplication (0 DSP), generics n and w, at most two carry chains per stage (FR-018, FR-025) | N/A (designed for; see Complexity Tracking for the absorption and output trees, and for the clock, reset and counters) |
 | IV. Evidence-based claims | No claim. The bias rule, its control and its counts are fixed before any measurement (R4); every result is reported; no re-run except after a recorded tool defect; findings classified (FR-060); disclaimer everywhere. SP 800-22 and the held-out programme belong to feature 007, so FUT-SEC-7 stays open | Pass |
 | V. Reproducibility, archival, provenance | Inputs from public strings (R3); every record holds the §17.2 fields (R16); `phyco-v2` archived with SHA-256 in `baseline/phyco-v2/` (FR-042); pinned requirements and line endings (R18); a re-check script recomputes every verdict | Pass |
 | VI. Specification before implementation | Spec and plan approved 2026-11-01; tasks await approval. Candidates are research objects under the approved rules; the reference model is written from the design document after selection, and the design is frozen only after the owner design review | Pass |
@@ -167,7 +180,11 @@ projection before every heavy run, and sizes in order (R7); keys of reduced vari
 constants held at each food node (R15); and a lock for every append to a hash-chained log
 (R16). The numpy interpreter of the operation lists is analysis code that the model never
 imports (R11, R17). The constant ROMs at the food nodes remove the grid-wide data path that one
-central LFSR would need, so the absorption and output trees stay Principle III's only exception.
+central LFSR would need, so the absorption and output trees, and the clock, reset and
+replicated counters, are Principle III's only exceptions, each justified in Complexity
+Tracking. The checklist answers of 2026-11-01 add no violation either: each is stricter, adds
+a check, or settles a value before its first use, and each protocol change among them becomes
+an entry of the protocol change log (FR-044).
 
 ## Project Structure
 
@@ -185,9 +202,14 @@ specs/004-crypto-architecture-v3/
 │   └── cli.md               # every new script and tool, with exit codes
 ├── checklists/
 │   ├── requirements.md
-│   └── redesign-inputs.md   # the seed-entropy note's §5.3, item by item (FR-048)
+│   ├── redesign-inputs.md   # the seed-entropy note's §5.3, item by item (FR-048)
+│   └── security.md, design-rationale.md, analysis.md, protocol.md, hardware.md,
+│       reproducibility.md   # the six /speckit-checklist passes, reviewer-owned
+├── checklist-choices.md     # the choices for every open checklist item, answered 2026-11-01
 ├── design.md                # written in tasks; the phyco-v3 design document, frozen
-├── rationale.md             # written in tasks; the design rationale (security.md §8)
+├── rationale.md             # written in tasks; the design rationale (security.md §8), its own
+│                            # file, versioned with design.md and frozen with it; its approval
+│                            # status stays outside it (FR-034)
 └── tasks.md                 # /speckit-tasks
 ```
 
@@ -212,11 +234,15 @@ protocol/
 
 research/004/
 ├── ir.py                     # operation lists, interpreters, inverse (R11)
-├── candidates/               # A1–A3 and B1–B3 at most, one module each
+├── candidates/               # A1–A3 and B1–B3 at most, one module each, with reference outputs
+│   ├── <id>/superseded/      # every replaced operation list, as <sha256>.py, unchanged
+│   └── superseded.json       # committed inventory of every superseded hash and path
 ├── tools/                    # bijectivity, dependency, bias, symmetry, invariants, costmodel
+│   ├── critical_counts.json  # integer critical counts per (N, S) and (N_a, S_A) (R4)
 │   └── trails/               # box tables, MILP active-box counting, ARX branch-and-bound
 ├── validation/               # re-finding S12–S15, FUT-SEC-8, published trail values
-└── candidates.jsonl          # the candidate log
+├── candidates.jsonl          # the candidate log
+└── protocol-changes.jsonl    # the protocol change log (FR-044; data-model §18)
 
 scripts/
 ├── archive_phyco_v2.py       # baseline/phyco-v2/ and its MANIFEST.json (R18)
@@ -231,6 +257,7 @@ scripts/
 ├── gen_constructed_v3.py     # constructed-state vectors (FR-054)
 ├── design_freeze.py          # create and validate the freeze
 ├── recheck_004.py            # recomputes every verdict (FR-065)
+├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
 └── check_claims.py           # register against README, security.md, disclaimers
 
 tests/
@@ -243,15 +270,24 @@ tests/
 ├── test_vectors_v3.py
 ├── test_v3_transcription.py  # model against tests/v3_reference.py, step by step
 ├── v3_reference.py           # second transcription, separate session (FR-057)
-├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze
+├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze;
+│                             # no key loaded into any state before the FUT-SEC-8 review (FR-001);
+│                             # every seed-set load is dev-only (FR-040)
+├── test_records_004.py       # one light command per kind re-run as recorded; two worker counts;
+│                             # the attribute pin and byte-order mark of every hashed path (FR-053)
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
-vectors/phyco-v3/             # Π and Π⁻¹ KATs, mode vectors, digests, constructed states
+vectors/phyco-v3/             # Π and Π⁻¹ KATs, mode vectors, digests, constructed states, the
+                              # constant tables, and the sidecar MANIFEST.json (R8)
 baseline/phyco-v2/            # byte-exact copies and MANIFEST.json (FR-042)
 
 reports/004-crypto-architecture-v3/
-├── fut-sec-8/                # demonstration record, tool check, review
+├── environment-windows.json  # the environment records, written at setup (R1)
+├── environment-wsl.json
+├── downloads.json            # the downloads manifest (R19)
+├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
+├── fut-sec-8/                # demonstration record, tool check, review, any reproduction
 ├── validation/               # tool validation records
 ├── candidates/<id>/          # evidence per candidate
 ├── d4/                       # the D4 choice and its inputs
@@ -271,11 +307,15 @@ source and binary.
 ## Phases and gates (for /speckit-tasks)
 
 1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks
-   (R16, R18); the Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
-   installed; corrected `requirements.txt`; `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py`
-   with fingerprints; `protocol/evidence.py`; the provenance log; the `phyco-v2` archive
-   (FR-042). (The status of the strategy note and of security.md §22 rows 5a and 5a.1 was
-   updated during planning, in security.md 2.10.)
+   (R16, R18; the pins for `reports/004-crypto-architecture-v3/**` and `*.gz` were added on
+   2026-11-01); the Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
+   installed; the downloads manifest `downloads.json`, one entry per file fetched (R19); the
+   environment records of both platforms (R1); corrected `requirements.txt`;
+   `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints; `protocol/evidence.py`;
+   the provenance log; the protocol change log, whose first entries are the protocol changes
+   chosen with the checklist answers of 2026-11-01 (FR-044); the `phyco-v2` archive (FR-042).
+   (The status of the strategy note and of security.md §22 rows 5a and 5a.1 was updated during
+   planning, in security.md 2.10.)
 2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check, with progress written by the
    main thread only (R2); the sweep, a heavy run → demonstration record → ⛔ **FUT-SEC-8 result
    review**. No key-loading code before it.
@@ -295,9 +335,10 @@ source and binary.
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
 7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes
    `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
-8. **US5**: rationale; security.md 2.11 with the §20.1 decision; review package; ⛔ **owner
-   design review**; external review recorded as done or not arranged; the owner commits the
-   feature files (Principle IX); ⛔ **design freeze**; L1 recorded when its gate passes.
+8. **US5**: rationale; the security.md version of FR-051 (2.11 already records the §20.1
+   decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design
+   review**; external review recorded as done or not arranged; the owner commits the feature
+   files (Principle IX); ⛔ **design freeze**; L1 recorded when its gate passes.
 9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
    checklist group F corrected, and an addendum to the feature-002 phase report, whose
    "invertible-looking ARX" S13 contradicts (FR-051); claim-register test; re-check of every
@@ -339,4 +380,5 @@ source and binary.
 |-----------|------------|-------------------------------------|
 | C tooling beyond the Python and numpy stack (Technical Constraints) | The sweep costs about 2³² × 257 steps per target; a C evaluator generated from an operation list is added only if a heavy run's projection does not fit its budget (R7) | The Python model runs at about 2 × 10⁵ steps/s, about 64 days per target; lowering counts to fit a budget is not allowed |
 | A second copy of the design-1.0 step, in `fast/seed_search.c` | `fast/phyco_stream.c` stays unchanged, because the feature-003 freeze hashes its source and binary | Editing or rebuilding it would touch frozen evidence; the copy is checked against both golden vector files before any sweep |
-| Absorption and output trees over the rate lanes, which are not neighbour links (Principle III) | FR-018 requires registered trees for absorption and output | Neighbour-only paths would take about n steps per block; the trees are fully registered, and the design document gives the timing justification Principle III asks for |
+| Absorption and output trees over the rate lanes, which are not neighbour links (Principle III) | FR-018 requires registered trees for absorption and output | Neighbour-only paths would take about n steps per block. The trees are fully registered, and the design document specifies, per supported size, each tree's fan-in per stage, depth, registered stages and latency in cycles; the latency enters FR-025's reset-to-first-output latency and FR-026's throughput. The justification Principle III asks for is an argument in the design document: a register at every stage and a fan-in bounded by a stated number |
+| Clock, reset and round and phase counters reaching every node (Principle III) | Every node needs the clock, a reset, and the round and phase position that index its constant ROM (R15) | The clock uses the device's clock network. Reset is synchronous and reaches the nodes through a registered fan-out tree whose latency is part of the reset sequence (FR-025). The counters are replicated, one copy at each food node or node, all started by that reset and running in lockstep, so no counter value crosses the grid. One global counter would be a grid-wide data path, and an unregistered reset fan-out would be a long combinational path |

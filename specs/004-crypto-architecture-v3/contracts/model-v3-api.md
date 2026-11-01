@@ -13,13 +13,19 @@ shown as `<…>` are fixed by the design document.
 
 - Imports: the standard library and `phycoweb.constants_v3` only. A test bans every other import
   (numpy, scipy and the analysis code included), as `tests/test_purity_v2.py` does for
-  `phyco-v2`.
+  `phyco-v2`, and also bans `time`, `random`, `os`, `sys`, `platform` and `secrets` in the
+  model. The generators read the clock and the platform only for the sidecar record of the
+  vectors (data model §11), never for content.
 - Arithmetic: integers only. In the functions that compute Π, Π⁻¹ and the mode, a test bans
   multiplication, division, modulo and power operators, floating-point constants and
   data-dependent shift or rotation amounts (every amount is a literal or a constant from
   `constants_v3`). Index arithmetic outside those functions is not restricted.
 - No branch, table index or selection on secret data; comparisons only on public counters, and
-  those are unsigned (FR-020, FR-055).
+  those are unsigned (FR-020, FR-055). In the model this is a discipline only, and the model is
+  never called constant time, since Python integers are not; the claim test flags "constant
+  time" beside it. Constant time by construction is a property of the design's sequence of
+  operations and of a hardware implementation of it: in hardware, a cycle count fixed by public
+  values; in feature 006's C, no branch or memory index that depends on secret data.
 - Python 3.8 grammar (best-effort `ast.parse(source, feature_version=(3, 8))` check).
 - Deterministic: the same inputs give the same outputs on every platform and Python version
   (FR-035).
@@ -59,36 +65,52 @@ pi_trace(lanes, variant_id) -> list[list[int]]
 ## Generator (production interface; FR-007, FR-013 to FR-016, FR-033)
 
 ```text
-g = Generator(variant_id)               # runs the start-up self-test (FR-059)
-g.instantiate(key, nonce, pers=b"")     # key 32 bytes, nonce 16 bytes, pers ≤ <max> bytes
+g = Generator(variant_id, key)          # key 32 bytes; runs the start-up self-test (FR-059)
+g.instantiate(nonce, pers=b"")          # nonce 16 bytes, pers ≤ <max> bytes; uses the stored key
 out = g.generate(nbits)                 # canonical serialization (FR-015); forget runs inside
 g.reseed(data)                          # data ≤ <max> bytes; treated as attacker-chosen (T9)
-g.zeroize()                             # clears the whole state; the object is then unusable
+g.zeroize()                             # clears the whole state and the key; the object is then unusable
 ```
 
 | Rule | Contract |
 |------|----------|
 | Variant | `Generator` accepts only `PRODUCTION_VARIANTS`; any other ID raises `VariantRefused` (SC-010) |
-| Start-up self-test | the constructor runs the known-answer self-test of FR-059, whose inputs and expected output come from the committed vectors (frozen at the freeze), then zeroizes the whole state; on failure it raises `SelfTestError` and the object stays unusable |
-| Call sequence | `generate` or `reseed` before `instantiate`, and any call after `zeroize`, raise `CallSequenceError`; `zeroize` is final, so a new key needs a new `Generator`; `instantiate` may be called again with the bound key and a new nonce |
-| Forget | runs inside every `generate`, after its last output block, so it can never be skipped (FR-013) |
-| Output | `generate(nbits)` returns `nbits / 8` bytes in the design document's serialization; nbits a positive multiple of 32, otherwise `ValueError`; `words32(out)` splits it into 32-bit words as the vector files list them |
+| Start-up self-test | the constructor runs the known-answer self-test of FR-059, whose inputs and expected output come from the committed vectors (frozen at the freeze), then zeroizes the whole state, and only then stores the key, which the object holds until `zeroize` clears it; on failure it raises `SelfTestError`, zeroizes, and the object stays unusable |
+| Key | taken once, at construction. The key enters the state at every `instantiate`, from the stored copy, so FR-013's instantiate keeps its inputs. No key is ever compared. In hardware the key register is loaded once and zeroized with the state |
+| Call sequence | `generate` or `reseed` before `instantiate`, and any call after `zeroize`, raise `CallSequenceError`; `zeroize` is final, so a new key needs a new `Generator`; `instantiate` may be called again with a new nonce |
+| Forget | runs inside every `generate`, after its last output block, so it can never be skipped; instantiate also ends with a forget call, in the form the theorem covers (FR-013; research R10) |
+| Output | `generate(nbits)` returns `nbits / 8` bytes in the design document's serialization; nbits a positive multiple of 32, otherwise `ValueError`; `words32(out)` splits it into 32-bit words as the vector files list them. The last output block of a request whose length is not a multiple of r keeps its first bits in FR-015's serialization order and discards the rest, and the padding rule fixes partial input blocks (FR-014); nothing rounds, since nothing divides (FR-027) |
+| No read-back | `Generator` exposes no state, key or counter through any public method or attribute, and refuses reduced variants. `pi`, `pi_inv`, `pi_trace` and `ResearchDuplex`, named research-only in the docstring, are the only places that show state or run reduced variants. Python cannot make memory unreadable, so the rule concerns the interface (FR-025, FR-033) |
 | Per-request limit | nbits above min(per-instantiation limit, 2¹⁹) raises `LimitExceeded`, with no output and no state change |
 | Per-instantiation limit | output that would pass the limit raises `LimitExceeded`, with no output and no state change; a new nonce is needed; `reseed` never resets a counter |
 | Other limits | every other online quantity the theorem's bound counts (for example calls of Π per key, instantiations per key, reseeds per instantiation) has the design document's limit and a counter; a call that would pass one raises `LimitExceeded`, with no output and no state change (research R9) |
-| Per-key limit | a `Generator` is bound to the key of its first `instantiate`; a different key raises `KeyMismatch`, with no state change; output under all its nonces counts against the per-key limit (`LimitExceeded` beyond it); the binding and the counters are never reset, since `zeroize` ends the object |
+| Per-key limit | a `Generator` holds one key, from construction; output under all its nonces counts against the per-key limit, and a call refused at a per-key limit raises `LimitExceeded`, zeroizes and ends the object, since nothing more may be done with that key; the counters are never reset, since `zeroize` ends the object |
 | Keys u, and limits across objects | u is a parameter of the bound, stated in the security target. Across objects, processes and devices, the per-key limits and u are usage rules that the design document states for the caller; the model enforces them only within one object |
 | Nonce reuse | the same key, nonce and personalization string give the same output; stated behaviour (T7), not detected |
-| Lengths | a key other than 32 bytes, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` |
+| Lengths | a key other than 32 bytes at construction, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` |
 
 The model never wraps, truncates or carries on past a limit (Edge Cases). Counters wider than
 32 bits are held as 32-bit words with the design document's carry rule (re-decided feature-002
 FR-002).
 
+**Failure paths**, each tested (FR-058):
+
+| Path | Effect |
+|------|--------|
+| A refused request: a limit other than a per-key one, a length, a call out of sequence, a refused variant | nothing changes, and the object stays usable |
+| A failed self-test | zeroizes; the object is unusable |
+| An exception after the state has changed | zeroizes the whole state and ends the object, so no half-updated state survives |
+| A call refused at a per-key limit | zeroizes and ends the object |
+
+**Across resets in hardware**: a device cannot end itself as an object can, so a reset or
+zeroization returns it to a state that accepts a new key. The per-key limits and counters then
+restart, so across resets they are usage rules for the caller, as across objects in the model,
+and the design document lists them with the other usage rules (FR-007, FR-025).
+
 ## Research duplex
 
 ```text
-d = ResearchDuplex(variant_id)          # any supported keyed variant, reduced ones included
+d = ResearchDuplex(variant_id, key)     # any supported keyed variant, reduced ones included
 ```
 
 The same calls and rules as `Generator`, on any supported variant, for evidence on reduced
@@ -105,15 +127,18 @@ not the production interface: it is named in the model's docstring as research o
 |-----------|------|-------------|
 | `VariantRefused` | `ValueError` | an unsupported or reduced variant at `Generator`; a keyless variant at `ResearchDuplex`; an unsupported value anywhere |
 | `CallSequenceError` | `RuntimeError` | a call out of the order above |
-| `LimitExceeded` | `ValueError` | a request or total beyond a limit |
-| `KeyMismatch` | `ValueError` | `instantiate` with a key other than the bound one |
-| `SelfTestError` | `RuntimeError` | the start-up self-test fails |
+| `LimitExceeded` | `ValueError` | a request or total beyond a limit; at a per-key limit the object is also zeroized and ended |
+| `SelfTestError` | `RuntimeError` | the start-up self-test fails; the object is zeroized and unusable |
+
+There is no `KeyMismatch`: the key is taken at construction and never compared.
 
 ## Tests that hold the model to this contract (FR-058)
 
 `tests/test_model_v3.py`: minimum, maximum and boundary values; all-zero and all-one keys and
 nonces; single-bit keys; overflow and truncation; shift and rotation boundaries; reset,
-zeroization and repeated instantiation; long runs (the 2²⁰-word digest); every exception above;
-every supported configuration; every data-flow direction the design document states.
-`tests/test_vectors_v3.py` and `tests/test_v3_transcription.py` cover the vectors and the second
-transcription.
+zeroization and repeated instantiation; long runs (the 2²⁰-word digest); every exception above
+and every failure path; every supported configuration; every data-flow direction the design
+document states. `tests/test_vectors_v3.py` and `tests/test_v3_transcription.py` cover the
+vectors and the second transcription; the model's tests also check that `phyco-v3` reproduces
+the selected candidate's outputs through the variant map of the `selected` log entry (data
+model §3).

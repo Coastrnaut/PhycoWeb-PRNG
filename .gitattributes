@@ -19,5 +19,9 @@ reports/003-extended-batteries-calibration/calibration/summary.md text eol=lf
 reports/002-core-dynamics-redesign/attempt-1/freeze.json text eol=crlf
 reports/003-extended-batteries-calibration/attempt-1/freeze.json text eol=crlf
 baseline/** -text
+# Feature 004: every report file is LF. Later lines take precedence, so the binary rules below
+# still apply inside it, and compressed records are never treated as text.
+reports/004-crypto-architecture-v3/** text eol=lf
 *.hex text eol=lf
 *.bin binary
+*.gz binary

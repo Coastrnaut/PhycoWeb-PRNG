@@ -1,10 +1,15 @@
 # Feature Specification: Cryptographic Architecture and phyco-v3 Design
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Feature Branch**: `004-crypto-architecture-v3`
 
 **Created**: 2026-11-01
 
-**Status**: Spec and plan approved (2026-11-01); tasks approval, reviews and design freeze pending
+**Status**: Spec and plan approved (2026-11-01); checklist choices answered and applied
+(2026-11-01); tasks approval, reviews and design freeze pending
 
 **Input**: User description (verbatim):
 
@@ -71,10 +76,6 @@ This revision takes every section and item of those four documents into account.
 requirement below or has a recorded disposition: a later feature, the owner, or out of scope
 (section "Input coverage").
 
-> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
-> to generate secrets; use an established cryptographic random-number generator for keys,
-> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
-
 ## Context
 
 `phyco-v2` (feature 002; `design.md` 1.0, SHA-256 `a1109bf1…`; `phycoweb/model_v2.py`, SHA-256
@@ -115,7 +116,9 @@ moved, because the freeze records of features 002 and 003 hash them.
 
 **External review.** An external design review before the freeze is in scope if one can be
 arranged (security.md §7). The independent review of claim level L5 belongs to feature 009 and
-is out of scope.
+is out of scope. The review asks for comments on a design that makes no claim. It is not an
+evaluation intended to support a claim, which the Security Policy defers, and is never cited as
+one; the review package (FR-063) carries the disclaimer and says so.
 
 **The rules that select the design are fixed in this spec before any design result exists**
 (section "Pre-registered Design Protocol"). After approval they may only become stricter
@@ -149,6 +152,13 @@ and the design document leaves an implementer, human or model, nothing to guess.
   the mode) is coded from the design document alone, in a separate session, and checked step by
   step against the model before the freeze? → A: Yes, as specified (option A; FR-057). The
   separate session starts only after the owner's recorded go-ahead.
+- Q: Which options of [checklist-choices.md](./checklist-choices.md) apply to the 206 open items
+  of the six requirements-quality checklists? → A: All recommended (owner, 2026-11-01). They are
+  applied to this spec, the plan and its design artifacts, security.md and `.gitattributes`.
+  Every change they make to the pre-registered design protocol is stricter or settles an open
+  case by its most conservative reading (FR-044). Each is recorded with its reason before any
+  result exists, as the first entries of the protocol change log
+  `research/004/protocol-changes.jsonl` when that log is created.
 
 ## Review & Approval *(Constitution Principle VIII)*
 
@@ -156,10 +166,14 @@ and the design document leaves an implementer, human or model, nothing to guess.
 |------|----------|------|----------|-------|
 | Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session, with D1–D10 as clarified on 2026-11-01 (section "Clarifications"); the pre-registered design protocol may only become stricter (FR-044). Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), not recorded before |
 | Plan approval | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session: plan.md and its design artifacts, research.md R1–R19 with every choice answered as recommended and its eleven changes applied, data-model.md, the two contracts, quickstart.md and checklists/redesign-inputs.md. From this approval the values the plan fixes belong to the pre-registered design protocol and may only become stricter (FR-044). The six `/speckit-checklist` passes of the strategy note (§8.3) run next, before `/speckit-tasks` |
+| Checklist choices ([checklist-choices.md](./checklist-choices.md): the 206 open items of the six `/speckit-checklist` checklists) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md and `.gitattributes`. Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044). The checklists are re-read against the changed text; ticking stays with the reviewer |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
-| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | |
+| D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`d4/tie.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
+| Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`selection.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
+| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, which the rules must then select; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
+| L1 recorded (FUT-SEC-8 result review and the design document's security-target chapter reviewed; FR-012) | _pending_ | _pending_ | _pending_ | L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
@@ -208,8 +222,12 @@ generic argument into a reproduced result, and it validates the search tool befo
 result from the tooling is allowed to count.
 
 **Independent Test**: Run the pre-registered demonstration on its development targets. Check
-that each recovered seed equals its target, that the numbers of false matches agree with the
-random baseline, and that the cost is recorded with its commands and hashes.
+that each recovered seed equals its target, that the false matches agree with the random
+baseline, and that the cost is recorded with its commands and hashes. Agreement is tested on the
+one-word false-match count of each target, against a Poisson distribution of mean
+(2³² − 1)/2³², and on the three targets pooled, against three times that mean, two-sided at level
+0.01; any false match after two or three words is reported as a deviation. A disagreement is a
+finding (FR-060), analysed as the protocol says, and never a reason to sweep again.
 
 **Acceptance Scenarios**:
 
@@ -314,9 +332,12 @@ rule.
 **Why this priority**: These are the structural proofs and first bounds of L2, and they fix the
 round count. They need the design (User Story 3).
 
-**Independent Test**: Re-run every evidence script with its recorded command and compare the
-output with the recorded result; check that each tool's validation record is older than its
-first counted result.
+**Independent Test**: Run the re-check of FR-065, which recomputes every verdict from the saved
+outputs, and check that each tool's validation record is older than its first counted result.
+Full re-runs are listed per kind with their cost: the light kinds are re-run with their
+recorded commands and compared as FR-053 defines (deterministic kinds byte for byte, searches
+and solver runs by their values and verdicts); the heavy kinds are re-run only on request, one
+at a time.
 
 **Acceptance Scenarios**:
 
@@ -355,10 +376,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
 **Acceptance Scenarios**:
 
 1. **Given** the design rationale, **When** it is checked against security.md §8, **Then** every
-   item is covered, and the slime-mould mapping is stated to carry no security argument.
+   item is covered, and the slime-mould mapping is stated to carry no security argument. The
+   owner design review records "no security statement rests on the mapping" as one of its
+   items, and the claim-register test finds no security wording in the mapping chapter
+   (FR-069).
 2. **Given** the candidate log, **When** it is compared with the model's variant IDs and the
-   evidence records, **Then** every candidate that produced evidence is in the log with its
-   decision and reason.
+   evidence records, **Then** every candidate design is in the log, whether or not it produced
+   evidence, with its decision and reason; every record a log entry cites exists with the cited
+   SHA-256; and the `selected` entry maps the selected candidate's variant IDs to those of
+   `phyco-v3`, through which `phyco-v3` reproduces the candidate's outputs.
 3. **Given** the archive, **When** its manifest is checked, **Then** every archived `phyco-v2`
    file matches its recorded SHA-256 and the live file it was copied from.
 4. **Given** the owner design review and the external review record (done, or not arranged),
@@ -388,11 +414,38 @@ freeze hashes and the baseline manifest; run the claim-register test.
   production interface refuses it.
 - **Odd grid sizes**: a red-black update needs an even torus. An odd size uses a three-colour
   schedule from the same generics, or is listed as unsupported with the reason, as an open item
-  against FUT-GRID-1.
-- **A candidate fails an inverse or bijectivity test**: it is rejected and logged with the
-  failure, never deleted, and it counts towards the stop rule's budget.
-- **A tool fails its validation**: its negative results do not count, no bound from it enters
-  the round rule, and the failure is recorded.
+  against FUT-GRID-1. The schedule is a function of n's parity, computed at elaboration from one
+  stated rule (two colours for even n, three for odd n), so an odd n is the same core with
+  another generic value (FR-018, FR-019).
+- **A candidate fails an inverse or bijectivity test**: the failure is investigated first. A
+  recorded tool defect gets the one re-run the protocol allows, inside the budget; otherwise the
+  candidate is rejected and logged with the failure, never deleted, and it counts towards the
+  stop rule's budget. An operation list not made of the two allowed step forms (research R11) is
+  refused before any test.
+- **A candidate is to be dropped for a reason the rules do not name**: it cannot be. `rejected`
+  and `ineligible` are recorded only for the rules' reasons: a failed inverse or bijectivity
+  test, a failed eligibility item or a spent budget. A candidate may be withdrawn before its
+  first tool run for any recorded reason, and it still counts towards the stop rule; the log
+  writer refuses any other decision (FR-041).
+- **A run is suspected of a tool defect**: a tool defect is one of a failed validation or
+  re-validation; a disagreement between avalanche counts and dependency matrices; a
+  disagreement between two evaluators of one operation list (scalar, batch, C, model); a crash
+  or an undocumented exit status; or a bug in the tool's code, shown by the faulty line and by a
+  test that fails before the fix and passes after. It is recorded with that evidence before any
+  re-run. A disliked result is none of these.
+- **A tool fails its validation**: none of its results count, no bound from it enters the round
+  rule, and the failure is recorded. The defect is recorded with its cause and fixed, and the
+  tool is validated again on a second known result as well as the first, so that a fix cannot
+  be tuned to one value; attempts are not limited, but each is recorded. Results of the failed
+  version never count; results already counted from an earlier validated version stand, since
+  they cite its hash. A trail or distinguisher found by a tool not yet validated is never
+  dropped: it is recorded as an unverified hypothesis (FR-060) and blocks the candidate's
+  eligibility until a validated tool, or a direct evaluation of the trail with the validated
+  exact models, settles it (FR-039).
+- **A validation target's published value cannot be obtained**: the tool stays unvalidated and
+  its results are `not evaluated`; the owner may provide the value with its source (research
+  R19). If no trail route is validated, no candidate can establish R_bound, none is eligible,
+  and the feature recommends stopping (stop rule).
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
   established for that candidate within its analysis budget, and it cannot be frozen. The gap
   is reported, and the feature tries another candidate within the stop rule's budget or
@@ -402,21 +455,40 @@ freeze hashes and the baseline manifest; run the claim-register test.
   budget.
 - **A distinguisher on more rounds turns up before the freeze**: R rises by the rule, or the
   candidate is dropped. A finding that breaks the target on the full rounds is recorded at once
-  (FR-051). After the freeze, any change is a new model ID, and the frozen design is never
-  edited.
+  (FR-051). If it comes after the owner design review, the design document gets a new version,
+  the rationale is revised, the review is repeated for the changed parts and recorded in a row
+  of its own, and the review package is rebuilt (FR-043).
+- **A change is needed after the freeze** (to a frozen file, a raise of R by feature 005, a new
+  claimable size): it is a new model ID with its own vectors and freeze (FR-028), and the frozen
+  files are never edited. Before the freeze, a change is a new design-document version and a
+  log entry.
+- **The frozen design document and the frozen model disagree**: the frozen model and vectors are
+  the expected values (FR-056), and the design document is the specification. A disagreement
+  found after the freeze is a finding; the frozen files stay unchanged, and the correction is a
+  new model ID with its own design-document version, model, vectors and freeze (FR-028), even
+  where the intended design is the same. If it bears on any claim, it is recorded at once
+  (FR-051).
 - **Both nonlinearity families score the same**: the pre-registered tie-break decides.
 - **No external reviewer can be arranged**: the freeze proceeds, and the review is recorded as
   not arranged (security.md §7).
 - **A request exceeds an output limit, or production is asked for a reduced variant**: the
   interface refuses with an error. It never wraps, truncates or carries on silently.
 - **Nonce reuse**: the same key, nonce and personalization string give the same output. This is
-  stated behaviour (T7), not an error the generator can detect across instantiations.
+  stated behaviour (T7), not detected, within one object or across objects. No bounded record
+  could cover the per-key instantiation limit, other objects or other devices, and the RTL keeps
+  no nonce history, so a partial check would make the model differ from the hardware and
+  suggest a protection that does not exist. A test shows the stated behaviour (FR-058).
 - **Reseed without a validated entropy source**: the interface allows it, but it gives no
   prediction resistance, and its input is treated as chosen by the attacker (T9).
 - **The Python model is slow at large grids**: vectors at large sizes may be shorter than at
   4×4, with the length and the measured speed stated.
 - **Large evidence records** (for example dependency matrices at 16×16): the plan decides what is
-  committed, compressed or regenerated on demand, and every record's hash is kept.
+  committed, compressed or regenerated on demand, and every record's hash is kept. An output kept
+  only locally must come from a deterministic command, so that its committed SHA-256 can be
+  checked by regenerating it, and its record states that command's cost (heavy or not, hours
+  projected). An output that is not deterministic, such as a solver log with timings, is never
+  local-only: it is committed, compressed, or its verdict rests on a committed deterministic
+  summary (research R16).
 - **An edge state that no key reaches**: it still gets a constructed-state vector, and the record
   says that no key reaches it, as no seed reaches class 3 in `phyco-v2` (vhdl-genai.md §5.2).
 - **The second transcription disagrees with the model**: the disagreement is a finding. Its cause
@@ -440,16 +512,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-001**: Before any `phyco-v3` instantiation (key-loading) code exists, `phyco-v2`'s 64-bit
   seed bound MUST be reproduced on a reduced seed domain as pre-registered below: for each
   target, the first two seed words are revealed, all 2³² candidates for the last two are
-  tested, and the seed is recovered from the first three output words.
+  tested, and the seed is recovered from the first three output words. Instantiation code is
+  code that loads a key into a state of `phyco-v3` or of any candidate: the mode's instantiate
+  in the model, the research duplex, and any script that runs instantiate, such as the
+  instantiation states of research R4. It does not include the development-input loader, which
+  derives keys but loads none, keyless operation lists of Π, or the text of the design document.
 - **FR-002**: The demonstration record MUST give every match after one, two and three words
   beside the expected number, the cost per candidate in generator steps and in time, the total
   cost, the extrapolation to all 2⁶⁴ seeds, the machine and commands, and the SHA-256 of the
   model and of the search tool. Before the sweep, the search tool MUST reproduce the `phyco-v2`
   golden vectors. The demonstration report MUST meet security.md §12.4, with T1 as the attacker
   and its knowledge of the position stated (seed-entropy note §2, item 8).
-- **FR-003**: The owner MUST review the result (⛔ gate) before any `phyco-v3` instantiation
-  code is written. The result is the search tool's validation record (security.md §12.5), and
-  the best-attack register row for exhaustive seed search (security.md §12.6) MUST cite it.
+- **FR-003**: The owner MUST review the result (⛔ gate) before any instantiation code (FR-001)
+  is written, for `phyco-v3` or for any candidate. The result is the search tool's validation
+  record (security.md §12.5), and the best-attack register row for exhaustive seed search
+  (security.md §12.6) MUST cite it. The evidence scripts' guard refuses to run instantiation
+  code before the review is recorded, and a test checks the guard.
 
 **Security target (L1; FUT-SEC-1 to FUT-SEC-6, FUT-SEC-9)**
 
@@ -460,81 +538,223 @@ freeze hashes and the baseline manifest; run the claim-register test.
   stated relative to Π as a random permutation and limited to attacks below the target
   strength, as in a flat sponge claim (strategy note §2.1), and the one assumption it rests on,
   that Π has no structural distinguisher below 2¹²⁸, MUST be named as what the cryptanalysis
-  attacks.
+  attacks. Backtracking resistance means that a state compromised between calls reveals nothing
+  about output delivered before the last forget call, and that a state compromised within a
+  request reveals, through Π⁻¹, only that request's earlier blocks back to its last forget call,
+  at most the per-request cap of 2¹⁹ bits. Instantiate ends with a forget call (FR-013), so no
+  such walk reaches the key. Every cost in the security target, in FR-005 and in the round
+  rule's R_dist is counted in one unit, evaluations of Π or Π⁻¹ (research R9's N), with every
+  data block observed counted as at least one evaluation, and an attack's data is also bounded
+  by the output limits (FR-007).
 - **FR-005**: The target strength MUST be s = 128 bits at every claimable size, and no parameter
-  MAY admit a generic attack that costs less than 2¹²⁸ (FUT-SEC-1).
-- **FR-006**: The key MUST be 256 bits (D2), assumed uniform and secret. It is the entropy input
-  at instantiation, so its entropy exceeds the target strength, as SP 800-90A requires of
-  entropy input (seed-entropy note §3); where the key comes from lies outside the generator and
-  MUST be stated as an assumption. The nonce MUST be 128 bits, and a nonce MUST be used at most
-  once per key (FUT-SEC-3). An optional personalization string MUST have a stated maximum length
-  and MUST NOT replace the nonce. The behaviour on a repeated nonce MUST be stated (T7).
+  MAY admit a generic attack that costs less than 2¹²⁸ evaluations of Π or Π⁻¹ (FR-004;
+  FUT-SEC-1).
+- **FR-006**: For the production parameter sets (the claimable sizes, w = 32, c = 256), the key
+  MUST be 256 bits (D2). The key is assumed to have full entropy, to be uniform and secret, and
+  to come from an established cryptographic random-number generator, never from a PhycoWeb-PRNG
+  model. The generator cannot check this, a key with less entropy caps the strength at that
+  entropy (FR-010), and the security target lists the assumption among the caller's
+  obligations. The key is the entropy input at instantiation, so its entropy exceeds the target
+  strength, as SP 800-90A requires of entropy input (seed-entropy note §3). The nonce MUST be
+  128 bits, and a nonce MUST be used at most once per key (FUT-SEC-3), in one of two ways: a
+  counter per key, never repeated or wrapped, kept by the caller across objects and devices; or
+  random 128-bit nonces, whose collision probability, at most q²/2¹²⁹ for q instantiations, is
+  a term of the mode's bound, with a per-key limit of at most 2³² instantiations so that the
+  term stays within ε (FR-007). An optional personalization string MUST have a stated maximum
+  length and MUST NOT replace the nonce. The behaviour on a repeated nonce MUST be stated (T7).
+  A keyed reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
+  size-profile row states s = c/2 as a bound on that variant only, with status `research` and
+  "no claim" (FR-032).
 - **FR-007**: The security target MUST specify the maximum output per instantiation (key and
-  nonce), per generate request and per key across all nonces, and the maximum number of keys u
-  that it covers, each derived from the mode's theorem at s = 128 with the target advantage
-  stated (FUT-SEC-6). The production interface MUST refuse any request beyond them.
+  nonce), per generate request and per key across all nonces, the maximum number of keys u
+  that it covers, and every other online quantity the theorem's bound counts (calls of Π,
+  instantiations per key, with their own limit when nonces are random (FR-006), and reseeds per
+  instantiation), each with a limit and a counter, and each derived from the mode's theorem at
+  s = 128 with the target advantage stated (FUT-SEC-6). Every limit is stated in the theorem's
+  unit, calls of Π, and also in bits at every claimable size: a request of n bits takes ⌈n/r⌉
+  output calls plus one forget call, and the calls instantiate takes are stated. The production
+  interface MUST refuse any request beyond them. Across objects, processes and devices, and
+  across resets of a device (FR-025), the per-key limits and u are usage rules that the caller
+  keeps; the model enforces them only within one object. The security target lists them with
+  the caller's other obligations (the key source and nonce uniqueness, FR-006).
 - **FR-008**: The threat model MUST adopt each of T1–T11 (security.md §5) for `phyco-v3` or
-  exclude it with a reason, and MUST list the assets of a keyed design. T1 MUST be restated for
-  `phyco-v3`, with the attacker knowing the position of every output block it observes.
+  exclude it with a reason, and MUST list the assets of a keyed design: at least the key; the
+  capacity part at every moment; the whole state within a request, whose earlier blocks Π⁻¹
+  recovers back to the last forget call; every output block delivered to the caller; the
+  integrity of the limit counters; and the caller's nonce-uniqueness record. The design
+  document may add more. T1 MUST be restated for `phyco-v3`, with the attacker knowing the
+  position of every output block it observes. T4 is adopted as constant time by construction
+  (FR-020); power, electromagnetic and fault-injection attacks and the behaviour on reset and
+  clock glitches are deferred to feature 008, with the risk stated: a state read by a probe, or
+  changed by a fault, in mid-request exposes that request back to its last forget call.
 - **FR-009**: For every supported size, the specification MUST state the key entropy, the secret
   state reachable from the key, and the bound these place on any security level (Security
-  Policy; FUT-GRID-2). Public parts of the state (constants, domain-separation bits, counters)
-  MUST NOT be counted as secret.
+  Policy; FUT-GRID-2). The secret state reachable from the key is the set of state bits that no
+  public input sets and no output reveals, at every call boundary: after instantiate, after each
+  generate with its forget call, and after each reseed. For the duplex as designed it is the
+  capacity part, c bits. It is counted from the specified layout (which lanes form the capacity
+  part, and that no call writes or outputs them) and recorded per boundary as "by
+  specification", not measured. Public parts of the state and of the inputs (constants,
+  domain-separation bits, counters, the nonce, the personalization string, reseed inputs and
+  every output) MUST NOT be counted as secret; a reseed input is never secret state, even from
+  a secret source (FR-016). A research variant's bound is labelled "research variant, no claim"
+  and is never compared with s = 128 or reported as a strength (FR-032).
 - **FR-010**: Every claimable size MUST be shown to respect every generic bound of security.md
-  §12.2: strength at most the key entropy; reachable secret state at least 2s; output volume
-  stated; multi-target search, k − log₂ u ≥ s within the stated u; key plus nonce at least 2s;
-  capacity c ≥ 2s; quantum search (T11) stated; behaviour on nonce reuse stated.
-- **FR-011**: The certification route MUST be named (FUT-SEC-9; D8). No artifact MAY describe
-  `phyco-v3`, or any model, as FIPS 140-3 approved or as an SP 800-90A DRBG.
+  §12.2: strength at most the key entropy; reachable secret state at least 2s at every call
+  boundary (FR-009); output volume stated, with every limit at most what the theorem allows at
+  ε (the doubling check of research R9); multi-target search, k − log₂ u ≥ s within the stated
+  u; key plus nonce at least 2s; capacity c ≥ 2s; quantum search (T11), k/2 ≥ s, which holds
+  with equality at k = 256 and s = 128; behaviour on nonce reuse stated (edge case "Nonce
+  reuse"), with its test. Each is a check in the size profile (`parameters.json`) that can fail.
+- **FR-011**: The certification route MUST be named (FUT-SEC-9; D8); naming it meets FUT-SEC-9
+  by specification. The functionality class within AIS 20/31 version 3.0 stays an open item,
+  written "class unconfirmed" beside the route, until the approved download (research R19) is
+  read and the class is confirmed or changed in the design document, at the security-target
+  review. No artifact MAY describe `phyco-v3`, or any model, as FIPS 140-3 approved or as an
+  SP 800-90A DRBG. A value taken from a standard is cited as that standard's value (for example
+  "the value SP 800-90A uses for its largest request"), never as compliance, and the design
+  document states once that `phyco-v3` conforms to no standard; the claim-register test
+  (FR-069) flags "compliant", "conforms" and "approved" near a standard's name outside that
+  statement.
 - **FR-012**: The claim template of security.md §3 MUST be filled in for `phyco-v3` as a target
   and marked "target, not a claim". The claim register (security.md §15) MUST record `phyco-v3`
   at L0, then at L1 once its gate has passed and FUT-SEC-8 and the security-target chapter of
-  the design document have been reviewed, and with "no claim" at every level.
+  the design document have been reviewed, and with "no claim" at every level. The L1 gate is a
+  row of its own in the Review & Approval table; it reads "blocked", naming the missing paper,
+  while any theorem the mode chapter uses is "unverified" (research R10). For L1, FUT-SEC-4 is
+  met by statement, since it applies only if prediction resistance is claimed and D7 does not
+  seek it, and FUT-SEC-5 is met by specification for its specified part (key loading, diffusion
+  through instantiation, the first-order differences of research R4) and stays open for feature
+  005's analysis (FR-049); the register records the same split. The register's `claim_level`
+  holds the highest level reached (L0 or L1), and a separate `in_progress` field names L2 with
+  its start date, that of the first counted trail-bound record, and "not reached"; the
+  claim-register test checks that no document states a level above `claim_level`.
 
 **Mode (D1)**
 
 - **FR-013**: The generator MUST be a keyed duplex over Π with the calls instantiate (key, nonce,
   personalization string), generate (n bits), forget and an optional reseed (input), and forget
-  MUST follow every generate request. Its security bound MUST come from a named, published
-  theorem for exactly this mode (for example the keyed-duplex bounds of Daemen, Mennink and Van
-  Assche, 2017, or the sponge-based generator of Bertoni et al., 2010). Every precondition of
-  the theorem, including how the key enters the state, MUST be listed with the design feature
-  that meets it.
+  MUST follow every generate request and end every instantiate, in the form the theorem covers
+  (research R10), so that no state compromise reaches the key (FR-004). Its security bound MUST
+  come from a named, published theorem for exactly this mode (for example the keyed-duplex
+  bounds of Daemen, Mennink and Van Assche, 2017, or the sponge-based generator of Bertoni et
+  al., 2010). Every precondition of the theorem, including how the key enters the state, MUST be
+  listed with the design feature that meets it. The key and the nonce are placed in the initial
+  state at stated positions, the rest of it set to stated constants, as the full-state keyed
+  duplex initializes; later inputs (the personalization string and reseed inputs) are absorbed
+  over the rate only (FR-018), and the mode chapter MUST show that this is a special case of the
+  theorem's absorption. Both are preconditions, "unverified" until the paper is read; if the
+  paper's form differs, the design takes the paper's form, or the feature stops. The reachable
+  secret state MUST stay at least 2s at every call boundary (FR-009), and a reseed never resets
+  a counter. In the model the key is given once, when the generator object is constructed, and
+  held until zeroization: each instantiate takes the nonce and the personalization string and
+  loads the stored key into the state, so no key is ever compared with another. In hardware the
+  key register is loaded once and zeroized with the state (FR-025).
 - **FR-014**: Padding and domain separation MUST be specified so that every absorbed input (key,
   nonce, personalization string, reseed input) and every call type can be decoded uniquely from
-  the absorbed blocks and is separated from every other, and this injectivity MUST be shown.
+  the absorbed blocks and is separated from every other, and this injectivity MUST be shown in
+  two ways: a proof in the design document that the encoding of every (call type, input) pair
+  into absorbed blocks is injective, with the padding rule, the rule for partial blocks and the
+  domain bits stated; and a committed check over every input length from 0 to each input's
+  maximum and every call type, showing that distinct (call type, length) pairs give distinct
+  block layouts, with a test that distinct development inputs give distinct block sequences.
+  Acceptance is 0 collisions and the proof accepted at the owner design review. Where call
+  types use distinct constant streams, the proof says whether the streams or the domain bits
+  carry the separation. Padding constants and domain separators are constants of the mode, with
+  their rule and reason stated (FR-034).
 - **FR-015**: The capacity MUST be c ≥ 256 bits at every claimable size, with rate r = b − c.
   Output MUST come only from the outer (rate) part, after a full call of Π. One canonical
   serialization of the output (word width, byte order, bit order) MUST be stated for every tool
-  and for the hardware export.
+  and for the hardware export. A request whose length is not a multiple of r keeps the first
+  bits of its last block in that order and discards the rest (FR-027). Every digest of output,
+  such as the long-run digest of the vectors, is taken over this serialization as raw bytes
+  (4·2²⁰ bytes for 2²⁰ words of 32 bits), never over a text rendering of it.
 - **FR-016**: The reseed input MUST be treated as chosen by the attacker (T9) unless it comes
-  from a validated SP 800-90B source, and reseeding MUST NOT weaken any property sought.
+  from a validated SP 800-90B source, and reseeding MUST NOT weaken any property sought. To make
+  that verifiable, the mode chapter MUST map reseed to the theorem's absorption call with
+  attacker-chosen input and list that mapping as a precondition, "unverified" until the paper
+  is read (research R10); the reachable secret state after each reseed is at least 2s (FR-009);
+  and a reseed never resets a counter. A reseed input's length is public even when its content
+  is secret (FR-020).
 - **FR-017**: The claimable sizes MUST be decided, which resolves the FUT-SEC-2 and FUT-GRID-2
   conflict at 2×2 (security.md §20.1). By default (D3) they start at 4×4, and 2×2 and 3×3 are
   reduced research variants outside every claim. The decision MUST be recorded in security.md
-  §20.1.
+  §20.1 with the reason it weakens neither requirement: FUT-SEC-1 and FUT-SEC-2 bound a claimed
+  strength, no claim covers a research size, each research row of the size profile states its
+  key entropy c, its s = c/2 and the status `research`, and the production interface refuses
+  every research variant (FR-033).
 
 **Permutation Π (FUT-GRID-1 to FUT-GRID-5)**
 
 - **FR-018**: Π MUST be a keyless permutation of the whole state of an n×n torus grid, with grid
   size n and word width w as generics covering every n from 2 to 16 (FUT-GRID-1). Each node
   holds two w-bit lanes (pressure and vein), so the state has b = 2w·n² bits (D3). Data MUST
-  flow only between direct neighbours, with at most four channels per node; round constants
-  MUST enter at local food nodes, placed by a stated rule (FUT-GRID-4); absorption and output
-  MUST use registered trees over the rate lanes. The torus MUST be realisable as a folded
-  torus, so that every link, the wrap-around links included, joins neighbouring nodes of the
-  layout (Principle III; strategy note §5.4). The supported sizes MUST be listed with b, c, r, R
-  and their status (claimable or research variant), and any size from 2×2 to 16×16 that is not
-  supported MUST be listed with the reason as an open item against FUT-GRID-1.
+  flow only between direct neighbours, with at most four channels per node: a channel is one
+  w-bit word passed from a node to a neighbour in one phase, and a node receives at most four
+  per phase (one from each neighbour, or two from each of two), counted from the operation list
+  with the linear layer between boxes included. Round constants MUST enter at local food nodes,
+  placed by a stated rule (FUT-GRID-4); absorption and output MUST use registered trees over the
+  rate lanes only. The torus MUST be realisable as a folded torus, so that every link, the
+  wrap-around links included, joins neighbouring nodes of the layout (Principle III; strategy
+  note §5.4): logical neighbours sit at most two positions apart in each dimension of the
+  layout, for odd n as well as even, with at most one node between a link's ends, and the
+  design document gives the folding rule and the longest link per size. The colour schedule is
+  a function of n's parity, computed at elaboration from one stated rule (two colours for even
+  n, three for odd n), so an odd n is the same core with another generic value; without such a
+  rule, odd sizes are unsupported with the reason (research R14). The supported sizes MUST be
+  listed with b, c, r, R and their status (claimable or research variant), and any size from
+  2×2 to 16×16 that is not supported MUST be listed with the reason as an open item against
+  FUT-GRID-1. The list names each size's keyed variants: the production variant at every
+  claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced variant, such
+  as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce; keyless variants are listed as
+  permutation-only. Per claimable size it gives the start-up self-test's expected output
+  (FR-059). For every supported size the design document states the number of food nodes, their
+  positions by the rule and the reason for them (for example the number of rounds until every
+  lane depends on a constant injected in round 1, from the dependency propagation of research
+  R13); the ROM depth at each food node (R entries per call type, times the number of distinct
+  constant streams) and the word width, with the total bits reported, which the cost model does
+  not score (research R5); and each tree's fan-in per stage, depth, registered stages and
+  latency in cycles. The trees' latency enters the reset-to-first-output latency (FR-025) and
+  the throughput (FR-026), and the timing justification Principle III asks for is an argument
+  in the design document (a register at every stage, a fan-in bounded by a stated number),
+  referenced from the plan's Complexity Tracking. The frozen `phycoweb/constants_v3.py` holds
+  one constant table per supported (n, w), and the constant script also writes each as JSON
+  beside the vectors, frozen with them; feature 006 turns them into packages and the RTL selects
+  one by its generics, while the LFSR that generates them stays in the script. A size without a
+  table cannot be built until the same script generates one.
 - **FR-019**: Π MUST be bijective by construction, with every round a composition of steps that
   are invertible whatever their inputs, and Π⁻¹ MUST be specified step by step and modelled.
+  The colour schedule MUST follow the rules of research R11: within one phase no update reads a
+  lane that another update of that phase writes, every round runs every phase in a fixed order,
+  and an odd n uses a three-colour schedule from the same generics or is unsupported with the
+  reason (FR-018). Π⁻¹ is written out at the same level of detail as Π (the phases in reverse
+  order, the constants in reverse, each operation's width, signedness and place in the update
+  order) and checked against the inverse generated from the operation list. Its roles are
+  stated: R_b, attacks in the inverse direction, and the exposure within a request (FR-004). It
+  is research-only and outside the production interface (FR-033).
 - **FR-020**: Π and the mode MUST use fixed operations only: no control flow, table index, shift
   amount, rotation amount, selection or wiring between nodes may depend on secret data, so that
   the number of operations, and the cycle count in hardware, is constant by construction. This
   excludes data-dependent rotations or shifts and key-dependent topology (strategy note §10,
-  rejected ideas).
+  rejected ideas). Public values are the variant, the call type and the lengths of the
+  personalization string, of the reseed input and of every request; a reseed input's length is
+  public even when its content is secret, as the threat model states. A cycle count may depend
+  on public values and on nothing else, and the design document gives, per call (instantiate,
+  generate of n bits with its forget, reseed of m bytes, a refused request, zeroization, the
+  start-up self-test), a formula in cycles from the variant and the public lengths only,
+  counting the cycles with ready high (FR-025); feature 008 compares measured counts with them
+  (FUT-HW-5). Constant time by construction is a property of the design's sequence of
+  operations and of a hardware implementation of it. For each implementation it means: in
+  hardware, a cycle count fixed by public values; in feature 006's C, no branch or memory index
+  that depends on secret data; in the Python model, branch-free on data as a discipline only,
+  never called constant time, since Python integers are not. The C tools of this feature are
+  branch-free on data where stated, and their timing is not claimed either; the claim-register
+  test flags "constant time" beside the model (FR-069).
 - **FR-021**: Every state word MUST be full-range: no update may confine a lane to a subrange or
-  keep it biased (S12, S14).
+  keep it biased (S12, S14). A lane is biased if any of its bits fires under the bias rule at a
+  round count measured, and confined if an update maps it into a subrange. The rationale's
+  full-range argument is that every update `dst ← dst ⊙ F(srcs)` is a bijection of dst for
+  fixed srcs (research R11), so no lane loses values; the bias rule checks the rest.
 - **FR-022**: The nonlinear component MUST be designed, named and given its bounds in the
   rationale (S11). The ARX and Boolean families MUST both be explored on reduced widths with
   development keys, and one chosen by the pre-registered choice rule (D4). The ARX candidates
@@ -542,49 +762,183 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (64 bits at w = 32) under the long-trail strategy: the box's trail bounds come from a
   validated search, exhaustive where the width allows (FR-039), and the bound for Π follows
   from counting active boxes (strategy note §5.3; D10). Only the method is reused, never a
-  published box or its constants (D6).
+  published box or its constants (D6). "Exhaustive" applies to box widths up to 16 bits
+  (w ≤ 8), where the full difference and linear tables are computed; at w = 16 and 32 the box's
+  trail bounds come from the validated ARX search with the exact models of addition (research
+  R12), within the 8 h per instance of research R7. The rationale states the differential and
+  linear branch numbers of the local linear layer between boxes, or the rule by which a
+  difference must activate boxes in later rounds, and derives the active-box count from it; the
+  validated active-box counting of research R12 checks it. The box uses only w-bit operations
+  on the node's two lanes, never a 2w-bit addition, so every datapath word stays at w bits
+  (re-decided feature-002 FR-002).
 - **FR-023**: Round constants MUST be generated by a committed script from a stated rule. They
   MUST differ in every round and at every food node within one call of Π, and their pattern MUST
   have no non-trivial translational or rotational symmetry of the grid at any supported size
-  (FUT-GRID-4; S2, S7). The design document MUST state whether the call types (instantiate,
-  generate, forget, reseed) draw on distinct constant streams as part of domain separation
-  (FR-014; strategy note §10), with the reason, and the mode theorem's preconditions MUST still
-  hold.
+  (FUT-GRID-4; S2, S7). "Differ" means that within one call of Π no two constants are equal,
+  equal up to a word rotation by k = 1…w − 1, complements of one another, or rotations of
+  complements; the constant script checks this beside the symmetry checks of research R13. The
+  design document MUST state whether the call types (instantiate, generate, forget, reseed) draw
+  on distinct constant streams as part of domain separation (FR-014; strategy note §10), with
+  the reason, and the mode theorem's preconditions MUST still hold. The rule (its polynomial,
+  seed, reading order, and distinct streams per call type or not) is fixed by one stated rule
+  before the first candidate is scored, and each candidate's instance of it before that
+  candidate's first tool run, recorded in its log entry's `parameters`. The polynomial is the
+  first primitive polynomial of the stated degree, in a stated order, that is not on the list
+  of published constants of re-decided feature-002 FR-007, and the seed is a fixed public
+  value. The script writes one table per supported (n, w) (FR-018); every constant of Π and the
+  mode, padding constants and domain separators included, has its rule and reason in the
+  rationale (FR-034).
 - **FR-024**: Rotation amounts and every other per-node constant MUST be generated by stated
   rules, chosen by the trail bounds they give, with no non-trivial grid symmetry and with a
-  stated scaling to every word width (FUT-GRID-4).
-- **FR-025**: Each pipeline stage of the round structure MUST need at most one or two serial
-  32-bit carry chains. All state MUST be registered, zeroization of the whole state MUST be
-  specified, and there MUST be no read-back path for key or state (feature-002 O1; FUT-HW-1,
-  FUT-HW-5; security.md §13). The design document MUST specify the key-loading interface and
-  reset sequence: serial or parallel key loading, the latency from reset to the first output, an
-  output-valid signal, and the zeroization of key and state (checklist group E).
+  stated scaling to every word width (FUT-GRID-4). They are chosen at the D4 width (16, or else
+  8; research R6), where both bounds are computed, with the scaling rule to every other width
+  stated before the search. Before the search runs, the candidate's log entry records the space
+  of amounts, the ranking measure, the rounds, the width and the tie order; the full ranking is
+  a committed record, and the amounts chosen are its first entry. R_bound at w = 32 is computed
+  with the scaled amounts, and the rationale reports whether the ranking held after scaling,
+  without choosing again. Every amount, after scaling, lies in 1 to w − 1 at every supported
+  width; the constant script and the operation list refuse 0 and w, and where scaling would
+  give 0 or w at w = 4 the rule names the allowed amount to use instead. Across widths and sizes
+  only w, n and the values derived from them by stated rules change (FR-032).
+- **FR-025**: The hardware structure of Π and the mode MUST meet these rules, each stated in the
+  design document (feature-002 O1; FUT-HW-1, FUT-HW-5; security.md §13; checklist group E):
+  - **Stages.** Each pipeline stage of the round structure needs at most two serial w-bit carry
+    chains, so the same count applies at every width (FR-022). A stage is one colour phase and
+    takes one clock cycle, so a round of P phases takes P cycles (P = 2 for a red-black
+    schedule), and carry chains are counted per phase. A subtraction counts as one chain, as an
+    addition does; a public counter held as 32-bit words counts where it sits on a stage's
+    path, and not when it is registered on a path of its own. The design document gives each
+    stage's estimated delay against the 5 ns of 200 MHz on the XC7A100T −1, with its source, and
+    the LUT levels on its longest path, as estimates that feature 008's post-route timing
+    checks; they are reported, not eligibility rules.
+  - **Registers and read-back.** All state is registered, and there is no read-back path for
+    key or state. This covers the RTL's ports and, on the board, the configuration readback and
+    any debug core (an integrated logic analyser, JTAG user registers): feature 008 builds the
+    production bitstream with readback security set and no debug core, and records it.
+    Constructed states (FR-054) run on the RTL in simulation only, loaded by the testbench
+    (VHDL-2008 external names or `force`), so the synthesizable RTL has no load or read-back
+    port; on the board, FUT-HW-4's equivalence uses the vectors a key reaches, through the
+    normal interface. In the model, `Generator` exposes no state, key or counter through any
+    public method or attribute, and `pi`, `pi_inv`, `pi_trace` and `ResearchDuplex`, named
+    research-only, are the only places that show state (FR-033); Python cannot make memory
+    unreadable, so this rule concerns the interface.
+  - **Key loading and reset.** The design document specifies the key-loading interface and the
+    reset sequence: serial or parallel key loading, the latency from reset to the first output,
+    an output-valid signal, and the zeroization of key and state. The key-loading interface is
+    generic in c: a c-bit key and a c/2-bit nonce (research R14), 256 and 128 bits at every
+    claimable size; keyless variants have none, and FUT-GRID-2's key loading "for every
+    supported size" is met through the keyed variant each size has (FR-018). The clock uses the
+    device's clock network. Reset is synchronous and reaches the nodes through a registered
+    fan-out tree whose latency is part of the reset sequence, and the round and phase counters
+    are replicated, one copy at each food node or node, all started by that reset and running
+    in lockstep, so that no counter value crosses the grid. The latency is given as two figures
+    in cycles, fixed by public values: from reset released to the self-test done and the state
+    zeroized (ready for a key), and from the last key word accepted to the first output valid,
+    the trees' latency included (FR-018).
+  - **Flow control.** Each interface (key loading, absorption, output) uses valid and ready.
+    While the consumer stalls, the core holds its state and output and resumes the same
+    sequence, so a call's cycle count depends on stalls, which the consumer sets in public, and
+    never on secret data; the cycle formulas of FR-020 count cycles with ready high.
+  - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees,
+    the key-loading buffer, the held key and the output register, and returns the round, phase
+    and limit counters to their reset values. Its triggers are reset, an explicit zeroize, a
+    failed self-test, an error path and a per-key limit reached, each with its latency in
+    cycles and output-valid low throughout. Every path that leaves key-dependent state behind
+    is specified and tested (FR-058): a refused request changes nothing, and the object or
+    device stays usable; a failed self-test zeroizes and leaves it unusable; an exception after
+    the state has changed zeroizes the whole state and ends the object, so no half-updated
+    state survives; and a call refused at a per-key limit zeroizes and ends the object, since
+    nothing more may be done with that key. After reset or zeroization, output-valid stays low
+    and the output register holds zeros until an instantiate completes, and a generate request
+    before then is refused with an error signal, as the model raises `CallSequenceError`.
+  - **Usage rules across resets.** A reset or a zeroization returns the device to a state that
+    accepts a new key, since a device cannot end itself as an object can. The per-key limits
+    and counters then restart, so across resets they are usage rules for the caller, as across
+    objects in the model (FR-007), and the design document lists them with the other usage
+    rules. The behaviour on reset and clock glitches is deferred to feature 008, with its risk
+    stated (FR-008).
 - **FR-026**: The design document MUST state, for every supported size, the output bits per call
   of Π (r) and per round (r/R), and the throughput these imply at the 200 MHz target with the
-  stated pipeline. It MUST also give the estimated hardware cost per output bit, from the
-  operation-count model of the nonlinearity choice rule, so that feature 008 can test it against
-  Ascon, Trivium and Grain-128AEAD on the same board (strategy note §10). Measured throughput
-  belongs to features 006 and 008 (FUT-HW-3).
+  stated pipeline. With P phases per round (FR-025), the implied rate is r/(P·R) bits per cycle,
+  and the cost per output bit counts P·R cycles per call of Π. The output interface's width is
+  stated per size (for example 32 bits per cycle at every size, as the vector files list words,
+  or a stated wider bus), and the implied throughput is the lesser of r/(P·R) bits per cycle and
+  the interface's bits per cycle, both reported. It is stated for stated request sizes (the
+  2¹⁹-bit cap, and 4,096 words as in the long-run digest), counting each request's output calls
+  plus its forget call and the trees' latency, with instantiate's calls spread over a stated
+  number of requests per instantiation; the rate before forget calls is reported beside it as
+  an upper bound. A rate below the goal of 10⁸ words per second (for example 0.75 × 10⁸ at 4×4
+  and R = 32) is reported and is never an eligibility rule. It MUST also give the estimated
+  hardware cost per output bit, from the operation-count model of the nonlinearity choice rule,
+  so that feature 008 can test it against Ascon, Trivium and Grain-128AEAD on the same board
+  (strategy note §10), and, from the same model, the estimated LUTs and flip-flops per claimable
+  size (LUTs per node and round × n² for the stages built, plus a stated allowance for the trees
+  and ROMs, and 2w·n² state flip-flops plus pipeline registers) against the XC7A100T's 63,400
+  LUTs and 126,800 flip-flops, naming the largest size expected to fit, as an estimate that
+  feature 008 checks. Measured throughput belongs to features 006 and 008 (FUT-HW-3).
 - **FR-027**: The design document MUST state the width, signedness, wrap rule, shift kind and
   comparison semantics of every operation, the update order, the direction of every data flow
   between neighbours, and the edge states of the model (Principle I; security.md §8 and §13), so
-  that an implementation from it has nothing to guess. Every word, counter and intermediate
-  value MUST have an explicit bit width, ready for a fixed-width type such as `numeric_std`
-  `unsigned`, and nothing MAY depend on the range of an integer type, which differs between
-  VHDL-2008 and VHDL-2019 (vhdl-genai.md R4 and §4.3).
+  that an implementation from it has nothing to guess; Π⁻¹ is written at the same level of
+  detail (FR-019). Every word, counter and intermediate value MUST have an explicit bit width,
+  ready for a fixed-width type such as `numeric_std` `unsigned`, and nothing MAY depend on the
+  range of an integer type, which differs between VHDL-2008 and VHDL-2019 (vhdl-genai.md R4 and
+  §4.3). Every state word, counter and intermediate is declared `unsigned`, and every operation
+  of FR-055 is written as an unsigned operation; a signed type, resize or comparison appears
+  only where FR-055 justifies it, with vectors at its sign boundary. Bit 0 is the least
+  significant bit, words are `unsigned(w − 1 downto 0)`, rotl(x, k) moves bit i to bit
+  (i + k) mod w, every shift and rotation amount lies in 1 to w − 1 (FR-024), and the order of
+  lanes and nodes is stated. Truncation is stated too: the last output block of a request whose
+  length is not a multiple of r keeps its first bits in FR-015's serialization order and
+  discards the rest, and the padding rule fixes partial input blocks (FR-014). Nothing rounds,
+  since nothing divides.
 - **FR-028**: The round count R of every claimable size MUST be the value the pre-registered
-  round rule gives at the freeze. Rounds MUST NOT be removed once results exist, no round count
-  or constant MAY be chosen from held-out results (feature-002 O6), and any change after the
-  freeze MUST be a new model ID.
+  round rule gives at the freeze. R is computed per claimable size and may differ between sizes;
+  the rationale explains its growth with n by the grid's diameter and the R_f and R_b found per
+  size. Rounds MUST NOT be removed once results exist, and no round count or constant MAY be
+  chosen from held-out results (feature-002 O6). A firing of the bias rule is reported as a
+  distinguisher at its round count that raises R, with the family-wise rate of chance firings
+  stated beside it (about 21% at R = 32, 23% with the avalanche test), and is never measured
+  again to remove it; the final report repeats the rate. Before the freeze, a change is a new
+  design-document version and a log entry. After the freeze, any change to a frozen file, a
+  raise of R by feature 005, a new claimable size, or the correction of a disagreement between
+  the frozen design document and the frozen model (edge cases), MUST be a new model ID with its
+  own design-document version, model, vectors and freeze.
 - **FR-029**: R_f and R_b, the numbers of rounds after which every output bit of Π (respectively
-  Π⁻¹) depends on every input bit, MUST be computed exactly for every supported size.
-  Instantiation MUST make every state bit depend on every key and nonce bit before the first
-  output (FUT-GRID-3).
+  Π⁻¹) depends on every input bit, MUST be computed exactly for every supported size. A round
+  is one pass over every colour phase in order, with that round's constants (research R11); R,
+  R_dist, R_bound, R_f, R_b and the r/R of FR-026 all count rounds, and a phase is one pipeline
+  stage (FR-025). "Computed exactly" means the exact structural propagation of research R13,
+  which over-approximates actual dependence: full structural dependence is necessary, not
+  sufficient, for full diffusion, and the avalanche test of research R4, with its cross-check,
+  observes the actual dependence. Instantiation MUST make every state bit depend on every key
+  and nonce bit before the first output (FUT-GRID-3): the calls of Π and the rounds between key
+  loading and the first output are stated, and the dependency propagation through instantiate
+  as a whole shows that dependence, with the margin over R_f stated.
 - **FR-030**: The design document MUST state the slime-mould mapping of every component
   (pressure and vein lanes, flux coupling, vein accumulation, food nodes, peristaltic rotations)
-  and show how each failed `phyco-v2` mechanism (S2, S5–S7, S11–S15) is replaced. No security
-  argument MAY rest on the mapping, or on chaos or Lyapunov-exponent arguments (strategy note
-  §5.1 and §10).
+  and show how each failed `phyco-v2` mechanism (S2, S5–S7, S11–S15) is replaced: for each, it
+  names the rule of Π that replaces it and the evidence record (FR-037, FR-039) showing that the
+  failure does not recur, for example S13's merging against bijectivity by construction and the
+  exhaustive check, and S12 and S14 against the full-range rule and the bias rule; the final
+  report's lessons table cites the same records (FR-051). FR-030 covers the mechanisms of the
+  step function. The others are answered elsewhere: S1 and S3 (the seed bound) by the key and
+  the security target, S4 (no key, nonce or reseed) by the mode, S8 (seed words shared between
+  pressures) by key loading and the rotational pairs of research R4, and S9 and S10 (bijection
+  and cycles) by bijectivity by construction and the generic bound. The mapping chapter states
+  what the mapping contributes (names, the structure of lanes and nodes, each component's place
+  in the metaphor) and what it does not (any security property), answering security.md §8 both
+  ways. Every component names at least one attack class it resists, a bound it supports or a
+  functional need (bijectivity, locality, hardware cost); one with none is labelled "kept for
+  the mapping only", with its cost stated, or is removed. No security argument MAY rest on the
+  mapping, or on chaos, Lyapunov exponents, ergodicity, emergent complexity, biological
+  unpredictability, or battery results offered as evidence of mixing or security (strategy note
+  §5.1 and §10). Every security statement in the rationale cites a bound record, an analysis,
+  the mode theorem or a structural proof; the mapping chapter contains no security statement,
+  and none cites it. A statement whose only support is the mapping is a finding. Two checks find
+  one: an item of the owner design review, "no security statement rests on the mapping", and a
+  rule of the claim-register test (FR-069) that flags security wording (secure, strength,
+  resist, unpredictable, chaos, Lyapunov, ergodic) inside the mapping chapter.
 - **FR-031**: The threshold-triggered disruption (Frustrated Foraging) MUST be removed from Π
   (D5); the food forcing becomes round-constant injection.
 
@@ -592,76 +946,281 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 - **FR-032**: Reduced variants MUST be defined from the same generics: word widths 8, 16 and 32,
   plus 4 for exhaustive checks; fewer rounds; the research grid sizes; and reduced capacities,
-  which the research sizes need. Each MUST have its own variant ID, and its bound MUST be stated
-  (FR-009).
+  which the research sizes need. "The same generics" means that the operation list's structure
+  (its operations, their forms and order, and the colour schedule's rule) is the same at every
+  width and size, and only w, n and the values derived from them by stated rules change: the
+  rotation amounts by the scaling rule (FR-024), the constants by the constant rule, the colour
+  count by n's parity, the food-node positions by their rule, c, and the key and nonce lengths.
+  Anything else makes a different design. Each variant MUST have its own variant ID, which
+  carries its R, and its bound MUST be stated (FR-009): the size-profile row of a keyed reduced
+  variant states s = c/2 as a bound on that variant only, labelled "research variant, no
+  claim" (FR-006). Each research variant's R is stated with its reason: the round rule's value
+  where its inputs exist at that variant, or a reduced count chosen for a stated test and
+  marked as reduced. The D4 score (by its rule) and exhaustive bijectivity (2×2, w = 4) may rest
+  on reduced variants; R_bound, R_f, R_b and the bias evidence come from the production width
+  at each claimable size. A reduced-variant result transfers as evidence about the design, by
+  the same generics, never as a value of the round rule. The reduced variants a candidate uses
+  as evidence (widths, sizes, round counts, capacities) are logged in its `parameters` before
+  its first tool run; one added later is logged with its reason before its first run, and
+  every result on it is reported, used or not.
 - **FR-033**: The production interface MUST accept only the production parameter sets (a
   claimable size, w = 32, the frozen capacity and the frozen R for that size) and MUST refuse
-  every reduced variant, as the development tools refuse held-out seeds.
+  every reduced variant, as the development tools refuse held-out seeds. In the model the
+  production interface is `Generator`; `pi`, `pi_inv`, `pi_trace` and `ResearchDuplex`, named
+  research-only in the module's docstring, are the only places that run reduced variants or
+  show state (FR-025). Π⁻¹ is research-only and never part of the production interface.
 
 **Design document, model and vectors**
 
 - **FR-034**: A versioned design document for `phyco-v3` MUST cover every Phase 0 item of
   security.md §8, including the eight questions for a network of nodes, and a design rationale
-  covering every rationale item of security.md §8 (strategy note §7.2). The rationale MUST take
-  each attack class of security.md §12.1 in turn and name the design feature meant to resist it,
-  or mark the class open for feature 005. Its approval status MUST be kept outside the frozen
-  file (feature-002 O5).
+  covering every rationale item of security.md §8 (strategy note §7.2). The rationale is its own
+  file, `rationale.md`, versioned with the design document and frozen with it (FR-043). Its
+  approval status, like the design document's, MUST be kept outside the frozen file
+  (feature-002 O5). The two documents MUST also meet these rules:
+  - **Components.** The rationale gives the role and the reason of every component: the two
+    lanes per node, the coupling function, the vein accumulator, the colour schedule, the local
+    linear layer between boxes, the food nodes and their placement, the rotation amounts, the
+    round constants, the padding rule, the domain separators, forget, the absorption and output
+    trees, and every component the chosen candidate adds. Each names what it is for (FR-030).
+  - **Constants.** Every constant of Π and the mode has its rule and reason: round constants,
+    rotation amounts, padding constants and domain separators, the last two in the mode
+    chapter.
+  - **Attack classes.** The rationale takes each attack class of security.md §12.1 in turn and
+    names the design feature meant to resist it, or marks the class open for feature 005 with
+    its reason. It names a resisting feature, never "open", for the classes this feature's
+    evidence addresses: differential and linear (trail bounds), slide (round constants),
+    invariant subspace (invariant checks, constants), rotational and rotational-XOR (symmetry
+    checks, the rotational pairs of research R4), the inverse direction (R_b, Π⁻¹ in the bias
+    rule) and the mode's generic attacks (the theorem). For every candidate (it matters most for
+    the Boolean family) it gives upper bounds on the algebraic degree of r rounds of Π and Π⁻¹,
+    and the round counts below which a degree-based distinguisher (zero-sum, cube) costs less
+    than 2¹²⁸ by those bounds; such a distinguisher raises R_dist (round rule).
+  - **Network questions.** Each of the eight questions is answered for the duplex as designed,
+    and a question that does not fit gets the reason: for question 6, the output is the rate
+    lanes themselves; for question 4, the cycle structure of Π takes the place of absorbing
+    states, covered by the generic bound (research R13, choice R13.2).
+  - **Alternatives.** A chapter gives the other family's representative and its score, every
+    candidate not selected with its log entries and reason, the D4 record and the selection
+    record, each cited by record ID.
+  - **Margin.** The margin per claimable size is three numbers, R − R_dist, R − R_bound and
+    R / max(R_f, R_b), with the term that set R, and the rationale explains R's growth with n
+    (FR-028). It argues Δ = 2 against the single-trail limits of FR-038 as a pre-registered
+    allowance, not a proof, and states the gap from clustering and hulls as a residual risk
+    for feature 005 (FR-062).
 - **FR-035**: A Python reference model MUST implement Π, Π⁻¹ and the mode with model ID
   `phyco-v3` and its variant IDs. It MUST be integer-only (Principle I), bit-exact and
   deterministic across platforms and supported Python versions (Principle V), and marked
-  model-only, RTL-pending (Principle II). It MUST NOT import analysis-only dependencies.
+  model-only, RTL-pending (Principle II). It MUST NOT import analysis-only dependencies, and it
+  reads no clock, random source, environment variable or platform property: its import test
+  bans `time`, `random`, `os`, `sys`, `platform` and `secrets`, as it bans numpy. The supported
+  Python versions are 3.10 and 3.14, the two tested; 3.8, 3.9 and 3.11 to 3.13 are "expected,
+  not tested", since the model uses only the standard library and passes the 3.8 grammar check.
+  The analysis tools need Python 3.10 or later and are tested on 3.10.11 and 3.14.4. Every
+  evaluator of an operation list MUST agree with the others before it counts: before any
+  evidence run on a candidate, the scalar and the batch interpreters agree on reference outputs
+  for the 16 Π inputs of research R8 at every variant the candidate uses, computed by the
+  scalar interpreter and committed with the candidate; a C evaluator agrees on the same outputs
+  before its first run; and after selection the model agrees with all of them on the committed
+  vectors.
 - **FR-036**: Golden vectors and known-answer tests MUST be committed for Π and Π⁻¹ at every
   supported size and every reduced variant used as evidence, and for the mode at every claimable
   size with at least two development keys and 10,000 words each (FUT-GRID-5). Where the model's
-  speed limits a size, the length and the measured speed MUST be stated.
+  speed limits a size, the length and the measured speed MUST be stated. The vectors trace the
+  state after every phase of every round for the first four inputs, so that an RTL mismatch can
+  be located to one stage. Generated files hold only deterministic content, in a fully specified
+  text format (data-model introduction: upper-case hexadecimal zero-padded to the word's width,
+  lanes in the design document's order, a fixed header grammar, canonical JSON, a final
+  newline, LF only), so that another implementation can write byte-identical files. The
+  command, the interpreter, the model's SHA-256, the platform, the measured speed and the
+  generation time go to a sidecar record per generator run, which the check of generated files
+  does not compare; the measured speed is stated there. Every run started on a candidate or a
+  variant writes a record, even if aborted (`inconclusive` or `blocked`, with the reason); a
+  run later found hit by a tool defect keeps its record, with the defect noted. FUT-GRID-5's
+  validation of an intermediate size before 16×16 is carried to features 006 and 008: the RTL
+  and the board validate 4×4 before 8×8 and 16×16, in the order of sizes of research R7
+  (FR-052, FR-056).
 
 **Structural evidence and bounds**
 
 - **FR-037**: The structural evidence MUST include:
   - Π⁻¹(Π(x)) = x and Π(Π⁻¹(x)) = x on fixed and development inputs at every supported size and
-    variant;
+    variant: the 16 vector inputs and 2¹⁰ development test states of research R13, counts that
+    may only rise;
   - exhaustive bijectivity on the smallest variant, 2×2 at 4-bit words (2³² states);
   - R_f and R_b from exact dependency matrices (FR-029);
   - the frequency of ones in every state bit after each round on development inputs, as for
     S14, and the avalanche of single-bit input differences per round (strategy note §5.4);
   - symmetry checks of every constant pattern (FR-023, FR-024);
-  - a check that no conserved sum or zero mode of `phyco-v2`'s transport (S13) survives in Π.
+  - a check that no conserved sum or zero mode of `phyco-v2`'s transport (S13) survives in Π. A
+    form that holds on more test states than its chance rate allows (2⁻ʷ for a w-bit sum or
+    XOR), by a binomial test at the bias rule's level, 0.005 divided by the number of forms and
+    round counts tested, fails the check as a probabilistic invariant and raises R_dist at that
+    round count;
+  - for every claimable size, R_dist, R_f, R_b and R_bound established. The frequency and
+    avalanche measurements pass when they are conclusive (their controls did not fire and no
+    tool defect is left unresolved), whatever R_dist they give, and inconclusive bias evidence
+    at a size makes the candidate ineligible (research R4).
 - **FR-038**: First differential and linear trail bounds MUST be computed on reduced rounds,
   either proven by the design strategy (for example by counting active boxes with exhaustively
   computed box bounds) or computed by a validated solver, for the reduced widths and for the
-  production width. Each bound MUST state its rounds, width, size, kind, value, method, tool and
-  validation record, and that it bounds single trails under the usual independence assumptions;
+  production width; R_bound comes from the production width at each claimable size (FR-032).
+  Each bound MUST state its rounds, width, size, kind, value, method, tool and validation
+  record, and that it bounds single trails under the usual independence assumptions;
   clustering into differentials and linear hulls, and key-dependent effects, MUST be listed as
-  open for feature 005 (strategy note §2.1).
-- **FR-039**: Before any negative result of an analysis tool counts, the tool MUST re-find a
-  known result of its kind (security.md §12.5): on `phyco-v2`, the FUT-SEC-8 recovery, both
-  merging mechanisms of S13, the vein bounds of S12 and S15, and the bias of S14; for trail
-  search, a published optimal trail of a reference design. Each tool's version, licence and
-  validation MUST be recorded at its first use.
+  open for feature 005 (strategy note §2.1). A solver-computed bound counts only when the
+  solver proves it: an optimal or infeasible status with the proven dual bound used, or a
+  search that exhausts its space within its cap. The best solution found is never a bound, and
+  a search that times out gives no bound and is recorded as `inconclusive`. The solver options
+  that decide a bound are fixed and recorded (a MIP gap of 0, the feasibility and integrality
+  tolerances, the thread count and the 8 h limit), and a floating-point bound becomes an exact
+  rational by rounding in the direction that weakens it, a weight rounded down, never up. A
+  bound established at one claimable size is carried to a larger size only by a proof in the
+  design document that holds for every claimable n (for example that every r-round trail at
+  n×n activates at least as many boxes as at 4×4), checked by computing it at 8×8; otherwise
+  each size needs its own computed bound.
+- **FR-039**: Before any result of an analysis tool counts, positive or negative, the tool MUST
+  re-find a known result of its kind (security.md §12.5): on `phyco-v2`, the FUT-SEC-8
+  recovery, both merging mechanisms of S13, the vein bounds of S12 and S15, and the bias of S14;
+  for trail search, a published optimal trail of a reference design. Every tool whose verdict
+  counts has one: the symmetry check re-finds S7's rotation structure of `phyco-v2`'s
+  constants; the dependency propagation re-finds the hand-derived matrices of a stated small
+  operation list; exhaustive bijectivity re-finds a known permutation (2³² distinct outputs) and
+  a stated map with collisions (fewer); the avalanche test re-finds a planted gap, a stated
+  variant that leaves one lane unmixed; and the cost model re-finds the hand-counted examples
+  of research R5. The bias tool's validation also shows its detection power: on 100 sets of
+  synthetic binomial counts with a planted bias at the 90%-power values of research R4 (0.0030,
+  0.0031 and 0.0033 at the three sizes), its firing rate lies within a stated binomial interval
+  around 90%. Each known result is of the kind of its use, or a cross-check covers the
+  difference: the ARX search reproduces the exhaustive box tables at w = 4 and 8 (boxes of 8
+  and 16 bits) before it counts at w = 16 and 32, and the active-S-box counter reproduces the
+  exhaustive trail optima of a χ-like candidate at w = 4; a tool used outside its validated
+  kind writes `not evaluated`. A tool is validated again after any change to its code (its
+  SHA-256 differs), a dependency upgrade, or a use at a word width, operation set or kind of
+  model outside its validated kind, and each counted result cites the validation record of the
+  tool's exact hash. Each tool's version, licence and validation MUST be recorded at its first
+  use; a self-written tool's version is the SHA-256 of its code. A positive result is never
+  dropped for want of validation: a trail or distinguisher from a tool not yet validated is
+  recorded as an unverified hypothesis (FR-060) and blocks the candidate's eligibility until a
+  validated tool, or a direct evaluation of the trail with the validated exact models, settles
+  it; if confirmed, it raises R_dist. A possible weakness can therefore only raise R or block,
+  never vanish. A tool whose validation target's value cannot be obtained stays unvalidated,
+  and its results are `not evaluated` (edge cases). Validation runs charge no candidate and
+  have their own cap of 8 h per instance; the D4 reduced-width searches count against their
+  candidate's trail budget, and the FUT-SEC-8 vector check and sweep against the
+  demonstration's own budget.
 
 **Protocol**
 
-- **FR-040**: Only development keys, nonces and inputs, derived from public strings by a rule
-  fixed in the plan, MAY be used. No held-out key set MAY be created or used in this feature.
-  Feature 007 defines the held-out sets, and the requirement that they cannot be computed before
-  its freeze MUST be carried to it.
+- **FR-040**: Only development keys, nonces and inputs, derived from public strings, or from
+  fixed constants and development inputs, by a rule fixed in the plan, MAY be used; the closed
+  class of constructed inputs (research R3; data-model §2) is the only use of the second kind,
+  and no value or index is picked after any output is seen. This holds for the whole feature,
+  the freeze and everything after it included: no held-out key set MAY be created or used in
+  this feature at any time. Every tool of this feature that reads feature 002's or 003's seed
+  sets loads only feature 002's `dev` set and exits 2 on any held-out set, as security.md §11.3
+  requires of development tools, and a test checks every such call. No statistical battery
+  (SP 800-22, PractRand, TestU01 or any other) runs on a candidate or on `phyco-v3` in this
+  feature: the frequency and avalanche tests of the bias rule are the only statistics, and the
+  statistical programme belongs to feature 007 under its own protocol. Feature 007 defines the
+  held-out sets, and this requirement MUST be carried to it in a checkable form: the held-out
+  keys are derived from data that does not exist until the later of `phyco-v3`'s design freeze
+  and feature 007's protocol freeze, for example SHA-256 over feature 007's protocol freeze
+  record with a public string; feature 007 states the derivation, and a test re-derives it.
+  Varying that record to steer the keys would change the frozen protocol, visibly in its
+  history. The requirement is carried in the final report's open items and in the text of
+  security.md §22 row 5a.4 (FR-052).
 - **FR-041**: Every candidate design MUST be logged in an append-only log with its ID,
-  parameters, evidence, decision and reason, and no entry MAY be deleted (Principle V). More
-  than three candidates of a family MUST NOT be evaluated (stop rule). The candidate frozen MUST
-  be the one the pre-registered rules select, and the final report MUST state the selection bias
-  of choosing among candidates on development inputs (security.md §11.6).
+  parameters, evidence, decision and reason, and no entry MAY be deleted (Principle V). A
+  design's `proposed` entry, with its operation list's SHA-256, comes before any tool runs on
+  it, and every tool refuses an operation list whose hash has no `proposed` or `correction`
+  entry (exit 2). Every variant ID used, every round count measured and every fix to an
+  operation list is logged under its candidate, and the log cites every record of every run,
+  used or not. Before an operation list changes, its version is copied unchanged to
+  `research/004/candidates/<id>/superseded/<sha256>.py`, and a committed inventory lists every
+  hash and path, so that every `oplist_sha256` in the log stays checkable; the re-check
+  verifies the inventory. More than three candidates of a family MUST NOT be evaluated (stop
+  rule); a candidate counts as evaluated from its first entry, `proposed`, whatever happens
+  after, and a fourth `proposed` entry of a family is refused. A candidate is `rejected` or
+  `ineligible` only for the rules' reasons (a failed inverse or bijectivity test, a failed
+  eligibility item, a spent budget); it may be withdrawn before its first tool run for any
+  recorded reason and still counts, and the log writer refuses any other decision. The
+  candidate frozen MUST be the one the pre-registered rules select; the owner design review
+  cannot put another eligible candidate in its place, and throughput is never a reason to
+  decline. A stricter change of the protocol applies to every candidate, those already
+  evaluated included: each one's verdicts are recomputed under the new rule from saved outputs
+  where possible (FR-044). The final report MUST state the selection bias of choosing among
+  candidates on development inputs (security.md §11.6): the candidates logged and evaluated per
+  family, the evaluations (measurements and searches) behind the frozen one, the bias rule's
+  family-wise chance rates over them, and that every result of the frozen candidate is on
+  development inputs chosen among up to six candidates, so that feature 007's held-out
+  evaluation is the unbiased test. The rationale's chapter on alternatives cites the log
+  entries (FR-034).
 - **FR-042**: `phyco-v2` MUST be archived as byte-exact copies in `baseline/phyco-v2/`, with every
   file's SHA-256 and source in a committed manifest (Principle V): at least the model, the C
   stream, `design.md` 1.0 and the golden vectors. The live files MUST stay unchanged.
 - **FR-043**: The design freeze MUST come after the owner design review (⛔ gate) and after the
-  external design review is recorded as done or not arranged (D9). Before the freeze the owner
-  is asked to commit the feature files (Principle IX). The freeze record MUST hold the SHA-256 of
-  the design document, the model, the vectors (constructed-state vectors included), the scripts
-  that generate the constants and the vectors, R with every input of the round rule, the tool
-  versions, `git_head` and `git_dirty`, and the owner's approval (⛔ gate). After the freeze,
-  the frozen files MUST NOT change.
+  external design review is recorded as done or not arranged (D9); the external review is never
+  cited as an evaluation (section "Context"). A decline at the owner design review states its
+  reasons and ends in one of: a revision of the design document or rationale (same candidate,
+  new version, review repeated); a fix that leaves the design unchanged, logged under the
+  candidate; a further candidate within the stop rule, which the rules must then select; or a
+  stop. Each is logged with its reasons. Any change after the owner design review (R raised, a
+  new finding, a corrected document) makes a new design-document version: the rationale is
+  revised, the review is repeated for the changed parts and recorded in a row of its own, and
+  the review package is rebuilt. The freeze runs in this order: (1) the owner commits the
+  feature files (Principle IX); (2) `design_freeze.py create` runs with `git_dirty` false and
+  writes the record as `draft`; (3) the owner's approval is written into it (⛔ gate); (4) the
+  owner commits the record; (5) `design_freeze.py validate` exits 0. Dirty means a tracked file
+  modified or an untracked file not ignored; ignored files (the locks, local-only outputs) do
+  not count, and local-only outputs are in the record by SHA-256 anyway. The freeze record MUST
+  hold the SHA-256 of the design document, `rationale.md`, the model, the vectors
+  (constructed-state vectors included), the scripts that generate the constants and the
+  vectors, the selected operation list, `research/004/ir.py` with its tools, and the scripts
+  that compute verdicts (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `recheck_004.py`,
+  `protocol/devinputs_v3.py`, `protocol/evidence.py`); R with every input of the round rule and
+  every evidence record behind R, by ID and by SHA-256; the last `seq` and line SHA-256 of the
+  candidate log, the provenance log and the protocol change log; the tool versions; `git_head`
+  and `git_dirty`; and the owner's approval. After the freeze, the frozen files MUST NOT
+  change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code
+  that produced the verdicts, and the frozen model and vectors stay the expected values
+  (FR-056) even when they disagree with the frozen design document (edge cases; FR-028).
 - **FR-044**: After spec approval the pre-registered design protocol MAY only become stricter,
-  and every change MUST be recorded with its reason before any result it affects.
+  and every change MUST be recorded with its reason before any result it affects, with the
+  owner's recorded approval: the agent may propose a stricter change but not make it. Settling a
+  case the protocol leaves undefined is a change of the same kind: allowed only before any
+  result it affects exists, with the owner's approval, recorded in the change log, and never
+  looser than any reading of the existing text. The plan's rules for an exact D4 tie, for no
+  scored family and for a representative found ineligible first were settled that way, at plan
+  approval. Every change is recorded in the protocol change log,
+  `research/004/protocol-changes.jsonl`, chained and locked like the candidate log, with per
+  entry the date, the rule, the old and new text, the reason, the direction (below), the
+  approver, the last record ID that existed before it, so that "before any result it affects"
+  can be checked, and the results known at the time of the change. A stricter change applies
+  to every candidate, those already evaluated included. It is applied first by recomputing
+  verdicts from saved outputs; a new measurement it needs, such as more inputs, is a new
+  measurement of the same kind under the changed rule, not a re-run: the old records stay, and
+  the new hours count against the same budget row. Every firing already recorded stands, so a
+  stricter change can only raise R or make a candidate ineligible, never undo a raise. If the
+  row cannot hold the new run, that evidence is inconclusive and the candidate ineligible at
+  that size, as for any spent budget; a budget lowered below the hours already used leaves zero
+  hours, results so far stand, and no further run of that row starts. After a stop, a later
+  feature may evaluate further candidates only under its own pre-registered protocol and new
+  model IDs, and it counts this feature's candidates, results and stop in its selection bias
+  (FR-041). "Stricter" has one direction per rule, the one that makes the conclusion more
+  conservative, and each rule of section "Pre-registered Design Protocol" repeats its own:
+  - eligibility: items only added; selection and the nonlinearity choice rule (D4): no change;
+  - tool validation: known results and re-validation triggers only added;
+  - the FUT-SEC-8 demonstration: no change;
+  - the round rule: Δ only rises, and sources of R_dist are only added;
+  - the bias rule: only a change that can add firings and never remove one. Every firing
+    recorded under the rule then in force stands, and a larger N, N_a or F, or a new set, is
+    tested under its new S or S_A in addition, so R can only rise;
+  - the stop rule: budgets and the candidate limit only fall;
+  - the constant rule (FR-023): fixed before the first candidate is scored, no change after;
+  - the security-target parameters: s, the key and nonce lengths and c only rise; ε only falls
+    and N only rises; u, every output limit and the per-request cap only fall;
+  - the values the plan fixes: as the plan's table "Values this plan fixes" states for each.
 - **FR-045**: Heavy runs (the FUT-SEC-8 sweep, exhaustive bijectivity, solver runs) MUST NOT
   overlap one another or any battery run (security.md §12.5).
 - **FR-046**: Every download MUST have the owner's permission for that file (name, source,
@@ -682,18 +1241,32 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 - **FR-049**: FUT-SEC-1 to FUT-SEC-9 MUST be carried as requirements traced to tasks and
   evidence, as in the table "Security Policy traceability" below. FUT-SEC-7's statistical
-  programme MUST stay open in the final report, and so MUST the FUT-SEC-5 attack analysis that
-  belongs to feature 005.
-- **FR-050**: Every report and document of this feature MUST carry the disclaimer at the top of
-  this spec, MUST use only the vocabulary of security.md §15 ("proven bound", "best known
-  attack", "no attack found within budget", "not evaluated"), and MUST label every target as a
-  target. No artifact MAY describe `phyco-v3`, or any model, as secure, proven secure or
-  unbreakable, or state a security strength as achieved. Wherever the use of `phyco-v3` is
-  described, the restriction of security.md §4 MUST be stated.
+  programme MUST stay open in the final report, and no battery runs in this feature (FR-040).
+  FUT-SEC-5 is split: this feature specifies key loading, shows diffusion through instantiation
+  (FR-029) and measures the first-order related-key and related-nonce differences of research
+  R4, reported as "a single-difference avalanche measurement, not a related-key analysis";
+  feature 005 analyses related-key and related-IV differential and linear attacks beyond first
+  order, weak-key classes and key-dependent effects, and that analysis MUST stay open in the
+  final report. The boundary keys of FR-058 are tests of the model, not a weak-key analysis. No
+  claim, evaluation or certification may follow from this feature alone (FR-052).
+- **FR-050**: Every report and document of this feature MUST carry the design-form disclaimer,
+  the block directly under this spec's title (FR-068), MUST use only the vocabulary of
+  security.md §15 ("proven bound", "best known attack", "no attack found within budget", "not
+  evaluated"), and MUST label every target as a target. No artifact MAY describe `phyco-v3`, or
+  any model, as secure, proven secure or unbreakable, or state a security strength as achieved.
+  "Proven" may appear only with its object named in the same sentence or table row (a trail
+  bound, a theorem's bound on an advantage) and its record cited; "proven" or "provably" never
+  takes the design, the generator or a security property as its object. Frequency, avalanche
+  and battery results are reported only as inputs to R_dist or as statistics, never as evidence
+  of security or of mixing beyond what they measured, and no text implies prediction resistance
+  (D7). The claim-register test (FR-069) treats every other use as a finding. Wherever the use
+  of `phyco-v3` is described, the restriction of security.md §4 MUST be stated.
 - **FR-051**: A new version of security.md, with a history entry, MUST give `phyco-v3` its own
   section (a table of structural facts, best-attack register rows for its first bounds, and a
-  lessons table that links S1–S15 to the rules of Π), a row in §1.1, a validation-phase table
-  like §1.3, the §20.1 decision, the claim-register entry, the status of roadmap stage 5a.1 and
+  lessons table that links all fifteen of S1–S15 to the rules of Π or the parts of the design
+  that answer them (FR-030), citing the evidence records that the final report's lessons table
+  cites), a row in §1.1, a validation-phase table like §1.3, the §20.1 decision (recorded in
+  2.11 on 2026-11-01; FR-017), the claim-register entry, the status of roadmap stage 5a.1 and
   a mention in §23. security.md keeps policy, status and registers, and derivations and other
   per-model detail go to research notes or reports (strategy note G16 and §7.1). A finding that
   breaks the target on the full rounds MUST be recorded at once, with a history entry and a
@@ -703,15 +1276,48 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-052**: The final phase report MUST follow the constitution's Phase Completion Reporting,
   MUST state which items of the constitution's change-completion list remain open (the
   statistical evaluation in feature 007; the RTL), MUST state the risks of strategy note §11 as
-  they stand at the end of the feature, and MUST recommend proceed, revise or stop.
+  they stand at the end of the feature, and MUST recommend proceed, revise or stop; a stop is
+  reported with what was reached (security.md §21, option C). It MUST state that, with
+  FUT-SEC-7 (feature 007) and FUT-SEC-5's analysis (feature 005) open and L2 to L5 not reached
+  (features 005 to 009), no claim, evaluation or certification may follow from this feature
+  alone, and list each gap with its feature, as security.md §22 rows 5a.2 to 5a.6 name them.
+  Its open items carry FR-040's requirement on held-out keys in its checkable form, and
+  FUT-GRID-5's validation of 4×4 before 8×8 and 16×16 to features 006 and 008 (FR-036).
 
 **Reproducibility**
 
 - **FR-053**: Every evidence record MUST be reproducible from a committed script with fixed
   inputs and the recorded command, with the model hash and tool versions recorded (Principle V).
-  Every new file whose hash is recorded MUST have a pinned line ending in `.gitattributes`; new
-  scripts MUST write explicit LF line endings and, where possible, hash line-ending-normalized
-  content. `requirements.txt` MUST be corrected and its versions pinned (checklist group F).
+  `requirements.txt` MUST be corrected and its versions pinned (checklist group F). These rules
+  make that checkable:
+  - **Reproducible, per kind.** Deterministic kinds (vectors, constants, dependency matrices,
+    counts, digests) reproduce byte for byte; searches and solver runs reproduce their values
+    and verdicts. A comparison excludes `record_id`, `created_utc`, timings, `platform`,
+    `versions` where the environment differs, `git_head` and `git_dirty`, and the environment
+    is either of the two of research R1, as recorded.
+  - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
+    The model hash is that of the candidate's operation list before selection and that of
+    `model_v3.py` after it. With `git_dirty` often true, the hashes, not `git_head`, identify
+    the code.
+  - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
+    that nothing depends on set iteration, hash randomization, thread completion or worker
+    count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test
+    runs one light kind with two worker counts and compares the outputs.
+  - **Hashes and line endings.** Each recorded hash says beside it whether it is over the raw
+    bytes or over LF-normalized content (`raw` or `lf-normalized`). Every new file whose hash
+    is recorded is hashed over its raw bytes and MUST have a pinned line ending in
+    `.gitattributes` (LF, or `binary`), so that its raw and normalized content agree on every
+    checkout: `reports/004-crypto-architecture-v3/**` is pinned to LF, and `*.gz` to `binary`.
+    An existing `text=auto` file that a new record hashes, such as `security.md` or `README.md`,
+    is hashed over its LF-normalized content, and no existing pin changes. The CRLF-pinned
+    freeze records of features 002 and 003 keep their recorded hashes over CRLF bytes. A test
+    lists every path whose hash a committed record, manifest or freeze record holds and checks
+    with `git check-attr text eol` that each has an explicit rule or `binary`, or that its
+    record marks the hash `lf-normalized`; it replaces the one-off check of 2026-10-31.
+  - **Encoding.** Every new text file is UTF-8 without a byte-order mark, with LF line endings.
+    Scripts write with `encoding="utf-8"` and `newline="\n"`, the line-ending test also looks
+    for a byte-order mark, and no hashed file is written by Windows PowerShell 5.1, whose
+    `Out-File -Encoding utf8` adds one.
 
 **Verification and translation readiness (security.md §8, §10 and §13; vhdl-genai.md §5)**
 
@@ -720,19 +1326,28 @@ freeze hashes and the baseline manifest; run the claim-register test.
   development keys: at least all-zero and all-one lanes, states that drive every addition to a
   carry out of its top bit, every shift and rotation boundary, the first and last value of every
   counter, every output limit reached and one request beyond it, and every domain separator.
-  These vectors are part of the frozen vectors (FR-043; vhdl-genai.md R3 and §5.3, step 1).
+  These vectors are part of the frozen vectors (FR-043; vhdl-genai.md R3 and §5.3, step 1). On
+  the RTL they run in simulation only, loaded by the testbench (FR-025), and the record of an
+  edge state that no key reaches says that it is covered in simulation only.
 - **FR-055**: Every operation on state words in Π and the mode MUST give the same bits whether
   its operands are read as signed or unsigned: addition and subtraction modulo 2^w, XOR, AND,
   OR, NOT, rotations and logical shifts. An arithmetic shift, a signed comparison or a sign
   extension MAY appear only with a justification in the rationale and constructed-state vectors
   at its sign boundary (FR-054), because those are the corners where translations of `phyco-v2`
-  go wrong (vhdl-genai.md §5.2). Comparisons of public counters MUST be unsigned.
+  go wrong (vhdl-genai.md §5.2). Comparisons of public counters MUST be unsigned. Every shift
+  and rotation amount lies in 1 to w − 1 at every supported width (FR-024), and every operation
+  is written as an unsigned operation on `unsigned` words (FR-027).
 - **FR-056**: The frozen model, vectors, known-answer tests and constructed-state vectors MUST be
   the only source of expected values for every later implementation, and none MAY come from a
   drafting tool or be edited to make a test pass (vhdl-genai.md R1). This feature writes no RTL,
-  testbench or mutant catalogue. The final report MUST map each of the hardware note's rules
-  R1–R12, and the AI-assisted RTL rules of security.md §13, to the requirement of this feature
-  that applies it or to feature 006 or 008, which carries it.
+  testbench or mutant catalogue. Where the frozen design document and the frozen model
+  disagree, the frozen model and vectors are the expected values, and the correction is a new
+  model ID (FR-028). The final report MUST map each of the hardware note's rules R1–R12, and the
+  AI-assisted RTL rules of security.md §13, to the requirement of this feature that applies it
+  or to feature 006 or 008, which carries it. The mapping carries two rules of this feature:
+  constructed-state vectors run on the RTL in simulation only, loaded by the testbench, while
+  the board's equivalence check (FUT-HW-4) uses the vectors a key reaches; and the RTL and the
+  board validate 4×4 before 8×8 and 16×16 (FUT-GRID-5; FR-036).
 - **FR-057**: A second transcription of Π, Π⁻¹ and the mode MUST be written from the design
   document alone, in a session separate from the one that wrote the model and importing no code
   from it, and MUST agree with the model step by step on the vectors before the freeze, as
@@ -747,14 +1362,27 @@ freeze hashes and the baseline manifest; run the claim-register test.
   repeated instantiation; long runs; invalid parameters, invalid states and invalid call
   sequences such as generate before instantiate; and every supported configuration. Every
   data-flow direction stated in the design document (FR-027) MUST be tested (checklist group
-  F). Property-based tests (for example with Hypothesis) MUST be added if the owner approves
-  the download; otherwise their absence MUST be recorded as an open item.
+  F). The tests also show the stated behaviour on a repeated nonce (edge case "Nonce reuse"),
+  every zeroization path of FR-025 (a refused request, a failed self-test, an exception after
+  the state has changed, a call refused at a per-key limit), the refusal of a generate request
+  after reset or zeroization until an instantiate completes, and that the key, given once at
+  construction, is never compared with another (FR-013). Property-based tests (for example with
+  Hypothesis) MUST be added if the owner approves the download; otherwise their absence MUST be
+  recorded as an open item. They run under a settings profile registered by the test package,
+  with `derandomize=True` and `database=None`, so that every run tries the same examples and a
+  failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
   the reset sequence of FR-025, whose stated latency includes it: its inputs, taken from the
   frozen vectors, its expected output, its behaviour on failure, and the zeroization of the
-  whole state after it, before the first instantiate. Features 006 and 008 implement it in the
-  RTL (strategy note §10; D10). It is not a FIPS 140-3 self-test and MUST NOT be described as
-  one (FR-011).
+  whole state after it, before the first instantiate. The self-test runs instantiate with the
+  key and nonce 0 of the frozen vectors, then a generate long enough that every node, every
+  lane, every constant ROM entry of the calls run, both trees and the counters take part, then
+  a reseed if the design has one. It compares the output with the expected output stated per
+  claimable size from the frozen vectors and then zeroizes; on failure it zeroizes and blocks
+  every call. Its cycle count is stated (FR-020), and the reset latency of FR-025 runs from
+  reset released to the self-test done and the state zeroized. Features 006 and 008 implement it
+  in the RTL (strategy note §10; D10). It is not a FIPS 140-3 self-test and MUST NOT be
+  described as one (FR-011).
 
 **Findings, evidence and review (security.md §9.1, §14, §16 and §17)**
 
@@ -766,7 +1394,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-061**: Every evidence record MUST hold the fields of security.md §17.2: a unique
   identifier, and the date and time; the model ID, design-document version, `git_head` and
   `git_dirty`; tool and dependency versions, operating system and hardware; the exact command
-  and configuration; the inputs or their derivation; output paths with SHA-256; the exit status
+  and configuration, runnable as written (the interpreter by its full path, the Windows Python
+  or `~/.venvs/phycoweb/bin/python` in WSL; the working directory, which is the repository
+  root; paths relative to it), with a test that re-runs one light command of each kind exactly
+  as recorded; the SHA-256 of every code file the run used (`code_sha256`: the script, the
+  `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
+  source and its binary); the inputs or their derivation; output paths with SHA-256; the exit status
   and assertions; the classification (FR-060); the analyst and the reviewer, with the review
   status; known limitations; and the disclaimer, which feature 003's provenance records lacked
   (feature-003 phase report, open issue 3). A statistical measurement, such as the bias rule's,
@@ -774,25 +1407,40 @@ freeze hashes and the baseline manifest; run the claim-register test.
   summaries.
 - **FR-062**: The final report and the design rationale MUST keep apart demonstrated facts,
   mathematical arguments, experimental observations, unverified hypotheses, unsuccessful
-  attacks, untested areas and residual risks (security.md §17.3). The final report MUST name
-  which of the nine reports of security.md §17.3 this feature contributes to, and which are not
-  started.
+  attacks, untested areas and residual risks (security.md §17.3). In the rationale each
+  statement carries one of seven labels (fact, argument, observation, hypothesis, unsuccessful
+  attack, untested, residual risk), by section heading where a section holds one kind and
+  inline otherwise, the label fixed by the statement's support. The gap between single-trail
+  bounds and bounds on differentials and linear hulls is stated as a residual risk for feature
+  005 (FR-034). The final report MUST name which of the nine reports of security.md §17.3 this
+  feature contributes to, and which are not started.
 - **FR-063**: A review package MUST be assembled for the external design review, whether or not
   a reviewer is arranged: the spec, the design document and rationale with exact revisions, the
   model source and vectors, the evidence records, the threat model, the security target marked
   as targets, and the known limitations and unresolved findings (security.md §14). Sending it is
-  the owner's outward action (Principle IX).
+  the owner's outward action (Principle IX). The package carries the design-form disclaimer and
+  states that the review asks for comments on a design that makes no claim and is not an
+  evaluation intended to support one (section "Context"). Where its manifest hashes an existing
+  `text=auto` file, such as security.md or README.md, the hash is over LF-normalized content
+  and marked so (FR-053).
 - **FR-064**: No AI session MAY be recorded as an independent or external reviewer: a second AI
   review is not independent cryptanalysis (security.md §14), and a security argument drafted by
   an AI tool is a draft for review, not evidence (security.md §2.1 and §16.3; vhdl-genai.md
   §2.5). The final report MUST record who took each role of security.md §16.2 in this feature,
-  and mark every role that was not staffed.
+  and mark every role that was not staffed. Each AI-drafted section of the rationale is
+  recorded in the provenance log with its review status, which the owner design review
+  updates; the frozen text carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the inverse, bijectivity,
   dependency, bias, symmetry, invariant and bound checks; eligibility and selection) MUST be
   computed by code from saved outputs and be recomputable by a re-check script, never taken from
   a narrative (security.md §16.1). No phase, test or gate MAY be recorded as passed because its
   documents exist; where evidence is missing, the status MUST be "not evaluated",
-  "inconclusive" or "blocked" (security.md §16.3).
+  "inconclusive" or "blocked" (security.md §16.3). The re-check needs only committed files, so
+  every verdict is recomputable on a fresh clone: the committed per-round summaries suffice
+  (for example, R_f from the per-round flag "every output bit depends on every input bit"), and
+  local-only outputs serve only to re-derive a committed summary, which the re-check also does
+  when they are present; it lists both checks per kind. The re-check is the routine
+  reproduction test (User Story 4), and it runs the frozen verdict scripts (FR-043).
 - **FR-066**: This feature MUST prepare what feature 005's copy of the cryptanalysis
   instructions needs (security.md §16.4; strategy note G13): the model ID and design-document
   version for its placeholders, `phyco-v3`'s threat-model rows (FR-008), its table of structural
@@ -800,28 +1448,57 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-067**: Every file of this feature drafted or repaired with an AI tool (design document,
   model, transcription, scripts, tests and reports) MUST be recorded with the tool and model,
   the date, the task ID and its review status, in the feature's evidence (vhdl-genai.md R7;
-  security.md §17.2).
+  security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section.
 
 **Claims discipline (security.md §1 and §15; strategy note §3.1 and §10)**
 
-- **FR-068**: The design-form disclaimer MUST be defined once in code, beside the existing
+- **FR-068**: The design-form disclaimer, the block directly under this spec's title, MUST be
+  defined once in code as `DESIGN_DISCLAIMER`, holding exactly that text, beside the existing
   disclaimer constant, which stays unchanged. Every generated report and record of this feature
-  MUST take it from there, and every hand-written document MUST carry the same text (strategy
-  note §3.1).
+  MUST take it from there, every hand-written document MUST carry the same text (strategy note
+  §3.1), and the claim-register test compares every document's copy with the constant.
 - **FR-069**: A machine-readable claim and evidence register MUST list every model ID with its
   claim level, its claim or "no claim", its bound and its evidence records (D10). An automated
   test MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the
   register and that hand-written documents carry the disclaimer of FR-068, and MUST report any
   use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
-  feature-003 T041).
+  feature-003 T041). Its scope is every document of this feature and the comments and
+  docstrings of every file it adds or changes (`phycoweb/`, `protocol/`, `scripts/`,
+  `research/004/`, `tests/` and `fast/seed_search.c`). Its rules flag the following, and a
+  flagged line passes only through an allow-list entry in the register, each with its reason:
+  - a strength not labelled as a target: a number of bits beside "security", "strength" or
+    "secure", or a cost such as 2¹²⁸ beside "security", unless the same sentence or row carries
+    "target" or quotes a rule;
+  - "proven" or "provably" without its object and its record (FR-050);
+  - frequency, avalanche or battery results offered as evidence of security or of mixing, and
+    any text that implies prediction resistance (FR-050);
+  - "compliant", "conforms" and "approved" near a standard's name, outside the design
+    document's one statement that `phyco-v3` conforms to no standard (FR-011);
+  - a claim level above the register's `claim_level` in any document (FR-012);
+  - security wording (secure, strength, resist, unpredictable, chaos, Lyapunov, ergodic) and the
+    arguments FR-030 forbids, inside the mapping chapter (FR-030);
+  - "constant time" beside the model (FR-020).
 
 ### Pre-registered Design Protocol
 
-Fixed at spec approval; afterwards it may only become stricter (FR-044).
+Fixed at spec approval; afterwards it may only become stricter (FR-044). Each rule states what
+stricter means for it, and every change is recorded in the protocol change log with its reason
+and the owner's approval (FR-044).
 
 **Development inputs.** Keys, nonces, personalization strings and test states are development
 inputs, derived from public strings by a rule the plan fixes before their first use, as feature
-002 derived its seeds. No held-out key set exists in this feature.
+002 derived its seeds. No held-out key set exists in this feature. Beside them, a closed class
+of constructed inputs is allowed, each fixed by a public rule before its first use (research R3;
+data-model §2): (1) the fixed patterns of FR-058 and research R8 (all-zero, all-one,
+alternating, counting; the single-bit keys and nonces e_i for every i); (2) the edge states of
+FR-054, from the design document's list; (3) the avalanche flips x ⊕ e_j, the key and nonce bit
+flips and the word rotations of development inputs, for every j, bit and k the rule names; and
+(4) feature 002's `dev` seeds for FUT-SEC-8, the one external development set. No value or
+index is picked after any output is seen. A run that is not evidence, such as the 60 s
+projection before a heavy run or any timing probe, writes a record of kind `projection` with
+its inputs (the first inputs of the run it projects); its outputs other than timing are
+discarded unread, the record says so, and its time counts against the budget row of the run it
+projects. *Stricter means*: the derivation does not change.
 
 **FUT-SEC-8 demonstration.**
 
@@ -831,11 +1508,13 @@ inputs, derived from public strings by a rule the plan fixes before their first 
 | Attacker's observations | The first two seed words of the target, and the first three output words after the 256-step warm-up |
 | Search | Every pair (s₂, s₃) in 0…65535², once per target; a candidate is dropped at its first mismatching word |
 | Success | The target is among the candidates that match all three words |
-| Random baseline | False matches expected per target: about 1 after one word (2³² candidates, 32-bit words), about 2⁻³² after two, about 2⁻⁶⁴ after three |
+| Random baseline | False matches expected per target: about 1 after one word (2³² candidates, 32-bit words), about 2⁻³² after two, about 2⁻⁶⁴ after three. Agreement is tested on the one-word count of each target against a Poisson distribution of mean (2³² − 1)/2³², and of the three pooled against three times that mean, two-sided at level 0.01; any false match after two or three words is reported as a deviation. The baseline assumes each candidate's output words uniform and independent of the target's; `phyco-v2`'s biases (S12, S14) could make false matches more frequent, so a count above the baseline is an observation about `phyco-v2`, reported as such, and does not change the success criterion. A disagreement is a finding (FR-060), never a reason to sweep again |
 | Cost | Steps and time per candidate, measured; the total; the extrapolation to 2⁶⁴ candidates. Expected: about 2³² × 257 steps per target, about 3.6 core-hours at 8.5 × 10⁷ steps/s |
 | Check before the sweep | The search tool reproduces the `phyco-v2` golden vectors |
-| Budget | One pass over the 2³² candidates per target, for three targets; a repeat only after a tool defect is fixed (Edge Cases) |
+| Budget | One pass over the 2³² candidates per target, for three targets; a repeat only after a tool defect is fixed (Edge Cases). Checking a record's listed matches and recovered seeds runs no sweep and is not a repeat. Nor is a reproduction after the FUT-SEC-8 result review: a heavy run that writes its own record, compared field by field with the original, which can neither replace the demonstration record nor change the review; a difference is a finding |
 | Report | security.md §12.4, with T1 as the attacker, who knows the position of the observed words |
+
+*Stricter means*: no change.
 
 **Round rule.** For every claimable size,
 
@@ -843,16 +1522,25 @@ inputs, derived from public strings by a rule the plan fixes before their first 
 R = max(2 · R_dist, R_bound + Δ, 2 · max(R_f, R_b))
 ```
 
+Every term counts rounds, a round being one pass over every colour phase (FR-029), and every term
+comes from the production width at that size; a reduced-variant result is evidence about the
+design, never a value of the rule (FR-032).
+
 - R_f, R_b: from the exact dependency matrices (FR-029).
 - R_bound: the smallest number of rounds after which the proven bound on the best differential
   trail probability and the proven bound on the best linear trail's squared correlation are both
   below 2⁻¹²⁸, from bounds (FR-038) that hold at the production width and that size. If it is
-  not established, the size cannot be frozen.
+  not established, the size cannot be frozen. A bound is carried from one claimable size to a
+  larger one only by a proof that holds for every claimable n, checked at 8×8 (FR-038).
 - R_dist: the largest number of rounds of Π or Π⁻¹ for which this feature's evidence shows a
-  distinguisher costing less than 2¹²⁸: incomplete diffusion, a bias that meets the bias rule
-  below, or a trail found with probability or squared correlation above 2⁻¹²⁸. Feature 005's
-  campaign may raise R_dist; a higher R is then a new model ID.
+  distinguisher costing less than 2¹²⁸ evaluations of Π or Π⁻¹ (FR-004): incomplete diffusion,
+  a bias that meets the bias rule below, a probabilistic invariant (FR-037), a trail found with
+  probability or squared correlation above 2⁻¹²⁸, or a degree-based distinguisher (zero-sum,
+  cube) that the rationale's algebraic-degree bounds admit (FR-034). Feature 005's campaign may
+  raise R_dist; a higher R is then a new model ID (FR-028).
 - Δ = 2. It may only be raised.
+
+*Stricter means*: Δ only rises, and sources of R_dist are only added.
 
 **Bias rule.** At each size and round count, a state bit's frequency of ones counts as a
 distinguisher if its two-sided binomial p-value is at most 0.005/S, where S is the number of
@@ -861,71 +1549,107 @@ fixed in the plan before any measurement. By the Bonferroni inequality, the rule
 states with probability at most 0.005. Before its first use at each size, it is applied once to
 the same number of uniform states, derived from public strings by SHA-256 as the development
 inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md
-§11.6).
+§11.6). A firing is reported as a distinguisher at its round count that raises R, with the
+family-wise rate of chance firings stated beside it (FR-028), and it is never measured again to
+remove it. *Stricter means*: only a change that can add firings and never remove one. Every
+firing recorded under the rule then in force stands, and a larger N, N_a or F, or a new set, is
+tested under its new S or S_A in addition, so R can only rise.
 
 **Nonlinearity choice rule (D4).** Each family is represented by its best candidate on reduced
 widths. The family chosen is the one with the larger proven weight per round (−log₂ of the
 weaker of the differential and linear bounds, per round, over the rounds computed) per unit of
 estimated hardware cost (LUTs per node and round, from an operation-count model the plan fixes
 before any candidate is scored). Ties go to the smaller R from the round rule, then to fewer
-serial carry chains per round, then to the owner's recorded choice.
+serial carry chains per round, then to the owner's recorded choice. That choice is made only
+after the tie record (`d4/tie.json`) exists, never changes, and is recorded in that record and
+in its own row of the Review & Approval table ("D4 tie"), with the date and the SHA-256 of the
+record the owner saw. *Stricter means*: no change.
 
-**Tool validation.** A tool's result counts only after its validation record exists (FR-039).
+**Tool validation.** A tool's result, positive or negative, counts only after its validation
+record exists (FR-039). *Stricter means*: known results and re-validation triggers are only
+added.
 
 **Eligibility and selection.** A candidate is eligible for the freeze only if it passes every
 structural test (FR-037), has an established R_bound at every claimable size, and meets FR-018 to
-FR-031. Of the eligible candidates of the chosen family, or of the other family if the chosen one
-has none, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's recorded
-choice. Every candidate stays in the log (FR-041).
+FR-031. "Passes" means that every measurement is conclusive (its controls did not fire and no
+tool defect is left unresolved), whatever R_dist it gives, and that R_dist, R_f, R_b and
+R_bound are established at every claimable size; inconclusive bias evidence at a size makes the
+candidate ineligible. Of the eligible candidates of the chosen family, or of the other family if
+the chosen one has none, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's
+recorded choice, made only after the selection record (`selection.json`) exists, never changed,
+and recorded in that record and in its own row of the Review & Approval table ("Selection tie"),
+with the date and the SHA-256 of the record the owner saw. Every candidate stays in the log
+(FR-041). A stricter change applies to every candidate, those already evaluated included, and
+the verdicts are recomputed under it (FR-044). *Stricter means*: eligibility items are only
+added; the selection rule does not change.
 
 **Stop rule.** At most three candidates of each family (D4) are evaluated. A candidate is a
-distinct design of Π with its own entry in the candidate log (FR-041), eligible or not; a reduced
-variant, a round count, or a fix to the model that leaves the design unchanged is not a new
-candidate. The analysis budget per candidate, such as the solver time for trail bounds, is fixed
-in the plan before the first candidate is scored. The feature recommends stopping (security.md
-§21, option C) if none of the evaluated candidates is eligible, or if no published theorem's
-preconditions can be met by the mode. No candidate is eligible, for example, when an attack below
-the target reaches the full rounds of every candidate, or when R_bound is not established at the
-production width for any of them (strategy note §10; D10). The budget may only be lowered
-(FR-044). A stop is a valid, reportable outcome.
+distinct design of Π with its own entry in the candidate log (FR-041), eligible or not, and it
+counts as evaluated from its first entry, `proposed`, which comes before any tool runs on it; a
+fourth `proposed` entry of a family is refused. A change makes a new candidate if it touches the
+operation list's structure: the nonlinear component, the round structure (its operations, their
+forms or order), the colour schedule, or the rule that generates the constants or the rotation
+amounts. It is a variant or a fix if it changes only values the candidate's logged rules derive
+(w, n, R, c), or corrects a value to what those rules give; so a reduced variant, a round count,
+or a fix to the model that leaves the design unchanged is not a new candidate. When in doubt, it
+is a new candidate. The analysis budget per candidate, such as the solver time for trail bounds,
+is fixed in the plan before the first candidate is scored. The feature recommends stopping
+(security.md §21, option C) if none of the evaluated candidates is eligible, or if no published
+theorem's preconditions can be met by the mode. No candidate is eligible, for example, when an
+attack below the target reaches the full rounds of every candidate, or when R_bound is not
+established at the production width for any of them (strategy note §10; D10). The budget may
+only be lowered (FR-044): a budget lowered below the hours already used leaves zero hours, and a
+new measurement under a stricter rule counts against the same budget row. A stop is a valid,
+reportable outcome, reported with what was reached. After a stop, a later feature may evaluate
+further candidates only under its own pre-registered protocol and new model IDs, and it counts
+this feature's candidates, results and stop in its selection bias. *Stricter means*: budgets
+and the candidate limit only fall.
 
 ### Re-decided feature-002 requirements
 
 | Feature-002 requirement | Rule in feature 002 | Decision for `phyco-v3` | Reason |
 |-------------------------|---------------------|-------------------------|--------|
 | FR-001 | Integer operations only: add, subtract, XOR, AND, OR, NOT, constant shifts and rotations, comparisons, table lookups, conditional selection; no multiplication, division, modulo or power | Kept and made stricter: in Π and the mode's datapath only add, subtract, XOR, AND, OR, NOT, constant shifts and constant rotations; no multiplication, division, modulo or power; no table lookup, comparison or selection on secret data; comparisons only on public counters such as the output limits; no arithmetic shift, signed comparison or sign extension without the justification of FR-055 | Fixed operations and constant time (FR-020); no signedness corners (FR-055); S6, S12 |
-| FR-002 | Every value at most 32 bits, with signedness, wrap and comparison semantics stated | Kept for every datapath word (w = 32; reduced widths 4, 8 and 16). A public counter wider than 32 bits, such as an output-limit counter, is held as 32-bit words with a stated carry rule | Principle I; checklist group E |
+| FR-002 | Every value at most 32 bits, with signedness, wrap and comparison semantics stated | Kept for every datapath word (w = 32; reduced widths 4, 8 and 16). A public counter wider than 32 bits, such as an output-limit counter, is held as 32-bit words with a stated carry rule; it counts as a carry chain where it sits on a stage's path, and not when it is registered on a path of its own (FR-025) | Principle I; checklist group E |
 | FR-003 | Keep the `lut-v1` table, phase increments and quarter-period offset | Dropped: round constants by a stated rule, never repeated within a call, replace the public 128-step forcing | S2; slide attacks (group F) |
 | FR-004 | Keep the bio-inspired structure, including a threshold-triggered disruption | Revised: the structure stays as a documented mapping (FR-030), without the threshold-triggered disruption | D5; FR-020 |
 | FR-005 | Disruption on 1–50% of steps | Withdrawn with the disruption | D5 |
 | FR-006 | 32-bit unsigned output words from the generator's own state | Revised: the output is the rate part after a full call of Π, in one canonical serialization | FR-015; S5 |
-| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants | Checklist group C; feature-002 O2 |
+| FR-007 | No cryptographic primitive, standard PRNG or value derived from one | Re-decided (D6). Allowed: a standard mode with a published proof, with its padding and domain separation; published design and analysis methods; a plain counter, which is not a PRNG. Forbidden in Π, the mode and key loading: any published permutation, cipher, hash, MAC or standard PRNG, any component taken from one, and their constants. Constants come from a stated rule in a committed script that reproduces no published primitive's constants. The script holds a committed list of the polynomials and constant sets it refuses, each with its source: at least those of the reference designs of research R12 and of every design the rationale cites. The check fails if the chosen polynomial is listed, or if the constant table contains a listed sequence, also under word rotation or complement | Checklist group C; feature-002 O2 |
 | FR-008 | Bit-exact model; golden vectors for at least 2 development seeds × 10,000 words; an RTL-consumable description; RTL out of scope | Kept and extended to every size (FR-035, FR-036); RTL out of scope | Principle II; FUT-GRID-5 |
 | FR-009 | Seed domain of four integers in 0…65535 | Replaced by a 256-bit key and a 128-bit nonce (FR-006); `phyco-v2` keeps its seed domain | FUT-SEC-1; S1 |
 
 ### Security Policy traceability
 
+In the last column, **met by specification** means that a cited section of the design document
+(version and section) states how the requirement is met, that nothing remains to measure, and
+that the owner has accepted that section, at the security-target review that records L1 for
+FUT-SEC-1 to FUT-SEC-6 and FUT-SEC-9 (FR-012) or else at the owner design review. **Met by
+evidence** means that a record of FR-061 shows it, computed by code (FR-065). **Met by
+statement** means that the requirement applies only under a condition, and a cited decision
+states that the condition does not hold. The Evidence column cites the section or the record.
+
 | Requirement | Met in this feature by | Evidence | Expected status at the end |
 |-------------|------------------------|----------|----------------------------|
-| FUT-SEC-1 Key entropy | FR-005, FR-006, FR-010 | Security target; parameter table | Met by specification |
+| FUT-SEC-1 Key entropy | FR-005, FR-006, FR-010 | Security target; parameter table. FR-010's "key plus nonce at least 2s" and "reachable secret state at least 2s" answer the time–memory–data trade-offs on the key and on the state, the attack security.md applies to `phyco-v2`'s seed (S3, §5) | Met by specification |
 | FUT-SEC-2 Reachable secret state | FR-009, FR-010, FR-015, FR-017 | Parameter table per size; the 2×2 decision | Met by specification at every claimable size |
 | FUT-SEC-3 Stream separation | FR-006, FR-014 | Nonce rule; domain separation | Met by specification |
-| FUT-SEC-4 Reseeding | FR-004, FR-016 | Prediction resistance not sought (D7) | Not applicable, as stated |
-| FUT-SEC-5 Initialization analysis | FR-013, FR-014, FR-029 | Key loading specified; diffusion through instantiation | Met by specification; the attack analysis open for feature 005 |
+| FUT-SEC-4 Reseeding | FR-004, FR-016 | Prediction resistance not sought (D7) | Met by statement: it applies only if prediction resistance is claimed, and D7 does not seek it |
+| FUT-SEC-5 Initialization analysis | FR-013, FR-014, FR-029, FR-049 | Key loading specified; diffusion through instantiation; the first-order related-key and related-nonce differences of research R4, reported as "a single-difference avalanche measurement, not a related-key analysis" | Met by specification for its specified part; related-key and related-IV attacks beyond first order, weak-key classes and key-dependent effects open for feature 005 (FR-049) |
 | FUT-SEC-6 Output limit | FR-007 | Limits derived from the theorem; refusal beyond them | Met by specification |
 | FUT-SEC-7 Re-validation | FR-035, FR-036, FR-043 | New model ID, vectors, design freeze | Partly met; the statistical programme open for feature 007 |
 | FUT-SEC-8 Demonstration first | FR-001 to FR-003 | Demonstration record and its review | Done |
-| FUT-SEC-9 Certification route | FR-011 | Named route (D8) | Met by specification |
-| FUT-GRID-1 Parameterised size | FR-018 | Generics and the list of supported sizes | Met by specification and model |
-| FUT-GRID-2 Key fills the state at every size | FR-009, FR-017 | Parameter table; the 2×2 decision | Met at every claimable size |
-| FUT-GRID-3 Mixing across the grid | FR-029 | R_f, R_b; diffusion through instantiation | Met by evidence |
-| FUT-GRID-4 Per-node constants by rule | FR-023, FR-024 | Constant script; symmetry checks | Met by evidence |
+| FUT-SEC-9 Certification route | FR-011 | Named route (D8), with "class unconfirmed" beside it until the AIS 20/31 version 3.0 download is read | Met by specification; the functionality class an open item, closed at the security-target review |
+| FUT-GRID-1 Parameterised size | FR-018 | Generics and the list of supported sizes | Partly met: the generics cover n = 2…16 in the model, the supported sizes are listed, and n = 5, 6, 7 and 9…15 are open items with their reason (FR-018) |
+| FUT-GRID-2 Key fills the state at every size | FR-009, FR-017, FR-018, FR-025 | Parameter table; the 2×2 decision; a keyed variant at every supported size | Met at every claimable size; not met at the research sizes 2×2 and 3×3, a conflict decided by D3 (FR-017; security.md §20.1, option 1). Key and nonce loading is defined for every supported size through its keyed variant (FR-018) |
+| FUT-GRID-3 Mixing across the grid | FR-015, FR-029 | R_f, R_b; diffusion through instantiation; the output is the rate part after a full call of Π, and every output bit depends on every input bit after R_f rounds | Met by evidence; the clause "output taps MUST NOT depend only on a local neighbourhood" met by specification |
+| FUT-GRID-4 Per-node constants by rule | FR-023, FR-024, FR-031 | Constant script; symmetry checks | Met by evidence; the clause "disruption behaviour MUST be re-established at each size" not applicable, since D5 removes the disruption (FR-031) |
 | FUT-GRID-5 Validation per size | FR-036 | Vectors per size | Vectors met; the statistics per size open for feature 007 |
-| FUT-HW-1 Generic VHDL | FR-018, FR-020, FR-027, FR-055, FR-056 | Generics, exact semantics, a sign-free datapath, the frozen oracle | Specified; RTL, GHDL equivalence and 0 DSP blocks open for feature 006 |
-| FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Carry chains per stage; output bits per round; estimated cost | Designed for; Vivado post-route results open for feature 008 |
-| FUT-HW-3 Performance on the board | FR-026 | Throughput implied at 200 MHz | Measurement open for features 006 and 008 |
-| FUT-HW-4 Equivalence and statistics from hardware output | FR-036, FR-054, FR-056 | Vectors, constructed-state vectors, the oracle | Open for feature 008, whose spec states which battery levels run on hardware output and which on the C stream |
-| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test | Open for feature 008, whose spec lists the board tests and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
+| FUT-HW-1 Generic VHDL | FR-018, FR-020, FR-027, FR-055, FR-056 | Generics, exact semantics, a sign-free datapath, the frozen oracle. Design-level criteria: every operation's width, signedness and shift kind stated (FR-027); a sign-free datapath (FR-055); no multiplication in the operation set, for 0 DSP blocks, with an instruction to feature 006 that synthesis must not map additions to DSP slices | Specified; RTL, GHDL equivalence and 0 DSP blocks open for feature 006 |
+| FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Carry chains per stage; output bits per round; estimated cost. Design-level criteria: the chain and LUT-level counts per stage (FR-025) and the size estimate against the device (FR-026) | Designed for; Vivado post-route results open for feature 008 |
+| FUT-HW-3 Performance on the board | FR-026 | Throughput implied at 200 MHz. Design-level criterion: the implied throughput for the stated request sizes and output interface (FR-026) | Measurement open for features 006 and 008 |
+| FUT-HW-4 Equivalence and statistics from hardware output | FR-036, FR-054, FR-056 | Vectors, constructed-state vectors, the oracle. Design-level criterion: vectors traced at stage granularity (FR-036) | Open for feature 008, whose spec states which battery levels run on hardware output and which on the C stream |
+| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test. Design-level criteria: the cycle formulas (FR-020), the port list with no read-back path and the zeroization list (FR-025) | Open for feature 008, whose spec lists the board tests and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
 
 ### Redesign checklist (`seed-entropy-bound.md` §5.3)
 
@@ -1054,7 +1778,7 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 | §3 what a claim needs | FR-005, FR-006 (entropy input), FR-009, FR-010, FR-011, FR-016 |
 | §4 consequences | Context; FR-035, FR-036, FR-040, FR-049 |
 | §5 FUT-SEC-1 to FUT-SEC-9 | table "Security Policy traceability" |
-| §5.1 FUT-GRID-1 to FUT-GRID-5 | table "Security Policy traceability" |
+| §5.1 FUT-GRID-1 to FUT-GRID-5 | table "Security Policy traceability", including FUT-GRID-3's output-taps clause (met by specification, FR-015, FR-029) and FUT-GRID-4's disruption clause (not applicable, FR-031) |
 | §5.2 the board and FUT-HW-1 to FUT-HW-5 | table "Security Policy traceability"; 006, 008 |
 | §5.3 redesign checklist | FR-048; table "Redesign checklist" |
 | §6 superseded feature description | superseded by the Input |
@@ -1103,9 +1827,11 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Tool validation record**: tool, version, licence, the known result re-found, outcome, date.
 - **Demonstration record**: targets, revealed words, matches after one, two and three words, cost
   per candidate, total, extrapolation, machine, commands, hashes.
-- **Design freeze record**: hashes of the design document, model, vectors (constructed-state
-  vectors included) and the constant and vector scripts; R and its inputs; tool versions;
-  `git_head`, `git_dirty`.
+- **Design freeze record**: hashes of the design document, `rationale.md`, model, vectors
+  (constructed-state vectors included), the constant and vector scripts, the selected operation
+  list, `research/004/ir.py` and the verdict scripts; R and its inputs; the last `seq` and line
+  hash of each log; tool versions; `git_head`, `git_dirty`; status (`draft`, then approved) and
+  the owner's approval (FR-043).
 - **Baseline archive**: the `phyco-v2` files, with SHA-256 and source, in a manifest.
 - **Constructed-state vector**: the edge state, how it was constructed, whether any key reaches
   it, inputs, outputs, SHA-256.
@@ -1113,7 +1839,10 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   (FR-061).
 - **Provenance record**: file, tool and model, date, task ID, review status.
 - **Claim and evidence register**: model ID, claim level, claim or "no claim", bound, evidence
-  records.
+  records, and the allow-list of flagged lines, each with its reason (FR-069).
+- **Protocol change log**: one chained, append-only entry per change of a pre-registered rule:
+  date, rule, old and new text, reason, direction, approver, the last record ID before it and
+  the results known then (FR-044).
 - **Review package**: the items of security.md §14, with exact revisions.
 
 ## Success Criteria *(mandatory)*
@@ -1123,48 +1852,60 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **SC-001**: For each of the 3 targets, the FUT-SEC-8 sweep recovers the target seed within one
   pass over 2³² candidates, the matches after one, two and three words are reported against the
   baseline, and the owner's review is recorded before any `phyco-v3` instantiation code exists.
-- **SC-002**: 9 of 9 FUT-SEC requirements are traced to requirements, tasks and evidence:
-  FUT-SEC-1 to FUT-SEC-6 and FUT-SEC-9 are met by specification, FUT-SEC-8 is done, and
-  FUT-SEC-7 is listed as open.
+- **SC-002**: 9 of 9 FUT-SEC requirements are traced to requirements, tasks and evidence, with
+  the statuses of table "Security Policy traceability" in the terms it defines: FUT-SEC-1,
+  FUT-SEC-2, FUT-SEC-3, FUT-SEC-6 and FUT-SEC-9 are met by specification; FUT-SEC-4 is met by
+  statement (D7); FUT-SEC-5 is met by specification for its specified part, with its analysis
+  open for feature 005 (FR-049); FUT-SEC-8 is done; and FUT-SEC-7 is listed as open.
 - **SC-003**: Every claimable size satisfies every generic bound of security.md §12.2, with 0
-  violations, and every supported size states its key entropy, reachable secret state and bound.
-- **SC-004**: Π⁻¹(Π(x)) = x and Π(Π⁻¹(x)) = x hold on 100% of test inputs at every supported size
-  and variant, and the smallest variant maps its 2³² inputs to 2³² distinct outputs.
+  violations, every check of `parameters.json` that can fail passes (each output limit at most
+  what the theorem allows at ε, k/2 ≥ s, and the stated nonce-reuse behaviour with its test),
+  and every supported size states its key entropy, reachable secret state and bound.
+- **SC-004**: Π⁻¹(Π(x)) = x and Π(Π⁻¹(x)) = x hold on 100% of the test inputs of research R13
+  (the 16 vector inputs and 2¹⁰ development test states, counts that may only rise) at every
+  supported size and variant, and the smallest variant maps its 2³² inputs to 2³² distinct
+  outputs.
 - **SC-005**: R_f and R_b are reported for 100% of supported sizes, and R at every claimable size
   equals the round rule's value, with every input cited.
-- **SC-006**: The committed script reproduces 100% of the constants, no constant repeats within a
-  call, and 0 non-trivial grid translations or rotations preserve any constant pattern at any
-  supported size.
-- **SC-007**: 100% of counted tool results have a validation record older than they are: S12,
-  S13, S14, S15 and the FUT-SEC-8 recovery are re-found on `phyco-v2`, and a published optimal
-  trail is re-found.
+- **SC-006**: The committed script reproduces 100% of the constants on both platforms of
+  SC-009; within one call no two constants are equal, equal up to a word rotation, complements
+  of one another, or rotations of complements; and 0 non-trivial grid translations or rotations
+  preserve any constant pattern at any supported size.
+- **SC-007**: 100% of counted tool results have a validation record older than they are: its
+  `created_utc` is earlier, and the counted record cites its ID and SHA-256. Every counted tool
+  has a known result (FR-039): S12, S13, S14, S15 and the FUT-SEC-8 recovery are re-found on
+  `phyco-v2`, a published optimal trail is re-found, and the symmetry, dependency, bijectivity,
+  avalanche and cost-model checks re-find their stated known results.
 - **SC-008**: Every claimable size has an established R_bound from recorded trail bounds, each
   citing its method, tool and validation.
-- **SC-009**: 100% of the committed vectors and known-answer tests are reproduced on both
-  Windows and Linux.
-- **SC-010**: 100% of reduced-variant requests and 100% of requests beyond an output limit are
-  refused by the production interface.
-- **SC-011**: 0 candidate designs that produced evidence are missing from the candidate log, 0
-  log entries are deleted, 0 held-out keys are created or used, and no family has more than
-  three candidates in the log.
+- **SC-009**: 100% of the generated files (the vectors, known-answer tests, constants and
+  constructed-state vectors) are reproduced on both Windows and Linux, the latter in WSL.
+- **SC-010**: 100% of reduced-variant requests and 100% of requests beyond any limit of FR-007
+  (output volume, calls of Π, instantiations per key, reseeds per instantiation) are refused by
+  the production interface.
+- **SC-011**: 0 candidate designs are missing from the candidate log, whether or not they
+  produced evidence, 0 log entries are deleted, 0 held-out keys are created or used, and no
+  family has more than three candidates in the log.
 - **SC-012**: Every archived `phyco-v2` file matches its manifest hash and its live source, and
   every frozen file of features 002 and 003 still hashes as recorded.
 - **SC-013**: The design rationale covers 100% of the items of security.md §8, and the owner
   design review, the external review record and the design freeze are recorded.
 - **SC-014**: 9 of 9 carried-over feature-002 requirements and every item of the §5.3 checklist
   have a recorded disposition.
-- **SC-015**: No report, document or comment describes `phyco-v3`, or any model, as
-  cryptographically secure, proven secure or unbreakable, or states a security strength as
-  achieved, and every report carries the disclaimer.
+- **SC-015**: No report, document, code comment or docstring (in the files FR-069 scans)
+  describes `phyco-v3`, or any model, as cryptographically secure, proven secure or
+  unbreakable, or states a security strength as achieved, and every report carries the
+  disclaimer.
 - **SC-016**: 100% of the edge states the design document lists have a constructed-state
-  vector, and the second transcription agrees with the model at 100% of the steps of the
-  committed vectors.
+  vector, reproduced on both platforms of SC-009, and the second transcription agrees with the
+  model at 100% of the steps of the committed vectors.
 - **SC-017**: 100% of evidence records hold every field of security.md §17.2 and the disclaimer,
   100% of findings carry a classification of security.md §9.1, and the re-check scripts
-  reproduce 100% of the verdicts.
+  reproduce 100% of the verdicts on a fresh clone from committed files alone (FR-065).
 - **SC-018**: The claim-register test reports 0 disagreements between the register, README,
-  security.md and the disclaimers, and 0 uses of forbidden wording outside the rules that
-  forbid it.
+  security.md and the disclaimers, 0 uses of forbidden wording outside the rules that forbid
+  it, and 0 strengths stated without "target" or a quoted rule outside the register's
+  allow-list (FR-069).
 - **SC-019**: 100% of the sections and items of the four input documents have a requirement or a
   recorded disposition (section "Input coverage"), and the final report maps 12 of 12 rules
   R1–R12 of the hardware note.
@@ -1187,8 +1928,14 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   downloads, each needing permission. If none is approved, bounds come from self-written
   exhaustive or branch-and-bound searches, validated in the same way (FR-039). Analysis tools
   are never imported by the core model.
-- **AIS 20/31 version 3.0** (D8) also needs a download with permission. Until it is read, the
-  route stays named with its functionality class unconfirmed, as an open item.
+- **AIS 20/31 version 3.0** (D8) is among the downloads the owner approved (research R19), and
+  none has been made yet. Until it is read, the route stays named with "class unconfirmed"
+  beside it, an open item closed at the security-target review once the class is confirmed or
+  changed in the design document (FR-011).
+- **Key source**: the caller supplies a 256-bit key with full entropy, uniform and secret, from
+  an established cryptographic random-number generator, never from a PhycoWeb-PRNG model. The
+  generator cannot check this, and a key with less entropy caps the strength at that entropy
+  (FR-006, FR-010).
 - **Python model speed**: about 2 × 10⁵ words/s for `phyco-v2` at 2×2. A permutation of a large
   grid will be much slower, so the plan sets vector lengths at large sizes (FR-036).
 - **Square grids only**; rectangular grids are out of scope.

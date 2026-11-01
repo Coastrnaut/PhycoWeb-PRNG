@@ -44,7 +44,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| V1 | `python scripts/validate_tool.py --tool <tool> --known s13-transport --out-dir $REP/validation`, and the same for `s12`, `s13-decay`, `s14`, `s15` | `re-found` records (SC-007) |
+| V1 | `python scripts/validate_tool.py --tool <tool> --known s13-transport --out-dir $REP/validation`, and the same for `s12`, `s13-decay`, `s14`, `s15` and for each structural tool's known result of research R13 (symmetry, dependency propagation, exhaustive bijectivity, avalanche, cost model) | `re-found` records, one for every counted tool (SC-007); the bias test's record also shows it firing in 82 to 97 of the 100 synthetic sets (R4) |
 | V2 | `validate_tool.py --tool <trail tool> --known speck32-diff` (and `speck32-lin`, `present-5r`, `sparkle-box`) | `re-found`; exit 2 without a recorded source for the value |
 
 ## Security target (T, US2)
@@ -70,12 +70,12 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| M1 | `python scripts/gen_constants_v3.py --check` | exit 0 (SC-006) |
+| M1 | `python scripts/gen_constants_v3.py --check` on Windows; `wpy scripts/gen_constants_v3.py --check` in WSL | exit 0 on both (SC-006, SC-009) |
 | M2 | `python scripts/gen_vectors_v3.py --check` on Windows; `wpy scripts/gen_vectors_v3.py --check` in WSL | exit 0 on both (SC-009) |
-| M3 | `python scripts/gen_constructed_v3.py --check` | exit 0 (SC-016) |
-| M4 | `python -c "from phycoweb.model_v3 import Generator; Generator('phyco-v3/n2-w16-R8-c64')"` | `VariantRefused` (SC-010) |
+| M3 | `python scripts/gen_constructed_v3.py --check` on Windows; `wpy scripts/gen_constructed_v3.py --check` in WSL | exit 0 on both (SC-016, SC-009) |
+| M4 | `python -c "from phycoweb.model_v3 import Generator; Generator('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `VariantRefused` (SC-010) |
 | M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, call-sequence errors including any call after `zeroize`, boundaries (FR-058) |
-| M6 | `python -c "from phycoweb.model_v3 import ResearchDuplex as D; D('phyco-v3/n2-w16-R8-c64').instantiate(bytes(32), bytes(16))"` | `ValueError`: that variant takes an 8-byte key and a 4-byte nonce (R14) |
+| M6 | `python -c "from phycoweb.model_v3 import ResearchDuplex as D; D('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `ValueError` at construction: that variant takes an 8-byte key, and a 4-byte nonce at `instantiate` (R14) |
 
 ## Second transcription (X)
 
@@ -89,6 +89,6 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | Step | Command | Expected |
 |------|---------|----------|
 | F1 | `python scripts/design_freeze.py create` before the owner design review | exit 2 |
-| F2 | after the reviews: `create`; owner approval; `validate` | exit 0 (FR-043) |
-| F3 | `python scripts/recheck_004.py` | 0 disagreements (SC-017) |
+| F2 | after the reviews, the five steps of [contracts/cli.md](./contracts/cli.md): the owner commits the feature files; `create` on a clean tree (status `draft`); the owner's approval; the owner commits the record; `validate` | exit 0 (FR-043); `validate` exits 2 while the record is `draft` |
+| F3 | `python scripts/recheck_004.py` in a fresh clone | 0 disagreements (SC-017) |
 | F4 | `python scripts/check_claims.py` | 0 findings (SC-015, SC-018) |

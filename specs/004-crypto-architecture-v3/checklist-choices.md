@@ -14,6 +14,13 @@ Nothing in the spec, the plan, research.md or the checklists changes until the o
 and no checklist item is ticked here. Ticking stays with the reviewer, as each checklist's
 "Review Ownership" note says.
 
+**Status: answered on 2026-11-01, "all recommended" (owner).** Option A of every row is applied
+where its Changes cell names a document: the spec, plan.md, research.md, data-model.md, the two
+contracts, quickstart.md, security.md (version 2.11) and `.gitattributes`. A row that also names
+a later feature or a document not yet written (the design document, a test, the final report)
+is held there by the spec requirement its Changes cell names. No checklist item is ticked: that
+stays with the reviewer.
+
 ## How to answer
 
 - Reply "all recommended", or give letters by ID, for example "SEC-010 B, HW-003 C, the rest

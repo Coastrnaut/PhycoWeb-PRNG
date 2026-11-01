@@ -5,35 +5,61 @@
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
 Exit codes, as in feature 003: **0** success; **1** completed with a failing or non-PASS verdict
-(by design); **2** refused by a guard (wrong namespace, missing approval, budget exhausted, a
-fourth candidate, a size out of order, lock held, hash mismatch, broken log chain, existing
+(by design); **2** refused by a guard (wrong namespace or index, missing approval, budget
+exhausted, a fourth candidate, a size out of order, an operation list not in the log, an
+environment that does not match its pins, lock held, hash mismatch, broken log chain, existing
 record), and nothing is written; **3** tool or I/O error, a recorded tool defect included.
 `REP=reports/004-crypto-architecture-v3`. Every record is written through `protocol/evidence.py`
 ([data-model.md](../data-model.md) §1).
 
 ## Guards shared by every script
 
+- **Environment**: `protocol/evidence.py` checks at start that the interpreter and the
+  installed packages match research R1 and the pins of `requirements.txt` for that platform,
+  and exits 2 on any mismatch. A changed environment needs R1 updated first, with the owner's
+  approval.
 - **Inputs**: only the namespaces `dev` and `control` of `protocol/devinputs_v3.py`, and for
-  US1 the feature-002 `dev` set; anything else exits 2 (FR-040).
+  US1 the feature-002 `dev` set; anything else exits 2 (FR-040). `control` serves only uniform
+  controls and `dev` is never a control: each evidence kind's namespace is fixed in code, not
+  chosen on the command line, and the loader refuses `control` for any kind but a control and
+  any index outside the use's declared range. Every tool that reads feature 002's or 003's seed
+  sets loads only feature 002's `dev` set, with `allow=("dev",)` as `fut_sec8.py` does, and
+  exits 2 on any held-out set, as security.md §11.3 requires of development tools;
+  `tests/test_protocol_004.py` checks every such call.
+- **Operation lists**: every tool refuses an operation list whose SHA-256 has no `proposed` or
+  `correction` entry in the candidate log, exit 2 (FR-041).
 - **Heavy runs** (`seed_search` sweeps, exhaustive bijectivity, trail searches, the frequency and
   avalanche tests): take `data/heavy-run.lock` with an exclusive create; if it exists, exit 2.
   The lock holds the PID, command and start time and is removed on exit (FR-045).
-- **Hash-chained logs**: every append to `research/004/candidates.jsonl` or `$REP/provenance.jsonl`
-  takes `data/log-append.lock` by exclusive create, checks the chain up to the last line,
-  appends one line chained to it and releases the lock. It exits 2, appending nothing, if the
-  lock is not free within 10 s or the chain is broken (research R16).
+- **Hash-chained logs**: every append to `research/004/candidates.jsonl`,
+  `research/004/protocol-changes.jsonl` or `$REP/provenance.jsonl` takes
+  `data/log-append.lock` by exclusive create, checks the chain up to the last line, appends one
+  line chained to it and releases the lock. It exits 2, appending nothing, if the lock is not
+  free within 10 s or the chain is broken (research R16).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7).
-- **Order of US1**: any script that loads a key into a `phyco-v3` state exits 2 unless the
-  "FUT-SEC-8 result review" row of the spec's Review & Approval table reads Approved (FR-003);
-  `tests/test_protocol_004.py` fails if `phycoweb/model_v3.py` defines key loading before that.
-- **Tool validation**: a result of a tool without a `re-found` validation record of its kind is
-  written with `status` `not evaluated` and never counts (FR-039).
+- **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
+  exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table reads
+  Approved (FR-001, FR-003). Key loading is code that loads a key into such a state: the mode's
+  instantiate in the model, the research duplex, and any script that runs instantiate, such as
+  the instantiation states of research R4. It is not the development-input loader, which
+  derives keys but loads none, nor a keyless operation list of Π, nor the design document's
+  text. `tests/test_protocol_004.py` fails if `phycoweb/model_v3.py` or a candidate defines key
+  loading before that.
+- **Tool validation**: one rule for every counted result, positive or negative (FR-039). A
+  result of a tool without a `re-found` validation record of its kind and of its exact hash is
+  written with `status` `not evaluated` and never counts; a trail or distinguisher it finds is
+  recorded as an unverified hypothesis, `blocked`, which blocks the candidate's eligibility
+  until a validated tool, or direct evaluation with the validated exact models, settles it
+  (data model §5). A tool is validated again after any change to its code (its SHA-256
+  differs), a dependency upgrade, or a use at a word width, operation set or kind of model
+  outside its validated kind; until then its results are `not evaluated`.
 - **Budget**: a script refuses work on a candidate whose budget row is spent (R7), exit 2, and a
   search that reaches its per-instance cap writes `inconclusive`. A heavy run first projects its
-  hours on the candidate (at most 60 s) and exits 2, writing nothing, if the projection does not
-  fit the hours left in its row.
+  hours on the candidate (at most 60 s), writing a `projection` record (data model §1), and
+  exits 2, writing no evidence, unless its projection, plus the projections (probes only) of
+  the same kind of run at every larger claimable size, fits the hours left in its row.
 - **Trail tools**: once the feature's first trail search has started, a trail tool without an
   earlier `re-found` record is refused, exit 2 (research R12).
 
@@ -58,6 +84,8 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 
 ```text
 fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8 [--repeat-after-defect ID]
+fut_sec8.py --verify RECORD
+fut_sec8.py --reproduce RECORD --binary fast/build/seed_search --out-dir $REP/fut-sec-8
 ```
 
 Takes the targets from `protocol.seedsets.load("dev", allow=("dev",))[:3]`, computes the
@@ -65,6 +93,15 @@ observations with `phycoweb/model_v2.py`, runs the vector check, then one sweep 
 separates any extra three-word match with the fourth word, and writes the demonstration record
 (data model §4). A second run exits 2 unless `--repeat-after-defect` names a recorded tool
 defect (spec Edge Cases). Exit 1 if a target is not recovered.
+
+Neither of the other two modes is a demonstration attempt:
+
+- `--verify RECORD` re-checks every listed three-word match and every recovered seed with
+  `model_v2`, in seconds, with no sweep. Exit 1 on any disagreement.
+- `--reproduce RECORD` is allowed only after the FUT-SEC-8 result review, and exits 2 before
+  it. It re-runs the sweep as a heavy run and writes a `fut-sec-8-reproduction` record, compared
+  field by field with the original (data model §4). It can neither replace the demonstration
+  record nor change the review, and a difference is a finding, exit 1.
 
 ## `scripts/archive_phyco_v2.py`
 
@@ -83,9 +120,12 @@ validate_tool.py --tool NAME --known KNOWN_ID --out-dir $REP/validation
 ```
 
 Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `s15`,
-`fut-sec-8`, or a published value such as `speck32-diff`, `speck32-lin`, `present-5r`,
-`sparkle-box`) and writes a validation record (data model §7). Exit 1 if not re-found. A
-published value needs its source recorded (paper, table, value) or exits 2.
+`fut-sec-8`, a published value such as `speck32-diff`, `speck32-lin`, `present-5r`,
+`sparkle-box`, or a structural tool's known result of research R13) and writes a validation
+record (data model §7). Exit 1 if not re-found. A published value needs its source recorded
+(the entry of `$REP/downloads.json`, or a value the owner provides with its source, and the
+paper's table and value) or exits 2. After a failed validation, the re-validation names a
+second known result of the tool's kind as well as the first.
 
 ## `scripts/evidence_v3.py`
 
@@ -101,8 +141,10 @@ are those of research R4 and R13 and cannot be lowered by an option: a `frequenc
 both input sets, and an `avalanche` run the flip set and the related-key, related-nonce and
 rotational sets. An `avalanche` run needs the candidate's `dependency` record at the same size,
 or exits 2; a disagreement with its matrices writes the record with `status` `inconclusive` and
-a tool-defect entry, and exits 3. `--project` prints the projected hours against the budget row
-and writes nothing.
+a tool-defect entry, and exits 3. Every run started writes a record, even if aborted
+(`inconclusive` or `blocked`, with the reason). `--project` runs the timing probe of research
+R7, writes a `projection` record and prints the projected hours against the budget row; it
+writes no evidence.
 
 ## `scripts/d4_choice.py`
 
@@ -145,9 +187,13 @@ gen_vectors_v3.py [--check] [--variant ID ...]   # writes vectors/phyco-v3/ (res
 gen_constructed_v3.py [--check]                  # writes the constructed-state vectors
 ```
 
-Each writes LF files and records its command, the model's SHA-256, the measured speed and the
-generation time. `--check` regenerates in memory and exits 1 on any byte difference. After the
-freeze, writing over a frozen file exits 2.
+Each writes only deterministic content, under the format rules of the data model's
+introduction. The command (script and arguments, relative to the repository root), the
+interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to
+the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run (data model §11),
+which `--check` does not compare. `gen_constants_v3.py` also writes each constant table as
+`vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory and exits 1 on any
+byte difference. After the freeze, writing over a frozen file exits 2.
 
 ## `scripts/design_freeze.py`
 
@@ -155,6 +201,15 @@ freeze, writing over a frozen file exits 2.
 design_freeze.py create                 # writes $REP/freeze/freeze.json with status draft
 design_freeze.py validate               # recomputes every hash
 ```
+
+The freeze runs in five steps (FR-043): (1) the owner commits the feature files; (2) `create`
+runs with `git_dirty` false and writes the record as `draft`; (3) the owner's approval is
+written into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
+tracked file modified or an untracked file not ignored; ignored files, the locks and the
+local-only outputs, do not count. The record holds what data model §13 lists: among others
+`rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the verdict
+scripts, every evidence record behind R by ID and by SHA-256, and the last `seq` and line
+SHA-256 of the candidate log, the provenance log and the protocol change log.
 
 `create` exits 2 if the owner design review row is not Approved, if the external review row is
 neither done nor "not arranged", or if `git_dirty` is true. `validate` exits 1 on any hash
@@ -167,7 +222,24 @@ recheck_004.py [--kind KIND]
 ```
 
 Recomputes every verdict of the feature from saved outputs (FR-065) and compares it with the
-recorded one. Exit 1 on any disagreement, with each listed.
+recorded one. Exit 1 on any disagreement, with each listed. Every verdict is recomputable on a
+fresh clone from committed files, so it works from the committed per-round summaries, for
+example R_f from the per-round flag "every output bit depends on every input bit". Where
+local-only outputs are present, it also re-derives each committed summary from them. Its output
+lists both checks per kind, and it verifies the inventory of superseded operation lists
+(data model §3).
+
+## `scripts/repair_log.py`
+
+```text
+repair_log.py --log LOG --approval REF
+```
+
+Repairs a broken hash chain in one of the three logs, only with the owner's recorded go-ahead,
+which `--approval` cites; without it, exit 2. The broken file is kept unchanged with its
+SHA-256, and a `repair` entry records the break's position, its cause and what was restored.
+Entries after the break count only where the records they cite corroborate them, and the final
+report states the repair (research R16).
 
 ## `scripts/check_claims.py`
 
