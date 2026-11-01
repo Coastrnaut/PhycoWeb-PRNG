@@ -1,16 +1,22 @@
-# Next Steps: Feature 004, Cryptographic Redesign Part 1
+# Next Steps: Feature 004 and Experiment E1
 
 Date: 2026-10-31.
 
 **Status:** a proposal for owner review, drafted by the AI coding agent. Nothing here is approved
-yet, and nothing here is a security claim. The reasoning is in the research note
+yet, and nothing here is a security claim. The reasoning for feature 004 is in the research note
 [`research/security/crypto-redesign-strategy.md`](research/security/crypto-redesign-strategy.md)
-(the strategy note). The policy is in [`security.md`](security.md) 2.7 and the
+(the strategy note), and the argument for both tracks is set out as three assertion outlines in
+[`research/assertion-outlines.md`](research/assertion-outlines.md). Experiment E1 (section 7) is
+described in [`research/engagement/scrutiny-game.md`](research/engagement/scrutiny-game.md). The
+policy is in [`security.md`](security.md) 2.7 and the
 [constitution](.specify/memory/constitution.md) 1.2.0, which prevails.
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,
 > nonces, tokens and salts.
+
+> **The Truth.** When faced with adversity, maintain composure to creatively improve stakeholder
+> engagement of diverse ideas and perspectives in engineering and learning.
 
 ## 1. Before the first prompt
 
@@ -20,6 +26,8 @@ yet, and nothing here is a security claim. The reasoning is in the research note
 3. Decide the questions in section 3, or leave them to `/speckit-clarify`.
 4. Optionally, amend the constitution (section 2).
 5. Approve the strategy note and the security.md 2.7 changes.
+6. Optionally, read Outline A of the assertion outlines: it is the argument feature 004 starts to
+   make, as a plan rather than a claim.
 
 ## 2. Optional: constitution amendment (`/speckit-constitution`)
 
@@ -148,3 +156,136 @@ prompts are in strategy note §9.3.
 
 An attack on the full design at any point sends the work back to 004 with a new model ID, or
 stops it (Option C, security.md §21).
+
+Experiment E1 (section 7) runs beside these features. It shares no gates with them and changes no
+claim level.
+
+## 7. Experiment E1: the Scrutiny Game (proposed)
+
+E1 is a scenario game about public cryptographic scrutiny. Players practise self-awareness,
+empathy and emotion regulation on cards built from the project's real findings, and the humor
+style of the game's guide is the variable under test. The generator deals the cards in public
+from a published seed, which is a permitted use (security.md §4); allocation to arms, prize draws
+and participant codes use the operating-system CSPRNG instead, because they must not be
+predictable. The design is in
+[`research/engagement/scrutiny-game.md`](research/engagement/scrutiny-game.md), and the argument
+for it is in Outlines B and C of
+[`research/assertion-outlines.md`](research/assertion-outlines.md).
+
+E1 is a separate track: it needs none of feature 004's gates, feature 004 needs none of its
+gates, and it changes no claim level. It does involve people, so it has gates of its own, and
+the first of them comes before any code. Think of it as the friendly match played beside the
+tournament: different rules, same board, and nobody's rating changes.
+
+### 7.1 Before the E1 prompt
+
+1. Finish feature 003 and run `/speckit-converge` on it (section 1), so that the tooling never
+   points at two unfinished features at once.
+2. Decide where E1 runs. The constitution's Mission covers evaluating the generator, not research
+   with people, so running E1 from this repository needs the amendment in section 7.2. The
+   alternative is a separate repository that uses the generator as a dependency.
+3. Find the ethics body: a research ethics committee or institutional review board that will
+   review the study before anyone is recruited.
+4. Decide the questions in section 7.4, or leave them to `/speckit-clarify`.
+
+### 7.2 Constitution amendment for E1 (`/speckit-constitution`)
+
+Needed only if E1 runs from this repository:
+
+```text
+Amend the constitution for experiment E1. MINOR: extend the Mission with a second, separate
+objective: studying how humor and emotional intelligence help people give and receive public
+scrutiny of the generator, without changing any claim about it. Add a Human Participants
+Policy: no study with people MAY recruit anyone before a research ethics committee or
+institutional review board has approved it and the owner has approved its start, with both
+approvals recorded in the repository; participants MUST be adults who gave informed consent,
+and MAY withdraw at any time; emotions MUST be self-reported, never inferred from faces, voices
+or other biometric data; humor MUST NOT target a participant, a real person or a group, and
+MUST stop for any participant who reports distress; personal data MUST be minimal and
+pseudonymous and MUST be kept out of the repository; the generator MAY only do public,
+reproducible work where predictability is harmless, and allocation to study arms, prize draws
+and participant codes MUST use an established CSPRNG. The Security Policy is unchanged and may
+only become stricter.
+```
+
+### 7.3 Experiment E1 (`/speckit-specify`)
+
+Run `/speckit-specify` with `SPECIFY_FEATURE_DIRECTORY=specs/e1-scrutiny-game` set, so that E1
+takes no feature number and the cryptographic stages keep 004 to 009 (security.md §22). The
+setting is written to `.specify/feature.json`, which then points at E1; before running a command
+for the other track, set `SPECIFY_FEATURE_DIRECTORY` to that track's directory again.
+
+```text
+Experiment E1, the Scrutiny Game: a pre-registered study of humor and emotional intelligence in
+public cryptographic scrutiny, with PhycoWeb-PRNG as its case study. This feature makes no claim
+about the generator and changes no claim level (security.md section 15).
+
+Why: the generator can earn trust only through public scrutiny (security.md sections 7 and 15,
+level L5), and scrutiny is hard on the people who give and receive it. Players practise
+self-awareness, empathy and emotion regulation on scenario cards built from the project's real
+findings and events (security.md section 9.2, S1-S15), and the humor style of the game's guide
+is the variable under test: affiliative, gently self-deprecating about the project, sarcastic
+about the situation only, or none, against a reading control.
+
+Scope, in order:
+1. Research questions, hypotheses, outcomes and an analysis plan ready for pre-registration:
+   emotion understanding and management before and after (STEU and STEM, if their research-use
+   terms allow), humor style as a moderator (HSQ), perceived support, enjoyment, a manipulation
+   check, and open answers analysed by thematic analysis.
+2. A pilot of about 20 to 40 adults for feasibility, and a confirmatory design sized by a power
+   analysis on the pilot; the number of arms may shrink to what the power allows.
+3. The scenario deck: cards written by people, each with its adversity, cast, skill, choices, a
+   debrief in every humor style, and what the project actually did; composites only, with no
+   real reviewer named or quoted.
+4. A humor style guide and safety rules: empathy before any joke, humor off at the player's
+   request, no joke about a person or group, no joke on a turn where the player reports
+   distress, and support contacts checked by the ethics body.
+5. Randomness roles: phyco-v2 deals the card order and the questionnaire order from a published
+   study seed (a permitted, harmless use; security.md section 4); allocation to arms, prize
+   draws and participant codes use the operating-system CSPRNG; no development or held-out seed
+   is used, and nothing from E1 feeds any acceptance decision.
+6. No emotion inference: self-report only, with no camera, no microphone and no automated
+   emotion analysis; language-model characters only in a later, optional phase, with every
+   output logged.
+7. An ethics package (consent, debrief, distress rule, data plan) and a local, offline prototype
+   of the game for the pilot, with tests that the deal is reproducible from the seed.
+
+Gates: no recruitment before ethics approval and the owner's approval of the start; every
+outward action (pre-registration, recruitment, publication, events) needs the owner's
+authorization for that action (Principle IX); public text about the generator carries the
+disclaimer and makes no randomness-quality or security claim (Principle VIII, gate 3); a VHDL
+dealer only after the RTL-start gate. Out of scope: any security claim, any change to the
+generator or its protocol, emotion recognition, and lotteries. Inputs:
+research/engagement/scrutiny-game.md, research/assertion-outlines.md (Outlines B and C) and
+security.md sections 4, 9.2 and 15.
+```
+
+### 7.4 Decisions for the owner or `/speckit-clarify`
+
+Where there is a recommended choice, it comes first.
+
+1. Where E1 runs: this repository with the amendment of section 7.2, or a separate repository.
+2. Which ethics body reviews it.
+3. Arms in the pilot: all four humor styles and the reading control, or fewer.
+4. Instruments: STEU and STEM, or another validated measure whose terms allow this use.
+5. Thanks for players: none, a fixed token of thanks, or a prize draw run by the CSPRNG.
+6. Language-model characters: never, or a later phase with a local model.
+
+### 7.5 After the E1 spec
+
+1. `/speckit-clarify`, then `/speckit-plan`.
+2. `/speckit-checklist`, once per focus area, before the tasks. The agent runs them after the plan
+   with these prompts:
+   - ethics: "ethics: consent, withdrawal, debrief, distress rule, ethics approval before
+     recruitment, adults only";
+   - humor safety: "humor safety: empathy first, opt-out, no targets, distress override, every
+     line reviewed";
+   - measurement: "measurement: validated instruments and their terms, pre-registration, power,
+     manipulation check, thematic analysis";
+   - randomness: "randomness: phyco-v2 only for the public deal; CSPRNG for allocation, draws and
+     codes; the disclaimer; no held-out seeds";
+   - data protection: "data: minimal, pseudonymous, outside the repository, deleted on request,
+     no biometric data";
+   - inclusion: "inclusion: plain language, accessibility, cultural review of every joke".
+3. `/speckit-tasks`, `/speckit-analyze`, then `/speckit-implement`. The work stops at every ⛔
+   gate: ethics approval, pilot start, each outward action, and RTL start.

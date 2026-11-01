@@ -7,7 +7,9 @@ cryptographic advice (security.md §16), makes no security claim and changes no 
 builds on [security.md](../../security.md) 2.6 and [seed-entropy-bound.md](seed-entropy-bound.md),
 and is meant as the input for the next Spec Kit feature (§9.2). Once approved, it supersedes the
 suggested feature description in §6 of that note. security.md 2.7 applies §7.3 of this note and
-records S15 (§3.3); the prompts to run next are in [next.md](../../next.md).
+records S15 (§3.3); the prompts to run next are in [next.md](../../next.md). Outline A of
+[`research/assertion-outlines.md`](../assertion-outlines.md) restates this note's argument as an
+assertion outline: three claims, four reasons each, one piece of evidence per reason.
 
 **Governed by:** the [constitution](../../.specify/memory/constitution.md) 1.2.0, above all its
 Security Policy. Where this note and the constitution differ, the constitution applies.
@@ -615,6 +617,7 @@ section 5 with the section 5.3 checklist groups A to G.
 | An entropy-source feature for reseeding (FUT-SEC-4) | low now | A large separate effort (SP 800-90B); out of scope until a claim is near |
 | Fault countermeasures in hardware (duplicated rounds, state parity) | later | With FUT-HW-5 |
 | Nonce-misuse behaviour documented | medium | Two streams with the same key and nonce are identical |
+| A scenario game on public scrutiny, with humor and emotional intelligence (experiment E1) | medium | Could help find and keep the reviewers that L5 needs; makes no claim; involves people, so ethics approval comes first ([next.md](../../next.md) §7) |
 
 Rejected ideas, with reasons:
 
@@ -624,6 +627,9 @@ Rejected ideas, with reasons:
   control they add here.
 - **Chaos or Lyapunov-exponent arguments** as security evidence (Alvarez and Li, 2006).
 - **Choosing rounds or constants from held-out results**: selection bias (feature-002 O6).
+- **Emotion recognition from faces or voices to steer E1**: not valid (Barrett et al., 2019),
+  biased (Rhue, 2018), and prohibited in education institutions by the EU AI Act; players report
+  their own feelings instead ([assertion outlines](../assertion-outlines.md), Claim C1).
 
 ## 11. Risks and expectations
 
