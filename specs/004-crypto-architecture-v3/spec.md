@@ -130,6 +130,26 @@ AI-assisted RTL bind features 006 and 008, but three of them reach back into thi
 Python model is the only oracle, the oracle and its corner-case vectors exist before any RTL,
 and the design document leaves an implementer, human or model, nothing to guess.
 
+## Clarifications
+
+### Session 2026-11-01
+
+- Q: Do you confirm the nine defaults D1 to D9 as they stand in the spec? → A: Yes. All nine are
+  confirmed as written (option A).
+- Q: Should this feature build both the machine-checked claim register and the start-up
+  self-test definition? → A: Yes, both stay (option A): the register with its test (FR-069), and
+  the self-test as a step of the reset sequence in the design document (FR-059).
+- Q: Should at least one ARX candidate be required to use the long-trail design, with each
+  node's two lanes as one 64-bit add-rotate-XOR box? → A: Yes, required for at least one ARX
+  candidate (option A); the D4 choice rule still picks the family (FR-022).
+- Q: What should make this feature recommend stopping when no candidate design qualifies for
+  the freeze? → A: A candidate budget (option C): at most three candidates of each family are
+  evaluated, and if none is eligible, the feature recommends stopping (stop rule).
+- Q: Should the spec keep the requirement that a second copy of the design (Π, its inverse and
+  the mode) is coded from the design document alone, in a separate session, and checked step by
+  step against the model before the freeze? → A: Yes, as specified (option A; FR-057). The
+  separate session starts only after the owner's recorded go-ahead.
+
 ## Review & Approval *(Constitution Principle VIII)*
 
 | Gate | Reviewer | Date | Decision | Notes |
@@ -146,23 +166,24 @@ and the design document leaves an implementer, human or model, nothing to guess.
 
 ## Decisions Taken as Defaults
 
-The strategy note (§8.4) leaves nine decisions to the owner. This spec adopts the recommended
+The strategy note (§8.4) leaves nine decisions to the owner. This spec adopted the recommended
 option of each as its default, so that every requirement below is definite. D10 records which of
-the note's further ideas (§10) the spec adopts. `/speckit-clarify` or the spec approval confirms
-or changes them. A change is made in this spec before any result it affects.
+the note's further ideas (§10) the spec adopts. On 2026-11-01 the owner confirmed D1–D9 as
+written, and D10 with its stop rule changed to a budget of three candidates per family (section
+"Clarifications"). A later change is made in this spec before any result it affects.
 
-| ID | Decision | Default in this spec | Alternative | Used in |
-|----|----------|----------------------|-------------|---------|
-| D1 | Mode | Keyed duplex: instantiate, generate, forget, optional reseed | Counter mode with feed-forward and fast key erasure | FR-013 |
-| D2 | Key and nonce | 256-bit key; 128-bit nonce, used once per key | 128-bit key with a 128-bit nonce | FR-006 |
-| D3 | Claimable sizes (FUT-SEC-2 and FUT-GRID-2 at 2×2) | Claimable from 4×4; 2×2 and 3×3 are reduced research variants outside every claim | Wider nodes, for example four 32-bit lanes, so that 2×2 holds 512 bits | FR-017, FR-018 |
-| D4 | Nonlinearity | ARX and Boolean both explored on reduced widths with development keys; one chosen by the pre-registered choice rule | ARX only, or Boolean only | FR-022 |
-| D5 | Frustrated Foraging | Removed from Π; the food forcing becomes round-constant injection at food nodes | Kept as a fixed, not data-triggered, schedule and analysed | FR-031 |
-| D6 | Feature-002 FR-007 | Standard modes allowed; published primitives, their components and their constants forbidden | Feature-002 FR-007 unchanged | FR-047 |
-| D7 | Prediction resistance | Not sought until a validated entropy source exists | A separate entropy-source feature | FR-004, FR-016 |
-| D8 | Certification route (FUT-SEC-9) | Independent academic cryptanalysis plus an AIS 20/31-style evaluation; the functionality class confirmed after AIS 20/31 version 3.0 (2024) is read | Another named scheme | FR-011 |
-| D9 | External expertise | The owner design review is required; the owner seeks an external design review, recorded as done or not arranged; the L5 reviewers are named in feature 009 | Reviewers named now | FR-043 |
-| D10 | Ideas of strategy note §10 adopted here | The claim and evidence register with its test (FR-069), a start-up self-test defined for the RTL (FR-059), a 64-bit ARX-box among the ARX candidates (FR-022) and examples in the stop rule; the other ideas go to later features or stay out of scope (section "Input coverage") | Any subset of these | FR-022, FR-059, FR-069 |
+| ID | Decision | Choice | Alternative | Used in | Status |
+|----|----------|--------|-------------|---------|--------|
+| D1 | Mode | Keyed duplex: instantiate, generate, forget, optional reseed | Counter mode with feed-forward and fast key erasure | FR-013 | Confirmed 2026-11-01 |
+| D2 | Key and nonce | 256-bit key; 128-bit nonce, used once per key | 128-bit key with a 128-bit nonce | FR-006 | Confirmed 2026-11-01 |
+| D3 | Claimable sizes (FUT-SEC-2 and FUT-GRID-2 at 2×2) | Claimable from 4×4; 2×2 and 3×3 are reduced research variants outside every claim | Wider nodes, for example four 32-bit lanes, so that 2×2 holds 512 bits | FR-017, FR-018 | Confirmed 2026-11-01 |
+| D4 | Nonlinearity | ARX and Boolean both explored on reduced widths with development keys; one chosen by the pre-registered choice rule | ARX only, or Boolean only | FR-022 | Confirmed 2026-11-01 |
+| D5 | Frustrated Foraging | Removed from Π; the food forcing becomes round-constant injection at food nodes | Kept as a fixed, not data-triggered, schedule and analysed | FR-031 | Confirmed 2026-11-01 |
+| D6 | Feature-002 FR-007 | Standard modes allowed; published primitives, their components and their constants forbidden | Feature-002 FR-007 unchanged | FR-047 | Confirmed 2026-11-01 |
+| D7 | Prediction resistance | Not sought until a validated entropy source exists | A separate entropy-source feature | FR-004, FR-016 | Confirmed 2026-11-01 |
+| D8 | Certification route (FUT-SEC-9) | Independent academic cryptanalysis plus an AIS 20/31-style evaluation; the functionality class confirmed after AIS 20/31 version 3.0 (2024) is read | Another named scheme | FR-011 | Confirmed 2026-11-01 |
+| D9 | External expertise | The owner design review is required; the owner seeks an external design review, recorded as done or not arranged; the L5 reviewers are named in feature 009 | Reviewers named now | FR-043 | Confirmed 2026-11-01 |
+| D10 | Ideas of strategy note §10 adopted here | The claim and evidence register with its test (FR-069), a start-up self-test defined for the RTL (FR-059), a 64-bit ARX-box among the ARX candidates (FR-022) and a pre-registered stop rule with a budget of three candidates per family; the other ideas go to later features or stay out of scope (section "Input coverage") | Any subset of these | FR-022, FR-059, FR-069 | Confirmed 2026-11-01; the stop rule changed to a candidate budget |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -369,14 +390,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   schedule from the same generics, or is listed as unsupported with the reason, as an open item
   against FUT-GRID-1.
 - **A candidate fails an inverse or bijectivity test**: it is rejected and logged with the
-  failure, never deleted.
+  failure, never deleted, and it counts towards the stop rule's budget.
 - **A tool fails its validation**: its negative results do not count, no bound from it enters
   the round rule, and the failure is recorded.
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
-  established and the design cannot be frozen. The feature reports the gap, then extends the
-  analysis, changes the candidate or stops.
+  established for that candidate within its analysis budget, and it cannot be frozen. The gap
+  is reported, and the feature tries another candidate within the stop rule's budget or
+  recommends stopping.
 - **The round rule gives an expensive R**: rounds are never lowered for throughput. The cost is
-  reported, and a different candidate may be tried before the freeze.
+  reported, and a different candidate may be tried before the freeze, within the stop rule's
+  budget.
 - **A distinguisher on more rounds turns up before the freeze**: R rises by the rule, or the
   candidate is dropped. A finding that breaks the target on the full rounds is recorded at once
   (FR-051). After the freeze, any change is a new model ID, and the frozen design is never
@@ -515,8 +538,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-022**: The nonlinear component MUST be designed, named and given its bounds in the
   rationale (S11). The ARX and Boolean families MUST both be explored on reduced widths with
   development keys, and one chosen by the pre-registered choice rule (D4). The ARX candidates
-  MUST include one that treats a node's pressure and vein lanes as one 2w-bit ARX-box (64 bits
-  at w = 32) under the long-trail strategy (strategy note §5.3; D10).
+  MUST include at least one that treats a node's pressure and vein lanes as one 2w-bit ARX-box
+  (64 bits at w = 32) under the long-trail strategy: the box's trail bounds come from a
+  validated search, exhaustive where the width allows (FR-039), and the bound for Π follows
+  from counting active boxes (strategy note §5.3; D10). Only the method is reused, never a
+  published box or its constants (D6).
 - **FR-023**: Round constants MUST be generated by a committed script from a stated rule. They
   MUST differ in every round and at every food node within one call of Π, and their pattern MUST
   have no non-trivial translational or rotational symmetry of the grid at any supported size
@@ -620,10 +646,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   Feature 007 defines the held-out sets, and the requirement that they cannot be computed before
   its freeze MUST be carried to it.
 - **FR-041**: Every candidate design MUST be logged in an append-only log with its ID,
-  parameters, evidence, decision and reason, and no entry MAY be deleted (Principle V). The
-  candidate frozen MUST be the one the pre-registered rules select, and the final report MUST
-  state the selection bias of choosing among candidates on development inputs (security.md
-  §11.6).
+  parameters, evidence, decision and reason, and no entry MAY be deleted (Principle V). More
+  than three candidates of a family MUST NOT be evaluated (stop rule). The candidate frozen MUST
+  be the one the pre-registered rules select, and the final report MUST state the selection bias
+  of choosing among candidates on development inputs (security.md §11.6).
 - **FR-042**: `phyco-v2` MUST be archived as byte-exact copies in `baseline/phyco-v2/`, with every
   file's SHA-256 and source in a committed manifest (Principle V): at least the model, the C
   stream, `design.md` 1.0 and the golden vectors. The live files MUST stay unchanged.
@@ -709,10 +735,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   that applies it or to feature 006 or 008, which carries it.
 - **FR-057**: A second transcription of Π, Π⁻¹ and the mode MUST be written from the design
   document alone, in a session separate from the one that wrote the model and importing no code
-  from it, and MUST agree with the model step by step on the vectors, as `tests/v2_reference.py`
-  does for `phyco-v2` (security.md §8 acceptance criteria, §10.2). Its agreement MUST be
-  reported with the common-mode caveat of security.md §10.2; an implementation from outside the
-  project belongs to feature 006.
+  from it, and MUST agree with the model step by step on the vectors before the freeze, as
+  `tests/v2_reference.py` does for `phyco-v2` (security.md §8 acceptance criteria, §10.2). That
+  session MUST start only after the owner's recorded go-ahead, and the provenance records of the
+  model and the transcription (FR-067) MUST show that they come from different sessions. The
+  agreement MUST be reported with the common-mode caveat of security.md §10.2; an
+  implementation from outside the project belongs to feature 006.
 - **FR-058**: The tests of the model MUST cover the items of security.md §10.1 as they apply to a
   keyed design: minimum, maximum and boundary values; all-zero and all-one keys and nonces;
   single-bit keys; overflow and truncation; shift and rotation boundaries; reset, zeroization and
@@ -721,10 +749,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   data-flow direction stated in the design document (FR-027) MUST be tested (checklist group
   F). Property-based tests (for example with Hypothesis) MUST be added if the owner approves
   the download; otherwise their absence MUST be recorded as an open item.
-- **FR-059**: The design document MUST define a known-answer self-test for start-up, with its
-  inputs, expected output and behaviour on failure, for the RTL of features 006 and 008 to
-  implement (strategy note §10; D10). It is not a FIPS 140-3 self-test and MUST NOT be described
-  as one (FR-011).
+- **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
+  the reset sequence of FR-025, whose stated latency includes it: its inputs, taken from the
+  frozen vectors, its expected output, its behaviour on failure, and the zeroization of the
+  whole state after it, before the first instantiate. Features 006 and 008 implement it in the
+  RTL (strategy note §10; D10). It is not a FIPS 140-3 self-test and MUST NOT be described as
+  one (FR-011).
 
 **Findings, evidence and review (security.md §9.1, §14, §16 and §17)**
 
@@ -844,14 +874,20 @@ serial carry chains per round, then to the owner's recorded choice.
 
 **Eligibility and selection.** A candidate is eligible for the freeze only if it passes every
 structural test (FR-037), has an established R_bound at every claimable size, and meets FR-018 to
-FR-031. Of the eligible candidates of the chosen family, the one with the smallest R at 4×4 is
-frozen; a tie goes to the owner's recorded choice. Every candidate stays in the log (FR-041).
+FR-031. Of the eligible candidates of the chosen family, or of the other family if the chosen one
+has none, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's recorded
+choice. Every candidate stays in the log (FR-041).
 
-**Stop rule.** The feature recommends stopping (option C) if no candidate is eligible, or if no
-published theorem's preconditions can be met by the mode. No candidate is eligible, for example,
-when an attack below the target reaches the full rounds of every candidate, or when trail bounds
-cannot be obtained beyond a few rounds at a claimable size, so that R_bound is never established
-(strategy note §10; D10). A stop is a valid, reportable outcome.
+**Stop rule.** At most three candidates of each family (D4) are evaluated. A candidate is a
+distinct design of Π with its own entry in the candidate log (FR-041), eligible or not; a reduced
+variant, a round count, or a fix to the model that leaves the design unchanged is not a new
+candidate. The analysis budget per candidate, such as the solver time for trail bounds, is fixed
+in the plan before the first candidate is scored. The feature recommends stopping (security.md
+§21, option C) if none of the evaluated candidates is eligible, or if no published theorem's
+preconditions can be met by the mode. No candidate is eligible, for example, when an attack below
+the target reaches the full rounds of every candidate, or when R_bound is not established at the
+production width for any of them (strategy note §10; D10). The budget may only be lowered
+(FR-044). A stop is a valid, reportable outcome.
 
 ### Re-decided feature-002 requirements
 
@@ -1109,7 +1145,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **SC-010**: 100% of reduced-variant requests and 100% of requests beyond an output limit are
   refused by the production interface.
 - **SC-011**: 0 candidate designs that produced evidence are missing from the candidate log, 0
-  log entries are deleted, and 0 held-out keys are created or used.
+  log entries are deleted, 0 held-out keys are created or used, and no family has more than
+  three candidates in the log.
 - **SC-012**: Every archived `phyco-v2` file matches its manifest hash and its live source, and
   every frozen file of features 002 and 003 still hashes as recorded.
 - **SC-013**: The design rationale covers 100% of the items of security.md §8, and the owner
@@ -1137,8 +1174,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 
 ## Assumptions
 
-- **Defaults D1–D10** stand until they are confirmed or changed (section "Decisions Taken as
-  Defaults").
+- **Decisions**: the owner confirmed D1–D10 on 2026-11-01, with the stop rule of D10 changed to
+  a budget of three candidates per family (section "Clarifications").
 - **Machine and run times**: the 32-thread machine with WSL2 used in feature 003. The FUT-SEC-8
   sweep costs about 3.6 core-hours per target at the 8.5 × 10⁷ steps/s measured for the C stream
   (`reports/003-extended-batteries-calibration/dev/timing.json`): about 11 core-hours for three
