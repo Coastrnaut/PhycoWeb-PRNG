@@ -172,6 +172,80 @@ They are open like every other item; the reviewer ticks them.
   that no 4×4 heavy run could start? [Conflict, cli contract "Order of sizes", "Budget"; research
   R7; data-model §1]
 
+## Second re-run (2026-11-01)
+
+Items found when the checklist was run a third time, over the complete documents and the
+repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
+every other item; the reviewer ticks them.
+
+- [ ] CHK037 Is the value of R_cur with which a candidate's frequency and avalanche tests start
+  defined, and is the order of the evidence kinds that feed the round rule fixed (plan phase 5
+  lists one; no rule states it), given that research R4 measures rounds 1…R_cur and extends them
+  only when one of its own tests fires, while R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) can
+  also rise through a trail bound, R_f, R_b or an invariant; and is it stated whether a rise found
+  after the bias tests extends them to the new R (a new measurement of the same kind, in the 12 h
+  row) or why the round counts already measured suffice? [Gap, Spec §Pre-registered Design
+  Protocol "Round rule", "Bias rule"; research R4, R7, R13; plan phase 5]
+- [ ] CHK038 Is the avalanche test's detection power required to be shown before its first counted
+  use, as the frequency test's is by 100 synthetic sets planted at its 90%-power biases, given that
+  research R4's sensitivity table states 0.0443, 0.0451 and 0.0465 at 90% power under
+  0.005/(128·S_A), while R3's synthetic counts serve the frequency test only, and R13's known
+  result for the avalanche test (a planted gap) and the cross-check in every run show only
+  differences that never flip; or is it stated why these suffice, for the related-key and
+  rotational sets as well? [Coverage, Spec §FR-039; research R3, R4, R13]
+- [ ] CHK039 Is the outcome specified when a uniform control fires by chance, given that research
+  R4 applies each test to fixed public `control` states (R3) that involve no candidate, so that the
+  firing recurs for every candidate and in the one re-run, which "always runs its control again
+  first, with the same counts", while no tool defect exists to fix; and is it stated whether the
+  control runs once per size and test or once per candidate, what chance of such a firing is
+  accepted (by the union bound at most 0.0025 per size for the frequency control, 2b bits at
+  0.005/S), and whether it makes that size's bias evidence inconclusive for every candidate and so
+  ends the feature in a stop? [Edge Case, Recovery, Spec §Edge Cases "The bias rule fires on its
+  uniform control"; research R3, R4, R7; quickstart E3]
+- [ ] CHK040 Is a trail tool identified by name or by its exact hash for research R12's fixed tool
+  set and the cli contract's "Trail tools" guard ("a trail tool without an earlier `re-found`
+  record is refused"), given that any code change gives a new hash and needs a new validation
+  record, that R7 fixes and validates a tool again after a defect and makes the engine faster when
+  a projection does not fit, and that each counted result cites the validation record of the
+  tool's exact hash; and may a search that reached its 8 h cap run again with a faster validated
+  version, as a new measurement, a re-run or not at all? [Ambiguity, Spec §FR-039; research R7,
+  R12; cli contract "Trail tools", "Tool validation"]
+- [ ] CHK041 Are research R12's cross-checks between kinds (the ARX search reproducing the
+  exhaustive box tables at w = 4 and 8 before it counts at w = 16 and 32, and the active-S-box
+  counter reproducing the exhaustive trail optima of "a χ-like candidate" at w = 4) stated to be
+  validation runs, charged to no candidate and capped at 8 h per instance, or the "solver
+  cross-checks" of R7's 48 h trail row; and is it stated whether they run once per tool or on each
+  candidate's boxes, and which design serves when no χ-like candidate is entered? [Clarity,
+  research R7, R12]
+- [ ] CHK042 Is it stated, with its limits, that an optimal or infeasible status of HiGHS, reached
+  under built-in floating-point feasibility and integrality tolerances that scipy does not expose,
+  is taken as a proof of a lower bound, given that rounding the weight down (research R12)
+  corrects the reported value but not a status that a tolerance made wrong; and is an exact or
+  independent confirmation required for a bound that sets R_bound, such as the exhaustive tables
+  at a small width, or is each such bound reported as resting on the solver's tolerances?
+  [Assumption, Spec §FR-038; research R7, R12]
+- [ ] CHK043 Does research R7's reservation protect the kinds of evidence that share a budget row,
+  given that a run starts when its projection plus the probes of "the same kind of run at every
+  larger claimable size" fit the hours left, so that the frequency test can use hours the avalanche
+  test needs in the 12 h row, or one kind of trail search the hours of another in the 48 h row; and
+  is it stated which kinds a projection reserves for and in which order the kinds of one row run?
+  [Gap, research R4, R7; cli contract "Budget"]
+- [ ] CHK044 Is "the tools' validation" a property that does not depend on the neighbourhood, as
+  FR-032 and FR-052 assume when they let it transfer from 2×2, given that at 2×2 opposite
+  neighbours coincide, so a validation there cannot show that the dependency propagation or the
+  symmetry check tells a node's neighbours apart; that the symmetry check's only known result is
+  S7's rotation structure of `phyco-v2`'s constants, on a 4-node ring, with none for the
+  translations, rotations by 90° and reflections of a torus at n ≥ 3; and that the grid size of
+  the dependency propagation's "stated small operation list" is not given? [Consistency,
+  Spec §FR-032, §FR-052; research R13; security.md §9.2 S7]
+- [ ] CHK045 Is it stated who or what assigns a record's `classification` (code, from stated
+  rules, or the analyst), given that data-model §1 has `status` "computed by code (FR-065)" but
+  says nothing of the kind for `classification`, that a reproduction compares it, and that every
+  record holds one, records without a finding (vectors, constants, projections) included; and is
+  the class stated for a firing that raises R, which may be a chance firing at the stated
+  family-wise rate, and for a search that reached its cap? [Clarity, Spec §FR-060, §FR-065,
+  §SC-017; data-model §1; security.md §9.1]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
