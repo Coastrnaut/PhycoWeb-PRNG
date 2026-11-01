@@ -184,6 +184,77 @@ They are open like every other item; the reviewer ticks them.
   such as exhaustive bijectivity at w = 4, as evidence about the claimable sizes? [Gap, Spec
   §FR-018, §FR-032; research R13, R14]
 
+## Second re-run (2026-11-01)
+
+Items found when the checklist was run a third time, over the complete documents and the
+repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
+every other item; the reviewer ticks them.
+
+- [ ] CHK040 Is the width at which a candidate's rotation amounts are searched fixed before the
+  search, given that FR-024 and research R15 run the search at "the D4 width" and record that width
+  in the candidate's log entry first, while research R6 fixes the D4 width only once bounds exist
+  for candidates of both families (the widest of 16 or 8 at which each family has both bounds over a
+  common r* ≥ 2), so that amounts searched at 16 could be scored at 8, against R6's "Rotation
+  amounts are chosen at this width"? [Conflict, Spec §FR-024; research R6, R15]
+- [ ] CHK041 Is the rotation-amount search charged to a budget row of research R7 (the candidate's
+  48 h trail row or a row of its own) and bounded by it, and is it stated how a point of the search
+  space ranks when its trail search reaches the 8 h cap and gives no bound, given that every point
+  needs bounds at the D4 width, that R7's list of what is charged does not name the search, and
+  that the chosen amounts are the ranking's first entry? [Gap, Spec §FR-024; research R7, R15;
+  data-model §3]
+- [ ] CHK042 Is "the constant table contains a listed sequence" defined (the least number of
+  consecutive words that counts as a match, the tables it applies to, and how a listed constant of
+  another word width, such as a 64-bit one, is compared with w-bit words), given that at w = 4 every
+  word is one of sixteen values, so that a single-word match is certain if PRESENT's S-box, which
+  holds all sixteen, is among the listed constant sets, and is the chance of an accidental match at
+  w = 32 stated, since a failure after the first score blocks the design freeze and the rule never
+  changes? [Measurability, Spec §Re-decided feature-002 requirements "FR-007", §FR-023; research
+  R12, R15]
+- [ ] CHK043 Is it stated who adds a design to the refused list after it is frozen and how the
+  addition is recorded (a change-log entry with the owner's approval, as FR-044 requires of a
+  change the agent may only propose, and the list's new SHA-256), whether designs that the spec,
+  the plan, research.md or security.md name after that moment are added as the rationale's later
+  citations are, and what follows when an addition matches, since the freeze then stays blocked
+  with the rule unchanged: a stop, a further candidate or a new model ID? Is a match found after
+  the freeze covered? [Gap, Recovery, Spec §FR-023, §FR-044, §Re-decided feature-002 requirements
+  "FR-007"; research R15]
+- [ ] CHK044 Are the algebraic-degree bounds that raise R_dist required as per-candidate evidence
+  before the round rule is applied (a record kind of data-model §5, the tool or derivation behind
+  each bound, and its validation under FR-039), given that FR-034 and research R13 place them in the
+  rationale, which the plan writes in phase 8 after selection, while R_dist enters R and the
+  selection by the smallest R at 4×4 in phase 5, and that FR-039 names no known result for a degree
+  tool? [Conflict, Spec §FR-034, §FR-039, §Pre-registered Design Protocol "Round rule"; research
+  R13; data-model §5, §9; plan "Phases and gates" 5, 8]
+- [ ] CHK045 Is it stated which items of FR-018 to FR-031 decide a candidate's eligibility, given
+  that `round_rule.py --select` applies eligibility by code before selection, with each item of
+  FR-018 to FR-031 recorded beside its evidence (data-model §9), while several of those
+  requirements are duties of the design document and rationale, which exist only for the selected
+  candidate (FR-026's throughput and size estimate, FR-027's operation semantics, FR-030's mapping
+  chapter), so that eligibility can be decided from each candidate's operation list and records
+  alone? [Conflict, Spec §Pre-registered Design Protocol "Eligibility and selection", §FR-026,
+  §FR-027, §FR-030; data-model §9; cli contract `round_rule.py`; plan "Phases and gates" 5, 6]
+- [ ] CHK046 Is it stated what a decline at the owner design review does to the declined candidate,
+  given that a decline may end in "a further candidate within the stop rule, which the rules must
+  then select", while the review cannot put another eligible candidate in the rules' place and a
+  candidate becomes ineligible only for the rules' reasons: if the declined candidate stays
+  eligible and the rules select it again over the further one, is the outcome a revision, a stop,
+  or the same candidate brought back to the review? [Ambiguity, Spec §FR-041, §FR-043, §Review &
+  Approval "Owner design review"]
+- [ ] CHK047 Is the evidence FR-030 asks for each replaced mechanism allowed to be a cited section
+  of the design document where no record of FR-037 or FR-039 can show it, as for S5 (each output
+  word a function of four state words, answered by the rate part after a full call of Π, FR-015)
+  and S6 (data-dependent shifts, answered by fixed operations, FR-020), and is a trail-bound record
+  of FR-038 accepted for S11, whose answer is the designed nonlinear component, given that FR-051's
+  lessons table also cites evidence records for S1, S3 and S4, which the key, the security target
+  and the mode answer by specification? [Consistency, Spec §FR-030, §FR-038, §FR-051; security.md
+  §9.2]
+- [ ] CHK048 Is the claim-register test's rule for the mapping chapter reconciled with the statement
+  FR-030 requires there, what the mapping does not contribute ("any security property"), given that
+  the chapter must contain "no security statement" and the rule flags secure, strength, resist,
+  unpredictable, chaos, Lyapunov and ergodic inside it: is that negative statement exempt or
+  allow-listed, and does the rule match whole words or stems ("secure" in "security", "resist" in
+  "resists")? [Conflict, Spec §FR-030, §FR-069; security.md §8]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
