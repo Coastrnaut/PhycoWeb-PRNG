@@ -1,0 +1,104 @@
+{
+ "attempt": 1,
+ "kind": "supplementary re-score with the fixed PractRand parser (T039a)",
+ "frozen_verdict": "PASS",
+ "frozen_verdict_stands": true,
+ "note": "The freeze pins the hash of the parser that scored the attempt; this file does not replace attempt.json or rescore.json. It only shows what the fixed parser gives on the same saved logs.",
+ "parser_sha256_fixed": "fc141a2b3ae8bc134fb8a8ad446066dbb0a43440380748834af3786982f086b3",
+ "rescored_verdict_fixed_parser": "PASS",
+ "reason": "candidate did not fail",
+ "verdict_identical": true,
+ "roles": {
+  "positive": {
+   "frozen_parser": {
+    "n_pvalues": 101210,
+    "failing_runs": 0,
+    "incomplete_runs": 0,
+    "fails": false
+   },
+   "fixed_parser": {
+    "n_pvalues": 101210,
+    "failing_runs": 0,
+    "incomplete_runs": 0,
+    "fails": false,
+    "practrand_saturated_lines": 0,
+    "practrand_rule2_lines": 0,
+    "practrand_pvalues_per_run": [
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483
+    ]
+   },
+   "failing_set_unchanged": true,
+   "threshold": 4.940223298093074e-08
+  },
+  "negative": {
+   "frozen_parser": {
+    "n_pvalues": 10242,
+    "failing_runs": 70,
+    "incomplete_runs": 0,
+    "fails": true
+   },
+   "fixed_parser": {
+    "n_pvalues": 10795,
+    "failing_runs": 70,
+    "incomplete_runs": 0,
+    "fails": true,
+    "practrand_saturated_lines": 553,
+    "practrand_rule2_lines": 3978,
+    "practrand_pvalues_per_run": [
+     448,
+     431,
+     448,
+     445,
+     447,
+     444,
+     440,
+     438,
+     436,
+     438
+    ]
+   },
+   "failing_set_unchanged": true,
+   "threshold": 4.940223298093074e-08
+  },
+  "candidate": {
+   "frozen_parser": {
+    "n_pvalues": 101210,
+    "failing_runs": 0,
+    "incomplete_runs": 0,
+    "fails": false
+   },
+   "fixed_parser": {
+    "n_pvalues": 101210,
+    "failing_runs": 0,
+    "incomplete_runs": 0,
+    "fails": false,
+    "practrand_saturated_lines": 0,
+    "practrand_rule2_lines": 0,
+    "practrand_pvalues_per_run": [
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483,
+     9483
+    ]
+   },
+   "failing_set_unchanged": true,
+   "threshold": 4.940223298093074e-08
+  }
+ },
+ "disclaimer": "Passing NIST SP 800-22 does not show cryptographic security. This generator must not be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts."
+}

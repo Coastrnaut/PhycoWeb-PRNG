@@ -230,9 +230,19 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
 - [X] T036 [US2] `battery_rescore.py --attempt 1` → `rescore.json`, identical required. (SC-006)
 - [X] T037 [US2] Write `$REP/attempt-1/phase-report.md`: verdict, both controls, every failing
   result, suspicious results, timings, open issues, disclaimer. (FR-014, FR-016, SC-004)
-- [ ] T038 ⛔ [US2] **Owner result review** of attempt 1. Record in spec.md. (Principle VIII)
-- [ ] T039 [US2] Only if attempt 1 is INCONCLUSIVE or INVALID: repeat T033–T038 for attempt 2 on
-  `heldout-2`, writing to `$REP/attempt-2/`. Otherwise mark not applicable. (FR-013)
+- [X] T038 ⛔ [US2] **Owner result review** of attempt 1. Record in spec.md. (Principle VIII)
+- [X] T039 [US2] Not applicable: attempt 1 is PASS (owner, 2026-11-01). Only if attempt 1 is
+  INCONCLUSIVE or INVALID: repeat T033–T038 for attempt 2 on `heldout-2`, writing to
+  `$REP/attempt-2/`. Otherwise mark not applicable. (FR-013)
+
+- [X] T039a [US2] Fix the PractRand parser defect (attempt-1 phase report, issue 1) in
+  `protocol/batteries.py`: match saturated result lines printed with `R>` or `R<` and count each
+  as a failure under rule 2; add a fixture with saturated lines to `tests/data/batteries/` and
+  tests in `tests/test_batteries.py`. Stricter only. Re-score attempt 1 with the fixed parser as a
+  supplementary check in `$REP/attempt-1/rescore-parser-fix.json`, reported next to the frozen
+  verdict without replacing it (the freeze pins the old parser's hash). Record issues 2–4
+  (role-sequential scheduling, the freeze status field, lut-v1 close-pairs times) as open items
+  for feature 007's protocol. (FR-014, SC-006; owner request 2026-11-01)
 
 **Checkpoint**: battery verdict reviewed.
 
@@ -240,25 +250,25 @@ runs (light CPU use); the 2 × 100 × 10⁶-word check (T016) waits until T008 f
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T040 Run the full test suite on Windows and in WSL; record exact commands and results in
+- [X] T040 Run the full test suite on Windows and in WSL; record exact commands and results in
   `$REP/dev/test-log.md`; confirm the feature-002 hashes from T003 are unchanged. (FR-005,
   FR-008; Principle V)
-- [ ] T041 Claims check: grep `$REP`, README and new code for "cryptographically secure",
+- [X] T041 Claims check: grep `$REP`, README and new code for "cryptographically secure",
   "crypto-grade", "suitable for secrets", "secure"; confirm the verbatim disclaimer in every
   `summary.md`, `phase-report.md` and record. Also grep for "security level", "security
   strength" and "bits of security", and confirm each match states a bound or limitation, not a
   claim (constitution 1.2.0 Security Policy). (FR-016, SC-007)
-- [ ] T042 Update README §5 with the calibration result and the battery verdict, with what the
+- [X] T042 Update README §5 with the calibration result and the battery verdict, with what the
   verdict does and does not mean (preserve CRLF line endings). Keep the seed-size bullet added
   on 2026-10-31. Update `security.md` §1.3 and §11.4 with the reviewed verdict.
   (FR-016, SC-007; Principle IV)
-- [ ] T043 Write the final report `$REP/phase-report.md`: FR-001…FR-016 and SC-001…SC-007 →
+- [X] T043 Write the final report `$REP/phase-report.md`: FR-001…FR-016 and SC-001…SC-007 →
   evidence, open issues, security concerns, recommendation. Under security concerns, include the
   seed-entropy bound (64-bit seed caps any security level at 64 bits;
   `research/security/seed-entropy-bound.md`, FUT-SEC-1…9). State that constitution 1.2.0,
   approved 2026-10-31 after this plan's Constitution Check against 1.1.0, applies, and that the
   feature meets its Security Policy. (Principle VII; Security Policy)
-- [ ] T044 ⛔ **Owner final result review**. Record in spec.md and update its Status line.
+- [X] T044 ⛔ **Owner final result review**. Record in spec.md and update its Status line.
   (Principle VIII)
 
 ---
@@ -290,3 +300,25 @@ Requirement coverage: FR-001…006 (T004–T011), FR-007…008 (T002, T012–T01
 FR-010…015 (T021–T039), FR-016 (T010, T030, T032, T037, T041–T042); SC-001…002 (T008–T009),
 SC-003 (T012, T016, T030), SC-004 (T030, T035), SC-005 (T021–T022, T034), SC-006 (T027–T028,
 T031, T036), SC-007 (T041–T042).
+
+---
+
+## Phase 7: Convergence
+
+- [ ] T045 (Deferred by the owner, 2026-11-01: do before the next battery freeze, with the T041
+  fixes.) Add `git_head`, `git_dirty`, `versions` and `command` to every record the feature-003
+  writers produce (`scripts/battery_run.py`, `scripts/battery_attempt.py`,
+  `scripts/battery_rescore.py`, `protocol/battery_freeze.py`, `scripts/calibrate.py`,
+  `scripts/calibration_report.py`, `scripts/stream_equiv.py`, and the S and timing writers), with a
+  test that every writer emits them; do not edit existing attempt-1 records, which are frozen or
+  hash-pinned. Today `run.json`, `attempt.json`, `rescore.json`, `summary.json`, `S.json` and
+  `timing.json` lack all four, and no record has `git_dirty`, per data-model.md (preamble) (partial)
+- [X] T046 Make `run.json` match data-model.md §7 (`complete`, `stopped_early`, `length_bytes`,
+  `n_pvalues`, `results`, `rule1`–`rule3`, `fails`), or record an owner-approved data-model
+  correction stating that these fields are recomputed from `log.txt` by
+  `protocol/batteries.load_run` and kept in `attempt.json`, per data-model.md §7 (partial).
+  Resolved 2026-11-01 by the owner-approved data-model correction (§7).
+- [X] T047 Write the re-score outcome into `attempt.json` as `rescore` (§9) when
+  `scripts/battery_rescore.py` runs, or record an owner-approved data-model correction that it
+  lives only in `rescore.json`, per data-model.md §8 (partial). Resolved 2026-11-01 by the
+  owner-approved data-model correction (§8–§9).

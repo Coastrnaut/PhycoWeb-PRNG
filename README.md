@@ -169,6 +169,11 @@ When using autonomous code generation tools or development loops to maintain thi
 
 5. Project Status & Verified Evidence
 
+What has been verified, feature 003 (`reports/003-extended-batteries-calibration/`):
+• Positive-control calibration: under the feature-002 SP 800-22 rules, the OS CSPRNG fails by chance in 207 of 1,000 runs, 20.7% (95% CI 18.2–23.3%). So a perfect candidate passes a feature-002 attempt only about 63% of the time, and one FAIL there, on its own, is weak evidence against a generator.
+• Pre-registered battery attempt 1 (10 held-out seeds never used in tuning; PractRand to 1 TiB; TestU01 SmallCrush, Crush and BigCrush in both bit orders; both controls; a Bonferroni threshold of 4.94 × 10⁻⁸ over 101,210 p-values): verdict **PASS**, accepted at the owner review on 2026-11-01. phyco-v2 failed no rule in any of its 70 runs, the OS-CSPRNG positive control failed none, and lut-v1 failed all 70. A re-score from the saved logs reproduced the verdict. A parser defect found afterwards (saturated PractRand lines skipped, all of them lut-v1's) is fixed, and a re-score with the fixed parser gives the same verdict.
+• The fast C streams used for the batteries match the Python models word for word. The full test suite (179 tests) passes on Windows and on Ubuntu (WSL2).
+
 What has been verified, feature 002 (`reports/002-core-dynamics-redesign/`, `specs/002-core-dynamics-redesign/design.md`):
 • The `phyco-v2` reference model (`phycoweb/model_v2.py`) is integer-only and multiplierless (add, subtract, XOR, constant shifts and rotations, compare, the lut-v1 table), with golden vectors and an automated purity check. The full test suite (116 tests) passes on Windows and on Ubuntu (WSL2).
 • The SP 800-22 harness `sp80022` 1.0.0 was validated against the published examples, Appendix B and NIST's own STS 2.1.2 (0 mismatches at ±1e-6), and replaces nistrng.
@@ -179,12 +184,12 @@ What has been verified, feature 001 (`reports/001-integer-lut-perturbation/`):
 • It is bit-exact with the archived floating-point model in every stage except the perturbation source.
 
 What has not been verified, or is known to be weak:
-• Statistical quality beyond SP 800-22. The PASS above means only that the SP 800-22 tests detected no defect in 100 held-out sequences. Broader batteries (PractRand, TestU01, Dieharder) have not been run. The feature-001 screening used the defective nistrng 1.2.3; see the erratum and the re-score table in `reports/001-integer-lut-perturbation/summary.md`. lut-v1 fails SP 800-22 under the feature-002 protocol.
+• Statistical quality beyond these tests. The two PASS verdicts mean only that SP 800-22, PractRand and TestU01 detected no defect at the depths run. Dieharder has not been run, and the structural tests aimed at the design itself (related seeds, cross-stream correlation, the biased top bits of D) have not started. The feature-001 screening used the defective nistrng 1.2.3; see the erratum and the re-score table in `reports/001-integer-lut-perturbation/summary.md`. lut-v1 fails SP 800-22 under the feature-002 protocol.
 • Cryptographic security: none. No cryptographic analysis or independent review exists. lut-v1's output exposes the low 8 bits of each vein value. phyco-v2 has 272 bits of state, no keying and no cryptanalysis, and its update uses generic add-rotate-XOR operations.
 • Seed size: phyco-v2's seed is four 16-bit words, 64 bits in total. That caps any security level at 64 bits, however large the internal state, which is below the 112-bit minimum for approved cryptographic use. Trying every seed costs about 2⁷² generator steps; the attack has not been run. Any cryptographic claim or certification would need a new key interface, and probably another core redesign. The constitution's Security Policy makes requirements FUT-SEC-1 to FUT-SEC-9 binding before any such claim; see `research/security/seed-entropy-bound.md` and `security.md` §20.1.
 • Hardware: no VHDL, testbench or synthesis result exists yet. phyco-v2 has open RTL items (a fixed 2×2 ring, a long combinational path per step); see the design review in `specs/002-core-dynamics-redesign/plan.md`.
 
-Do not use PhycoWeb-PRNG for secrets. phyco-v2 passing NIST SP 800-22 shows only that no statistical defect was detected by those tests. It does not show cryptographic security.
+Do not use PhycoWeb-PRNG for secrets. phyco-v2 passing NIST SP 800-22, PractRand and TestU01 shows only that no statistical defect was detected by those tests. Passing statistical batteries does not show cryptographic security.
 
 Setup
 

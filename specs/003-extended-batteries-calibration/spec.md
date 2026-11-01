@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-29
 
-**Status**: Approved for planning (2026-10-29)
+**Status**: Complete (2026-11-01). Battery attempt 1 PASS; final result review approved
 
 **Input**: User description: "Run broader test suites (PractRand, TestU01) on phyco-v2. Measure
 how often the positive control fails by chance (O3) before any further acceptance attempt"
@@ -45,8 +45,9 @@ they are. The feature-002 protocol, harness `sp80022` 1.0.0 and its unused seed 
 | Tool acquisition (PractRand, TestU01 downloads) | Coastrnaut (repository owner) | 2026-10-29 | Approved | Approved in session ("approved, download both"): `PractRand_0.96.zip` (904,832 bytes, sourceforge.net/projects/pracrand, 2025-12-26) and `TestU01.zip` 1.2.3 (3,123,035 bytes, simul.iro.umontreal.ca/testu01, 2015-02-11) |
 | Calibration result review (US1, T011: reports/003-extended-batteries-calibration/calibration/phase-report.md) | Coastrnaut (repository owner) | 2026-10-30 | Approved | Approved in session after the requested DFT cross-check (dft-crosscheck.md: 0 mismatches vs NIST STS 2.1.2; the excess is the test's own). Overall positive-control false-failure rate 207/1000 = 20.7% (95% CI 18.2–23.3%). Run records (167 MB, runs/*.json.gz) are committed, not kept local |
 | Battery freeze 1 (T034: attempt-1/freeze.json, heldout-1) | Coastrnaut (repository owner) | 2026-10-30 | Approved | Approved in session ("i approve the battery freeze"); approval fields recorded in freeze.json by the agent. S = 101,210, threshold 4.94e-08; draft at git 5b9fcfd with all source, binary and tool hashes |
+| Battery attempt 1 result review (T038: reports/003-extended-batteries-calibration/attempt-1/phase-report.md) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("T038 approved: I accept battery attempt 1 (heldout-1) as PASS, with the phase report as written"). PASS: phyco-v2 failed no rule in 70 runs; both controls behaved as designed; re-score identical. A statistical result only, not a security claim. Attempt 2 (T039) not applicable. The PractRand parser fix (T039a) is a supplementary check and does not replace the frozen verdict |
 | Battery freeze (before each further held-out battery attempt) | _pending_ | _pending_ | _pending_ | One row per attempt |
-| Final result review | _pending_ | _pending_ | _pending_ | Required before the feature is declared complete |
+| Final result review (T044: reports/003-extended-batteries-calibration/phase-report.md) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("T044 approved; fix T041 findings before next freeze; run converge"). The two T041 findings (provenance records without `disclaimer`; the generated disclaimer naming SP 800-22) are to be fixed before the next battery freeze |
 
 ## Clarifications
 

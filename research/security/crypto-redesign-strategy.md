@@ -608,7 +608,12 @@ section 5 with the section 5.3 checklist groups A to G.
   PractRand, TestU01, and Dieharder or a recorded reason) on unused held-out key sets per supported
   size, 4x4 first, with decision rules calibrated before the freeze, a deterministic positive
   control (for example ChaCha20 with a published key) and graded negative controls; pre-registered
-  and stricter-only. Passing shows that no defect was found, not security."
+  and stricter-only; with the open items of the 003 attempt-1 phase report (runs scheduled from
+  any role as slots free up, with times projected per role and generator; the freeze's status set
+  on approval; the lut-v1 close-pairs times explained or bounded; a disclaimer in every provenance
+  record, a battery form of the generated disclaimer, and `git_head`, `git_dirty`, `versions` and
+  `command` in every record, all fixed before the next freeze).
+  Passing shows that no defect was found, not security."
 - **008**: "Hardware validation of phyco-v3 on the Arty A7-100T (FUT-HW-2 to FUT-HW-5): Vivado
   post-route resources and timing at 4x4 and at the largest grid that fits, with an optional
   open-flow fit (openXC7) as a cross-check that never replaces Vivado's timing; on-board

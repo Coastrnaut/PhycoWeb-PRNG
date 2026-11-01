@@ -139,14 +139,15 @@ because `scripts/battery_attempt.py` is frozen (section 6, issue 2).
    checked by an independent scan. A candidate that failed only with saturated lines would be
    missed by rules 1 and 2. **Fix before any later attempt**: match `R>` and `R<`, count those
    lines as failures, and add a test fixture. The change is stricter-only, and needs a new freeze
-   because the file's hash is frozen.
-2. **Role-sequential scheduling** wasted most of the 13.5 h negative tail (section 5). Before a
-   later attempt, start runs from any role as slots free up, and project times per role and per
-   generator, including the negative control's BigCrush.
-3. **`freeze.json` still reads `"status": "draft"`**, although its `approved_by` and
-   `approved_on` fields are filled and the attempt accepted it. The status field
-   is cosmetic but misleading. Set it on approval in future freezes.
-4. **The `lut-v1` close-pairs times** (section 5) are unexplained. They do not affect any verdict.
+   because the file's hash is frozen. *Fixed on 2026-11-01 (T039a); see the addendum.*
+2. **Role-sequential scheduling** (open item for feature 007) wasted most of the 13.5 h
+   negative tail (section 5). Before a later attempt, start runs from any role as slots free
+   up, and project times per role and per generator, including the negative control's BigCrush.
+3. **`freeze.json` still reads `"status": "draft"`** (open item for feature 007), although its
+   `approved_by` and `approved_on` fields are filled and the attempt accepted it. The status
+   field is cosmetic but misleading. Set it on approval in future freezes.
+4. **The `lut-v1` close-pairs times** (open item for feature 007; section 5) are unexplained.
+   They do not affect any verdict.
 5. **Carried over from the dev report:** `stream_bytes` counts bytes written, not consumed, and
    feature-003 files were uncommitted when the freeze recorded `git_head`.
 
@@ -163,8 +164,51 @@ security.md §15).
 applicable, and the polish tasks T040–T044 follow. Fix issue 1 before any further battery
 attempt, in feature 003 if the owner wants it there, otherwise in feature 007's protocol.
 
+## Addendum (2026-11-01, after the owner's review): the parser fix
+
+This addendum follows the owner's approval of the report above and does not change it. **The
+frozen verdict, PASS, stands.** The freeze pins the hash of the parser that scored the attempt
+(`batteries_sha256` `46c4dd15…`), so the result below is a supplementary check, kept beside
+`attempt.json` and `rescore.json` and never in place of them.
+
+**The fix (T039a).** `_RESULT` in `protocol/batteries.py` now matches `R=`, `R>` and `R<`, marks
+a line printed with `R>` or `R<` as saturated, and counts every saturated line as a rule-2
+failure whatever its printed grade. That is stricter-only: no line that failed before passes
+now. A synthetic fixture whose only failures are saturated lines
+(`tests/data/batteries/pr-saturated/`) and three new tests in `tests/test_batteries.py` cover it;
+the three failed before the fix and pass after it, and all 15 battery tests pass. The fixed
+file's SHA-256 is `fc141a2b…`; any later attempt needs a new freeze that pins it.
+
+**The supplementary re-score** (`rescore-parser-fix.json`), the same saved logs read by the
+fixed parser:
+
+| Role | p-values, frozen parser | p-values, fixed parser | Saturated lines | Failing runs, frozen / fixed | Outcome |
+|------|-------------------------|------------------------|-----------------|------------------------------|---------|
+| positive (`os`) | 101,210 | 101,210 | 0 | 0 / 0 | unchanged |
+| negative (`lut-v1`) | 10,242 | 10,795 | 553 | 70 / 70 | unchanged |
+| candidate (`phyco-v2`) | 101,210 | 101,210 | 0 | 0 / 0 | unchanged |
+
+Verdict with the fixed parser: **PASS** (candidate did not fail), identical to the frozen
+verdict. The 553 recovered lines all belong to the negative control, which already failed every
+run; its PractRand count per run is now 438 to 448, and its rule-2 lines number 3,978. The
+threshold stays at 4.94 × 10⁻⁸, because the negative role's count stays below the frozen S. In
+short, the bug hid failures only from a generator that was failing loudly anyway, which is the
+least embarrassing place a bug like this can hide, and it is now gone.
+
+**Open items for feature 007's protocol.** Issues 2 to 4 of section 6 are carried to the
+protocol of feature 007 (statistical re-validation), recorded in the 007 prompt of the strategy
+note (§9.3):
+
+- schedule runs from any role as slots free up, not role by role, and project times per role
+  and per generator, including the negative control's BigCrush;
+- set the freeze's `status` field to `approved` when the owner approves it;
+- explain or bound the `lut-v1` `snpair_ClosePairs` times before projecting a negative control's
+  run time.
+
+Issue 5 stays as recorded in the dev report.
+
 ## Review & Approval
 
 | Role | Name | Date | Decision |
 |------|------|------|----------|
-| Owner (T038) | | | |
+| Owner (T038) | Coastrnaut (repository owner) | 2026-11-01 | Approved: PASS accepted, with the report as written; attempt 2 not applicable |

@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.8 (2026-10-31). The change history is in section 25.
+- **Document:** `security.md`, version 2.9 (2026-11-01). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -29,7 +29,7 @@
 |-------|--------|-------|------|----------------------|------------------------|--------------------------|------|
 | `float-v0` | `baseline/float-v0/` (archived; SHA-256 in `MANIFEST.json`) | floating-point food generator (`np.sin`, `np.cos`) | 4 × 16 bits | Feature-001 screening only, done with the defective `nistrng` 1.2.3 (see the erratum in `reports/001-integer-lut-perturbation/summary.md`) | none | L0; no claim | archive only |
 | `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | L0; no claim | negative control |
-| `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). PractRand/TestU01 attempt 1 is in progress (feature 003) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
+| `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). Passed the pre-registered PractRand/TestU01 attempt 1 (0 of 70 runs failing, `heldout-1` battery set; feature 003, section 11.4) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
 
 ### 1.2 What is and is not established for `phyco-v2`
 
@@ -41,6 +41,8 @@
   - Three implementations written in this project agree bit for bit.
   - The pre-registered SP 800-22 protocol detected no statistical defect in 100 held-out
     sequences.
+  - The pre-registered battery protocol (PractRand to 1 TiB; TestU01 SmallCrush, Crush and
+    BigCrush in both bit orders) detected no statistical defect on 10 held-out seeds.
 - **Bounded by the specification**: phyco-v2's seed is four 16-bit words, 64 bits in total.
   That caps any security strength at **64 bits**, however large the internal state (section 9.2,
   S1–S3). 64 bits is below the 112-bit minimum for approved cryptographic use (SP 800-57 Part 1,
@@ -53,14 +55,14 @@
   prediction resistance (impossible as specified: there is no reseed input), side-channel
   behaviour, and hardware equivalence. No RTL exists.
 
-### 1.3 Validation phases for `phyco-v2` (status 2026-10-31)
+### 1.3 Validation phases for `phyco-v2` (status 2026-11-01)
 
 | Phase | Gate | Status | Evidence |
 |-------|------|--------|----------|
 | 0 Specification | frozen and unambiguous | **Met** for design 1.0, at the owner design review on 2026-10-28 (design SHA-256 `a1109bf1…`) | `design.md` §2–§6; tests `test_design_trace`, `test_widths_v2`, `test_purity_v2` |
 | 1 Mathematical and structural analysis | review completed; critical defects resolved | **Started.** S12–S15 are recorded with proofs and committed scripts, not yet reviewed; the other facts in section 9.2 come from the specification and feature 002 | `research/security/` |
 | 2 Reference implementation | independent implementations agree | **Partly met.** Three in-project implementations agree; none comes from outside the project; there is no VHDL | `vectors/`, `tests/v2_reference.py`, `reports/003-extended-batteries-calibration/streams/equivalence.json` |
-| 3 Statistical validation | campaign completed; anomalies assessed | **In progress.** SP 800-22 PASS; positive control calibrated; PractRand/TestU01 attempt 1 running; structural (level 3) tests not started | `reports/002-core-dynamics-redesign/`, `reports/003-extended-batteries-calibration/` |
+| 3 Statistical validation | campaign completed; anomalies assessed | **In progress.** SP 800-22 PASS; positive control calibrated; PractRand/TestU01 attempt 1 PASS (owner review 2026-11-01); structural (level 3) tests not started | `reports/002-core-dynamics-redesign/`, `reports/003-extended-batteries-calibration/` |
 | 4 Cryptanalysis | threat model and attack campaign completed | **Not started.** A draft threat model is in section 5 | — |
 | 5 Hardware validation | RTL matches the model | **Not started.** RTL is pending, with the exceptions recorded as O1 in feature 002 | `design.md` §7 |
 | 6 Independent evaluation | external review and reproduction | **Not started** | — |
@@ -771,7 +773,7 @@ The aim is to find detectable statistical defects. It does not prove cryptograph
 | Level | Content | Status for `phyco-v2` |
 |-------|---------|-----------------------|
 | 1 Basic properties | frequency, runs, serial correlation, bit distribution, autocorrelation, block frequency, entropy estimates (read according to their assumptions) | covered inside SP 800-22 |
-| 2 Established batteries | NIST SP 800-22; TestU01 SmallCrush, Crush, BigCrush; PractRand (Dieharder optional) | SP 800-22 done; PractRand/TestU01 attempt 1 in progress |
+| 2 Established batteries | NIST SP 800-22; TestU01 SmallCrush, Crush, BigCrush; PractRand (Dieharder optional) | SP 800-22 done; PractRand/TestU01 attempt 1 PASS (Dieharder not run) |
 | 3 Structural and adversarial | state-dependent output, cross-stream correlation, seed sensitivity, related seeds (T2), long-period and cycle studies, tests conditioned on chosen initial states, tests aimed at the design's own structure (S6–S8) | not started |
 
 ### 11.2 Test-tool validation (lesson from features 001–002)
@@ -816,7 +818,9 @@ existed:
   `scripts/battery_rescore.py`).
 - **Multiple testing.** The battery rule is a Bonferroni threshold over every reported p-value:
   min(p, 1 − p) ≤ 0.005 / S, with S = 101,210, giving 4.94 × 10⁻⁸. Any PractRand FAIL grade or
-  TestU01 `eps` row also counts as a failure.
+  TestU01 `eps` row also counts as a failure. From 2026-11-01 (T039a) a PractRand line whose
+  statistic saturates (printed `R>` or `R<`) counts as a failure too; the parser used for
+  attempt 1 skipped such lines (section 11.4).
 
 ### 11.4 Results to date
 
@@ -826,9 +830,9 @@ existed:
 | Positive-control calibration (1,000 runs of OS data) | Chance failure rate under the feature-002 rules: **20.7% (95% CI 18.2–23.3%)**. A perfect candidate passes an attempt only **63%** of the time (CI 59–67%) | `reports/003-extended-batteries-calibration/calibration/` |
 | DFT cross-check | Our DFT agrees with STS 2.1.2 on 1,000 fresh sequences. The test's own variance constant is about 6% too small: E[d²] = 1.062 (CI 1.053–1.071), and it rejects 1.23% of random sequences at α = 0.01 | `calibration/dft-crosscheck.md` |
 | Battery dev rehearsal (1 dev seed; not evidence) | phyco-v2 had no failures in PractRand to 1 TiB or in SmallCrush, Crush and BigCrush in both bit orders | `reports/003-extended-batteries-calibration/dev/` |
-| Battery attempt 1 (`heldout-1` battery set) | Started 2026-10-30. The positive control passed (70 of 70 runs). The negative control failed as required (section 11.5). The candidate runs are in progress. **The verdict needs the owner result review (T038) and is not stated here** | `reports/003-extended-batteries-calibration/attempt-1/` |
+| Battery attempt 1 (`heldout-1` battery set, 10 seeds; S = 101,210, threshold 4.94 × 10⁻⁸) | **PASS**, accepted at the owner result review on 2026-11-01 (T038). phyco-v2 failed no rule in any of its 70 runs (PractRand to 1 TiB; SmallCrush, Crush and BigCrush in both bit orders); smallest min(p, 1 − p) 1.0 × 10⁻⁶, about 20 times the threshold. The positive control failed none of 70; the negative control failed all 70 (section 11.5). The re-score was identical. A parser defect found afterwards (saturated `R>` lines skipped, all of them lut-v1's) was fixed, and a supplementary re-score with the fixed parser gives the same verdict. PASS means that no statistical defect was found at this depth, not cryptographic security | `reports/003-extended-batteries-calibration/attempt-1/` (phase report and addendum; `rescore.json`, `rescore-parser-fix.json`) |
 
-### 11.5 Negative control (lut-v1) in battery attempt 1, not yet reviewed
+### 11.5 Negative control (lut-v1) in battery attempt 1, reviewed 2026-11-01
 
 - **PractRand**: all 10 seeds stopped at the first checkpoint (2²⁷ bytes) with FAIL grades.
 - **SmallCrush**: 12–15 of 15 statistics at `eps` in every run.
@@ -1399,7 +1403,7 @@ The prior feasibility assessment named three concerns:
 
 Their status, and that of the investigations that follow from them:
 
-| Priority | Investigation | Status (2026-10-31) | Evidence or next step |
+| Priority | Investigation | Status (2026-11-01) | Evidence or next step |
 |----------|---------------|---------------------|-----------------------|
 | Critical | Resolve mathematical ambiguities | **Resolved** for lut-v1 and phyco-v2 | feature 001 FR-007/FR-008; `design.md` §2–§6 |
 | Critical | Remove floating point | **Resolved**: integer lookup table; AST purity tests | feature 001; `test_purity`, `test_purity_v2` |
@@ -1411,7 +1415,7 @@ Their status, and that of the investigations that follow from them:
 | High | State reconstruction | Not started | section 12.3 items 1–2 |
 | High | Prediction resistance | Not applicable as specified (S4) | — |
 | High | Distinguishing attacks | Statistical batteries only | section 12.3 item 6 |
-| Medium | Statistical batteries | SP 800-22 done; PractRand/TestU01 attempt 1 in progress | section 11.4 |
+| Medium | Statistical batteries | SP 800-22 done; PractRand/TestU01 attempt 1 PASS; structural tests not started | section 11.4 |
 | Medium | FPGA implementation | Not started (O1) | section 13 |
 | Final | Independent cryptographic review | Not started | section 14 |
 
@@ -1543,10 +1547,10 @@ No option is assumed secure.
 
 | Stage | Work | Status |
 |-------|------|--------|
-| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.8) |
+| 1 | Governance: constitution, gates, evidence rules, this document | Done (constitution 1.2.0; this document 2.9) |
 | 2 | Remove floating point, fully specify integer semantics | Done (feature 001) |
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
-| 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 in progress (003) |
+| 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 PASS (003, reviewed 2026-11-01) |
 | 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
 | 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–009 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; proposed, not yet approved. The first prompt is in [`next.md`](next.md). Its requirements are binding (constitution 1.2.0, section 20.1) |
 | 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Not started |
@@ -1632,6 +1636,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.6 | 2026-10-31 | Recorded S13: the step function is not one-to-one (vein-decay pairs and a transport zero mode), which settles S9; and S14: the vein values stay near 2³⁰, so the top bits of D are biased. Evidence from `research/security/step_probes.py`. Sections 5, 9.2 (S9) and 12.3 (items 3 and 5) and the roadmap updated |
 | 2.7 | 2026-10-31 | Applied §7.3 of the research note `research/security/crypto-redesign-strategy.md`. Recorded S15: the bound of S12 holds from every state, so a 2×2 design with design-1.0 veins has at most about 2²⁵² secret states, below FUT-SEC-2; evidence from `research/security/vein_descent.py`. Added a claim level per model (sections 1.1 and 1.3); definitions for a keyed design, a claim template and the AIS class names by version (3); threat-model rows T6–T11 (5); SP 800-232, eSTREAM, ISO/IEC 29192 and BSI TR-02102-1 as comparison references, and the checked AIS 20/31 version (6); the design phase and a recommended external design review (7); design-rationale requirements (8); attack classes, generic bounds, tool validation and a best-attack register (12.1, 12.2, 12.5, 12.6); the claim ladder and claim register in place of the classifications (15); instructions per model ID (16.4); the open FUT-SEC-2 and FUT-GRID-2 decision (20, 20.1); Options A1–A3 and C (21); features 004–009 in stage 5a (22); and the next feature, with its prompt in `next.md` (24) |
 | 2.8 | 2026-10-31 | Added rules for AI-assisted RTL and testbenches (section 13), from the research note `research/hardware/vhdl-genai.md`: expected values only from the model, its vectors and the C implementation; deterministic checks before review; testbenches checked against seeded mutants; explicit `numeric_std` types, and the model's edge states in the vectors; no shared author for a design and its only testbench; provenance and licence records. Added the matching control and strict rule (16.3) and the planned VHDL tools (19). Stricter only; no RTL exists yet |
+| 2.9 | 2026-11-01 | Recorded the reviewed battery verdict (feature 003, attempt 1: PASS, accepted by the owner on 2026-11-01) in sections 1.1–1.3, 11.1, 11.4, 11.5 and the roadmap, and the stricter PractRand rule for saturated lines (section 11.3). No claim level changes |
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
 > used to generate secrets; use an established cryptographic random-number generator for keys,

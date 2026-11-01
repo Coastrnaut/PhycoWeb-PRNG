@@ -48,8 +48,10 @@ def commands() -> Dict[str, str]:
 # ---------------------------------------------------------------- PractRand
 
 _LENGTH = re.compile(r"^length=\s.*\(2\^(\d+) bytes\)")
+# "R>" and "R<" mark a statistic beyond PractRand's display range (saturated); such lines
+# were once skipped (attempt-1 phase report, issue 1) and now always fail rule 2.
 _RESULT = re.compile(
-    r"^\s+(?P<name>\S+)\s+(?:R=\s*(?P<raw>\S+)\s+)?"
+    r"^\s+(?P<name>\S+)\s+(?:R(?P<rel>[=<>])\s*(?P<raw>\S+)\s+)?"
     r"(?:(?P<pf>\"pass\"|\"fail\")|p\s*~?=\s*(?P<one>1-)?\s*(?P<val>[0-9.]+(?:e-[0-9]+)?))"
     r"\s+(?P<grade>\S.*?)\s*$")
 
@@ -76,13 +78,15 @@ def parse_practrand(text: str) -> Dict:
         if not m or m.group("name") == "Test":
             continue
         grade = m.group("grade")
+        saturated = m.group("rel") in ("<", ">")
         if m.group("pf"):
             results.append({"test": m.group("name"), "checkpoint": checkpoint, "p": None,
-                            "q": None, "passfail": m.group("pf").strip('"'), "grade": grade})
+                            "q": None, "passfail": m.group("pf").strip('"'), "grade": grade,
+                            "saturated": saturated})
         else:
             p, q = _practrand_q(m.group("one"), m.group("val"))
             results.append({"test": m.group("name"), "checkpoint": checkpoint, "p": p, "q": q,
-                            "grade": grade})
+                            "grade": grade, "saturated": saturated})
     return {"results": results, "length_log2": last,
             "n_pvalues": sum(r["q"] is not None for r in results)}
 
@@ -112,7 +116,8 @@ def threshold_rules(parsed: Dict, battery: str) -> Dict:
     """Rules 2 and 3, which do not depend on S."""
     if battery == "practrand":
         rule2 = [r for r in parsed["results"]
-                 if r["grade"].startswith("FAIL") or r.get("passfail") == "fail"]
+                 if r["grade"].startswith("FAIL") or r.get("passfail") == "fail"
+                 or r.get("saturated")]
         return {"rule2": rule2, "rule3": []}
     return {"rule2": [], "rule3": parsed["eps_lines"]}
 

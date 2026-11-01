@@ -59,6 +59,34 @@ class TestPractRand(unittest.TestCase):
         self.assertEqual({r["test"] for r in batteries.rule1(parsed, 3.4e-7)},
                          {"FPF/16:all", "DC6-9x1Bytes-1", "BRank(12):3K(1)"})
 
+    def test_saturated_lines_are_parsed_and_fail(self):
+        # Attempt-1 phase report, issue 1: lines printed with R> or R< were dropped.
+        parsed = batteries.parse_practrand(PR_HEADER + (
+            "  Gap-16:A                          R>+99999  p = 0           FAIL !!!!!!!!  \n"
+            "  DC6-9x1Bytes-1                    R<-99999  p = 1           FAIL !!!!!!!!  \n"
+            "  BCFN(2+0,13-3U)                   R>+99999  p = 0           normal         \n"))
+        got = {r["test"]: r for r in parsed["results"]}
+        self.assertEqual(parsed["n_pvalues"], 3)
+        self.assertTrue(all(r["saturated"] for r in parsed["results"]))
+        self.assertEqual(got["DC6-9x1Bytes-1"]["q"], 0.0)
+        rules = batteries.threshold_rules(parsed, "practrand")
+        # A saturated line fails rule 2 whatever its printed grade.
+        self.assertEqual(len(rules["rule2"]), 3)
+        self.assertEqual(len(batteries.rule1(parsed, 1e-12)), 3)
+
+    def test_only_saturated_failures_fixture_fails(self):
+        run = batteries.load_run(DATA / "pr-saturated")
+        self.assertEqual(run["n_pvalues"], 3)
+        self.assertEqual({r["test"] for r in run["rule2"]},
+                         {"Gap-16:A", "[Low1/8]DC6-9x1Bytes-1"})
+        self.assertTrue(batteries.run_fails(run, 0.005 / 101210)["fails"])
+
+    def test_lut_v1_fixture_counts_saturated_lines(self):
+        run = batteries.load_run(DATA / "pr-lut")
+        saturated = [r for r in run["results"] if r["saturated"]]
+        self.assertEqual(len(saturated), 23)
+        self.assertTrue(all(r in run["rule2"] for r in saturated))
+
 
 class TestTestU01(unittest.TestCase):
     def test_passing_fixture(self):

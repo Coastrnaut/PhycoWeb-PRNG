@@ -1,0 +1,9 @@
+RNG_test using PractRand version 0.96
+
+rng=RNG_stdin32, seed=unknown
+length= 128 megabytes (2^27 bytes), time= 2.1 seconds
+  Test Name                         Raw       Processed     Evaluation       
+  BCFN(2+0,13-3U)                   R=  +0.7  p = 0.378     normal           
+  Gap-16:A                          R>+99999  p = 0           FAIL !!!!!!!!  
+  [Low1/8]DC6-9x1Bytes-1            R<-99999  p = 1           FAIL !!!!!!!!  
+  ...and 3 test result(s) without anomalies

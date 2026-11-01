@@ -79,3 +79,70 @@ exit 0. Results, S and timing are in `dev/phase-report.md`, `dev/S.json` and `de
 - Windows: `python -W ignore -m unittest tests.test_batteries tests.test_battery_protocol`:
   40 OK.
 - WSL: the same, plus `tests.test_fast_stream`: 48 OK.
+
+## T039a parser fix (2026-11-01)
+
+- Windows: `python -m unittest tests.test_batteries`: 3 new tests fail before the fix
+  (saturated `R>`/`R<` lines not parsed), then **15 tests OK** after it.
+- Supplementary re-score of attempt 1 with the fixed parser:
+  `attempt-1/rescore-parser-fix.json`, PASS, identical to the frozen verdict (attempt-1 phase
+  report, addendum).
+
+## T040 full suite (2026-11-01, git `66c431e` plus the uncommitted T037–T039a changes)
+
+| Environment | Command | Result |
+|-------------|---------|--------|
+| Windows 11, Python 3.10.11 | `python -W ignore -m unittest discover -s tests -t .` | **179 tests OK, 9 skipped** (59.0 s) |
+| Ubuntu (WSL2), Python 3.14.4 | `~/.venvs/phycoweb/bin/python -W ignore -m unittest discover -s tests -t .` | **179 tests OK, 3 skipped** (65.4 s) |
+
+The 6 extra skips on Windows are the `tests.test_fast_stream` tests that need the Linux binary.
+The tests that re-score attempts work on temporary copies; the real `rescore.json` files were
+not touched (modification times unchanged).
+
+Frozen sources, re-hashed: all **unchanged** from T003.
+
+| File | SHA-256 | Same as T003 |
+|------|---------|--------------|
+| `phycoweb/model_v2.py` | `1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec` | yes |
+| `phycoweb/model.py` | `80ffd147af92006204bd426bc99259fcbd6e55dc655295a9ad1aedc2685ec346` | yes |
+| `phycoweb/lut.py` | `387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3` | yes |
+| `protocol/seedsets.py` | `0471cb7bd009500a885f3a2228dae9b637469ab5b44bc51ae0dee4e1a228c057` | yes |
+| `scripts/evalcore.py` | `ab4ad2d1b29893c02582f73b24abbcffa35973cf0c9d9aa6a9b5188328525298` | yes |
+| `sp80022` 1.0.0 (`source_sha256`) | `1563526ed25f695dba223c3d62c8ce900ba4f485dd62f09a694ece0602c41700` | yes |
+
+`protocol/batteries.py` changed in T039a (`46c4dd15…` frozen for attempt 1, now `fc141a2b…`);
+it is a feature-003 file, not a feature-002 one.
+
+## T041 claims check (2026-11-01)
+
+Searched `reports/003-extended-batteries-calibration/` (run logs, `stderr.txt` and `.jsonl`
+excluded), `README.md` and the 22 code files added since `f507c6b`.
+
+| Search | Matches | Finding |
+|--------|---------|---------|
+| "cryptographically secure", "crypto-grade", "suitable for secrets" | 1 (README line 49) | a denial: "it is **not** cryptographically secure" |
+| "secure" as a word | the same line | no claim |
+| "security level", "security strength", "bits of security" | 2 (README lines 20 and 184) | both state the 64-bit seed bound, below the 112-bit minimum; no claim |
+
+**Disclaimer.** The two `summary.md` files and `calibration/phase-report.md` carry
+`protocol.disclaimer.DISCLAIMER` verbatim; `dev/phase-report.md` and `attempt-1/phase-report.md`
+carry the battery form of FR-016 ("Passing statistical batteries does not show cryptographic
+security…"). Of the JSON records, 1,000 calibration runs,
+221 battery `run.json` files, and `attempt.json`, `rescore.json`, `rescore-parser-fix.json`,
+`calibration/summary.json`, `dft-crosscheck.json`, `dev/S.json`, `dev/timing.json` and
+`streams/equivalence.json` carry it verbatim.
+
+Two findings, neither a claim of security:
+
+1. **Five provenance records carry no `disclaimer` field**, against data-model.md ("every
+   record carries `disclaimer`"): `tools/practrand.json`, `tools/testu01.json`,
+   `attempt-1/freeze.json`, `attempt-1/started.json` and `attempt-1/equivalence.json`. They hold
+   tool versions, hashes and the equivalence check, no test result. They were not edited:
+   `freeze.json` is owner-approved and `started.json` pins its hash. Fix in the writers before
+   the next freeze.
+2. **The generated disclaimer names the wrong test.** `DISCLAIMER` is feature 002's text and
+   begins "Passing NIST SP 800-22…", so the battery `summary.md` and records say SP 800-22 where
+   FR-016 asks for "statistical batteries". It still says the generator must not be used for
+   secrets. The hand-written reports use the battery form. A battery form of the constant needs
+   a change to `scripts/battery_attempt.py`, which attempt 1's freeze pins, so it belongs before
+   the next freeze, not in attempt 1's records.

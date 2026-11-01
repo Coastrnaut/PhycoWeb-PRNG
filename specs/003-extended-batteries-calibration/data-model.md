@@ -71,33 +71,56 @@ directories, never edited by hand.
 `role` ∈ {positive, negative, candidate}; `battery` ∈ {practrand, smallcrush, crush, bigcrush};
 `orientation` ∈ {fwd, rev} (PractRand: fwd only, it tests all bits).
 
-Files: `log.txt` (tool output), `pvalues.jsonl` (TestU01) or parsed results (PractRand),
-`stream.sha256`, `run.json`:
+Files: `log.txt` (tool output), `pvalues.jsonl` (TestU01 only), `stderr.txt`,
+`stream.sha256`, `run.json`.
+
+*Corrected 2026-11-01 with owner approval (converge T046):* `run.json` records how the run was
+made, not its parsed result. The parsed fields are recomputed from `log.txt` and `pvalues.jsonl`
+by `protocol/batteries.load_run` whenever the run is scored, so the attempt and every re-score
+read the same raw files.
+
+`run.json`:
 
 | Field | Rule |
 |-------|------|
+| `role`, `generator`, `battery`, `orientation`, `mode` | as above; `mode` is `dev` or `attempt-<n>` (`fixture` in test data) |
 | `seed` | four ints, or `null` for `os` |
+| `length_target_log2`, `stop_on_fail` | PractRand target; `stop_on_fail` negative control only (spec Edge Cases) |
+| `stream_command`, `consumer_command` | the exact commands |
+| `stream_sha256`, `stream_bytes`, `stream_exit_status` | the stream fed to the tool |
+| `exit_status`, `elapsed_s`, `started`, `host`, `python` | |
+
+Computed by `load_run` (not stored in `run.json`):
+
+| Field | Rule |
+|-------|------|
 | `complete` | tool exited 0 and reached its full length/battery |
-| `stopped_early` | negative control only (spec Edge Cases) |
-| `length_bytes` | PractRand: last checkpoint reached |
+| `stopped_early` | stopped by `stop_on_fail` before the target |
+| `length_log2` | PractRand: last checkpoint reached |
 | `n_pvalues` | count contributing to S |
-| `results` | list of {test, checkpoint, p, grade} |
-| `rule1`, `rule2`, `rule3` | lists of results that meet each rule |
+| `results` | PractRand: {test, checkpoint, p, q, grade, saturated}; TestU01: {test, index, p, q} |
+| `rule1`, `rule2`, `rule3` | results that meet each rule (rule 1 needs the threshold) |
 | `fails` | any rule met |
-| `exit_status`, `elapsed_s` | |
 
 ## 8. Battery attempt (`attempt-<n>/attempt.json`, `summary.md`)
 
 - `equivalence`: per held-out seed and model, 10⁶ words checked, mismatches (non-zero → INVALID).
-- `roles`: for each of positive, negative, candidate: `status` (`run` / `not_run`), runs
-  complete / total, `fails`, failing runs.
+- `roles`: for each of positive, negative, candidate: `status` (`run` / `not_run`) and, when
+  run, `outcome`: `threshold`, `fails`, `failing_runs`, `incomplete_runs`, `n_pvalues`, and per
+  run `fails`, `complete`, `stopped_early`, the count of results under each rule and the first
+  five of each.
 - `verdict`: PASS / FAIL / INCONCLUSIVE / INVALID (spec rules), with the reason.
-- `rescore` (§9) after the re-score.
+
+*Corrected 2026-11-01 with owner approval (converge T047):* the re-score is not written into
+`attempt.json`, which stays as the attempt left it; it is the separate record of §9.
 
 ## 9. Re-score (`attempt-<n>/rescore.json`)
 
 Re-applies `protocol/batteries.py` to every saved log; records per run whether `fails` and the
-rule lists are identical, and whether the verdict is identical (SC-006).
+rule lists are identical, and whether the verdict is identical (SC-006). Fields:
+`recorded_verdict`, `rescored_verdict`, `reason`, `differences`, `identical`. A supplementary
+re-score with a later parser goes in its own file (attempt 1: `rescore-parser-fix.json`) and
+never replaces this one.
 
 ## State transitions
 
