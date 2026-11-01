@@ -435,8 +435,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **When**: the choice is computed once, by code, after every candidate entered for it has
     been scored, and before the production-width analysis of the chosen family starts. At least
     one candidate per family is entered, and the entered set is recorded in the candidate log
-    before the first score. A candidate added later counts towards the stop rule but does not
-    change the recorded choice.
+    before the first score. `d4_choice.py` exits 2 until every candidate of the recorded entered set
+    has, at 16 and, where this rule needs it, at 8, a final reduced-width outcome for each bound
+    kind: a bound record, the `inconclusive` record of a capped search, or an `ineligible` or
+    `rejected` log decision. A capped search counts as no bound at that width, so the choice
+    proceeds once every entered candidate has an outcome, whatever it is, and the choice record
+    lists each outcome; no search is retried to reach a score (R12). A candidate added later, only
+    in place of one `rejected` or `ineligible` (spec "Eligibility and selection"), counts towards
+    the stop rule but does not change the recorded choice.
   - **Where**: at 4×4, at the widest reduced width, 16 or else 8, at which at least one entered
     candidate of each family has both a differential and a linear trail bound for a common
     number of rounds of at least 2; r* is the largest such common number. Only candidates with
@@ -1168,9 +1174,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     rule, the old and new text, the reason, the direction, `stricter` in the rule's stated direction
     or `settled`, which fixes a case the protocol leaves open, only before any result
     it affects exists, with the owner's approval, and never looser than any reading of the existing
-    text; the readings compared for a settled case; the approver, the last record ID that existed
-    before it, so that "before any result it affects" can be checked, and the results known at the
-    time (FR-044). The spec's Clarifications point to it.
+    text; the readings compared for a settled case; the approver, with the confirmation of the
+    approval step, the last record ID that existed before it, so that "before any result it affects"
+    can be checked, and the results known at the time (FR-044). Approving an entry is the owner's
+    own act, which the agent never performs: the writer's approval step prints the SHA-256 of the
+    entry, or of the first entries together when the log is created, and appends nothing unless
+    standard input is an interactive terminal and the owner types its first 16 hex digits; the entry
+    records that confirmation (data-model §18). The spec's Clarifications point to it.
   - **A broken chain** is repaired only with the owner's go-ahead, recorded as a row "Log
     repair <n>" of the spec's Review & Approval table that names the log, the `seq` of the break and
     the date, reads Approved and is committed; `repair_log.py --approval` names that row, and the
@@ -1180,11 +1190,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     where the records they cite corroborate them, and the final report states the repair.
   - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files;
     (2) `design_freeze.py create` runs with `git_dirty` false and writes the record as `draft`;
-    (3) the owner runs `design_freeze.py approve`, which writes the approval into it and changes
-    nothing else (data-model §13); (4) the owner commits the record; (5) `validate`, which
+    (3) the owner runs `design_freeze.py approve`, which prints `draft_sha256`, refuses unless
+    standard input is an interactive terminal and the owner types its first 16 hex digits, writes
+    the approval with that confirmation into it and changes nothing else (data-model §13); (4) the
+    owner commits the record; (5) `validate`, which
     recomputes `draft_sha256` and every hash, exits 0. Dirty means a tracked file modified or an
     untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
-    and local-only outputs are in the record by SHA-256 anyway.
+    and local-only outputs are in the record by SHA-256 anyway. Steps (1), (3) and (4) are the
+    owner's own acts, which the agent never performs (spec FR-043).
 - **Rationale**: the edge case on large records leaves the choice to the plan. 10 MB keeps the
   repository small; hashes keep every local record checkable.
 - **Alternatives**: commit everything (hundreds of MB of matrices); keep only summaries (the

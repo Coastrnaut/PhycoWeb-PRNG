@@ -48,9 +48,10 @@ record those values and change nothing, except that the constant rule's early fi
 the stricter checklist answers of 2026-11-01, and its values were settled by the answers to the
 re-run the same day. The last row lists the spec's security parameters with their directions. Every
 change from now on is an entry of the protocol change log `research/004/protocol-changes.jsonl`
-(data-model §18). Its first entries, written when the log is created, record the answered checklist
-rows of both runs whose applied change altered the text of a pre-registered rule, one entry per row,
-citing its ID; the constant rule's values and its refused list's SHA-256 are among them, `settled`
+(data-model §18). Its first entries, written when the log is created, record the answered rows of
+every checklist round answered before the log is created, by the lists "Rows that change the
+protocol" of checklist-choices.md, in round order, one entry per row, citing its ID; the constant
+rule's values and its refused list's SHA-256 are among them, `settled`
 before the first candidate is scored.
 
 | Item left to the plan | Value fixed here | Research | Stricter means |
@@ -327,10 +328,11 @@ source and binary.
    installed; the downloads manifest `downloads.json`, one entry per file fetched (R19); the
    environment records of both platforms (R1); corrected `requirements.txt`;
    `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints; `protocol/evidence.py`;
-   the provenance log; the protocol change log, whose first entries are the protocol changes
-   chosen with the checklist answers of 2026-11-01 (FR-044); the `phyco-v2` archive (FR-042).
-   (The status of the strategy note and of security.md §22 rows 5a and 5a.1 was updated during
-   planning, in security.md 2.10.)
+   the provenance log; the protocol change log, whose first entries are the answered rows of every
+   checklist round answered before it is created, by the per-round lists of checklist-choices.md, in
+   round order, approved by the owner at the log's approval step (FR-044; data-model §18); the
+   `phyco-v2` archive (FR-042). (The status of the strategy note and of security.md §22 rows 5a and
+   5a.1 was updated during planning, in security.md 2.10.)
 2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check, with progress written by the
    main thread only (R2); the sweep, a heavy run → demonstration record → ⛔ **FUT-SEC-8 result
    review**. No key-loading code before it.

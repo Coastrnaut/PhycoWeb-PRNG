@@ -342,3 +342,9 @@ every other item; the reviewer ticks them.
   and `/speckit-clarify`.
 - Add comments or findings inline.
 - Items are numbered sequentially for easy reference.
+- On 2026-11-01 the owner asked the agent to verify each item against the text and tick it if it
+  holds. The agent did so, with its evidence for each item in its report, and the 42 items it found
+  to hold were ticked in commit b3a30e8 ("checlists verified"). A tick here therefore records a
+  determination the owner delegated, and the owner's tasks approval includes the review of those
+  ticks: an item the owner does not accept is unticked. Items of later runs follow the same rule,
+  and each commit that ticks items is named here.

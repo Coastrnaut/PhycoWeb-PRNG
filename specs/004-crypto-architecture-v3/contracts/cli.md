@@ -184,29 +184,43 @@ recorded tool defect in the control's own code (data model §5).
 ```text
 d4_choice.py --log research/004/candidates.jsonl --out $REP/d4/choice.json
 d4_choice.py --tie --log research/004/candidates.jsonl --out $REP/d4/tie.json
+d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json
 ```
 
-Computes the D4 choice of research R6 from saved bound records. Exits 2 if `choice.json`
-exists or if no entered set is recorded. After an exact tie, `--tie` writes `tie.json` once,
-when R at 4×4 exists for both representatives or one of them is ineligible; before that, or if
-`tie.json` exists, it exits 2.
+Computes the D4 choice of research R6 from saved bound records. Exits 2 if `choice.json` exists, if
+no entered set is recorded, or until every entered candidate has a final reduced-width outcome for
+each bound kind at 16 and, where research R6 needs it, at 8: a bound record, the `inconclusive`
+record of a capped search, or an `ineligible` or `rejected` log decision; the choice record lists
+each outcome, and no search is retried to reach a score. After an exact tie, `--tie` writes
+`tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible; before
+that, or if `tie.json` exists, it exits 2. `--choose`, run by the owner after `tie.json` exists,
+writes `d4/tie-choice.json` with the choice, who, when and `seen_sha256`, and exits 2 if that hash
+differs from `tie.json`'s, if no tie exists or if a choice exists; `tie.json` is never rewritten.
 
 ## `scripts/round_rule.py`
 
 ```text
 round_rule.py --candidate ID           # writes candidates/<ID>/round-rule.json
 round_rule.py --select                 # writes $REP/freeze/selection.json
+round_rule.py --close                  # writes the candidate log's set-closed entry
+round_rule.py --choose ID --seen SHA256 --by NAME   # writes $REP/freeze/selection-tie-choice.json
 ```
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
-ID. `--select` applies eligibility, the fallback to the other family and the stop rule; exit 1 if
-the outcome is a stop. Eligibility is decided for every candidate from its own records (data model
+ID. `--close` writes the candidate log's `set-closed` entry once every candidate has a final
+decision and no replacement is pending, and exits 2 otherwise. `--select` exits 2 before that entry;
+it applies eligibility, the fallback to the other family and the stop rule; exit 1 if the outcome is
+a stop. Eligibility is decided for every candidate from its own records (data model
 §9): FR-026's figures from its `cost` record per size, written by `research/004/tools/costmodel.py`
 from the operation list, P and R; FR-027's semantics from the operation list's declarations;
 FR-030's mapping from its `mapping` log entry. A missing item fails eligibility. After a decline at
 the owner design review that ends in a further candidate, `--select` runs again over the whole set,
 the declined candidate included, and writes `selection-2.json`, citing `selection.json`; if it
-selects the declined candidate again, the outcome is a stop, exit 1.
+selects the declined candidate again, the outcome is a stop, exit 1. The decline reopens the set
+once, for one further candidate, and `--close` writes a second `set-closed` entry before `--select`
+runs again. `--choose`, run by the owner after a tie in `selection.json`, writes
+`freeze/selection-tie-choice.json` with the choice, who, when and `seen_sha256`, and exits 2 if that
+hash differs from `selection.json`'s, if no tie exists or if a choice exists.
 
 ## `scripts/mode_limits_v3.py`
 
@@ -263,8 +277,11 @@ SHA-256 of the candidate log, the provenance log and the protocol change log.
 owner design review row is not Approved, if the external review row is
 neither done nor "not arranged", or if `git_dirty` is true. `create` stores `draft_sha256`, the
 SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
-the owner, changes `status` from `draft` to `approved`, adds `approved_by`, `approved_utc` and
-`approval_wording`, and changes nothing else. `validate` recomputes `draft_sha256` and every hash
+the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
+the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
+`approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
+else. Steps (1), (3) and (4) are the owner's own acts, which the agent never performs (FR-043).
+`validate` recomputes `draft_sha256` and every hash
 and checks the format rules; it exits 1 if anything but the approval fields changed or a hash does
 not match, and 2 while `status` is `draft` (data model §13).
 

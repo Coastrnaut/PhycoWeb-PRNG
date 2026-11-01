@@ -15,8 +15,10 @@ against a moving target until they agree. The second re-run's 56 other items fol
 their own, then the re-run's 25, then the 193 other items of the first run, checklist by checklist.
 
 No option was written into the spec, the plan, research.md or any other document before the owner
-answered its round. This document ticks no checklist item: ticking stays with the reviewer, as each
-checklist's "Review Ownership" note says, and PRO-045 asks how the ticks of 2026-11-01 are recorded.
+answered its round. This document ticks no checklist item. On 2026-11-01 the owner asked the agent
+to verify each item against the text and tick it if it holds; each checklist's Notes record that
+instruction, its date and the commits that ticked items, and the owner's tasks approval includes the
+review of those ticks (PRO-045).
 
 **Status: all 306 rows answered, "all recommended" (owner), on 2026-11-01: the 206 of the first run,
 the 29 of the re-run and the 71 of the second re-run.** The 71 rows of the second re-run are being
@@ -475,6 +477,111 @@ REP-029, REP-035 to REP-037 and REP-049 are under Conflicts, REP-028 and REP-030
 | REP-025 | Does FR-053's pin rule cover an existing file that a new manifest or record hashes, such as `security.md` and `README.md`? | Add: a new record or the review package hashes an existing `text=auto` file over its LF-normalized content and says so (REP-023), so the hash is the same on every checkout, and no existing file's pin changes | B: pin `security.md` and `README.md` to LF: their working-tree bytes on this Windows checkout change from CRLF to LF at the next checkout. C: hash their raw bytes: the hash then differs between platforms | spec FR-053, FR-063; data-model §16; research R18 |
 | REP-026 | Is a repeatable check required that every file whose hash is recorded has an explicit line-ending rule in `.gitattributes`? | Add: a test lists every path whose hash a committed record, manifest or freeze record holds and checks with `git check-attr text eol` that each has an explicit rule or `binary`, or that its record marks the hash `lf-normalized`; it replaces the one-off check noted in `.gitattributes` on 2026-10-31 | B: repeat the one-off check before each freeze: a missing pin could slip in between. C: none | spec FR-053; research R18 |
 | REP-027 | Is the encoding of every new text file stated beside its line ending? | Add: FR-053 adds UTF-8 without a byte-order mark for every new text file; scripts write with `encoding="utf-8"` and `newline="\n"`; REP-026's check also looks for a byte-order mark; and no hashed file is written by Windows PowerShell 5.1, whose `Out-File -Encoding utf8` adds one | B: an encoding for JSON only, as now. C: none | spec FR-053; data-model introduction; research R18 |
+
+## Rows that change the protocol
+
+PRO-047 places each round's protocol changes here: one list per round, naming every answered row
+whose option altered the text of a pre-registered rule, whatever its kind, under each rule it
+alters. The protocol change log's first entries, written when it is created, are these rows, one
+entry per row, in round order (data-model §18); a round answered after the log exists adds its
+entries the usual way, proposed by the agent and approved by the owner (spec FR-044).
+
+A row is listed under a rule when its Changes cell names that rule's text: the rule in the spec's
+Pre-registered Design Protocol, the research section that holds its values, a requirement the rule
+takes as its content, as each heading below names them, or the plan's table "Values this plan
+fixes". Every Stricter or Settle row is listed, since its kind says that it changes a rule; REP-023
+is the one that names none of these texts, and it is listed under the hashes of research R16, which
+it settles. This reading is the inclusive one: a listed row that changes no rule costs one log
+entry, while a row left out would be a protocol change outside the log.
+
+These three lists were written on 2026-11-01, after their rounds were answered, by that reading, so
+they await the owner's confirmation, asked for at the tasks approval. A later round's list is
+written with its rows, before the answer that approves it.
+
+From the first run, 147 of its 206 rows:
+
+- **Development inputs** (research R3; FR-040): PRO-001, PRO-002, PRO-003, PRO-004, PRO-005,
+  PRO-006, PRO-007, PRO-008, PRO-009, PRO-010.
+- **FUT-SEC-8 demonstration** (FR-001 to FR-003): SEC-033, ANA-024, ANA-025, HW-001, REP-003.
+- **Bias rule**, with the inputs per bias measurement (research R4): ANA-014, ANA-016, ANA-023,
+  ANA-026, ANA-027, ANA-028, PRO-006, PRO-022, PRO-029, REP-018, REP-019.
+- **Round rule**, with its terms (FR-032, FR-038): SEC-001, SEC-016, SEC-037, RAT-007, RAT-009,
+  RAT-014, RAT-019, RAT-021, ANA-011, ANA-012, ANA-029, ANA-030, ANA-031, ANA-032, REP-011.
+- **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
+  FR-022): RAT-007, RAT-008, RAT-014, ANA-018, PRO-019, PRO-028, HW-001, HW-002, HW-003, HW-004,
+  HW-005, HW-006, HW-007, HW-025.
+- **Tool validation**, with the trail tools and the known results (research R12; FR-039): RAT-007,
+  RAT-008, ANA-001, ANA-002, ANA-003, ANA-004, ANA-006, ANA-007, ANA-008, ANA-011, ANA-012, ANA-021,
+  ANA-028, REP-005, REP-011.
+- **Structural checks** (research R13; FR-037): RAT-009, RAT-015, RAT-016, RAT-022, RAT-025,
+  ANA-002, ANA-010, ANA-013, ANA-015, ANA-026.
+- **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: SEC-006, SEC-011,
+  SEC-030, SEC-037, SEC-038, SEC-039, RAT-002, RAT-004, RAT-005, RAT-007, RAT-008, RAT-012, RAT-013,
+  RAT-014, RAT-015, RAT-016, RAT-017, RAT-019, RAT-020, RAT-022, RAT-024, RAT-025, RAT-027, RAT-028,
+  RAT-029, RAT-030, RAT-031, RAT-032, ANA-010, ANA-013, ANA-015, ANA-016, ANA-029, PRO-019, PRO-032,
+  HW-001, HW-002, HW-003, HW-004, HW-005, HW-006, HW-007, HW-008, HW-009, HW-011, HW-012, HW-013,
+  HW-014, HW-015, HW-016, HW-017, HW-018, HW-019, HW-020, HW-021, HW-022, HW-023, HW-024, HW-025,
+  HW-026, HW-027, HW-028, HW-029, HW-030, HW-031, HW-032.
+- **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): RAT-010,
+  RAT-026, ANA-011, ANA-017, ANA-019, ANA-020, ANA-021, ANA-022, ANA-023, ANA-031, PRO-006, PRO-011,
+  PRO-012, PRO-013, PRO-014, PRO-017, PRO-020, PRO-025, PRO-026, PRO-029, PRO-034, PRO-035, REP-018.
+- **Vector lengths** (research R8; FR-036): PRO-003, PRO-014, HW-035, HW-037, REP-015, REP-020,
+  REP-021.
+- **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
+  SEC-001, SEC-002, SEC-003, SEC-008, SEC-012, SEC-013, SEC-014, SEC-015, SEC-016, SEC-017, RAT-011,
+  HW-015, HW-020, HW-029, HW-030, REP-020.
+- **Constant rule** (research R15; FR-023): RAT-011, RAT-012, RAT-013, RAT-014, RAT-015, RAT-016,
+  RAT-017, HW-009, HW-022, HW-025, HW-028.
+- **Protocol changes and their directions** (FR-044): SEC-036, RAT-012, PRO-021, PRO-022, PRO-023,
+  PRO-024, PRO-025, PRO-026, PRO-027, PRO-035.
+- **Values this plan fixes** (the plan's table): SEC-036, ANA-009, PRO-022, PRO-028.
+- **Records and their hashes** (research R16), for the one Settle row that names no text above:
+  REP-023.
+
+From the re-run, 20 of its 29 rows:
+
+- **Development inputs** (research R3; FR-040): REP-029.
+- **Bias rule**, with the inputs per bias measurement (research R4): REP-029, REP-031.
+- **Round rule**, with its terms (FR-032, FR-038): RAT-039.
+- **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
+  FR-022): ANA-033.
+- **Tool validation**, with the trail tools and the known results (research R12; FR-039): ANA-033,
+  ANA-034, REP-029.
+- **Structural checks** (research R13; FR-037): RAT-036, ANA-033, ANA-034.
+- **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: SEC-042, RAT-036,
+  RAT-037, RAT-038, RAT-039, HW-038, HW-039, HW-040, HW-042.
+- **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): ANA-035,
+  ANA-036.
+- **Vector lengths** (research R8; FR-036): HW-041, REP-033.
+- **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
+  SEC-043, RAT-038.
+- **Constant rule** (research R15; FR-023): RAT-036, RAT-037, RAT-038.
+- **Protocol changes and their directions** (FR-044): PRO-036.
+- **Values this plan fixes** (the plan's table): RAT-037, PRO-038.
+
+From the second re-run, 50 of its 71 rows:
+
+- **Development inputs** (research R3; FR-040): ANA-039, PRO-043, REP-052, REP-053, REP-054.
+- **FUT-SEC-8 demonstration** (FR-001 to FR-003): SEC-047.
+- **Bias rule**, with the inputs per bias measurement (research R4): ANA-037, ANA-038, ANA-039,
+  REP-037, REP-052.
+- **Round rule**, with its terms (FR-032, FR-038): RAT-044, ANA-037, ANA-042, ANA-044.
+- **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
+  FR-022): RAT-040, PRO-044, PRO-048, HW-043, HW-054, HW-055.
+- **Tool validation**, with the trail tools and the known results (research R12; FR-039): ANA-038,
+  ANA-040, ANA-041, ANA-042, REP-052.
+- **Structural checks** (research R13; FR-037): RAT-044, ANA-037, ANA-038, ANA-044.
+- **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: SEC-046, RAT-040,
+  RAT-041, RAT-042, RAT-043, RAT-045, RAT-047, RAT-048, PRO-044, PRO-049, HW-043, HW-044, HW-045,
+  HW-046, HW-047, HW-048, HW-049, HW-050, HW-051, HW-052, HW-053, HW-054, HW-055, HW-056.
+- **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): RAT-041,
+  RAT-046, ANA-037, ANA-039, ANA-040, ANA-041, ANA-043, PRO-046, PRO-049, REP-035, REP-036.
+- **Vector lengths** (research R8; FR-036): REP-046, REP-047.
+- **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
+  SEC-051.
+- **Constant rule** (research R15; FR-023): RAT-040, RAT-041, RAT-042, RAT-043, HW-047.
+- **Protocol changes and their directions** (FR-044): RAT-043, PRO-042, PRO-047, REP-041.
+- **Values this plan fixes** (the plan's table): PRO-047.
 
 ## After the answer
 

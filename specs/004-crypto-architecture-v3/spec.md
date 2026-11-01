@@ -173,13 +173,13 @@ and the design document leaves an implementer, human or model, nothing to guess.
 |------|----------|------|----------|-------|
 | Spec approval (security target, mode, design rules, pre-registered design protocol, re-decided feature-002 FR-001 to FR-009, decisions D1–D10) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session, with D1–D10 as clarified on 2026-11-01 (section "Clarifications"); the pre-registered design protocol may only become stricter (FR-044). Also records the owner's approval of the strategy note and of the security.md 2.7 to 2.9 changes (strategy note §8.1, step 5), not recorded before |
 | Plan approval | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session: plan.md and its design artifacts, research.md R1–R19 with every choice answered as recommended and its eleven changes applied, data-model.md, the two contracts, quickstart.md and checklists/redesign-inputs.md. From this approval the values the plan fixes belong to the pre-registered design protocol and may only become stricter (FR-044). The six `/speckit-checklist` passes of the strategy note (§8.3) run next, before `/speckit-tasks` |
-| Checklist choices ([checklist-choices.md](./checklist-choices.md): the 206 open items of the six `/speckit-checklist` checklists) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md and `.gitattributes`. Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044). The checklists are re-read against the changed text; ticking stays with the reviewer |
-| Checklist choices, re-run ([checklist-choices.md](./checklist-choices.md): the 29 items the re-run of the six checklists found on 2026-11-01) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md and security.md (2.12). Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are re-read against the changed text; ticking stays with the reviewer |
-| Tasks approval | _pending_ | _pending_ | _pending_ | |
+| Checklist choices ([checklist-choices.md](./checklist-choices.md): the 206 open items of the six `/speckit-checklist` checklists) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md and `.gitattributes`. Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044). The checklists are re-read against the changed text. On 2026-11-01 the owner asked the agent to verify each item against the text and tick it if it holds; the agent did so, with its evidence for each item in its report. The owner's tasks approval includes the review of those ticks, and an item the owner does not accept is unticked |
+| Checklist choices, re-run ([checklist-choices.md](./checklist-choices.md): the 29 items the re-run of the six checklists found on 2026-11-01) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Answered in session: "all recommended". Applied the same day to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md and security.md (2.12). Every protocol change among them is stricter or settles an open case conservatively and is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are re-read against the changed text. On 2026-11-01 the owner asked the agent to verify each item against the text and tick it if it holds; the agent did so, with its evidence for each item in its report. The owner's tasks approval includes the review of those ticks, and an item the owner does not accept is unticked |
+| Tasks approval | _pending_ | _pending_ | _pending_ | Includes the owner's review of the checklist items the agent ticked on the owner's instruction of 2026-11-01 (each checklist's Notes), where an item the owner does not accept is unticked, and the owner's confirmation of checklist-choices.md's lists "Rows that change the protocol", written after their rounds were answered |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
-| D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`d4/tie.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
-| Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, with the SHA-256 of the record the owner saw (`selection.json`). Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
+| D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME` into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
+| Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME` into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. "Not needed" if the rule decides without a tie |
 | Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
@@ -473,14 +473,21 @@ freeze hashes and the baseline manifest; run the claim-register test.
   R19). If no trail route is validated, no candidate can establish R_bound, none is eligible,
   and the feature recommends stopping (stop rule).
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
-  established for that candidate within its analysis budget, and it cannot be frozen. The gap
-  is reported, and the feature tries another candidate within the stop rule's budget or
-  recommends stopping.
+  established for that candidate within its analysis budget, and it cannot be frozen. The gap is
+  reported, and the candidate is `ineligible`; another candidate may be entered in its place within
+  the stop rule's budget before the set closes (section "Pre-registered Design Protocol",
+  "Eligibility and selection"), or the feature recommends stopping.
 - **The round rule gives an expensive R**: rounds are never lowered for throughput. The cost is
-  reported, and a different candidate may be tried before the freeze, within the stop rule's
-  budget.
-- **A distinguisher on more rounds turns up before the freeze**: R rises by the rule, or the
-  candidate is dropped. A finding that breaks the target on the full rounds is recorded at once
+  reported, and an expensive R is never a reason to enter or select another candidate: a further
+  candidate is entered only in place of one `rejected` or `ineligible`, within the stop rule's
+  budget, and selection follows the rules (section "Pre-registered Design Protocol", "Eligibility
+  and selection").
+- **A distinguisher on more rounds turns up before the freeze**: R rises by the round rule, and
+  every measurement the raised R needs runs as a new measurement of its kind in the same budget row
+  (research R7). If a row cannot hold it, that evidence is inconclusive and the candidate
+  `ineligible` at that size for a spent budget, and selection proceeds among the others within the
+  stop rule. A raised R is never by itself a reason to drop a candidate. A finding that breaks the
+  target on the full rounds is recorded at once
   (FR-051). If it comes after the owner design review, the design document gets a new version,
   the rationale is revised, the review is repeated for the changed parts and recorded in a row
   of its own, and the review package is rebuilt (FR-043).
@@ -1397,7 +1404,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   after, and a fourth `proposed` entry of a family is refused. A candidate is `rejected` or
   `ineligible` only for the rules' reasons (a failed inverse or bijectivity test, a failed
   eligibility item, a spent budget); it may be withdrawn before its first tool run for any
-  recorded reason and still counts, and the log writer refuses any other decision. The
+  recorded reason and still counts, and the log writer refuses any other decision. A raised R is
+  never by itself a reason to drop a candidate: the measurements it needs run in their budget rows,
+  and a row that cannot hold them makes the candidate `ineligible` for a spent budget (edge cases).
+  Candidates are entered before any is scored, and a further one only in place of one `rejected` or
+  `ineligible`, within the stop rule, never because another's R is high; the set closes at a
+  `set-closed` log entry before selection, and a decline at the owner design review reopens it once,
+  for one further candidate (section "Pre-registered Design Protocol"). The
   candidate frozen MUST be the one the pre-registered rules select; the owner design review cannot
   put another eligible candidate in its place, and throughput is never a reason to decline. After a
   decline that ends in a further candidate, the rules select again over the whole set, the declined
@@ -1433,7 +1446,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   writes the record as `draft`; (3) the owner's approval is written into it by `design_freeze.py
   approve`, run by the owner, which changes the status and adds who, when and the wording, and
   nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
-  having checked against the draft's SHA-256 that nothing but the approval changed. Dirty means a
+  having checked against the draft's SHA-256 that nothing but the approval changed. Steps (1), (3)
+  and (4) are the owner's own acts: like a constitution amendment, they fall outside the standing
+  authorization for local commits (constitution 1.3.0, Principle IX), and the agent never performs
+  them, even when asked in general terms. `design_freeze.py approve` prints `draft_sha256` and
+  refuses unless standard input is an interactive terminal and the owner types its first 16 hex
+  digits, and the record keeps that confirmation (data-model §13). Dirty means a
   tracked file modified or an untracked file not ignored; ignored files (the locks, local-only
   outputs) do not count, and local-only outputs are in the record by SHA-256 anyway. The freeze
   record MUST hold the SHA-256 of the design document, `rationale.md`, the model, the vectors
@@ -1458,7 +1476,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `research/004/protocol-changes.jsonl`, chained and locked like the candidate log, with per
   entry the date, the rule, the old and new text, the reason, the direction (below), the readings
   compared for a settled case, the approver, the last record ID that existed before it, so that
-  "before any result it affects" can be checked, and the results known at the time of the change. A
+  "before any result it affects" can be checked, and the results known at the time of the change.
+  Its first entries, written when it is created, are the answered rows of every checklist round
+  answered before then, by the per-round lists "Rows that change the protocol" of
+  checklist-choices.md, in round order; the owner's answer to a round approves its list, and a round
+  answered after the log exists adds entries the usual way, proposed by the agent and approved by
+  the owner. Approving a change is the owner's own act, outside the standing authorization like the
+  freeze's steps (1), (3) and (4) and every Review & Approval decision that opens a guard (FR-043;
+  section "Review & Approval"), and the agent never performs it, even when asked in general terms:
+  the change log's approval step prints the SHA-256 of what is approved and refuses unless standard
+  input is an interactive terminal and the owner types its first 16 hex digits, and the entry
+  records that confirmation (data-model §18). Every commit carries the owner's git identity and no
+  AI co-author line, so the history cannot show who acted, and the owner's review at each ⛔ gate
+  lists these acts since the last gate. A
   stricter change applies to every candidate, those already evaluated included. It is applied first
   by recomputing verdicts from saved outputs; a new measurement it needs, such as more inputs, is a
   new measurement of the same kind under the changed rule, not a re-run: the old records stay, and
@@ -1815,13 +1845,14 @@ of constructed inputs is allowed, each fixed by a public rule before its first u
 data-model §2): (1) the fixed patterns of FR-058 and research R8 (all-zero, all-one,
 alternating, counting; the single-bit keys and nonces e_i for every i); (2) the edge states of
 FR-054, from the design document's list; (3) the avalanche flips x ⊕ e_j, the key and nonce bit
-flips and the word rotations of development inputs, for every j, bit and k the rule names; and
-(4) feature 002's `dev` seeds for FUT-SEC-8, the one external development set. No value or
-index is picked after any output is seen. A run that is not evidence, such as the 60 s
-projection before a heavy run or any timing probe, writes a record of kind `projection` with
-its inputs (the first inputs of the run it projects); its outputs other than timing are
-discarded unread, the record says so, and its time counts against the budget row of the run it
-projects. *Stricter means*: the derivation does not change.
+flips and the word rotations of development inputs, for every j, bit and k the rule names; (4)
+feature 002's `dev` seeds for FUT-SEC-8, the one external development set; and (5) synthetic counts
+for the bias test's validation only, drawn by a public rule from seeds hashed from public strings
+(research R3). No value or index is picked after any output is seen. A run that is not evidence,
+such as the 60 s projection before a heavy run or any timing probe, writes a record of kind
+`projection` with its inputs (the first inputs of the run it projects); its outputs other than
+timing are discarded unread, the record says so, and its time counts against the budget row of the
+run it projects. *Stricter means*: the derivation does not change.
 
 **FUT-SEC-8 demonstration.**
 
@@ -1895,10 +1926,11 @@ widths. The family chosen is the one with the larger proven weight per round (�
 weaker of the differential and linear bounds, per round, over the rounds computed) per unit of
 estimated hardware cost (LUTs per node and round, from an operation-count model the plan fixes
 before any candidate is scored). Ties go to the smaller R from the round rule, then to fewer
-serial carry chains per round, then to the owner's recorded choice. That choice is made only
-after the tie record (`d4/tie.json`) exists, never changes, and is recorded in that record and
-in its own row of the Review & Approval table ("D4 tie"), with the date and the SHA-256 of the
-record the owner saw. *Stricter means*: no change.
+serial carry chains per round, then to the owner's recorded choice. That choice is made only after
+the tie record (`d4/tie.json`) exists, never changes, and is recorded beside it, in
+`d4/tie-choice.json`, which `d4_choice.py --choose` writes against the SHA-256 of the record the
+owner saw, and in its own row of the Review & Approval table ("D4 tie"), with the date and both
+records' SHA-256; the tie record stays as the script wrote it. *Stricter means*: no change.
 
 **Tool validation.** A tool's result, positive or negative, counts only after its validation
 record exists (FR-039). *Stricter means*: known results and re-validation triggers are only
@@ -1915,28 +1947,37 @@ tool defect is left unresolved), whatever R_dist it gives, and that R_dist, R_f,
 R_bound are established at every claimable size; inconclusive bias evidence at a size makes the
 candidate ineligible. Of the eligible candidates of the chosen family, or of the other family if
 the chosen one has none, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's
-recorded choice, made only after the selection record (`selection.json`) exists, never changed,
-and recorded in that record and in its own row of the Review & Approval table ("Selection tie"),
-with the date and the SHA-256 of the record the owner saw. Every candidate stays in the log
-(FR-041). A stricter change applies to every candidate, those already evaluated included, and
-the verdicts are recomputed under it (FR-044). *Stricter means*: eligibility items are only
-added; the selection rule does not change.
+recorded choice, made only after the selection record (`selection.json`) exists, never changed, and
+recorded beside it, in `freeze/selection-tie-choice.json`, which `round_rule.py --choose` writes
+against the SHA-256 of the record the owner saw, and in its own row of the Review & Approval table
+("Selection tie"), with the date and both records' SHA-256; the selection record stays as the script
+wrote it. Every candidate stays in the log (FR-041). Candidates are entered before any is scored
+(the entered set of research R6), and a further candidate may be entered later only in place of one
+that became `rejected` or `ineligible`, within the stop rule's three per family, never because
+another's R is high. The set closes at a `set-closed` entry of the candidate log, written by
+`round_rule.py --close` once every candidate has a final decision and no replacement is pending, and
+selection runs only after it. A decline at the owner design review reopens the set once, for one
+further candidate (FR-043). A stricter change applies to every candidate, those already evaluated
+included, and the verdicts are recomputed under it (FR-044). *Stricter means*: eligibility items are
+only added; the selection rule does not change.
 
 **Stop rule.** At most three candidates of each family (D4) are evaluated. A candidate is a
 distinct design of Π with its own entry in the candidate log (FR-041), eligible or not, and it
 counts as evaluated from its first entry, `proposed`, which comes before any tool runs on it; a
-fourth `proposed` entry of a family is refused. A change makes a new candidate if it touches the
-operation list's structure: the nonlinear component, the round structure (its operations, their
-forms or order), the colour schedule, or the rule that generates the constants or the rotation
-amounts. It is a variant or a fix if it changes only values the candidate's logged rules derive
-(w, n, R, c), or corrects a value to what those rules give; so a reduced variant, a round count,
-or a fix to the model that leaves the design unchanged is not a new candidate. When in doubt, it
-is a new candidate. The analysis budget per candidate, such as the solver time for trail bounds,
-is fixed in the plan before the first candidate is scored. The feature recommends stopping
-(security.md §21, option C) if none of the evaluated candidates is eligible, or if no published
-theorem's preconditions can be met by the mode. No candidate is eligible, for example, when an
-attack below the target reaches the full rounds of every candidate, or when R_bound is not
-established at the production width for any of them (strategy note §10; D10). The budget may
+fourth `proposed` entry of a family is refused. A later candidate is entered only in place of one
+`rejected` or `ineligible`, or once after a decline at the owner design review, never because
+another's R is high, and none after the set closes (Eligibility and selection). A change makes a new
+candidate if it touches the operation list's structure: the nonlinear component, the round structure
+(its operations, their forms or order), the colour schedule, or the rule that generates the
+constants or the rotation amounts. It is a variant or a fix if it changes only values the
+candidate's logged rules derive (w, n, R, c), or corrects a value to what those rules give; so a
+reduced variant, a round count, or a fix to the model that leaves the design unchanged is not a new
+candidate. When in doubt, it is a new candidate. The analysis budget per candidate, such as the
+solver time for trail bounds, is fixed in the plan before the first candidate is scored. The feature
+recommends stopping (security.md §21, option C) if none of the evaluated candidates is eligible, or
+if no published theorem's preconditions can be met by the mode. No candidate is eligible, for
+example, when an attack below the target reaches the full rounds of every candidate, or when R_bound
+is not established at the production width for any of them (strategy note §10; D10). The budget may
 only be lowered (FR-044): a budget lowered below the hours already used leaves zero hours, and a
 new measurement under a stricter rule counts against the same budget row. A stop is a valid,
 reportable outcome, reported with what was reached. After a stop, a later feature may evaluate
@@ -2283,17 +2324,19 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Python model speed**: about 2 × 10⁵ words/s for `phyco-v2` at 2×2. A permutation of a large
   grid will be much slower, so the plan sets vector lengths at large sizes (FR-036).
 - **Square grids only**; rectangular grids are out of scope.
-- **No git branch** is created; the feature directory names the feature. Only the owner commits,
-  pushes or publishes (Principle IX).
-- **External review**: constitution 1.2.0 does not require an external design review, and
+- **No git branch** is created; the feature directory names the feature. The agent commits locally
+  under the owner's standing authorization (Principle IX, constitution 1.3.0), at consistent
+  checkpoints and with no AI co-author line; only the owner pushes, tags, releases or publishes.
+- **External review**: constitution 1.3.0 does not require an external design review, and
   security.md §7 recommends one. Arranging it is the owner's outward action (Principle IX).
-- **Constitution**: 1.2.0 applies. The optional amendment of strategy note §9.1 and the
+- **Constitution**: 1.3.0 applies. The optional amendment of strategy note §9.1 and the
   Principle I wording update (checklist group E) are not part of this feature.
 - **Change completion**: `phyco-v3` remains a design under evaluation. Of the constitution's
   change-completion list, the statistical evaluation (feature 007) and the RTL (features 006 and
   008) are still open when this feature ends (FR-052).
-- **AI assistance**: as in features 001–003, an AI coding agent drafts the documents and code and
-  runs the tools, bound by the constitution as a human contributor is (security.md §16.1). Tools
+- **AI assistance**: as in features 001–003 (security.md §16.1), except that the agent commits
+  locally under the standing authorization above: an AI coding agent drafts the documents and code
+  and runs the tools, bound by the constitution as a human contributor is. Tools
   judge its drafts and the owner reviews them (FR-064, FR-065, FR-067).
 - **Roles**: mathematics, cryptanalysis, hardware and independent review are not staffed
   (security.md §16.2) unless the owner arranges otherwise.
