@@ -11,7 +11,7 @@ is set out as four assertion outlines in
 described in [`research/engagement/scrutiny-game.md`](research/engagement/scrutiny-game.md), and
 the rules for AI-assisted VHDL in
 [`research/hardware/vhdl-genai.md`](research/hardware/vhdl-genai.md) (the hardware note). The
-policy is in [`security.md`](security.md) 2.8 and the
+policy is in [`security.md`](security.md) 2.9 and the
 [constitution](.specify/memory/constitution.md) 1.2.0, which prevails.
 
 > Passing statistical batteries does not show cryptographic security. This generator must not be
@@ -28,7 +28,7 @@ policy is in [`security.md`](security.md) 2.8 and the
 2. Run `/speckit-converge` on feature 003. The agent runs it automatically at that point.
 3. Decide the questions in section 3, or leave them to `/speckit-clarify`.
 4. Optionally, amend the constitution (section 2).
-5. Approve the strategy note and the security.md 2.7 and 2.8 changes.
+5. Approve the strategy note and the security.md 2.7 to 2.9 changes.
 6. Optionally, read Outline A of the assertion outlines: it is the argument feature 004 starts to
    make, as a plan rather than a claim.
 
@@ -66,7 +66,7 @@ From strategy note §8.4. The recommended choice comes first.
 
 ## 4. Feature 004 (`/speckit-specify`)
 
-This is the prompt of strategy note §9.2, updated for security.md 2.8. Run `/speckit-specify`
+This is the prompt of strategy note §9.2, updated for security.md 2.9. Run `/speckit-specify`
 with this text:
 
 ```text
@@ -118,7 +118,7 @@ FUT-SEC-7's held-out statistical programme is delivered by a later feature and s
 feature's report. Re-decide every carried-over feature-002 requirement (FR-001 to FR-009),
 including the FR-007 rule on standard primitives and standard modes. Out of scope: RTL, the
 held-out statistical programme, the full cryptanalysis campaign, external review, publication and
-any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.8
+any security claim. Inputs: research/security/crypto-redesign-strategy.md, security.md 2.9
 (sections 3, 5, 8, 9.2, 12, 15, 20.1 and 21), and research/security/seed-entropy-bound.md
 section 5 with the section 5.3 checklist groups A to G.
 ```
