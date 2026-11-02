@@ -1619,9 +1619,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the values that decide verdicts live there. Every version of the design
     document that a record cites by `design_version` is kept the same way, as
     `design-versions/<sha256>.md` (spec FR-034). Every record also holds `protocol_seq` and
-    `protocol_line_sha256`, the protocol change log's last entry when the run started, which every
-    record holds, since the shared guard "Protocol log" refuses every run that writes evidence while
-    the log does not exist, its chain does not check or its first entries do not all hold the
+    `protocol_line_sha256`, the protocol change log's last entry when the run started, which exists
+    for every run, since the shared guard "Protocol log" refuses every run that writes evidence
+    while the log does not exist, its chain does not check or its first entries do not all hold the
     owner's `approval_confirmed` (spec FR-044).
   - **Code at HEAD.** A run that writes evidence exits 2 unless every source file in its
     `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
