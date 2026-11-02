@@ -53,7 +53,7 @@ implementation can write byte-identical files:
 | `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`; unique; part of the file name |
 | `kind` | str | one of the kinds of sections 4–11, `projection`, `lock-cleared`, `reproduction` or `recheck` (below) |
 | `created_utc` | str | ISO 8601, seconds |
-| `model_id`, `variant_id` | str | `phyco-v2` for US1 and for tool validation on it; otherwise a candidate or `phyco-v3` variant ID (research R14) |
+| `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version and hash; `none` before it exists |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
@@ -88,10 +88,17 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants, projections, validations, and a search at its cap, which keeps `status` `inconclusive` | `none` |
-| A firing, or a trail found by a validated tool, that raises R (a possible weakness only raises R; section 5) | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and the stated family-wise chance of a false firing |
+| No finding: vectors, constants and constructed states with their generator checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost`, `recheck` and `lock-cleared` records, the D4 choice, round-rule and selection records, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
+| A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
+| A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
+| A `degree` record that raises R_dist, its inside-out count included | `strong theoretical concern`: an argument shows it, and no run demonstrates it |
+| A proven bound (section 6) | `no weakness identified within the analysis performed`, with its scope |
 | A test that does not fire | `no weakness identified within the analysis performed`, with its scope |
+| A reproduction that differs on a field that enters a verdict | `unverified hypothesis`, with `status` `blocked` until it is resolved (Reproduction, below) |
+| A reproduction that differs only in the p-values, which decide no verdict | `none`: a finding about the run's reproducibility, reported, which blocks nothing |
 | A finding of a tool not yet validated | `unverified hypothesis`, with `status` `blocked` |
+| The demonstration record (section 4) | `confirmed vulnerability` of `phyco-v2`'s seed bound once every target is recovered; a disagreement in its match counts is an `unverified hypothesis` until the FUT-SEC-8 result review |
 
 - **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or
   `lf-normalized` (research R16).
@@ -120,7 +127,14 @@ the class.
   record holds the original's ID and SHA-256, each compared field with its outcome, the reported
   fields, and `match` or `differs`. A reproduction appends nothing to the candidate log, charges no
   budget row and is not a re-run under research R7, so it can neither replace evidence nor add any,
-  and a difference is a finding. It compares these fields with the original and reports every other
+  and a difference is a finding: the original stands; a difference in a field that enters a verdict
+  (every compared field but the p-values) makes the candidate's eligibility `blocked`, as an
+  unverified hypothesis does (FR-060), until it is resolved, and in the environment that made the
+  original it is a tool defect of research R7, whose one re-run is a new measurement in the
+  original's row and raises R by the round rule if it fires; a difference in
+  the p-values, which decide no verdict, is reported and blocks nothing.
+  `round_rule.py` reads the `reproduction` records of the candidate's records
+  (section 9). It compares these fields with the original and reports every other
   field only: `kind`, `model_id`, `variant_id`, each source file's entry in `code_sha256`, `inputs`,
   each deterministic output's `sha256` and `bytes` (not its path), `exit_status`, `assertions`,
   `status`, `classification`, and the fields the table below lists for its kind, `design_sha256`
@@ -149,8 +163,8 @@ design document, which the table names; for every other kind it is reported, and
 | Demonstration (section 4) | `targets`, `revealed`, `observed`, `vector_check`, `matches`, `assumption`, `listed`, `recovered`, `model_sha256`; of `tool`, the source's SHA-256; of `cost`, the steps per candidate and the total steps | of `cost`, the seconds, the steps per second and the extrapolation; the rest of `tool` (the binary's hash, compiler, flags, threads); `report`, which restates the compared fields with timings; `design_sha256` |
 | Structural evidence (section 5: `inverse`, `bijectivity`, `dependency`, `symmetry`, `invariant`, `degree`) | the fields of its row in section 5 | the projected and used hours, the measured speed; `design_sha256` |
 | Statistical evidence (section 5: `frequency`, `avalanche`, `control`) | the fields of its row and the items of security.md §11.6 above: counts, critical counts and fired bits byte for byte, and the p-values by value | as for structural evidence |
-| Trail bound (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap | of `budget`, the hours used; the raw solver log; `design_sha256` |
-| Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
+| Trail bound and trail (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap; of a `trail` record, `trail_kind`, `characteristic` and `weight` | of `budget`, the hours used; the raw solver log; `design_sha256` |
+| Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `second_known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
 | D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
 | Constant tables (section 11; `gen_constants_v3.py`) | every file it writes, byte for byte, and `design_sha256`, since its restatement check reads the design document (research R15) | the sidecar entry's command, interpreter, platform, speed and time |
 | Vectors and constructed states (section 11; `gen_vectors_v3.py`, `gen_constructed_v3.py`) | every file it writes, byte for byte | as for the constant tables, and `design_sha256` |
@@ -218,7 +232,7 @@ cite them hold on every checkout.
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
-| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
+| `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; the uniform controls' hours, logged by no candidate, are added to `statistics` by the Budget guard from the control records (section 5); each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
 | `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) |
 | `variant_map` | on the `selected` entry: the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it |
 | `date_utc` | ISO 8601 |
@@ -316,7 +330,7 @@ and every recovered seed with `model_v2`, with no sweep.
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
 | `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
 | `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
-| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired. One record per test and size, `controls/<test>-<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
+| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<test>-<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order, each pattern on its own (the K sets of amounts placed by their rule among them); symmetries that fix a pattern; the relations checked between the constants of one call (R13); at 2×2 and 3×3, the statement that the placements of the food nodes and of the amounts were checked together with the round constants as one pattern (R13) | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
 | `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, w − 1 for a w-bit addition), a round's count the product of its phases'; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, w for an addition of two variable words, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
@@ -335,6 +349,10 @@ and every recovered seed with `model_v2`, with no sweep.
   `dependency` record and a trail-bound record (section 6) read no constant value, cover one
   permutation for all and state that reason. Where the streams are not distinct, one permutation is
   covered.
+- **Constants cited.** Every record whose result depends on the constants names the constant table
+  it read by path and SHA-256, so that a result on one table is never cited for another; a rise of R
+  makes a new table, and with distinct streams it changes every later call type's constants from
+  round 1 (research R15).
 - **Unvalidated tools.** A trail or distinguisher found by a tool not yet validated is recorded
   as an unverified hypothesis (FR-060), with `status` `blocked`, and it blocks the candidate's
   eligibility until a validated tool, or direct evaluation of the trail with the validated
@@ -347,16 +365,29 @@ and every recovered seed with `model_v2`, with no sweep.
 |-------|------|
 | `bound_kind` | `differential` (trail probability) or `linear` (squared trail correlation) |
 | `rounds`, `width`, `size` | the variant it bounds |
-| `bound` | a rational as a "p/q" string, and its −log₂. A floating-point solver value becomes the rational by rounding in the direction that weakens the bound: a weight is rounded down, never up |
+| `bound` | the weight W, the bound's −log₂, as a rational "p/q" string: a multiple of 2⁻¹⁶ rounded down, never up, which weakens the bound, from the solver's float or from an exact probability (an exhaustive table's entry), which the record holds beside it; for an active-box or active-S-box count, the integer at or below the proven dual bound, with no tolerance (9.9999999 counts as 9), with the dual bound beside it (R12) |
 | `method` | for example `active-box count`, `exhaustive table`, `milp`, `branch-and-bound` |
 | `tool`, `validation` | the tool, and the ID and SHA-256 of the validation record of its exact hash, whose `created_utc` must be earlier (FR-039; SC-007); a tool used outside its validated kind writes `not evaluated` |
 | `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such; the record states that its status rests on those tolerances (R12); the raw solver log is an output marked not deterministic, which a reproduction reports only (section 1) |
 | `scope` | "single trails under the usual independence assumptions; clustering into differentials and linear hulls, and key-dependent effects, open for feature 005" |
-| `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash (R12); an ARX search at w = 16 or 32 counts only after it |
+| `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash: before the amounts are chosen, the cross-check on the first amounts of the candidate's space in tie order, which runs first in its trail row; after it, the cross-check of the chosen amounts scaled to w = 4 and 8, which the production-width searches need (R7, R12). The cross-check record lists per r the tool's value and the exhaustive one, equal by exact equality (section 7); a bound without a passed cross-check does not count, and `d4_choice.py` uses none |
 | `budget` | hours used, a timing that a reproduction reports only (section 1), and the cap; only a proven result gives a `bound` (R12), and a capped or timed-out search has `status` `inconclusive` and no `bound` |
 
 A bound from a tool not yet validated never counts; a trail it finds is an unverified hypothesis
 (section 5).
+
+**Bounds per size.** Before selection, every candidate's R_bound at each claimable size comes from
+bound records computed at that size; a proof in the design document that carries a bound to a larger
+size serves only as a check beside them, in the rationale (FR-038).
+
+**Trail record** (`candidates/<id>/trail-<record_id>.json`; FR-038). A trail is a characteristic of
+Π exhibited by a validated tool that searches Π at the size and width the round rule uses:
+`trail_kind` (`differential` or `linear`), `characteristic` (the difference or mask after every
+round), `weight` (the trail's exact probability or squared correlation as a rational "p/q" string,
+with its −log₂), `rounds`, `size`, `width`, `tool` and `validation`, as for a bound;
+`round-rule.json` cites it under `R_dist` (section 9). A bound, a box's trail, an active-box or
+active-S-box count and a bound search's optimum are bounds, never trail records; an optimal
+characteristic that a search of Π returns with its weight is one, written beside its bound record.
 
 ## 7. Tool validation record (`validation/<tool>-<record_id>.json`; FR-039)
 
@@ -364,7 +395,9 @@ A bound from a tool not yet validated never counts; a trail it finds is an unver
 downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
 and value, or the `owner-provided` entry of a value the owner provides),
 `validated_kind` (word width, operation set and kind of model; R12), `known_result` (paper,
-table and value, or the security.md finding S12–S15 or FUT-SEC-8), `found`, `outcome`
+table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
+known result fixed before the tool's first validation, with its source and its provenance-log entry,
+section 14, or `none`, which the first validation record states), `found`, `outcome`
 (`re-found` or `not re-found`). A tool's results count only after a `re-found` record of the
 same kind and of the tool's exact hash exists.
 
@@ -376,18 +409,22 @@ same kind and of the tool's exact hash exists.
   deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
   S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; the planted torus
   symmetries of the stated lists at n = 3 and 4 found, and none on the list without one; each
-  structural tool's counts and matrices, entry by entry; the degree derivation's count by the rule,
+  structural tool's counts and matrices, entry by entry; the avalanche test's three
+  planted results, the bits that fire matching each stated set bit for bit
+  at every round count tested; the degree derivation's count by the rule,
   exactly, with the exact degree from the truth table reported beside it and the upper bound at
   least that degree, and its hand-derived inside-out count; R5's counts; and FUT-SEC-8's
   three seeds and its vector check. A measured fraction, such as S13's 41%
   and 32% or S14's bit frequencies, matches when the tool's count lies in the binomial interval
   around the recorded fraction, for the tool's sample size, with at most 0.005 in each tail.
   Anything else is `not re-found`.
-- **After a failed validation**, the record of the next attempt holds the defect, its cause and
-  the fix, and the re-validation re-finds a second known result of its kind as well as the
-  first, named in the defect record before the fix runs. Every attempt is a record of its own.
-  Results of the failed version never count; results already counted from an earlier
-  validated version stand, since they cite its hash.
+- **After a failed validation**, the record of the next attempt holds the defect, its cause and the
+  fix, and the re-validation re-finds the tool's second known result as well as the first, fixed
+  before its first validation with its source in the provenance log (section 14) and cited by the
+  defect record; a tool whose first validation record states that it has none stays unvalidated
+  after a failed validation, its results `not evaluated`. Every attempt is a record of its own.
+  Results of the failed version never count; results already counted from an earlier validated
+  version stand, since they cite its hash.
 - **The bias test** (R4): S14's bias re-found on `phyco-v2`, and on 100 sets of synthetic
   binomial counts with one bit planted at the 90%-power biases it fires in 82 to 97 of the 100
   sets.
@@ -398,23 +435,38 @@ same kind and of the tool's exact hash exists.
   an environment with that numpy version, and a draw that differs is reported and counts for
   nothing; after an approved numpy upgrade the old record stands, and a new validation runs as a new
   record.
-- **The avalanche test** (R4): the planted gap of R13 re-found; its verdict function, applied to
+- **The avalanche test** (R4): R13's three planted results re-found, one per path: the planted gap
+  only if, at every round count tested, every difference bit of the unmixed lane fires
+  and no other bit does, bit for bit against the stated set, and the key
+  and nonce bits that never reach a stated lane and the lane that commutes
+  with word rotation, each flagged exactly; its verdict function, applied to
   every count 0 to N_a of one difference bit, fires exactly on the counts at or beyond the two
   critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
   computed exactly from the binomial distribution, is at least 0.9. One record per size covers the
-  flip set, the related-key and related-nonce set and the rotational pairs.
+  three paths, the flip set, the related-key and related-nonce set and the rotational pairs.
 - **Cross-checks between kinds** (R12) are records of the candidate they run on, once per candidate
-  and tool version, charged to its trail row; a failed one is a tool defect. The validations on
+  and tool version, charged to its trail row; a failed one is a tool defect. Each lists, for every r
+  from 1 to the largest at which the exhaustive computation finishes within its 8 h cap, the tool's
+  value and the exhaustive one, which must be equal: the ARX search's optimal single-trail weight
+  over r rounds of the box against the best product of one-round table entries over r rounds, one
+  round equalling the table's best entry, and the active-S-box counter's minimum over r rounds at
+  4×4 against the exhaustive minimum from the nonlinear layer's tables. A trail weight above a
+  differential's weight, as clustering gives, is expected and not compared. They run first in the
+  candidate's trail row, on the first amounts of its space in tie order, and again on the
+  chosen amounts scaled to w = 4 and 8 (research R7, R12). The validations on
   published values stay validation records, charged to no candidate.
 - **Self-written known results.** Each known result this feature writes itself (the small operation
   lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted torus symmetries and
-  the one with none, the map with collisions, the variant with a planted gap, R5's
+  the one with none, the map with collisions, the variant with a planted gap, the
+  instantiation variant with a key bit and a nonce bit that never reach a
+  lane, the operation list with a lane that commutes with word rotation, R5's
   hand-counted examples, the small operation list of known degree with its
   inside-out count) is written under `research/004/`, whose files are pinned to
   LF (research R18), with its SHA-256, and entered in the provenance log
   (section 14) before the tool it validates is drafted, so its entry's `seq` comes before the tool's
-  first entry. The validation record cites both entries, and a test checks their order and that the
-  hashes still match.
+  first entry. A self-written second known result (above) is written and entered in the same way.
+  The validation record cites both entries, and a test checks their order and that the hashes still
+  match.
 - **A value that cannot be obtained** leaves the tool unvalidated and its results `not
   evaluated`, unless the owner provides the value with its source, recorded as an `owner-provided`
   entry of the downloads manifest, which `source` cites (R12, R19).
@@ -428,7 +480,9 @@ reduced-width outcome for each bound kind at 16 and, where R6 needs it, at 8: a 
 statement that r* compares the candidates over the same rounds and is not a rate per round
 (R6); per scored candidate `W_D` and `W_L` as rationals, `luts` (R5) and the score;
 `representatives`; `outcome` (`chosen`, `chosen by default`, `tie` or `not computable`, R6);
-`chosen_family`; `tie_breaks_applied`; `bound_records`. Written once by `scripts/d4_choice.py`
+`chosen_family`; `tie_breaks_applied`; `bound_records`, each from a tool that
+has passed its cross-check on that candidate, which its `cross_check` cites
+(section 6): `d4_choice.py` uses no other. Written once by `scripts/d4_choice.py`
 from saved bound records; a second run that would change it is refused. After a tie,
 `d4/tie.json` is written once by `d4_choice.py --tie`, with both values of R at 4×4, or the
 ineligibility that decided it. If the tie-breaks reach the owner's choice, it is made only after
@@ -444,8 +498,11 @@ choice and both records' SHA-256.
 ## 9. Round rule, eligibility and selection
 
 `candidates/<id>/round-rule.json`, a fixed-name file (introduction), per claimable size: `R_f`,
-`R_b`, `R_bound` (with its bound records), `R_dist` (with its evidence records, the `degree` records
-among them), `delta` = 2, `R`, and `eligible` with each item of FR-018 to FR-031 and FR-037 and its
+`R_b`, `R_bound` (with its bound records, computed at that size; FR-038), `R_dist` (with its
+evidence records, the `degree` and `trail` records among them), `delta` = 2, `R`, with each rise and
+its cause and the records made again at the new variant in research R7's order
+("After a rise of R"), so that R is final at a size once a pass raises it no
+further, and `eligible` with each item of FR-018 to FR-031 and FR-037 and its
 evidence, decided for every candidate before selection: FR-018's folding rule, longest link, food
 nodes with their reason and tree figures from the operation list and its `parameters` entry
 (section 3); FR-020's cycles per call, with FR-026's figures, from its `cost` records per claimable
@@ -457,7 +514,9 @@ code; FR-027's semantics from the operation list's own declarations, which the f
 for every operation; FR-030's mapping from the candidate's `mapping` log entry. FR-025's interface
 formats, call sequence and zeroization rules are properties of the mode, the same for every
 candidate, decided once in the mode chapter, and the self-test's expected output (FR-018) is
-generated from the selected candidate's vectors and cannot fail. A missing item fails eligibility.
+generated from the selected candidate's vectors and cannot fail. A missing item fails eligibility,
+and so does a `reproduction` record of one of the candidate's records that differs on a field that
+enters a verdict, until a re-run after a recorded tool defect resolves it (section 1; research R7).
 The design document restates them for the selected candidate, and the owner design review checks
 that the two agree. `selection.json`, a fixed-name file too, written only after the candidate log's
 `set-closed` entry (section 3): the eligible candidates of the
@@ -628,7 +687,10 @@ candidate log is (section 3: the previous line's UTF-8 bytes as stored, final LF
 append takes `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired
 as in section 3. The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
-its own, with its SHA-256, before the first entry of the tool it validates. `section` names a part
+its own, with its SHA-256, before the first entry of the tool it validates. Each tool's second known
+result (section 7) has an entry of its own before the tool's first validation, with its source: a
+second published value from research R19's approved papers (paper, table and value), or a
+self-written result with its SHA-256, entered before the tool's first entry. `section` names a part
 of a file: each AI-drafted section of the rationale has its own entry with its review status, which
 the owner design review updates, so that the frozen text carries no status (FR-034).
 

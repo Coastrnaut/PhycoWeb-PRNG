@@ -279,21 +279,30 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     give, max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)). R_cur is the candidate's current value of the
     round rule. If a test fires at a round count r with 2r > R_cur, R_cur becomes 2r and the
     measurement extends to it, until no firing round count raises R. Any later rise, from either
-    bias test, a reproduction's finding or a stricter change, extends every bias test already run at
-    that size to the new R, as a new measurement of the same kind charged to the 12 h row (R7); if
-    the row cannot hold it, that size's bias evidence is inconclusive and the candidate
-    `ineligible`.
+    bias test, a re-run after a reproduction's finding or a stricter change, first makes every
+    record that depends on R again at the new variant, in R7's order ("After a rise of R"), the bias
+    tests last: every bias test already run at that size is extended to the new R, as a new
+    measurement of the same kind charged to the 12 h row (R7); if the row cannot hold it, that
+    size's bias evidence is inconclusive and the candidate `ineligible`. A result at rounds 1 to the
+    old R stands for the new variant only where its constants do not change, which with distinct
+    streams holds only for the first call type in R15's reading order (Call types, below).
   - **Call types.** Where the call types draw on distinct constant streams (spec FR-023), both
     tests, with every set, run on each call type's permutation, each record naming its call type,
     and R_cur is the largest over the call types, so a firing in any of them raises it; the uniform
-    controls read no constant and serve every call type.
+    controls read no constant and serve every call type. A rise of R changes the constants of every
+    call type after the first in R15's reading order from round 1, so their results are measured
+    again from round 1 on the new table, each record naming the table's SHA-256, as a new
+    measurement charged to the 12 h row.
   - **Uniform control.** Before its first use at each size by any candidate, each test is applied
     once, with the same counts and the same threshold, to uniform control inputs: two sets of 2²⁰
     control states, and N_a·(|F| + 384 + w − 1) XOR differences of two independent control states,
     N_a for each flipped bit, key or nonce bit and rotation amount. The control inputs are R3's
     `control` states at that size: the two frequency sets are states 0…2²⁰ − 1 and
     2²⁰…2²¹ − 1, and XOR difference i is state 2i ⊕ state 2i + 1. The control's one record per test
-    and size serves every candidate. If a test fires on its control, the bias evidence of that size
+    and size serves every candidate. Its hours are charged, at each size, to every candidate's 12 h
+    row, whether the control ran for that candidate or before it, and each row's reservation counts
+    them by projection until they exist; the control runs only if every entered candidate's row can
+    hold it (R7). If a test fires on its control, the bias evidence of that size
     is inconclusive for every candidate, so none is eligible at that size, and the feature
     recommends stopping (stop rule), citing the control record; the control inputs are never redrawn
     or replaced, and the rule is not loosened (Edge Cases). The chance accepted is at most 0.0025
@@ -322,9 +331,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     its power without new inputs: the verdict function, applied to every count 0 to N_a of one
     difference bit, must fire exactly on the counts at or beyond the two critical values of
     `critical_counts.json`, and the power at δ_A = 0.0443, 0.0451 and 0.0465, computed exactly from
-    the binomial distribution, must be at least 0.9, as the table below states. R13's planted gap
-    and the cross-check keep validating the counting. One record per size covers the flip set, the
-    related-key and related-nonce set and the rotational pairs, which share N_a and the threshold.
+    the binomial distribution, must be at least 0.9, as the table below states. R13's three planted
+    results, one for each path (the flip set, the related-key and related-nonce set and the
+    rotational pairs), and the cross-check keep validating the counting; each planted result is
+    re-found only if the bits that fire match its stated set bit for bit at every round count
+    tested. One record per size covers the three paths, which share N_a and the threshold.
     R3 does not change.
   - **Sensitivity**, computed for this plan with scipy 1.15.3, for the bias |f − 1/2| of one bit
     that fires with probability 1/2 (and 0.9):
@@ -373,8 +384,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   and rotational sets, mostly counting bits: 3.8 h in all. A raise of R to 64 doubles that to 7.7 h,
   still inside the 12 h of R7. Where the call types draw on distinct streams, both tests run once
   per call type (Call types, above), so at four call types the 3.8 h become about 15 h at R = 32,
-  more than the 12 h row holds; at the same cost per round, the row then holds such a candidate's
-  bias evidence only up to about R = 25. The avalanche test complements the exact dependency
+  more than the 12 h row holds; at the same cost per round, the row then
+  holds such a candidate's bias evidence only up to about R = 25, and a rise
+  of R measures every call type after the first again from round 1 (Rounds
+  measured), at further cost. The avalanche test complements the exact dependency
   matrices (R13), which also check it, and its budget sets N_a and F. The second input set holds
   the key fixed, as the many nonces under one key do, and the related and rotational sets let
   their results raise R before the freeze instead of only in feature 005 (checklist B4).
@@ -498,9 +511,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     ```
 
   - Each family's representative is its scored candidate with the highest score, and the family
-    with the higher representative is chosen. Scores are compared exactly, without logarithms:
-    bounds are kept as rational numbers, and candidate A scores higher than B when
-    p_A^(L_B) < p_B^(L_A), where p is the weaker (larger) of a candidate's two bounds.
+    with the higher representative is chosen. Scores are compared exactly: each weight is kept as a
+    rational, a multiple of 2⁻¹⁶ rounded down, never up (R12), and candidate A scores higher than B
+    when p_A^(L_B) < p_B^(L_A), where p = 2^(−W) is the weaker (larger) of a candidate's two bounds,
+    W = min(W_D, W_L), decided exactly as W_A·L_B > W_B·L_A, since 2^(−W) is irrational for a W that
+    is not an integer.
   - **Exact tie.** The spec's first tie-break, the smaller R, needs R_bound at the production
     width, which does not exist yet at the moment of the choice. The choice then waits: both
     representatives go on to the production-width analysis within their own budgets, and
@@ -542,19 +557,24 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 
   | Work | Budget |
   |------|--------|
-  | Trail-bound searches of every kind, width and size together (the reduced-width and rotation-amount searches, box tables, box-trail searches, active-box or active-S-box counting, solver cross-checks) | 48 h; each search instance at most 8 h |
+  | Trail-bound searches of every kind, width and size together (the solver cross-checks, the rotation-amount and reduced-width searches, box tables, box-trail searches, active-box or active-S-box counting) | 48 h; each search instance at most 8 h |
   | Structural checks (inverse tests, exhaustive bijectivity, dependency matrices, symmetry and invariant checks, `degree` records) | 6 h |
-  | Frequency and avalanche tests with their controls (R4) | 12 h |
+  | Frequency and avalanche tests, with the hours of the uniform controls at each size (R4) | 12 h |
 
   - A search gives a bound only when the solver proves it: an optimal or infeasible status with
     the proven dual bound used, or a search that exhausts its space within its cap. The best
     solution found is never a bound. A search that reaches its cap gives no bound, and its
-    record says "inconclusive" (security.md §16.3). A candidate without an established R_bound
-    at every claimable size within its budget is ineligible.
+    record says "inconclusive" (security.md §16.3). A candidate without an established R_bound at
+    every claimable size within its budget is ineligible; R_bound at each claimable size comes from
+    a bound computed at that size, so the reservation keeps every such search, 16×16 included, and a
+    row that cannot hold the 16×16 search leaves the candidate without R_bound there (R12, "Bounds
+    per size").
   - **Tool defects.** A tool defect is one of: a failed validation or re-validation; a
     disagreement between avalanche counts and dependency matrices (R4); a disagreement between
-    two evaluators of one operation list (scalar, batch, C, model); a crash or an undocumented
-    exit status; or a bug in the tool's code, shown by the faulty line and a test that fails
+    two evaluators of one operation list (scalar, batch, C, model); a crash or an undocumented exit
+    status; a reproduction that differs from its original on a field that
+    enters a verdict, in the environment that made the original (R16); or a
+    bug in the tool's code, shown by the faulty line and a test that fails
     before the fix and passes after. It is recorded with that evidence before any re-run
     (data-model §1, `exclusions_and_reruns`). A disliked result is none of these.
   - **Re-runs.** A run may be repeated only after a tool defect is found and recorded: one
@@ -568,7 +588,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     recorded tool defect, and a speed-up is not a defect (R12). A uniform control is run again only
     after a recorded tool defect in the control's own code (R4). A reproduction (R16) is not a
     re-run: it writes only its `reproduction` record, appends nothing to the candidate log and
-    charges no row, so it can neither replace evidence nor add any.
+    charges no row, so it can neither replace evidence nor add any. The original stands, and a
+    reproduction that differs from it on a field that enters a verdict is a finding that blocks the
+    candidate's eligibility, `blocked`, as an unverified hypothesis does (spec FR-060), until it is
+    resolved; in the environment that made the original it is a tool defect, which gives this one
+    re-run, a new measurement in the original's row, whose own result raises R by the round rule if
+    it fires. A difference in a field that decides no verdict, such as a p-value, is reported and
+    blocks nothing.
   - **Stricter changes during a candidate's runs.** A stricter change of a rule is applied first
     by recomputing the verdicts from saved outputs. New measurements it needs, such as more
     inputs, are a new measurement of the same kind under the changed rule, not a re-run: the
@@ -589,8 +615,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     tool defect. The D4 reduced-width searches are trail searches on
     their candidate and count against its trail row, and so do the rotation-amount searches of R15,
     at each width searched: each instance is capped at 8 h, and its projection reserves hours like
-    any other run. The FUT-SEC-8 vector check and sweep
-    fall under the demonstration's own budget row (spec, Pre-registered Design Protocol).
+    any other run. The FUT-SEC-8 vector check and sweep fall under the demonstration's own budget
+    row (spec, Pre-registered Design Protocol). A uniform control (R4) belongs to no candidate and
+    runs once per test and size, but every candidate's 12 h row is charged, at each size, that
+    size's control hours, whether the control ran for it or before it, and the row's reservation
+    counts them by projection until they exist; the control projects first and runs only if every
+    entered candidate's row can hold it, and it writes no candidate-log entry: the Budget guard
+    reads the control records when it charges each row (cli contract).
   - **Order of sizes.** Each kind of evidence runs at 4×4, then 8×8, then 16×16. A larger size
     starts only when the smaller one's run of that kind has finished without making the
     candidate ineligible, so a candidate that fails at 4×4 spends none of its 16×16 hours
@@ -600,6 +631,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     record, which is not evidence, so the probes at 8×8 and 16×16 that a 4×4 run's projection needs
     run before it, while evidence of that kind at a larger size still waits for the smaller size's
     run.
+  - **After a rise of R** (spec round rule). Every record that depends on R is made again at the new
+    variant, each a new measurement of its kind, charged to its row where this section budgets the
+    kind: first the constant table for the new R with its checks (R15); then the inverse and
+    invariant checks (R13); then the `cost` records and the reference outputs (R5, R11); then the
+    bias tests, extended to the new R (R4). The propagation through instantiate and its margin over
+    R_f are computed again (R13). A check made again that fails or fires raises R again or makes the
+    candidate `ineligible`, as its kind says, and the sequence repeats until R no longer rises; a
+    row that cannot hold a run it needs leaves that evidence inconclusive and the candidate
+    `ineligible`. The trail bounds, the dependency matrices and the `degree` records read no R and
+    stand.
   - **Heavy runs.** A heavy run is any run that is of a kind this section budgets, uses more than
     one worker process or thread, or is projected to take, or last took, more than 10 minutes. Every
     heavy run takes the lock of R16, never overlaps another heavy run or any battery run, projects
@@ -623,9 +664,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     this reserves the hours of every later run without fixing a split. Each row's kinds run in a
     fixed order: the 12 h row the frequency test, then the avalanche test, each with its control;
     the 6 h row the inverse tests, exhaustive bijectivity, dependency matrices, symmetry and
-    invariant checks and the `degree` records; the 48 h row the reduced-width and rotation-amount
-    searches, then box tables, box-trail searches, active-box or active-S-box counting and the
-    solver cross-checks. The order of sizes stays.
+    invariant checks and the `degree` records; the 48 h row first the solver cross-checks at w = 4
+    and 8 on the candidate's boxes or nonlinear layer with the first amounts of its recorded space
+    in tie order, fixed before the run, so that they need no search result (R12); then the
+    rotation-amount searches and the D4 reduced-width searches, whose bound records count once those
+    cross-checks have passed; then, once the amounts are chosen, the cross-checks of the chosen
+    amounts scaled to w = 4 and 8, before any production-width search counts; then the box tables,
+    the box-trail searches and the active-box or active-S-box counting. The order of sizes stays.
     Otherwise the engine is made faster first, with more worker processes or with a C evaluator
     generated from the same operation list. A C evaluator agrees with the scalar interpreter on
     the candidate's committed reference outputs for R8's 16 Π inputs before its first run (R11),
@@ -787,10 +832,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Only two operation forms exist: `dst ← dst ⊙ F(srcs)` with ⊙ ∈ {⊕, ⊞, ⊟}, dst ∉ srcs, and F
     built from rotations, shifts, bitwise functions and round constants; and `dst ← rotl(dst, k)`
     with k fixed. Both are invertible whatever F is, so a list made of them is bijective by
-    construction (FR-019), and the inverse list is generated mechanically. A list not made of
-    these two forms is refused before any test.
-  - A round is a sequence of phases (colour classes), and the updates within one phase read no
-    lane that another update of the same phase writes. A phase is a pipeline stage for FR-025:
+    construction wherever the phase rule below holds (FR-019), and the inverse list is generated
+    mechanically. A list not made of these two forms is refused before any test.
+  - A round is a sequence of phases (colour classes), and the updates within one phase read no lane
+    that another update of the same phase writes. The loader checks this phase rule at every
+    supported size, from the declared reads and writes after the neighbourhood is resolved, and
+    refuses a list that breaks it, exit 2, before any test; a committed test runs the check on every
+    list at every size, with a stated list that breaks the rule at one size only, which it must
+    refuse. Both interpreters apply a phase as the hardware does, each update reading the values at
+    the phase's start, which equals list order where the rule holds, checked on the vectors;
+    bijectivity by construction, and with it spec FR-032's transfer from 2×2,
+    rests on the rule at each size. A phase is a pipeline stage for FR-025:
     it takes one clock cycle, so a round of P phases takes P cycles, and carry chains are counted
     per phase (R5). A round may visit a colour class more than once, so P counts phases, not
     colours; in a three-colour schedule the classes form a proper colouring of the torus (R14).
@@ -811,8 +863,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Reference outputs.** Before any evidence run on a candidate, the scalar and batch
     interpreters agree on reference outputs for R8's 16 Π inputs at every variant the candidate
     uses, computed by the scalar interpreter and committed with the candidate. A C evaluator
-    must agree on the same outputs before its first run (R7). A disagreement between two
-    evaluators is a tool defect.
+    must agree on the same outputs before its first run (R7). A disagreement between two evaluators
+    is a tool defect. A rise of R makes a new variant, whose reference outputs are computed and
+    checked before its first evidence run (R7, "After a rise of R").
   - Every rotation, shift and constant is a fixed value of the list (FR-020); nothing in the list
     can read data to choose an operation.
   - After selection, `phycoweb/model_v3.py` is written by hand from the design document for
@@ -846,9 +899,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     does not expose, are HiGHS's built-in values in the pinned scipy 1.15.3, recorded as such;
     scipy documents the algorithm as deterministic. Every MILP bound record states that its status
     rests on these built-in tolerances, and the design document and the final report say so beside
-    R_bound. A floating-point bound becomes data-model
-    §6's rational by rounding in the direction that weakens it: a weight is rounded down, never
-    up.
+    R_bound. A floating-point weight becomes data-model §6's rational by rounding down to a multiple
+    of 2⁻¹⁶, never up, which weakens the bound, and an active-box or active-S-box count is the
+    integer at or below its proven dual bound, with no tolerance, so a dual bound of 9.9999999
+    counts as 9; the record holds the float and the rounded value. A box lost to this rounding is
+    recovered only by an exact method where one exists, the cross-checks at w = 4 and 8, never by
+    rounding up.
   - **What counts as a bound.** Only a proven result: an optimal or infeasible status with the
     proven dual bound used, or a search that exhausts its space within its cap. A search that times
     out gives no bound, and its record says `inconclusive` (R7). A bound that sets R_bound is
@@ -857,10 +913,22 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     settings). At 16 and 32, and so at the production width R_bound comes from, no exact
     confirmation exists without a further tool, so those bounds are reported as proven by the solver
     within its tolerances, a limitation stated in each record's `limitations` (data-model §1).
-  - **Bounds per size.** A bound computed at one size is carried to another only by a proof in
-    the design document that holds for every claimable n, for example that every r-round trail
-    at n×n activates at least as many boxes as at 4×4, checked by computing it at 8×8.
-    Otherwise each size needs its own computed bound, as the round rule's "at that size" reads.
+  - **Trails.** A trail is a characteristic of Π, its difference or mask after every round with its
+    exact weight, exhibited by a validated tool that searches Π at the size and width the round rule
+    uses, the production width at a claimable size; it is held in data-model §6's `trail` record,
+    which `round-rule.json` cites, and enters R_dist. A bound, a box's trail, an active-box or
+    active-S-box count and a bound search's optimum are bounds, which enter R through R_bound; an
+    optimal characteristic that a search of Π returns with its weight counts as a trail. So 2·R_dist
+    counts only trails exhibited at the production width, and where none is, trail-based attacks
+    enter R through R_bound + Δ.
+  - **Bounds per size.** Before selection, every candidate's R_bound at each claimable size comes
+    from a bound computed at that size, as the round rule's "at that size" reads, and the 48 h
+    reservation keeps every such search (R7). A proof in the design document that carries a bound to
+    a larger size for every claimable n, for example that every r-round trail at n×n activates at
+    least as many boxes as at 4×4, checked by computing it at 8×8, may be written for the selected
+    candidate only; it serves as a check beside the computed bounds, reported in the rationale, and
+    replaces none. A candidate whose row cannot hold a 16×16 search has no R_bound there and is
+    `ineligible`, as for any spent row.
   - Only with a separate approval, since R19 requests none: a SAT solver with Python bindings,
     or CryptoSMT or CASCADA, as a faster or independent cross-check.
   - **Fixed tool set** (**protocol**): the trail tools are those with a `re-found` validation record
@@ -876,7 +944,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Each tool re-finds a published result of its kind before any of its results counts, and its
     validation record cites the paper, table and value, taken from a copy the owner provides or
     from the paper's download, approved on 2026-11-01 (R19). Every counted tool has one known
-    result, each with a validation record (data-model §7); the structural tools' known results
+    result, each with a validation record (data-model §7), and a second fixed before its first
+    validation (Second known results, below); the structural tools' known results
     are in R13, and the bias test's in R4.
 
     | Tool | Kind | Known result to re-find |
@@ -897,11 +966,20 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     in each tail; anything else is `not re-found`.
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
-    8 h (R7): the ARX search must reproduce the exhaustive box tables of each distinct
-    ARX-box of each ARX candidate at w = 4 and 8 (boxes of 8 and 16 bits)
-    before its searches at w = 16 and 32 count, and the active-S-box counter
-    must reproduce the exhaustive trail optima of each Boolean candidate's
-    nonlinear layer at w = 4, whatever its form. A failed cross-check is a tool defect (R7). The
+    8 h (R7): for each distinct ARX-box of each ARX candidate at w = 4 and 8 (boxes of 8 and 16
+    bits), the ARX search's optimal single-trail weight over r rounds of the box must equal the
+    optimal trail weight computed from the exhaustive tables by a search over characteristics, the
+    best product of one-round entries, for every r from 1 to the largest at which that computation
+    finishes within its 8 h cap, one round equalling the table's best entry, before the search's
+    results at w = 16 and 32 count; and the active-S-box counter's minimum over r rounds at 4×4 must
+    equal the exhaustive minimum from each Boolean candidate's nonlinear-layer tables at w = 4,
+    whatever its form, over the same range of r. Each record lists both values per r, compared by
+    exact equality; a trail weight above a differential's weight, as clustering gives, is expected
+    and not compared. They run first in the candidate's 48 h row, on the first amounts of its
+    recorded space in tie order, fixed before the run, so that they need no search result; the
+    rotation-amount and D4 searches count once they pass, and after the amounts are chosen, the
+    chosen amounts scaled to w = 4 and 8 get cross-checks of their own before any
+    production-width search counts (R7). A failed cross-check is a tool defect (R7). The
     validations of the table above, on published values, stay validation runs charged to no
     candidate. A tool used outside its validated kind writes `not evaluated`.
   - **Re-validation.** A tool is validated again after any change to its code (its SHA-256
@@ -910,10 +988,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     hash. A re-validated version of a named trail tool serves only searches not yet run (Fixed tool
     set).
   - **A failed validation.** The defect is recorded with its cause and fixed, and the tool is
-    validated again, on a second known result of its kind as well as the first, named in the
-    defect record before the fix runs, so that a fix cannot be tuned to one value. Attempts are
-    not limited, but each is recorded. Results of the failed version never count; results
-    already counted from an earlier validated version stand, since they cite its hash.
+    validated again on its second known result as well as the first, both fixed before its first
+    validation (below), which the defect record cites, so that a fix cannot be tuned to one value. A
+    tool whose first validation record says it has no second known result stays unvalidated after a
+    failed validation, and its results are `not evaluated`, as for a value that cannot be obtained.
+    Attempts are not limited, but each is recorded. Results of the failed version never count;
+    results already counted from an earlier validated version stand, since they cite its hash.
+  - **Second known results.** Each counted tool's second known result is fixed before its first
+    validation, with its source, in the provenance log beside the first (data-model §14): a second
+    published value of its kind from R19's approved papers (paper, table and value) where one is
+    there, or else a self-written result of its kind, written and logged before the tool is drafted,
+    as R13's are. A tool with neither says so in its first validation record.
   - **A value that cannot be obtained.** If a known result's published value cannot be had, the
     tool stays unvalidated and its results `not evaluated`; the owner may provide the value with
     its source (R19). If no trail route is validated, no candidate can establish R_bound, none
@@ -929,6 +1014,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 ## R13. Structural checks (FR-019, FR-029, FR-037)
 
 - **Decision** (**protocol** for the counts):
+  - **Phase rule**: before any other check, the loader's check of R11 runs at every supported size,
+    and a committed test runs it on every operation list at every size, with a stated list that
+    breaks the rule at one size only, which it must refuse (spec FR-019); whether the rule holds
+    depends on n, since the neighbourhood is resolved per size (R14).
   - **Inverse**: Π⁻¹(Π(x)) = x and Π(Π⁻¹(x)) = x for the 16 vector inputs and 2¹⁰ test states at
     every supported size and variant.
   - **Exhaustive bijectivity**: 2×2 at w = 4 (b = 32), all 2³² inputs, through the batch
@@ -947,8 +1036,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     its cross-check, observes it.
   - **Through instantiate**: the calls of Π and rounds between key loading and the first output
     are stated, and the propagation through instantiate as a whole shows every state bit
-    depending on every key and nonce bit before the first output, with the margin over R_f
-    stated (FR-029).
+    depending on every key and nonce bit before the first output, with the margin over R_f stated
+    (FR-029). After a rise of R, the propagation and its margin are computed again for the new
+    variant (R7, "After a rise of R").
   - **Food nodes**: per supported size, the design document states the number of food nodes, at
     least three in an asymmetric arrangement at every claimable size (Symmetry, below), their
     positions by the rule and the reason, for example the number of rounds until every
@@ -1026,7 +1116,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     no constant value and cover one permutation for all, each record stating that reason, as the
     trail bounds do (spec FR-023). Where the streams are not distinct, one permutation is covered.
   - **Order.** At each size these checks run after the trail bounds and before the frequency and
-    avalanche tests, the `degree` records last among them (R4, "Rounds measured").
+    avalanche tests, the `degree` records last among them (R4, "Rounds measured"). After a rise of
+    R, the inverse tests, the invariant checks and the checks of the new constant table are made
+    again at the new variant before the bias tests are extended (R7, "After a rise of R"); the
+    dependency matrices and the `degree` records read no R and stand.
   - **Known results.** Each structural tool re-finds a known result before its results count
     (R12; data-model §7):
 
@@ -1035,17 +1128,21 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Symmetry check | S7's rotation structure of `phyco-v2`'s constants; and stated lists with planted torus symmetries (a translation, a rotation by 90° and a reflection) at n = 3 and 4, which it must find, and one with none, which it must clear |
     | Dependency propagation | the hand-derived matrices of a stated small operation list at 3×3 and at 4×4 |
     | Exhaustive bijectivity | a known permutation (2³² ones in the bitmap) and a stated map with collisions (fewer) |
-    | Avalanche test | a planted gap: a stated variant that leaves one lane unmixed; and, without new inputs, its verdict code on every count 0 to N_a and its exact power at R4's δ_A (R4) |
+    | Avalanche test | one planted result per path, each flagged exactly, bit for bit against its stated set at every round count tested: for the flip set, a stated variant that leaves one lane unmixed, every difference bit of that lane firing and no other; for the related-key and related-nonce set, a stated instantiation variant in which a stated key bit and a stated nonce bit never reach a stated lane; for the rotational pairs, a stated operation list in which one stated lane commutes with word rotation; and, without new inputs, its verdict code on every count 0 to N_a and its exact power at R4's δ_A (R4) |
     | Cost model (R5) | R5's hand-counted examples |
     | Degree bound | on a stated small operation list, for example one box at w = 4, over a few rounds: the rule's count, reproduced exactly, with the exact degree from its truth table reported beside it and the upper bound checked to be at least that degree; and a hand-derived inside-out count at w = 4, reproduced exactly |
 
     Each known result this feature writes itself, the small operation lists with their hand-derived
     matrices, the lists with planted symmetries and the one with none, the map with collisions, the
-    variant with a planted gap, R5's hand-counted examples
-    and the small operation list of known degree with its hand-derived inside-out count, is written
+    variant with a planted gap, the instantiation variant with a key bit and a nonce bit
+    that never reach a lane, the operation list with a lane that commutes
+    with word rotation, R5's hand-counted examples and the small operation
+    list of known degree with its hand-derived inside-out count, is written
     with its SHA-256 and entered in the provenance log (data-model §14) before
-    the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry. The
-    validation record cites both entries, and a test checks their order and that the hashes still
+    the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry; each
+    structural tool's second known result is self-written in the same way, written and logged before
+    the tool is drafted (R12, "Second known results"). The validation record cites
+    both entries, and a test checks their order and that the hashes still
     match. What must match is stated per known result in data-model §7. Only the validation of tools
     whose behaviour does not depend on the neighbourhood transfers from 2×2 (box and S-box tables,
     the bijectivity bitmap, the cost model's counts), which is why the dependency propagation and
@@ -1083,8 +1180,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (FR-024; R15). After scaling, every amount lies in 1 to w − 1 at every supported width; the
     constant script and the operation list refuse 0 and w, and where scaling would give 0 or w
     at w = 4, the rule names the allowed amount to use instead.
-  - The operation list's structure is the same at every width and size, and only the values
-    R11 names change with w and n.
+  - The operation list's structure is the same at every width and size, and only the values R11
+    names change with w and n. Whether the phase rule of R11 holds depends on n, since the
+    neighbourhood is resolved per size and at 2×2 a node's opposite neighbours coincide, so the
+    loader checks it at every supported size (spec FR-019).
   - Variant ID: `<design>/n<n>-w<w>-R<R>-c<c>`, for example `cand-A1/n2-w16-R8-c64`, where the
     design is a candidate ID or, after selection, `phyco-v3`. The production interface accepts
     only the three production IDs and refuses every other ID with an error (FR-033).
@@ -1116,7 +1215,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   `phycoweb/constants_v3.py`. The design document states whether the call types draw on distinct
   constant streams (FR-023); where they do, the script's checks run on each call type's stream, and
   every kind of evidence whose result depends on the constants covers each call type's permutation
-  (R4, R13).
+  (R4, R13). A table holds the constants of R rounds, so a rise of R generates the table again for
+  the new R with every check of this section, and every record whose result depends on the constants
+  names the SHA-256 of the table it read, so that a result on one table is never cited for another
+  (spec round rule); with distinct streams, the reading order below makes a rise change every later
+  call type's constants from round 1, so their results are measured again from round 1 (R4).
   - **The rule, fixed early** (**protocol**): the polynomial, seed, reading order and whether
     the call types draw on distinct streams are fixed by one stated rule before the first
     candidate is scored, and each candidate's instance of it before its first tool run,
@@ -1178,7 +1281,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     as a new log entry, if R6's rule fixes the D4 width at 8, so that the scores at 8 use the
     amounts found at 8. The scaling rule to every other width is stated before it, and every scaled
     amount lies in 1 to w − 1 (R14). Its searches are trail searches on the candidate and count
-    against its 48 h row, each instance capped at 8 h (R7); a space whose projection, with the row's
+    against its 48 h row, each instance capped at 8 h, and their bound records count only after the
+    candidate's cross-checks on the first amounts of its space in tie order, which run
+    first in that row (R7, R12); a space whose projection, with the row's
     other runs, does not fit the 48 h row is refused by the Budget guard (cli contract), so the
     search is inconclusive and the candidate `ineligible`, and a smaller space makes a new candidate
     within the stop rule. A point whose search reaches its cap has no bound and ranks below every
@@ -1292,7 +1397,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     original's ID and SHA-256, each compared field with its outcome, the reported fields, and
     `match` or `differs`. It appends nothing to the candidate log, charges no budget row and is not
     a re-run under R7, so it can neither replace evidence nor add any; it is a heavy run where R7
-    says so, and a difference is a finding, exit 1. It compares the fields data-model §1 lists for
+    says so, and a difference is a finding, exit 1: the original stands, a difference in a field
+    that enters a verdict blocks the candidate's eligibility, `blocked`, until it is resolved, as a
+    tool defect of R7 where it arises in the environment that made the original, whose one re-run is
+    new evidence in the original's row, and a difference in a field that decides no verdict, such as
+    a p-value, is reported and blocks nothing. It compares the fields data-model §1 lists for
     its kind and reports every other field only, timings and raw solver logs among them; a different
     source hash makes it a new run, not a reproduction. A `p_values` file is compared by its values,
     within the tolerance data-model §1 defines, and decides nothing; every other `.gz` file is
@@ -1486,8 +1595,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 On 2026-11-01 the owner approved every file in the two tables below, each as listed with its
 source, size and licence ("Tool acquisition" in the spec's Review & Approval table). Nothing
 else is covered: a file not listed here, the tools under "Not requested", or a file whose source
-or licence differs from its row, or whose size differs from a size given in bytes, needs its own
-permission. Each file is fetched when the task that uses it is reached. Nothing in this plan
+or licence differs from its row, or whose size differs from a size given in bytes, needs its
+own permission. A tool's second known result (R12) comes from these papers
+where one of its kind is there, fixed before the tool's first validation, so
+that no paper is requested after a failed validation to supply one. Each
+file is fetched when the task that uses it is reached. Nothing in this plan
 depends on any of them; without them the work uses the tools of R12 and records each gap as an
 open item. The requests below were prepared on 2026-11-01 from the hosts' pages and from header
 requests, with no file body downloaded. A size comes from the server's header where it gave one,

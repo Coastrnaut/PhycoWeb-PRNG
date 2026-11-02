@@ -21,7 +21,11 @@ appends nothing to the candidate log, charges no budget row and is not a re-run 
 so it can neither replace evidence nor add any; the Budget and Order of sizes guards, which concern
 evidence, do not refuse it, and every other guard applies, so a search that reached its cap is not
 reproduced (Trail tools). It is a heavy run where research R7 says so: it takes the lock and
-projects first, its projection charged to no row. A difference is a finding, exit 1. `fut_sec8.py
+projects first, its projection charged to no row. A difference is a finding, exit 1: the original
+stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
+until it is resolved, and in the environment that made the original it is a tool defect of research
+R7, whose one re-run is new evidence in the original's row; a difference in the
+p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
 --reproduce` is this mode for the demonstration, under the conditions of its section.
 
 ## Guards shared by every script
@@ -105,7 +109,9 @@ projects first, its projection charged to no row. A difference is a finding, exi
   needs (its own kind at every larger claimable size, and every other kind of the row at every
   claimable size, in the row's fixed order of research R7), fits the hours left in its row. A probe
   writes nothing but its `projection` record, and its time counts against the row of the run it
-  projects (data model §1).
+  projects (data model §1). Every candidate's 12 h row is charged, at each size, the hours of that
+  size's uniform controls (research R4), read from the `control` records, which append nothing to
+  the candidate log, or by projection until they exist.
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has
@@ -178,8 +184,10 @@ Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `
 record (data model §7). Exit 1 if not re-found. A published value needs its source recorded, an
 entry of `$REP/downloads.json` (research R19): a `fetched` file's entry with the paper's table and
 value, or the `owner-provided` entry of a value the owner provides with its source; any other entry,
-or none, exits 2. After a failed validation, the re-validation names a
-second known result of the tool's kind as well as the first. `--reproduce RECORD` runs that record's
+or none, exits 2. A tool's first validation records its second known result, fixed with its source
+in the provenance log before that validation, or the statement that it has none (data model §7,
+§14); after a failed validation, the re-validation re-finds the second as well as the first, and for
+a tool with none it exits 2, leaving the tool unvalidated. `--reproduce RECORD` runs that record's
 validation again, as the introduction describes, and compares the fields data model §1 lists for a
 validation.
 
@@ -198,13 +206,16 @@ stands, and a new validation runs as a new record (research R3, R4).
 
 ```text
 evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] [--project] --out-dir DIR
+evidence_v3.py --kind control --test frequency|avalanche --size N [--project] --out-dir DIR
 evidence_v3.py --reproduce RECORD
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
 `invariant`, `degree` or `bound` (with `--bound-kind differential|linear --method M`). The
-candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model
-§5 or §6 and its raw outputs, and appends an `evidence` entry to the candidate log; with
+candidate must be in the log; a `bound` needs a validated tool. Writes one record of data
+model §5 or §6 and its raw outputs, and for a `bound` run of a tool that
+searches Π also a `trail` record of the optimal characteristic it returns
+(data model §6), and appends an `evidence` entry to the candidate log; with
 `--reproduce RECORD` it runs that record's configuration as the introduction describes, writes only
 its `reproduction` record and appends nothing. The counts
 are those of research R4 and R13 and cannot be lowered by an option: a `frequency` run covers
@@ -214,9 +225,12 @@ or exits 2; a disagreement with its matrices writes the record with `status` `in
 a tool-defect entry, and exits 3. Every run started writes a record, even if aborted
 (`inconclusive` or `blocked`, with the reason). `--project` runs the timing probe of research
 R7, writes a `projection` record and prints the projected hours against the budget row; it writes no
-evidence. A `control` run belongs to no candidate: it runs once per test and size, before that
-test's first use at that size by any candidate, writes its record under `$REP/controls/`, which
-serves every candidate, and exits 2 if that record exists, except for the one re-run after a
+evidence. A `control` run, the second form, belongs to no candidate and takes no `--candidate`: it
+runs once per test and size, before that test's first use at that size by any candidate, projects
+first and runs only if every entered candidate's 12 h row can hold its hours, since each row is
+charged them (Budget), writes its record under `$REP/controls/`, with `model_id` and `variant_id`
+null and its inputs from the `control` namespace, which serves every candidate, appends no
+candidate-log entry, and exits 2 if that record exists, except for the one re-run after a
 recorded tool defect in the control's own code (data model §5).
 
 ## `scripts/d4_choice.py`
@@ -228,7 +242,9 @@ d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json
 d4_choice.py --reproduce RECORD
 ```
 
-Computes the D4 choice of research R6 from saved bound records. Exits 2 if `choice.json` exists, if
+Computes the D4 choice of research R6 from saved bound records, using only those of a
+tool that has passed its cross-check on that candidate, which each record's
+`cross_check` cites (data model §6, §8). Exits 2 if `choice.json` exists, if
 no entered set is recorded, or until every entered candidate has a final reduced-width outcome for
 each bound kind at 16 and, where research R6 needs it, at 8: a bound record, the `inconclusive`
 record of a capped search, or an `ineligible` or `rejected` log decision; the choice record lists
@@ -265,7 +281,9 @@ FR-024's ranking report from its log entries; FR-025's stages, chains per phase 
 the operation list's declarations, checked by code; FR-027's semantics from the
 operation list's declarations; FR-030's mapping from its `mapping` log entry.
 FR-025's interface formats, call sequence and zeroization rules are the mode's,
-decided once in the mode chapter. A missing item fails eligibility. After a
+decided once in the mode chapter. A missing item fails eligibility, and so does a `reproduction`
+record of one of the candidate's records that differs on a field that enters a verdict, until a
+re-run after a recorded tool defect resolves it (data model §1). After a
 decline at the owner design review that ends in a further candidate, `--select`
 runs again over the whole set, the declined candidate included, and writes `selection-2.json`,
 citing `selection.json`; if it selects the declined candidate again, the outcome is a stop, exit 1.
