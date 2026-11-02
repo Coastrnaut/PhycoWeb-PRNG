@@ -787,9 +787,17 @@ start open, and an item is ticked only under the rule in the Notes below.
   commit 5798640. The 14 items of the third re-run, CHK056 to CHK069, verified in the same way once
   their answers were applied, were ticked in commit 8d340b4. The 4 items of the fourth re-run,
   CHK070 to CHK073, verified in the same way once their answers were applied, as the owner's
-  instruction of 2026-11-02 asks again for every round, were ticked in commit 214bc1a. The 2
-  items of the fifth re-run, CHK074 and CHK075, verified in the same way once
-  their answers were applied, were ticked in commit 68dd149. A tick here
+  instruction of 2026-11-02 asks again for every round, were ticked in commit 214bc1a. The 2 items
+  of the fifth re-run, CHK074 and CHK075, verified in the same way once their answers were applied,
+  were ticked in commit 68dd149. Of the 6 items of the sixth re-run, CHK076 to CHK081, verified in
+  the same way once their answers were applied, the 5 from CHK076 to CHK080 were ticked in commit
+  6c7c591. CHK081 stays open: REP-081 states plan phase 1's order, each step after the steps it
+  needs, but the guard "Environment" of `protocol/evidence.py`, from which `scripts/recheck_004.py`
+  alone is exempt, exits 2 while no environment record is in force with its row Approved, and that
+  order writes the environment records at step (7), after the downloads manifest's
+  entries of step (5), so that those entries and the first environment record
+  itself, each written through that module, are refused, and the tasks cannot
+  follow the order as written. The seventh re-run takes it up. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

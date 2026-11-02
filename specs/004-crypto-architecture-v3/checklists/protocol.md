@@ -581,7 +581,15 @@ start open, and an item is ticked only under the rule in the Notes below.
   applied, CHK062 was ticked in commit 68dd149. CHK061 stays open: the lists name their rounds'
   commits and the comparison's results, but no text says who makes PRO-061's comparison before the
   tasks approval, while `scripts/protocol_change.py check`, whose comparison it is, is written only
-  in implementation, after that approval. The sixth re-run takes it up. A tick here
+  in implementation, after that approval. The sixth re-run takes it up. Of the 4 items of the sixth
+  re-run, CHK063 to CHK066, verified in the same way once their answers were applied, CHK063, CHK064
+  and CHK066 were ticked in commit 6c7c591, and with them CHK061, which PRO-063 completes: before
+  the tasks approval the agent makes the comparison with `research/004/place_check.py`, committed
+  in 2392150. CHK065 stays open: PRO-065 exempts a `lock-cleared` record from the guard "Protocol
+  log" but not from the guard "Environment", which exits 2 while no environment record is in force
+  with its row Approved, and plan phase 1 writes the environment records at its step (7), after the
+  protocol change log, so that a stale `data/log-append.lock` held before then cannot be cleared and
+  the log's creation stays blocked. The seventh re-run takes it up. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
