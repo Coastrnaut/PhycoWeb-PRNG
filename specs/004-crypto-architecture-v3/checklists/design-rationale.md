@@ -447,6 +447,24 @@ and an item is ticked only under the rule in the Notes below.
   the record that decided it? [Completeness, Spec §FR-034 "Alternatives", §FR-043, §Pre-registered
   Design Protocol "Nonlinearity choice rule", "Eligibility and selection"; data-model §8, §9]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK067 Does the re-decided feature-002 FR-007 row state the refused-list match as FR-023 and
+  research R15 now state it, given that the row still reads "a run of consecutive table words of at
+  least 64 bits equal to consecutive words of a listed constant set read from any multiple of w,
+  also after one word rotation or the complement of every word", the wording that RAT-058's answer
+  replaced in FR-023 and research R15 with 2w transforms, each rotating every word of the run by the
+  same k, k = 0…w − 1, with or without the complement of every word, so that rotations of
+  complements match, while RAT-058's Changes cell named only FR-023 and R15? Is the row's sentence
+  aligned with FR-023, or does it cite FR-023 for the transforms, so that the spec does not state
+  the rule's one check in two readings, one of them leaving open which rotation amounts count and
+  whether a rotation of a complement matches? [Consistency, Spec §Re-decided feature-002
+  requirements "FR-007", §FR-023; research R15]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
