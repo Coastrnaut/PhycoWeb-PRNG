@@ -467,6 +467,50 @@ start open, and an item is ticked only under the rule in the Notes below.
   [Consistency, Spec §FR-018, §FR-023, §Security Policy traceability "FUT-GRID-1"; research R14,
   R15; model contract "Variant IDs"]
 
+## Fourth re-run (2026-11-02)
+
+Items found when the checklist was run a fifth time, over the complete documents and the repository,
+after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK071 Is the form of key loading stated once, given that FR-025 asks the design document to
+  specify "serial or parallel key loading", while the same requirement fixes the key path as "a key
+  register at each node that holds key bits, loaded once per key along a registered shift chain
+  through those nodes", FR-013 loads the key "once, along a registered shift chain", FR-059 feeds
+  the self-test's key and nonce through the chains "word by word as the host would" with "no
+  parallel load path", and the plan's Complexity Tracking rejects "A central key register with a
+  tree to the key lanes" as "a grid-wide path carrying secret data"? Is the choice taken out of
+  FR-025's list, so that a parallel load, which the rest of the text excludes, cannot be read as
+  allowed? [Conflict, Spec §FR-025 "Key loading and reset", §FR-013, §FR-059; plan "Complexity
+  Tracking"; constitution Principle III]
+- [ ] CHK072 Are the sources of the selector at every lane stated the same way everywhere, with the
+  absorption tree among them where a rate lane holds nonce bits, given that FR-025 has the nonce
+  reach "its lanes through the absorption tree where they are rate lanes" while its selector sets
+  each lane "from a key register, the nonce chain or its stated constant", FR-013's "from a key
+  register, the nonce or its stated constant", and the plan's Complexity Tracking places the key and
+  the nonce "from key registers at the nodes whose lanes hold key bits and from the nonce chain,
+  through a selector at every lane"? Is it stated where the nonce's words for rate lanes are held
+  between their transfer on the absorption interface and the one cycle of the copy, and whether they
+  are written into their lanes in that cycle or absorbed over the rate after it, as an XOR with each
+  lane's stated constant would be, so that the hardware's initial state is the one FR-013 places,
+  "at stated positions, the rest of it set to stated constants", as research R10 does? Are the
+  registers that hold them among those that zeroization clears and among the parts of FR-026's
+  estimate? [Gap, Consistency, Spec §FR-013, §FR-018, §FR-025 "Key loading and reset",
+  "Zeroization", §FR-026; plan "Complexity Tracking"; research R10]
+- [ ] CHK073 Is the writing of an exploration table specified as a command, with the time it may
+  run, given that FR-018, research R14 and R15 and the model contract have `gen_constants_v3.py`
+  write a table "for that (n, w) on demand" under `research/004/exploration/` "with its check
+  record", and that FUT-GRID-1's "Partly met" rests on "constant tables generated on demand at the
+  other sizes", while the cli contract gives `gen_constants_v3.py` no option that names an (n, w),
+  that path or that record, and states that "after the freeze a generator runs only with `--check`
+  or `--reproduce`", the freeze hashing "the scripts that generate the constants" and
+  `phycoweb/model_v3.py`, whose research interface is the one that reads an exploration table? Are
+  the check record's kind and place stated, and what a failed check of an exploration table, such as
+  a match with the refused list, means for the frozen design, given that such a table is "never
+  frozen and never evidence"? [Conflict, Gap, Spec §FR-018, §Security Policy traceability
+  "FUT-GRID-1"; research R14, R15; data-model §13; model contract "Variant IDs"; cli contract
+  "Generators of constants and vectors"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
