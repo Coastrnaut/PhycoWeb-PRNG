@@ -76,7 +76,8 @@ projects first, its projection charged to no row. A difference is a finding, exi
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Order of US1, below;
-  `design_freeze.py create`; `repair_log.py`) reads it as committed at HEAD, never the working tree,
+  `round_rule.py --select`; `design_freeze.py create`; `repair_log.py`; the test of the second
+  transcription's provenance) reads it as committed at HEAD, never the working tree,
   and exits 2 while the working tree's table differs from HEAD's. The rows that open a guard are set
   to Approved and committed by the owner (the note under that table), so an uncommitted row opens
   none, and the owner's review at each ⛔ gate lists the approval commits since the last gate.
@@ -234,8 +235,11 @@ record of a capped search, or an `ineligible` or `rejected` log decision; the ch
 each outcome, and no search is retried to reach a score. After an exact tie, `--tie` writes
 `tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible; before
 that, or if `tie.json` exists, it exits 2. `--choose`, run by the owner after `tie.json` exists,
-writes `d4/tie-choice.json` with the choice, who, when and `seen_sha256`, and exits 2 if that hash
-differs from `tie.json`'s, if no tie exists or if a choice exists; `tie.json` is never rewritten.
+prints `tie.json`'s SHA-256 and exits 2 unless standard input is an interactive terminal and the
+owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the choice, who, when,
+`seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash differs from
+`tie.json`'s, if no tie exists or if a choice exists; `tie.json` is never rewritten. Running
+`--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
 
 ## `scripts/round_rule.py`
 
@@ -249,22 +253,26 @@ round_rule.py --reproduce RECORD       # a round-rule or selection record (intro
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
 ID. `--close` writes the candidate log's `set-closed` entry once every candidate has a final
-decision and no replacement is pending, and exits 2 otherwise. `--select` exits 2 before that entry;
-it applies eligibility, the fallback to the other family and the stop rule; exit 1 if the outcome is
-a stop. Eligibility is decided for every candidate from its own records (data model
-§9): FR-026's figures from its `cost` record per size, written by `research/004/tools/costmodel.py`
-from the operation list, P and R; FR-027's semantics from the operation list's declarations;
-FR-030's mapping from its `mapping` log entry. A missing item fails eligibility. After a decline at
-the owner design review that ends in a further candidate, `--select` runs again over the whole set,
-the declined candidate included, and writes `selection-2.json`, citing `selection.json`; if it
-selects the declined candidate again, the outcome is a stop, exit 1. The decline reopens the set
-once, for one further candidate, and `--close` writes a second `set-closed` entry before `--select`
-runs again. `--choose`, run by the owner after a tie in `selection.json`, writes
-`freeze/selection-tie-choice.json` with the choice, who, when and `seen_sha256`, and exits 2 if that
-hash differs from `selection.json`'s, if no tie exists or if a choice exists. `round-rule.json` and
-`selection.json` keep fixed names: before one changes, `protocol/evidence.py` keeps its current
-content as `versions/<sha256>.json` beside it, and the new content holds `previous_sha256` (data
-model introduction).
+decision and no replacement is pending, and exits 2 otherwise. `--select` exits 2 before that entry,
+and after a D4 tie until the spec's "D4 tie" row reads Approved at HEAD with the SHA-256 of
+`d4/tie-choice.json` (Approvals, above); it applies eligibility, the fallback to the other family
+and the stop rule; exit 1 if the outcome is a stop. Eligibility is decided for every candidate from
+its own records (data model §9): FR-026's figures from its `cost` record per size, written by
+`research/004/tools/costmodel.py` from the operation list, P and R; FR-027's semantics from the
+operation list's declarations; FR-030's mapping from its `mapping` log entry. A missing item fails
+eligibility. After a decline at the owner design review that ends in a further candidate, `--select`
+runs again over the whole set, the declined candidate included, and writes `selection-2.json`,
+citing `selection.json`; if it selects the declined candidate again, the outcome is a stop, exit 1.
+The decline reopens the set once, for one further candidate, and `--close` writes a second
+`set-closed` entry before `--select` runs again. `--choose`, run by the owner after a tie in
+`selection.json`, prints `selection.json`'s SHA-256 and exits 2 unless standard input is an
+interactive terminal and the owner types its first 16 hex digits; it writes
+`freeze/selection-tie-choice.json` with the choice, who, when, `seen_sha256` and `choice_confirmed`,
+and exits 2 if that hash differs from `selection.json`'s, if no tie exists or if a choice exists.
+Running `--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
+`round-rule.json` and `selection.json` keep fixed names: before one changes, `protocol/evidence.py`
+keeps its current content as `versions/<sha256>.json` beside it, and the new content holds
+`previous_sha256` (data model introduction).
 
 ## `scripts/mode_limits_v3.py`
 
@@ -275,9 +283,12 @@ mode_limits_v3.py --reproduce RECORD
 
 Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴ and
 N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
-`theorem` is `unverified` until its paper has been read. `limits.json` keeps its fixed name: before
-it changes, its current content is kept as `security-target/versions/<sha256>.json`, and the new
-content holds `previous_sha256` (data model introduction).
+`theorem` is `unverified` until its paper has been read. It also writes the size profile
+`parameters.json` beside `limits.json` (data model §10), each row from the variant table and the
+design document's layout, with FR-010's generic-bound checks computed by code; exit 1 on any
+violation at a claimable size. Both files keep their fixed names: before one changes, its current
+content is kept as `security-target/versions/<sha256>.json`, and the new content holds
+`previous_sha256` (data model introduction).
 
 ## Generators of constants and vectors
 
@@ -332,8 +343,11 @@ scripts, every evidence record behind R by ID and by SHA-256, and the last `seq`
 SHA-256 of the candidate log, the provenance log and the protocol change log.
 
 `create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
-owner design review row is not Approved, if the external review row is
-neither done nor "not arranged", or if `git_dirty` is true. `create` stores `draft_sha256`, the
+security-target review or the owner design review row is not Approved, if the external review row is
+neither done nor "not arranged", if a selection tie exists and the "Selection tie" row does not read
+Approved with the SHA-256 of `freeze/selection-tie-choice.json`, if a theorem the mode chapter uses
+is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
+theorem (research R10), or if `git_dirty` is true. `create` stores `draft_sha256`, the
 SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
 the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
@@ -402,7 +416,11 @@ of the run that died holding it (data model §1; research R16).
 check_claims.py
 ```
 
-Checks README, security.md §1.1 and §15 and the disclaimers against `protocol/claims.json`, that
-every hand-written document of this feature carries the design-form disclaimer, and that
-forbidden wording (FR-050) appears only in the rules that forbid it. Exit 1 on any finding
-(SC-018). `tests/test_claims.py` runs it.
+Runs FR-069's test as written, with its scope, rules, strength rule and allow-list: it checks
+README, security.md §1.1 and §15 and the disclaimers against `protocol/claims.json` and that every
+hand-written document of this feature carries the design-form disclaimer, and it scans every
+Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`,
+the checklists and checklist-choices.md included, README, security.md, and the comments and
+docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
+of the register, with its reason (data model §15). Exit 1 on any finding (SC-018).
+`tests/test_claims.py` runs it.

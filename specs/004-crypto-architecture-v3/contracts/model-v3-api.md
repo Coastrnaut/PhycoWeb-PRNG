@@ -26,10 +26,11 @@ shown as `<…>` are fixed by the design document.
   `constants_v3`). Index arithmetic outside those functions is not restricted.
 - No branch, table index or selection on secret data; comparisons only on public counters, and
   those are unsigned (FR-020, FR-055). In the model this is a discipline only, and the model is
-  never called constant time, since Python integers are not; the claim test flags "constant
-  time" beside it. Constant time by construction is a property of the design's sequence of
-  operations and of a hardware implementation of it: in hardware, a cycle count fixed by public
-  values; in feature 006's C, no branch or memory index that depends on secret data.
+  never called constant time, since Python integers are not; the claim test flags "constant time" in
+  every line it scans, beside the model and elsewhere (FR-069). Constant time by construction is a
+  property of the design's sequence of operations and of a hardware implementation of it: in
+  hardware, a cycle count fixed by public values; in feature 006's C, no branch or memory index that
+  depends on secret data.
 - Key and zeroization: the object stores its own copy of the key as a `bytearray`; `zeroize`, and
   every path that zeroizes, overwrites that copy with zeros in place and then drops it, and drops
   the state's integers, which Python cannot overwrite. Like constant time, this is a discipline: it
@@ -116,9 +117,11 @@ FR-002).
 | A call refused at a per-key limit | zeroizes and ends the object |
 
 **Error paths in hardware**: the design document lists every condition the RTL detects after the
-state has changed, each of which zeroizes, raises the error signal and needs a new key, or states
-that there is none, since with valid and ready a bad request is refused before anything changes
-(FR-025).
+state has changed, each of which zeroizes, raises the error signal with a zeroizing code and needs a
+new key, such as a last partial word of a personalization string or a reseed input with a nonzero
+unused byte, which can arrive after earlier blocks of that input have been absorbed; a bad request
+that valid and ready refuse before anything changes is a refusal that changes nothing (FR-025). The
+model takes whole byte strings and has no such case.
 
 **Across resets in hardware**: a device cannot end itself as an object can, so a reset or
 zeroization returns it to a state that accepts a new key. The per-key limits and counters then

@@ -51,8 +51,8 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| T1 | `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json` | bound at most ε = 2⁻⁶⁴ at the limits, doubling check passes; `theorem` `unverified` until its paper is read |
-| T2 | reviewer reads `security-target/parameters.json` against security.md §12.2 | 0 violations at every claimable size (SC-003); keyed reduced variants with a c-bit key and a c/2-bit nonce, checked at s = c/2 (R14) |
+| T1 | `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json` | bound at most ε = 2⁻⁶⁴ at the limits, doubling check passes; `theorem` `unverified` until its paper is read; the size profile `parameters.json` written beside `limits.json` |
+| T2 | reviewer checks `security-target/parameters.json`, written by T1's `mode_limits_v3.py`, and its record against security.md §12.2 | 0 violations at every claimable size, each check computed by code (SC-003; FR-010, FR-065); keyed reduced variants with a c-bit key and a c/2-bit nonce, checked at s = c/2 (R14) |
 
 ## Candidates and evidence (E, US4)
 

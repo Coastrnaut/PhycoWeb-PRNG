@@ -9,36 +9,37 @@ the 376 items in the six checklists that `/speckit-checklist` generated after pl
 the recommended option first: the 206 items of the first run, the 29 that the re-run of 2026-11-01
 found in the text those answers changed and the 71 that the second re-run of 2026-11-01 found over
 the complete documents and the repository, all answered and applied, and the 70 that the third
-re-run of 2026-11-01 found over the complete documents and the repository, not yet answered. The 41
-items marked `[Conflict]` come first, the 9 of the third re-run before the 15 of the second re-run,
-the 4 of the re-run and the 13 of the first run: where two texts disagree, every other item would be
-checked against a moving target until they agree. The third re-run's 61 other items follow in a
-section of their own, then the second re-run's 56, then the re-run's 25, then the 193 other items of
-the first run, checklist by checklist.
+re-run of 2026-11-01 found over the complete documents and the repository, answered on 2026-11-02.
+The 41 items marked `[Conflict]` come first, the 9 of the third re-run before the 15 of the second
+re-run, the 4 of the re-run and the 13 of the first run: where two texts disagree, every other item
+would be checked against a moving target until they agree. The third re-run's 61 other items follow
+in a section of their own, then the second re-run's 56, then the re-run's 25, then the 193 other
+items of the first run, checklist by checklist.
 
 No option was written into the spec, the plan, research.md or any other document before the owner
-answered its round, and none of the third re-run's options has been written yet. This document ticks
-no checklist item. On 2026-11-01 the owner asked the agent to verify each item against the text and
-tick it if it holds; each checklist's Notes record that instruction, its date and the commits that
-ticked items, and the owner's tasks approval includes the review of those ticks (PRO-045).
+answered its round. This document ticks no checklist item. On 2026-11-01 the owner asked the agent
+to verify each item against the text and tick it if it holds; each checklist's Notes record that
+instruction, its date and the commits that ticked items, and the owner's tasks approval includes the
+review of those ticks (PRO-045).
 
-**Status: 306 rows answered, "all recommended" (owner), on 2026-11-01, and applied: the 206 of the
-first run, the 29 of the re-run and the 71 of the second re-run; the 70 rows of the third re-run
-await the owner's answer.** Option A of every answered row is applied where its Changes cell names a
-document: the spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md,
-security.md (versions 2.11, 2.12 and 2.13) and `.gitattributes`; the second re-run's rows were
-committed checklist by checklist, each checklist's rows once they were written into every document
-they name. Where a Changes cell names research R16, R17 or R18 for `.gitignore` or
-`requirements.txt`, the row changes that research passage, and the file itself changes at setup
-(plan phase 1), as the passage says. A row that also names a later feature or a document not yet
-written (the design document, a test, the final report) is held there by the spec requirement its
-Changes cell names.
+**Status: all 376 rows answered, "all recommended" (owner): the 206 of the first run, the 29 of the
+re-run and the 71 of the second re-run on 2026-11-01, and applied, and the 70 of the third re-run on
+2026-11-02.** The 70 rows of the third re-run are being applied checklist by checklist, and each
+checklist's rows are committed once they are written into every document they name. Option A of
+every row of the first three rounds is applied where its Changes cell names a document: the spec,
+plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md (versions 2.11,
+2.12 and 2.13) and `.gitattributes`; the second re-run's rows were committed checklist by checklist,
+each checklist's rows once they were written into every document they name. Where a Changes cell
+names research R16, R17 or R18 for `.gitignore` or `requirements.txt`, the row changes that research
+passage, and the file itself changes at setup (plan phase 1), as the passage says. A row that also
+names a later feature or a document not yet written (the design document, a test, the final report)
+is held there by the spec requirement its Changes cell names.
 
 ## How to answer
 
-- The first three rounds were answered "all recommended" on 2026-11-01, the second re-run's 71 rows
-  included. The third re-run's 70 rows await an answer: "all recommended", letters by ID, for
-  example "HW-066 B, REP-061 B, the rest recommended", or an option in the owner's own words.
+- The first three rounds were answered "all recommended" on 2026-11-01, and the third re-run's 70
+  rows on 2026-11-02. An answer could also have given letters by ID, for example "HW-066 B,
+  REP-061 B, the rest recommended", or an option in the owner's own words.
 - After each answer, the changes each chosen option names are applied with their reasons. The six
   checklists are then re-read against the changed text, and the reviewer ticks an item once the text
   it asks for is in place.
@@ -93,7 +94,7 @@ Changes cell names.
 
 The 41 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
 
-From the third re-run of 2026-11-01, not yet answered, in checklist order:
+From the third re-run of 2026-11-01, answered on 2026-11-02, "all recommended", in checklist order:
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -160,8 +161,8 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 
 The 61 items other than conflicts that the third re-run of 2026-11-01 found over the complete
 documents and the repository, in checklist order: 10 security, 7 design-rationale, 11 analysis, 8
-protocol, 13 hardware and 12 reproducibility. They await the owner's answer, as do the 9 conflicts
-above.
+protocol, 13 hardware and 12 reproducibility. They were answered on 2026-11-02, "all recommended",
+as were the 9 conflicts above.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -602,10 +603,10 @@ entry, while a row left out would be a protocol change outside the log.
 
 The first three lists were written on 2026-11-01, after their rounds were answered, by that reading,
 so they await the owner's confirmation, asked for at the tasks approval. A later round's list is
-written with its rows, before the answer that approves it: the fourth list, the third re-run's, was
-written with its rows on 2026-11-01, and the owner's answer to that round approves it (FR-044). If
-the answer chooses another option for a row, the list follows the option chosen before the change
-log takes it.
+written with its rows, before the answer that approves it, and if the answer chooses another option
+for a row, the list follows the option chosen before the change log takes it. The fourth list, the
+third re-run's, was written with its rows on 2026-11-01, and the owner's answer to that round, "all
+recommended" on 2026-11-02, approved it as written (FR-044).
 
 From the first run, 147 of its 206 rows:
 
@@ -755,8 +756,9 @@ B, RAT-050 B, RAT-051 B, RAT-052 B, ANA-050 B, ANA-055 B and ANA-056 B. RAT-052'
 one recommendation that reads a check less strictly anywhere: at the research sizes 2×2 and 3×3
 only, where as written the symmetry check fails every candidate (every placement there is fixed by a
 symmetry that moves a node, computed on 2026-11-01), it checks the placement with its constants, as
-RAT-036 did for the constants at 2×2, and no claim covers those sizes (D3). Once the rows are
-answered, the chosen options are written into the documents their Changes cells name, each with its
-reason; the protocol changes among them, listed above under "Rows that change the protocol", are
-recorded as FR-044 requires; the six checklists are re-read; and `/speckit-tasks` follows, up to the
-⛔ tasks approval.
+RAT-036 did for the constants at 2×2, and no claim covers those sizes (D3). The owner answered "all
+recommended" on 2026-11-02, which approves this round's list above, and the chosen options are being
+written into the documents their Changes cells name, each with its reason; the protocol changes
+among them enter the protocol change log when it is created, before any result exists (FR-044;
+data-model §18); the six checklists are re-read; and `/speckit-tasks` follows, up to the ⛔ tasks
+approval.

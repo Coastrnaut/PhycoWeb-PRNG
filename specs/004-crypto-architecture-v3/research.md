@@ -747,10 +747,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Reseed** is mapped to the theorem's absorption call with attacker-chosen input (T9;
     FR-016). A reseed never resets a counter (model contract).
   - Each of these is listed among the preconditions, "unverified" until its paper is read. If a
-    paper's form differs, the design takes the paper's form, or the feature stops (below).
+    paper's form differs, the design takes the paper's form in a new design-document version, or the
+    feature stops (below).
 - **Reading the papers is a download** (FR-046); the owner approved each file of R19 on
   2026-11-01. Until a paper is on disk and read, the mode chapter marks its use of that theorem
-  "unverified", and the security-target chapter cannot pass the review that records L1 (FR-012).
+  "unverified", and L1 is not recorded while it is (FR-012): the security-target review may read
+  Approved, and the "L1 recorded" row then reads "blocked", naming the missing paper. The owner
+  design review and the freeze need every theorem the mode chapter uses `verified` in `limits.json`,
+  with each precondition marked met in the mode chapter: `design_freeze.py create` exits 2
+  otherwise, naming the theorem, and the freeze record holds `limits.json`'s SHA-256 and each
+  theorem's status (data-model §13).
 - **If a call does not match a theorem exactly**, the call is changed to the theorem's form
   (forget as a duplexing call that overwrites the outer part, reseed as a domain-separated
   absorption), or the feature stops (Edge Cases). A mode without a matching theorem is never
@@ -1392,14 +1398,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     disclaimer, the block directly under the spec's title, as at the top of this document;
     `DISCLAIMER` stays unchanged. The claim test compares every document's copy with the
     constant. No freeze of features 002 or 003 pins this file.
-  - The claim and evidence register is `protocol/claims.json`. `tests/test_claims.py` checks
-    README, security.md §1.1 and §15, and the disclaimers against it, and scans every document of
-    this feature, README and security.md included, for the wording FR-050 forbids, "random", "truly
-    random", "randomness" and "high-entropy" among it (Principle IV). "Near" and "beside" in its
-    rules mean the same sentence or table row, and every flagged line, a rule's own line included,
-    passes only through an allow-list entry with its reason (data-model §15). Inside the mapping
-    chapter it matches FR-030's list as whole words, ignoring case, with their inflections, and a
-    test runs that rule on sample sentences that must and must not be flagged.
+  - The claim and evidence register is `protocol/claims.json`. `tests/test_claims.py` runs FR-069's
+    test as written, with its scope, rules, strength rule and allow-list: it checks README,
+    security.md §1.1 and §15, and the disclaimers against the register, and scans every document of
+    this feature, that is every Markdown file under `specs/004-crypto-architecture-v3/` and
+    `reports/004-crypto-architecture-v3/`, the checklists and checklist-choices.md included, with
+    README and security.md, and the comments and docstrings of the files FR-069 names, for the
+    wording FR-050 forbids, "random" with its inflections and "high-entropy" among it (Principle
+    IV), and for FR-069's other rules. "Near" and "beside" in its rules mean the same sentence or
+    table row, every rule matches whole words, ignoring case, with FR-069's inflections, and every
+    flagged line, a rule's own line included, passes only through an allow-list entry with its
+    reason (data-model §15). A test runs every rule and every standing phrase on sample sentences
+    that must and must not be flagged, the mapping chapter's rule among them.
 - **Rationale**: these are the spec's named fixes (checklist groups E and F). Markers keep one
   file correct for both environments.
 - **Alternatives**: two requirements files (more drift).

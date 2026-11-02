@@ -264,7 +264,7 @@ scripts/
 ├── evidence_v3.py            # one evidence kind for one candidate (R4, R12, R13)
 ├── d4_choice.py              # the D4 score and choice (R5, R6)
 ├── round_rule.py             # R, eligibility, selection, stop rule
-├── mode_limits_v3.py         # the theorem's bound at the limits (R9)
+├── mode_limits_v3.py         # the theorem's bound at the limits and the size profile (R9; FR-010)
 ├── gen_constants_v3.py       # constants and their checks (R15)
 ├── gen_vectors_v3.py         # vectors and known-answer tests (R8)
 ├── gen_constructed_v3.py     # constructed-state vectors (FR-054)
@@ -362,8 +362,9 @@ source and binary.
    16×16 (R7).
 6. **US3 model and vectors**: the design document complete; constants; `model_v3.py`; vectors
    and known-answer tests on Windows and Linux; constructed states; refusals; tests.
-7. **Second transcription**: ⛔ **owner go-ahead**; a separate session writes
-   `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
+7. **Second transcription**: ⛔ **owner go-ahead**, the Review & Approval row "Second transcription
+   go-ahead", which the owner sets and commits and the provenance test reads at HEAD; a separate
+   session writes `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
 8. **US5**: first the security-target review, with its Review & Approval row, after the selection
    and before the owner design review: it cites the selected candidate's records of FR-029's
    diffusion through instantiation and of R4's first-order differences, and closes FR-011's
