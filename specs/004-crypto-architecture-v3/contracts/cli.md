@@ -92,6 +92,13 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   fields as the heavy-run lock, and only `scripts/clear_lock.py` removes a stale one. It exits 2,
   appending nothing, if the lock is not free within 10 s, naming the lock and whether its holder
   still runs, or if the chain is broken (research R16).
+- **Protocol log**: every script that writes evidence exits 2, writing nothing, through
+  `protocol/evidence.py`, while `research/004/protocol-changes.jsonl` does not exist, its chain does
+  not check, or its first entries, one per listed row of every round answered before it was created
+  and one per place the owner confirmed as an entry of its own (`protocol_change.py`, below), do not
+  all hold the owner's `approval_confirmed`; every record then cites the log's last entry in
+  `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18).
+  `tests/test_protocol_004.py` covers the refusal.
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -585,18 +592,26 @@ record <n>" or "Owner-provided value <n>", with that SHA-256, which the Environm
 ## `scripts/protocol_change.py`
 
 ```text
+protocol_change.py check                  # the comparison alone; writes nothing
 protocol_change.py create                 # the first entries, from checklist-choices.md
 protocol_change.py propose FILE           # one later entry, its fields in FILE
 ```
 
 The one writer of the protocol change log, `research/004/protocol-changes.jsonl`, through
 `protocol/changelog.py` (spec FR-044; data model §18). `create` runs only while the log does not
-exist, and exits 2 once it does. It reads the lists "Rows that change the protocol" of
-checklist-choices.md, in round order, and each listed rule's text, in each place its heading names,
-at the two commits of each round, and compares them first: it exits 2, writing nothing, while a
-place whose text changed between a round's two commits has no row of that round listed under its
-rule, and otherwise builds one first entry per listed row, with `rules`, `row`, `granularity` and
-`place_check`. `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
+exist, and exits 2 once it does. `check` reads the lists "Rows that change the protocol" of
+checklist-choices.md, in round order, each naming its round's two commits by hash, and compares each
+rule's text, in each place its heading names, over each round's pair and over every span from the
+plan-approval commit to HEAD outside the pairs; it prints each place whose text changed, with its
+commit, the rows of that round listed under its rule and each place changed by an edit that no row
+made, and writes nothing. Its comparison is made before the tasks approval and its result written
+beside each list, where the owner confirms each place changed by an edit that no row made as an
+entry of its own or as no change of rule, with the reason (spec FR-044). `create` runs the same
+comparison first and exits 2, writing nothing, while a place whose text changed has no row of that
+round listed under its rule and no such confirmation, or while its result differs from the one
+confirmed beside the lists, and otherwise builds one first entry per listed row, with `rules`,
+`row`, `granularity` and `place_check`, and one per place confirmed as an entry of its own.
+`propose FILE` builds one later entry from FILE, a JSON object holding its fields,
 which the agent may write as a proposal. Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`. Each then ends in the approval step, an owner's own act that

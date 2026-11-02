@@ -717,11 +717,20 @@ takes as its content, as each heading below names them, or the plan's table "Val
 fixes". Every Stricter or Settle row is listed, since its kind says that it changes a rule; REP-023
 is the one that names none of these texts, and it is listed under the hashes of research R16, which
 it settles. This reading is the inclusive one: a listed row that changes no rule costs one log
-entry, while a row left out would be a protocol change outside the log. Before the log is created,
-its writer, `scripts/protocol_change.py create`, compares each rule's text, in each place its
-heading names, at the two commits of each round, and exits 2, writing nothing, while a place whose
-text changed has no row of that round listed under its rule; the comparison's result is recorded
-with the first entries (data-model §18).
+entry, while a row left out would be a protocol change outside the log. Each list names its round's
+two commits by hash, the commit before the round's first applied row and the commit that completed
+its alignment, so that a round's alignment commits fall inside its pair, the first two rounds' pairs
+being the commits that hold their rows with their other edits, named as such (PRO-061). Before the
+tasks approval the comparison of `scripts/protocol_change.py check`, which writes nothing, is made
+over each round's pair and over every span from the plan-approval commit, 65bcbf2, to HEAD outside
+the pairs, each rule's text compared in each place its heading names, and its result is written
+beside each list; a place changed by an edit that no row made, in a round's commits or between two
+rounds, is recorded beside the list with its commit, for the owner to confirm at the tasks approval
+as an entry of its own or as no change of rule, with the reason. Before the log is created, its
+writer, `scripts/protocol_change.py create`, runs the same comparison and exits 2, writing nothing,
+while a place whose text changed has no row of that round listed under its rule and no such
+confirmation, or while its result differs from the one the owner confirmed; the comparison's result
+is recorded with the first entries (data-model §18).
 
 The first three lists were written on 2026-11-01, after their rounds were answered, by their rows'
 Changes cells, the reading before PRO-058, so they await the owner's confirmation, asked for at the

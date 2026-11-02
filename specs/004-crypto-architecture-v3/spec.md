@@ -1988,14 +1988,28 @@ freeze hashes and the baseline manifest; run the claim-register test.
   answered before then, by the per-round lists "Rows that change the protocol" of
   checklist-choices.md, in round order, each holding, per rule its row is listed under, that rule's
   text before and after its round was applied (data-model §18). A row is listed under every rule
-  whose text its Changes cell names or its applied change altered, and before the log is created its
-  writer compares each rule's text, in each place its heading names, at the two
-  commits of each round, and exits 2, writing nothing, while a place whose text
-  changed has no row of that round listed under its rule; the comparison's
+  whose text its Changes cell names or its applied change altered. Each list names its round's two
+  commits by hash, the commit before the round's first applied row and the commit that completed its
+  alignment, so that a round's alignment commits fall inside its pair, the first two rounds' pairs
+  being the commits that hold their rows with their other edits, named as such. Before the tasks
+  approval the comparison of `scripts/protocol_change.py check`, which writes nothing, is made over
+  each round's pair and over every span from the plan-approval commit to HEAD outside the pairs,
+  each rule's text compared in each place its heading names, and its result is written beside each
+  list; a place changed by an edit that no row made, in a round's commits or between two rounds, is
+  recorded beside the list with its commit, for the owner to confirm at the tasks approval as an
+  entry of its own or as no change of rule, with the reason. Before the log is created its writer
+  runs the same comparison and exits 2, writing nothing, while a place whose text changed has
+  no row of that round listed under its rule and no such confirmation, or
+  while its result differs from the one the owner confirmed; the comparison's
   result is recorded with the first entries. The owner's answer to a round
   approves its list. The log is created, and no evidence run starts, only after the owner has
   confirmed every list, and a row the owner takes out of a list is recorded beside it with the
-  owner's reason. A round answered after the log exists adds entries the
+  owner's reason; the shared guard "Protocol log" enforces it: `protocol/evidence.py` exits 2,
+  writing nothing, while the log does not exist, its chain does not check, or its first entries, one
+  per listed row of every round answered before it was created and one per place
+  the owner confirmed as an entry of its own, do not all hold the owner's
+  `approval_confirmed`, so that every record cites the log's last entry (cli contract;
+  data-model §1). A round answered after the log exists adds entries the
   usual way, proposed by the agent and approved by the owner. Approving a
   change is the owner's own act, outside the standing authorization like the freeze's steps (1), (3)
   and (4), the tie choices, the environment records and the values the owner provides, each written
