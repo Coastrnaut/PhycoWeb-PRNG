@@ -293,12 +293,14 @@ no entered set is recorded, or until every entered candidate has a final reduced
 each bound kind at 16 and, where research R6 needs it, at 8: a bound record, the `inconclusive`
 record of a capped search, or an `ineligible` or `rejected` log decision; the choice record lists
 each outcome, and no search is retried to reach a score. After an exact tie, `--tie` writes
-`tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible; before
+`tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible, with
+`decided_by` (`R at 4×4`, `carry chains`, `ineligible` or `owner`); before
 that, or if `tie.json` exists, it exits 2. `--choose`, run by the owner after `tie.json` exists,
 prints `tie.json`'s SHA-256 and exits 2 unless standard input is an interactive terminal and the
 owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the choice, who, when,
 `seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash differs from
-`tie.json`'s, if no tie exists or if a choice exists; `tie.json` is never rewritten. Running
+`tie.json`'s, if no tie exists, if a tie-break decided it (`decided_by` other
+than `owner`) or if a choice exists; `tie.json` is never rewritten. Running
 `--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
 
 ## `scripts/round_rule.py`
@@ -316,9 +318,12 @@ ID. `--close` writes the candidate log's `set-closed` entry once every candidate
 decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule
 record at every claimable size) and no `replacement` entry of the log is `pending`
 (data model §3), and exits 2 otherwise. `--select` exits 2 before that entry,
-and after a D4 tie until the spec's "D4 tie" row reads Approved at HEAD with the SHA-256 of
-`d4/tie-choice.json` (Approvals, above); it applies eligibility, the fallback to the other family
-and the stop rule; exit 1 if the outcome is a stop. Eligibility is decided for every candidate from
+and after a D4 tie until the spec's "D4 tie" row reads, at HEAD (Approvals, above), Approved with
+the SHA-256 of `d4/tie-choice.json` where `d4/tie.json`'s `decided_by` is `owner`, or "Not needed",
+naming the tie record and its tie-break, where a tie-break decided it, the family then taken
+from `d4/tie.json`; it applies eligibility, the fallback to the other family, both families where
+the D4 record's outcome is `not computable` (research R6), and the stop rule; exit 1
+if the outcome is a stop. Eligibility is decided for every candidate from
 its own records (data model §9): FR-018's folding rule, longest link, food nodes and tree figures
 from the operation list and its `parameters` entry; FR-020's cycles per call and FR-026's figures
 from its `cost` records per size, written by `research/004/tools/costmodel.py` from the operation
@@ -443,8 +448,10 @@ and its row, "Selection tie" or "Selection tie <k>", does not read Approved
 with the SHA-256 of its choice record, if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
 theorem, those marks being read as `unverified` while the security-target review row does not read
-Approved (research R10), or if `git_dirty` is true. `create` stores `draft_sha256`, the
-SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
+Approved (research R10), if the design document's header holds a line other than
+its title, the disclaimer and its line "Version: …" (spec FR-034), or if
+`git_dirty` is true. `create` stores `draft_sha256`, the SHA-256 of the record's
+canonical JSON without that field and the approval fields. `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
 the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
 `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing

@@ -67,7 +67,7 @@ implementation can write byte-identical files:
 | `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
-| `design_version`, `design_sha256` | str | the design document's version and hash; `none` before it exists |
+| `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>" (1.0 once frozen; spec FR-034), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
 | `protocol_seq`, `protocol_line_sha256` | int, hex | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256; `none` before the log exists |
@@ -83,7 +83,7 @@ implementation can write byte-identical files:
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
 | `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
 | `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
-| `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` stays `pending` until a review is recorded |
+| `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` and `review_status` stay as written, `pending` where no review preceded the record, which is never overwritten: its review is a provenance entry that names the record's ID and SHA-256 (section 14) |
 | `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
 | `heavy_run` | bool | true if the run held the heavy-run lock (FR-045) |
 | `disclaimer` | str | `protocol.disclaimer.DESIGN_DISCLAIMER`, verbatim (FR-068) |
@@ -307,8 +307,12 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   because another's R is high, and one is entered for every such candidate while its family has
   fewer than three evaluated candidates and the budget allows: the agent proposes it, and the owner
   approves its entry, quoted with its date in its `proposed` entry, which closes the
-  `replacement` entry logged with the decision; a stated reason, the family full or
-  the budget spent, closes it otherwise. The set closes at a `set-closed`
+  `replacement` entry logged with the decision; a stated reason, the family full or the budget
+  spent, closes it otherwise. The budget allows while each of the replacement's own rows of research
+  R7, at its current value after any lowering, holds more than zero hours; it is spent when a
+  lowered budget left one of those rows at zero, and the log writer closes a `replacement` entry for
+  that reason only when R7's rows and the protocol change log's entry that lowered
+  the budget show it, exit 2 otherwise. The set closes at a `set-closed`
   entry, written by `round_rule.py --close` once every candidate has a final decision and no
   `replacement` entry is `pending`; `--select` exits 2 before it, and no candidate is entered after
   it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate,
@@ -562,17 +566,22 @@ statement that r* compares the candidates over the same rounds and is not a rate
 `chosen_family`; `tie_breaks_applied`; `bound_records`, each from a tool that
 has passed its cross-check on that candidate, which its `cross_check` cites
 (section 6): `d4_choice.py` uses no other. Written once by `scripts/d4_choice.py`
-from saved bound records; a second run that would change it is refused. After a tie,
-`d4/tie.json` is written once by `d4_choice.py --tie`, with both values of R at 4×4, or the
-ineligibility that decided it. If the tie-breaks reach the owner's choice, it is made only after
+from saved bound records; a second run that would change it is refused. After a tie, `d4/tie.json`
+is written once by `d4_choice.py --tie`, with both values of R at 4×4, or the ineligibility that
+decided it, and `decided_by`: `R at 4×4`, `carry chains`, `ineligible` or `owner`. Where a tie-break
+decides, no choice is made: the owner sets the Review & Approval row "D4 tie" to "Not needed",
+naming the tie record and its tie-break, and `round_rule.py --select` takes the family from
+`tie.json`. If the tie-breaks reach the owner's choice, it is made only after
 `d4/tie.json` exists and recorded beside it: `d4_choice.py --choose ID --seen SHA256 --by NAME`, run
 by the owner, prints `tie.json`'s SHA-256 and exits 2 unless standard input is an interactive
 terminal and the owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the
 choice, who, when, `seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash
-differs from `tie.json`'s, if no tie exists or if a choice exists, so the choice never changes.
-Running it is the owner's own act, which the agent never performs (spec FR-043).
-`tie.json` stays as the script wrote it, and the Review & Approval row "D4 tie" holds the date, the
-choice and both records' SHA-256.
+differs from `tie.json`'s, if no tie exists, if a tie-break decided it or if a
+choice exists, so the choice never changes. Running it is the owner's own
+act, which the agent never performs (spec FR-043). `tie.json` stays as the
+script wrote it, and the Review & Approval row "D4 tie" holds, where the owner chose, the date, the
+choice and both records' SHA-256. The design rationale's Alternatives chapter cites these records by
+path and SHA-256 (spec FR-034).
 
 ## 9. Round rule, eligibility and selection
 
@@ -620,7 +629,8 @@ its first 16 hex digits; it writes `freeze/selection-tie-choice.json`, or
 `seen_sha256` and `choice_confirmed`, and exits 2 if that hash differs from the record's, if the
 record has no tie or if a choice for it exists, so the choice never changes. Running it
 is the owner's own act, which the agent never performs (spec FR-043). Every selection record stays
-as the script wrote it. A choice binds only the record whose hash it names, so a tie in a later
+as the script wrote it, and the design rationale's Alternatives chapter cites each with its tie
+choice (spec FR-034). A choice binds only the record whose hash it names, so a tie in a later
 record needs a new choice, and the Review & Approval row "Selection tie", or "Selection tie <k>" for
 `selection-<k>.json`, holds the date, the choice and both records' SHA-256. If a later record
 selects another candidate, the security-target review and every later review are held again for it,
@@ -745,8 +755,10 @@ copy against its manifest hash and its live source (SC-012).
 
 ## 13. Design freeze record (`freeze/freeze.json`; FR-043)
 
-- **Hashes**, each with its kind (`raw` or `lf-normalized`, R16): the design document (with
-  its version); `rationale.md`, versioned with it; `phycoweb/model_v3.py`;
+- **Hashes**, each with its kind (`raw` or `lf-normalized`, R16): the design document (with its
+  version, from its header, which holds its title, the disclaimer and the version line and
+  nothing else, `create` exiting 2 on any other header line); `rationale.md`,
+  versioned with it and carrying the same version; `phycoweb/model_v3.py`;
   `phycoweb/constants_v3.py`, with its table per supported (n, w); `phycoweb/selftest_v3.py`
   (section 11); every vector file, including the constructed-state vectors, the constant tables
   beside them and the sidecar `MANIFEST.json`, frozen with them as the record of the runs that
@@ -790,9 +802,15 @@ the frozen files (FR-034).
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
 
-One line per file drafted or repaired with an AI tool: `seq` and `prev_sha256`, chained as the
-candidate log is (section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`,
-`section`, `sha256`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`. Every
+One line per file drafted or repaired with an AI tool, and per section where a file is
+drafted in parts: `seq` and `prev_sha256`, chained as the candidate log is
+(section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`,
+`section`, `sha256`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`, which is
+`pending`, `accepted` or `changes-requested`. A review is a new entry for the same `path` and
+`section`, with `follows`, the `seq` of the entry it follows, and `sha256`, the SHA-256 of the
+section text reviewed; the latest entry for a path and section gives its status, and no entry
+changes. The review of an evidence record is an entry that names the record's ID
+and SHA-256, the record's `reviewer` staying as written (section 1). Every
 append takes `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired
 as in section 3. The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
@@ -800,8 +818,8 @@ its own, with its SHA-256, before the first entry of the tool it validates. Each
 result (section 7) has an entry of its own before the tool's first validation, with its source: a
 second published value from research R19's approved papers (paper, table and value), or a
 self-written result with its SHA-256, entered before the tool's first entry. `section` names a part
-of a file: each AI-drafted section of the rationale has its own entry with its review status, which
-the owner design review updates, so that the frozen text carries no status (FR-034).
+of a file: each AI-drafted section of the rationale has its own entries, to which the owner design
+review adds a review entry for each, so that the frozen text carries no status (FR-034).
 
 ## 15. Claim and evidence register (`protocol/claims.json`; FR-069)
 
@@ -891,8 +909,12 @@ owner's action.
   record, with its start date and "not reached". Every level carries "no claim".
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
-- **Design document**: draft versions 0.x; the version the owner design review approves; frozen
-  as 1.0. After the freeze any change is a new model ID (FR-028). A record's `design_sha256` names
+- **Design document**: draft versions 0.<k>, the next with each committed change before the freeze,
+  `rationale.md` carrying the same; the version the owner design review approves; frozen as 1.0. A
+  revision after a decline or after the owner design review is logged under the
+  candidate with its old and new version, and each version a record cites
+  is kept as `design-versions/<sha256>.md` (section 1). After the freeze
+  any change is a new model ID (FR-028). A record's `design_sha256` names
   the version its run saw, and a reproduction compares it only for the kinds whose code reads the
   document (section 1), so a later draft does not make an earlier record differ.
 - **Gates** (spec Review & Approval table): a row's Decision is `_pending_`, Approved or Declined,

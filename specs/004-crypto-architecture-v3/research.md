@@ -708,6 +708,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the chosen family ends with no eligible candidate, once every candidate of the chosen family has
     its final decision; otherwise each that was not analysed there is `ineligible`, with the reason
     "not analysed at the production width: D4 chose the other family".
+  - **Replacements.** A candidate entered in place of one `rejected` or `ineligible` (spec stop
+    rule) has rows of its own, at their current values after any lowering. "The budget allows" its
+    entry while each of those rows holds more than zero hours, and "the budget spent", which closes
+    a `replacement` entry otherwise, means that a lowered budget left one of them at zero, which the
+    log writer checks against these rows and the protocol change log's entry that lowered the budget
+    (data-model §3).
   - **After a rise of R** (spec round rule). Every record that depends on R is made again at the new
     variant, each a new measurement of its kind, charged to its row where this section budgets the
     kind: first the constant table for the new R with its checks (R15); then the inverse and
@@ -1485,8 +1491,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `reports/004-crypto-architecture-v3/spec-versions/<sha256>.md`,
     committed with the records, so every `spec_sha256` names content that is kept, whether or
     not a commit holds it (data-model §1). Every version of research.md that a record cites by
-    `research_sha256` is kept the same way, as `research-versions/<sha256>.md`, since the values
-    that decide verdicts live there. Every record also holds `protocol_seq` and
+    `research_sha256` is kept the same way, as `research-versions/<sha256>.md`, since
+    the values that decide verdicts live there. Every version of the design
+    document that a record cites by `design_version` is kept the same way, as
+    `design-versions/<sha256>.md` (spec FR-034). Every record also holds `protocol_seq` and
     `protocol_line_sha256`, the protocol change log's last entry when the run started (`none` before
     the log exists).
   - **Code at HEAD.** A run that writes evidence exits 2 unless every source file in its

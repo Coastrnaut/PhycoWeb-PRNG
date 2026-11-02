@@ -219,7 +219,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Tasks approval | _pending_ | _pending_ | _pending_ | Includes the owner's review of the checklist items the agent ticked on the owner's instruction of 2026-11-01 (each checklist's Notes), where an item the owner does not accept is unticked, and the owner's confirmation of checklist-choices.md's lists "Rows that change the protocol", written after their rounds were answered. The protocol change log is created, and no evidence run starts, only after the owner has confirmed every list, and a row the owner takes out of a list is recorded beside it with the owner's reason, that it changed no rule (data-model §18) |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | The row names the demonstration record it reviews, `fut-sec-8/<record_id>.json`, by ID and SHA-256, and security.md's best-attack register row for exhaustive seed search cites that record (data-model §4) |
-| D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie |
+| D4 tie (only if the tie-breaks of the nonlinearity choice rule reach the owner's choice) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie, or if a tie-break decides it: the owner then sets this row to "Not needed", naming `d4/tie.json` and its tie-break (`decided_by`), and `round_rule.py --select` opens on that value at HEAD and takes the family from `d4/tie.json` |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
 | Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
@@ -247,7 +247,9 @@ Two lists of rows are set by the owner and committed, as "Log repair <n>" is. Th
 rows a guard reads at HEAD, each with its guard: the FUT-SEC-8 result review and
 each "FUT-SEC-8 result review <k>", read by the evidence scripts' guard (cli
 contract, "Order of US1"); the D4 tie, read by `round_rule.py --select`, which
-exits 2 after a D4 tie until the row reads Approved with the choice record's SHA-256; the Selection
+exits 2 after a D4 tie until the row reads Approved with the choice record's
+SHA-256, where the tie-breaks reached the owner's choice, or "Not needed",
+naming the tie record and its tie-break, where one decided it; the Selection
 tie and each "Selection tie <k>" of a later selection record, read the same way
 by `design_freeze.py create`; the Security-target review and each "Security-target review <k>", the
 Owner design review and each "Owner design review <k>", and the External design review, read by
@@ -584,8 +586,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
   established for that candidate within its analysis budget, and it cannot be frozen. The gap is
   reported, and the candidate is `ineligible`; another candidate is entered in its place, before the
-  set closes, while its family has fewer than three evaluated candidates and the budget allows, as
-  the candidate log's `replacement` entry records (section "Pre-registered Design Protocol",
+  set closes, while its family has fewer than three evaluated candidates and the budget allows (each
+  of the replacement's rows holding more than zero hours; stop rule), as the candidate log's
+  `replacement` entry records (section "Pre-registered Design Protocol",
   "Eligibility and selection"); if no candidate ends eligible, the feature recommends stopping.
 - **The round rule gives an expensive R**: rounds are never lowered for throughput. The cost is
   reported, and an expensive R is never a reason to enter or select another candidate: a further
@@ -1489,18 +1492,33 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-034**: A versioned design document for `phyco-v3` MUST cover every Phase 0 item of
   security.md §8, including the eight questions for a network of nodes, and a design rationale
   covering every rationale item of security.md §8 (strategy note §7.2). The rationale is its own
-  file, `rationale.md`, versioned with the design document and frozen with it (FR-043). Its
-  approval status, like the design document's, MUST be kept outside the frozen file
-  (feature-002 O5). The two documents MUST also meet these rules:
+  file, `rationale.md`, versioned with the design document and frozen with it (FR-043). Its approval
+  status, like the design document's, MUST be kept outside the frozen file (feature-002 O5), in the
+  provenance log, where each review is a new entry (FR-064). The two documents MUST also meet these
+  rules:
+  - **Version.** The design document's header holds its title, the disclaimer and "Version: 0.<k>",
+    1.0 once frozen, and nothing else, and `rationale.md` carries the same version. Each committed
+    change before the freeze makes the next 0.<k>, and a revision after a decline or after the owner
+    design review is logged under the candidate with its old and new version. `protocol/evidence.py`
+    reads each record's `design_version` from that line, and the first record that cites a version
+    stores the document as `design-versions/<sha256>.md`, as `spec-versions/` holds the spec
+    (data-model §1); `design_freeze.py create` exits 2 on any other header line, which a test
+    checks.
   - **Components.** The rationale gives the role and the reason of every component: the two
     lanes per node, the coupling function, the vein accumulator, the colour schedule, the local
     linear layer between boxes, the food nodes and their placement, the rotation amounts, the
     round constants, the padding rule, the domain separators, forget, the absorption and output
-    trees, and every component the chosen candidate adds. Each names what it is for: the attack
+    trees, the key shift chain and the nonce chain, the selector at every lane, the start tree with
+    its call-type field, the reset tree that every zeroization trigger drives, the replicated
+    round and phase counters with the constant ROMs they index, and every
+    component the chosen candidate adds. Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's
     `mapping` log entry records it, which the list cites; a component with none is labelled "kept
     for the mapping only", with its cost stated, or is removed, and the mapping chapter restates
-    only each component's place in the metaphor (FR-030).
+    only each component's place in the metaphor (FR-030). The hardware structures among them name
+    their functional need, and the paths that carry secret data, the key chain and the selectors,
+    also the attack class they meet (no read-back, zeroization), fault attacks staying with feature
+    008; the rationale cites the plan's Complexity Tracking for each.
   - **Constants.** Every constant of Π and the mode has its rule and reason: round constants,
     rotation amounts, padding constants and domain separators, the last two in the mode
     chapter.
@@ -1524,8 +1542,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     lanes themselves; for question 4, the cycle structure of Π takes the place of absorbing
     states, covered by the generic bound (research R13, choice R13.2).
   - **Alternatives.** A chapter gives the other family's representative and its score, every
-    candidate not selected with its log entries and reason, the D4 record and the selection
-    record, each cited by record ID.
+    candidate not selected with its log entries and reason, and the records that decided the
+    outcome, each cited by record ID or by path and SHA-256: `d4/choice.json`, `d4/tie.json` and
+    `d4/tie-choice.json` where they exist, every selection record with its tie choice, each
+    decline's log entry and, for each candidate not selected, the entry or record that decided it,
+    so that every reason it gives traces to its record.
   - **Margin.** The margin per claimable size is three numbers, R − R_dist, R − R_bound and
     R / max(R_f, R_b), with the term that set R, and the rationale explains R's growth with n
     (FR-028). It argues Δ = 2 against the single-trail limits of FR-038 as a pre-registered
@@ -1788,7 +1809,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   once the security-target review reads Approved (FR-012), and after the external design review is
   recorded as done or not arranged (D9); the external review is never cited as an evaluation
   (section "Context"). A decline at the owner design review states its reasons and ends in one of: a
-  revision of the design document or rationale (same candidate, new version, review repeated); a fix
+  revision of the design document or rationale (same candidate, new version, logged
+  under the candidate with its old and new version, review repeated); a fix
   that leaves the design unchanged, logged under the candidate; a further candidate within the stop
   rule, only one the rules can select (from the chosen family, or from the other only where the
   declined candidate was selected by the fallback or D4 was not computable, while its family has
@@ -2195,9 +2217,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `phyco-v2`'s seed bound once every target is recovered.
 - **FR-061**: Every evidence record MUST hold the fields of security.md §17.2: a unique
   identifier, which names the record's file by one rule (data-model §1), and
-  the date and time; the model ID, design-document version, `git_head` and
-  `git_dirty`; tool and dependency versions, operating system and hardware; the exact command
-  and configuration, runnable as written (the interpreter by its full path: on Windows the
+  the date and time; the model ID, design-document version, read from the
+  document's version line (FR-034), `git_head` and `git_dirty`; tool and
+  dependency versions, operating system and hardware; the exact command and
+  configuration, runnable as written (the interpreter by its full path: on Windows the
   `python.exe` of the Store distribution's versioned prefix, `sys.executable` with the
   alias resolved, and in WSL `~/.venvs/phycoweb/bin/python`, as research R1
   states; the working directory, which is the repository root; paths relative
@@ -2241,9 +2264,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   review is not independent cryptanalysis (security.md §14), and a security argument drafted by
   an AI tool is a draft for review, not evidence (security.md §2.1 and §16.3; vhdl-genai.md
   §2.5). The final report MUST record who took each role of security.md §16.2 in this feature,
-  and mark every role that was not staffed. Each AI-drafted section of the rationale is
-  recorded in the provenance log with its review status, which the owner design review
-  updates; the frozen text carries no status (FR-034, FR-067).
+  and mark every role that was not staffed. Each AI-drafted section of the rationale is recorded in
+  the provenance log with its review status. A review is a new entry for the same path and section,
+  holding the `seq` of the entry it follows and the SHA-256 of the section text reviewed, and the
+  latest entry for that path and section gives the status, so that no entry changes; the frozen text
+  carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the inverse, bijectivity,
   dependency, bias, symmetry, invariant and bound checks; the check of generated files on each
   platform; the size profile's generic-bound checks and the bound at the limits; eligibility and
@@ -2275,7 +2300,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-067**: Every file of this feature drafted or repaired with an AI tool (design document,
   model, transcription, scripts, tests and reports) MUST be recorded with the tool and model,
   the date, the task ID and its review status, in the feature's evidence (vhdl-genai.md R7;
-  security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section.
+  security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section. The
+  review status is `pending`, `accepted` or `changes-requested`, and a review is a new provenance
+  entry, never a change to an entry or a record (FR-064; data-model §1, §14).
 
 **Claims discipline (security.md §1 and §15; strategy note §3.1 and §10)**
 
@@ -2507,8 +2534,9 @@ means that every measurement is conclusive (its controls did not fire, no tool d
 unresolved and no reproduction that differs from its original on a field that enters a verdict is
 unresolved; FR-053), whatever R_dist it gives, and that R_dist, R_f, R_b and
 R_bound are established at every claimable size; inconclusive bias evidence at a size makes the
-candidate ineligible. Of the eligible candidates of the chosen family, or of the other family if
-the chosen one has none, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's
+candidate ineligible. Of the eligible candidates of the chosen family, or of the other family if the
+chosen one has none, or, where the D4 record's outcome is `not computable`, of both
+families, the one with the smallest R at 4×4 is frozen; a tie goes to the owner's
 recorded choice, made only after the selection record (`selection.json`, or a
 later `selection-<k>.json`) exists, never changed, and recorded beside it, in
 `freeze/selection-tie-choice.json` (`freeze/selection-<k>-tie-choice.json`), which `round_rule.py
@@ -2552,8 +2580,13 @@ fourth `proposed` entry of a family is refused. A later candidate is entered
 only in place of one `rejected` or `ineligible`, one for each such candidate
 while its family has fewer than three evaluated candidates and the budget
 allows, or once after a decline at the owner design review where the rules can
-select it, never because another's R is high, and none after the set closes
-(Eligibility and selection). A change makes a new candidate if it touches the
+select it, never because another's R is high, and none after the set closes (Eligibility and
+selection). The budget allows a replacement while each of its own rows of research R7, at its
+current value after any lowering, holds more than zero hours; "the budget spent", the reason that
+closes a `replacement` entry otherwise, means that a lowered budget left a row of the
+further candidate at zero, which the log writer accepts only when R7's rows
+and the protocol change log's entry that lowered the budget show it, exit 2
+otherwise (data-model §3). A change makes a new candidate if it touches the
 operation list's structure: the nonlinear component, the round structure
 (its operations, their forms or order), the colour schedule, or the rule that generates the
 constants or the rotation amounts. It is a variant or a fix if it changes only values the
