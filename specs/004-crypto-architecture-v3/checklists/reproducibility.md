@@ -684,6 +684,85 @@ and an item is ticked only under the rule in the Notes below.
   §FR-045, §FR-053; research R7; data-model §1 "Reproduction", §4; cli contract "Reproduction",
   `fut_sec8.py`]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK076 Is a writer named for the downloads manifest's entries other than `owner-provided`: the
+  `approved` entries that it holds "from setup on", and the change of an entry to `fetched`, "with
+  its SHA-256, download date and local path", or to `not obtained`, "with the reason"? Records are
+  "written by one module, `protocol/evidence.py`", which keeps a fixed-name file's content under
+  `versions/` before it changes, while the cli contract gives a command for `owner-provided` entries
+  only (`owner_record.py`), although `limits.json` cites each theorem paper "by its `fetched`
+  entry's SHA-256" and `validate_tool.py`'s source guard reads a `fetched` entry. Is it stated that
+  the writer computes the SHA-256 and the size from the downloaded file itself, checked against
+  PyPI's for a wheel ("Each file's SHA-256 is checked against PyPI's after download and recorded"),
+  and that it refuses an entry for a file that no `approved` entry names? [Gap, Spec §FR-046;
+  research R16, R19; data-model introduction, §7, §10; cli contract `owner_record.py`,
+  `validate_tool.py`]
+- [ ] CHK077 Does the generators' fixed order place `gen_constructed_v3.py`? FR-036 says "The
+  generators run in a fixed order, each `--check` passing before the next": the constant tables,
+  then the vectors with `phycoweb/selftest_v3.py`, and only then `Generator`; the cli contract and
+  data-model §11 give the same three steps. The third generator, which writes the constructed-state
+  vectors "from chosen states as well as from development keys" (FR-054) and has its own check
+  (quickstart M3), is in none of them, although it reads the constant tables and, for the edge
+  states that a key reaches, the mode. Is its step stated, after the constant tables' check and, if
+  it runs the mode through `Generator`, after the check that covers `selftest_v3.py`; and is it
+  among "the scripts that generate the constants and the vectors" that the freeze hashes, as its
+  vectors are? [Gap, Consistency, Spec §FR-036, §FR-043, §FR-054; data-model §11, §13; cli contract
+  "Generators of constants and vectors"; quickstart M3]
+- [ ] CHK078 Is it stated through which interface the constructed-state vectors and FR-058's tests
+  reach the mode's edge states? FR-054 asks for "the first and last value of every counter, every
+  output limit reached and one request beyond it", FR-058 tests "a call refused at a per-key
+  limit", and quickstart M5 expects "refusals beyond every limit", while the model contract gives
+  the mode only `Generator` and `ResearchDuplex`, which has "The same calls and rules as
+  `Generator`", so that a counter reaches its last value only through the calls it counts: up to
+  2³² instantiations per key, at about 1 ms per call of Π at 4×4 (research R8), months of calls. Is
+  a research-only way stated to start the mode from a chosen counter value or a chosen state, with
+  `Generator` refusing it, and are the edge states that a feasible run reaches named apart from
+  those covered only from chosen states, so that every such vector and test can be regenerated as
+  written? [Gap, Spec §FR-007, §FR-054, §FR-058; model contract "Research duplex", "Per-key
+  limit"; research R8, R9; quickstart M5]
+- [ ] CHK079 Are the bytes defined that a provenance entry's `sha256` covers? `provenance.py`
+  refuses "a `sha256` that is not that of the named file, the named section's text or the named
+  record", and a review entry holds "the SHA-256 of the section text reviewed", while no passage
+  says where a section's text starts and ends (from its heading to the next heading of the same
+  level or another bound, the heading line included or not, its final LF), and an entry has no hash
+  kind beside its `sha256`, which a record's hashes have ("Every SHA-256 a record holds is recorded
+  beside its kind"), although FR-051 changes security.md and README.md, existing `text=auto` files
+  that research R16 hashes "over its LF-normalized content". Are a section's bounds and each
+  entry's hash kind stated, so that the writer, the review and a later reader compute the same
+  value? [Clarity, Spec §FR-051, §FR-064, §FR-067; data-model §1 "Hashes", §14; research R16; cli
+  contract `provenance.py`]
+- [ ] CHK080 Is the provenance stated of the files drafted with an AI tool before the provenance log
+  exists? FR-067 records "Every file of this feature drafted or repaired with an AI tool" with "the
+  tool and model, the date, the task ID and its review status", and plan phase 1 creates the log,
+  while the spec, the plan, research, the data model, the contracts, the quickstart, the checklists
+  and checklist-choices.md were drafted and repaired with an AI tool over several sessions before
+  it and before any task existed, as are the phase's own files listed before the log, among them
+  `protocol/devinputs_v3.py` and `protocol/evidence.py`; `provenance.py add` takes every field but
+  `seq`, `prev_sha256` and `date_utc`, "which the writer adds". Are these files in FR-067's scope,
+  and if so, which date (the drafting's or the append's), which of several sessions, which
+  `task_id` and which `sha256` (the file at the append, or each committed version) does each entry
+  hold, given that the commits carry no AI co-author line, so that "the history cannot show who
+  wrote" them? [Gap, Coverage, Spec §FR-067, §Review & Approval; data-model §14; plan "Phases and
+  gates"; cli contract `provenance.py`]
+- [ ] CHK081 Is the order of plan phase 1's steps stated where one needs another? The phase lists
+  the Hypothesis wheels "downloaded, checked against PyPI's SHA-256 and installed" before the
+  downloads manifest that holds each file's entry "from setup on", and the environment records
+  before "corrected `requirements.txt`" and `protocol/evidence.py`, while `owner_record.py
+  environment` writes a record "only when its Python and pinned packages match this section and the
+  pins of `requirements.txt` for that platform" (research R1), R18's pins "enter
+  `requirements.txt` only then", after the wheels' install (research R19), FR-058 has "a new
+  environment record" approved once the wheels are installed, which presumes one before them, and
+  `protocol/evidence.py` keeps a fixed-name file's earlier content under `versions/`. Are the
+  dependencies stated, for example the manifest's `approved` entries before any download, the
+  corrected `requirements.txt` before the first environment records, and each writer before the
+  files it writes, so that the tasks can follow them? [Consistency, Spec §FR-058; plan "Phases and
+  gates"; research R1, R18, R19; cli contract `owner_record.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
