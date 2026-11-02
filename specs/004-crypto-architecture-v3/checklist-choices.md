@@ -1055,6 +1055,23 @@ From the sixth re-run, 11 of its 22 rows:
 - **Protocol changes and their directions** (FR-044): PRO-063, PRO-064, PRO-065, PRO-066.
 - **Records and their hashes** (research R16): PRO-065, PRO-066.
 
+Its round's two commits (PRO-061) are 2156dd8 and f9683fc, which applied its last rows, the commit
+that completes its alignment being named here in f9683fc's place once it exists: that commit adds
+`research/004/place_check.py`, the script spec FR-044 names for the comparison, and writes its
+results beside these lists. The comparison over 2156dd8 and f9683fc, made with that script, found a
+row of the round listed under every rule whose place changed, each of the round's six commits
+changing only places under rules that list a row of its own checklist, and the security rows'
+commit, 072394a, none; the check of each row's Changes cell found each row listed under every
+heading whose place it names. The alignment adds that script and edits only this file, which hold no
+such place.
+
+Over every span from the plan-approval commit, 65bcbf2, to 2156dd8 outside the rounds' pairs, the
+comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
+recorded beside the re-run's list above; the span from 285584c to 2156dd8, between the fifth and
+sixth re-runs' pairs, changed no place. Before the tasks approval the script compares every pair and
+span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
+and which the owner confirms in the row "Place check" (PRO-063).
+
 ## After the answer
 
 The options chosen for the 29 rows of the re-run were written into the documents their Changes cells
