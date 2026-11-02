@@ -665,9 +665,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     or the active-S-box counter's equality (R12); a disagreement between
     avalanche counts and dependency matrices (R4); a disagreement between
     two evaluators of one operation list (scalar, batch, C, model); a crash or an undocumented exit
-    status; a reproduction that differs from its original on a field that
-    enters a verdict, in the environment that made the original (R16); or a
-    bug in the tool's code, shown by the faulty line and a test that fails
+    status; a reproduction that differs from its original on a field that enters a verdict, in the
+    environment that made the original (R16); a disagreement of the re-check under the rules in
+    force at a record's entry, or a `recheck` record's reproduction that differs, wherever it ran
+    (R16); or a bug in the tool's code, shown by the faulty line and a test that fails
     before the fix and passes after. It is recorded with that evidence before any re-run
     (data-model §1, `exclusions_and_reruns`). A disliked result is none of these.
   - **Re-runs.** A run may be repeated only after a tool defect is found and recorded: one
@@ -1692,8 +1693,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
     it lists both checks per kind. This re-check is the routine test of User Story 4. It recomputes
     each verdict under the rules in force at the protocol change-log entry its record cites and,
-    where a later stricter change applies (FR-044), also under the current rules, listing both; a
-    disagreement in either is reported. Under the rules in force at a record's entry, it runs the
+    where a later stricter change applies (FR-044), also under the current rules, listing both. A
+    disagreement under the rules in force at a record's entry blocks the candidate as a differing
+    reproduction does: the record's result becomes an unverified hypothesis, `blocked` (spec
+    FR-060), the `recheck` record is a finding, and the disagreement is a tool defect of R7, whose
+    one re-run follows the fix; a disagreement under a later stricter change is that change's
+    recomputed verdict, applied as R7's stricter change and recorded in `results_known`
+    (data-model §18), not a defect; and `round_rule.py --select` reads the `recheck` records beside
+    the `reproduction` records and exits 2 while one holds an unresolved disagreement for a
+    record it cites. Under the rules in force at a record's entry, it runs the
     verdict functions at that record's `git_head`, from a separate worktree of that commit, and
     names each commit, so that a function changed before the freeze is never
     applied to records it did not compute; under the current rules it runs
@@ -1703,7 +1711,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `recheck` record holds the interpreter, platform and full `pip freeze` it ran with, and says
     when that environment is not one of R1's; a reproduction stays in the environment that made its
     original (R1), and a `recheck` record is reproduced by `recheck_004.py --reproduce RECORD`,
-    comparing its verdicts and counts, in any environment, as the re-check runs. Full re-runs
+    comparing its verdicts and counts, in any environment, as the re-check runs; a reproduction of
+    it that differs is a tool defect of `recheck_004.py` wherever it ran,
+    since its verdicts and counts depend on no environment. Full re-runs
     are reproductions (above), listed per kind with their cost: the light
     kinds of R7 always, a heavy kind only on the owner's request, one at a time, as a heavy run
     charged to R7's feature-wide row (FR-045).

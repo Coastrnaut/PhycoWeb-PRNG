@@ -579,11 +579,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   first tool run for any recorded reason, and it still counts towards the stop rule; the log
   writer refuses any other decision (FR-041).
 - **A run is suspected of a tool defect**: a tool defect is one of a failed validation or
-  re-validation; a disagreement between avalanche counts and dependency matrices; a
-  disagreement between two evaluators of one operation list (scalar, batch, C, model); a crash or an
+  re-validation; a failed cross-check between kinds (FR-039); a disagreement
+  between avalanche counts and dependency matrices; a disagreement between two
+  evaluators of one operation list (scalar, batch, C, model); a crash or an
   undocumented exit status; a reproduction that differs from its original on a field that enters a
-  verdict, in the environment that made the original (FR-053); or a bug in
-  the tool's code, shown by the faulty line and by a test that fails before
+  verdict, in the environment that made the original (FR-053); a disagreement of the re-check under
+  the rules in force at a record's entry, or a re-check's reproduction that differs, wherever it ran
+  (FR-065); or a bug in the tool's code, shown by the faulty line and by a test that fails before
   the fix and passes after. It is recorded with that evidence before any
   re-run. A disliked result is none of these.
 - **A tool fails its validation**: none of its results count, no bound from it enters the round
@@ -2335,8 +2337,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   property, with its decision; a `degree` record that raises R_dist is a strong theoretical concern,
   since an argument shows it and no run demonstrates it; a proven bound, or a test that does not
   fire, is "no weakness identified within the analysis performed", with its scope; a reproduction
-  that differs on a field that enters a verdict, and a finding of a tool not yet validated, stay
-  unverified hypotheses, `blocked`; and the demonstration record is a confirmed vulnerability of
+  that differs on a field that enters a verdict, a record whose verdict the re-check, under
+  the rules in force at that record's entry, does not recompute (FR-065),
+  and a finding of a tool not yet validated, stay unverified hypotheses,
+  `blocked`; and the demonstration record is a confirmed vulnerability of
   `phyco-v2`'s seed bound once every target is recovered.
 - **FR-061**: Every evidence record MUST hold the fields of security.md §17.2: a unique
   identifier, which names the record's file by one rule (data-model §1), and
@@ -2413,7 +2417,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   is never applied to records it did not compute, and for the current rules those at HEAD. It
   recomputes each verdict under the rules in force at the protocol change-log entry its
   record cites and, where a later stricter change applies (FR-044), also under the current rules,
-  both listed; a disagreement in either is reported. It is exempt from the environment guard, since
+  both listed. A disagreement under the rules in force at a record's entry blocks the candidate as a
+  differing reproduction does: the record's result becomes an unverified hypothesis, `blocked`
+  (FR-060), the `recheck` record is a finding, and the disagreement is a tool defect (edge cases),
+  whose one re-run follows the fix; a disagreement under a later stricter change is that change's
+  recomputed verdict, applied as a stricter change (FR-044) and recorded in the change log's
+  `results_known`, not a defect; selection waits while a disagreement of the first kind is
+  unresolved for a record it cites (data-model §9); and a `recheck` record's reproduction that
+  differs is a tool defect of the re-check wherever it ran, since its verdicts and counts
+  depend on no environment. It is exempt from the environment guard, since
   it recomputes verdicts from committed counts by exact integer arithmetic (data-model §5) and
   imports only the standard library and those `protocol/` modules that do the same, which a test
   checks; its `recheck` record holds the interpreter, platform and full `pip freeze` it ran with,

@@ -101,7 +101,7 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants and constructed states with their generator runs and checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost`, `recheck` and `lock-cleared` records, the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| No finding: vectors, constants and constructed states with their generator runs and checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
 | A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
 | A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
 | A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
@@ -110,6 +110,7 @@ the class.
 | A test that does not fire | `no weakness identified within the analysis performed`, with its scope |
 | A reproduction that differs on a field that enters a verdict | `unverified hypothesis`, with `status` `blocked` until it is resolved (Reproduction, below) |
 | A reproduction that differs only in the p-values, which decide no verdict | `none`: a finding about the run's reproducibility, reported, which blocks nothing |
+| A `recheck` record with a disagreement under the rules in force at a record's entry | `unverified hypothesis` for that record's result, with `status` `blocked` until it is resolved, the disagreement being a tool defect (Re-check records, below) |
 | A finding of a tool not yet validated | `unverified hypothesis`, with `status` `blocked` |
 | The demonstration record (section 4) | `confirmed vulnerability` of `phyco-v2`'s seed bound once every target is recovered; a disagreement in its match counts is an `unverified hypothesis` until the FUT-SEC-8 result review |
 
@@ -151,7 +152,14 @@ the class.
   entry and HEAD for the current rules (research R16), and holds in place of
   `environment` the interpreter, the platform and the full `pip freeze` it
   ran with, and says when that environment is not one of research R1's: the re-check is exempt from
-  the environment guard (cli contract).
+  the environment guard (cli contract). A disagreement under the rules in force at a record's entry
+  blocks the candidate as a differing reproduction does: the record's result becomes an unverified
+  hypothesis, `blocked` (spec FR-060), the `recheck` record is a finding, and the disagreement is a
+  tool defect of research R7, whose one re-run follows the fix; a disagreement under a later
+  stricter change is that change's recomputed verdict, applied as research R7's stricter change and
+  recorded in `results_known` (section 18), not a defect. A reproduction of a `recheck` record that
+  differs is a tool defect of `recheck_004.py` wherever it ran, since its verdicts and counts depend
+  on no environment.
 - **Reproduction.** A reproduction of a record is run by its script's `--reproduce RECORD` mode (cli
   contract), `fut_sec8.py`'s for a demonstration record included, in a separate worktree of the
   original's `git_head`, the code files of its `code_sha256` checked against that commit's blobs, so
@@ -175,7 +183,7 @@ the class.
   that made the original (below), it is a tool defect of research R7, whose one re-run is a new
   measurement in the original's row and raises R by the round rule if it fires; a difference in the
   p-values, which decide no verdict, makes the outcome `differs` and blocks nothing.
-  `round_rule.py` reads the `reproduction` records of the candidate's records
+  `round_rule.py` reads the `reproduction` and `recheck` records of the candidate's records
   (section 9). It compares these fields with the original and reports every other
   field only: `kind`, `model_id`, `variant_id`, each source file's entry in `code_sha256`, `inputs`,
   each deterministic output's `sha256` and `bytes` (not its path), `exit_status`, `assertions`,
@@ -378,7 +386,7 @@ proposed ─► entered-d4 ─► scored ─┐       (only candidates entered b
 | `model_sha256` | `1260142d…` for `phycoweb/model_v2.py`, checked |
 | `report` | the nine items of security.md §12.4, with T1 as the attacker |
 | `supersedes`, `defect` | in a repeat after a tool defect, the earlier record's ID and the ID of the recorded defect it follows (cli contract, `fut_sec8.py`); `none` in the first record |
-| `owner_request` | in a repeat after a tool defect, the owner's request, quoted with its date, without which the repeat exits 2, the repeat being a heavy run charged to research R7's feature-wide row (cli contract, `fut_sec8.py`); `none` in the first record |
+| `owner_request` | in a repeat after a tool defect, the owner's request, quoted with its date, without which the repeat exits 2, the repeat being a heavy run charged to research R7's feature-wide row (cli contract, `fut_sec8.py`); `none` in the first record. It is the repeat's request: a reproduction's, `fut_sec8.py --reproduce` being a heavy run too, is kept in its `reproduction` record (section 1) |
 
 Each record is named by its `record_id`, which begins with `demonstration`, so that a repeat after a
 defect writes beside the first, which stays; a run exits 2 while a record exists and no new defect
@@ -644,7 +652,10 @@ formats, call sequence and zeroization rules are properties of the mode, the sam
 candidate, decided once in the mode chapter, and the self-test's expected output (FR-018) is
 generated from the selected candidate's vectors and cannot fail. A missing item fails eligibility,
 and so does a `reproduction` record of one of the candidate's records that differs on a field that
-enters a verdict, until a re-run after a recorded tool defect resolves it (section 1; research R7).
+enters a verdict, or a `recheck` record that disagrees with one of them under the rules in force at
+its entry, until a re-run after a recorded tool defect resolves it (section 1; research R7);
+`round_rule.py --select` reads the `recheck` records beside the `reproduction` records and
+exits 2 while one holds an unresolved disagreement for a record it cites.
 The record at every claimable size is an eligible candidate's final decision (section 3); a
 candidate of the family D4 did not choose gets it at the production width only if the chosen family
 ends with no eligible candidate, and is otherwise `ineligible` (spec "Nonlinearity choice rule").
@@ -1018,8 +1029,10 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 A change applies to every candidate, those already evaluated included. Every record cites the log's
 last entry when its run started (`protocol_seq`, `protocol_line_sha256`; section 1), and
 `recheck_004.py` recomputes each verdict under the rules in force at that entry and, where a later
-stricter change applies, also under the current rules, listing both; a disagreement in either is
-reported. The log's first entries, written when it is created, are the answered rows of every
+stricter change applies, also under the current rules, listing both; a disagreement under the rules
+in force at the entry blocks the candidate and is a tool defect, and one under a later stricter
+change is that change's recomputed verdict, recorded in `results_known` (section 1, Re-check
+records). The log's first entries, written when it is created, are the answered rows of every
 checklist round answered before the log is created, by the lists "Rows that change the protocol" of
 [checklist-choices.md](./checklist-choices.md), in round order: one entry per listed row, whose
 applied change altered the text of a pre-registered rule, whatever its kind, the 70 rows tagged

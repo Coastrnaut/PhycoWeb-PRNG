@@ -190,7 +190,7 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8
             [--repeat-after-defect ID --owner-request "WORDS (DATE)"]
 fut_sec8.py --verify RECORD
-fut_sec8.py --reproduce RECORD --binary fast/build/seed_search
+fut_sec8.py --reproduce RECORD --binary fast/build/seed_search --owner-request "WORDS (DATE)"
 ```
 
 Takes the targets from `protocol.seedsets.load("dev", allow=("dev",))[:3]`, computes the
@@ -212,7 +212,11 @@ its ID, so that every earlier record stays reproducible:
 - `--verify RECORD` re-checks every listed three-word match and every recovered seed with
   `model_v2`, in seconds, with no sweep. Exit 1 on any disagreement.
 - `--reproduce RECORD` is allowed only after the FUT-SEC-8 result review, and exits 2 before
-  it. It re-runs the sweep as a heavy run and writes a `reproduction` record
+  it. It re-runs the sweep, a heavy run of about 2³² × 257 steps per target,
+  only with `--owner-request "WORDS (DATE)"`, the owner's request quoted
+  with its date, which its `reproduction` record keeps, and exits 2 without
+  one; it takes the lock, projects first and is charged to research R7's
+  feature-wide row, as the introduction states. It writes a `reproduction` record
   under `$REP/reproductions/<record_id>/<n>/`, its outputs placed as the
   introduction describes, taking no `--out-dir`, compared field by field with the
   original under data model §1's rule: the demonstration's fields listed
@@ -363,8 +367,11 @@ the operation list's declarations, checked by code; FR-027's semantics from the
 operation list's declarations; FR-030's mapping from its `mapping` log entry.
 FR-025's interface formats, call sequence and zeroization rules are the mode's,
 decided once in the mode chapter. A missing item fails eligibility, and so does a `reproduction`
-record of one of the candidate's records that differs on a field that enters a verdict, until a
-re-run after a recorded tool defect resolves it (data model §1). Any change before the freeze that
+record of one of the candidate's records that differs on a field that enters a verdict, or a
+`recheck` record that disagrees with one of them under the rules in force at its entry, until a
+re-run after a recorded tool defect resolves it (data model §1, §9); `--select` reads the `recheck`
+records beside the `reproduction` records and exits 2 while one holds an
+unresolved disagreement for a record it cites. Any change before the freeze that
 touches any candidate's eligibility or R at 4×4 after a selection record exists makes `--select` run
 again over the whole set and write the next record, `selection-<k>.json`, k = 2, 3, …, citing the
 previous one by path and SHA-256; earlier records stay. After a decline at the owner design review
@@ -538,7 +545,13 @@ environment.
 
 It recomputes each verdict under the rules in force at the protocol change-log entry its record
 cites and, where a later stricter change applies (FR-044), also under the current rules; both are
-listed, and a disagreement in either is reported. A cited file kept under a fixed name is resolved
+listed. A disagreement under the rules in force at a record's entry is a finding: the record's
+result becomes an unverified hypothesis, `blocked` (spec FR-060), until it is resolved, and the
+disagreement is a tool defect of research R7, whose one re-run follows the fix; one under a later
+stricter change is that change's recomputed verdict, applied as a stricter change and recorded in
+the change log's `results_known` (data model §18), not a defect. A reproduction of a `recheck`
+record that differs is a tool defect of this script wherever it ran, since its verdicts and counts
+depend on no environment. A cited file kept under a fixed name is resolved
 from its `versions/` (data model introduction). Under the rules in force at a record's entry it runs
 the verdict functions at that record's `git_head` (below), and under the current rules those at
 HEAD.
