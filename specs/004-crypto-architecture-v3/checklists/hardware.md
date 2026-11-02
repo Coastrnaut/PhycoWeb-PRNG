@@ -222,7 +222,7 @@ Items found when the checklist was run a third time, over the complete documents
 repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
 every other item; the reviewer ticks them.
 
-- [ ] CHK043 Does FR-026's implied throughput, "the lesser of r/(P·R) bits per cycle and the
+- [x] CHK043 Does FR-026's implied throughput, "the lesser of r/(P·R) bits per cycle and the
   interface's bits per cycle", agree with FR-025's flow control, under which "the next call starts
   only after the consumer has taken the block", so that draining a block never overlaps the next
   call of Π? At 4×4 with R = 32, P = 2 and a 32-bit interface, a block then takes 64 + 24 cycles,
@@ -230,14 +230,14 @@ every other item; the reviewer ticks them.
   and research R5, and data-model §10's `throughput_implied`, overstate the rate unless the drain is
   counted in the formula or allowed to overlap the next call. [Conflict, Spec §FR-025 "Flow
   control", §FR-026; research R5; data-model §10]
-- [ ] CHK044 Is FUT-HW-2's clock, "Target ≥ 200 MHz, from the 100 MHz oscillator through an MMCM",
+- [x] CHK044 Is FUT-HW-2's clock, "Target ≥ 200 MHz, from the 100 MHz oscillator through an MMCM",
   reconciled with FUT-HW-1's "no instantiated vendor primitives", the hardware note's R2 and R8 and
   Principle III's vendor-neutral RTL, for example by a board wrapper in feature 008 that holds the
   clocking primitive outside the core, whose clock is then an input, given that FR-025 says only
   that "the clock uses the device's clock network" and that no requirement carries this split to
   feature 006 or 008? [Conflict, Spec §FR-025 "Key loading and reset"; FUT-HW-1, FUT-HW-2; hardware
   note R2, R8; constitution Principle III]
-- [ ] CHK045 Is the zeroization at a per-key limit timed one way throughout FR-025, whose list of
+- [x] CHK045 Is the zeroization at a per-key limit timed one way throughout FR-025, whose list of
   triggers names "a per-key limit reached" while its list of paths, like the model contract, has "a
   call refused at a per-key limit" zeroize, so that the RTL zeroizes at the first call that would
   pass the limit and not as soon as a counter reaches it; and can the host tell from the ports which
@@ -245,14 +245,14 @@ every other item; the reviewer ticks them.
   of sequence, any other limit), given one error signal and FR-020's single formula for "a refused
   request"? [Consistency, Spec §FR-025 "Zeroization", §FR-020; model contract "Per-key limit",
   "Failure paths"]
-- [ ] CHK046 Is the one-block output buffer the "output register" that zeroization clears, and is
+- [x] CHK046 Is the one-block output buffer the "output register" that zeroization clears, and is
   it, with the registers of both trees, required to be cleared when a request ends, with or before
   its forget call, so that neither the last block delivered nor the discarded rest of a partial last
   block stays in the core between calls, given that FR-004's backtracking resistance holds across
   each forget call, that FR-008 lists every output block delivered as an asset, and that FR-025
   names the clearing of these registers only among zeroization's effects? [Gap, Spec §FR-025 "Flow
   control", "Zeroization", §FR-004, §FR-008]
-- [ ] CHK047 Is the path by which a zeroization other than reset (an explicit zeroize, a failed
+- [x] CHK047 Is the path by which a zeroization other than reset (an explicit zeroize, a failed
   self-test, an error path, a per-key limit) reaches every node, both trees, the buffer and the
   replicated counters specified, for example through the reset's registered fan-out tree, with the
   latency that each trigger's figure counts; where the call types draw on distinct constant streams,
@@ -260,63 +260,63 @@ every other item; the reviewer ticks them.
   signals the plan's Complexity Tracking justifies, which names only the trees, the clock, reset,
   the start signal and the counters? [Gap, Spec §FR-025 "Zeroization", §FR-018, §FR-023; plan
   "Complexity Tracking"; constitution Principle III]
-- [ ] CHK048 Is the hardware path that places the key and the nonce at their stated positions in the
+- [x] CHK048 Is the hardware path that places the key and the nonce at their stated positions in the
   initial state at every instantiate (FR-013) specified: where the key register sits, how its bits
   and the nonce reach the lanes that hold them, for example a register at each node loaded once
   along neighbour links or a registered tree, and with what latency in the key-loading and
   instantiate figures; and is that path justified in Complexity Tracking, given that FR-018's
   registered trees run over the rate lanes only? [Gap, Spec §FR-013, §FR-018, §FR-025 "Key loading
   and reset"; plan "Complexity Tracking"; constitution Principle III]
-- [ ] CHK049 Is the hardware call sequence specified as a whole, including the states the model has
+- [x] CHK049 Is the hardware call sequence specified as a whole, including the states the model has
   no counterpart for (no key held, after reset or a zeroization; a key held and no instantiate yet),
   with the calls each state accepts and the response to every other call, among them a key load
   while a key is held and an instantiate with no key, so that the RTL's refusals match the model's
   `CallSequenceError` rules and feature 008 can test FUT-HW-5's "key zeroization on reset" from the
   ports, without a read-back path? [Gap, Spec §FR-025 "Key loading and reset", "Usage rules across
   resets"; model contract "Call sequence"; FUT-HW-5]
-- [ ] CHK050 Is it stated that the start-up self-test's output stays inside the core, compared there
+- [x] CHK050 Is it stated that the start-up self-test's output stays inside the core, compared there
   and never driven on the output port, with output-valid low throughout and the comparator taking
   each block at once, given that FR-025 keeps output-valid low after reset only "until an
   instantiate completes", that the self-test runs an instantiate (FR-059), and that the next call
   starts only after a consumer has taken the block? [Clarity, Spec §FR-059, §FR-025 "Zeroization",
   "Flow control"]
-- [ ] CHK051 Is the core's behaviour between FPGA configuration and the first reset specified, for
+- [x] CHK051 Is the core's behaviour between FPGA configuration and the first reset specified, for
   example every register's initial value zero, output-valid low and every call refused until a reset
   has run the self-test, given that reset is synchronous, that the self-test is a step of the reset
   sequence (FR-059), and that a device configured but never reset would otherwise run without it?
   [Gap, Edge Case, Spec §FR-025 "Key loading and reset", §FR-059]
-- [ ] CHK052 Is the counting rule of FR-020's cycle formulas stated for the input interfaces as well
+- [x] CHK052 Is the counting rule of FR-020's cycle formulas stated for the input interfaces as well
   as the output, so that the cycles in which the core waits for the host's data during key loading,
   a personalization string or a reseed input are excluded as the consumer's stalls are, given that
   "counting the cycles with ready high" excludes a consumer's stall on output but, on an input,
   where ready is the core's own signal, still counts its waiting; and can feature 008 then compare a
   measured count with its formula whatever pace the host keeps? [Measurability, Spec §FR-020,
   §FR-025 "Flow control"; FUT-HW-5]
-- [ ] CHK053 Are the data formats of the key-loading and absorption interfaces stated (the bits per
+- [x] CHK053 Are the data formats of the key-loading and absorption interfaces stated (the bits per
   transfer, how the core learns the length in bytes of a personalization string or a reseed input
   before it pads it, and the value of the unused bits in a last partial word), and is the hardware's
   rule for a request length that is not a whole number of output words stated, as the model refuses
   an `nbits` that is not a positive multiple of 32? [Gap, Spec §FR-025 "Flow control", §FR-014,
   §FR-020; model contract "Output"]
-- [ ] CHK054 Does FR-026's LUT and flip-flop estimate count what FR-025 and FR-059 add beside the
+- [x] CHK054 Does FR-026's LUT and flip-flop estimate count what FR-025 and FR-059 add beside the
   nodes, trees and ROMs: the one-block output buffer (r bits, 16,128 at 16×16, nearly as many as the
   16,384 state flip-flops) with its read-out to the interface width, the key register and the
   key-loading buffer, the replicated round and phase counters, the limit counters, and the
   self-test's stored key, nonce and expected output; and is block RAM estimated as well, since
   FUT-HW-2 asks for "LUT/FF/BRAM use"? [Completeness, Spec §FR-026, §FR-025 "Flow control", §FR-059;
   FUT-HW-2; research R5]
-- [ ] CHK055 Is P, the number of phases in a round, defined as the number of colours (two for even
+- [x] CHK055 Is P, the number of phases in a round, defined as the number of colours (two for even
   n, three for odd n) or as the number of phases in the candidate's operation list, which could
   visit a colour twice, for example to fit a 2w-bit ARX-box with more than two serial additions into
   stages of at most two carry chains; and do the cycle formulas, r/(P·R) and the cost per output bit
   then use that one P per candidate and size? [Clarity, Spec §FR-025 "Stages", §FR-026, §FR-019;
   research R5, R11]
-- [ ] CHK056 Is the stated three-colour rule for odd n required to give a proper colouring of the
+- [x] CHK056 Is the stated three-colour rule for odd n required to give a proper colouring of the
   torus, its wrap-around links included, at every odd n the generics cover, and is that checked at
   each, given that a rule as simple as (i + j) mod 3 gives two neighbours across the wrap the same
   colour at n = 7 and 13, and that among the odd sizes only 3×3 can get vectors in this feature?
   [Edge Case, Spec §FR-018, §FR-019, §Edge Cases "Odd grid sizes"; FUT-GRID-1; research R14]
-- [ ] CHK057 Are FUT-HW-3's power measurement, through the board's VCCINT current sensor and the
+- [x] CHK057 Are FUT-HW-3's power measurement, through the board's VCCINT current sensor and the
   XADC beside the Vivado estimate, and its on-chip counters of words per second carried to feature
   008, given that the traceability table's FUT-HW-3 row names only the implied throughput and
   "Measurement open for features 006 and 008"? [Coverage, Spec §Security Policy traceability

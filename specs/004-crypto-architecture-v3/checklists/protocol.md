@@ -220,7 +220,7 @@ Items found when the checklist was run a third time, over the complete documents
 repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
 every other item; the reviewer ticks them.
 
-- [ ] CHK041 Do the spec's Assumptions agree with constitution 1.3.0, which gives the agent a
+- [x] CHK041 Do the spec's Assumptions agree with constitution 1.3.0, which gives the agent a
   standing authorization for local commits, given that they still read "Only the owner commits,
   pushes or publishes (Principle IX)", "Constitution: 1.2.0 applies" and "constitution 1.2.0 does
   not require an external design review", and describe AI assistance "as in features 001–003" by
@@ -228,7 +228,7 @@ every other item; the reviewer ticks them.
   Constitution Check IX say the agent commits locally under that authorization; and does any
   document of the feature name 1.3.0? [Conflict, Spec §Assumptions; plan "Technical Context",
   "Constitution Check"; security.md §16.1; constitution IX]
-- [ ] CHK042 Is it stated which acts stay the owner's own under constitution 1.3.0's standing
+- [x] CHK042 Is it stated which acts stay the owner's own under constitution 1.3.0's standing
   authorization, as its Governance keeps constitution amendments out of it: the freeze's step (1)
   "the owner commits the feature files (Principle IX)", step (3) `design_freeze.py approve`, "run
   by the owner", and step (4) "the owner commits the record", and the owner's approval of a
@@ -237,7 +237,7 @@ every other item; the reviewer ticks them.
   NAME` takes any name and that a change-log entry's `approver` is a field its writer fills in?
   [Gap, Spec §FR-043, §FR-044; data-model §13, §18; research R16; cli contract
   `design_freeze.py`; constitution IX]
-- [ ] CHK043 Does the Pre-registered Design Protocol's "Development inputs" rule, which names "a
+- [x] CHK043 Does the Pre-registered Design Protocol's "Development inputs" rule, which names "a
   closed class of constructed inputs" with four members, agree with FR-039, FR-040, research R3 and
   data-model §2, which add class 5, the bias tool's synthetic counts drawn by numpy's PCG64 from
   seeds hashed from public strings (the settled answer REP-029), given that this paragraph is the
@@ -245,7 +245,7 @@ every other item; the reviewer ticks them.
   change-log entry for REP-029 records the rule's old and new text? [Consistency, Spec
   §Pre-registered Design Protocol "Development inputs", §FR-039, §FR-040; research R3; data-model
   §2, §18]
-- [ ] CHK044 Can the owner's tie choice be "recorded in that record" (`d4/tie.json`, or
+- [x] CHK044 Can the owner's tie choice be "recorded in that record" (`d4/tie.json`, or
   `selection.json` for a selection tie) while its Review & Approval row cites "the SHA-256 of the
   record the owner saw", given that writing the choice into the record changes that hash, that
   `d4_choice.py --tie` writes `tie.json` once and exits 2 if it exists, and that no command writes
@@ -253,35 +253,35 @@ every other item; the reviewer ticks them.
   file holds the choice and how its hash relates to the one the owner saw? [Conflict, Spec
   §Pre-registered Design Protocol "Nonlinearity choice rule", "Eligibility and selection",
   §Review & Approval; data-model §8, §9; cli contract `d4_choice.py`, `round_rule.py`]
-- [ ] CHK045 Do the Review & Approval rows for the checklist choices ("The checklists are re-read
+- [x] CHK045 Do the Review & Approval rows for the checklist choices ("The checklists are re-read
   against the changed text; ticking stays with the reviewer") agree with how the six checklists
   were ticked on 2026-11-01, when the owner asked the agent to verify every item and tick each one
   that holds; and is it recorded who ticked each item, on whose instruction, and whether the tasks
   approval includes the owner's review of the agent's ticks, so that a ticked item shows the
   reviewer's determination that each checklist's Review Ownership note requires? [Consistency,
   Spec §Review & Approval; checklists "Review Ownership"; constitution VIII]
-- [ ] CHK046 Is "or the candidate is dropped" in the edge case "A distinguisher on more rounds turns
+- [x] CHK046 Is "or the candidate is dropped" in the edge case "A distinguisher on more rounds turns
   up before the freeze" limited to the rules' reasons, given that the edge case "A candidate is to
   be dropped for a reason the rules do not name" says it cannot be and that FR-041's log writer
   refuses any decision but `rejected` or `ineligible` for a failed test, a failed eligibility item
   or a spent budget; and is it stated which of these a raised R leads to, for example `ineligible`
   when a budget row cannot hold the measurements the raised R needs? [Conflict, Spec §Edge Cases,
   §FR-041; data-model §3]
-- [ ] CHK047 Is it stated how the protocol changes of checklist rounds after the first two are
+- [x] CHK047 Is it stated how the protocol changes of checklist rounds after the first two are
   recorded, given that the change log's first entries are the answered rows "of both runs of
   2026-11-01" (data-model §18; plan "Values this plan fixes"), "fixed by row ID before the log is
   created", while this re-run's items may be answered before the log exists; and is it stated
   where that list of row IDs is written down, with each Add, Align and Clarify row that altered a
   pre-registered rule named, and who approves it before the log is created? [Gap, data-model §18;
   plan "Values this plan fixes", phase 1; Spec §FR-044, §Clarifications]
-- [ ] CHK048 Is the moment of the D4 choice fixed by a condition that `d4_choice.py` checks, given
+- [x] CHK048 Is the moment of the D4 choice fixed by a condition that `d4_choice.py` checks, given
   that research R6 computes it "after every candidate entered for it has been scored", that the
   width (16 or else 8) and r* depend on which bounds exist when it runs, and that the cli contract
   has it refuse only when `choice.json` exists or no entered set is recorded; and is it stated
   when the choice proceeds if an entered candidate cannot be scored, for example because a
   reduced-width search reached its 8 h cap? [Gap, Spec §Pre-registered Design Protocol
   "Nonlinearity choice rule"; research R6, R7; cli contract `d4_choice.py`; data-model §8]
-- [ ] CHK049 Is it stated when the candidate set closes and `round_rule.py --select` applies
+- [x] CHK049 Is it stated when the candidate set closes and `round_rule.py --select` applies
   selection and the stop rule (once every family has three evaluated candidates, at a recorded
   decision, or whenever it is run), given that the edge cases let the feature "try another
   candidate within the stop rule's budget or recommend stopping", and try "a different candidate"

@@ -211,13 +211,13 @@ Items found when the checklist was run a third time, over the complete documents
 repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
 every other item; the reviewer ticks them.
 
-- [ ] CHK045 Do FR-050, FR-069's rules and SC-015 cover the other words constitution Principle IV
+- [x] CHK045 Do FR-050, FR-069's rules and SC-015 cover the other words constitution Principle IV
   forbids beyond what committed evidence supports, "random" and "high-entropy" said of the
   generator, beside "secure" and "cryptographically secure", with the uses that stay allowed named
   (the project's name, PhycoWeb-PRNG; Π as a random permutation in a bound; random nonces; the
   random baseline), so that the claim-register test can tell a description of the generator from
   those uses? [Gap, Spec §FR-050, §FR-069, §SC-015; constitution IV]
-- [ ] CHK046 Is the reach of "near a standard's name" and "beside the model" defined (the same
+- [x] CHK046 Is the reach of "near a standard's name" and "beside the model" defined (the same
   line, sentence or table row, as it is for the word "target"), and is it stated whether a rule's
   own text passes of itself ("outside the rules that forbid it") or only through an allow-list
   entry ("a flagged line passes only through an allow-list entry"), given lines that are neither a
@@ -226,19 +226,19 @@ every other item; the reviewer ticks them.
   discipline" in a sentence about the model, and, if security.md is within the scan, its §6 rows
   "Approved DRBG mechanisms" and "NIST FIPS 140-3 | Approved March 2019"? [Clarity, Spec §FR-011,
   §FR-025, §FR-069; data-model §15 `allow_list`; security.md §6]
-- [ ] CHK047 Is it stated who records an approval in the Review & Approval table and commits it,
+- [x] CHK047 Is it stated who records an approval in the Review & Approval table and commits it,
   and whether a guard that reads a row, such as the "Order of US1" guard's "FUT-SEC-8 result
   review" row, reads the spec as committed at HEAD, as `repair_log.py` does, or the working tree,
   given that under constitution 1.3.0 the agent may commit and its commits carry no AI co-author
   line, so that the history alone cannot show whether the owner or the agent wrote and committed
   the row that opens the key-loading gate? [Gap, cli contract "Order of US1", `repair_log.py`;
   Spec §Review & Approval, §FR-001, §FR-003; constitution IX]
-- [ ] CHK048 Is security.md §15's gate for L1, "spec approval", aligned with FR-012, which records
+- [x] CHK048 Is security.md §15's gate for L1, "spec approval", aligned with FR-012, which records
   L1 in a row of its own once FUT-SEC-8 and the design document's security-target chapter have
   been reviewed, given that the spec was approved on 2026-11-01 with L1 unrecorded and that the
   ladder's own evidence column asks for "FUT-SEC-8 done", which cannot hold at spec approval?
   [Conflict, security.md §15; Spec §FR-012, §Review & Approval "L1 recorded"; data-model §17]
-- [ ] CHK049 Is the time of the security-target review stated (a phase of the plan, and whether it
+- [x] CHK049 Is the time of the security-target review stated (a phase of the plan, and whether it
   is part of the owner design review or held before it), given that it cites the records of
   FUT-SEC-5's measured part, diffusion through instantiation (FR-029) and research R4's first-order
   related-key and related-nonce differences, which exist only once candidates with key loading
@@ -246,21 +246,21 @@ every other item; the reviewer ticks them.
   candidates of phase 5, and FR-011 closes the functionality class at the same review?
   [Ambiguity, Spec §FR-011, §FR-012, §Security Policy traceability; plan "Phases and gates" 4, 5
   and 8; data-model §15]
-- [ ] CHK050 Is the effect of FR-016's exception, "unless it comes from a validated SP 800-90B
+- [x] CHK050 Is the effect of FR-016's exception, "unless it comes from a validated SP 800-90B
   source", stated, given that FR-009 and data-model §10 count a reseed input as never secret
   "even from a secret source", that the edge case treats a reseed without a validated source as
   attacker-chosen, that D7 seeks no prediction resistance and that this feature has no validated
   source, or is the exception removed, so that every reseed input is chosen by the attacker?
   [Consistency, Spec §FR-009, §FR-016, §Edge Cases "Reseed without a validated entropy source";
   data-model §10]
-- [ ] CHK051 Does the threat model adopt with a bound, or exclude with a reason (FR-008), the
+- [x] CHK051 Does the threat model adopt with a bound, or exclude with a reason (FR-008), the
   quantum generic attacks beyond single-key Grover search that T11's "quantum queries where the
   oracle allows them" opens, such as multi-target quantum key search over u keys, which some cost
   models put at about 2^((k − log₂ u)/2), below 2^s for every u > 1 at k = 256 and s = 128, and
   quantum attacks on the capacity through queries to the public Π, given that FR-010's only
   quantum check, k/2 ≥ s, holds with equality? Is security.md §12.2's "A 256-bit key keeps a
   margin" aligned with that equality? [Gap, Spec §FR-008, §FR-010; security.md §5 T11, §12.2]
-- [ ] CHK052 Is security.md required to name constitution 1.3.0 where it states the version that
+- [x] CHK052 Is security.md required to name constitution 1.3.0 where it states the version that
   governs it (the header's "v1.2.0, specifically the Security Policy and Principles IV, V, VIII
   and IX", §4's "(version 1.2.0) applies", §18's tree and §22's stage 1, "Done (constitution
   1.2.0; this document 2.12)"), since 1.3.0 amended Principle IX, which the header names, and is

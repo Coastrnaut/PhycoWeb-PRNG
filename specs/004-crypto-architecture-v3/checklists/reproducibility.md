@@ -217,7 +217,7 @@ Items found when the checklist was run a third time, over the complete documents
 repository, after the re-run's answers of 2026-11-01 and constitution 1.3.0. They are open like
 every other item; the reviewer ticks them.
 
-- [ ] CHK035 Is it stated how a reproduction of a record other than the FUT-SEC-8 demonstration runs
+- [x] CHK035 Is it stated how a reproduction of a record other than the FUT-SEC-8 demonstration runs
   and what it writes, given that only `fut_sec8.py` has a `--reproduce` mode, that `evidence_v3.py`
   writes a record and appends an `evidence` entry to the candidate log on every run, that research
   R7 allows a run to be repeated only after a recorded tool defect, once per kind and inside the
@@ -227,7 +227,7 @@ every other item; the reviewer ticks them.
   original, appends nothing to the candidate log, charges no budget row and is not a re-run?
   [Conflict, Spec §User Story 4 Independent Test, §FR-053, §FR-061; research R7, R16; data-model §1;
   cli contract `evidence_v3.py`, `fut_sec8.py`]
-- [ ] CHK036 Is the set of light kinds stated, given research R7's rule that a heavy run is any run
+- [x] CHK036 Is the set of light kinds stated, given research R7's rule that a heavy run is any run
   of a kind R7 budgets, which covers every kind `evidence_v3.py` writes, down to the inverse test on
   16 inputs, or any run with more than one worker, while User Story 4, research R16 and FR-061's
   test re-run "the light kinds" and "one light command of each kind"; and can FR-053's test, which
@@ -236,7 +236,7 @@ every other item; the reviewer ticks them.
   lock, and that the test suite runs it every time quickstart P0 runs? [Conflict, Spec §FR-045,
   §FR-053, §FR-061, §User Story 4 Independent Test; research R7, R16; plan "Project Structure";
   quickstart P0]
-- [ ] CHK037 Is it stated which rule applies to a `p_values` file written as gzip-compressed JSON,
+- [x] CHK037 Is it stated which rule applies to a `p_values` file written as gzip-compressed JSON,
   which data-model §1 allows, given that the reproduction rule compares a `.gz` file by its
   `uncompressed_sha256`, which needs identical p-values and makes any difference a failed
   comparison, and a `p_values` file within a relative tolerance of 10⁻⁶, listing any outside it, and
@@ -244,7 +244,7 @@ every other item; the reviewer ticks them.
   research R1; and is the tolerance defined where the plain ratio fails, for example a p-value of 0
   in one environment beside a subnormal one in the other, and relative to which of the two values?
   [Conflict, data-model §1 "Reproduction", §5 "Exact verdicts"; research R4, R16; Spec §FR-053]
-- [ ] CHK038 Are the fields of each kind that a reproduction compares listed apart from those it
+- [x] CHK038 Are the fields of each kind that a reproduction compares listed apart from those it
   only reports, given that data-model §1 compares "the fields of its kind" and every output's
   `sha256` and `bytes`, while the demonstration's `cost` holds seconds and steps per second, every
   heavy record holds its projected and used hours and its measured speed (research R7), a bound
@@ -253,7 +253,7 @@ every other item; the reviewer ticks them.
   "field by field" ends in a finding and exit 1, and FR-053's "searches and solver runs reproduce
   their values and verdicts" cannot be met? [Consistency, data-model §1 "Reproduction", §4, §6;
   research R7; Spec §FR-053, §FR-061; cli contract `fut_sec8.py`]
-- [ ] CHK039 Is `design_sha256` compared only for the kinds whose code reads the design document,
+- [x] CHK039 Is `design_sha256` compared only for the kinds whose code reads the design document,
   such as `gen_constants_v3.py`, which checks the document's restatement of the constant rule, given
   that data-model §1's comparison includes it for every record, that it is `none` for records made
   before the document exists, the FUT-SEC-8 demonstration and the tool validations on `phyco-v2`
@@ -261,7 +261,7 @@ every other item; the reviewer ticks them.
   reproduction, allowed only after the result review, and any reproduction after an edit to the
   document fail on a field their runs never read? [Consistency, data-model §1 "Reproduction", §4,
   §17 "Design document"; Spec §FR-053; research R15; cli contract `fut_sec8.py`]
-- [ ] CHK040 Is every code file whose SHA-256 a record holds required to be kept under that hash, as
+- [x] CHK040 Is every code file whose SHA-256 a record holds required to be kept under that hash, as
   spec versions are (`spec-versions/<sha256>.md`) and superseded operation lists are
   (`superseded/<sha256>.py`), or to be committed before the run starts, given that a reproduction
   needs each source file's entry in `code_sha256` to match ("a different source hash makes it a new
@@ -271,7 +271,7 @@ every other item; the reviewer ticks them.
   `git_dirty` to be "often true", as written when only the owner committed, while constitution 1.3.0
   lets the agent commit after each task? [Gap, Spec §FR-053, §FR-061; data-model §1, §3; research
   R16; constitution IX]
-- [ ] CHK041 Is the version of the protocol under which a verdict was computed identifiable from its
+- [x] CHK041 Is the version of the protocol under which a verdict was computed identifiable from its
   record, given that the values that decide verdicts are fixed in research.md (R4's N and
   thresholds, R7's budgets, R13's counts) and change only through the protocol change log, that a
   record cites only `spec_sha256`, that a reproduction recomputes the verdict "under the spec
@@ -280,7 +280,7 @@ every other item; the reviewer ticks them.
   each record when it compares its result with the recorded verdict, for example by each record
   holding the change log's last `seq` and line SHA-256? [Gap, Spec §FR-044, §FR-053, §FR-065;
   data-model §1, §18; research R16; cli contract `recheck_004.py`]
-- [ ] CHK042 Is it stated how each record kept under a fixed name changes, given data-model's rule
+- [x] CHK042 Is it stated how each record kept under a fixed name changes, given data-model's rule
   that a record is never overwritten and that a repeat run writes a new record with a new
   identifier: `candidates/<id>/round-rule.json`, which `round_rule.py --candidate` writes again as
   the candidate's evidence grows; `freeze/selection.json`; `security-target/parameters.json` and
@@ -290,7 +290,7 @@ every other item; the reviewer ticks them.
   content kept by SHA-256, as spec versions are, so that every record citing one by path and SHA-256
   names content that still exists? [Consistency, data-model introduction, §1, §9, §10, §16; research
   R1, R16, R19; Spec §FR-043; cli contract `round_rule.py`, `mode_limits_v3.py`]
-- [ ] CHK043 Is the location of local-only outputs stated, with the `.gitignore` rule that keeps
+- [x] CHK043 Is the location of local-only outputs stated, with the `.gitignore` rule that keeps
   them out of `git status`, given that the freeze needs `git_dirty` false and counts local-only
   outputs among the ignored files that "do not count", that research R16 adds only the two locks to
   `.gitignore`, which ignores nothing under `reports/004-crypto-architecture-v3/` but `*.log` files,
@@ -298,7 +298,7 @@ every other item; the reviewer ticks them.
   is a local-only output staged by mistake, or a committed output above research R16's 10 MB,
   refused? [Gap, Spec §FR-043, §Edge Cases "Large evidence records"; data-model §13; research R16,
   R18]
-- [ ] CHK044 Does research R18's list of new line-ending pins cover every new committed file whose
+- [x] CHK044 Does research R18's list of new line-ending pins cover every new committed file whose
   hash a record holds, beyond the Markdown files, `vectors/phyco-v3/**`, `research/004/**/*.jsonl`,
   `protocol/claims.json` and the report files: for example
   `research/004/tools/critical_counts.json`, whose path and SHA-256 every frequency and avalanche
@@ -307,13 +307,13 @@ every other item; the reviewer ticks them.
   SHA-256 in the provenance log, given that `git check-attr` gives such paths `text: auto` with no
   `eol`, and that this machine has `core.autocrlf=true`, so a fresh Windows checkout writes them
   with CRLF? [Coverage, Spec §FR-053; research R4, R11, R13, R18; data-model §3, §5, §7]
-- [ ] CHK045 Is research R16's test that "checks the header of every committed `.gz` file" limited
+- [x] CHK045 Is research R16's test that "checks the header of every committed `.gz` file" limited
   to the files this feature writes, given that the repository already tracks 1,000 `.gz` files of
   feature 003, listed with their hashes in its `SHA256SUMS`, and that a probe on 2026-11-01 found
   every one of them with a stored file name and a nonzero modification time, so that the test as
   written fails on files this feature may not change? [Edge Case, research R16, R18; data-model
   introduction "Format rules"; Spec §FR-053, §Context]
-- [ ] CHK046 Is it stated what record a check of the generated files writes on each platform, with
+- [x] CHK046 Is it stated what record a check of the generated files writes on each platform, with
   the fields of FR-061, given that `--check` regenerates in memory and writes nothing, that the
   sidecar `MANIFEST.json` takes one entry per generator run with only the command, interpreter,
   model hash, platform, speed and time, and that SC-009's "reproduced on both Windows and Linux",
@@ -322,7 +322,7 @@ every other item; the reviewer ticks them.
   files the freeze hashes, after which "writing over a frozen file exits 2"? [Gap, Spec §SC-009,
   §FR-036, §FR-065; data-model §11, §13; research R8; cli contract "Generators of constants and
   vectors"; quickstart M1–M3]
-- [ ] CHK047 Is the request schedule of the mode vectors defined exactly, given research R8's
+- [x] CHK047 Is the request schedule of the mode vectors defined exactly, given research R8's
   "requests of 1, 7, 64 and 1,000 words, repeated, then the remainder", which for 10,000 words
   leaves 352 after nine cycles, read either as one request of 352 words or as requests of 1, 7 and
   64 words and then 280, two readings that give different outputs since a forget call follows every
@@ -330,14 +330,14 @@ every other item; the reviewer ticks them.
   stated whether `<variant>` in the vector file names is the variant ID with `/` replaced by `_`, as
   data-model §11 says of a variant directory's name, or whether each variant has a directory?
   [Ambiguity, research R8; data-model §11; Spec §FR-036, §FR-015]
-- [ ] CHK048 Is it stated how `gen_vectors_v3.py` imports the model's `pi` and `ResearchDuplex` on
+- [x] CHK048 Is it stated how `gen_vectors_v3.py` imports the model's `pi` and `ResearchDuplex` on
   its first run, before `phycoweb/selftest_v3.py` exists, given the model contract's rule that the
   model imports `phycoweb.selftest_v3` and that step (2) of the order of generation writes that
   module through those functions, for example by an import inside `Generator` only or by a
   placeholder module that step (2) replaces? [Gap, Edge Case, data-model §11 "Order of generation";
   model contract "Module rules", "Research duplex"; cli contract "Generators of constants and
   vectors"; Spec §FR-036, §FR-059]
-- [ ] CHK049 Is it stated in which environments the re-check of a fresh clone may run, given that
+- [x] CHK049 Is it stated in which environments the re-check of a fresh clone may run, given that
   the environment guard shared by every script exits 2 unless the interpreter and packages match one
   of research R1's two environments, that a reproduction is limited to those two, and that SC-017
   and User Story 4 ask for the verdicts on "a fresh clone", which an external reviewer (FR-063) or a
@@ -346,19 +346,19 @@ every other item; the reviewer ticks them.
   arithmetic, with a record of the environment it ran in? [Conflict, Spec §SC-017, §FR-065, §FR-063,
   §User Scenarios; research R1, R16; cli contract "Guards shared by every script", `recheck_004.py`;
   quickstart F3]
-- [ ] CHK050 Is the check that `protocol/evidence.py` runs at start defined against the platform's
+- [x] CHK050 Is the check that `protocol/evidence.py` runs at start defined against the platform's
   environment record as a whole (its full `pip freeze`, Python, gcc and make) or against research
   R1's versions and the pins of `requirements.txt` only, and is it stated what change makes a new
   environment record (a package added, upgraded or removed, a Windows or WSL update), given that an
   unpinned package changed after setup would pass a check of the pins alone while every later record
   cites an environment record that no longer describes the machine? [Clarity, research R1, R18;
   data-model §1; cli contract "Guards shared by every script"]
-- [ ] CHK051 Do the markers of `requirements.txt` state a lower bound of Python 3.10, given that
+- [x] CHK051 Do the markers of `requirements.txt` state a lower bound of Python 3.10, given that
   `python_version < "3.14"` also admits Python 3.8 and 3.9, on which numpy 2.2.6 and scipy 1.15.3,
   which need Python 3.10 or later, cannot be installed, while FR-035 calls the model "expected, not
   tested" on those versions and the analysis tools need 3.10 or later? [Edge Case, research R17,
   R18; Spec §FR-035, §FR-053; constitution "Technical Constraints"]
-- [ ] CHK052 Are the bytes that each synthetic set's SHA-256 covers defined (for example the counts
+- [x] CHK052 Are the bytes that each synthetic set's SHA-256 covers defined (for example the counts
   as canonical JSON in the test's bit order), and is it stated whether the sets are committed or
   kept local, given that they hold 8,601,600 counts (S = 4b per set, 100 sets at each of the three
   sizes), about 60 MB as JSON and 17 MB as gzip at level 9 by an estimate of 2026-11-01, beyond the
@@ -368,21 +368,21 @@ every other item; the reviewer ticks them.
   them" read as one rule, also after an approved numpy upgrade, since numpy does not promise the
   same `Generator` stream across versions? [Clarity, Spec §FR-039, §FR-065; research R3, R4, R16;
   data-model §2, §7; cli contract `validate_tool.py`]
-- [ ] CHK053 Is the text whose SHA-256 forms each fingerprint fixed exactly: the case of the hex
+- [x] CHK053 Is the text whose SHA-256 forms each fingerprint fixed exactly: the case of the hex
   digits, given that the format rules make vector and state words upper case and digests lower case;
   a final newline after the value for i = 99, which `protocol/seedsets.py` writes; a state as one
   hex string in the design document's lane order or one field per lane; a personalization string at
   its full 32 bytes or at the design's maximum m; and whether `synthetic_seed` has a fingerprint, so
   that another implementation, or a later feature, computes the same fingerprints? [Clarity,
   data-model §2, introduction "Format rules"; research R3; Spec §FR-040]
-- [ ] CHK054 Is the interface of `protocol/devinputs_v3.py` stated consistently: whether `key(i)`
+- [x] CHK054 Is the interface of `protocol/devinputs_v3.py` stated consistently: whether `key(i)`
   and the other functions take the namespace that their strings `phycoweb-004/<ns>/<kind>/<i>`
   contain, whether they can be called outside `load` and so bypass its namespace and index-range
   checks, as quickstart P2's `d.key(0)` does, and whether the fingerprints are checked at import, as
   P2 expects, or at load, as data-model §2 and research R3 say, given that every evidence script
   must take its inputs from the loader (FR-040, FR-061)? [Consistency, data-model §2; research R3;
   quickstart P2; Spec §FR-040]
-- [ ] CHK055 Does the downloads manifest hold "one entry per file of these tables" (research R19), a
+- [x] CHK055 Does the downloads manifest hold "one entry per file of these tables" (research R19), a
   file not yet fetched included, which has no SHA-256 or date, or "one entry per file fetched"
   (plan, Setup); and does data-model §7's `source` cover a value the owner provides with its source,
   which the cli contract's `validate_tool.py` accepts but which has neither a path in the repository
