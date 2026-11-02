@@ -787,6 +787,17 @@ From the first run, 147 of its 206 rows:
 - **Records and their hashes** (research R16), for the one Settle row that names no text above:
   REP-023.
 
+Its round's two commits (PRO-061) are 0b8e6df and f8c6680, the commit that holds its rows with other
+edits. The comparison over them, made on 2026-11-02, found a row of the round listed under every
+rule whose place changed. A check of each row's Changes cell under PRO-058's reading, which the
+owner's answer to the fourth re-run approves, found eight rows of the round that name a place a
+heading below names and that this list does not list under that heading; they are added beside it on
+2026-11-02, six of them new to the list, so that the round enters the log with 153 of its 206 rows:
+
+- **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: PRO-025.
+- **Records and their hashes** (research R16): PRO-018, PRO-024, PRO-031, REP-002, REP-006, REP-013,
+  REP-014.
+
 From the re-run, 20 of its 29 rows:
 
 - **Development inputs** (research R3; FR-040): REP-029.
@@ -807,6 +818,23 @@ From the re-run, 20 of its 29 rows:
 - **Constant rule** (research R15; FR-023): RAT-036, RAT-037, RAT-038.
 - **Protocol changes and their directions** (FR-044): PRO-036.
 - **Values this plan fixes** (the plan's table): RAT-037, PRO-038.
+
+Its round's two commits (PRO-061) are f8c6680 and f9b2e92, the commit that holds its rows with other
+edits. The comparison over them found research R16 changed, in commit f9b2e92, with no row of the
+round listed under "Records and their hashes"; the eight rows of the round whose Changes cells name
+it are added beside the list on 2026-11-02 under PRO-058's reading, seven of them new to the list,
+so that the round enters the log with 27 of its 29 rows:
+
+- **Records and their hashes** (research R16): PRO-036, PRO-037, PRO-039, PRO-040, REP-028, REP-030,
+  REP-032, REP-034.
+
+Between this round's commits and the next round's, commit ad2c195 of 2026-11-01 changed research R3,
+a place that the heading "Development inputs" names, with an edit that no row made: it brought R3's
+bullet on held-out keys into line with FR-040, whose text the first run's rows PRO-008 and PRO-009,
+listed under that heading above, had changed in f8c6680. It is recorded here for the owner to
+confirm at the tasks approval as an entry of its own or as no change of rule, with the reason; the
+agent's reading is that it changed no rule beyond what PRO-008 and PRO-009 changed, since R3 then
+stated what FR-040 already said.
 
 From the second re-run, 50 of its 71 rows:
 
@@ -831,6 +859,16 @@ From the second re-run, 50 of its 71 rows:
 - **Constant rule** (research R15; FR-023): RAT-040, RAT-041, RAT-042, RAT-043, HW-047.
 - **Protocol changes and their directions** (FR-044): RAT-043, PRO-042, PRO-047, REP-041.
 - **Values this plan fixes** (the plan's table): PRO-047.
+
+Its round's two commits (PRO-061) are 2b1739a and 2b448f1, which applied its last rows, the round
+having no alignment commit of its own. The comparison over them found research R16 changed, in
+commits dfb7759, ccb2323 and 2b448f1, with no row of the round listed under "Records and their
+hashes"; the eleven rows of the round whose Changes cells name it are added beside the list on
+2026-11-02 under PRO-058's reading, five of them new to the list, so that the round enters the log
+with 55 of its 71 rows:
+
+- **Records and their hashes** (research R16): PRO-042, REP-035, REP-036, REP-037, REP-040, REP-041,
+  REP-042, REP-043, REP-045, REP-049, REP-052.
 
 From the third re-run, 50 of its 70 rows:
 
@@ -864,6 +902,15 @@ use", which its Changes cell does not name.
 
 - **Values this plan fixes** (the plan's table): PRO-056.
 
+Its round's two commits (PRO-061) are 37c20b2 and 39443d6, the commit that completed its alignment.
+The comparison over them found research R16 changed, in commits d0165a3, 810cbe2, 3ef45bb and
+39443d6, with no row of the round listed under "Records and their hashes"; the eight rows of the
+round whose Changes cells name it are added beside the list on 2026-11-02 under PRO-058's reading,
+three of them new to the list, so that the round enters the log with 53 of its 70 rows:
+
+- **Records and their hashes** (research R16): ANA-048, PRO-056, REP-058, REP-059, REP-061, REP-062,
+  REP-063, REP-065.
+
 From the fourth re-run, 18 of its 36 rows:
 
 - **FUT-SEC-8 demonstration** (FR-001 to FR-003): PRO-059.
@@ -884,8 +931,10 @@ Added beside this list on 2026-11-02 under PRO-058's reading, which the owner's 
 re-run approves: the five rows of this round whose applied changes altered research R16, the place
 that the heading below names, as their Changes cells also say (SEC-073 in commit 2d78666, RAT-061 in
 commit d5c2ee5, and REP-070, REP-071 and REP-073 in commit 2826842), so that the round enters the
-log with 23 of its 36 rows. The same comparison of every place the headings name, between commits
-812415c and 2826842, found no other place changed without a row of the round listed under its rule.
+log with 23 of its 36 rows. The same comparison of every place the headings name, between the
+round's two commits, 812415c and 4bbc3a6, the commit that completed its alignment (PRO-061; 2826842
+applied its last rows), found no other place changed without a row of the round listed under its
+rule.
 
 - **Records and their hashes** (research R16): SEC-073, RAT-061, REP-070, REP-071, REP-073.
 
@@ -900,6 +949,17 @@ From the fifth re-run, 9 of its 11 rows:
 - **Constant rule** (research R15; FR-023): RAT-067.
 - **Protocol changes and their directions** (FR-044): PRO-061, PRO-062.
 - **Records and their hashes** (research R16): PRO-062, REP-074.
+
+Its round's two commits (PRO-061) are c9f5cb1 and the commit that completes its alignment, which
+writes the comparison's results beside these lists and is named here once it exists. The comparison
+over c9f5cb1 and d046012, which applied its last rows, found a row of the round listed under every
+rule whose place changed, and the check of each row's Changes cell found each row listed under every
+heading whose place it names; the alignment edits only this file, which holds no such place.
+
+Over every span from the plan-approval commit, 65bcbf2, to c9f5cb1 outside the rounds' pairs, the
+comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
+recorded beside the re-run's list above. The span after this round's pair, to HEAD, is compared
+again before the tasks approval.
 
 ## After the answer
 
