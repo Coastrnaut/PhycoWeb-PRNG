@@ -460,6 +460,42 @@ and an item is ticked only under the rule in the Notes below.
   refusals are not left to whatever code first appends? [Gap, Spec §FR-044, §FR-067; plan "Source
   Code (repository root)"; data-model §14, §18; cli contract "Guards shared by every script"]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK061 Are the two commits of each round named where `scripts/protocol_change.py create` reads
+  them, and does the comparison run before the owner confirms the lists? FR-044, data-model §18 and
+  the cli contract compare each rule's text "at the two commits of each round", "the commit before
+  the row's round was applied" and "the commit that completed it, each commit named by its hash",
+  while only the fifth list names its commits (812415c and 2826842) and the first four name none;
+  the first run's and the re-run's rows were applied in commits that hold other edits too (f8c6680,
+  which also changed security.md and `.gitattributes`, and f9b2e92, which also appended the re-run's
+  checklist items), it is not stated whether a round's alignment commits, such as ad2c195, which
+  changed research.md after the re-run's items were ticked, fall inside its pair, and the comparison
+  runs only in `create`, after the owner has confirmed every list at the tasks approval, so that a
+  place it finds changed without a row comes to light after the confirmation it should inform. Is it
+  stated which commits each list's comparison reads, who runs the comparison before the tasks
+  approval and where its result stands beside each list, and how a place changed by an edit that no
+  row made, in a round's commits or between two rounds, is recorded and confirmed, so that `create`
+  does not exit 2 on lists the owner has already confirmed? [Gap, Ambiguity, Spec §FR-044;
+  data-model §18 `rules`, `place_check`; cli contract `protocol_change.py`; checklist-choices.md
+  "Rows that change the protocol"]
+- [ ] CHK062 Is a guard stated for FR-044's "The log is created, and no evidence run starts, only
+  after the owner has confirmed every list", given that the guards shared by every script
+  (Environment, Committed code, Inputs, Operation lists, Heavy runs, Hash-chained logs, Order of
+  sizes, Approvals, Order of US1, Tool validation, Budget, Trail tools) hold none that refuses an
+  evidence run while `research/004/protocol-changes.jsonl` does not exist or lacks its approved
+  first entries, and that data-model §1 and research R16 give a record's `protocol_seq` and
+  `protocol_line_sha256` the value `none` "before the log exists", which reads as allowing evidence
+  records then? Is the value `none` kept for a stated kind of record written before the log, or
+  removed, and does `protocol/evidence.py` exit 2 until the log holds its first entries with the
+  owner's `approval_confirmed`, with a test that covers that refusal? [Gap, Consistency, Spec
+  §FR-044; data-model §1, §18; research R16; cli contract "Guards shared by every script",
+  `protocol_change.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
