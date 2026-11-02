@@ -271,6 +271,8 @@ research/004/
 │   └── trails/               # box tables, MILP active-box counting, ARX branch-and-bound
 ├── validation/               # re-finding S12–S15, FUT-SEC-8, published trail values
 ├── exploration/              # constant tables for exploration: never frozen or evidence (R14)
+├── place_check.py            # the lists' comparison before the tasks approval (FR-044)
+├── place-check.json          # its result, which the row "Place check" names by SHA-256
 ├── candidates.jsonl          # the candidate log
 └── protocol-changes.jsonl    # the protocol change log (FR-044; data-model §18)
 

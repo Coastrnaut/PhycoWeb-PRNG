@@ -97,8 +97,11 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   not check, or its first entries, one per listed row of every round answered before it was created
   and one per place the owner confirmed as an entry of its own (`protocol_change.py`, below), do not
   all hold the owner's `approval_confirmed`; every record then cites the log's last entry in
-  `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18).
-  `tests/test_protocol_004.py` covers the refusal.
+  `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18). A `lock-cleared`
+  record (`clear_lock.py`, below) is the one kind `protocol/evidence.py` writes while the log does
+  not exist, with both fields `none`, since it records an event and clearing a stale lock is what
+  lets the log be created, and once the log exists it cites the last entry as every record does
+  (PRO-065). `tests/test_protocol_004.py` covers the refusal and that exception.
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -106,9 +109,10 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
   Order of US1, below; `round_rule.py --select`; `design_freeze.py create`;
-  `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`; the test of the second
-  transcription's provenance) reads it as committed at HEAD, never the working tree,
-  and exits 2 while the working tree's table differs from HEAD's. The rows that open a guard are set
+  `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`;
+  `protocol_change.py create`; the test of the second transcription's provenance) reads
+  it as committed at HEAD, never the working tree, and exits 2 while the
+  working tree's table differs from HEAD's. The rows that open a guard are set
   to Approved and committed by the owner (the note under that table), so an uncommitted row opens
   none, and the owner's review at each ⛔ gate lists the approval commits since the last gate. A
   review held again is a numbered row, "FUT-SEC-8 result review <k>", "Security-target review <k>"
@@ -120,8 +124,11 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   of `parameters.json` and `limits.json`, with the design document's version
   read (spec, the notes under the Review & Approval table). L1 is recorded
   again after a later row of either review family in "L1 recorded <k>", which
-  names the highest-k row of each family, and `check_claims.py` reads the
-  "L1 recorded" row with the highest k. A guard opens on Approved alone,
+  names the highest-k row of each family, and `check_claims.py` reads the "L1 recorded" row with the
+  highest k. The comparison of spec FR-044 is confirmed in the row "Place check",
+  and one made again over later commits in "Place check <k>", each naming
+  `research/004/place-check.json` by SHA-256, and `protocol_change.py create` reads
+  the one with the highest k (PRO-063). A guard opens on Approved alone,
   except that `design_freeze.py create` also takes done, naming the manifest the review read by
   SHA-256, or "not arranged" on the external review's row, the one with the highest k where the
   owner has had changes reviewed in "External design review <k>", and `round_rule.py --select` takes
@@ -625,16 +632,29 @@ The one writer of the protocol change log, `research/004/protocol-changes.jsonl`
 `protocol/changelog.py` (spec FR-044; data model §18). `create` runs only while the log does not
 exist, and exits 2 once it does. `check` reads the lists "Rows that change the protocol" of
 checklist-choices.md, in round order, each naming its round's two commits by hash, and compares each
-rule's text, in each place its heading names, over each round's pair and over every span from the
-plan-approval commit to HEAD outside the pairs; it prints each place whose text changed, with its
-commit, the rows of that round listed under its rule and each place changed by an edit that no row
-made, and writes nothing. Its comparison is made before the tasks approval and its result written
-beside each list, where the owner confirms each place changed by an edit that no row made as an
-entry of its own or as no change of rule, with the reason (spec FR-044). `create` runs the same
-comparison first and exits 2, writing nothing, while a place whose text changed has no row of that
-round listed under its rule and no such confirmation, or while its result differs from the one
-confirmed beside the lists, and otherwise builds one first entry per listed row, with `rules`,
-`row`, `granularity` and `place_check`, and one per place confirmed as an entry of its own.
+rule's text, in each place its heading names, each place's text delimited as spec FR-044 states,
+over each round's pair and over every span from the plan-approval commit outside the pairs; it
+prints each place whose text changed, with its commit, the rows of that round listed under its rule
+and each place changed by an edit that no row made, and writes nothing. It makes the comparison that
+`research/004/place_check.py`, committed for it, standard library only, made before the
+tasks approval, reading the named commits with `git show`: that script wrote
+`research/004/place-check.json`, which the results beside the lists restate and which the owner
+confirmed in the Review & Approval row "Place check", naming its SHA-256 and each place changed by
+an edit that no row made, confirmed as an entry of its own or as no change of rule, with the reason
+(spec FR-044). A test checks that `check` gives that file's result over its commits. `create` reads
+the row "Place check" at HEAD, or the "Place check <k>" with the highest k (Approvals, above), runs
+the same comparison first and exits 2, writing nothing, while a place whose text changed has no row
+of that round listed under its rule and no such confirmation, while its result up to `compared_to`
+differs from the file the row names, or while a place changed after `compared_to`, until the
+comparison is made again over the later commits and its file confirmed in "Place check <k>", read
+with the highest k (PRO-063). Otherwise it builds one first entry per listed row, with `rules`,
+`row`, `granularity` and `place_check`, and one per place confirmed as an entry of its own, with
+`rules` at the edit's parent and at its commit, `row` none, `granularity` `commit` with `commit`,
+the edit's hash, `reason`, the owner's confirmation naming the commit, and `place_check` for the
+pair or span that holds the commit; an edit inside a round's pair is recorded beside that round's
+list, and its entry follows the round's row entries; an edit between two rounds is recorded beside
+the list of the round before it, as ad2c195's is beside the re-run's, and its entry follows that
+round's entries, so that the log keeps the order of the commits (data model §18; PRO-064).
 `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
 which the agent may write as a proposal. Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
@@ -642,7 +662,10 @@ rule of a first entry, without `direction`, a `settled` one without `readings`, 
 the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
 together, taken over their canonical JSON without the approval fields, and appends nothing unless
 standard input is an interactive terminal and the owner types its first 16 hex digits, which
-`approver` records as `approval_confirmed`. Every append takes `data/log-append.lock` and checks the
+`approver` records as `approval_confirmed`. After the approval step `create` writes the first
+entries to a temporary file beside the log's path and renames it to that path once all are written,
+so that a writer that dies leaves no partial log, only the lock, which `scripts/clear_lock.py`
+removes (PRO-065). Every append takes `data/log-append.lock` and checks the
 chain first (Hash-chained logs, above). It writes log entries and no record, and so has no
 `--reproduce` mode (spec FR-061). `tests/test_protocol_004.py` covers each refusal.
 
@@ -675,7 +698,12 @@ Run by the owner or at the owner's request. It removes LOCK only when it can sho
 lock's environment, that no process with the PID and start time the lock holds still runs;
 otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
-`inconclusive` record of the run that died holding it (data model §1; research R16). A
+`inconclusive` record of the run that died holding it (data model §1; research R16). While the
+protocol change log does not exist, a `lock-cleared` record is the one kind that the guard "Protocol
+log" lets `protocol/evidence.py` write, with `protocol_seq` and `protocol_line_sha256`
+`none`; before the log exists only `data/log-append.lock` can be held, since
+every run that takes the heavy-run lock writes evidence, so that a writer of
+the logs that died holding it never blocks the log's creation (PRO-065). A
 `lock-cleared` record records an event and is not reproduced, so this script has no `--reproduce`
 mode (spec FR-061).
 

@@ -248,7 +248,8 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Checklist choices, fourth re-run ([checklist-choices.md](./checklist-choices.md): the 36 items the fourth re-run of the six checklists found on 2026-11-02 over the complete documents and the repository) | Coastrnaut (repository owner) | 2026-11-02 | Approved | Answered in advance in session on 2026-11-02, with the instruction to repeat the rounds of checklists, choices, changes and ticks until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes the recommended option of every row and also approves the round's list "Rows that change the protocol", written with its rows before the answer (FR-044). Applied on 2026-11-02, checklist by checklist, to this spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md and the eight checklist files, each change with its reason. No protocol change among them loosens the protocol at a claimable size (checklist-choices.md, "After the answer"), and each is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are re-read against the changed text. On the owner's instructions of 2026-11-01 and 2026-11-02 the agent verified each of the 36 items against the text, with its evidence for each item in its report, and ticked the 35 that hold; analysis CHK062 stayed open, since ANA-062's expected set, as applied, refuses a correct test below full diffusion, until the fifth re-run's ANA-068 completed ANA-062 and it was ticked with that round's items. The owner's tasks approval includes the review of those ticks, and an item the owner does not accept is unticked |
 | Checklist choices, fifth re-run ([checklist-choices.md](./checklist-choices.md): the 11 items the fifth re-run of the six checklists found on 2026-11-02 over the complete documents and the repository) | Coastrnaut (repository owner) | 2026-11-02 | Approved | Answered in advance in session on 2026-11-02, with the instruction to repeat the rounds of checklists, choices, changes and ticks until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes the recommended option of every row of every round of that loop and also approves the round's list "Rows that change the protocol", written with its rows before the answer (FR-044). Applied on 2026-11-02, checklist by checklist, to this spec, plan.md, research.md, data-model.md, the cli contract, quickstart.md and checklist-choices.md, each change with its reason. No protocol change among them loosens the protocol at a claimable size (checklist-choices.md, "After the answer"), and each is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are re-read against the changed text. On the owner's instructions of 2026-11-01 and 2026-11-02 the agent verified each of the 11 items against the text, with its evidence for each item in its report, and ticked the 10 that hold, and with them analysis CHK062, which ANA-068 completes; protocol CHK061 stays open, since no text says who makes PRO-061's comparison before the tasks approval, while `scripts/protocol_change.py check`, whose comparison it is, is written only in implementation, after that approval, and the sixth re-run takes it up. The owner's tasks approval includes the review of those ticks, and an item the owner does not accept is unticked |
 | Checklist choices, sixth re-run ([checklist-choices.md](./checklist-choices.md): the 22 items the sixth re-run of the six checklists found on 2026-11-02 over the complete documents and the repository) | Coastrnaut (repository owner) | 2026-11-02 | Approved | Answered in advance in session on 2026-11-02, with the instruction to repeat the rounds of checklists, choices, changes and ticks until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes the recommended option of every row of every round of that loop and also approves the round's list "Rows that change the protocol", written with its rows before the answer (FR-044). Being applied, checklist by checklist, to the documents each row's Changes cell names, each change with its reason. No protocol change among them loosens the protocol at a claimable size (checklist-choices.md, "After the answer"), and each is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are then re-read against the changed text; on the owner's instructions of 2026-11-01 and 2026-11-02 the agent verifies each item and ticks it if it holds, and the owner's tasks approval includes the review of those ticks |
-| Tasks approval | _pending_ | _pending_ | _pending_ | Includes the owner's review of the checklist items the agent ticked on the owner's instructions of 2026-11-01 and 2026-11-02 (each checklist's Notes), where an item the owner does not accept is unticked, and the owner's confirmation of checklist-choices.md's lists "Rows that change the protocol", the first three written after their rounds were answered, with the rows added beside them under PRO-058's reading and each place recorded there as changed by an edit that no row made, which the owner confirms as an entry of its own or as no change of rule, with the reason (FR-044). The protocol change log is created, and no evidence run starts, only after the owner has confirmed every list, and a row the owner takes out of a list is recorded beside it with the owner's reason, that it changed no rule (data-model §18) |
+| Tasks approval | _pending_ | _pending_ | _pending_ | Includes the owner's review of the checklist items the agent ticked on the owner's instructions of 2026-11-01 and 2026-11-02 (each checklist's Notes), where an item the owner does not accept is unticked, and the owner's confirmation of checklist-choices.md's lists "Rows that change the protocol", the first three written after their rounds were answered, with the rows added beside them under PRO-058's reading and each place recorded there as changed by an edit that no row made, which the owner confirms as an entry of its own or as no change of rule, with the reason, in the row "Place check" (FR-044; PRO-063). The protocol change log is created, and no evidence run starts, only after the owner has confirmed every list, and a row the owner takes out of a list is recorded beside it with the owner's reason, that it changed no rule (data-model §18) |
+| Place check (FR-044: the comparison of the lists "Rows that change the protocol", `research/004/place-check.json`, confirmed at the tasks approval) | _pending_ | _pending_ | _pending_ | Set by the owner and committed. It names `research/004/place-check.json` by SHA-256, with its `compared_to`, and each place the file records as changed by an edit that no row made, confirmed as an entry of its own or as no change of rule, with the reason. `protocol_change.py create` reads it at HEAD; a comparison made again over later commits is confirmed in "Place check <k>", k = 2, 3, … in order, read with the highest k (PRO-063) |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
 | FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | The row names the demonstration record it reviews, `fut-sec-8/<record_id>.json`, by ID and SHA-256, and security.md's best-attack register row for exhaustive seed search cites that record (data-model §4) |
 | D4 tie (only if the tie-breaks of the nonlinearity choice rule reach the owner's choice) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie, or if a tie-break decides it: the owner then sets this row to "Not needed", naming `d4/tie.json` and its tie-break (`decided_by`), and `round_rule.py --select` opens on that value at HEAD and takes the family from `d4/tie.json` |
@@ -293,7 +294,8 @@ from the one those rows give, L1 while that row reads Approved and names the hig
 each review family, both Approved, and L0 otherwise; each "Log repair <n>",
 read by `repair_log.py`; each "Environment record <n>", read by the evidence scripts' environment
 guard (cli contract, "Environment"); each "Owner-provided value <n>", read by `validate_tool.py`'s
-source guard; and the Second transcription go-ahead, read by the test of the
+source guard; the Place check and each "Place check <k>", read by `protocol_change.py create` in the
+row with the highest k (FR-044); and the Second transcription go-ahead, read by the test of the
 transcription's provenance. The second holds the rows that record an owner's own act that no guard
 reads: the Design freeze. A test checks that the first list, its numbered families included,
 and the contracts' guards agree both ways. Any other approval is written
@@ -2081,16 +2083,39 @@ freeze hashes and the baseline manifest; run the claim-register test.
   commits by hash, the commit before the round's first applied row and the commit that completed its
   alignment, so that a round's alignment commits fall inside its pair, the first two rounds' pairs
   being the commits that hold their rows with their other edits, named as such. Before the tasks
-  approval the comparison of `scripts/protocol_change.py check`, which writes nothing, is made over
-  each round's pair and over every span from the plan-approval commit to HEAD outside the pairs,
-  each rule's text compared in each place its heading names, and its result is written beside each
-  list; a place changed by an edit that no row made, in a round's commits or between two rounds, is
-  recorded beside the list with its commit, for the owner to confirm at the tasks approval as an
-  entry of its own or as no change of rule, with the reason. Before the log is created its writer
-  runs the same comparison and exits 2, writing nothing, while a place whose text changed has
-  no row of that round listed under its rule and no such confirmation, or
-  while its result differs from the one the owner confirmed; the comparison's
-  result is recorded with the first entries. The owner's answer to a round
+  approval the agent makes the comparison with `research/004/place_check.py`, committed for it,
+  standard library only, which reads the named commits with `git show` and writes
+  `research/004/place-check.json`: per round, its list's heading, its two commits and each place
+  whose text changed between them, with the rows of that round listed under its rule; per span
+  outside the pairs, from the plan-approval commit on, each commit that changed a place, with the
+  place; each place changed by an edit that no row made, with its commit; and `compared_to`, the
+  commit it compared up to. A place's text, as committed with CR LF read as LF, runs for an FR item
+  from its line `- **FR-0xx**` to the next line that starts an FR item, a bold group name or a
+  heading; for a research section from its heading `## R<k>.` to the next heading of that level; for
+  a paragraph of the protocol from its bold name to the next bold name or to the section's end; and
+  for the plan's table from its heading to the next heading. A round with no alignment commit takes
+  as its second commit the commit of its last applied row, named as such. The results beside each
+  list restate that file. A place changed by an edit that no row made, in a round's commits or
+  between two rounds, is recorded beside a list with its commit, for the owner to confirm at the
+  tasks approval as an entry of its own or as no change of rule, with the reason, in a Review &
+  Approval row of its own, "Place check", which names the file's SHA-256 and each such place with
+  its confirmation, a row the owner sets and commits (PRO-063): an edit inside a round's pair is
+  recorded beside that round's list, and its entry follows the round's row entries; an edit between
+  two rounds is recorded beside the list of the round before it, as ad2c195's is beside the
+  re-run's, and its entry follows that round's entries, so that the log keeps the order of the
+  commits. Such an entry holds `rules`, one object per rule whose place the edit changed, its
+  `old_text` and `new_text` at the edit's parent and at its commit, each named by hash, with
+  `direction` and `readings` per rule; `row` none and `granularity` `commit`, with `commit`, the
+  edit's hash; `reason`, the owner's confirmation with its reason, naming the commit; and
+  `place_check`, the comparison of the pair or span that holds the commit (PRO-064).
+  `scripts/protocol_change.py check`, which writes nothing, makes the same comparison, and a test
+  checks that it gives that file's result over its commits. Before the log is created its writer,
+  `create`, reads the row "Place check" at HEAD and exits 2, writing nothing, while a place whose
+  text changed has no row of that round listed under its rule and no such confirmation, while its
+  result up to `compared_to` differs from the file the row names, or while a place changed after
+  `compared_to`, until the comparison is made again over the later commits and its file confirmed in
+  "Place check <k>", read with the highest k; the comparison's result is
+  recorded with the first entries (PRO-063). The owner's answer to a round
   approves its list. The log is created, and no evidence run starts, only after the owner has
   confirmed every list, and a row the owner takes out of a list is recorded beside it with the
   owner's reason; the shared guard "Protocol log" enforces it: `protocol/evidence.py` exits 2,
@@ -2098,7 +2123,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   per listed row of every round answered before it was created and one per place
   the owner confirmed as an entry of its own, do not all hold the owner's
   `approval_confirmed`, so that every record cites the log's last entry (cli contract;
-  data-model §1). A round answered after the log exists adds entries the
+  data-model §1), with one exception: a `lock-cleared` record is the one kind that
+  `protocol/evidence.py` writes while the log does not exist, with `protocol_seq` and
+  `protocol_line_sha256` `none`, since it records an event and clearing a stale lock is what lets
+  the log be created; every other kind stays refused, and once the log exists a `lock-cleared`
+  record cites its last entry as every record does. Before the log exists only
+  `data/log-append.lock` can be held, since every run that takes the heavy-run lock writes evidence,
+  and after the approval step `create` writes the first entries to a temporary file beside the log's
+  path and renames it to that path once all are written, so that a writer that
+  dies leaves no partial log, only the lock, which `scripts/clear_lock.py`
+  removes (PRO-065). A round answered after the log exists adds entries the
   usual way, proposed by the agent and approved by the owner. Approving a
   change is the owner's own act, outside the standing authorization like the freeze's steps (1), (3)
   and (4), the tie choices, the environment records and the values the owner provides, each written
@@ -2126,7 +2160,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a stop, a later feature may evaluate further candidates only under its own pre-registered protocol
   and new model IDs, and it counts this feature's candidates, results and stop in its selection bias
   (FR-041). "Stricter" has one direction per rule, the one that makes the conclusion more
-  conservative, and each rule of section "Pre-registered Design Protocol" repeats its own:
+  conservative, and each rule of section "Pre-registered Design Protocol" repeats its own. Each
+  heading of checklist-choices.md's lists "Rows that change the protocol" takes its direction from
+  this list, and each listed row's rules take `stricter` in these directions or `settled`, with its
+  readings (data-model §18; PRO-066):
   - eligibility: items only added; selection and the nonlinearity choice rule (D4): no change;
   - tool validation: known results and re-validation triggers only added;
   - the FUT-SEC-8 demonstration: no change;
@@ -2141,7 +2178,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
     makes each candidate it touches fail FR-023;
   - the security-target parameters: s, the key and nonce lengths and c only rise; ε only falls
     and N only rises; u, every output limit and the per-request cap only fall;
-  - the values the plan fixes: as the plan's table "Values this plan fixes" states for each.
+  - the values the plan fixes: as the plan's table "Values this plan fixes" states for each;
+  - the development inputs (research R3): no change;
+  - the structural checks (research R13): counts only rise, and symmetries, constant relations,
+    forms and sources of R_dist are only added;
+  - the vector lengths (research R8): lengths only grow;
+  - records and their hashes (research R16): what a record holds, which files are hashed and kept,
+    and the writers' and guards' checks and refusals are only added, and no file's hash kind changes
+    once a record holds it;
+  - protocol changes and their directions (this requirement): an entry's fields, the comparison and
+    the guard's refusals are only added, and no rule's direction is loosened.
 - **FR-045**: Heavy runs MUST NOT overlap one another or any battery run (security.md §12.5). A
   heavy run is any run that is of a kind research R7 budgets, uses more than one worker process or
   thread, or is projected to take, or last took, more than 10 minutes; the FUT-SEC-8 sweep,

@@ -1738,7 +1738,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `data/log-append.lock`, by exclusive create, which `.gitignore` also gains. Holding it, the
     writer checks the chain up to the last line, appends one line chained to it and releases the
     lock. A writer that cannot take the lock within 10 s, or finds the chain broken, exits 2 and
-    appends nothing, so two scripts never chain to the same last line.
+    appends nothing, so two scripts never chain to the same last line. The protocol change log's
+    first entries are written by `protocol_change.py create`, after the approval step, to a
+    temporary file beside the log's path, which it renames to that path once all are written, so
+    that a writer that dies leaves no partial log, only the lock, which `clear_lock.py` removes
+    (PRO-065).
   - **Stale locks.** Both locks hold the PID and that process's start time, the environment
     (`windows` or `wsl`), the host, the command and the time the lock was taken. A script that finds
     a lock exits 2, naming the lock and whether its holder still runs, checked in the lock's
@@ -1746,7 +1750,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     removes one, and only when no process with that PID and start time runs; it writes a
     `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
     A heavy run that died holding the lock then gets the `inconclusive` record that every started
-    run writes (data-model §1).
+    run writes (data-model §1). Before the protocol change log exists a `lock-cleared` record is the
+    one kind `protocol/evidence.py` writes, with `protocol_seq` and `protocol_line_sha256` `none`,
+    since it records an event and clearing a stale lock is what lets the log be created; every other
+    kind stays refused by the guard "Protocol log", and once the log exists a `lock-cleared` record
+    cites its last entry as every record does. Before the log exists only `data/log-append.lock` can
+    be held, since every run that takes the heavy-run lock writes evidence (PRO-065).
   - **Protocol change log.** Each change of a pre-registered rule is one entry: the date, the
     rule, the old and new text, the reason, the direction, `stricter` in the rule's stated direction
     or `settled`, which fixes a case the protocol leaves open, only before any result
@@ -1775,6 +1784,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
     and local-only outputs are in the record by SHA-256 anyway. Steps (1), (3) and (4) are the
     owner's own acts, which the agent never performs (spec FR-043).
+- **Stricter means**: what a record holds, which files are hashed and kept, and the writers' and
+  guards' checks and refusals may only be added, and no file's hash kind changes once a record holds
+  it (spec FR-044; PRO-066).
 - **Rationale**: the edge case on large records leaves the choice to the plan. 10 MB keeps the
   repository small; hashes keep every local record checkable.
 - **Alternatives**: commit everything (hundreds of MB of matrices); keep only summaries (the

@@ -776,16 +776,44 @@ entry, while a row left out would be a protocol change outside the log. Each lis
 two commits by hash, the commit before the round's first applied row and the commit that completed
 its alignment, so that a round's alignment commits fall inside its pair, the first two rounds' pairs
 being the commits that hold their rows with their other edits, named as such (PRO-061). Before the
-tasks approval the comparison of `scripts/protocol_change.py check`, which writes nothing, is made
-over each round's pair and over every span from the plan-approval commit, 65bcbf2, to HEAD outside
-the pairs, each rule's text compared in each place its heading names, and its result is written
-beside each list; a place changed by an edit that no row made, in a round's commits or between two
-rounds, is recorded beside the list with its commit, for the owner to confirm at the tasks approval
-as an entry of its own or as no change of rule, with the reason. Before the log is created, its
-writer, `scripts/protocol_change.py create`, runs the same comparison and exits 2, writing nothing,
-while a place whose text changed has no row of that round listed under its rule and no such
-confirmation, or while its result differs from the one the owner confirmed; the comparison's result
-is recorded with the first entries (data-model §18).
+tasks approval the agent makes the comparison with `research/004/place_check.py`, committed for it,
+standard library only, which reads the named commits with `git show` and writes
+`research/004/place-check.json`, over each round's pair and over every span from the plan-approval
+commit, 65bcbf2, outside the pairs, up to its `compared_to`, each rule's text compared in each place
+its heading names, delimited as spec FR-044 states; a round with no alignment commit takes as its
+second commit the commit of its last applied row, named as such. The results written beside each
+list restate that file. A place changed by an edit that no row made, in a round's commits or between
+two rounds, is recorded beside a list with its commit, for the owner to confirm at the tasks
+approval as an entry of its own or as no change of rule, with the reason, in the Review & Approval
+row "Place check", which names the file's SHA-256 (PRO-063): an edit inside a round's pair is
+recorded beside that round's list, and its entry follows the round's row entries; an edit between
+two rounds is recorded beside the list of the round before it, as ad2c195's is beside the re-run's,
+and its entry follows that round's entries, so that the log keeps the order of the commits
+(PRO-064). Before the log is created, its writer, `scripts/protocol_change.py create`, whose `check`
+makes the same comparison, reads that row at HEAD and exits 2, writing nothing, while a place whose
+text changed has no row of that round listed under its rule and no such confirmation, while its
+result up to `compared_to` differs from the file the row names, or while a place changed after
+`compared_to`, until the comparison is made again over the later commits and its file confirmed in
+"Place check <k>", read with the highest k; the comparison's result is recorded with the first
+entries (data-model §18).
+
+Each heading takes the stricter direction that spec FR-044's list states for it, and each listed
+row's rules take `stricter` in that direction or `settled`, with its readings, a rule whose
+direction is "no change" taking `settled` whatever the row's kind (data-model §18; PRO-066). The
+directions, heading by heading: Development inputs, no change; FUT-SEC-8 demonstration, no change;
+Bias rule, only a change that can add firings and never remove one; Round rule, Δ only rises and
+sources of R_dist are only added; Nonlinearity choice rule (D4), no change; Tool validation, known
+results and re-validation triggers only added; Structural checks, counts only rise, and symmetries,
+constant relations, forms and sources of R_dist only added; Eligibility and selection, eligibility
+items only added and selection no change; Stop rule, budgets and the candidate limit only fall;
+Constant rule, fixed with its refused list before the first candidate is scored and no change after,
+the refused list only growing; Security-target parameters and output limits, where s, the key and
+nonce lengths and c only rise, ε only falls, N only rises, and u, every output limit and the
+per-request cap only fall; Values this plan fixes, as the plan's table states for each; Vector
+lengths, lengths only grow; Records and their hashes, what a record holds, which files are hashed
+and kept, and the writers' and guards' checks and refusals only added, no file's hash kind changing
+once a record holds it; and Protocol changes and their directions, an entry's fields, the comparison
+and the guard's refusals only added, no rule's direction loosened.
 
 The first three lists were written on 2026-11-01, after their rounds were answered, by their rows'
 Changes cells, the reading before PRO-058, so they await the owner's confirmation, asked for at the

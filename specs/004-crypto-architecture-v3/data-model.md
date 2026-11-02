@@ -70,7 +70,7 @@ implementation can write byte-identical files:
 | `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>" (1.0 once frozen; spec FR-034), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
-| `protocol_seq`, `protocol_line_sha256` | int, hex | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract) |
+| `protocol_seq`, `protocol_line_sha256` | int, hex, or `none` | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract); both `none` in a `lock-cleared` record written while the log does not exist, the one kind `protocol/evidence.py` writes then, since it records an event and clearing a stale lock is what lets the log be created (PRO-065) |
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
@@ -1035,7 +1035,10 @@ nor kept under `versions/` (spec FR-043).
   3, … in order), naming what it reviews by path and SHA-256, the chapter's version being a set of
   hashes (spec, the notes under the Review & Approval table); each guard reads its family's row with
   the highest k at HEAD, and L1 is recorded again in "L1 recorded <k>" once the later review rows
-  read Approved.
+  read Approved. The comparison of the lists "Rows that change the protocol" is confirmed in the row
+  "Place check", and one made again over later commits in "Place check <k>" (k = 2, 3, … in order),
+  each naming `research/004/place-check.json` by SHA-256; `protocol_change.py create` reads the one
+  with the highest k and opens on Approved alone (section 18; PRO-063).
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
   or a fired control; `blocked` while a gate it needs is pending; otherwise the computed verdict.
 
@@ -1049,12 +1052,12 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `seq`, `prev_sha256` | as in section 3 |
 | `date_utc` | ISO 8601 |
 | `rule` | the pre-registered rule changed, by its name in the spec's protocol or its research section; a first entry (below) holds `rules` instead |
-| `rules` | for a first entry only: one object per rule its row is listed under, each with `rule`, `old_text`, `new_text`, `direction` and `readings`, the texts being that rule's text, in each place its heading names, at the commit before the row's round was applied and at the commit that completed it, each commit named by its hash |
-| `row`, `granularity` | for a first entry only: the row's ID, question and chosen option; and `round`, since a round's rows were committed together, so that a row's own before and after exist in no commit |
-| `place_check` | for a first entry only: the result of the writer's comparison for the entry's round (below): the round's two commits, each place whose text changed between them, and the rows of that round listed under its rule, with each place changed by an edit that no row made, its commit and the owner's confirmation |
+| `rules` | for a first entry only: one object per rule its row is listed under, each with `rule`, `old_text`, `new_text`, `direction` and `readings`, the texts being that rule's text, in each place its heading names, at the commit before the row's round was applied and at the commit that completed it, each commit named by its hash; for an entry made from a place the owner confirmed as an entry of its own, one object per rule whose place the edit changed, its `old_text` and `new_text` at the edit's parent and at its commit, each named by hash (PRO-064) |
+| `row`, `granularity` | for a first entry only: the row's ID, question and chosen option; and `round`, since a round's rows were committed together, so that a row's own before and after exist in no commit; for an entry made from a place the owner confirmed, `row` none and `granularity` `commit`, with `commit`, the edit's hash (PRO-064) |
+| `place_check` | for a first entry only: the result of the writer's comparison, the one `research/004/place-check.json` holds, for the entry's round, or, for an entry made from a place the owner confirmed, for the pair or span that holds its commit (below; PRO-063, PRO-064): the round's two commits, each place whose text changed between them, and the rows of that round listed under its rule, with each place changed by an edit that no row made, its commit and the owner's confirmation |
 | `old_text`, `new_text` | the rule's text before and after; for a first entry, per rule in `rules` |
-| `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md |
-| `direction` | `stricter`, in the rule's stated stricter direction, or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
+| `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md; for an entry made from a place the owner confirmed, the owner's confirmation with its reason, naming the commit (PRO-064) |
+| `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
 | `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
 | `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
@@ -1074,31 +1077,47 @@ Stricter or Settle (26 and 44) among them. A row is listed under every rule whos
 cell names or its applied change altered (PRO-058). Each list names its round's two commits by hash,
 the commit before the round's first applied row and the commit that completed its alignment, so that
 a round's alignment commits fall inside its pair, the first two rounds' pairs being the commits that
-hold their rows with their other edits, named as such (PRO-061). Before the tasks approval the
-comparison of `scripts/protocol_change.py check`, which writes nothing, is made over each round's
-pair and over every span from the plan-approval commit to HEAD outside the pairs, each rule's text
-compared in each place its heading names, and its result is written beside each list; a place
-changed by an edit that no row made, in a round's commits or between two rounds, is recorded beside
-the list with its commit, for the owner to confirm at the tasks approval as an entry of its own or
-as no change of rule, with the reason. Before the log is created its writer runs the same comparison
-and exits 2, writing nothing, while a place whose text changed has no row of that round listed under
-its rule and no such confirmation, or while its result differs from the one the owner confirmed;
-each first entry records that comparison for its round in `place_check`, and a place confirmed as an
-entry of its own is a first entry of its own in its round's place, its `reason`
-naming the commit. Each holds `rules`, every rule its row is listed under,
+hold their rows with their other edits, named as such (PRO-061). Before the tasks approval the agent
+makes the comparison with `research/004/place_check.py`, committed for it, standard library only,
+which reads the named commits with `git show` and writes `research/004/place-check.json`, over each
+round's pair and over every span from the plan-approval commit outside the pairs, up to its
+`compared_to`, each rule's text compared in each place its heading names, each place's text
+delimited as spec FR-044 states; a round with no alignment commit takes as its second commit the
+commit of its last applied row, named as such. The results beside each list restate that file, and a
+place changed by an edit that no row made, in a round's commits or between two rounds, is recorded
+beside a list with its commit, for the owner to confirm at the tasks approval as an entry of its own
+or as no change of rule, with the reason, in the Review & Approval row "Place check", which names
+the file's SHA-256 (PRO-063). `scripts/protocol_change.py check`, which writes nothing, makes the
+same comparison, and a test checks that it gives that file's result over its commits. Before the log
+is created its writer reads that row at HEAD and exits 2, writing nothing, while a place whose text
+changed has no row of that round listed under its rule and no such confirmation, while its result up
+to `compared_to` differs from the file the row names, or while a place changed after `compared_to`,
+until the comparison is made again over the later commits and its file confirmed in
+"Place check <k>", read with the highest k; each first entry records that
+comparison for its round, or for the pair or span that holds its commit,
+in `place_check`. Each entry of a listed row holds `rules`, every rule its row is listed under,
 with `old_text` and `new_text` per rule: that rule's text, in each place its heading names, at the
 commit before the row's round was applied and at the commit that completed it; with the row's ID,
 question and chosen option, marked `granularity: round`. Each rule takes `stricter`, in its stated
 direction, or `settled`: under a rule whose direction is "no change" the direction is `settled`,
 with its `readings`, whatever the row's kind, and a row listed under several rules has a direction
-per rule. The log is created, and no evidence run starts, only after the owner has confirmed every
+per rule; a rule's stated direction is the one spec FR-044's list gives its heading (PRO-066). A
+place confirmed as an entry of its own is a first entry of its own, with `rules` at the edit's
+parent and at its commit, `row` none, `granularity` `commit` with `commit`, and its `reason` naming
+the commit (the table above): an edit inside a round's pair is recorded beside that round's list,
+and its entry follows the round's row entries; an edit between two rounds is recorded beside the
+list of the round before it, as ad2c195's is beside the re-run's, and its entry follows that round's
+entries, so that the log keeps the order of the commits (PRO-064). The log is
+created, and no evidence run starts, only after the owner has confirmed every
 list; a row the owner takes out of a list is recorded beside that list in checklist-choices.md with
 the owner's reason, that it changed no rule; the shared guard "Protocol log" enforces it:
 `protocol/evidence.py` exits 2, writing nothing, while the log does not exist, its chain does
 not check, or its first entries, one per listed row of every round answered
 before it was created and one per place the owner confirmed as an entry of
-its own, do not all hold the owner's `approval_confirmed`, so that every
-record cites the log's last entry (section 1). The owner's answer to a round
+its own, do not all hold the owner's `approval_confirmed`, so that every record cites the log's last
+entry (section 1), with one exception: a `lock-cleared` record is the one kind it writes while the
+log does not exist, with `protocol_seq` and `protocol_line_sha256` `none`, and once the log exists
+it cites the last entry as every record does (PRO-065). The owner's answer to a round
 approves its list; a round answered after the log exists adds entries the usual way, proposed by the
 agent and approved by the owner (spec FR-044). The entry for the re-run's REP-029, which added the
 synthetic counts as class 5, records the protocol's "Development inputs" paragraph before and after,
@@ -1115,5 +1134,8 @@ Approving an entry is the owner's own act, which the agent never performs (spec
 FR-044): the writer's approval step prints the SHA-256 of the entry, or of the
 first entries together when the log is created, and appends nothing unless standard input is an
 interactive terminal and the owner types its first 16 hex digits; each entry records that
-confirmation in `approver`. The history cannot show who acted, so the owner's review at each ⛔ gate
+confirmation in `approver`. After the approval step `create` writes the first entries to a temporary
+file beside the log's path and renames it to that path once all are written, so that a writer that
+dies leaves no partial log, only the lock, which `scripts/clear_lock.py` removes
+(PRO-065). The history cannot show who acted, so the owner's review at each ⛔ gate
 lists these approvals since the last gate.
