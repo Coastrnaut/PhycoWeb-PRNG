@@ -406,6 +406,100 @@ start open, and an item is ticked only under the rule in the Notes below.
   records? Is it stated when the class "strong theoretical concern", which FR-060 lists, is given?
   [Coverage, Spec §FR-060, §FR-065; data-model §1 "Classification", §4, §5; security.md §9.1]
 
+## Fourth re-run (2026-11-02)
+
+Items found when the checklist was run a fifth time, over the complete documents and the repository,
+after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK059 Is each counted tool's `validated_kind` stated, with the word widths, operation set and
+  kind of model its known results cover, and how the cross-checks between kinds at w = 4 and 8 bear
+  on it, given that data-model §7 records the kind's word width, that research R12 makes "a use at a
+  word width, operation set or kind of model outside its validated kind" a trigger for validating
+  again and has such a use write `not evaluated`, and that the ARX search's one named known result,
+  SPECK32's optimal trails, has 16-bit words while its counted searches run at w = 16 and 32 and its
+  cross-checks at w = 4 and 8, with no known result at w = 32 named for it? [Clarity, Conflict, Spec
+  §FR-039; research R12; data-model §7 `validated_kind`]
+- [ ] CHK060 Can the cross-check between kinds of an ARX candidate pass for a correct search and
+  fail for one that misses optimal trails? Research R12 compares, by exact equality, the ARX
+  search's optimal single-trail weight over r rounds of the box, a trail through the box's additions
+  under the exact models of addition, with the best product of one-round entries of the box's
+  exhaustive tables, "one round equalling the table's best entry", while a table entry is the box's
+  exact differential probability, which sums every trail through its internal additions, so that for
+  a box with more than one addition a correct search can lie above it at r = 1; and "a trail weight
+  above a differential's weight, as clustering gives, is expected and not compared", which, read
+  that way, also passes a search that reports too high a weight, the error that overstates a bound.
+  Is the comparison stated at one granularity, for example against an exhaustive search over the
+  box's internal trails at w = 4, with the table's weight as a floor that no search result may go
+  below? [Measurability, Conflict, Spec §FR-038, §FR-039; research R7, R12; data-model §6
+  `cross_check`, §7]
+- [ ] CHK061 Is "a firing" in the bias test's validation defined, given that research R4 and
+  data-model §7 count the sets of each family in which the test fires, 82 to 97 of 100, and record
+  "the planted bit's count and every fired bit", while each set also holds S − 1 unplanted bits
+  tested at 0.005/S, so that a family of 100 sets holds a firing of an unplanted bit with
+  probability up to about 1 − 0.995¹⁰⁰, near 0.39? Is a set counted only when its planted bit fires,
+  and is an unplanted bit that fires reported, counted or a failed validation? [Measurability, Spec
+  §FR-039; research R3, R4; data-model §7; cli contract `validate_tool.py`]
+- [ ] CHK062 Are the round counts at which the avalanche test's planted results are tested stated,
+  with the bits expected to fire at each, given that data-model §7 re-finds the planted gap only if,
+  "at every round count tested, every difference bit of the unmixed lane fires and no other bit
+  does", while at a round count below the variant's full diffusion the difference bits that the
+  exact dependency matrices show independent of the flipped bit never flip and so fire as well, as
+  the avalanche test's cross-check requires? Is "unmixed" defined, for example a lane that no update
+  writes but others read, since a lane that none reads either leaves every other bit unchanged when
+  one of its own bits is flipped? Do the related-key path's and the rotational path's stated sets
+  likewise give the bits that fire where their flips have not yet reached the whole state?
+  [Measurability, Conflict, Spec §FR-039; research R4, R13; data-model §7]
+- [ ] CHK063 Does the bias rule's S count the bits of every call type where the call types draw on
+  distinct constant streams? The spec defines S as "the number of bits tested at that size and round
+  count", and research R4 runs both tests "on each call type's permutation", while R4 and data-model
+  §5 fix S = 4b, and S_A, per permutation, so that at T call types T·4b bits are tested at
+  0.005/(4b) each and the rule's chance of firing on uniform states rises to about T times 0.005 per
+  size and round count, and FR-028 and research R4 state the chance of a raised R, about 21% at R =
+  32, for one permutation. Is the per-permutation threshold stated as the rule, with the chance for
+  T call types stated beside every firing, or does S count every call type's bits? [Consistency,
+  Spec §Pre-registered Design Protocol "Bias rule", §FR-023, §FR-028; research R4; data-model §5
+  `frequency`, `avalanche`]
+- [ ] CHK064 Is the rule's degree count defined for every operation an operation list may hold and
+  for the way they combine? Research R13 and data-model §5 state one degree, w − 1 for a w-bit
+  addition, take "each phase's degree" from a box's or S-box's truth table where its width allows,
+  and multiply the phases' degrees for a round, while research R11's forms also hold subtraction,
+  AND, OR, NOT, XOR, rotations, shifts and constants in F, an update's degree combines F's with that
+  of ⊙, a phase holds an update at every node, and an ARX-box spreads an addition and a dependent
+  operation over two phases, so that one box's truth table spans several phases. Are each
+  operation's degree, the degree of an update and of a phase, and the way a box's truth-table degree
+  enters the product stated, so that two implementations of the pre-registered rule give the same
+  count and raise R_dist at the same round counts? [Clarity, Spec §Pre-registered Design Protocol
+  "Round rule", §FR-034; research R11, R13; data-model §5 `degree`]
+- [ ] CHK065 Are a writer, a path and a record stated for each candidate's constant tables before
+  selection, one per variant (n, w, R) and call type, given that `gen_constants_v3.py` takes no
+  candidate and writes only `phycoweb/constants_v3.py` and
+  `vectors/phyco-v3/constants_n<n>_w<w>.json`, that research R15 runs the refused-list check and the
+  checks of the constants within a call on "every table the script writes, one per supported (n, w)
+  and each exploration table", that every record whose result depends on the constants names "the
+  constant table it read by path and SHA-256", that research R7 makes "the constant table for the
+  new R with its checks" first after a rise of R, and that a refused-list match in a candidate's
+  table makes it fail FR-023, an eligibility item? [Gap, Spec §FR-023, §Pre-registered Design
+  Protocol "Round rule", "Eligibility and selection"; research R7, R15; data-model §5 "Constants
+  cited"; cli contract "Generators of constants and vectors"]
+- [ ] CHK066 Are the sizes at which the invariant checks run, and their forms per colour class at
+  odd n, stated, given that research R13 checks the sums and XORs of the pressure and vein lanes
+  "over each colour of the checkerboard (even n)" and names no form for the three colour classes of
+  a schedule at odd n, which a supported 3×3 has (research R14), and that FR-037, research R13 and
+  data-model §5 state no size for the invariant check, as "every supported size and variant" is
+  stated for the inverse tests? [Coverage, Spec §FR-018, §FR-037; research R11, R13, R14; data-model
+  §5 `invariant`]
+- [ ] CHK067 Is a budget row stated for the heavy validation runs on known results that are not
+  published values, given that research R7 makes heavy every run of a kind it budgets, so that the
+  validations of the exhaustive-bijectivity tool on a known permutation and a map with collisions
+  over 2³² inputs, of the frequency test on S14's bias, of the avalanche test on its three planted
+  results and of the other structural tools are heavy, that FR-039 charges every heavy validation
+  run to research R7's feature-wide row and FR-045 every heavy run that charges no candidate, while
+  research R7 lists that row's runs as "validations and re-validations on published values (R12),
+  heavy reproductions (R16) and FR-053's test with two worker counts", and R12 and the cli
+  contract's Budget guard name only validations on published values? [Consistency, Spec §FR-039,
+  §FR-045; research R7, R12, R13; cli contract "Budget"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
