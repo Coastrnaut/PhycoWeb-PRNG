@@ -553,6 +553,67 @@ start open, and an item is ticked only under the rule in the Notes below.
   Protocol; data-model §18 `direction`, `rules`; research R8, R13, R16; checklist-choices.md "Rows
   that change the protocol"]
 
+## Seventh re-run (2026-11-02)
+
+Items found when the checklist was run an eighth time, over the complete documents and the
+repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK067 Do the places that the lists' headings name hold the texts that their directions
+  govern? The direction of "Records and their hashes" covers "what a record holds, which files are
+  hashed and kept, and the writers' and guards' checks and refusals", and that of "Protocol changes
+  and their directions" "an entry's fields, the comparison and the guard's refusals", while their
+  places are research R16 and FR-044 alone, and a record's fields stand in data-model §1, an entry's
+  in §18, the guards and the writers' refusals in the cli contract, the environment guard in
+  research R1, which no heading names, and the rows that the guard "Approvals" reads in the notes
+  under the Review & Approval table, none of them a place that `research/004/place_check.py`
+  compares, since it reads FR items, research sections, the protocol's paragraphs and the plan's
+  table only. Is it stated whether a change made in those texts alone, to a guard's refusals or a
+  record's fields, is a change of that rule, with its `old_text` and `new_text` taken from them, and
+  whether the comparison reads them, so that such a change cannot pass outside the log? [Coverage,
+  Gap, Spec §FR-044, §Review & Approval; data-model §1, §18; research R1, R16; cli contract "Guards
+  shared by every script"; checklist-choices.md "Rows that change the protocol"]
+- [ ] CHK068 Can the owner write an environment record, and a stale lock be cleared, while the guard
+  "Environment" refuses? `protocol/evidence.py` writes every record, the environment records among
+  the files it keeps under a fixed name (data-model introduction), and exits 2 at start unless the
+  running environment matches "the platform's environment record in force" as a whole and that
+  record's row, "Environment record <n>", reads Approved at HEAD, `scripts/recheck_004.py` "alone"
+  being exempt. The first environment record is written at plan phase 1's step (7), when no record
+  is in force, and after "a Windows or WSL update" the guard exits 2 on the very difference that
+  "the owner then writes a new environment record with `scripts/owner_record.py environment`" to
+  resolve, so that this owner's own act is refused at setup and after every change; and a
+  `lock-cleared` record, which the guard "Protocol log" lets that module write before the log exists
+  (PRO-065), is refused before step (7) and after any change until a new record is approved, so that
+  a stale `data/log-append.lock` blocks the logs' writers, the log's creation included. Is it stated
+  which writes the guard exempts, and on what condition, for example the environment record itself,
+  checked instead against research R1 and the pins of `requirements.txt`, and a `lock-cleared`
+  record; what their `environment` field holds while no record is in force, given that data-model §1
+  has every record name the record in force and lists no `environment` kind; and whether the guard
+  applies to the log writers, `protocol/changelog.py` and `protocol/provenance.py`? [Gap, Conflict,
+  Spec §FR-044, §FR-058, §Review & Approval; data-model introduction, §1 `kind`, `environment`;
+  research R1, R16 "Stale locks"; plan phase 1; cli contract "Environment", "Protocol log",
+  `owner_record.py`, `clear_lock.py`]
+- [ ] CHK069 Is the number of the log's first entries stated consistently with the lists, given that
+  data-model §18 counts among them "the 70 rows tagged Stricter or Settle (26 and 44)", the count
+  after the fourth re-run, while the lists now hold 81 such rows, 27 Stricter and 54 Settle, the
+  fifth re-run having added five Settle rows and the sixth five Settle rows and HW-077's Stricter,
+  and each list states the rows its round enters the log with, 153, 27, 55, 53, 23, 9 and 11, beside
+  the place ad2c195 changed, if the owner confirms it as an entry of its own? Is the count kept
+  current at each round, or replaced by the rule it stands for, that every Stricter or Settle row is
+  listed, so that no number in the requirements disagrees with the lists when `create` writes the
+  entries? [Consistency, Spec §FR-044; data-model §18; checklist-choices.md "Rows that change the
+  protocol"]
+- [ ] CHK070 Is the end of the standing authorization stated before the freeze, given that FR-043
+  makes step (1), "the owner commits the feature files (Principle IX)", an owner's own act that
+  falls "outside the standing authorization for local commits" and that "the agent never performs",
+  while under that authorization the agent commits "after each task or Spec Kit command", the
+  feature files included, so that by the freeze they may all be committed and step (1) leave nothing
+  to commit, and "the history cannot show who acted"? Is it stated from which point the agent
+  commits no feature file, for example from the owner design review's approval, which commit step
+  (1) is, and how the freeze record or the row "Design freeze" names it, so that step (1) can be
+  performed and found in the history? [Gap, Clarity, Spec §FR-043, §FR-044, §Review & Approval
+  "Design freeze"; cli contract `design_freeze.py`; data-model §13; constitution IX]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
