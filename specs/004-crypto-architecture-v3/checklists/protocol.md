@@ -407,6 +407,55 @@ start open, and an item is ticked only under the rule in the Notes below.
   spec's status cannot fall behind the gates it summarizes? [Consistency, Spec §Status, §Review &
   Approval; checklist-choices.md "Status"]
 
+## Fourth re-run (2026-11-02)
+
+Items found when the checklist was run a fifth time, over the complete documents and the repository,
+after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK058 Is a row listed under a rule by the text its Changes cell names or by the text its
+  applied change altered, given that checklist-choices.md's lists name "every row whose option
+  altered the text of a pre-registered rule" under "each rule it alters", while "A row is listed
+  under a rule when its Changes cell names that rule's text", and that PRO-056, whose Changes cell
+  names research R7, R12 and R16, spec FR-045 and User Story 4 and the cli contract's "Reproduction"
+  and "Budget", was applied in commit 810cbe2 also to the plan's table "Values this plan fixes
+  before first use", whose row "Analysis budget per candidate (stop rule)" gained "beside the six
+  candidates' rows, one feature-wide 66 h row for the heavy runs that charge no candidate", while
+  the fourth list, approved "as written" by the owner's answer of 2026-11-02, has no heading "Values
+  this plan fixes"? Since a first entry holds each rule's text "in each place its heading names"
+  (data-model §18), that table's old and new text would enter no entry. Is that row listed under the
+  table, and is a check stated, before the log is created, that every place of a rule's text that a
+  round's commits altered is covered by a row listed under it, so that no change made beyond a row's
+  Changes cell stays outside the log? [Conflict, Spec §FR-044; plan "Values this plan fixes before
+  first use"; data-model §18; checklist-choices.md "Rows that change the protocol"]
+- [ ] CHK059 Is it stated which budget row holds a FUT-SEC-8 repeat after a tool defect is fixed,
+  and how many repeats may follow, given that the demonstration's table allows "a repeat only after
+  a tool defect is fixed (Edge Cases)", that `fut_sec8.py --repeat-after-defect` admits a repeat for
+  each recorded tool defect "that no earlier record names", with no limit on their number, where a
+  candidate's evidence gets one re-run per kind and a second recorded defect leaves it inconclusive,
+  that research R7's FUT-SEC-8 row "holds one pass per target" and "each row refuses a run once it
+  is spent", that FR-039 charges "the FUT-SEC-8 vector check and sweep against the demonstration's
+  own budget", and that FR-045 charges "Every heavy run that charges no candidate" to the
+  feature-wide 66 h row? Is a repeat charged to the FUT-SEC-8 row, to the feature-wide row or to a
+  stated allowance of its own, and does it, as a heavy reproduction does, run only on the owner's
+  request? [Gap, Conflict, Spec §Pre-registered Design Protocol "FUT-SEC-8 demonstration", §Edge
+  Cases, §FR-039, §FR-045; research R7; data-model §4 `supersedes`, `defect`; cli contract
+  `fut_sec8.py`]
+- [ ] CHK060 Is a writer named, with its command, for the protocol change log and for the provenance
+  log, given that the plan's tree names `protocol/candidates.py` as the candidate log's writer and
+  `scripts/owner_record.py` for the owner's environment records and owner-provided values, while
+  data-model §18 leaves the owner's approval to "the writer's approval step", which "prints the
+  SHA-256 of the entry, or of the first entries together when the log is created, and appends
+  nothing unless standard input is an interactive terminal and the owner types its first 16 hex
+  digits", and no script of the plan's tree or of the cli contract creates
+  `research/004/protocol-changes.jsonl`, writes its first entries from the lists "Rows that change
+  the protocol" with each rule's text at the two commits, or proposes a later entry, and that FR-067
+  and data-model §14 name no writer for `provenance.jsonl`, whose appends only the shared guard
+  "Hash-chained logs" constrains? Is it stated which writer refuses an entry without `direction`,
+  `readings` for a `settled` one, or `last_record_id`, so that the owner's approval step and those
+  refusals are not left to whatever code first appends? [Gap, Spec §FR-044, §FR-067; plan "Source
+  Code (repository root)"; data-model §14, §18; cli contract "Guards shared by every script"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
