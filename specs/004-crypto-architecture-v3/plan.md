@@ -132,7 +132,8 @@ log, each appended under a lock; vectors under `vectors/phyco-v3/`, with the sid
 
 **Testing**: `python -W ignore -m unittest discover -s tests -t .` on both platforms; WSL-only
 tests (the C tool) skip cleanly on Windows; property-based tests with Hypothesis 6.168.5, whose
-download the owner approved on 2026-11-01 (R19; FR-058).
+download the owner approved on 2026-11-01, skipping with the open item named until its wheels are
+installed and checked (R17, R18, R19; FR-058).
 
 **Target Platform**: Windows 11 and Ubuntu on WSL2, i9-14900K, 32 logical CPUs, 31 GiB RAM.
 The design targets the Arty A7-100T at 200 MHz, which this feature does not build for.
@@ -241,7 +242,7 @@ protocol/
 ├── devinputs_v3.py           # new: development inputs and uniform controls (R3)
 ├── evidence.py               # new: the one writer of evidence records (R16)
 ├── candidates.py             # new: hash-chained candidate log, appended under a lock (FR-041, R16)
-├── design_freeze.py          # new: freeze create, approve and validate (FR-043)
+├── design_freeze.py          # new: the freeze's code, create, approve and validate (FR-043)
 ├── claims.json               # new: claim and evidence register (FR-069)
 └── disclaimer.py             # gains DESIGN_DISCLAIMER; DISCLAIMER unchanged (FR-068)
 
@@ -269,7 +270,7 @@ scripts/
 ├── gen_constants_v3.py       # constants and their checks (R15)
 ├── gen_vectors_v3.py         # vectors and known-answer tests (R8)
 ├── gen_constructed_v3.py     # constructed-state vectors (FR-054)
-├── design_freeze.py          # create, approve and validate the freeze
+├── design_freeze.py          # the freeze command, calling protocol/design_freeze.py
 ├── recheck_004.py            # recomputes every verdict (FR-065)
 ├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
 ├── owner_record.py           # the owner's environment records and owner-provided values (R1, R19)
@@ -289,9 +290,9 @@ tests/
 ├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze;
 │                             # no key loaded into any state before the FUT-SEC-8 review (FR-001);
 │                             # every seed-set load is dev-only (FR-040)
-├── test_records_004.py       # --reproduce of one light command per light kind (R7); the two-worker
-│                             # test, marked heavy; the attribute pin and byte-order mark of every
-│                             # hashed path (FR-053)
+├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
+│                             # the two-worker test, marked heavy; the attribute pin and byte-order
+│                             # mark of every hashed path (FR-053)
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
@@ -300,12 +301,13 @@ vectors/phyco-v3/             # Π and Π⁻¹ KATs, mode vectors, digests, cons
 baseline/phyco-v2/            # byte-exact copies and MANIFEST.json (FR-042)
 
 reports/004-crypto-architecture-v3/
+│                             # every fixed-name file keeps earlier contents in versions/ beside it
 ├── environment-windows.json  # the environment records, written by the owner (R1)
 ├── environment-wsl.json
 ├── downloads.json            # the downloads manifest (R19)
 ├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
 ├── research-versions/        # every research.md version a record cites, by SHA-256 (R16)
-├── fut-sec-8/                # demonstration record, tool check, review, any reproduction
+├── fut-sec-8/                # demonstration records (<record_id>.json), tool check, review
 ├── validation/               # tool validation records
 ├── controls/                 # uniform controls, one record per test and size,
 │                             # shared by every candidate (R4)
@@ -314,9 +316,12 @@ reports/004-crypto-architecture-v3/
 ├── security-target/          # bound at the limits, generic-bound table
 ├── freeze/                   # freeze record
 ├── review-package/
-├── reproductions/            # one directory per reproduced record and reproduction (R16)
+├── reproductions/            # <record_id>/<n>/ per reproduction, FUT-SEC-8's included (R16)
 ├── rechecks/                 # the re-check's records (FR-065)
+├── generator-runs/           # each generator run's record (data-model §11)
 ├── generator-checks/         # each generator's --check records, one per platform (SC-009)
+├── projections/              # every projection record (data-model §1)
+├── locks/                    # the lock-cleared records (R16)
 ├── provenance.jsonl          # FR-067
 └── phase-report.md
 ```
@@ -333,13 +338,16 @@ source and binary.
    `data/local/`, where local-only outputs go (R16, R18; the pins for
    `reports/004-crypto-architecture-v3/**`, `research/004/**`, `protocol/*.json` and `*.gz` were
    added on 2026-11-01), with R18's line-ending test, which runs from this phase on (FR-053); the
-   Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
-   installed; the downloads manifest `downloads.json`, one entry per file of R19's tables from setup
+   Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and installed from
+   outside the download directory under `-I`, as R19 states, then checked
+   against R18's pins, which enter `requirements.txt` only then; the downloads
+   manifest `downloads.json`, one entry per file of R19's tables from setup
    on, each with its `status` (`approved`, `fetched` or `not obtained`), and an `owner-provided`
    entry for each value the owner provides (R19); the environment records of both
    platforms (R1), these records and those entries written by the owner with
    `scripts/owner_record.py`, each with its Review & Approval row; corrected `requirements.txt`;
-   `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints; `protocol/evidence.py`;
+   `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with the fingerprints of every allowed (n, w), at
+   most 16 pairs, and of the synthetic seeds (R3); `protocol/evidence.py`;
    the provenance log; the protocol change log, whose first entries are the answered rows of every
    checklist round answered before it is created, by the per-round lists of checklist-choices.md, in
    round order, approved by the owner at the log's approval step (FR-044; data-model §18); the

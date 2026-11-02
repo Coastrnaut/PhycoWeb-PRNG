@@ -96,7 +96,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   exhaustive checks if Python is too slow) are built and run in WSL2 Ubuntu with gcc 15.2.0, and
   the Linux reproduction of every vector (SC-009) uses the WSL venv `~/.venvs/phycoweb`
   (Python 3.14.4, numpy 2.5.4, scipy 1.18.1). The machine is the i9-14900K with 32 logical CPUs
-  and 31 GiB RAM used in feature 003.
+  and 31 GiB RAM used in feature 003. On Windows this is, as a probe of 2026-11-01 found it, the
+  Store distribution of Python 3.10.11, named in a record's `command` by the full path of the
+  `python.exe` in its versioned prefix, `sys.executable` with the alias resolved; its packages,
+  numpy, scipy, nistrng and pip 26.2.2 among them, are in the user site, which evidence runs use and
+  `-I` would disable. `pip freeze`, for the environment record and for the start check, is that
+  interpreter's `-m pip freeze --all`, run without `-I`.
   - One environment record per platform, `environment-windows.json` and `environment-wsl.json`
     under `reports/004-crypto-architecture-v3/`, is written at setup and on any change by
     `scripts/owner_record.py environment`, which the owner runs, an owner's own act (spec FR-044):
@@ -119,11 +124,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the record in force has its row "Environment record <n>" Approved at HEAD with its
     SHA-256 (cli contract, "Environment"). `scripts/recheck_004.py` alone is
     exempt, since it imports only the standard library and `protocol/` (R16).
-  - A reproduction that re-runs evidence may run in either environment, whichever made the original,
-    and in no other; the re-check of R16 may run anywhere. It compares the
-    fields data-model §1 lists, and every other field, `command`, `config`, `parallelism`, the
-    analyst and the reviewer included, is reported only, since each may differ between environments
-    or analysts.
+  - A reproduction runs in the environment that made the original, as its environment record shows,
+    and in no other: a run in the other environment is not a reproduction and compares nothing with
+    the original, and the kinds that depend on the environment, the synthetic draws (numpy), the
+    MILP bounds (scipy) and the C tools (built in WSL only), need it anyway. The re-check of R16,
+    and a reproduction of its `recheck` record, may run anywhere. A reproduction compares the fields
+    data-model §1 lists, and every other field, `command`, `config`, `parallelism`, the
+    analyst and the reviewer included, is reported only, since each may differ between machines or
+    analysts.
 - **Rationale**: these are the environments of security.md §19, so no new tool is needed to
   start. There is no C compiler on Windows. Two Python versions on two platforms test FR-035's
   determinism across platforms and versions.
@@ -174,14 +182,19 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Uniform control | the same strings with `control` in place of `dev` | as above |
 
   - A measurement with N inputs uses i = 0…N − 1. The fingerprint of each kind, of the state kind at
-    every supported n and w and of the synthetic seeds at every size, is the SHA-256 of a text that
+    every supported n and w (FR-018's sizes with R14's widths, 4 at 2×2 only, 8, 16 and 32: at most
+    16 pairs) and of the synthetic seeds at every claimable size, is the SHA-256 of a text that
     data-model §2 fixes exactly, so that another implementation computes the same fingerprints: the
     values for i = 0…99, one per line, each line ending in LF, the last included, as
     `protocol/seedsets.py` writes; byte strings in lower-case hex, as digests are written, a state
     as one upper-case hex string of its w-bit words in the design document's lane order, and a
     synthetic seed as a decimal integer. A personalization string's fingerprint covers its full 32
     bytes, so it does not depend on m, which the design fixes later. The fingerprints are recorded
-    in the module and checked at load, as `protocol/seedsets.py` does.
+    in the module, all of them written in plan phase 1 before the first record, and checked at load,
+    as `protocol/seedsets.py` does; `load` refuses, exit 2, any other (n, w) or n and any kind
+    without a fingerprint, naming it. A variant outside these pairs is not a supported one (R14), so
+    nothing is added later and the module stays as frozen; a test checks that every allowed pair has
+    a fingerprint.
   - Every use takes its inputs from this rule: the vectors (keys and nonces 0 and 1, R8), the
     constructed states from development keys, the D4 scoring, the tool validation and every
     test. A use of N inputs takes i = 0…N − 1 of the kind it names, declared up front: scripts take
@@ -251,15 +264,20 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Exact verdicts.** For each (N, S) and (N_a, S_A), integer critical counts are derived once
     by exact integer arithmetic over the binomial distribution (sums of binomial coefficients,
     compared with the threshold as a rational) and recorded in a committed table,
-    `research/004/tools/critical_counts.json` (data-model §5). The verdict compares each count
+    `research/004/tools/critical_counts.json` (data-model §5), which is code, in every citing
+    record's `code_sha256` and matching HEAD, and append-only: counts for a new (N, S) or
+    (N_a, S_A) are added as new entries and existing ones never change, which a
+    test checks against the file's history. The verdict compares each count
     with its critical values, so scipy's tails decide nothing; scipy still computes the
     p-values reported.
     A reproduction compares the counts, the critical counts and the verdicts byte for byte, and the
     p-values by value, decompressed first in either format: two p-values agree when their difference
     is at most 10⁻⁶ times the larger of their magnitudes, or when both are below 2⁻¹⁰²², the
-    smallest normal double, so that a 0 beside a subnormal agrees. It lists any outside; a p-value
-    never decides a verdict, and a `p_values` file's hash and `uncompressed_sha256` may differ
-    between the two environments of R1 and are reported only (data-model §1).
+    smallest normal double, so that a 0 beside a subnormal agrees. A `p_values` output is marked
+    `deterministic` false with `compared: values`, so its hash, size and `uncompressed_sha256` are
+    reported only; a value outside makes the outcome `differs`, exit 1, with the values listed: a
+    finding about the run's reproducibility that blocks no candidate, since a p-value never decides
+    a verdict (data-model §1).
   - **Avalanche test.** FR-037 asks for it; using it as a source of R_dist is stricter than the
     spec. For each flipped input bit j in a set F, N_a = 2¹³ test states x (kind `state`, R3);
     after every round r = 1…R_cur the difference Π^r(x) ⊕ Π^r(x ⊕ e_j) is counted bit by bit,
@@ -642,7 +660,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     recorded stands, so a stricter change can only raise R or make a candidate ineligible,
     never undo a raise. If the row cannot hold the new run, that evidence is inconclusive and
     the candidate ineligible at that size. A budget lowered below the hours already used leaves
-    zero hours: the results so far stand, and no further run of that row starts.
+    zero hours: the results so far stand, and no further run of that row starts. The critical counts
+    that a new (N, S) or (N_a, S_A) needs are added to `critical_counts.json` as new entries, and
+    existing entries never change (R4).
   - Each candidate's log entry records the hours used per row (data-model §3). Each record
     states the hours projected and used, the measured speed and the engine's code hash. Others
     reproduce the counts and verdicts of finished runs exactly, and an inconclusive outcome as
@@ -699,11 +719,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     heavy run takes the lock of R16, never overlaps another heavy run or any battery run, projects
     first and records `heavy_run` true (FR-045). The examples that FR-045 and the cli contract list
     are cases of this rule, and a test checks that every budgeted kind and every script with a
-    worker option takes the lock. Every other kind is light: one this section does not budget that
-    runs with one worker in under 10 minutes, such as the constants, the vectors and the constructed
-    states, `mode_limits_v3.py`, the round rule, the D4 choice, the claim register and the re-check.
-    The tests of User Story 4, R16 and FR-061 reproduce the light kinds, and a budgeted kind is
-    reproduced only on the owner's request, quoted with its date in the reproduction record, as a
+    worker option takes the lock. Every other run is light: a run of a kind this section does not
+    budget, with one worker and in under 10 minutes, such as the constants, the vectors and the
+    constructed states, `mode_limits_v3.py`, the round rule, the D4 choice, the claim register and
+    the re-check; light is a property of each run, by this test, not of its kind.
+    The tests of User Story 4, R16 and FR-061 reproduce, per kind, one run
+    that was light, and a run of a budgeted kind is reproduced only on the
+    owner's request, quoted with its date in the reproduction record, as a
     heavy run charged to the feature-wide row (R16). FR-053's test with two worker counts
     is a heavy run: it runs a stated test operation list, takes the lock,
     projects first, charges no candidate, only the feature-wide row, and is not
@@ -1457,7 +1479,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     authorization to commit makes routine. Data and report files may still be dirty, and the record
     lists the dirty paths; a binary is rebuilt from committed source, its hash reported only. Each
     record's code is then found at its `git_head`, and a test checks each `code_sha256` entry
-    against the blob at that commit.
+    against the blob at that commit. `research/004/tools/critical_counts.json` is code too, one of
+    `research/004/ir.py`'s tools (R4). A run also exits 2 while a file a record would cite is
+    modified in the working tree, so that `dirty_paths` never holds a cited file. `--reproduce` runs
+    the original's code, from a separate worktree of its `git_head` checked against that commit's
+    blobs, and the committed-code guard applies to that commit (Reproduction, below).
   - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
     `security-target/parameters.json` and `limits.json`, the environment
     records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to
@@ -1465,12 +1491,23 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     its current content as `<dir>/versions/<sha256>.json` beside it, and the new content holds
     `previous_sha256`. A record that cites one gives its path and SHA-256, and the re-check resolves
     either from the versions. The selection records are not among them: each is written once, and a
-    later selection is a new record, `freeze/selection-<k>.json` (data-model §9).
+    later selection is a new record, `freeze/selection-<k>.json` (data-model §9). Three files are
+    append-only instead, their earlier entries never changing:
+    `research/004/tools/critical_counts.json` (R4), the sidecar `vectors/phyco-v3/MANIFEST.json` and
+    `research/004/candidates/superseded.json`; a record that cites one gives its SHA-256 and the
+    entry it used (data-model introduction).
   - **Reproduction.** Every script that writes evidence or generated files has a mode
-    `--reproduce RECORD`, which runs the recorded command's configuration with its output directory
-    replaced by `reproductions/<record_id>/<n>/` and writes a `reproduction` record there: the
-    original's ID and SHA-256, each compared field with its outcome, the reported fields, and
-    `match` or `differs`. It appends nothing to the candidate log, charges no candidate's budget row
+    `--reproduce RECORD`, which runs the recorded command's configuration in a separate worktree of
+    the original's `git_head`, the code files of its `code_sha256` checked against that commit's
+    blobs, with its output directory replaced by the main tree's `reproductions/<record_id>/<n>/`,
+    and writes a `reproduction` record there, naming that commit: the original's ID and
+    SHA-256, each compared field with its outcome, the reported fields, and `match` or `differs`.
+    The outputs the original commits are written there under the same suffix and 10 MB rules, and an
+    output it keeps local-only goes to `data/local/004/<record_id>/`, `<record_id>` there being the
+    reproduction's own, never committed, its SHA-256 compared with the original's; a generator's
+    reproduction compares each generated file in memory with the SHA-256
+    its `generator-run` record holds and writes no `.py` or `.hex` file. It
+    appends nothing to the candidate log, charges no candidate's budget row
     and is not a re-run under R7, so it can neither replace evidence nor add any; it is
     a heavy run where R7 says so, run only on the owner's request, quoted
     with its date in its record, and charged to R7's feature-wide row, and a
@@ -1480,12 +1517,19 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     new evidence in the original's row, and a difference in a field that decides no verdict, such as
     a p-value, is reported and blocks nothing. It compares the fields data-model §1 lists for
     its kind and reports every other field only, timings and raw solver logs among them; a different
-    source hash makes it a new run, not a reproduction. A `p_values` file is compared by its values,
-    within the tolerance data-model §1 defines, and decides nothing; every other `.gz` file is
+    source hash makes it a new run, not a reproduction. A `p_values` output, marked `deterministic`
+    false with `compared: values`, is compared by its values, within the tolerance
+    data-model §1 defines, and decides nothing, a value outside making the outcome
+    `differs`, a finding that blocks no candidate; every other `.gz` file is
     compared by its `uncompressed_sha256`. Its verdict is recomputed under the spec version, the
     research version and the protocol change-log entry the original cites
     (`spec-versions/<sha256>.md`, `research-versions/<sha256>.md`), so a later change cannot alter
-    it. The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`.
+    it, and it runs in the environment that made the original, as recorded, and in no other (R1).
+    The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
+    test reproduces, per kind, its latest light run and, where one exists, a light run made before
+    the last change to its code (R7), and leaves out, each with its reason, the claim test, which
+    writes no record and runs as a test, a `lock-cleared` record, which records an event, a tie
+    choice, an owner's own act, and the reproduction records, which are not reproduced.
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs and compares it with
     the recorded verdict (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
     committed files, so the committed per-round summaries must suffice, for example R_f from the
@@ -1494,12 +1538,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     it lists both checks per kind. This re-check is the routine test of User Story 4. It recomputes
     each verdict under the rules in force at the protocol change-log entry its record cites and,
     where a later stricter change applies (FR-044), also under the current rules, listing both; a
-    disagreement in either is reported. It is exempt from the environment guard of R1: it recomputes
+    disagreement in either is reported. Under the rules in force at a record's entry, it runs the
+    verdict functions at that record's `git_head`, from a separate worktree of that commit, and
+    names each commit, so that a function changed before the freeze is never
+    applied to records it did not compute; under the current rules it runs
+    HEAD's. It is exempt from the environment guard of R1: it recomputes
     verdicts from committed counts by exact integer arithmetic (data-model §5) and imports only the
     standard library and those `protocol/` modules that do the same, which a test checks. Its
     `recheck` record holds the interpreter, platform and full `pip freeze` it ran with, and says
-    when that environment is not one of R1's; a reproduction that re-runs evidence stays in R1's two
-    environments. Full re-runs are reproductions (above), listed per kind with their cost: the light
+    when that environment is not one of R1's; a reproduction stays in the environment that made its
+    original (R1), and a `recheck` record is reproduced by `recheck_004.py --reproduce RECORD`,
+    comparing its verdicts and counts, in any environment, as the re-check runs. Full re-runs
+    are reproductions (above), listed per kind with their cost: the light
     kinds of R7 always, a heavy kind only on the owner's request, one at a time, as a heavy run
     charged to R7's feature-wide row (FR-045).
   - Heavy runs take an exclusive lock, `data/heavy-run.lock`, which `.gitignore` gains, and
@@ -1580,7 +1630,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Tests use `unittest`, as in features 001–003: `python -W ignore -m unittest discover -s tests
     -t .`. The new tests cover FR-058's list, with property-based tests in Hypothesis 6.168.5,
     the last release that supports Python 3.10, whose download the owner approved on 2026-11-01
-    (R19). If it cannot be obtained, its absence is an open item (FR-058). Hypothesis runs under
+    (R19). Until its wheels are installed and checked in an environment (R18, R19), and if they
+    cannot be obtained, its absence is an open item (FR-058): the property tests skip with a reason
+    naming it, quickstart P0 reads "all tests pass, or skip with a listed open item, and none
+    fails", and the final report lists the skipped tests. When the wheels arrive,
+    the pins take effect, a new environment record is approved (R1), and
+    the property tests run before any later record. Hypothesis runs under
     a settings profile that the test package registers with `derandomize=True` and
     `database=None`, so every run tries the same examples and a failure replays by running
     again.
@@ -1638,8 +1693,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `requirements.txt` loses its stale header and pins the two tested environments with markers:
     `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"`,
     `numpy==2.5.4; python_version >= "3.14"`, the same for scipy (1.15.3 and 1.18.1), and
-    `nistrng==1.2.3` in both. With Hypothesis approved (R19), it adds `hypothesis==6.168.5`,
-    `sortedcontainers==2.4.0` and `exceptiongroup==1.3.1; python_version < "3.11"`. A comment in the
+    `nistrng==1.2.3` in both. The Hypothesis pins of R19, `hypothesis==6.168.5`,
+    `sortedcontainers==2.4.0` and `exceptiongroup==1.3.1; python_version < "3.11"`, enter it only
+    once their wheels are installed and checked in an environment, each marked for that platform;
+    until then they stand in it commented out, with the open item named (R17), and the
+    environment record is written against the file as it stands. A check after each
+    install compares `pip freeze` with these pins (R19). A comment in the
     file says that the analysis tools need Python 3.10 or later and that the model alone needs only
     the standard library (R17), so FR-035's "expected, not tested" on older versions concerns the
     model only, and that its markers admit Python 3.11 to 3.13 untested. A new environment record is
@@ -1700,7 +1759,14 @@ licence does not touch the project's GPL-3.0.
 | `main.pdf`: Beierle et al., "Lightweight AEAD and Hashing using the Sparkle Permutation Family", ToSC 2020(S1) | https://orbilu.uni.lu/bitstream/10993/41993/1/main.pdf (author preprint) | 1.02 MB, as ORBilu lists it | none stated on the record | the SPARKLE long-trail bound (R12) | as above |
 | `AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf`: BSI, "A proposal for: Functionality classes for random number generators", version 3.0, 17 September 2024 | https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile&v=3 | 6 MB, as BSI lists it | © BSI, under BSI's terms of use | D8's functionality class | the class stays unconfirmed, as an open item |
 
-**Software.** Installed from the downloaded files into the two existing environments. The
+**Software.** Installed from the downloaded files into the two existing environments, from outside
+the download directory: on Windows by `<python> -I -m pip install --user --no-index --no-deps`
+followed by the paths of the three Windows wheels, `<python>` being the full path of R1's Store
+Python, so that pip reads the downloaded files under `-I`, and in WSL by
+`~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` with the two WSL wheels. If
+pip refuses a user install under `-I`, the install stops for the owner's decision, and
+nothing runs from the download directory. A check after each install compares
+`pip freeze` with R18's pins, which enter `requirements.txt` only then (R18). The
 licences allow use in a GPL-3.0 project, and nothing here is committed or distributed. Each
 file's SHA-256 is checked against PyPI's after download and recorded.
 

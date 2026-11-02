@@ -24,7 +24,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| P0 | **heavy**: `python -W ignore -m unittest discover -s tests -t .` | all tests pass, existing and new, while no other heavy run holds `data/heavy-run.lock`; FR-053's two-worker test is marked heavy and takes the lock, and fails naming the lock if another run holds it |
+| P0 | **heavy**: `python -W ignore -m unittest discover -s tests -t .` | all tests pass, or skip with a listed open item, and none fails, existing or new, while no other heavy run holds `data/heavy-run.lock`; FR-053's two-worker test is marked heavy and takes the lock, and fails naming the lock if another run holds it |
 | P1 | `python scripts/archive_phyco_v2.py --check` | 0 mismatches between copies, manifest and live files (SC-012) |
 | P2 | `python -c "from protocol import devinputs_v3 as d; print(d.load('dev', 'key', allow=('dev',), count=1)[0].hex())"` | 64 hex digits; fingerprint checked at load |
 | P3 | any evidence script with an input namespace other than `dev` or `control` | exit 2, nothing written (FR-040) |

@@ -7,17 +7,26 @@
 All records are JSON (UTF-8, LF line endings, sorted keys), written by one module,
 `protocol/evidence.py`. Paths are under `reports/004-crypto-architecture-v3/` unless stated, and
 files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`;
-`protocol/evidence.py` refuses any other suffix there (research R16, R18). A record is never
-overwritten: a repeat run writes a new record with a new identifier, and the old one stays. The
-stated exceptions are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
+`protocol/evidence.py` refuses any other suffix there (research R16, R18), a
+reproduction's outputs included (section 1, Reproduction). A record is never
+overwritten: a repeat run, the demonstration's included (section 4), writes a
+new record with a new identifier beside the old one, which stays, its file
+named by its `record_id` (section 1, Record files). The stated exceptions
+are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
 `security-target/parameters.json` and `limits.json`, the environment records,
 `downloads.json` and `review-package/MANIFEST.json`. Before one changes,
 `protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
 the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
 re-check resolves either from the versions (research R16). The selection records are
 written once each and never rewritten: a later selection is a new record,
-`freeze/selection-<k>.json` (section 9). The freeze record changes only by the
-owner's approval, which `design_freeze.py approve` writes into it, its draft checked by
+`freeze/selection-<k>.json` (section 9). Three committed files are append-only, their earlier
+entries never changing: `research/004/tools/critical_counts.json`, which is code (section 5), the
+sidecar `vectors/phyco-v3/MANIFEST.json` (section 11) and `research/004/candidates/superseded.json`
+(section 3); a record that cites one gives its SHA-256 and the entry it used, and every evidence
+script exits 2 while a file a record would cite is modified in the working tree, so that
+`dirty_paths` never holds one (section 1). The freeze record changes only by the
+owner's approval, which `scripts/design_freeze.py approve` writes into it
+through the freeze code of `protocol/design_freeze.py`, its draft checked by
 `draft_sha256` (section 13).
 
 **Format rules** for every record and generated file (FR-036, FR-053), so that another
@@ -52,23 +61,23 @@ implementation can write byte-identical files:
 
 | Field | Type | Rule |
 |-------|------|------|
-| `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`; unique; part of the file name |
-| `kind` | str | one of the kinds of sections 4–11, `projection`, `lock-cleared`, `reproduction` or `recheck` (below) |
+| `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, the eight hex digits derived from the record's content; unique; the record's file is `<record_id>.json` unless this data model states its name (Record files, below) |
+| `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version and hash; `none` before it exists |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
 | `protocol_seq`, `protocol_line_sha256` | int, hex | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256; `none` before the log exists |
-| `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`) |
-| `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head` (research R16) |
+| `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
+| `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze`, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
+| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
-| `command`, `config` | str, object | the interpreter by its full path (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
+| `command`, `config` | str, object | the interpreter by its full path (on Windows the `python.exe` of the Store distribution's versioned prefix, `sys.executable` with the alias resolved; in WSL `~/.venvs/phycoweb/bin/python`; research R1), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
 | `inputs` | object | namespace (`dev` or `control`; for US1 the feature-002 `dev` set), kind, index range, fingerprint (R3) |
-| `outputs` | list | `{path, sha256, bytes, committed, deterministic}`, and `uncompressed_sha256` for a `.gz` file; `committed` false for local-only files, written under `data/local/004/<record_id>/` and never under this directory (R16); `deterministic` false for an output that is not, such as a raw solver log with timings, whose `sha256` and `bytes` a reproduction reports only; a committed file has one of the suffixes of the introduction and at most 10 MB, and `protocol/evidence.py` refuses a larger one, naming it |
+| `outputs` | list | `{path, sha256, bytes, committed, deterministic}`, `uncompressed_sha256` for a `.gz` file, and `compared` for an output compared otherwise than by its hash; `committed` false for local-only files, written under `data/local/004/<record_id>/`, the ID of the record that lists them, a reproduction's own included, and never under this directory (R16); `deterministic` false for an output that is not, such as a raw solver log with timings, whose `sha256` and `bytes` a reproduction reports only, and for a `p_values` file, with `compared: values`, whose `sha256`, `bytes` and `uncompressed_sha256` a reproduction reports only, comparing its values (Reproduction, below); a committed file has one of the suffixes of the introduction and at most 10 MB, a reproduction's included, and `protocol/evidence.py` refuses a larger one, naming it |
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
 | `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
 | `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
@@ -90,7 +99,7 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants and constructed states with their generator checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost`, `recheck` and `lock-cleared` records, the D4 choice, round-rule and selection records, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| No finding: vectors, constants and constructed states with their generator runs and checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost`, `recheck` and `lock-cleared` records, the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
 | A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
 | A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
 | A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
@@ -104,6 +113,20 @@ the class.
 
 - **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or
   `lf-normalized` (research R16).
+- **Record files.** Every record file is `<directory>/<record_id>.json`, the directory being its
+  kind's place: `fut-sec-8/` for a `demonstration`; `candidates/<id>/` for the kinds of sections 5
+  and 6 but `control`, and for a `cross-check` and a `cost` record; `controls/` for a `control`;
+  `validation/`, `generator-runs/`, `generator-checks/`, `projections/` and `rechecks/` for the
+  kinds they are named after; `locks/` for a `lock-cleared` record; and
+  `reproductions/<record_id>/<n>/`, with the original's ID, for a `reproduction`. Files whose names
+  this data model states keep them: the fixed-name files, with `versions/` (introduction); those
+  written once under a stated name, a second write being refused: `d4/choice.json`, `d4/tie.json`
+  and `d4/tie-choice.json` (section 8) and the selection records and their tie choices (section 9);
+  and the freeze record, `freeze/freeze.json`, which changes only by the owner's approval
+  (introduction, section 13). The eight hex digits of a `record_id` are the first eight of the
+  SHA-256 of the record's canonical JSON without `record_id` and with its own ID written as
+  `<record_id>` wherever a path holds it; until the record is complete, its outputs are written
+  under a temporary name, renamed to the ID before the record is written.
 - **Every run writes a record.** A run started on a candidate or a variant writes a record even
   if aborted (`inconclusive` or `blocked`, with the reason). A run later found hit by a tool
   defect keeps its record, with the defect noted.
@@ -120,23 +143,35 @@ the class.
 - **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its
   path and SHA-256, and the re-check resolves either from `<dir>/versions/`.
 - **Re-check records.** `recheck_004.py` writes a `recheck` record, `rechecks/<record_id>.json`,
-  which holds in place of `environment` the interpreter, the platform and the full `pip freeze` it
+  which names, per record, the commits whose verdict functions it ran, that
+  record's `git_head`, from a worktree of it, for the rules in force at its
+  entry and HEAD for the current rules (research R16), and holds in place of
+  `environment` the interpreter, the platform and the full `pip freeze` it
   ran with, and says when that environment is not one of research R1's: the re-check is exempt from
   the environment guard (cli contract).
 - **Reproduction.** A reproduction of a record is run by its script's `--reproduce RECORD` mode (cli
-  contract) and writes its outputs and a `reproduction` record into
-  `reproductions/<record_id>/<n>/`, n = 1, 2, … for successive reproductions of that record. The
-  record holds the original's ID and SHA-256, each compared field with its outcome, the reported
+  contract), `fut_sec8.py`'s for a demonstration record included, in a separate worktree of the
+  original's `git_head`, the code files of its `code_sha256` checked against that commit's blobs, so
+  the committed-code guard applies to that commit, not to HEAD's files. It writes its `reproduction`
+  record into the main tree's `reproductions/<record_id>/<n>/`, `<record_id>` being the original's
+  and n = 1, 2, … for successive reproductions of that record, with each output that the original
+  commits, under the same suffix and 10 MB rules (`outputs`); an output that the original keeps
+  local-only goes to `data/local/004/<record_id>/`, `<record_id>` there being the reproduction's
+  own, never committed, and the record holds its SHA-256, compared with the original's. A
+  generator's reproduction of a `generator-run` record compares each generated file in memory
+  with the SHA-256 that record holds (section 11) and writes no `.py` or
+  `.hex` file, its record holding each file's path, SHA-256 and outcome. The record holds the
+  original's ID and SHA-256, the commit it ran, each compared field with its outcome, the reported
   fields, and `match` or `differs`. A reproduction appends nothing to the candidate
   log, charges no candidate's budget row and is not a re-run under research
   R7, so it can neither replace evidence nor add any; a heavy one runs only on the owner's request,
   quoted with its date in the record's `owner_request`, and is charged to research R7's feature-wide
   row. A difference is a finding: the original stands; a difference in a field that enters a verdict
   (every compared field but the p-values) makes the candidate's eligibility `blocked`, as an
-  unverified hypothesis does (FR-060), until it is resolved, and in the environment that made the
-  original it is a tool defect of research R7, whose one re-run is a new measurement in the
-  original's row and raises R by the round rule if it fires; a difference in
-  the p-values, which decide no verdict, is reported and blocks nothing.
+  unverified hypothesis does (FR-060), until it is resolved, and, since it ran in the environment
+  that made the original (below), it is a tool defect of research R7, whose one re-run is a new
+  measurement in the original's row and raises R by the round rule if it fires; a difference in the
+  p-values, which decide no verdict, makes the outcome `differs` and blocks nothing.
   `round_rule.py` reads the `reproduction` records of the candidate's records
   (section 9). It compares these fields with the original and reports every other
   field only: `kind`, `model_id`, `variant_id`, each source file's entry in `code_sha256`, `inputs`,
@@ -145,15 +180,20 @@ the class.
   among them only where the table says so. Timings and the raw solver log are never compared.
   Deterministic kinds (vectors, constants, dependency matrices, counts, digests) thus match byte for
   byte, and searches and solver runs by their values and verdicts. A different source hash makes it
-  a new run, not a reproduction, and a binary's hash is reported only. A `p_values` file is compared
-  by its values, in either format, decompressed first, and its `uncompressed_sha256` is reported
-  only: two p-values agree when their difference is at most 10⁻⁶ times the larger of their
+  a new run, not a reproduction, and a binary's hash is reported only. A
+  `p_values` output is marked `deterministic` false with `compared: values`
+  (`outputs`), so its `sha256`, `bytes` and `uncompressed_sha256` are reported only,
+  and its values are compared, in either format, decompressed first: two
+  p-values agree when their difference is at most 10⁻⁶ times the larger of their
   magnitudes, or when both are below 2⁻¹⁰²², the smallest normal double, so that a 0 beside a
-  subnormal agrees; values outside are listed, and none decides a verdict (section 5, "Exact
-  verdicts"). Every other `.gz` file is compared by its `uncompressed_sha256`. The verdict is
+  subnormal agrees. A value outside makes the outcome `differs`, exit 1, with the values
+  listed: a finding about the run's reproducibility that blocks no candidate,
+  since no p-value decides a verdict (section 5, "Exact verdicts"). Every
+  other `.gz` file is compared by its `uncompressed_sha256`. The verdict is
   recomputed under the spec version, the research version and the protocol change-log entry the
   original cites (`spec-versions/`, `research-versions/`, section 18), so a later change cannot
-  alter it, and the environment is either of research R1's two, as recorded.
+  alter it, and it runs in the environment that made the original, as recorded, and in no other, a
+  `recheck` record's reproduction excepted, which runs anywhere, as the re-check does (research R1).
 
 **Fields compared, per kind** (FR-053). A reproduction compares the fields of the Reproduction
 bullet above that its original holds, and those this table lists for its kind; it reports the rest.
@@ -169,10 +209,17 @@ design document, which the table names; for every other kind it is reported, and
 | Statistical evidence (section 5: `frequency`, `avalanche`, `control`) | the fields of its row and the items of security.md §11.6 above: counts, critical counts and fired bits byte for byte, and the p-values by value | as for structural evidence |
 | Trail bound and trail (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap; of a `trail` record, `trail_kind`, `characteristic` and `weight` | of `budget`, the hours used; the raw solver log; `design_sha256` |
 | Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `second_known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
+| Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r, the tool's value, the exhaustive value and whether they are equal | the projected and used hours; `design_sha256` |
 | D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
-| Constant tables (section 11; `gen_constants_v3.py`) | every file it writes, byte for byte, and `design_sha256`, since its restatement check reads the design document (research R15) | the sidecar entry's command, interpreter, platform, speed and time |
-| Vectors and constructed states (section 11; `gen_vectors_v3.py`, `gen_constructed_v3.py`) | every file it writes, byte for byte | as for the constant tables, and `design_sha256` |
+| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15) | the measured speed and the generation time |
+| Generator run, vectors and constructed states (`gen_vectors_v3.py`, `gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
+| Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s | `design_sha256` for the other generators' |
+| Re-check (`recheck`; above) | per record, each recomputed verdict, its agreement with the recorded one and the commit whose functions computed it; the counts of agreements and disagreements | the interpreter, the platform and the `pip freeze` it ran with |
 | Projection (above) | nothing beyond the common fields | the measured speed and the projected hours |
+
+No row is needed for a `lock-cleared` record, which records an event, a `reproduction` record, which
+is not reproduced, or a tie choice (`d4-tie-choice`, `selection-tie-choice`), an owner's own act
+that no script repeats; the claim test writes no record (spec FR-061).
 
 ## 2. Development inputs (`protocol/devinputs_v3.py`; FR-040, R3)
 
@@ -183,8 +230,8 @@ design document, which the table names; for every other kind it is reported, and
 | `key(ns, i)`, `nonce(ns, i)`, `pers(ns, i, m)`, `reseed(ns, i)` | 32, 16, min(m, 32) and 32 bytes from SHA-256 of `phycoweb-004/<ns>/<kind>/<i>`; outside the module and its own tests, called only through `load` (below) |
 | `state(ns, n, w, i)` | b = 2w·n² bits from the digests of `phycoweb-004/<ns>/state/n<n>w<w>/<i>/<j>`, j = 0, 1, …, read into lanes as R3 states |
 | `synthetic_seed(ns, n, j)` | for `ns` = `dev` only, the first 16 bytes of SHA-256 of `phycoweb-004/dev/synthetic/n<n>/<j>`, read as a big-endian integer: the seed of synthetic set j at size n (class 5 below) |
-| `FINGERPRINTS` | per namespace and kind, per (n, w) for `state` and per n for `synthetic`: the SHA-256 of the fingerprint text below |
-| `load(ns, kind, allow, count, ...)` | the only way scripts take inputs, as feature 002's scripts use `protocol/seedsets.py`'s `load`: it checks the namespace against `allow` (`PermissionError`; scripts exit 2) and the kind's fingerprint (for `state` at the given n and w, for `synthetic` at the given n) and returns the values i = 0…count − 1, so no index outside the use's declared range can be read |
+| `FINGERPRINTS` | per namespace and kind, per (n, w) for `state` and per n for `synthetic`: the SHA-256 of the fingerprint text below; (n, w) over spec FR-018's sizes with research R14's widths (4 at 2×2 only, 8, 16 and 32), at most 16 pairs, and n over the claimable sizes, all written in plan phase 1 before the first record, after which nothing is added (research R3) |
+| `load(ns, kind, allow, count, ...)` | the only way scripts take inputs, as feature 002's scripts use `protocol/seedsets.py`'s `load`: it checks the namespace against `allow` (`PermissionError`; scripts exit 2) and the kind's fingerprint (for `state` at the given n and w, for `synthetic` at the given n) and returns the values i = 0…count − 1, so no index outside the use's declared range can be read; it refuses, naming it, any (n, w) or n without a fingerprint and any kind without one (scripts exit 2), and a test checks that every allowed pair has a fingerprint |
 
 The empty personalization string is a named input of its own. Indices are decimal without
 leading zeros. The module imports only `hashlib`. A keyed reduced variant of capacity c takes the
@@ -307,7 +354,7 @@ proposed ─► entered-d4 ─► scored ─┐       (only candidates entered b
    └─► withdrawn (before the first tool run; counts towards the stop rule)
 ```
 
-## 4. Demonstration record (`fut-sec-8/demonstration.json`; FR-001 to FR-003)
+## 4. Demonstration record (`fut-sec-8/<record_id>.json`; FR-001 to FR-003)
 
 | Field | Rule |
 |-------|------|
@@ -323,20 +370,25 @@ proposed ─► entered-d4 ─► scored ─┐       (only candidates entered b
 | `cost` | steps per candidate, total steps and seconds, steps per second; extrapolation to 2⁶⁴ seeds |
 | `model_sha256` | `1260142d…` for `phycoweb/model_v2.py`, checked |
 | `report` | the nine items of security.md §12.4, with T1 as the attacker |
+| `supersedes`, `defect` | in a repeat after a tool defect, the earlier record's ID and the ID of the recorded defect it follows (cli contract, `fut_sec8.py`); `none` in the first record |
 
-The record is the search tool's validation record (security.md §12.5), and security.md's
-best-attack register row for exhaustive seed search cites it (FR-003).
+Each record is named by its `record_id`, which begins with `demonstration`, so that a repeat after a
+defect writes beside the first, which stays; a run exits 2 while a record exists and no new defect
+is named (cli contract). The record is the search tool's validation record (security.md §12.5). The
+FUT-SEC-8 result review names the record it reviews by ID and SHA-256 in its row, and security.md's
+best-attack register row for exhaustive seed search cites that record (FR-003).
 
-A `fut-sec-8-reproduction` record (`fut-sec-8/reproduction-<record_id>.json`) is written only
-by `fut_sec8.py --reproduce`, after the FUT-SEC-8 result review. It holds the same fields and is
-compared field by field with the demonstration record, under section 1's comparison rule: the fields
-its table lists for the demonstration are compared, the timings of `cost` and the binary's hash are
-reported only, and `design_sha256`, which no FUT-SEC-8 code reads, is not compared.
-It is not a demonstration attempt: it can neither replace the demonstration record nor change
-the review, and a difference is a finding. `fut_sec8.py --verify` re-checks every listed match
-and every recovered seed with `model_v2`, with no sweep.
+`fut_sec8.py --reproduce RECORD`, run only after the FUT-SEC-8 result review and as a heavy run,
+reproduces a demonstration record under section 1's rule: it writes a `reproduction` record under
+`reproductions/<record_id>/<n>/`, `<record_id>` being the demonstration record's, its outputs placed
+as section 1 states, compares the fields section 1's table lists for the demonstration, reports the
+timings of `cost` and the binary's hash only, and does not compare `design_sha256`, which no
+FUT-SEC-8 code reads. It is not a demonstration attempt: it can neither replace the demonstration
+record nor change the review, and a difference is a finding. `fut_sec8.py --verify RECORD` re-checks
+every listed match and every recovered seed with `model_v2`, with no sweep. Both take a record by
+its ID, so that every earlier record stays reproducible and every run is reported.
 
-## 5. Structural and statistical evidence (`candidates/<id>/<kind>-<record_id>.json`)
+## 5. Structural and statistical evidence (`candidates/<id>/<record_id>.json`)
 
 | Kind | Fields beyond section 1 | Verdict computed by code |
 |------|-------------------------|--------------------------|
@@ -345,17 +397,19 @@ and every recovered seed with `model_v2`, with no sweep.
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
 | `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
 | `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
-| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<test>-<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
+| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order, each pattern on its own (the K sets of amounts placed by their rule among them); symmetries that fix a pattern; the relations checked between the constants of one call (R13); at 2×2 and 3×3, the statement that the placements of the food nodes and of the amounts were checked together with the round constants as one pattern (R13) | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
 | `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, w − 1 for a w-bit addition), a round's count the product of its phases'; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, w for an addition of two variable words, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
 
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
-  arithmetic over the binomial distribution (R4). It is committed, pinned to LF with every file
-  under `research/004/` (research R18), and scipy's p-values are reported only: a reproduction
-  compares them within a relative tolerance of 10⁻⁶, and counts,
-  critical counts and verdicts byte for byte (section 1).
+  arithmetic over the binomial distribution (R4). It is code, one of `research/004/ir.py`'s tools in
+  every citing record's `code_sha256`, committed at HEAD before a run cites it and pinned to LF with
+  every file under `research/004/` (research R18), and append-only: counts for a new (N, S) or
+  (N_a, S_A) are added as new entries and existing ones never change, which a test checks against
+  the file's history. scipy's p-values are reported only: a reproduction compares them by
+  section 1's rule, and counts, critical counts and verdicts byte for byte (section 1).
 - **Validation cited.** Every counted record holds `validation`, the ID and SHA-256 of the
   validation record of the tool's exact hash, whose `created_utc` is earlier (FR-039; SC-007).
 - **Call types.** Where the call types draw on distinct constant streams (spec FR-023), the
@@ -374,7 +428,7 @@ and every recovered seed with `model_v2`, with no sweep.
   exact models, settles it. If confirmed, it raises R_dist. A possible weakness can only raise
   R or block, never vanish.
 
-## 6. Trail-bound record (`candidates/<id>/bound-<record_id>.json`; FR-038)
+## 6. Trail-bound record (`candidates/<id>/<record_id>.json`, kind `bound`; FR-038)
 
 | Field | Rule |
 |-------|------|
@@ -395,16 +449,17 @@ A bound from a tool not yet validated never counts; a trail it finds is an unver
 bound records computed at that size; a proof in the design document that carries a bound to a larger
 size serves only as a check beside them, in the rationale (FR-038).
 
-**Trail record** (`candidates/<id>/trail-<record_id>.json`; FR-038). A trail is a characteristic of
-Π exhibited by a validated tool that searches Π at the size and width the round rule uses:
-`trail_kind` (`differential` or `linear`), `characteristic` (the difference or mask after every
-round), `weight` (the trail's exact probability or squared correlation as a rational "p/q" string,
+**Trail record** (`candidates/<id>/<record_id>.json`, kind `trail`; FR-038). A trail is a
+characteristic of Π exhibited by a validated tool that searches Π at the size
+and width the round rule uses: `trail_kind` (`differential` or `linear`),
+`characteristic` (the difference or mask after every round), `weight` (the
+trail's exact probability or squared correlation as a rational "p/q" string,
 with its −log₂), `rounds`, `size`, `width`, `tool` and `validation`, as for a bound;
 `round-rule.json` cites it under `R_dist` (section 9). A bound, a box's trail, an active-box or
 active-S-box count and a bound search's optimum are bounds, never trail records; an optimal
 characteristic that a search of Π returns with its weight is one, written beside its bound record.
 
-## 7. Tool validation record (`validation/<tool>-<record_id>.json`; FR-039)
+## 7. Tool validation record (`validation/<record_id>.json`; FR-039)
 
 `tool`, `version`, `tool_sha256`, `licence`, `source` (in the repository, or an entry of the
 downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
@@ -464,8 +519,10 @@ same kind and of the tool's exact hash exists.
   critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
   computed exactly from the binomial distribution, is at least 0.9. One record per size covers the
   three paths, the flip set, the related-key and related-nonce set and the rotational pairs.
-- **Cross-checks between kinds** (R12) are records of the candidate they run on, once per candidate
-  and tool version, charged to its trail row; a failed one is a tool defect. Each lists, for every r
+- **Cross-checks between kinds** (R12) are records of the candidate they run on, of
+  kind `cross-check`, written by `evidence_v3.py` into `candidates/<id>/`
+  (section 1, Record files), once per candidate and tool version, charged
+  to its trail row; a failed one is a tool defect. Each lists, for every r
   from 1 to the largest at which the exhaustive computation finishes within its 8 h cap, the tool's
   value and the exhaustive one, which must be equal: the ARX search's optimal single-trail weight
   over r rounds of the box against the best product of one-round table entries over r rounds, one
@@ -526,10 +583,11 @@ further, and `eligible` with each item of FR-018 to FR-031 and FR-037 and its
 evidence, decided for every candidate before selection: FR-018's folding rule, longest link, food
 nodes with their reason and tree figures from the operation list and its `parameters` entry
 (section 3); FR-020's cycles per call, with FR-026's figures, from its `cost` records per claimable
-size (`candidates/<id>/cost-<record_id>.json`, written by `research/004/tools/costmodel.py` from the
-operation list, P and R); FR-022's bounds from its bound records (section 6); FR-023's statement on
-the streams, with its reason, and FR-024's report on the ranking after scaling from its log entries;
-FR-025's stages, chains per phase and key path from the operation list's declarations, checked by
+size (`candidates/<id>/<record_id>.json`, kind `cost`, written by `research/004/tools/costmodel.py`
+from the operation list, P and R); FR-022's bounds from its bound records
+(section 6); FR-023's statement on the streams, with its reason, and FR-024's report
+on the ranking after scaling from its log entries; FR-025's stages, chains
+per phase and key path from the operation list's declarations, checked by
 code; FR-027's semantics from the operation list's own declarations, which the framework requires
 for every operation; FR-030's mapping from the candidate's `mapping` log entry. FR-025's interface
 formats, call sequence and zeroization rules are properties of the mode, the same for every
@@ -632,7 +690,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
-| `MANIFEST.json` | the sidecar: one entry per generator run with its `record_id`, which a generator's `--reproduce` names (cli contract), the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check` or `--reproduce`, which write their records under `reports/004-crypto-architecture-v3/` and never to the sidecar |
+| `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check` or `--reproduce`, which write their records under `reports/004-crypto-architecture-v3/` and never to the sidecar |
 
 The header of a mode vector file reads, for example:
 
@@ -648,6 +706,11 @@ so that `--check` can compare them byte for byte; everything that differs betwee
 platforms goes to the sidecar `MANIFEST.json` (R8). In the file names above, `<variant>` is the
 variant ID with `/` replaced by `_`, for example `mode_phyco-v3_n4-w32-R<R>-c256_dev0.hex`, and
 every file sits in the one directory `vectors/phyco-v3/`, with no directory per variant.
+
+**Generator runs** (FR-061). Each run of `gen_constants_v3.py`, `gen_vectors_v3.py` or
+`gen_constructed_v3.py` writes, beside its sidecar entry, a `generator-run` record,
+`generator-runs/<record_id>.json`, with the common fields of section 1 and each written file's path
+and SHA-256, which its reproduction compares in memory (section 1, Reproduction).
 
 **Generator checks** (SC-009). `--check` writes a `generator-check` record,
 `generator-checks/<record_id>.json`, with the common fields of section 1 (FR-061), each generated
@@ -684,9 +747,10 @@ copy against its manifest hash and its live source (SC-012).
   produced them (section 11); the scripts that generate the constants and the vectors; the selected
   operation list; `research/004/ir.py` with its tools; and the scripts that compute verdicts:
   `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`,
-  `protocol/devinputs_v3.py` and `protocol/evidence.py`; and the security target's files
-  `parameters.json` and `limits.json`, with each theorem's status from `limits.json`, every one of
-  which must be `verified`, with each precondition marked met (research R10).
+  `protocol/devinputs_v3.py` and `protocol/evidence.py`; the freeze's code,
+  `protocol/design_freeze.py`, and its command, `scripts/design_freeze.py`; and the security
+  target's files `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
+  every one of which must be `verified`, with each precondition marked met (research R10).
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the

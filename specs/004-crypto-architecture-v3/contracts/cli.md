@@ -10,27 +10,35 @@ exhausted, a fourth candidate, a size out of order, an operation list not in the
 that differs from its record, code not committed at HEAD, lock held, hash mismatch, broken log
 chain, existing record), and nothing is written; **3** tool or I/O error, a recorded tool defect
 included. `REP=reports/004-crypto-architecture-v3`. Every record is written through
-`protocol/evidence.py` ([data-model.md](../data-model.md) §1).
+`protocol/evidence.py` ([data-model.md](../data-model.md) §1), as `<record_id>.json` in its kind's
+directory, unless the data model states its name (data model §1, Record files).
 
 **Reproduction.** Every script that writes evidence or generated files also runs as
-`--reproduce RECORD` (data model §1): it runs the recorded command's configuration with its output
-directory replaced by `$REP/reproductions/<record_id>/<n>/`, n = 1, 2, … for successive
-reproductions of that record, and writes a `reproduction` record there: the original's ID and
-SHA-256, each compared field with its outcome, the reported fields, and `match` or
-`differs`. It appends nothing to the candidate log, charges no candidate's
+`--reproduce RECORD` (data model §1): it runs the recorded command's configuration in a separate
+worktree of the original's `git_head`, the code files of its `code_sha256` checked against
+that commit's blobs, with its output directory replaced by the main tree's
+`$REP/reproductions/<record_id>/<n>/`, n = 1, 2, … for successive reproductions of that record, and
+writes a `reproduction` record there: the original's ID and SHA-256, the commit it ran, each
+compared field with its outcome, the reported fields, and `match` or `differs`. The outputs that the
+original commits go there, under the same suffix and 10 MB rules, and an output it keeps
+local-only goes to `data/local/004/<record_id>/`, `<record_id>` there being the
+reproduction's own, its SHA-256 compared (data model §1). It runs only in the
+environment that made the original, as recorded, a re-check's reproduction excepted
+(research R1). It appends nothing to the candidate log, charges no candidate's
 budget row and is not a re-run under research R7, so it can neither replace
 evidence nor add any; the Budget and Order of sizes guards, which concern
-evidence, do not refuse it, and every other guard applies, so a search that reached its cap is not
+evidence, do not refuse it, and every other guard applies, Committed code with the
+original's commit in HEAD's place, so a search that reached its cap is not
 reproduced (Trail tools). It is a heavy run where research R7 says so: it then runs only
 with `--owner-request "WORDS (DATE)"`, the owner's request quoted with its
 date, which its record keeps, and exits 2 without one; it takes the lock,
 projects first and is charged to research R7's feature-wide row. A light
 reproduction needs no request. A difference is a finding, exit 1: the original
 stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
-until it is resolved, and in the environment that made the original it is a tool defect of research
-R7, whose one re-run is new evidence in the original's row; a difference in the
-p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
---reproduce` is this mode for the demonstration, under the conditions of its section.
+until it is resolved, and, since it ran in the environment that made the original, it is a tool
+defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
+p-values, which decide no verdict, makes the outcome `differs` and blocks nothing (data model §1).
+`fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
 
 ## Guards shared by every script
 
@@ -52,7 +60,10 @@ p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
   authorization to commit makes routine; data and report files may still be dirty, and the record
   lists the dirty paths. A binary is rebuilt from committed source, its hash reported only, and a
   test checks each record's `code_sha256` entries against the blobs at its `git_head` (FR-053;
-  research R16).
+  research R16). For `--reproduce`, the commit is the original's `git_head`, checked out in a
+  separate worktree (introduction). A run that writes evidence also exits 2 while a file a record
+  would cite, such as the sidecar or `research/004/candidates/superseded.json`, is modified in the
+  working tree, so that `dirty_paths` never holds a cited file (data model introduction).
 - **Inputs**: only the namespaces `dev` and `control` of `protocol/devinputs_v3.py`, and for
   US1 the feature-002 `dev` set; anything else exits 2 (FR-040). `control` serves only uniform
   controls and `dev` is never a control: each evidence kind's namespace is fixed in code, not
@@ -152,22 +163,27 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 ```text
 fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8 [--repeat-after-defect ID]
 fut_sec8.py --verify RECORD
-fut_sec8.py --reproduce RECORD --binary fast/build/seed_search --out-dir $REP/fut-sec-8
+fut_sec8.py --reproduce RECORD --binary fast/build/seed_search
 ```
 
 Takes the targets from `protocol.seedsets.load("dev", allow=("dev",))[:3]`, computes the
 observations with `phycoweb/model_v2.py`, runs the vector check, then one sweep per target,
-separates any extra three-word match with the fourth word, and writes the demonstration record
-(data model §4). A second run exits 2 unless `--repeat-after-defect` names a recorded tool
-defect (spec Edge Cases). Exit 1 if a target is not recovered.
+separates any extra three-word match with the fourth word, and writes a demonstration record,
+`fut-sec-8/<record_id>.json` (data model §4). A second run exits 2 unless `--repeat-after-defect`
+names a recorded tool defect that no earlier record names (spec Edge Cases); the repeat writes
+beside the first, holding `supersedes`, the earlier record's ID, and `defect`, the defect's. Exit 1
+if a target is not recovered.
 
-Neither of the other two modes is a demonstration attempt:
+Neither of the other two modes is a demonstration attempt, and each takes a demonstration record by
+its ID, so that every earlier record stays reproducible:
 
 - `--verify RECORD` re-checks every listed three-word match and every recovered seed with
   `model_v2`, in seconds, with no sweep. Exit 1 on any disagreement.
 - `--reproduce RECORD` is allowed only after the FUT-SEC-8 result review, and exits 2 before
-  it. It re-runs the sweep as a heavy run and writes a `fut-sec-8-reproduction` record, compared
-  field by field with the original under data model §1's rule: the demonstration's fields listed
+  it. It re-runs the sweep as a heavy run and writes a `reproduction` record
+  under `$REP/reproductions/<record_id>/<n>/`, its outputs placed as the
+  introduction describes, taking no `--out-dir`, compared field by field with the
+  original under data model §1's rule: the demonstration's fields listed
   there are compared, its timings and the binary's hash reported only, and `design_sha256`, which no
   FUT-SEC-8 code reads, is not compared (data model §4). It can neither replace the demonstration
   record nor change the review, and a difference is a finding, exit 1.
@@ -228,9 +244,11 @@ evidence_v3.py --reproduce RECORD
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
-`invariant`, `degree` or `bound` (with `--bound-kind differential|linear --method M`). The
-candidate must be in the log; a `bound` needs a validated tool. Writes one record of data
-model §5 or §6 and its raw outputs, and for a `bound` run of a tool that
+`invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) or
+`cross-check` (with `--tool NAME`), the cross-check between kinds of data model §7
+on the candidate's boxes or nonlinear layer, charged to its trail row. The
+candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model §5,
+§6 or §7 (a cross-check) and its raw outputs, and for a `bound` run of a tool that
 searches Π also a `trail` record of the optimal characteristic it returns
 (data model §6), and appends an `evidence` entry to the candidate log; with
 `--reproduce RECORD` it runs that record's configuration as the introduction describes, writes only
@@ -345,14 +363,18 @@ content is kept as `security-target/versions/<sha256>.json`, and the new content
 gen_constants_v3.py [--check]                    # writes phycoweb/constants_v3.py
 gen_vectors_v3.py [--check] [--variant ID ...]   # writes vectors/phyco-v3/ (research R8)
 gen_constructed_v3.py [--check]                  # writes the constructed-state vectors
-gen_vectors_v3.py --reproduce RECORD            # each generator: one sidecar entry (below)
+gen_constants_v3.py --reproduce RECORD           # a generator-run or generator-check record
+gen_vectors_v3.py --reproduce RECORD
+gen_constructed_v3.py --reproduce RECORD
 ```
 
 Each writes only deterministic content, under the format rules of the data model's
 introduction. The command (script and arguments, relative to the repository root), the
-interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to
-the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run with its `record_id` (data
-model §11), which `--check` does not compare. `gen_constants_v3.py` also writes each constant table
+interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to the
+sidecar `vectors/phyco-v3/MANIFEST.json`, append-only, one entry per generator run citing the
+`record_id` of that run's `generator-run` record, which each run writes under `$REP/generator-runs/`
+with the fields of data model §1 (FR-061) and each written file's path and SHA-256 (data model §11);
+`--check` does not compare the sidecar. `gen_constants_v3.py` also writes each constant table
 as `vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory, compares every
 generated file byte for byte with the committed one and writes a `generator-check` record under
 `$REP/generator-checks/` with the fields of data model §1 (FR-061), each generated file's path and
@@ -361,9 +383,12 @@ is each generator's pair of such records, one per platform, which quickstart M1 
 report cite. The sidecar is frozen with the vectors (data model §13), as the record of the runs that
 produced them: after the freeze a generator runs only with `--check` or `--reproduce`, which write
 their records under `$REP` and never to the sidecar, and writing over a frozen file exits 2.
-`--reproduce RECORD` (introduction) re-runs the sidecar entry with that `record_id` into
-`$REP/reproductions/<record_id>/<n>/` and compares every file it writes with the committed one, byte
-for byte, writing over no generated file and adding nothing to the sidecar.
+`--reproduce RECORD` (introduction), on each generator, runs the command of that `generator-run`
+record again and compares every file it generates, in memory, with the SHA-256 the record holds
+rather than with the file on disk, so that a later regeneration changes nothing, or, for a
+`generator-check` record, runs that `--check` again and compares its hashes and verdict; it writes
+no `.py` or `.hex` file and adds nothing to the sidecar, its `reproduction` record, under
+`$REP/reproductions/<record_id>/<n>/`, holding each file's path, SHA-256 and outcome.
 
 They run in three steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
@@ -388,8 +413,11 @@ writes the approval into it; (4) the owner commits the record; (5) `validate` ex
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others
 `rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the verdict
-scripts, every evidence record behind R by ID and by SHA-256, and the last `seq` and line
-SHA-256 of the candidate log, the provenance log and the protocol change log.
+scripts, both freeze files, every evidence record behind R by ID and by SHA-256, and the last `seq`
+and line SHA-256 of the candidate log, the provenance log and the protocol change log. The freeze's
+code is `protocol/design_freeze.py`, with create, approve and validate as functions, and this script
+is the command that calls it, as the other scripts call `protocol/evidence.py`; the record hashes
+both files (data model §13).
 
 `create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
 security-target review or the owner design review row is not Approved, if the external review row is
@@ -411,6 +439,7 @@ not match, and 2 while `status` is `draft` (data model §13).
 
 ```text
 recheck_004.py [--kind KIND]
+recheck_004.py --reproduce RECORD
 ```
 
 Recomputes every verdict of the feature from saved outputs (FR-065) and compares it with the
@@ -419,21 +448,29 @@ fresh clone from committed files, so it works from the committed per-round summa
 example R_f from the per-round flag "every output bit depends on every input bit". Where
 local-only outputs are present, it also re-derives each committed summary from them. Its output
 lists both checks per kind, and it verifies the inventory of superseded operation lists
-(data model §3).
+(data model §3). With `--reproduce RECORD` it runs a recorded re-check again, as the introduction
+describes, comparing its verdicts and counts (data model §1); like the re-check, it may run in any
+environment.
 
 It recomputes each verdict under the rules in force at the protocol change-log entry its record
 cites and, where a later stricter change applies (FR-044), also under the current rules; both are
 listed, and a disagreement in either is reported. A cited file kept under a fixed name is resolved
-from its `versions/` (data model introduction).
+from its `versions/` (data model introduction). Under the rules in force at a record's entry it runs
+the verdict functions at that record's `git_head` (below), and under the current rules those at
+HEAD.
 
 It is exempt from the environment guard (Guards, above): it recomputes verdicts from committed
 counts by exact integer arithmetic (data model §5), with the verdict functions of
-`protocol/evidence.py` that the scripts which wrote the records call, so that it runs the frozen
-code that produced each verdict (FR-043), and it imports only the standard library and those
-`protocol/` modules that do the same, which a test checks. It writes a `recheck` record under
-`$REP/rechecks/` holding the interpreter, the platform and the full `pip freeze` it ran with, and
-says when that environment is not one of research R1's. A reproduction that re-runs evidence stays
-limited to R1's two environments; SC-017's fresh clone is this re-check, as quickstart F3 runs it.
+`protocol/evidence.py` that the scripts which wrote the records call, for the rules in force at a
+record's entry those at its `git_head`, taken from a separate worktree of that
+commit and named per record, so that it runs the code that produced each
+verdict (FR-043) and a function changed before the freeze is never applied to
+records it did not compute, and it imports only the standard library and those
+`protocol/` modules that do the same, which a test checks. It writes a `recheck` record,
+`$REP/rechecks/<record_id>.json`, holding the interpreter, the platform and the full `pip freeze` it
+ran with, and says when that environment is not one of research R1's. A reproduction that re-runs
+evidence stays in the environment that made its original (research R1); SC-017's fresh clone is this
+re-check, as quickstart F3 runs it.
 
 ## `scripts/repair_log.py`
 
@@ -476,9 +513,11 @@ clear_lock.py LOCK                      # data/heavy-run.lock or data/log-append
 
 Run by the owner or at the owner's request. It removes LOCK only when it can show, in the
 lock's environment, that no process with the PID and start time the lock holds still runs;
-otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record under
-`$REP/locks/` with the lock's content and, for the heavy-run lock, the `inconclusive` record
-of the run that died holding it (data model §1; research R16).
+otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
+`$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
+`inconclusive` record of the run that died holding it (data model §1; research R16). A
+`lock-cleared` record records an event and is not reproduced, so this script has no `--reproduce`
+mode (spec FR-061).
 
 ## `scripts/check_claims.py`
 
@@ -493,4 +532,5 @@ Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-
 the checklists and checklist-choices.md included, README, security.md, and the comments and
 docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
 of the register, with its reason (data model §15). Exit 1 on any finding (SC-018).
-`tests/test_claims.py` runs it.
+`tests/test_claims.py` runs it. It writes no record and runs as a test, so FR-061's reproduction
+test leaves it out (spec FR-061).

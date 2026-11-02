@@ -188,7 +188,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Checklist choices, third re-run ([checklist-choices.md](./checklist-choices.md): the 70 items the third re-run of the six checklists found on 2026-11-01 over the complete documents and the repository) | Coastrnaut (repository owner) | 2026-11-02 | Approved | Answered in session on 2026-11-02: "all recommended", which also approves the round's list "Rows that change the protocol", written with its rows before the answer (FR-044). Being applied, checklist by checklist, to the documents each row's Changes cell names, each change with its reason. No protocol change among them loosens the protocol at a claimable size (checklist-choices.md, "After the answer"), and each is recorded in the protocol change log before any result exists (FR-044; data-model §18). The checklists are then re-read against the changed text; on the owner's instruction of 2026-11-01 the agent verifies each item and ticks it if it holds, and the owner's tasks approval includes the review of those ticks |
 | Tasks approval | _pending_ | _pending_ | _pending_ | Includes the owner's review of the checklist items the agent ticked on the owner's instruction of 2026-11-01 (each checklist's Notes), where an item the owner does not accept is unticked, and the owner's confirmation of checklist-choices.md's lists "Rows that change the protocol", written after their rounds were answered. The protocol change log is created, and no evidence run starts, only after the owner has confirmed every list, and a row the owner takes out of a list is recorded beside it with the owner's reason, that it changed no rule (data-model §18) |
 | Tool acquisition (each download: name, source, size, licence) | Coastrnaut (repository owner) | 2026-11-01 | Approved | Approved in session ("all downloads approved"): every file in the two tables of plan research R19, eight papers and four wheels, each as listed there with its source, size and licence. Not covered, and each needing a row of its own: a file not listed there, the tools R19 lists as not requested, and a file whose source or licence differs from its row or whose size differs from a size given in bytes. `169.pdf` and `47270450.pdf` come through the owner's browser |
-| FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | |
+| FUT-SEC-8 result review (before any `phyco-v3` key interface is implemented) | _pending_ | _pending_ | _pending_ | The row names the demonstration record it reviews, `fut-sec-8/<record_id>.json`, by ID and SHA-256, and security.md's best-attack register row for exhaustive seed search cites that record (data-model §4) |
 | D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
@@ -406,11 +406,13 @@ round count. They need the design (User Story 3).
 
 **Independent Test**: Run the re-check of FR-065, which recomputes every verdict from the saved
 outputs, and check that each tool's validation record is older than its first counted result.
-Full re-runs are reproductions, listed per kind with their cost: each light kind of research R7 is
-reproduced by its script's `--reproduce` mode, which runs the recorded command into a directory of
-its own, appends nothing to the candidate log and compares as FR-053 defines (deterministic kinds
-byte for byte, searches and solver runs by their values and verdicts); a heavy kind is reproduced
-only on the owner's request, quoted with its date in the reproduction record, one at a time, as a
+Full re-runs are reproductions, listed per kind with their cost: each kind is reproduced, in a run
+that was light by research R7's test, by its script's `--reproduce` mode, which runs the recorded
+command, from a worktree of the original's commit, into a directory of its own, appends nothing
+to the candidate log and compares as FR-053 defines (deterministic kinds
+byte for byte, searches and solver runs by their values and verdicts), the kinds that
+FR-061 leaves out excepted; a heavy run is reproduced only on the owner's
+request, quoted with its date in the reproduction record, one at a time, as a
 heavy run charged to research R7's feature-wide row, and the agent never starts one on its own.
 
 **Acceptance Scenarios**:
@@ -476,8 +478,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
 ### Edge Cases
 
 - **The demonstration misses its target**: the search tool is defective and fails its
-  validation. The defect is reported and fixed, and the sweep is repeated; every run is
-  reported. The demonstration uses development seeds and decides nothing about a design, so a
+  validation. The defect is reported and fixed, and the sweep is repeated under
+  `--repeat-after-defect`, its record written beside the first, which stays, and naming the defect
+  and the record it supersedes (data-model §4); every run is reported. The
+  demonstration uses development seeds and decides nothing about a design, so a
   repeat is not re-seeding until passing.
 - **More matches than expected**: any extra match after three words is listed and separated with
   a fourth word, and the count is reported against the baseline.
@@ -1664,8 +1668,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   kind, its class 5, the bias tool's synthetic counts in both families of its
   validation (research R4), drawn from seeds that are themselves derived from
   public strings, and no value or index is picked after any output is seen. Scripts take these
-  inputs only through the loader of research R3, which checks each kind's fingerprint, the SHA-256
-  of a text that data-model §2 states exactly, and returns only the use's declared index range. This
+  inputs only through the loader of research R3, which checks each kind's fingerprint, the
+  SHA-256 of a text that data-model §2 states exactly, refuses, exit 2, any
+  (n, w), n or kind without one, the allowed pairs being FR-018's sizes with
+  research R14's widths, and returns only the use's declared index range. This
   holds for the whole feature, the freeze and everything after it included: no held-out key set MAY
   be created or used in this feature at any time. Every tool of this feature that reads feature
   002's or 003's seed sets loads only feature 002's `dev` set and exits 2 on any held-out set, as
@@ -1768,7 +1774,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   vectors included), the scripts that generate the constants and the vectors, the selected operation
   list, `research/004/ir.py` with its tools, and the scripts that compute verdicts
   (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`,
-  `protocol/devinputs_v3.py`, `protocol/evidence.py`); the security target's files `parameters.json`
+  `protocol/devinputs_v3.py`, `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py`
+  and its command `scripts/design_freeze.py`; the security target's files `parameters.json`
   and `limits.json`, with each theorem's status; R with every input of the round rule and every
   evidence record behind R, by ID and by SHA-256; the last `seq` and line SHA-256 of the candidate
   log, the provenance log and the protocol change log; the tool versions; `git_head` and
@@ -1932,12 +1939,17 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 - **FR-053**: Every evidence record MUST be reproducible from a committed script with fixed
   inputs and the recorded command, with the model hash and tool versions recorded (Principle V).
-  `requirements.txt` MUST be corrected and its versions pinned (checklist group F). These rules
+  `requirements.txt` MUST be corrected and its versions pinned (checklist group F), the Hypothesis
+  pins entering it once their wheels are installed and checked (research R18). These rules
   make that checkable:
   - **Reproducible, per kind.** Deterministic kinds (vectors, constants, dependency matrices,
     counts, digests) reproduce byte for byte; searches and solver runs reproduce their values
-    and verdicts. A reproduction is run by the script's `--reproduce RECORD` mode and writes a
-    `reproduction` record of its own; it appends nothing to the candidate log,
+    and verdicts. A reproduction is run by the script's `--reproduce RECORD` mode, the re-check's,
+    the generator checks' and the cross-checks' included, from a separate worktree of the
+    original's `git_head` whose blobs its code is checked against, and writes a
+    `reproduction` record of its own, naming that commit; a generator's reproduction
+    compares each generated file in memory with the SHA-256 its `generator-run`
+    record holds (data-model §11); it appends nothing to the candidate log,
     charges no candidate's budget row (a heavy one, run only on the owner's
     request, charges research R7's feature-wide row) and is not a re-run
     under research R7, so it can neither replace evidence nor add any, and a
@@ -1949,18 +1961,23 @@ freeze hashes and the baseline manifest; run the claim-register test.
     deterministic output's `sha256` and `bytes`, `exit_status`, `assertions`, `status`,
     `classification` and the fields of its kind, and `design_sha256` only for the kinds whose code
     reads the design document) and reports every other field only, timings and raw solver logs among
-    them; a different source hash makes it a new run, not a reproduction. A `p_values` file is
-    compared by its values, within the tolerance data-model §1 defines, and decides nothing. The
+    them; a different source hash makes it a new run, not a reproduction. A `p_values` output is
+    marked not deterministic and compared by its values, within the tolerance data-model §1 defines;
+    a value outside makes the outcome `differs`, a finding about the run's
+    reproducibility that blocks no candidate, since a p-value decides nothing. The
     verdict is recomputed under the spec version, the research version and the protocol change-log
-    entry the original cites, and the environment is either of the two of research R1, as recorded.
+    entry the original cites, and a reproduction runs in the environment that made the original, as
+    recorded (research R1).
   - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
     The model hash is that of the candidate's operation list before selection and that of
     `model_v3.py` after it. Code is committed before every evidence run; `git_dirty` may be true for
-    data and reports only, and the record lists the dirty paths: a run that writes evidence exits 2
+    data and reports only, never for a file a record cites (data-model §1), and
+    the record lists the dirty paths: a run that writes evidence exits 2
     unless every source file in its `code_sha256` matches HEAD, committed and unmodified, which
     constitution 1.3.0's standing authorization to commit makes routine, and a binary is rebuilt
     from committed source, its hash reported only. Each record's code is then found at its
-    `git_head`, and a test checks each `code_sha256` entry against the blob at that commit.
+    `git_head`, and a test checks each `code_sha256` entry against the blob at that commit. A
+    reproduction runs the original's code at its `git_head`, and the guard applies to that commit.
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
     count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs
@@ -2050,7 +2067,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the order shows. After `zeroize`, the key buffer the object held reads all zeros and the object no
   longer refers to it (model contract). Property-based tests (for example with
   Hypothesis) MUST be added if the owner approves the download; otherwise their absence MUST be
-  recorded as an open item. They run under a settings profile registered by the test package,
+  recorded as an open item. Until the approved wheels are installed and checked, the property tests
+  skip with a reason naming that open item and none fails, and the final report lists the skipped
+  tests; once the wheels are installed, the pins take effect, a new environment record is
+  approved, and the property tests run before any later record (research R17,
+  R18). They run under a settings profile registered by the test package,
   with `derandomize=True` and `database=None`, so that every run tries the same examples and a
   failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
@@ -2104,12 +2125,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
   unverified hypotheses, `blocked`; and the demonstration record is a confirmed vulnerability of
   `phyco-v2`'s seed bound once every target is recovered.
 - **FR-061**: Every evidence record MUST hold the fields of security.md §17.2: a unique
-  identifier, and the date and time; the model ID, design-document version, `git_head` and
+  identifier, which names the record's file by one rule (data-model §1), and
+  the date and time; the model ID, design-document version, `git_head` and
   `git_dirty`; tool and dependency versions, operating system and hardware; the exact command
-  and configuration, runnable as written (the interpreter by its full path, the Windows Python
-  or `~/.venvs/phycoweb/bin/python` in WSL; the working directory, which is the repository
-  root; paths relative to it), with a test that reproduces one light command of each light kind
-  (research R7) exactly as recorded, through the script's `--reproduce` mode (FR-053); the SHA-256
+  and configuration, runnable as written (the interpreter by its full path: on Windows the
+  `python.exe` of the Store distribution's versioned prefix, `sys.executable` with the
+  alias resolved, and in WSL `~/.venvs/phycoweb/bin/python`, as research R1
+  states; the working directory, which is the repository root; paths relative
+  to it), with a test that reproduces exactly as recorded, through the script's `--reproduce` mode
+  (FR-053), per kind, a run that was light by research R7's test, light being a property of each
+  run: the kind's latest such run and, where one exists, one made before the last change to its
+  code; the test leaves out, each with its reason, the claim test, which writes no record and runs
+  as a test, a `lock-cleared` record, which records an event, a tie choice, an owner's own
+  act, and the reproduction records, which are not reproduced; the SHA-256
   of every code file the run used (`code_sha256`: the script, the
   `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
   source and its binary), each source file committed at HEAD before the run and a binary rebuilt
@@ -2120,7 +2148,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   reviewer, with the review status; known limitations; and the disclaimer, which feature 003's
   provenance records lacked (feature-003 phase report, open issue 3). A statistical measurement,
   such as the bias rule's, MUST also record the items of security.md §11.6. Raw tool output MUST be
-  kept, not only summaries.
+  kept, not only summaries. A generator run writes a `generator-run` record with these fields and
+  each written file's path and SHA-256 (data-model §11).
 - **FR-062**: The final report and the design rationale MUST keep apart demonstrated facts,
   mathematical arguments, experimental observations, unverified hypotheses, unsuccessful
   attacks, untested areas and residual risks (security.md §17.3). In the rationale each
@@ -2160,7 +2189,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   also does when they are present; it lists both checks per kind. The re-check is the routine
   reproduction test (User Story 4), and it runs the frozen verdict scripts (FR-043): the verdict
   functions it applies are those of `protocol/evidence.py`, which the scripts that wrote the records
-  call. It recomputes each verdict under the rules in force at the protocol change-log entry its
+  call: for the rules in force at a record's entry, those at that record's `git_head`, from a
+  separate worktree of that commit, named per record, so that a function changed before the freeze
+  is never applied to records it did not compute, and for the current rules those at HEAD. It
+  recomputes each verdict under the rules in force at the protocol change-log entry its
   record cites and, where a later stricter change applies (FR-044), also under the current rules,
   both listed; a disagreement in either is reported. It is exempt from the environment guard, since
   it recomputes verdicts from committed counts by exact integer arithmetic (data-model §5) and
@@ -2479,8 +2511,9 @@ FUT-SEC-1 to FUT-SEC-6 and FUT-SEC-9 (FR-012) or else at the owner design review
 evidence** means that a record of FR-061 shows it, computed by code (FR-065). **Met by
 statement** means that the requirement applies only under a condition, and a cited decision
 states that the condition does not hold. The Evidence column cites the section or the record.
-**Done**, used for FUT-SEC-8 alone, means that the demonstration record exists as the search tool's
-validation record (FR-003), that every development target is recovered as SC-001 states, that
+**Done**, used for FUT-SEC-8 alone, means that the demonstration record the FUT-SEC-8 result
+review names (data-model §4) exists as the search tool's validation record
+(FR-003), that every development target is recovered as SC-001 states, that
 security.md's best-attack register row for exhaustive seed search cites the record, and that the
 "FUT-SEC-8 result review" row reads Approved at HEAD; SC-002 and security.md §15 use it in that
 sense. **Partly met** means that the requirement's other clauses are met in one of the three terms
@@ -2766,7 +2799,7 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   100% of findings carry a classification of security.md §9.1 and every other record `none`, each
   computed by code (FR-060), and the re-check reproduces 100% of the verdicts on a fresh clone from
   committed files alone, on any machine, since it is exempt from the environment guard (FR-065); a
-  reproduction that re-runs evidence stays in research R1's two environments.
+  reproduction that re-runs evidence stays in the environment that made its original (research R1).
 - **SC-018**: The claim-register test reports 0 disagreements between the register, README,
   security.md and the disclaimers, 0 uses of forbidden wording outside the register's allow-list,
   and 0 strengths stated without "target" or a quoted rule outside it (FR-069).
