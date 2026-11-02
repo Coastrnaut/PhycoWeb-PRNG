@@ -97,16 +97,20 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   (Python 3.14.4, numpy 2.5.4, scipy 1.18.1). The machine is the i9-14900K with 32 logical CPUs
   and 31 GiB RAM used in feature 003.
   - One environment record per platform, `environment-windows.json` and `environment-wsl.json`
-    under `reports/004-crypto-architecture-v3/`, is written at setup and on any change: the
-    Windows build, the WSL distribution and version, Python, gcc, make and the full
-    `pip freeze`. Each evidence record cites its environment record's SHA-256 (data-model §1). Both
+    under `reports/004-crypto-architecture-v3/`, is written at setup and, with the owner's approval,
+    on any change: the Windows build, the WSL distribution, its version and the kernel, Python, gcc,
+    make and the full `pip freeze`. A record is written only when its Python and pinned packages
+    match this section and the pins of `requirements.txt` for that platform (R18). Each evidence
+    record cites its environment record's SHA-256 (data-model §1). Both
     keep fixed names: before one changes, its current content is kept as `versions/<sha256>.json`
     beside it, and the new record holds `previous_sha256` (R16).
-  - `protocol/evidence.py` checks at start that the interpreter and the installed packages
-    match this section and the pins for that platform (R18), and exits 2 on any mismatch. A changed
-    environment needs this section updated first, with the owner's approval.
-    `scripts/recheck_004.py` alone is exempt, since it imports only the standard library and
-    `protocol/` (R16).
+  - `protocol/evidence.py` checks at start the running environment against the platform's
+    environment record in force, as a whole: Python, every package and version of `pip freeze` (one
+    added, upgraded or removed), gcc and make in WSL, and the Windows build or the WSL distribution
+    and kernel. Any difference exits 2, naming it, a Windows or WSL update included; the owner then
+    approves a new environment record, with this section updated first when a pinned version
+    changes, and each later record cites the record in force. `scripts/recheck_004.py` alone is
+    exempt, since it imports only the standard library and `protocol/` (R16).
   - A reproduction that re-runs evidence may run in either environment, whichever made the original,
     and in no other; the re-check of R16 may run anywhere. It compares the
     fields data-model §1 lists, and every other field, `command`, `config`, `parallelism`, the
@@ -161,13 +165,23 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Test state i at n, w | `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>` for j = 0, 1, … | the digests concatenated; the first b bits, read most significant bit first into w-bit lanes in the design document's lane order |
   | Uniform control | the same strings with `control` in place of `dev` | as above |
 
-  - A measurement with N inputs uses i = 0…N − 1. The fingerprint of each kind (and of the state
-    kind at every supported n and w), the SHA-256 of the hex values for i = 0…99, one per line,
-    is recorded in the module and checked at load, as `protocol/seedsets.py` does.
+  - A measurement with N inputs uses i = 0…N − 1. The fingerprint of each kind, of the state kind at
+    every supported n and w and of the synthetic seeds at every size, is the SHA-256 of a text that
+    data-model §2 fixes exactly, so that another implementation computes the same fingerprints: the
+    values for i = 0…99, one per line, each line ending in LF, the last included, as
+    `protocol/seedsets.py` writes; byte strings in lower-case hex, as digests are written, a state
+    as one upper-case hex string of its w-bit words in the design document's lane order, and a
+    synthetic seed as a decimal integer. A personalization string's fingerprint covers its full 32
+    bytes, so it does not depend on m, which the design fixes later. The fingerprints are recorded
+    in the module and checked at load, as `protocol/seedsets.py` does.
   - Every use takes its inputs from this rule: the vectors (keys and nonces 0 and 1, R8), the
     constructed states from development keys, the D4 scoring, the tool validation and every
-    test. A use of N inputs takes i = 0…N − 1 of the kind it names, declared up front, and the
-    loader refuses any index outside it.
+    test. A use of N inputs takes i = 0…N − 1 of the kind it names, declared up front: scripts take
+    inputs only through `load(ns, kind, allow, count, ...)`, as feature 002's scripts use
+    `protocol/seedsets.py`'s `load`, which checks the namespace against `allow` and the kind's
+    fingerprint and returns the values i = 0…count − 1, so no index outside the declared range can
+    be read. The derivation functions take the namespace, as their strings do, and a test fails if
+    code outside the module and its own tests calls one (data-model §2).
   - The loader accepts only the namespaces `dev` and `control`. `control` serves only uniform
     controls, and `dev` is never a control. Each evidence kind's namespace is fixed in code, not
     chosen on the command line, and the loader refuses `control` for any kind but a control. The
@@ -187,10 +201,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
        `phycoweb-004/dev/synthetic/n<n>/<j>` read as a big-endian integer: one `binomial(N, 1/2)`
        count per tested bit, in the test's bit order, except the planted bit at position j mod S,
        drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033).
-       `protocol/devinputs_v3.py` stays standard-library only and gives `synthetic_seed(n, j)`;
-       `validate_tool.py` draws the counts. The validation record holds the numpy version and each
-       set's SHA-256, and a reproduction in the same environment draws the sets again and compares
-       them.
+       `protocol/devinputs_v3.py` stays standard-library only and gives the seeds through `load`,
+       `synthetic_seed(ns, n, j)` deriving them; `validate_tool.py` draws the counts. A set's
+       SHA-256 covers its counts as decimal text, one per line in the test's bit order, each line
+       ending in LF, as `protocol/seedsets.py` writes values. The sets are local-only (R16),
+       regenerated by their deterministic command, and never replaced: the validation record commits
+       each set's SHA-256, the numpy version and a per-set summary, and a later draw must reproduce
+       every hash with that numpy version (R4).
 
     A constructed input takes its index from its rule. No value or index is picked after any
     output is seen.
@@ -289,7 +306,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     and 0.0033 at the three sizes) it fires in 82 to 97 of the 100 sets, the binomial interval
     around 90% with at most 0.005 in each tail. Synthetic counts cost nothing to draw.
     They are R3's constructed class 5, drawn by a public rule from seeds fixed before first use,
-    hashed and never redrawn. The avalanche test's validation record also shows its verdict code and
+    hashed and never redrawn, which means that no set is ever replaced: a later draw must reproduce
+    every hash in an environment with that numpy version, and a draw that differs is reported and
+    counts for nothing; after an approved numpy upgrade the old record stands, and a new validation
+    runs as a new record. The sets are local-only (R16), regenerated by their deterministic command,
+    and the validation record commits each set's SHA-256 (R3), the numpy version and a per-set
+    summary, the planted bit's count and every fired bit, so a fresh clone recomputes the 82-to-97
+    verdict from committed files and a regeneration checks every count. The avalanche test's
+    validation record also shows its verdict code and
     its power without new inputs: the verdict function, applied to every count 0 to N_a of one
     difference bit, must fire exactly on the counts at or beyond the two critical values of
     `critical_counts.json`, and the power at δ_A = 0.0443, 0.0451 and 0.0465, computed exactly from
@@ -609,7 +633,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Vectors | Every supported size and evidence variant | Every claimable size |
   |---------|------------------------------------------|----------------------|
   | Π and Π⁻¹ | 16 inputs: all-zero, all-one, alternating `0x55…`, a counting pattern and test states 0…11; the state after every phase of every round for the first 4 inputs, as `pi_trace` returns it; the output for all 16 | — |
-  | Mode | — | 2 development keys (key and nonce 0, key and nonce 1) × 10,000 32-bit words, in generate requests of 1, 7, 64 and 1,000 words, repeated, then the remainder, with forget after each request |
+  | Mode | — | 2 development keys (key and nonce 0, key and nonce 1) × 10,000 32-bit words, in generate requests of 1, 7, 64 and 1,000 words in that order, cycled, the last request taking what is left (nine cycles, then 1, 7, 64 and 280 words), with forget after each request; the header says `schedule=cyclic-truncated` (data-model §11) |
   | Long run | — | the SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words (FR-058 "long runs"), taken over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines, so that feature 006's C stream and the hardware export can reproduce it from their own output |
   | Constructed states | the edge states the design document lists (FR-054) | the same |
 
@@ -628,10 +652,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Generated files hold only deterministic content (data-model §11). The command (script and
     arguments, relative to the repository root), the interpreter, the model's SHA-256, the
     platform, the measured speed (calls of Π and words per second) and the generation time go
-    to the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run, which
-    `--check` does not compare; FR-036's "measured speed stated" is met there. If generating a
-    file takes over an hour, it is generated once and its time recorded; its length is not
-    reduced.
+    to the sidecar `vectors/phyco-v3/MANIFEST.json`, one entry per generator run with its
+    `record_id`, which `--check` does not compare; FR-036's "measured speed stated" is met there.
+    `--check` writes a `generator-check` record under
+    `reports/004-crypto-architecture-v3/generator-checks/` with the common fields (data-model §1),
+    each generated file's path and SHA-256 and the verdict `match` or `differs`; SC-009's evidence
+    is each generator's pair of such records, one per platform, which quickstart M1 to M3 and the
+    final report cite. The sidecar is frozen with the vectors (data-model §13), as the record of the
+    runs that produced them; after the freeze a generator runs only with `--check` or `--reproduce`,
+    which write their records under the reports directory and never to the sidecar. If
+    generating a file takes over an hour, it is generated once and its time recorded; its length is
+    not reduced.
 - **Stricter means**: lengths may only grow.
 - **Rationale**: the spec allows shorter vectors at large sizes "where the model's speed limits a
   size". Because a call's output grows with the grid, speed does not limit the 10,000-word
@@ -1131,7 +1162,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     counts and p-values are JSON or gzip-compressed JSON, never `.npy`, and a solver's log is
     `.txt`, since `*.log` is ignored; `protocol/evidence.py` refuses any other suffix there (R18).
   - Records up to 10 MB, compressed with gzip, are committed. Larger outputs, such as full
-    dependency matrices at 16×16 (about 32 MB per round and direction), stay local, under
+    dependency matrices at 16×16 (about 32 MB per round and direction) and the synthetic sets of the
+    bias test's validation (8,601,600 counts, about 60 MB as text; R3, R4), stay local, under
     `data/local/004/<record_id>/` and never under `reports/004-crypto-architecture-v3/`:
     `.gitignore` gains `data/local/` (R18), and each record's `outputs` gives their paths with
     `committed` false. `protocol/evidence.py` refuses a committed output above 10 MB, naming it; a
@@ -1149,7 +1181,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     its record also holds the SHA-256 of the uncompressed content, which a reproduction compares,
     since another zlib may compress differently; a `p_values` file is compared by its values
     instead, its `uncompressed_sha256` reported only (data-model §1). A test checks the header of
-    every committed `.gz` file.
+    every committed `.gz` file under this feature's paths, `reports/004-crypto-architecture-v3/`,
+    `research/004/`, `vectors/phyco-v3/` and `baseline/phyco-v2/`; feature 003's 1,000 tracked `.gz`
+    files, listed with their hashes in its `SHA256SUMS`, hold a file name and a nonzero time, are
+    outside its scope and stay unchanged.
   - **Hashes.** Each hash is recorded beside its kind, `raw` or `lf-normalized`. Every new file
     is hashed over its raw bytes and is pinned to LF or `binary` (R18), so its raw and
     normalized content agree on every checkout. An existing `text=auto` file is hashed over its
@@ -1275,8 +1310,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Python versions** (FR-035): the model supports Python 3.10 and 3.14, the two tested; 3.8,
     3.9 and 3.11 to 3.13 are "expected, not tested", since the model uses only the standard
     library and passes the 3.8 grammar check. The analysis tools need 3.10 or later and are
-    tested on 3.10.11 and 3.14.4; a comment in `requirements.txt` says that its markers admit
-    3.11 to 3.13 untested (R18).
+    tested on 3.10.11 and 3.14.4; the markers of `requirements.txt` start at 3.10, and a comment
+    there says that the analysis tools need 3.10 or later and that the model alone needs only the
+    standard library, so that "expected, not tested" on 3.8 and 3.9 concerns the model only, and
+    that the markers admit 3.11 to 3.13 untested (R18).
   - The second transcription is `tests/v3_reference.py`, written from the design document alone in
     a separate session. That session starts only after the owner's recorded go-ahead. A person
     may write it, or a fresh agent session that the owner starts or authorizes; the provenance
@@ -1305,11 +1342,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     copies, which the later `*.hex text eol=lf` line governs, as `git check-attr` showed on
     2026-11-01; that is harmless while their sources stay LF, as they are.
   - `.gitattributes` gains `text eol=lf` for every Markdown file under
-    `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the spec among
-    them, since every record holds the spec's SHA-256 (data-model §1); and for
-    `vectors/phyco-v3/**`, `research/004/**/*.jsonl`, `protocol/claims.json`,
-    `reports/004-crypto-architecture-v3/**/*.json` and
-    `reports/004-crypto-architecture-v3/**/*.jsonl`, the provenance log among them.
+    `specs/004-crypto-architecture-v3/`, the spec among them, since every record holds the spec's
+    SHA-256 (data-model §1), and for `vectors/phyco-v3/**`. Every file under
+    `reports/004-crypto-architecture-v3/` and `research/004/`, and `protocol/*.json`, is pinned
+    already (below): the provenance log, `protocol/claims.json`, the candidate log and the protocol
+    change log, `research/004/tools/critical_counts.json`,
+    `research/004/candidates/superseded.json`, each candidate's committed reference outputs and the
+    self-written known results among them.
   - `.gitattributes` holds `reports/004-crypto-architecture-v3/** text eol=lf`, which covers
     solver logs, CSV and text outputs, followed by `*.gz binary`, so that compressed records are
     never treated as text. Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`,
@@ -1317,14 +1356,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     since `*.log` is ignored, and `protocol/evidence.py` refuses any other suffix. Later lines take
     precedence, and `*.bin binary` already follows it. Both lines were added when the checklist
     choices were applied (2026-11-01); the 1,000 tracked `.gz` files of feature 003 were already
-    stored as binary, so none changes.
+    stored as binary, so none changes, and R16's header test leaves them out.
+    `research/004/** text eol=lf` and `protocol/*.json text eol=lf` follow the reports line, before
+    the `*.hex`, `*.bin` and `*.gz` lines, so that those keep precedence; they were added when the
+    second re-run's choices were applied (2026-11-01), while neither path held a file.
   - **Hashes and pins.** A new record or the review package hashes an existing `text=auto` file
     over its LF-normalized content and says so (`lf-normalized`, R16), so the hash is the same
     on every checkout, and no existing file's pin changes. A test lists every path whose hash a
     committed record, manifest or freeze record holds, and checks with `git check-attr text eol`
     that each has an explicit rule or `binary`, or that its record marks the hash
     `lf-normalized`; it also looks for a byte-order mark. It replaces the one-off check noted in
-    `.gitattributes` on 2026-10-31.
+    `.gitattributes` on 2026-10-31, and it runs from plan phase 1 on, so that a path missed later
+    fails it as soon as the first record that cites it is committed.
   - **Encoding.** Every new text file is UTF-8 without a byte-order mark. Scripts write with
     `encoding="utf-8"` and `newline="\n"`, and no hashed file is written by Windows PowerShell
     5.1, whose `Out-File -Encoding utf8` adds a byte-order mark.
@@ -1334,14 +1377,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `.gitignore` gains, at setup (plan phase 1), the two locks of R16, `data/heavy-run.lock` and
     `data/log-append.lock`, and `data/local/`, where local-only outputs are written (R16), so that
     none of them shows in `git status` or counts as dirty.
-  - `requirements.txt` loses its stale header and pins the two tested environments with
-    markers: `numpy==2.2.6; python_version < "3.14"`, `numpy==2.5.4; python_version >= "3.14"`,
-    the same for scipy (1.15.3 and 1.18.1), and `nistrng==1.2.3` in both. With Hypothesis
-    approved (R19), it adds `hypothesis==6.168.5`, `sortedcontainers==2.4.0` and
-    `exceptiongroup==1.3.1; python_version < "3.11"`. The analysis tools need Python 3.10 or
-    later; the model needs only the standard library (R17). A comment in the file says that its
-    markers admit Python 3.11 to 3.13 untested. `protocol/evidence.py` checks these pins at
-    start (R1).
+  - `requirements.txt` loses its stale header and pins the two tested environments with markers:
+    `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"`,
+    `numpy==2.5.4; python_version >= "3.14"`, the same for scipy (1.15.3 and 1.18.1), and
+    `nistrng==1.2.3` in both. With Hypothesis approved (R19), it adds `hypothesis==6.168.5`,
+    `sortedcontainers==2.4.0` and `exceptiongroup==1.3.1; python_version < "3.11"`. A comment in the
+    file says that the analysis tools need Python 3.10 or later and that the model alone needs only
+    the standard library (R17), so FR-035's "expected, not tested" on older versions concerns the
+    model only, and that its markers admit Python 3.11 to 3.13 untested. A new environment record is
+    written only when the environment matches these pins, and `protocol/evidence.py` checks at start
+    against that record as a whole (R1).
   - `protocol/disclaimer.py` gains `DESIGN_DISCLAIMER`, holding exactly the design-form
     disclaimer, the block directly under the spec's title, as at the top of this document;
     `DISCLAIMER` stays unchanged. The claim test compares every document's copy with the
@@ -1410,9 +1455,14 @@ Every downloaded file is treated as untrusted: it goes into its own new director
 run from inside that directory, Python reading it runs with `-I`, and its SHA-256 and size are
 recorded against its row.
 
-A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds one
-entry per file of these tables: its name, source, size, SHA-256, download date and local path. It
-keeps that fixed name: before it changes, its current content is kept as `versions/<sha256>.json`
-beside it (R16). A validation record's `source` cites the manifest entry, with the paper's table and
-value (data-model §7). If a paper's value cannot be obtained, the tool it validates stays
-unvalidated and its results `not evaluated` (R12); the owner may provide the value with its source.
+A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds from
+setup on one entry per file of these tables, each with its name, source, size and licence and a
+`status`: `approved`, not yet fetched, with no SHA-256, date or path; `fetched`, with its SHA-256,
+download date and local path; or `not obtained`, with the reason. A value the owner provides gets an
+entry of its own, `owner-provided`, with the owner's words, the source the owner names, the date and
+the value's SHA-256. The manifest keeps its fixed name: before it changes, its current content is
+kept as `versions/<sha256>.json` beside it (R16). A validation record's `source` cites the manifest
+entry: a `fetched` file's, with the paper's table and value, or an `owner-provided` one (data-model
+§7). If a paper's value cannot be obtained, the tool it validates stays unvalidated and its results
+`not evaluated` (R12); the owner may provide the value with its source, as an `owner-provided`
+entry.

@@ -12,7 +12,10 @@ shown as `<…>` are fixed by the design document.
 ## Module rules (FR-020, FR-035, FR-055; research R17)
 
 - Imports: the standard library, `phycoweb.constants_v3` and `phycoweb.selftest_v3` only, the two
-  data modules the generators write (data model §11). A test bans every other import
+  data modules the generators write (data model §11). `phycoweb.selftest_v3` is imported inside
+  `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and `ResearchDuplex` import without
+  it, as `gen_vectors_v3.py` needs on its first run, before the module exists; a test imports the
+  model with the module absent. A test bans every other import
   (numpy, scipy and the analysis code included), as `tests/test_purity_v2.py` does for
   `phyco-v2`, and also bans `time`, `random`, `os`, `sys`, `platform` and `secrets` in the
   model. The generators read the clock and the platform only for the sidecar record of the
@@ -84,7 +87,7 @@ g.zeroize()                             # clears the whole state and the key; th
 |------|----------|
 | Variant | `Generator` accepts only `PRODUCTION_VARIANTS`; any other ID raises `VariantRefused` (SC-010) |
 | Construction | the constructor checks in this order, each refusal raising one exception: the variant (`VariantRefused`), then the key length (`ValueError`), then the self-test (`SelfTestError`); only then does it store the key. A failed construction leaves no object, and each refusal is tested with an input that would also fail every later check, so the order shows; the tests check the exact type, since `VariantRefused` is a `ValueError` (FR-058) |
-| Start-up self-test | the constructor runs the known-answer self-test of FR-059, whose inputs and expected output come from `phycoweb.selftest_v3`, copied from the committed vectors (frozen at the freeze; data model §11), then zeroizes the whole state, and only then stores its own copy of the key as a `bytearray`, which the object holds until `zeroize` clears it (Module rules); on failure it zeroizes any state the self-test used and raises `SelfTestError`, and no object exists |
+| Start-up self-test | the constructor imports `phycoweb.selftest_v3` (Module rules) and runs the known-answer self-test of FR-059, whose inputs and expected output come from it, copied from the committed vectors (frozen at the freeze; data model §11), then zeroizes the whole state, and only then stores its own copy of the key as a `bytearray`, which the object holds until `zeroize` clears it (Module rules); on failure it zeroizes any state the self-test used and raises `SelfTestError`, and no object exists; a `Generator` built before that module exists fails its self-test in the same way |
 | Key | taken once, at construction. The key enters the state at every `instantiate`, from the stored copy, so FR-013's instantiate keeps its inputs. No key is ever compared. In hardware the key register is loaded once and zeroized with the state, and key loading is a call of its own, with its latency and cycle count (FR-020, FR-025) |
 | Call sequence | `generate` or `reseed` before `instantiate`, and any call after `zeroize`, raise `CallSequenceError`; `zeroize` is final, so a new key needs a new `Generator`; `instantiate` may be called again with a new nonce |
 | Forget | runs inside every `generate`, after its last output block, so it can never be skipped; instantiate also ends with a forget call, in the form the theorem covers (FR-013; research R10) |

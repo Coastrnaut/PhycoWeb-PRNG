@@ -314,6 +314,7 @@ reports/004-crypto-architecture-v3/
 ├── review-package/
 ├── reproductions/            # one directory per reproduced record and reproduction (R16)
 ├── rechecks/                 # the re-check's records (FR-065)
+├── generator-checks/         # each generator's --check records, one per platform (SC-009)
 ├── provenance.jsonl          # FR-067
 └── phase-report.md
 ```
@@ -328,9 +329,12 @@ source and binary.
 
 1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks and for
    `data/local/`, where local-only outputs go (R16, R18; the pins for
-   `reports/004-crypto-architecture-v3/**` and `*.gz` were added on
-   2026-11-01); the Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
-   installed; the downloads manifest `downloads.json`, one entry per file fetched (R19); the
+   `reports/004-crypto-architecture-v3/**`, `research/004/**`, `protocol/*.json` and `*.gz` were
+   added on 2026-11-01), with R18's line-ending test, which runs from this phase on (FR-053); the
+   Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
+   installed; the downloads manifest `downloads.json`, one entry per file of R19's tables from setup
+   on, each with its `status` (`approved`, `fetched` or `not obtained`), and an `owner-provided`
+   entry for each value the owner provides (R19); the
    environment records of both platforms (R1); corrected `requirements.txt`;
    `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints; `protocol/evidence.py`;
    the provenance log; the protocol change log, whose first entries are the answered rows of every

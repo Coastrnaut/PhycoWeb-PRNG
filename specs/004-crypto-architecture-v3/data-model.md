@@ -30,11 +30,15 @@ implementation can write byte-identical files:
 - Hex words of vectors and states are upper case and zero-padded to the word's width, with lanes in
   the design document's order. Every digest is written as 64 lower-case hex digits, as the existing
   records already are. A vector file's header is `# key=value` fields in a fixed order, separated by
-  single spaces (section 11).
+  single spaces (section 11). In a fingerprint's text (section 2), byte strings (keys, nonces,
+  personalization strings, reseed inputs) are lower-case hex, as digests are, and states are written
+  as here.
 - A `.gz` file is written by `gzip.compress(data, compresslevel=9, mtime=0)`, so its header holds no
-  file name and a zero time. Its raw hash is over the compressed bytes, and its output entry also
-  holds `uncompressed_sha256`, the SHA-256 of its content, which a reproduction compares (research
-  R16).
+  file name and a zero time, and a test checks the header of every committed `.gz` file under this
+  feature's paths (research R16); feature 003's, listed with their hashes in its `SHA256SUMS`, are
+  outside its scope and stay unchanged. Its raw hash is over the compressed bytes, and its output
+  entry also holds `uncompressed_sha256`, the SHA-256 of its content, which a reproduction compares
+  for every `.gz` file but a `p_values` file (section 1; research R16).
 - `lf-normalized` content is the file's bytes with each CR LF pair replaced by LF, as Git
   normalizes, a lone CR kept; it is never computed from a file read in text mode, whose universal
   newlines also turn a lone CR into LF.
@@ -57,7 +61,7 @@ implementation can write byte-identical files:
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head` (research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
+| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), which the start check compared the running environment with as a whole (Python, every package of `pip freeze`, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
@@ -158,15 +162,26 @@ design document, which the table names; for every other kind it is reported, and
 |----------------------|------|
 | `PREFIX` | `phycoweb-004/` |
 | `NAMESPACES` | `dev`, `control`; nothing else is accepted |
-| `key(i)`, `nonce(i)`, `pers(i, m)`, `reseed(i)` | 32, 16, min(m, 32) and 32 bytes from SHA-256 of `phycoweb-004/<ns>/<kind>/<i>` |
-| `state(n, w, i)` | b = 2w·n² bits from the digests of `phycoweb-004/<ns>/state/n<n>w<w>/<i>/<j>`, j = 0, 1, …, read into lanes as R3 states |
-| `synthetic_seed(n, j)` | the first 16 bytes of SHA-256 of `phycoweb-004/dev/synthetic/n<n>/<j>`, read as a big-endian integer: the seed of synthetic set j at size n (class 5 below) |
-| `FINGERPRINTS` | per namespace and kind, and per (n, w) for `state`: SHA-256 of the hex values for i = 0…99, one per line, LF |
-| `load(ns, kind, allow, ...)` | checks the fingerprint, refuses a namespace not in `allow` and any index outside the use's declared range i = 0…N − 1 (`PermissionError`; scripts exit 2) |
+| `key(ns, i)`, `nonce(ns, i)`, `pers(ns, i, m)`, `reseed(ns, i)` | 32, 16, min(m, 32) and 32 bytes from SHA-256 of `phycoweb-004/<ns>/<kind>/<i>`; outside the module and its own tests, called only through `load` (below) |
+| `state(ns, n, w, i)` | b = 2w·n² bits from the digests of `phycoweb-004/<ns>/state/n<n>w<w>/<i>/<j>`, j = 0, 1, …, read into lanes as R3 states |
+| `synthetic_seed(ns, n, j)` | for `ns` = `dev` only, the first 16 bytes of SHA-256 of `phycoweb-004/dev/synthetic/n<n>/<j>`, read as a big-endian integer: the seed of synthetic set j at size n (class 5 below) |
+| `FINGERPRINTS` | per namespace and kind, per (n, w) for `state` and per n for `synthetic`: the SHA-256 of the fingerprint text below |
+| `load(ns, kind, allow, count, ...)` | the only way scripts take inputs, as feature 002's scripts use `protocol/seedsets.py`'s `load`: it checks the namespace against `allow` (`PermissionError`; scripts exit 2) and the kind's fingerprint (for `state` at the given n and w, for `synthetic` at the given n) and returns the values i = 0…count − 1, so no index outside the use's declared range can be read |
 
 The empty personalization string is a named input of its own. Indices are decimal without
 leading zeros. The module imports only `hashlib`. A keyed reduced variant of capacity c takes the
-first c/8 bytes of `key(i)` and the first c/16 bytes of `nonce(i)` (R3, R14).
+first c/8 bytes of `key(ns, i)` and the first c/16 bytes of `nonce(ns, i)` (R3, R14). A test fails
+if code outside the module and its own tests calls a derivation function.
+
+**Fingerprint text** (FR-040; research R3), fixed so that another implementation computes the same
+fingerprints: the values for i = 0…99, or j = 0…99 for `synthetic`, one per line, each line ending
+in LF, the last included, in ASCII, as `protocol/seedsets.py` writes. Keys, nonces, personalization
+strings and reseed inputs are lower-case hex of their bytes, as digests are written; a state is one
+string of its w-bit words in upper-case hex in the design document's lane order, as the format rules
+write states (introduction), which gives its first b bits in hex whatever that order is; a synthetic
+seed is a decimal integer. A personalization string's fingerprint is taken over its full 32 bytes,
+so it does not depend on m, which the design fixes later; a use with m < 32 takes a prefix the
+fingerprint already covers.
 
 Every use takes its inputs from this module: the vectors (keys and nonces 0 and 1), the
 constructed states from development keys, the D4 scoring, the tool validation and every test.
@@ -184,12 +199,14 @@ no value or index is picked after any output is seen.
 | 2 | edge states | the design document's list (FR-054) |
 | 3 | derived from development inputs | the avalanche flips x ⊕ e_j, the key and nonce bit flips and the word rotations, for every j, bit and k the rule names (R4) |
 | 4 | feature 002's `dev` seeds | for FUT-SEC-8 only (R2), the one external development set |
-| 5 | synthetic counts | for the bias test's validation only (R4): set j = 0…99 at each size from numpy's `Generator(PCG64(synthetic_seed(n, j)))`; one `binomial(N, 1/2)` count per tested bit, in the test's bit order, except the planted bit at position j mod S, drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033); `validate_tool.py` draws the counts, and the validation record holds the numpy version and each set's SHA-256 (section 7) |
+| 5 | synthetic counts | for the bias test's validation only (R4): set j = 0…99 at each size from numpy's `Generator(PCG64(s))`, s being its seed, which `load` returns for the kind `synthetic`; one `binomial(N, 1/2)` count per tested bit, in the test's bit order, except the planted bit at position j mod S, drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033); `validate_tool.py` draws the counts, which are local-only (research R16) and never replaced; a set's SHA-256 covers its counts as decimal text, one per line in the test's bit order, each line ending in LF, and the validation record commits it with the numpy version and a per-set summary (section 7) |
 
 ## 3. Candidate log (`research/004/candidates.jsonl`; FR-041, SC-011)
 
-One JSON object per line, append-only, each entry chained to the one before it. Every append
-takes `data/log-append.lock` and checks the chain first (R16).
+One JSON object per line, append-only, each entry chained to the one before it. Every append takes
+`data/log-append.lock` and checks the chain first (R16). The log, the superseded copies and their
+inventory are pinned to LF with every file under `research/004/` (research R18), so the hashes that
+cite them hold on every checkout.
 
 | Field | Rule |
 |-------|------|
@@ -300,8 +317,9 @@ and every recovered seed with `model_v2`, with no sweep.
 
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
-  arithmetic over the binomial distribution (R4). It is committed, and scipy's p-values are
-  reported only: a reproduction compares them within a relative tolerance of 10⁻⁶, and counts,
+  arithmetic over the binomial distribution (R4). It is committed, pinned to LF with every file
+  under `research/004/` (research R18), and scipy's p-values are reported only: a reproduction
+  compares them within a relative tolerance of 10⁻⁶, and counts,
   critical counts and verdicts byte for byte (section 1).
 - **Validation cited.** Every counted record holds `validation`, the ID and SHA-256 of the
   validation record of the tool's exact hash, whose `created_utc` is earlier (FR-039; SC-007).
@@ -330,8 +348,9 @@ A bound from a tool not yet validated never counts; a trail it finds is an unver
 
 ## 7. Tool validation record (`validation/<tool>-<record_id>.json`; FR-039)
 
-`tool`, `version`, `tool_sha256`, `licence`, `source` (in the repository, or the entry of the
-downloads manifest `downloads.json`, research R19, with the paper's table and value),
+`tool`, `version`, `tool_sha256`, `licence`, `source` (in the repository, or an entry of the
+downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
+and value, or the `owner-provided` entry of a value the owner provides),
 `validated_kind` (word width, operation set and kind of model; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `found`, `outcome`
 (`re-found` or `not re-found`). A tool's results count only after a `re-found` record of the
@@ -358,7 +377,13 @@ same kind and of the tool's exact hash exists.
 - **The bias test** (R4): S14's bias re-found on `phyco-v2`, and on 100 sets of synthetic
   binomial counts with one bit planted at the 90%-power biases it fires in 82 to 97 of the 100
   sets.
-  The sets are class 5 of section 2, and the record holds the numpy version and each set's SHA-256.
+  The sets are class 5 of section 2, local-only (section 1, `outputs`) and never replaced; the
+  record commits each set's SHA-256 (section 2), the numpy version and a per-set summary, the
+  planted bit's count and every fired bit, so a fresh clone recomputes the 82-to-97 verdict from
+  committed files and a regeneration checks every count. A later draw must reproduce every hash in
+  an environment with that numpy version, and a draw that differs is reported and counts for
+  nothing; after an approved numpy upgrade the old record stands, and a new validation runs as a new
+  record.
 - **The avalanche test** (R4): the planted gap of R13 re-found; its verdict function, applied to
   every count 0 to N_a of one difference bit, fires exactly on the counts at or beyond the two
   critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
@@ -370,13 +395,14 @@ same kind and of the tool's exact hash exists.
 - **Self-written known results.** Each known result this feature writes itself (the small operation
   lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted torus symmetries and
   the one with none, the map with collisions, the variant with a planted gap, R5's
-  hand-counted examples, the small operation list of known degree) is written with its SHA-256 and
-  entered in the provenance log (section 14)
-  before the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry.
-  The validation record cites both entries, and a test checks their order and that the hashes still
-  match.
+  hand-counted examples, the small operation list of known degree) is written under `research/004/`,
+  whose files are pinned to LF (research R18), with its SHA-256, and entered in the provenance log
+  (section 14) before the tool it validates is drafted, so its entry's `seq` comes before the tool's
+  first entry. The validation record cites both entries, and a test checks their order and that the
+  hashes still match.
 - **A value that cannot be obtained** leaves the tool unvalidated and its results `not
-  evaluated`, unless the owner provides the value with its source (R12, R19).
+  evaluated`, unless the owner provides the value with its source, recorded as an `owner-provided`
+  entry of the downloads manifest, which `source` cites (R12, R19).
 
 ## 8. D4 choice record (`d4/choice.json`; R5, R6)
 
@@ -479,25 +505,37 @@ bound at the limits and the doubling check of R9.
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
-| `MANIFEST.json` | the sidecar: one entry per generator run with its `record_id`, which a generator's `--reproduce` names (cli contract), the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it |
+| `MANIFEST.json` | the sidecar: one entry per generator run with its `record_id`, which a generator's `--reproduce` names (cli contract), the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check` or `--reproduce`, which write their records under `reports/004-crypto-architecture-v3/` and never to the sidecar |
 
 The header of a mode vector file reads, for example:
 
 ```text
-# model=phyco-v3 variant=phyco-v3/n4-w32-R<R>-c256 key=dev/0 nonce=dev/0 pers=empty requests=1,7,64,1000 count=10000 format=u32-hex
+# model=phyco-v3 variant=phyco-v3/n4-w32-R<R>-c256 key=dev/0 nonce=dev/0 pers=empty requests=1,7,64,1000 schedule=cyclic-truncated count=10000 format=u32-hex
 ```
 
 The header's fields come in this fixed order, each `key=value`, separated by single spaces.
-Generated files hold only deterministic content, under the format rules of the introduction,
+`schedule=cyclic-truncated` says that the requests cycle in the order given and the last takes what
+is left: nine cycles of 1, 7, 64 and 1,000 words, then 1, 7, 64 and 280 words for 10,000 (research
+R8). Generated files hold only deterministic content, under the format rules of the introduction,
 so that `--check` can compare them byte for byte; everything that differs between runs or
-platforms goes to the sidecar `MANIFEST.json` (R8). A variant directory name is the variant ID
-with `/` replaced by `_`.
+platforms goes to the sidecar `MANIFEST.json` (R8). In the file names above, `<variant>` is the
+variant ID with `/` replaced by `_`, for example `mode_phyco-v3_n4-w32-R<R>-c256_dev0.hex`, and
+every file sits in the one directory `vectors/phyco-v3/`, with no directory per variant.
+
+**Generator checks** (SC-009). `--check` writes a `generator-check` record,
+`generator-checks/<record_id>.json`, with the common fields of section 1 (FR-061), each generated
+file's path and SHA-256 and the verdict `match` or `differs`, computed by code (FR-065). SC-009's
+evidence is each generator's pair of such records, one per platform, which quickstart M1 to M3 and
+the final report cite.
 
 **Order of generation** (FR-036, FR-059): three steps, each generator's `--check` passing in this
 order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
 vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes
 `phycoweb/selftest_v3.py`, the self-test's inputs and expected output, copied from the vectors.
-(3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. Tests check that
+(3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. The model imports
+that module inside `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and
+`ResearchDuplex` import without it and step (2) runs before it exists; a `Generator` built before
+then fails its self-test and leaves no object (model contract, Module rules). Tests check that
 `Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
 `selftest_v3.py` with the vectors (section 13).
 
@@ -514,11 +552,12 @@ copy against its manifest hash and its live source (SC-012).
 - **Hashes**, each with its kind (`raw` or `lf-normalized`, R16): the design document (with
   its version); `rationale.md`, versioned with it; `phycoweb/model_v3.py`;
   `phycoweb/constants_v3.py`, with its table per supported (n, w); `phycoweb/selftest_v3.py`
-  (section 11); every vector file, including the constructed-state vectors and the constant tables
-  beside them; the scripts that generate the constants and the vectors; the selected operation list;
-  `research/004/ir.py` with its tools; and the scripts that compute verdicts: `evidence_v3.py`,
-  `round_rule.py`, `d4_choice.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
-  `protocol/evidence.py`.
+  (section 11); every vector file, including the constructed-state vectors, the constant tables
+  beside them and the sidecar `MANIFEST.json`, frozen with them as the record of the runs that
+  produced them (section 11); the scripts that generate the constants and the vectors; the selected
+  operation list; `research/004/ir.py` with its tools; and the scripts that compute verdicts:
+  `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `recheck_004.py`, `protocol/devinputs_v3.py`
+  and `protocol/evidence.py`.
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the

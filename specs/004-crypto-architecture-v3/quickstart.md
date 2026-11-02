@@ -26,7 +26,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 |------|---------|----------|
 | P0 | **heavy**: `python -W ignore -m unittest discover -s tests -t .` | all tests pass, existing and new, while no other heavy run holds `data/heavy-run.lock`; FR-053's two-worker test is marked heavy and takes the lock, and fails naming the lock if another run holds it |
 | P1 | `python scripts/archive_phyco_v2.py --check` | 0 mismatches between copies, manifest and live files (SC-012) |
-| P2 | `python -c "from protocol import devinputs_v3 as d; print(d.key(0).hex())"` | 64 hex digits; fingerprints checked at import |
+| P2 | `python -c "from protocol import devinputs_v3 as d; print(d.load('dev', 'key', allow=('dev',), count=1)[0].hex())"` | 64 hex digits; fingerprint checked at load |
 | P3 | any evidence script with an input namespace other than `dev` or `control` | exit 2, nothing written (FR-040) |
 | P4 | append to the candidate log while another process holds `data/log-append.lock` | exit 2 after 10 s, nothing appended (R16) |
 
@@ -70,9 +70,9 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| M1 | `python scripts/gen_constants_v3.py --check` on Windows; `wpy scripts/gen_constants_v3.py --check` in WSL | exit 0 on both (SC-006, SC-009) |
-| M2 | `python scripts/gen_vectors_v3.py --check` on Windows; `wpy scripts/gen_vectors_v3.py --check` in WSL | exit 0 on both (SC-009) |
-| M3 | `python scripts/gen_constructed_v3.py --check` on Windows; `wpy scripts/gen_constructed_v3.py --check` in WSL | exit 0 on both (SC-016, SC-009) |
+| M1 | `python scripts/gen_constants_v3.py --check` on Windows; `wpy scripts/gen_constants_v3.py --check` in WSL | exit 0 on both, each writing a `generator-check` record with verdict `match` under `$REP/generator-checks/`; the pair is SC-009's evidence (SC-006, SC-009) |
+| M2 | `python scripts/gen_vectors_v3.py --check` on Windows; `wpy scripts/gen_vectors_v3.py --check` in WSL | exit 0 on both, each writing a `generator-check` record, as in M1 (SC-009) |
+| M3 | `python scripts/gen_constructed_v3.py --check` on Windows; `wpy scripts/gen_constructed_v3.py --check` in WSL | exit 0 on both, each writing a `generator-check` record, as in M1 (SC-016, SC-009) |
 | M4 | `python -c "from phycoweb.model_v3 import Generator; Generator('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `VariantRefused` (SC-010) |
 | M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, call-sequence errors including any call after `zeroize`, boundaries (FR-058) |
 | M6 | `python -c "from phycoweb.model_v3 import ResearchDuplex as D; D('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `ValueError` at construction: that variant takes an 8-byte key, and a 4-byte nonce at `instantiate` (R14) |

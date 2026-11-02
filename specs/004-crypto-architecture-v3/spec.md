@@ -1255,25 +1255,30 @@ freeze hashes and the baseline manifest; run the claim-register test.
   vectors.
 - **FR-036**: Golden vectors and known-answer tests MUST be committed for Π and Π⁻¹ at every
   supported size and every reduced variant used as evidence, and for the mode at every claimable
-  size with at least two development keys and 10,000 words each (FUT-GRID-5). Where the model's
-  speed limits a size, the length and the measured speed MUST be stated. The vectors trace the
-  state after every phase of every round for the first four inputs, so that an RTL mismatch can
+  size with at least two development keys and 10,000 words each (FUT-GRID-5), in generate requests
+  that cycle through stated lengths, the last request taking what is left (research R8). Where the
+  model's speed limits a size, the length and the measured speed MUST be stated. The vectors trace
+  the state after every phase of every round for the first four inputs, so that an RTL mismatch can
   be located to one stage. Generated files hold only deterministic content, in a fully specified
   text format (data-model introduction: upper-case hexadecimal zero-padded to the word's width,
   lanes in the design document's order, a fixed header grammar, canonical JSON, a final
   newline, LF only), so that another implementation can write byte-identical files. The
   command, the interpreter, the model's SHA-256, the platform, the measured speed and the
   generation time go to a sidecar record per generator run, which the check of generated files
-  does not compare; the measured speed is stated there. Every run started on a candidate or a
-  variant writes a record, even if aborted (`inconclusive` or `blocked`, with the reason); a
-  run later found hit by a tool defect keeps its record, with the defect noted. FUT-GRID-5's
-  validation of an intermediate size before 16×16 is carried to features 006 and 008: feature 006's
-  RTL simulation runs 4×4 before 8×8 and 16×16, and feature 008's board runs 4×4 first, then each
-  larger claimable size that fits the XC7A100T, in order, the largest that fits last
-  (FUT-HW-2; FR-052, FR-056). FR-026's LUT and flip-flop estimate predicts the fit and Vivado's
-  post-route report decides it; a size that does not fit is listed in feature 008's spec with its
-  reason and stays covered by simulation. The generators run in a fixed order, each `--check`
-  passing before the next: the constant tables; then the vectors, written through `pi` and
+  does not compare; the measured speed is stated there. The check writes a record of its own on each
+  platform, with each generated file's SHA-256 and the verdict `match` or `differs`, and each
+  generator's pair of such records, one per platform, is the evidence of SC-009. The sidecar is
+  frozen with the vectors, as the record of the runs that produced them, and after the freeze a
+  generator runs only to check or to reproduce, and neither writes to it (data-model §11, §13).
+  Every run started on a candidate or a variant writes a record, even if aborted (`inconclusive` or
+  `blocked`, with the reason); a run later found hit by a tool defect keeps its record, with the
+  defect noted. FUT-GRID-5's validation of an intermediate size before 16×16 is carried to features
+  006 and 008: feature 006's RTL simulation runs 4×4 before 8×8 and 16×16, and feature 008's board
+  runs 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that
+  fits last (FUT-HW-2; FR-052, FR-056). FR-026's LUT and flip-flop estimate predicts the fit and
+  Vivado's post-route report decides it; a size that does not fit is listed in feature 008's spec
+  with its reason and stays covered by simulation. The generators run in a fixed order, each
+  `--check` passing before the next: the constant tables; then the vectors, written through `pi` and
   `ResearchDuplex`, which runs no self-test, together with `phycoweb/selftest_v3.py`, the
   self-test's inputs and expected output copied from them; and only then `Generator`, which imports
   it and runs the self-test (FR-059; data-model §11).
@@ -1338,13 +1343,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   synthetic binomial counts with a planted bias at the 90%-power values of research R4 (0.0030,
   0.0031 and 0.0033 at the three sizes), its firing rate lies within a stated binomial interval
   around 90%. The synthetic sets are constructed inputs of research R3's class 5, fixed by a public
-  rule before first use, hashed and never redrawn. Each known result this feature writes itself (the
-  small operation lists with their hand-derived matrices, the lists with planted symmetries and the
-  one with none, the map with collisions, the variant with a planted gap, research R5's hand-counted
-  examples, the small operation list of known degree) is written with its SHA-256 and entered in the
-  provenance log before the tool it validates is drafted; the validation record cites both entries,
-  and a test checks their order and that the hashes still match (data-model §7, §14). What must
-  match is stated per known result (data-model §7): exact equality for every deterministic fact, and
+  rule before first use, hashed and never replaced: they stay local, regenerated by their
+  deterministic command, and the validation record commits each set's SHA-256, the numpy version and
+  a per-set summary, so that its verdict is recomputable from committed files; a later draw must
+  reproduce every hash with that numpy version, a draw that differs counts for nothing, and after an
+  approved numpy upgrade a new validation runs as a new record (research R3, R4). Each known result
+  this feature writes itself (the small operation lists with their hand-derived matrices, the lists
+  with planted symmetries and the one with none, the map with collisions, the variant with a planted
+  gap, research R5's hand-counted examples, the small operation list of known degree) is written
+  with its SHA-256 and entered in the provenance log before the tool it validates is drafted; the
+  validation record cites both entries, and a test checks their order and that the hashes still
+  match (data-model §7, §14). What must match is stated per known result (data-model §7): exact
+  equality for every deterministic fact, and
   for a measured fraction a count in the binomial interval around the recorded fraction at the
   tool's sample size, with at most 0.005 in each tail; anything else is `not re-found`. Each known
   result is of the kind of its use, or a cross-check covers the difference: the ARX search
@@ -1378,12 +1388,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   fixed constants and development inputs, by a rule fixed in the plan, MAY be used; the closed
   class of constructed inputs (research R3; data-model §2) is the only use of the second kind, its
   class 5, the bias tool's synthetic counts, drawn from seeds that are themselves derived from
-  public strings, and no value or index is picked after any output is seen. This holds for the whole
-  feature, the freeze and everything after it included: no held-out key set MAY be created or used
-  in this feature at any time. Every tool of this feature that reads feature 002's or 003's seed
-  sets loads only feature 002's `dev` set and exits 2 on any held-out set, as security.md §11.3
-  requires of development tools, and a test checks every such call. No statistical battery
-  (SP 800-22, PractRand, TestU01 or any other) runs on a candidate or on `phyco-v3` in this
+  public strings, and no value or index is picked after any output is seen. Scripts take these
+  inputs only through the loader of research R3, which checks each kind's fingerprint, the SHA-256
+  of a text that data-model §2 states exactly, and returns only the use's declared index range. This
+  holds for the whole feature, the freeze and everything after it included: no held-out key set MAY
+  be created or used in this feature at any time. Every tool of this feature that reads feature
+  002's or 003's seed sets loads only feature 002's `dev` set and exits 2 on any held-out set, as
+  security.md §11.3 requires of development tools, and a test checks every such call. No statistical
+  battery (SP 800-22, PractRand, TestU01 or any other) runs on a candidate or on `phyco-v3` in this
   feature: the frequency and avalanche tests of the bias rule are the only statistics, and the
   statistical programme belongs to feature 007 under its own protocol. Feature 007 defines the
   held-out sets, and this requirement MUST be carried to it in a checkable form: the held-out
@@ -1646,18 +1658,24 @@ freeze hashes and the baseline manifest; run the claim-register test.
     bytes or over LF-normalized content (`raw` or `lf-normalized`). Every new file whose hash
     is recorded is hashed over its raw bytes and MUST have a pinned line ending in
     `.gitattributes` (LF, or `binary`), so that its raw and normalized content agree on every
-    checkout: `reports/004-crypto-architecture-v3/**` is pinned to LF, and `*.gz` to `binary`. Files
+    checkout: `reports/004-crypto-architecture-v3/**`, `research/004/**` and `protocol/*.json` are
+    pinned to LF, and `*.gz` to `binary`. Files
     committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`, and
-    `protocol/evidence.py` refuses any other suffix there. Every `.gz` file is written by
-    `gzip.compress(data, compresslevel=9, mtime=0)`, and its record also holds the SHA-256 of the
-    uncompressed content, which a reproduction compares for every `.gz` file but a `p_values` file,
-    whose values it compares instead (data-model §1).
+    `protocol/evidence.py` refuses any other suffix there. Every `.gz` file this feature writes is
+    written by `gzip.compress(data, compresslevel=9, mtime=0)`, and its record also holds the
+    SHA-256 of the uncompressed content, which a reproduction compares for every `.gz` file but a
+    `p_values` file, whose values it compares instead (data-model §1). A test checks the header of
+    every committed `.gz` file under this feature's paths (`reports/004-crypto-architecture-v3/`,
+    `research/004/`, `vectors/phyco-v3/` and `baseline/phyco-v2/`); feature 003's `.gz` files,
+    listed with their hashes in its `SHA256SUMS`, are outside its scope and stay unchanged.
     An existing `text=auto` file that a new record hashes, such as `security.md` or `README.md`,
     is hashed over its LF-normalized content, and no existing pin changes. The CRLF-pinned
     freeze records of features 002 and 003 keep their recorded hashes over CRLF bytes. A test
     lists every path whose hash a committed record, manifest or freeze record holds and checks
     with `git check-attr text eol` that each has an explicit rule or `binary`, or that its
-    record marks the hash `lf-normalized`; it replaces the one-off check of 2026-10-31.
+    record marks the hash `lf-normalized`; it replaces the one-off check of 2026-10-31 and runs from
+    plan phase 1 on, so that a path missed later fails it as soon as the first record that cites it
+    is committed.
   - **Encoding.** Every new text file is UTF-8 without a byte-order mark, with LF line endings.
     Scripts write with `encoding="utf-8"` and `newline="\n"`, the line-ending test also looks
     for a byte-order mark, and no hashed file is written by Windows PowerShell 5.1, whose
@@ -1723,9 +1741,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
   the reset sequence of FR-025, whose stated latency includes it: its inputs, taken from the
-  frozen vectors (which the vector script copies, in the model, into `phycoweb/selftest_v3.py`;
-  FR-036), its expected output, its behaviour on failure, and the zeroization of the
-  whole state after it, before the first instantiate. The self-test runs instantiate with the
+  frozen vectors (which the vector script copies, in the model, into `phycoweb/selftest_v3.py`,
+  imported only in `Generator`'s constructor, so that a `Generator` built before that file exists
+  fails its self-test; FR-036), its expected output, its behaviour on failure, and the zeroization
+  of the whole state after it, before the first instantiate. The self-test runs instantiate with the
   key and nonce 0 of the frozen vectors, then a generate long enough that every node, every
   lane, every constant ROM entry of the calls run, both trees and the counters take part, then
   a reseed if the design has one. It compares the output with the expected output stated per
@@ -1763,13 +1782,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   of every code file the run used (`code_sha256`: the script, the
   `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
   source and its binary), each source file committed at HEAD before the run and a binary rebuilt
-  from committed source (FR-053); the inputs or their derivation; output paths with SHA-256, and for
-  each whether it is deterministic (a raw solver log is not, and a reproduction reports its hash
-  only); the exit status and assertions; the classification (FR-060); the analyst and the reviewer,
-  with the review status; known limitations; and the disclaimer, which feature 003's provenance
-  records lacked (feature-003 phase report, open issue 3). A statistical measurement, such as the
-  bias rule's, MUST also record the items of security.md §11.6. Raw tool output MUST be kept, not
-  only summaries.
+  from committed source (FR-053); the inputs or their derivation (the namespace, kind, index range
+  and fingerprint of each input taken through the loader; data-model §2); output paths with SHA-256,
+  and for each whether it is deterministic (a raw solver log is not, and a reproduction reports its
+  hash only); the exit status and assertions; the classification (FR-060); the analyst and the
+  reviewer, with the review status; known limitations; and the disclaimer, which feature 003's
+  provenance records lacked (feature-003 phase report, open issue 3). A statistical measurement,
+  such as the bias rule's, MUST also record the items of security.md §11.6. Raw tool output MUST be
+  kept, not only summaries.
 - **FR-062**: The final report and the design rationale MUST keep apart demonstrated facts,
   mathematical arguments, experimental observations, unverified hypotheses, unsuccessful
   attacks, untested areas and residual risks (security.md §17.3). In the rationale each
@@ -1796,14 +1816,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   recorded in the provenance log with its review status, which the owner design review
   updates; the frozen text carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the inverse, bijectivity,
-  dependency, bias, symmetry, invariant and bound checks; eligibility and selection) and every
+  dependency, bias, symmetry, invariant and bound checks; the check of generated files on each
+  platform; eligibility and selection) and every
   record's classification (FR-060) MUST be computed by code from saved outputs and be recomputable
   by a re-check script, never taken from
   a narrative (security.md §16.1). No phase, test or gate MAY be recorded as passed because its
   documents exist; where evidence is missing, the status MUST be "not evaluated",
   "inconclusive" or "blocked" (security.md §16.3). The re-check needs only committed files, so
   every verdict is recomputable on a fresh clone: the committed per-round summaries suffice
-  (for example, R_f from the per-round flag "every output bit depends on every input bit"), and
+  (for example, R_f from the per-round flag "every output bit depends on every input bit", and the
+  bias tool's validation from each synthetic set's committed summary), and
   local-only outputs serve only to re-derive a committed summary, which the re-check also does
   when they are present; it lists both checks per kind. The re-check is the routine reproduction
   test (User Story 4), and it runs the frozen verdict scripts (FR-043): the verdict functions it
@@ -2296,7 +2318,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **SC-008**: Every claimable size has an established R_bound from recorded trail bounds, each
   citing its method, tool and validation.
 - **SC-009**: 100% of the generated files (the vectors, known-answer tests, constants and
-  constructed-state vectors) are reproduced on both Windows and Linux, the latter in WSL.
+  constructed-state vectors) are reproduced on both Windows and Linux, the latter in WSL, as each
+  generator's pair of check records, one per platform, shows (FR-036, FR-065).
 - **SC-010**: 100% of reduced-variant requests and 100% of requests beyond any limit of FR-007
   (output volume, calls of Π, instantiations per key, reseeds per instantiation) are refused by
   the production interface.
