@@ -513,6 +513,86 @@ start open, and an item is ticked only under the rule in the Notes below.
   FR-051's lessons table also cites, is that section named? [Ambiguity, Conflict, Spec §FR-030,
   §FR-034, §FR-051, §FR-069; data-model §15]
 
+## Seventh re-run (2026-11-02)
+
+Items found when the checklist was run an eighth time, over the complete documents and the
+repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK072 Is the outcome stated for the representative that loses an exact D4 tie, and for the
+  other candidates of both families while the tie waits, given that research R6 sends both
+  representatives on "to the production-width analysis within their own budgets" until
+  `d4_choice.py --tie` applies the tie-breaks once both values of R at 4×4 exist, while the rule
+  that ends a candidate of the family D4 did not choose, `ineligible` for each one "not analysed at
+  the production width", applies "once D4 has chosen a family" (research R7, "The other family") and
+  fits no candidate analysed at 4×4, and `round_rule.py --close` writes `set-closed` only once every
+  candidate has a final decision, `withdrawn`, `rejected`, `ineligible` or a round-rule record at
+  every claimable size? Is it stated whether the losing representative goes on at 8×8 and 16×16,
+  waits with its family's rows reserved as the fallback, or ends with a decision and reason of its
+  own, and whether the other candidates of both families wait during the tie, so that the set can
+  close and no hours go to a family the tie-breaks did not choose? [Gap, Spec §Pre-registered Design
+  Protocol "Nonlinearity choice rule", "Eligibility and selection"; research R6 "Exact tie", R7;
+  data-model §8; cli contract `d4_choice.py`, `round_rule.py`]
+- [ ] CHK073 Does the candidate log's `mapping` entry cover the components FR-034's list now names,
+  given that the entry, written before the candidate's first score, holds "each component's place in
+  the metaphor and the attack class, bound or need it serves", the rationale's list gives each
+  component's role "as the candidate's `mapping` log entry records it, which the list cites", and
+  the owner design review checks that the mapping chapter and that list agree with the entry, while
+  FR-030 names five components (pressure and vein lanes, flux coupling, vein accumulation, food
+  nodes, peristaltic rotations) and RAT-070 added hardware structures, most of them the same for
+  every candidate, FR-025's call sequence and zeroization rules being properties of the mode, with
+  no evident place in the metaphor: the one-block output buffer, the call-state controller with its
+  error-code register and the `selftest_fail` latch, and the self-test's selectors, comparator and
+  stored inputs, beside the key registers of each candidate's key path? Is it stated whether every
+  candidate's entry records those shared structures, or where else their roles are recorded and
+  cited, and whether a component may have no place in the metaphor, with how the entry and the
+  mapping chapter say so under the chapter's word rule? [Consistency, Gap, Spec §FR-030, §FR-034
+  "Components"; data-model §3 `mapping`]
+- [ ] CHK074 Does FR-034's list of chapters place everything the design document must hold, given
+  that a test checks the six level-2 headings, each once and in order, and "Permutation" names the
+  operation list, the colour schedule, the rotation amounts, the round constants and the variant
+  table, while no chapter is named for Π⁻¹, which FR-019 has "written out at the same level of
+  detail as Π" and FR-027 repeats, for FR-029's statement of the calls of Π and the rounds between
+  key loading and the first output, with the margin over R_f, or for the answers to security.md §8's
+  eight network questions and its other Phase 0 items, which FR-034's first sentence puts in the
+  design document while its rule "Network questions" stands among the rules that both documents
+  meet? Is it stated in which chapter each of these stands, or whether another level-2 heading may
+  stand among the six, so that the second transcription (FR-057), the owner design review and the
+  test find each one? [Completeness, Clarity, Spec §FR-019, §FR-027, §FR-029, §FR-034 "Chapters",
+  "Network questions", §FR-057; security.md §8]
+- [ ] CHK075 Does FR-034's walk through the attack classes allow the outcome that security.md
+  §12.1's class "Side-channel and fault" has in this spec, given that the rationale must name, for
+  each class, "the design feature meant to resist it" or mark it "open for feature 005 with its
+  reason", while that class is met in part by FR-020's fixed operations, which FR-008 adopts for T4,
+  and is otherwise deferred to feature 008 (power, electromagnetic and fault-injection attacks, with
+  FR-008's stated risk), as FR-034's components rule also says ("fault attacks staying with feature
+  008")? Is it stated how the rationale marks a class, or the part of one, that another feature
+  takes up, citing the requirement that defers it and the risk it states, so that such a class is
+  neither given a resisting feature it lacks nor marked open for the wrong feature? [Consistency,
+  Gap, Spec §FR-008, §FR-020, §FR-034 "Attack classes", "Components"; security.md §12.1, §13]
+- [ ] CHK076 Does FR-034's list of the paths that carry secret data, "the key registers, which hold
+  the key between instantiates, the key chain and the selectors", each with "the attack class they
+  meet (no read-back, zeroization)", cover every hardware structure that holds one of FR-008's
+  assets, given that those assets include "the whole state within a request", "every output block
+  delivered to the caller" and "the integrity of the limit counters", and that FR-025's zeroization
+  clears, beside the key's registers, every pipeline register, the registers of both trees and the
+  one-block output buffer? Is it stated whether the output buffer, the pipeline registers, the
+  output tree's registers and the limit counters are among those paths, each with the attack class
+  it meets, or why each is not? [Consistency, Coverage, Spec §FR-008, §FR-025 "Zeroization",
+  "Registers and read-back", §FR-034 "Components"]
+- [ ] CHK077 Is it stated who writes the provenance log's review entries, those of the
+  security-target review for the chapters "Security target" and "Mode" and those of the owner design
+  review for each AI-drafted section of the rationale, and on whose word, and is the reviewer named
+  in them? Data-model §14 gives each entry the AI tool's `tool`, `model` and `session` and a
+  `review_status`, with no field for who reviewed, `provenance.py review` names no one who runs it,
+  and the rule that the agent writes an approval "only on the owner's explicit word for that row,
+  quoted with its date in the row's notes" is stated for the Review & Approval rows alone. Can
+  FR-064's rule that no AI session is recorded as an independent or external reviewer, and the final
+  report's record of who took each role of security.md §16.2, be checked from these entries, and is
+  it stated whether a chapter's review entry and its Review & Approval row must name the same
+  SHA-256? [Gap, Measurability, Spec §FR-034, §FR-064, §FR-067, §Review & Approval and the notes
+  under the table; data-model §14; cli contract `provenance.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
