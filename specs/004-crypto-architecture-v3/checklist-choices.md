@@ -6,10 +6,10 @@
 
 Feature `004-crypto-architecture-v3`. Date: 2026-11-01. Each row below gives the choices for one of
 the 306 items in the six checklists that `/speckit-checklist` generated after plan approval, with
-the recommended option first: the 206 items of the first run and the 29 that the re-run of
-2026-11-01 found in the text those answers changed, all answered and applied, and the 71 that the
-second re-run of 2026-11-01 found over the complete documents and the repository, answered the same
-day. The 32 items marked `[Conflict]` come first, the 15 of the second re-run before the 4 of the
+the recommended option first: the 206 items of the first run, the 29 that the re-run of 2026-11-01
+found in the text those answers changed and the 71 that the second re-run of 2026-11-01 found over
+the complete documents and the repository, all answered and applied. The 32 items marked
+`[Conflict]` come first, the 15 of the second re-run before the 4 of the
 re-run and the 13 of the first run: where two texts disagree, every other item would be checked
 against a moving target until they agree. The second re-run's 56 other items follow in a section of
 their own, then the re-run's 25, then the 193 other items of the first run, checklist by checklist.
@@ -20,15 +20,16 @@ to verify each item against the text and tick it if it holds; each checklist's N
 instruction, its date and the commits that ticked items, and the owner's tasks approval includes the
 review of those ticks (PRO-045).
 
-**Status: all 306 rows answered, "all recommended" (owner), on 2026-11-01: the 206 of the first run,
-the 29 of the re-run and the 71 of the second re-run.** The 71 rows of the second re-run are being
-applied checklist by checklist, and each checklist's rows are committed once they are written into
-every document they name. Option A of every row of the first run and the re-run is applied where its
-Changes cell names a document: the spec, plan.md,
-research.md, data-model.md, the two contracts, quickstart.md, security.md (versions 2.11 and 2.12)
-and `.gitattributes`. A row that also names a later feature or a document not yet written (the
-design document, a test, the final report) is held there by the spec requirement its Changes cell
-names.
+**Status: all 306 rows answered, "all recommended" (owner), on 2026-11-01, and applied: the 206 of
+the first run, the 29 of the re-run and the 71 of the second re-run.** Option A of every row is
+applied where its Changes cell names a document: the spec, plan.md, research.md, data-model.md, the
+two contracts, quickstart.md, security.md (versions 2.11, 2.12 and 2.13) and `.gitattributes`; the
+second re-run's rows were committed checklist by checklist, each checklist's rows once they were
+written into every document they name. Where a Changes cell names research R16, R17 or R18 for
+`.gitignore` or `requirements.txt`, the row changes that research passage, and the file itself
+changes at setup (plan phase 1), as the passage says. A row that also names a later feature or a
+document not yet written (the design document, a test, the final report) is held there by the spec
+requirement its Changes cell names.
 
 ## How to answer
 
@@ -80,7 +81,8 @@ names.
 
 The 32 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
 
-From the second re-run of 2026-11-01, answered the same day, "all recommended", in checklist order:
+From the second re-run of 2026-11-01, answered the same day, "all recommended", and applied, in
+checklist order:
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -133,7 +135,7 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 The 56 items other than conflicts that the second re-run of 2026-11-01 found over the complete
 documents and the repository, in checklist order: 6 security, 5 design-rationale, 9 analysis, 6
 protocol, 13 hardware and 17 reproducibility. They were answered on 2026-11-01, "all recommended",
-as were the 15 conflicts above.
+and applied, as were the 15 conflicts above.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -589,8 +591,7 @@ The options chosen for the 29 rows of the re-run were written into the documents
 name, among them spec.md, plan.md, research.md, data-model.md, the two contracts, quickstart.md and
 security.md (version 2.12), each change with its reason. Changes to the protocol are recorded before
 any result exists, as FR-044 requires; none exists yet. The six checklists were then re-read over
-the complete documents and the repository, and that second re-run found the 71 items whose rows
-await an answer.
+the complete documents and the repository, and that second re-run found 71 more items.
 
 Of the 206 answered rows, 13 are conflicts and 193 come from the six checklists' other items: 38
 security, 34 design-rationale, 31 analysis, 33 protocol, 32 hardware and 25 reproducibility. By
@@ -605,6 +606,11 @@ Of the 71 rows of the second re-run, 15 are conflicts and 56 come from its other
 recommendations are 26 Add, 20 Align, 14 Clarify, 10 Settle and 1 Stricter. No recommended option
 loosens the protocol; five alternatives are marked "looser": SEC-048 B, RAT-043 B, ANA-039 B,
 ANA-040 B and REP-036 B. The owner answered "all recommended" the same day, and the chosen options
-are being written into the documents their Changes cells name, each with its reason; the protocol
-changes among them are recorded as FR-044 requires, by the rule PRO-047 settles; the six checklists
-are re-read; and `/speckit-tasks` follows, up to the ⛔ tasks approval.
+were written into the documents their Changes cells name, each change with its reason: spec.md,
+plan.md, research.md, data-model.md, the two contracts, quickstart.md, security.md (version 2.13)
+and `.gitattributes`. The protocol changes among them are listed above under "Rows that change the
+protocol", by the rule PRO-047 settles, and enter the protocol change log when it is created, before
+any result exists (FR-044; data-model §18). The six checklists were then re-read over the complete
+documents and the repository: each of the 71 items holds and is ticked, as each checklist's Notes
+record. A further re-run of the six checklists follows, then `/speckit-tasks`, up to the ⛔ tasks
+approval.

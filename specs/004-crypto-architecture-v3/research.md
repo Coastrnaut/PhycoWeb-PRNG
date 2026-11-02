@@ -9,10 +9,11 @@ turns out differently. No such fallback may loosen a rule. The plan's table "Val
 fixes" lists every value marked protocol here, so one list names them all.
 
 The answers to the checklist choices ([checklist-choices.md](./checklist-choices.md), "all
-recommended", 2026-11-01), those of the first run and those of the re-run the same day, are applied
-in the sections below. Each that changes a protocol value is stricter, or settles an open case by
-its most conservative reading before any result it affects, and becomes an entry of the protocol
-change log `research/004/protocol-changes.jsonl` when that log is created (FR-044; data-model §18).
+recommended", 2026-11-01), those of the first run, the re-run and the second re-run the same day,
+are applied in the sections below. Each that changes a protocol value is stricter, or settles an
+open case by its most conservative reading before any result it affects, and becomes an entry of the
+protocol change log `research/004/protocol-changes.jsonl` when that log is created, by the per-round
+lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18).
 
 > This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
 > to generate secrets; use an established cryptographic random-number generator for keys,
