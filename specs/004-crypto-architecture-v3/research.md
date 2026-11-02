@@ -341,8 +341,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     2²⁰…2²¹ − 1, and XOR difference i is state 2i ⊕ state 2i + 1. The control's one record per test
     and size serves every candidate. Its hours are charged, at each size, to every candidate's 12 h
     row, whether the control ran for that candidate or before it, and each row's reservation counts
-    them by projection until they exist; the control runs only if every entered candidate's row can
-    hold it (R7). If a test fires on its control, the bias evidence of that size
+    them by projection until they exist; the control runs once every row it counts can hold them,
+    each charged them in full: the 12 h row of every entered candidate, except a candidate
+    `withdrawn`, `rejected` or `ineligible`, whose row is charged no control that runs after that
+    decision, and a candidate whose row cannot hold the hours, which takes no test of that kind at
+    that size, its evidence there inconclusive, and is charged nothing for it (R7;
+    ANA-074). If a test fires on its control, the bias evidence of that size
     is inconclusive for every candidate, so none is eligible at that size, and the feature
     recommends stopping (stop rule), citing the control record; the control inputs are never redrawn
     or replaced, and the rule is not loosened (Edge Cases). The chance accepted is at most 0.0025
@@ -434,8 +438,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     21% at R = 32, or 23% with the avalanche test, for one permutation, T = 1. For T call types with
     distinct streams, each tested at its own threshold, it is 1 − 0.995^(3⌈R/2⌉·T), about 62% at
     R = 32 with T = 4, or 1 − 0.995^(T·(3⌈R/2⌉ + 3)) with the avalanche test, about
-    64% (computed on 2026-11-02), and the chance stated beside a firing is
-    the one for the T call types tested. With the avalanche threshold at
+    64% (computed on 2026-11-02), and the chance stated beside a firing is the one for the T call
+    types tested. The rate counts the pairs of a claimable size and a round count r at which the
+    tests ran with 2r above the R then in force, the only round counts at which a firing raises R,
+    N of them: 1 − 0.995^(T·N), or 1 − 0.995^(T·(N + 3)) with the avalanche test, so that with one R
+    at every size and no rise N = 3⌈R/2⌉, as above; beside a firing, N counts the pairs tested up to
+    that firing's record, and the final report and the spec's FR-041 count every pair tested by the
+    freeze, each size's own R and every rise included, as `round_rule.py`
+    computes it from the records (ANA-075). With the avalanche threshold at
     0.005/S_A per round count, as first drafted, it would be 38% at R = 32. A raised R adds round
     counts, so a raise can repeat, and repeated raises can use up the budget of R7, which ends
     the measurement as inconclusive. The spec's rule cannot be loosened (FR-044), so this cost is
@@ -731,8 +741,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     feature-wide row (below). A uniform control (R4) belongs to no candidate and
     runs once per test and size, but every candidate's 12 h row is charged, at each size, that
     size's control hours, whether the control ran for it or before it, and the row's reservation
-    counts them by projection until they exist; the control projects first and runs only if every
-    entered candidate's row can hold it, and it writes no candidate-log entry: the Budget guard
+    counts them by projection until they exist; the control projects first and runs once every row
+    it counts can hold its hours, each charged them in full: the 12 h row of every entered
+    candidate, except a candidate `withdrawn`, `rejected` or `ineligible`, whose row is charged no
+    control that runs after that decision, and a candidate whose row cannot hold the hours, which
+    takes no test of that kind at that size, its evidence there inconclusive, and is charged nothing
+    for it (spec "Bias rule"; ANA-074). The control writes no candidate-log entry: the Budget guard
     reads the control records when it charges each row (cli contract).
   - **The feature-wide row.** Beside the six candidates' rows and the FUT-SEC-8 row, one
     feature-wide row of 66 h holds every heavy run that charges no candidate, the FUT-SEC-8 row's
@@ -769,7 +783,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     entry while each of those rows holds more than zero hours, and "the budget spent", which closes
     a `replacement` entry otherwise, means that a lowered budget left one of them at zero, which the
     log writer checks against these rows and the protocol change log's entry that lowered the budget
-    (data-model §3).
+    (data-model §3). A decision whose cause the candidate's family or the whole set shares,
+    `ineligible` because D4 chose the other family (above) or a decision that a fired uniform
+    control, the lack of a validated trail route or a match in the shared polynomial brings, takes
+    no replacement: its `replacement` entry is logged closed at once, with the reason "cause shared"
+    (spec "Eligibility and selection"; ANA-073).
   - **After a rise of R** (spec round rule). Every record that depends on R is made again at the new
     variant, each a new measurement of its kind, charged to its row where this section budgets the
     kind: first the constant table of the new variant, written by `gen_constants_v3.py --candidate`
@@ -1167,7 +1185,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     example the difference and linear tables of (x, y) ↦ (x ⊞ y, y) at w = 4 and 8, whose entries
     the formulas of Lipmaa and Moriai and of Wallén give exactly; a use without one writes
     `not evaluated`, so that a Boolean candidate's D4 score and R_bound rest on no use that no known
-    result covers (ANA-072).
+    result covers (ANA-072). Each known result at a validated width, the first and each further one,
+    has a second known result of its own at that width, fixed with it before the tool's first
+    validation (Second known results, below), and after a failed validation at any width the
+    re-validation re-finds every known result of the tool, the first and the second at each of its
+    widths (A failed validation, below), so that no use at any width counts again on a fix tuned to
+    one value (ANA-076).
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
     8 h (R7): for each distinct ARX-box of each ARX candidate, two checks, for every r from 1 to the
@@ -1201,19 +1224,23 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     again. Each counted result cites the validation record of the tool's exact
     hash. A re-validated version of a named trail tool serves only searches not yet run (Fixed tool
     set).
-  - **A failed validation.** The defect is recorded with its cause and fixed, and the tool is
-    validated again on its second known result as well as the first, both fixed before its first
-    validation (below), which the defect record cites, so that a fix cannot be tuned to one value. A
-    tool whose first validation record says it has no second known result stays unvalidated after a
-    failed validation, and its results are `not evaluated`, as for a value that cannot be obtained.
+  - **A failed validation.** The defect is recorded with its cause and fixed, and the tool, after a
+    failure at any width, is validated again on every known result it has, the first and the second
+    at each of its widths, all fixed before its first validation (below), which the defect record
+    cites, so that no use at any width counts again on a fix tuned to one value
+    (ANA-076). A tool that has no second known result at one of its widths, as its
+    validation records say, stays unvalidated after a failed validation, and its
+    results are `not evaluated`, as for a value that cannot be obtained.
     Attempts are not limited in number, but each is recorded, and a heavy one is charged to R7's
     feature-wide row, which refuses it once spent. Results of the failed version never count;
     results already counted from an earlier validated version stand, since they cite its hash.
-  - **Second known results.** Each counted tool's second known result is fixed before its first
-    validation, with its source, in the provenance log beside the first (data-model §14): a second
-    published value of its kind from R19's approved papers (paper, table and value) where one is
-    there, or else a self-written result of its kind, written and logged before the tool is drafted,
-    as R13's are. A tool with neither says so in its first validation record.
+  - **Second known results.** Each known result of a counted tool at a validated width, the first
+    and each further one, has a second known result of its own at that width, fixed before the
+    tool's first validation, with its source, in the provenance log beside the first
+    (data-model §14): a second published value of its kind at that width from R19's approved papers
+    (paper, table and value) where one is there, or else a self-written result of its kind at that
+    width, written and logged before the tool is drafted, as R13's are (ANA-076). A tool with
+    neither at a width says so in the first validation record of that width's known result.
   - **A value that cannot be obtained.** If a known result's published value cannot be had, the
     tool stays unvalidated and its results `not evaluated`; the owner may provide the value with
     its source (R19). If no trail route is validated, no candidate can establish R_bound, none

@@ -167,7 +167,11 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   writes nothing but its `projection` record, and its time counts against the row of the run it
   projects (data model §1). Every candidate's 12 h row is charged, at each size, the hours of that
   size's uniform controls (research R4), read from the `control` records, which append nothing to
-  the candidate log, or by projection until they exist. Every heavy run that charges no candidate,
+  the candidate log, or by projection until they exist; the row of a candidate `withdrawn`,
+  `rejected` or `ineligible` is charged no control that runs after that decision, and a
+  candidate whose row cannot hold a control's hours takes no test of that kind at
+  that size, its evidence there inconclusive, and is charged nothing for it
+  (research R4, R7; ANA-074). Every heavy run that charges no candidate,
   the FUT-SEC-8 row's one pass per target excepted, a validation or re-validation, on a published
   value or on any other known result (research R7), a heavy reproduction, a FUT-SEC-8
   repeat after a tool defect or FR-053's test with two worker counts, projects
@@ -264,11 +268,13 @@ value. Exit 1 if not re-found. A published value needs its source recorded, an
 entry of `$REP/downloads.json` (research R19): a `fetched` file's entry with the paper's table and
 value, or the `owner-provided` entry of a value the owner provides with its source, written by
 `scripts/owner_record.py owner-provided`, whose Review & Approval row "Owner-provided value <n>"
-reads Approved at HEAD (Approvals, above); any other entry, or none, exits 2. A
-tool's first validation records its second known result, fixed with its source
-in the provenance log before that validation, or the statement that it has none (data model §7,
-§14); after a failed validation, the re-validation re-finds the second as well as the first, and for
-a tool with none it exits 2, leaving the tool unvalidated. `--reproduce RECORD` runs that record's
+reads Approved at HEAD (Approvals, above); any other entry, or none, exits 2. For each known result
+at a validated width, the first and each further one, the first validation on it records its second
+known result at that width, fixed with its source in the provenance log before the tool's first
+validation, or the statement that it has none (data model §7, §14); after a failed validation at any
+width, the re-validation re-finds every known result of the tool, the first and the second at each
+of its widths, and for a tool with none at one of its widths it exits 2,
+leaving the tool unvalidated (ANA-076). `--reproduce RECORD` runs that record's
 validation again, as the introduction describes, and compares the fields data model §1 lists for a
 validation.
 
@@ -318,8 +324,12 @@ a tool-defect entry, and exits 3. Every run started writes a record, even if abo
 R7, writes a `projection` record and prints the projected hours against the budget row; it writes no
 evidence. A `control` run, the second form, belongs to no candidate and takes no `--candidate`: it
 runs once per test and size, before that test's first use at that size by any candidate, projects
-first and runs only if every entered candidate's 12 h row can hold its hours, since each row is
-charged them (Budget), writes its record under `$REP/controls/`, with `model_id` and `variant_id`
+first and runs once every row it counts can hold its hours, each charged them in full (Budget): the
+12 h row of every entered candidate, except a candidate `withdrawn`, `rejected` or `ineligible`,
+whose row is charged no control that runs after that decision, and a candidate whose
+row cannot hold the hours, which takes no test of that kind at that size,
+its evidence there inconclusive, and is charged nothing for it (ANA-074),
+writes its record under `$REP/controls/`, with `model_id` and `variant_id`
 null and its inputs from the `control` namespace, which serves every candidate, appends no
 candidate-log entry, and exits 2 if that record exists, except for the one re-run after a
 recorded tool defect in the control's own code (data model §5).
@@ -363,11 +373,15 @@ round_rule.py --choose ID --seen SHA256 --by NAME   # writes the latest selectio
 round_rule.py --reproduce RECORD       # a round-rule or selection record (introduction)
 ```
 
-R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
-ID. `--close` writes the candidate log's `set-closed` entry once every candidate has a final
+R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record ID.
+It computes from the evidence records the N of spec FR-028's family-wise rate, the pairs of a
+claimable size and a round count r at which the bias tests ran with 2r above the R then in force, up
+to each firing's record for the rate stated beside it and by the freeze for the final report's
+(ANA-075). `--close` writes the candidate log's `set-closed` entry once every candidate has a final
 decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule
 record at every claimable size) and no `replacement` entry of the log is `pending` (data model §3),
-and exits 2 otherwise. The representative that lost an exact D4 tie has its final decision as the
+an entry logged closed at once with the reason "cause shared" reading as closed (ANA-073), and
+exits 2 otherwise. The representative that lost an exact D4 tie has its final decision as the
 other family's candidates have theirs: `ineligible`, with the reason "D4 chose the other family by
 its tie-breaks", unless the chosen family ends with no eligible candidate, when its family is
 analysed as research R7 states (RAT-072). `--select` exits 2 before the `set-closed` entry,

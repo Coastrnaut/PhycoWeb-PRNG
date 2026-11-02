@@ -293,7 +293,7 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, its key path and any other it adds: each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, its key path and any other it adds: each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision where the decision's cause lies in the candidate itself, its own evidence or properties, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent); where its family or the whole set shares the cause, the entry is logged closed at once, with the reason "cause shared", and no replacement is entered for it (Decisions, below; ANA-073), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
@@ -315,7 +315,14 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   before its first tool run, for any recorded reason, and it still counts towards the stop
   rule. The log writer refuses any other decision. A raised R is never by itself a reason for a
   decision: the measurements it needs run as new measurements in their budget rows, and a row that
-  cannot hold them makes the candidate `ineligible` for a spent budget (spec Edge Cases).
+  cannot hold them makes the candidate `ineligible` for a spent budget (spec Edge Cases). A
+  decision's `replacement` entry is logged `pending` only where the decision's cause lies in the
+  candidate itself, its own evidence or properties; where its family or the whole set shares the
+  cause, as for the reasons "not analysed at the production width: D4 chose the other family" and
+  "D4 chose the other family by its tie-breaks", and for the decisions that a fired uniform control,
+  the lack of a validated trail route or a match in the shared polynomial bring, the entry is logged
+  closed at once, with the reason "cause shared", and no replacement is entered for it (spec
+  "Eligibility and selection"; ANA-073).
 - **Entered set.** Candidates are entered before any is scored (R6's entered set). A further
   candidate is entered later only in place of one that became `rejected` or `ineligible`, never
   because another's R is high, and one is entered for every such candidate while its family has
@@ -505,8 +512,10 @@ layer's S-boxes take (ANA-072), and the cross-checks never widen a kind: a
 cross-check is not a use, covers a candidate's operation set only, writes no
 `not evaluated` and calls for no validation again; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
-known result fixed before the tool's first validation, with its source and its provenance-log entry,
-section 14, or `none`, which the first validation record states), `found`, `outcome`
+known result of the record's `known_result`, at its width, fixed before the tool's first validation,
+with its source and its provenance-log entry, section 14, or `none`, which the first record
+of that known result states; every known result at a validated width, the
+first and each further one, has its own, R12; ANA-076), `found`, `outcome`
 (`re-found` or `not re-found`). A tool's results count only after a `re-found` record of the
 same kind and of the tool's exact hash exists.
 
@@ -535,10 +544,12 @@ same kind and of the tool's exact hash exists.
   around the recorded fraction, for the tool's sample size, with at most 0.005 in each tail.
   Anything else is `not re-found`.
 - **After a failed validation**, the record of the next attempt holds the defect, its cause and the
-  fix, and the re-validation re-finds the tool's second known result as well as the first, fixed
-  before its first validation with its source in the provenance log (section 14) and cited by the
-  defect record; a tool whose first validation record states that it has none stays unvalidated
-  after a failed validation, its results `not evaluated`. Every attempt is a record of its own.
+  fix, and the re-validation, after a failure at any width, re-finds every known result of the tool,
+  the first and the second at each of its widths, each fixed before its first validation with its
+  source in the provenance log (section 14) and cited by the defect record, so that no use at any
+  width counts again on a fix tuned to one value (R12; ANA-076); a tool whose records state that it
+  has no second known result at one of its widths stays unvalidated after a failed
+  validation, its results `not evaluated`. Every attempt is a record of its own.
   Results of the failed version never count; results already counted from an earlier validated
   version stand, since they cite its hash.
 - **The bias test** (R4): S14's bias re-found on `phyco-v2`, with S12's ranges and classes and S15's

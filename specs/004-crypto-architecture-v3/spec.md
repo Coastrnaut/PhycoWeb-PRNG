@@ -659,11 +659,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the fix and passes after. It is recorded with that evidence before any
   re-run. A disliked result is none of these.
 - **A tool fails its validation**: none of its results count, no bound from it enters the round
-  rule, and the failure is recorded. The defect is recorded with its cause and fixed, and the
-  tool is validated again on its second known result, fixed before its first
-  validation, as well as the first, so that a fix cannot be tuned to one
-  value (a tool with none stays unvalidated, its results `not evaluated`;
-  FR-039); attempts are not limited, but each is recorded. Results of the failed
+  rule, and the failure is recorded. The defect is recorded with its cause and fixed, and the tool
+  is validated again on every known result it has, the first and the second at each of
+  its widths, all fixed before its first validation, so that no use at any
+  width counts again on a fix tuned to one value (a tool with no second at
+  one of its widths stays unvalidated, its results `not evaluated`; FR-039;
+  ANA-076); attempts are not limited, but each is recorded. Results of the failed
   version never count; results already counted from an earlier validated version stand, since
   they cite its hash. A trail or distinguisher found by a tool not yet validated is never
   dropped: it is recorded as an unverified hypothesis (FR-060) and blocks the candidate's
@@ -672,7 +673,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **A validation target's published value cannot be obtained**: the tool stays unvalidated and
   its results are `not evaluated`; the owner may provide the value with its source (research
   R19). If no trail route is validated, no candidate can establish R_bound, none is eligible,
-  and the feature recommends stopping (stop rule).
+  and the feature recommends stopping (stop rule); the decisions this brings log their `replacement`
+  entries closed at once, with the reason "cause shared" (Eligibility and selection; ANA-073).
 - **A paper that a mode theorem rests on cannot be obtained or read**: its theorem stays
   `unverified`, and `downloads.json` records the file as `not obtained` with the reason (research
   R19). Where another theorem of research R10's list covers the same call and its paper is on disk
@@ -755,7 +757,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   "blocked" (security.md §16.3). A generated report is not proof that a test ran.
 - **The bias rule fires on its uniform control**: the bias evidence of that size is inconclusive for
   every candidate, since the control's one record per test and size serves them all, so none is
-  eligible at that size and the feature recommends stopping (stop rule), citing the control record.
+  eligible at that size and the feature recommends stopping (stop rule), citing
+  the control record, and the decisions this brings log their `replacement`
+  entries closed at once, with the reason "cause shared", since a replacement
+  would meet the same control record (Eligibility and selection; ANA-073).
   The control inputs are never redrawn or replaced, and the rule is not loosened (Principle IV).
 - **Property-based testing is not approved**: the boundary and fixed tests stand alone, and the
   gap is recorded as an open item (FR-058).
@@ -1585,10 +1590,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   size. Rounds MUST NOT be removed once results exist, and no round count or constant MAY be
   chosen from held-out results (feature-002 O6). A firing of the bias rule is reported as a
   distinguisher at its round count that raises R, with the family-wise rate of chance firings on
-  uniform outputs for the T call types tested stated beside it, 1 − 0.995^(3⌈R/2⌉·T), or
-  1 − 0.995^(T·(3⌈R/2⌉ + 3)) with the avalanche test: about 21% and 23% at R = 32 with one stream,
-  T = 1, and about 62% and 64% with T = 4 (research R4), and is never measured
-  again to remove it; the final report repeats the rate. Before the freeze, a change is a new
+  uniform outputs for the T call types tested stated beside it, and is never measured again to
+  remove it; the final report repeats the rate. The rate is 1 − 0.995^(T·N), or
+  1 − 0.995^(T·(N + 3)) with the avalanche test, where N is the number of pairs of a claimable size
+  and a round count r at which the tests ran with 2r above the R then in force, the only round
+  counts at which a firing raises R: with one R at every size and no rise, N = 3⌈R/2⌉, so that the
+  rate is about 21% and 23% at R = 32 with one stream, T = 1, and about 62% and 64% with T = 4
+  (research R4); beside a firing, N counts the pairs tested up to that firing's record, and the
+  final report and FR-041's statement of the selection bias count every pair tested by the
+  freeze, each size's own R and every rise included, and `round_rule.py`
+  computes N from the records (ANA-075). Before the freeze, a change is a new
   design-document version and a log entry. After the freeze, any change to a frozen file, a
   raise of R by feature 005, a new claimable size, or the correction of a disagreement between
   the frozen design document and the frozen model (edge cases), MUST be a new model ID with its
@@ -1995,13 +2006,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   hand-counted examples, the small operation list of known degree) is written
   with its SHA-256 and entered in the provenance log before the tool it validates is drafted; the
   validation record cites both entries, and a test checks their order and that the hashes still
-  match (data-model §7, §14). Each tool's second known result, which a re-validation after a failed
-  validation re-finds beside the first, is fixed before the tool's first validation, with its
-  source, in the provenance log: a second published value of its kind from research R19's approved
-  papers, or else a self-written result of its kind, written and logged before the tool is drafted;
-  a tool with neither says so in its first validation record, and after a failed
-  validation it stays unvalidated, its results `not evaluated` (research
-  R12). What must match is stated per known result (data-model §7): exact
+  match (data-model §7, §14). Each known result of a tool at a validated width, the first and each
+  further one, has a second known result of its own at that width, fixed before the tool's first
+  validation, with its source, in the provenance log: a second published value of its kind at that
+  width from research R19's approved papers, or else a self-written result of its kind at that
+  width, written and logged before the tool is drafted. After a failed validation at any width, the
+  re-validation re-finds every known result of the tool, the first and the second at each of its
+  widths, so that no use at any width counts again on a fix tuned to one value; a tool with neither
+  at one of its widths says so in its validation records, and after a failed
+  validation it stays unvalidated, its results `not evaluated` (research R12;
+  ANA-076). What must match is stated per known result (data-model §7): exact
   equality for every deterministic fact, and
   for a measured fraction a count in the binomial interval around the recorded fraction at the
   tool's sample size, with at most 0.005 in each tail; anything else is `not re-found`. Each known
@@ -2117,7 +2131,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   where possible (FR-044). The final report MUST state the selection bias of choosing among
   candidates on development inputs (security.md §11.6): the candidates logged and evaluated per
   family, the evaluations (measurements and searches) behind the frozen one, the bias rule's
-  family-wise chance rates over them, and that every result of the frozen candidate is on
+  family-wise chance rates over them, each counting every pair of a claimable size and a
+  round count tested by the freeze, each size's own R and every rise included
+  (FR-028; ANA-075), and that every result of the frozen candidate is on
   development inputs chosen among up to six candidates, so that feature 007's held-out
   evaluation is the unbiased test. The rationale's chapter on alternatives cites the log
   entries (FR-034).
@@ -2967,10 +2983,17 @@ fixed in the plan before any measurement. By the Bonferroni inequality, the rule
 fires on uniform states with probability at most 0.005 for one permutation.
 Before its first use at each size, it is applied once to the same number of
 uniform states, derived from public strings by SHA-256 as the development
-inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md
-§11.6). A firing is reported as a distinguisher at its round count that raises R,
-with the family-wise rate of chance firings for the call types tested stated
-beside it (FR-028), and it is never measured again to remove it. At each size
+inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md §11.6).
+The hours of this uniform control are charged to every entered candidate's 12 h row, whether the
+control ran for it or before it (research R7), and the control runs once every row it counts can
+hold them, each charged them in full: the 12 h row of every entered candidate, except a candidate
+`withdrawn`, `rejected` or `ineligible`, whose row is charged no control that runs after that
+decision, and a candidate whose row cannot hold the hours, which takes no test of that kind at that
+size, its evidence there inconclusive, and is charged nothing for it (research R4, R7; ANA-074).
+A firing is reported as a distinguisher at its round count that raises R,
+with the family-wise rate of chance firings for the call types tested stated beside it,
+over the pairs of a size and a round count tested up to that firing's record
+(FR-028; ANA-075), and it is never measured again to remove it. At each size
 it runs after the trail bounds and the structural checks, from the R they
 give, and a later rise of R extends it to the new R (round rule). *Stricter means*: only a change
 that can add firings and never remove one. Every
@@ -3051,8 +3074,16 @@ became `rejected` or `ineligible`, never because another's R is high: one is ent
 candidate while its family has fewer than three evaluated candidates and the budget allows, proposed
 by the agent, its entry approved by the owner, and the candidate log's `replacement` entry,
 `pending` from the decision until the replacement's `proposed` entry or a
-stated reason (the family full, the budget spent) closes it, records each case
-(data-model §3). The set closes at a `set-closed` entry of the candidate log, written by
+stated reason (the family full, the budget spent) closes it, records each case (data-model §3). The
+entry is logged `pending` only with a decision whose cause lies in the candidate itself, its own
+evidence or properties. A decision whose cause its family or the whole set shares calls for no
+replacement, and its `replacement` entry is logged closed at once, with the reason "cause shared":
+`ineligible` because D4 chose the other family, by its score or its tie-breaks, and the decisions
+that a fired uniform control, the lack of a validated trail route or a match in the shared
+polynomial bring, which end in the stop rule's recommendation for every candidate; a
+candidate of the family D4 did not choose that is analysed after all takes a
+replacement only for a decision of its own (research R7, "The other family";
+ANA-073). The set closes at a `set-closed` entry of the candidate log, written by
 `round_rule.py --close` once every candidate has a final decision and no replacement is pending, and
 selection runs only after it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for
 an eligible candidate, its round-rule record at every claimable size; a candidate of
@@ -3083,7 +3114,9 @@ current value after any lowering, holds more than zero hours; "the budget spent"
 closes a `replacement` entry otherwise, means that a lowered budget left a row of the
 further candidate at zero, which the log writer accepts only when R7's rows
 and the protocol change log's entry that lowered the budget show it, exit 2
-otherwise (data-model §3). A change makes a new candidate if it touches the
+otherwise (data-model §3). A decision whose cause its family or the whole set shares calls for no
+replacement: its `replacement` entry is logged closed at once, with the reason "cause shared"
+(Eligibility and selection; ANA-073). A change makes a new candidate if it touches the
 operation list's structure: the nonlinear component, the round structure
 (its operations, their forms or order), the colour schedule, or the rule that generates the
 constants or the rotation amounts. It is a variant or a fix if it changes only values the
