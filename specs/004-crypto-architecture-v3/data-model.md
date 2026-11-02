@@ -882,7 +882,12 @@ drafted in parts: `seq` and `prev_sha256`, chained as the candidate log is
 `pending`, `accepted` or `changes-requested`. A review is a new entry for the same `path` and
 `section`, with `follows`, the `seq` of the entry it follows, and `sha256`, the SHA-256 of the
 section text reviewed; the latest entry for a path and section gives its status, and no entry
-changes. The review of an evidence record is an entry that names the record's ID
+changes. A chapter of the design document under review carries no mark in the file: its status is
+its entries' `review_status`, `pending` from its drafting, with its Review & Approval row, and the
+security-target review adds a review entry for each chapter it covers, "Security target"
+and "Mode", naming its heading as `section`, so that the file the review
+read is the file `design_freeze.py create` compares (spec FR-012, FR-034;
+RAT-068). The review of an evidence record is an entry that names the record's ID
 and SHA-256, the record's `reviewer` staying as written (section 1). Every append takes
 `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
 section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenance.py add` for an
@@ -927,8 +932,9 @@ adds a later row of either review family, which makes L1 lapse, and never before
   key loading, and by evidence for diffusion through instantiation (FR-029) and research R4's
   first-order related-key and related-nonce differences, and stays open for feature 005's analysis
   (FR-049). L1's "FUT-SEC-1 to FUT-SEC-6 met by specification" (security.md §15) is decided on this
-  one reading: the security-target review accepts the design document's section on key loading and
-  cites the selected candidate's evidence records of the measured part, which exist by then, since
+  one reading: the security-target review accepts the section "Key loading" of
+  the design document's chapter "Mode" (spec FR-034) and cites the selected
+  candidate's evidence records of the measured part, which exist by then, since
   the review is the first step of plan phase 8, after the selection, so nothing remains to measure.
 - `allow_list`: the lines the claim test would flag that may stand, each with its path, its
   text and its reason. The test flags any strength (a number of bits beside "security",

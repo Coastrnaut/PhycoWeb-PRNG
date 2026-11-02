@@ -386,9 +386,11 @@ takes each from there.
    on published values, from the papers of R19, whose downloads the owner approved on
    2026-11-01 (`47270450.pdf` through the owner's browser), or from values the owner provides.
    The set of trail tools is fixed when the first trail search starts (R12).
-4. **US2 security target**: design document chapter 1, drafted here and marked "draft, under review"
-   until the security-target review of phase 8, which cites records that exist only after phase 5;
-   the mode chapter with every precondition, `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and
+4. **US2 security target**: the design document's chapters "Security target", chapter 1, and "Mode",
+   with every precondition, drafted here and recorded as under review, in the provenance log and in
+   the security-target review's row, with no mark in the file, until the
+   security-target review of phase 8, which cites records that exist only after phase 5
+   (RAT-068, RAT-069); `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and
    AIS 20/31 3.0 come from the approved downloads of R19, `169.pdf` through the owner's browser.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4

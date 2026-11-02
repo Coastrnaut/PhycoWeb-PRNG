@@ -254,7 +254,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | D4 tie (only if the tie-breaks of the nonlinearity choice rule reach the owner's choice) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie, or if a tie-break decides it: the owner then sets this row to "Not needed", naming `d4/tie.json` and its tie-break (`decided_by`), and `round_rule.py --select` opens on that value at HEAD and takes the family from `d4/tie.json` |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
-| Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
+| Security-target review (the design document's chapters "Security target" and "Mode", with the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows (FR-069) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names nothing |
@@ -850,9 +850,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   allow-list entry with its reason.
 - **FR-012**: The claim template of security.md §3 MUST be filled in for `phyco-v3` as a target
   and marked "target, not a claim". The claim register (security.md §15) MUST record `phyco-v3`
-  at L0, then at L1 once its gate has passed and FUT-SEC-8 and the security-target chapter of
-  the design document have been reviewed, and with "no claim" at every level. The chapter is drafted
-  in plan phase 4 and marked "draft, under review". Its review, the security-target review, has a
+  at L0, then at L1 once its gate has passed and FUT-SEC-8 and the design document's chapters
+  "Security target" and "Mode" (FR-034) have been reviewed, and with "no claim" at every level. Both
+  chapters are drafted in plan phase 4 and recorded as under review, in the provenance log and in
+  the security-target review's Review & Approval row, until that review in phase 8; neither carries
+  a mark in `design.md`, whose approval status stays outside the file (FR-034), so
+  that the text the review approves is the text `design_freeze.py create`
+  compares (RAT-068, RAT-069). Their review, the security-target review, has a
   Review & Approval row of its own and is the first step of phase 8, after the selection and before
   the owner design review: it cites the selected candidate's records of FR-029's diffusion through
   instantiation and of research R4's first-order differences, which exist only after phase 5, and
@@ -1493,18 +1497,20 @@ freeze hashes and the baseline manifest; run the claim-register test.
   as a whole shows that dependence, with the margin over R_f stated.
 - **FR-030**: The design document MUST state the slime-mould mapping of every component
   (pressure and vein lanes, flux coupling, vein accumulation, food nodes, peristaltic rotations)
-  and show how each failed `phyco-v2` mechanism (S2, S5–S7, S11–S15) is replaced: for each, it
-  names the rule of Π that replaces it and the evidence record, or the section and test where the
-  answer is by specification, named per row. A record of FR-037, FR-038 or FR-039 is cited where a
+  and show, in a chapter of its own, "Replaced mechanisms" (FR-034), outside the mapping chapter,
+  how each failed `phyco-v2` mechanism (S2, S5–S7, S11–S15) is replaced: one row for each, naming
+  the rule of Π that replaces it and the evidence record, or the section and test where the answer
+  is by specification. A record of FR-037, FR-038 or FR-039 is cited where a
   measurement or search shows that the failure does not recur (S2, S7, S12–S15, S8's rotational
   pairs, and S11's trail-bound records with the D4 choice record), for example S13's merging against
   bijectivity by construction and the exhaustive check, and S12 and S14 against the full-range rule
   and the bias rule. Where the answer is a property of the specification, the design document's
   section that states it and the test that checks it are cited (S1 and S3 the key and the security
   target, S4 the mode, S5 the full call's rate output, FR-015, S6 the fixed operations, FR-020, S9
-  and S10 bijectivity by construction and the generic bound). The final report's lessons table cites
-  the same evidence (FR-051). FR-030 covers the mechanisms of the
-  step function. The others are answered elsewhere: S1 and S3 (the seed bound) by the key and
+  and S10 bijectivity by construction and the generic bound). The lessons table of FR-051, in
+  security.md and in the final report, cites that chapter's rows with their
+  records (FR-051). FR-030 covers the mechanisms of the step function. The
+  others are answered elsewhere: S1 and S3 (the seed bound) by the key and
   the security target, S4 (no key, nonce or reseed) by the mode, S8 (seed words shared between
   pressures) by key loading and the rotational pairs of research R4, and S9 and S10 (bijection
   and cycles) by bijectivity by construction and the generic bound. The mapping chapter states
@@ -1538,7 +1544,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   other match in the chapter is flagged, so the chapter uses none of the listed words elsewhere, and
   a test runs the rule on sample sentences of both kinds. The chapter is the design document's
   section headed "Slime-mould mapping", from that heading to the next heading of the same level, and
-  the test exits 1 if the heading is missing or appears twice.
+  the test exits 1 if the heading is missing or appears twice. The mapping chapter keeps each
+  component's place in the metaphor and its one fixed sentence, so that its word rule and its one
+  allow-list entry stand as they are, and the claim test's other rules apply to the chapter
+  "Replaced mechanisms" as to the rest of the design document (RAT-071).
 - **FR-031**: The threshold-triggered disruption (Frustrated Foraging) MUST be removed from Π
   (D5); the food forcing becomes round-constant injection.
 
@@ -1599,22 +1608,46 @@ freeze hashes and the baseline manifest; run the claim-register test.
     stores the document as `design-versions/<sha256>.md`, as `spec-versions/` holds the spec
     (data-model §1); `design_freeze.py create` exits 2 on any other header line, which a test
     checks.
+  - **Chapters.** The design document's chapters are level-2 headings with fixed names, each once
+    and in this order, which a test checks: "Security target" (the properties sought, the threats,
+    the parameter table, the generic bounds per size and the output limits, FR-004 to FR-012);
+    "Mode" (the calls, the initial state, the theorem with each precondition and the feature that
+    meets it, padding and domain separation with their constants and FR-014's proof, forget, the
+    limits and counters, the interface formats, the call sequence and the zeroization rules that
+    FR-025 makes properties of the mode, and its section "Key loading", which the security-target
+    review accepts, data-model §15); "Permutation" (the operation list, the colour schedule, the
+    rotation amounts, the round constants and the variant table); "Hardware structure" (the rest of
+    FR-025, FR-020's cycle formulas, FR-026's estimate and FR-059's self-test); "Replaced
+    mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each edge state of FR-054
+    stands in the chapter of what it concerns. The security-target review covers "Security target"
+    and "Mode", with the security target's files (the notes under the Review & Approval table), and
+    the owner design review every chapter, with the rationale, whose Alternatives chapter is its own
+    (RAT-069).
   - **Components.** The rationale gives the role and the reason of every component: the two
     lanes per node, the coupling function, the vein accumulator, the colour schedule, the local
     linear layer between boxes, the food nodes and their placement, the rotation amounts, the
     round constants, the padding rule, the domain separators, forget, the absorption and output
     trees, the key shift chain, the nonce chain and the rate lanes' nonce registers,
     the selector at every lane, the start tree with its call-type field,
-    the reset tree that every zeroization trigger drives, the replicated
-    round and phase counters with the constant ROMs they index, and every
-    component the chosen candidate adds. Each names what it is for: the attack
+    the reset tree that every zeroization trigger drives, the replicated round and phase counters
+    with the constant ROMs they index, the key register at each node that holds key bits, apart from
+    the key shift chain, the one-block output buffer, the controller of the call-state table with
+    its error-code register and the latched `selftest_fail` output, the self-test's
+    parts (the selector at each chain's input, its r-bit comparator and the
+    storage of its key, nonce and expected output), and every component the
+    chosen candidate adds (RAT-070). Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's
     `mapping` log entry records it, which the list cites; a component with none is labelled "kept
     for the mapping only", with its cost stated, or is removed, and the mapping chapter restates
     only each component's place in the metaphor (FR-030). The hardware structures among them name
-    their functional need, and the paths that carry secret data, the key chain and the selectors,
-    also the attack class they meet (no read-back, zeroization), fault attacks staying with feature
-    008; the rationale cites the plan's Complexity Tracking for each.
+    their functional need, and the paths that carry secret data, the key registers, which hold the
+    key between instantiates, the key chain and the selectors, also the attack class they meet (no
+    read-back, zeroization), fault attacks staying with feature 008, while the self-test's stored
+    key, nonce and expected output are development inputs of the frozen vectors and carry no secret;
+    the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
+    the key registers under the row on the key and nonce chains and the output buffer under the row
+    on the clock, reset and start signal, and the design document's chapter "Hardware structure" for
+    the rest (RAT-070).
   - **Constants.** Every constant of Π and the mode has its rule and reason: round constants,
     rotation amounts, padding constants and domain separators, the last two in the mode
     chapter.
@@ -2169,8 +2202,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-051**: A new version of security.md, with a history entry, MUST give `phyco-v3` its own
   section (a table of structural facts, best-attack register rows for its first bounds, and a
   lessons table that links all fifteen of S1–S15 to the rules of Π or the parts of the design
-  that answer them (FR-030), citing for each the evidence record, or the section and test where the
-  answer is by specification, as the final report's lessons table does), a row in §1.1, a
+  that answer them (FR-030), citing for each the evidence record, or the
+  section and test where the answer is by specification, as the final report's
+  lessons table does, and for S2, S5–S7 and S11–S15 the rows of the design
+  document's chapter "Replaced mechanisms" with their records), a row in §1.1, a
   validation-phase table like §1.3, the §20.1 decision (recorded in
   2.11 on 2026-11-01; FR-017), the claim-register entry, the status of roadmap stage 5a.1 and
   a mention in §23. security.md keeps policy, status and registers, and derivations and other
