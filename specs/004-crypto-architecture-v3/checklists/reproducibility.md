@@ -584,6 +584,66 @@ start open, and an item is ticked only under the rule in the Notes below.
   tree completed, with each file's role stated once? [Consistency, plan "Project Structure"; cli
   contract `design_freeze.py`, `clear_lock.py`; data-model introduction, §13; quickstart F1]
 
+## Fourth re-run (2026-11-02)
+
+Items found when the checklist was run a fifth time, over the complete documents and the repository,
+after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK070 Is the limit on committed suffixes stated for the paths it governs, given that FR-053
+  pins `reports/004-crypto-architecture-v3/**`, `research/004/**` and `protocol/*.json` to LF and
+  then says "Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and
+  `.gz`, and `protocol/evidence.py` refuses any other suffix there", while the plan's tree puts code
+  under `research/004/` (`ir.py`, one module per candidate, each superseded operation list as
+  `<sha256>.py`, and the tools), which the freeze hashes as "the selected operation list" and
+  "`research/004/ir.py` with its tools", and research R16 and the data-model introduction state the
+  limit for `reports/004-crypto-architecture-v3/` only? Is the limit stated for the reports
+  directory alone, or with the suffixes each other path may hold, so that no requirement and no test
+  of `protocol/evidence.py` refuses the committed code? [Conflict, Spec §FR-053 "Hashes and line
+  endings", §FR-043; plan "Source Code (repository root)"; research R16, R18; data-model
+  introduction, §13]
+- [ ] CHK071 Do FR-043's "scripts that compute verdicts" and FR-065's list of verdicts cover every
+  verdict that decides whether a result counts? The freeze hashes `evidence_v3.py`, `round_rule.py`,
+  `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
+  `protocol/evidence.py`, but not `scripts/validate_tool.py`, whose record's `outcome` decides
+  whether a tool's results count (FR-039), nor `scripts/fut_sec8.py`, which computes the
+  demonstration's matches and exits 1 "if a target is not recovered"; and FR-065 lists the
+  demonstration, the structural, bias and bound checks, the check of generated files, the size
+  profile's checks and the bound at the limits, and eligibility and selection, but neither the tool
+  validations and re-validations, nor the cross-checks between kinds, "A failed cross-check is a
+  tool defect" (research R12), nor the D4 choice. Since "a fix to a verdict script is a new file, so
+  that the re-check (FR-065) runs the code that produced the verdicts", is every script that
+  computes a verdict among the frozen files, or the reason for leaving it out stated, and is each of
+  those verdicts one that the re-check recomputes? [Consistency, Coverage, Spec §FR-039, §FR-043,
+  §FR-065; research R12, R16; data-model §7, §13; cli contract `validate_tool.py`, `fut_sec8.py`,
+  `recheck_004.py`]
+- [ ] CHK072 Is each test that a requirement names given a place in the plan's tests tree, given
+  that the tree names the subjects of `test_protocol_004.py` (the candidate log and its lock,
+  budgets, size order, the stop rule, the freeze, no key loaded before the FUT-SEC-8 review,
+  dev-only seed-set loads) and of `test_records_004.py` (reproductions, the two-worker test, the
+  attribute pin and byte-order mark of every hashed path), while no file or subject is named for the
+  test that the first list of approvals and the contracts' guards "agree both ways" and the test
+  that "compares the three" status lines (both in the notes under the Review & Approval table), the
+  proper-colouring test at every odd n (FR-018), the test that every budgeted kind and every script
+  with a worker option takes the heavy-run lock (FR-045), the test of each `code_sha256` entry
+  against the blob at its `git_head` and the header test of every committed `.gz` file (FR-053), the
+  test that the re-check imports only the standard library and those `protocol/` modules that
+  recompute by exact arithmetic (FR-065), and the test that
+  `research/004/tools/critical_counts.json` is only appended to (data-model §5)? Is each placed in a
+  file of the tree, so that every test the requirements name can be traced from a requirement to a
+  file? [Traceability, Completeness, Spec §Review & Approval, §FR-018, §FR-045, §FR-053, §FR-065;
+  plan "Source Code (repository root)"; data-model §5]
+- [ ] CHK073 Is the environment of a re-check's reproduction stated the same way everywhere, given
+  that FR-053 counts "the re-check's" `--reproduce` among the reproductions and says that "a
+  reproduction runs in the environment that made the original, as recorded (research R1)", and
+  research R16 that a reproduction "runs in the environment that made the original, as recorded, and
+  in no other (R1)", while research R1 lets "a reproduction of its `recheck` record" run anywhere,
+  data-model §1 excepts "a `recheck` record's reproduction", "which runs anywhere", the cli contract
+  says that "like the re-check, it may run in any environment", and FR-065 exempts the re-check from
+  the environment guard? Is the exception stated in FR-053 and in research R16's sentence as well?
+  [Consistency, Spec §FR-053, §FR-065; research R1, R16; data-model §1 "Reproduction"; cli contract
+  `recheck_004.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
