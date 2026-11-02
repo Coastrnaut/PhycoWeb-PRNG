@@ -461,7 +461,11 @@ and an item is ticked only under the rule in the Notes below.
   to hold were ticked in commit b3a30e8 ("checlists verified"). The 8 items of the second re-run,
   CHK045 to CHK052, verified in the same way once their answers were applied, were ticked in
   commit 5798640. The 11 items of the third re-run, CHK053 to CHK063, verified in the same way once
-  their answers were applied, were ticked in commit 8d340b4. A tick here
+  their answers were applied, were ticked in commit 8d340b4. The 10 items of the fourth re-run,
+  CHK064 to CHK073, verified in the same way once their answers were applied, as the owner's
+  instruction of 2026-11-02 asks again for every round, were ticked in commit 214bc1a. CHK066's
+  premise that redesign-inputs.md lacked the disclaimer was wrong: it carried it
+  after its meta lines, and SEC-066 moved it under the title. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

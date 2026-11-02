@@ -9,12 +9,15 @@ turns out differently. No such fallback may loosen a rule. The plan's table "Val
 fixes" lists every value marked protocol here, so one list names them all.
 
 The answers to the checklist choices ([checklist-choices.md](./checklist-choices.md), "all
-recommended"), those of the first run, the re-run and the second re-run on 2026-11-01 and those of
-the third re-run on 2026-11-02, are applied in the sections below. Each that changes a protocol
+recommended"), those of the first run, the re-run and the second re-run on 2026-11-01 and
+those of the third and fourth re-runs on 2026-11-02, the fourth's given in
+advance, are applied in the sections below. Each that changes a protocol
 value is stricter, or settles an open case by its most conservative reading
-before any result it affects, at every claimable size, RAT-036 and RAT-052
-changing a check only at the research sizes, where as written it fails every
-candidate (checklist-choices.md, "How to answer"), and becomes an entry of the
+before any result it affects, at every claimable size, RAT-036 and RAT-052 changing a check only at
+the research sizes, where as written it fails every candidate, and ANA-062 stating
+the round counts at which the avalanche test's validation is checked and
+the bits that must fire at each, where as written it fails every correct
+test (checklist-choices.md, "How to answer"), and becomes an entry of the
 protocol change log `research/004/protocol-changes.jsonl` when that log is created, by the per-round
 lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18).
 

@@ -670,7 +670,9 @@ and an item is ticked only under the rule in the Notes below.
   to hold were ticked in commit b3a30e8 ("checlists verified"). The 21 items of the second re-run,
   CHK035 to CHK055, verified in the same way once their answers were applied, were ticked in
   commit 5798640. The 14 items of the third re-run, CHK056 to CHK069, verified in the same way once
-  their answers were applied, were ticked in commit 8d340b4. A tick here
+  their answers were applied, were ticked in commit 8d340b4. The 4 items of the fourth re-run,
+  CHK070 to CHK073, verified in the same way once their answers were applied, as the owner's
+  instruction of 2026-11-02 asks again for every round, were ticked in commit 214bc1a. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

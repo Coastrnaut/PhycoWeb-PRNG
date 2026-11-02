@@ -525,7 +525,14 @@ and an item is ticked only under the rule in the Notes below.
   to hold were ticked in commit b3a30e8 ("checlists verified"). The 9 items of the second re-run,
   CHK037 to CHK045, verified in the same way once their answers were applied, were ticked in
   commit 5798640. The 13 items of the third re-run, CHK046 to CHK058, verified in the same way once
-  their answers were applied, were ticked in commit 8d340b4. A tick here
+  their answers were applied, were ticked in commit 8d340b4. The 9 items of the fourth re-run,
+  CHK059 to CHK067, were verified in the same way once their answers were applied, as the owner's
+  instruction of 2026-11-02 asks again for every round; the 8 that hold were ticked in commit
+  214bc1a. CHK062 stays open: ANA-062, applied as written, gives the expected set at each round
+  count as the planted bits and every bit independent of the flipped bit, while below full diffusion
+  a bit that depends on the flipped bit can flip with a frequency far from 1/2 and fire, one XORed
+  with it at round 1 flipping every time, so that "only if exactly that set
+  fires" refuses a correct test. The fifth re-run takes it up. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

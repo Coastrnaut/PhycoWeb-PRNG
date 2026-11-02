@@ -194,10 +194,14 @@ chain beside it, and the clock, reset, start signal and replicated counters,
 are Principle III's only exceptions, each justified in Complexity Tracking.
 The checklist answers of 2026-11-01, of the first run, the re-run and the
 second re-run, add no violation beyond the key chain, which the second re-run's answers make
-explicit, and those of 2026-11-02, of the third re-run, none beyond the nonce chain beside it, both
-justified in Complexity Tracking: each is stricter, adds a check, or settles an open case by its
+explicit, those of 2026-11-02, of the third re-run, none beyond the nonce chain beside it, both
+justified in Complexity Tracking, and those of the fourth re-run, the same day, none, the rate
+lanes' nonce registers being registers at their own nodes, filled through the
+absorption tree: each is stricter, adds a check, or settles an open case by its
 most conservative reading before any result it affects, at every claimable size, RAT-036 and RAT-052
-changing a check only at the research sizes, where as written it fails every candidate
+changing a check only at the research sizes, where as written it fails every candidate, and ANA-062
+stating the round counts at which the avalanche test's validation is checked and the
+bits that must fire at each, where as written it fails every correct test
 (checklist-choices.md, "How to answer"), and each protocol change among them
 becomes an entry of the protocol change log (FR-044). The start signal reaches the nodes and the
 replicated counters through a registered fan-out tree, as reset does, and output leaves through a
