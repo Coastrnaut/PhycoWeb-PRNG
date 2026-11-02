@@ -267,6 +267,99 @@ every other item; the reviewer ticks them.
   the security.md version of FR-051 required to carry that change? [Conflict, security.md header,
   §4, §18, §22; constitution 1.3.0; Spec §FR-051]
 
+## Third re-run (2026-11-01)
+
+Items found when the checklist was run a fourth time, over the complete documents and the
+repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK053 Is the match form of FR-069's word rules stated outside the mapping chapter, as it is
+  inside it (whole words, ignoring case, with their inflections): whether "random", "high-entropy",
+  "proven", "compliant", "conforms", "approved" and "constant time" match as whole words or within
+  words, in any case, with inflections such as "Compliance" and "approval", and in joined or
+  hyphenated forms such as "random-nonce", "random-number" and `os.urandom`? Does a standing entry's
+  one fixed phrase pass only a line that contains that phrase, so that other forms of an allowed use
+  ("a random nonce", "random 128-bit nonces", "random-nonce limit", "random source", "hash
+  randomization") each need an entry of their own, given that the project's name, PhycoWeb-PRNG, has
+  a standing entry although it contains none of the flagged words? [Measurability, Spec §FR-069;
+  data-model §15 `allow_list`; research R18]
+- [ ] CHK054 Do the other statements of the claim-register test agree with FR-069: the cli
+  contract's `check_claims.py`, which checks that forbidden wording "appears only in the rules that
+  forbid it" and names neither the allow-list, nor the strength rule, nor the scan's scope; research
+  R18, whose scan covers "every document of this feature, README and security.md included" but not
+  the comments and docstrings that FR-069 and SC-015 add; and SC-018, which counts "uses of
+  forbidden wording outside the rules that forbid it" with no allow-list, so that the uses the
+  standing entries allow would count against it? Is "every document of this feature" listed, given
+  that the six checklists and checklist-choices.md quote the forbidden words in their questions and
+  rows? [Consistency, Spec §FR-069, §SC-015, §SC-018; cli contract `scripts/check_claims.py`;
+  research R18]
+- [ ] CHK055 Does the claim-register test have a rule, or does the spec state that the owner's
+  review alone checks it, for each other description the spec forbids: a model described as an SP
+  800-90A DRBG (FR-011), the start-up self-test described as a FIPS 140-3 self-test (FR-059),
+  "constant time" said of the C tools, whose timing is not claimed (FR-020), the external design
+  review cited as an evaluation (Context; FR-043), and research R4's measurement called a
+  related-key analysis or FR-058's boundary keys a weak-key analysis (FR-049), given that FR-069
+  flags only "compliant", "conforms" and "approved" near a standard's name and "constant time"
+  beside the model? [Coverage, Spec §FR-011, §FR-020, §FR-049, §FR-059, §FR-069, §Context "External
+  review"]
+- [ ] CHK056 Is the tie choice protected as the owner's other acts are: `d4_choice.py --choose` and
+  `round_rule.py --choose` write the owner's choice in an exact D4 tie or a selection tie from `--by
+  NAME` and `--seen SHA256`, and refuse only a wrong hash, an absent tie or an existing choice,
+  while `design_freeze.py approve` and the change log's approval step refuse unless standard input
+  is an interactive terminal and the owner types the first 16 hex digits of the hash? Is running
+  `--choose` listed among the owner's own acts that the agent never performs (FR-043, FR-044), given
+  that the history cannot show who ran it and that the choice decides the family or the design?
+  [Consistency, cli contract `d4_choice.py`, `round_rule.py`; Spec §FR-044, §Review & Approval "D4
+  tie", "Selection tie"; data-model §8, §9]
+- [ ] CHK057 Do the Review & Approval table and its note agree with the gates and guards of the
+  other documents: the note's list of rows that open a guard names the D4 tie, Selection tie and
+  Design freeze rows, which no guard in the contracts reads, and omits the external design review
+  row, which `design_freeze.py create` reads, so that the agent could write that row on the owner's
+  word; and the owner's recorded go-ahead for the second transcription, a ⛔ gate of plan phase 7
+  (FR-057), has no row? Is each row that opens a guard tied to the guard that reads it at HEAD?
+  [Consistency, Spec §Review & Approval, §FR-057; cli contract "Approvals", `design_freeze.py`; plan
+  "Phases and gates" 7]
+- [ ] CHK058 Are the traceability table's statuses other than its three defined terms defined:
+  "Done" for FUT-SEC-8, which SC-002 repeats and security.md §15's L1 evidence requires ("FUT-SEC-8
+  done"), with what it takes (the validated search tool's record, every target recovered as SC-001
+  states, the best-attack register row that cites it, and the "FUT-SEC-8 result review" row Approved
+  at HEAD), and "Partly met" for FUT-SEC-7? [Clarity, Spec §Security Policy traceability, §SC-001,
+  §SC-002, §FR-003; security.md §15]
+- [ ] CHK059 Are the outcomes of a Declined decision stated for the gates other than the owner
+  design review, the FUT-SEC-8 result review and the security-target review in particular: a
+  corrected demonstration report or a revised security-target chapter as a new version, reviewed
+  again in a row of its own; a security-target parameter changed only in its stricter direction
+  (FR-044); or a stop? Is it stated that the owner design review does not start while the
+  security-target review is declined, given that data-model §17 lets every gate go from `_pending_`
+  to Declined? [Gap, Spec §Review & Approval, §FR-003, §FR-012, §FR-043; data-model §17; plan
+  "Phases and gates" 8]
+- [ ] CHK060 Is the claim register's `claim_level` range consistent with security.md §15's ladder,
+  given that data-model §15 gives it as L0…L5 for every model ID while the ladder ends at L6, the
+  scoped claim of Principle VIII gate 3? [Consistency, data-model §15; security.md §15; Spec
+  §FR-069]
+- [ ] CHK061 Is it stated whether the security-target review may read Approved, and the owner design
+  review and the freeze proceed, while a theorem the mode chapter uses is "unverified", given that
+  research R10 says the security-target chapter "cannot pass the review that records L1" while the
+  spec lets that review pass and the "L1 recorded" row read "blocked", and that `design_freeze.py
+  create` checks neither the theorem status of `limits.json` nor the preconditions, although a mode
+  without a matching theorem is never adopted (FR-013, Edge Cases) and a paper may show a form the
+  design must take? [Conflict, Spec §FR-012, §FR-013, §FR-043, §Edge Cases; research R10; cli
+  contract `design_freeze.py`]
+- [ ] CHK062 Is the writer of the size profile `security-target/parameters.json` named, with
+  FR-010's generic-bound checks computed by code as FR-065 requires, given that the plan's tree and
+  the cli contract name a script for `limits.json` only and that quickstart step T2 has a reviewer
+  read the file against security.md §12.2? Does the freeze record pin the security target's files
+  and the scripts that compute their verdicts, given that `mode_limits_v3.py` is not among FR-043's
+  verdict scripts, so that the re-check after the freeze runs the code that produced them?
+  [Consistency, Spec §FR-010, §FR-043, §FR-065, §SC-003; data-model §10, §13; quickstart T2]
+- [ ] CHK063 Is the refusal of a last partial word with a nonzero unused byte classified, given that
+  it can arrive after earlier blocks of the same personalization string or reseed input have been
+  absorbed: an error path, which zeroizes and carries a zeroizing error code, or a refusal that
+  changes nothing, which needs the core to hold the whole input before absorbing any of it, with
+  that buffer in the zeroization list and the cycle formulas? Is every other check that the core can
+  make only part-way through an input classified in the same way? [Coverage, Spec §FR-014, §FR-025
+  "Flow control", "Zeroization"; model contract "Error paths in hardware"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy
