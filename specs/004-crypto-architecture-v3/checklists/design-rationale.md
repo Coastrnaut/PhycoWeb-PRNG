@@ -255,6 +255,123 @@ every other item; the reviewer ticks them.
   allow-listed, and does the rule match whole words or stems ("secure" in "security", "resist" in
   "resists")? [Conflict, Spec §FR-030, §FR-069; security.md §8]
 
+## Third re-run (2026-11-01)
+
+Items found when the checklist was run a fourth time, over the complete documents and the
+repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK049 Is the degree-based term of R_dist required to count distinguishers that combine the
+  forward and the inverse bounds, given that research R13 and data-model §5 raise R_dist at each
+  round count whose own bound d, for Π or for Π⁻¹ taken separately, is at most 126, while a zero-sum
+  built from a middle state, over a subspace of dimension max(d_f, d_b) + 1 taken r₁ rounds forward
+  and r₂ rounds backward, gives a distinguisher on r₁ + r₂ rounds at a cost of 2^(max(d_f, d_b) + 1)
+  (the inside-out method)? Is the round count it reaches, with its cost against 2¹²⁸, part of the
+  `degree` record's verdict, so that the distinguishers "that the candidate's `degree` records
+  admit" include it? [Coverage, Spec §FR-034, §Pre-registered Design Protocol "Round rule"; research
+  R13; data-model §5 `degree`; security.md §12.1]
+- [ ] CHK050 Are the stated operation degrees that the `degree` records use upper bounds, and is the
+  route that the claimable sizes use the one that is validated? Research R13 and data-model §5 give
+  "w − 1 for a w-bit addition", while the most significant bit of the sum of two variable w-bit
+  words has degree w (bit i has degree i + 1; at w = 2 it is x₁ ⊕ y₁ ⊕ x₀y₀), and w − 1 holds only
+  when one operand is constant, which it is not in the form `dst ← dst ⊙ F(srcs)` with ⊙ = ⊞; a
+  round's degree is taken "from each box's or S-box's truth table", with no rule for a round of P
+  phases, whose degree is bounded by the product over its phases; and the known result validates the
+  truth-table route on one box at w = 4, while at w = 32 a 64-bit box has no truth table and its
+  records come from the stated degrees, with data-model §7 asking for "the degree bound's exact
+  degree", which a correct bound looser than the exact degree would fail. Is each of these stated,
+  given that FR-034 calls the records "upper bounds" and that the cost 2^(d + 1) of each raised
+  round count holds only for an upper bound? [Conflict, Spec §FR-034, §FR-039; research R11, R13;
+  data-model §5 `degree`, §7]
+- [ ] CHK051 May every node use the same rotation amounts? Research R13's symmetry check covers
+  "every per-node constant, such as the rotation amounts", and an assignment equal at every node is
+  mapped to itself by every translation, so it fails the check, and FR-024 asks for amounts "with no
+  non-trivial grid symmetry", while FR-022 gives the 2w-bit ARX-box one set of trail bounds ("the
+  box's trail bounds") and research R15 ranks "the possible amounts" by the bounds they give, as for
+  one box. If the amounts differ between nodes, are the search space over per-node assignments, the
+  trail bounds of each distinct box within research R7's 8 h per instance and 48 h row, the
+  active-box count over boxes with different bounds, and the rule that derives each size's
+  assignment from n stated, given that research R11 and R14 change the amounts only with w, by the
+  scaling rule? [Conflict, Spec §FR-022, §FR-024, §FR-037; research R6, R7, R11, R13, R14, R15;
+  security.md FUT-GRID-4, S8]
+- [ ] CHK052 Is research R13's check of "the placement of the food nodes", a pattern of its own
+  beside each round's constants, consistent with the food-node rule? A placement of one food node is
+  mapped to itself by a rotation about it, one of two food nodes by the half-turn about their
+  midpoint, one with every node a food node by every symmetry, and every placement at 2×2 by a
+  translation or by the reflection in a diagonal, each a symmetry that moves a node, so that each
+  such placement fails the check although distinct constants at the food nodes break the symmetry,
+  and FR-037's symmetry checks are structural tests that every candidate must pass at every
+  supported size. Are the placement and the constants it carries checked as one pattern, or are a
+  least number of food nodes and an arrangement with no symmetry required per size, and is 2×2's
+  verdict stated? [Conflict, Spec §FR-018, §FR-023, §FR-037, §Pre-registered Design Protocol
+  "Eligibility and selection"; research R13; data-model §5 `symmetry`]
+- [ ] CHK053 Is it stated how the other items of FR-018 to FR-031 that are written as duties of the
+  design document or the rationale are decided for every candidate before selection, given that the
+  eligibility rule gives a form only for FR-026's figures, FR-027's semantics and FR-030's mapping,
+  while FR-018 asks for the folding rule and the longest link, the food nodes with their reason,
+  each tree's figures and, per claimable size, the start-up self-test's expected output, FR-020 for
+  a formula in cycles per call ("the design document gives, per call"), FR-022 for the bounds "in
+  the rationale", FR-023 for the statement whether the call types draw on distinct constant streams,
+  with its reason, FR-024 for the report "whether the ranking held after scaling", and FR-025 for
+  rules "each stated in the design document"? Is it stated which of them are properties of the mode
+  shared by every candidate, decided once, and which are checked on the selected candidate only?
+  [Completeness, Spec §Pre-registered Design Protocol "Eligibility and selection", §FR-018, §FR-020,
+  §FR-022 to §FR-025; data-model §3 `parameters`, §9]
+- [ ] CHK054 Is the mapping chapter's restatement of the candidate's `mapping` log entry consistent
+  with the chapter's own rule, given that FR-030 has the chapter restate, for the selected
+  candidate, each component's place in the metaphor "and the attack class, bound or need it serves",
+  with every component naming "at least one attack class it resists", while the chapter "contains no
+  security statement" and the claim-register rule flags resist, resists, resisting, resistance and
+  security inside it? Is the attack-class part kept outside the chapter, for example in the
+  rationale's component list (FR-034), with the chapter restating only each component's place in the
+  metaphor, or is a stated form of the restatement exempt, with its allow-list entry? [Conflict,
+  Spec §FR-030, §FR-034, §FR-069; data-model §3 `mapping`, §15 `allow_list`]
+- [ ] CHK055 Does the mapping chapter's word rule cover the arguments FR-030 forbids, and can the
+  test find the chapter? FR-069 flags "the arguments FR-030 forbids" there beside the word list, but
+  "emergent complexity" contains no listed word, and a mixing or diffusion claim made through the
+  mapping, which FR-030 forbids as "evidence of mixing or security", is flagged elsewhere only when
+  it cites frequency, avalanche or battery results; and the chapter's bounds in the design document
+  (a fixed heading, or a file of its own) are not stated, so the rule's scope is not defined. Are
+  the words or phrases that stand for each forbidden argument listed, and is the chapter's heading
+  fixed? [Measurability, Spec §FR-030, §FR-069; data-model §15]
+- [ ] CHK056 Is it stated from which family the further candidate after a decline may come, and what
+  follows when the declined candidate's family already has three candidates? The declined candidate
+  stays eligible, selection takes the eligible candidates of the chosen family first, and a
+  candidate added later "does not change the recorded choice", so, unless D4 was not computable, a
+  further candidate of the other family can never be selected while the declined one is eligible,
+  and one of the same family is selected only with a smaller R at 4×4 than the declined one, or
+  through the owner's choice in a tie; and a family with three candidates admits no further one
+  within the stop rule. Is the outcome stated for each case (a revision, or a stop without a further
+  candidate), so that a further candidate's hours are not spent on one the rules cannot select?
+  [Coverage, Spec §Pre-registered Design Protocol "Eligibility and selection", "Stop rule", §FR-041,
+  §FR-043, §Review & Approval "Owner design review"; research R6; data-model §3, §9]
+- [ ] CHK057 Where a candidate's call types draw on distinct constant streams, is it stated which of
+  the permutations they define each kind of evidence covers: all four (instantiate, generate, forget
+  and reseed), or one, with the reason the others share its results? Only the refused-list check
+  names "each call type's stream"; research R13's symmetry check reads "each round's constants", and
+  the inverse tests, the bias tests, the invariant checks and the dependency matrices name no call
+  type. Is each kind's coverage stated, given that the constants differ between the permutations and
+  that FR-023 requires that "the mode theorem's preconditions MUST still hold"? [Coverage, Spec
+  §FR-014, §FR-023, §FR-037; research R4, R13, R15; data-model §5]
+- [ ] CHK058 Is the set of transforms under which a refused-list match is sought stated exactly,
+  given that "after one word rotation or the complement applied to every word" leaves open which
+  rotation amounts count (every k from 1 to w − 1, the same k for every word of the run) and whether
+  a rotation combined with the complement matches, while FR-023's "differ" relation within a call
+  covers "rotations of complements" and the stated chance of an accidental match, T·L·2w·2⁻⁶⁴,
+  counts 2w transforms per position, w rotations each with and without the complement? [Clarity,
+  Spec §FR-023, §Re-decided feature-002 requirements "FR-007"; research R15]
+- [ ] CHK059 Are the rotation search's space of amounts and ranking measure set by one rule for
+  every candidate, or chosen for each candidate in its log entry, given that research R15 and
+  data-model §3 let each candidate's entry record its own space, measure and rounds before its
+  search, that every point needs a differential and a linear bound at the search width, so that the
+  48 h row, at up to 8 h per instance, bounds the number of points a space can hold, and that the D4
+  score compares min(W_D, W_L) over r*, a round count fixed only after the searches, while the
+  amounts are ranked at the rounds recorded before them? Is the ranking measure required to be the
+  score's own, and is it stated what follows when a recorded space is too large for its row's
+  projection, given that a change of the rule that generates the rotation amounts makes a new
+  candidate? [Consistency, Spec §FR-024, §Pre-registered Design Protocol "Nonlinearity choice rule",
+  "Stop rule"; research R6, R7, R15; data-model §3 `parameters`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
