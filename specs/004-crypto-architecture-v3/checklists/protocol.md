@@ -290,6 +290,123 @@ every other item; the reviewer ticks them.
   Spec §Pre-registered Design Protocol "Eligibility and selection", "Stop rule", §Edge Cases,
   §FR-041; cli contract `round_rule.py`]
 
+## Third re-run (2026-11-01)
+
+Items found when the checklist was run a fourth time, over the complete documents and the
+repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK050 Are the owner's approvals that open a guard but have no Review & Approval row stated as
+  the owner's own acts, each with a record? Research R1 writes each environment record "with the
+  owner's approval, on any change", and after any difference every evidence script exits 2 until
+  "the owner then approves a new environment record", while no command writes the record, none of
+  its fields holds the approval, its date or the owner's typed confirmation, and the table has no
+  row for it; and an `owner-provided` entry of the downloads manifest, "with the owner's words, the
+  source the owner names, the date and the value's SHA-256", opens `validate_tool.py`'s source
+  guard, where for a published value "any other entry, or none, exits 2", so that it can make a
+  tool's results count, with no writer named. Is each placed outside the standing authorization, as
+  FR-044 places "every Review & Approval decision that opens a guard", and given a writer, the
+  owner's confirmation and a row or field that records it, given that the note under the table lets
+  the agent write an approval only "on the owner's explicit word for that row"? [Gap, Spec §FR-044,
+  §Review & Approval; research R1, R19; data-model §1, §7; cli contract "Guards shared by every
+  script", `validate_tool.py`]
+- [ ] CHK051 Can each of the change log's first entries hold what data-model §18 asks, given that
+  the log takes "one entry per listed row", each citing "its row ID and the rules it is listed
+  under", while `rule` is one name ("the pre-registered rule changed, by its name in the spec's
+  protocol or its research section") and `old_text` and `new_text` are "the rule's text before and
+  after", and that a row may be listed under several rules (the second re-run's ANA-037 under the
+  bias rule, the round rule, the structural checks and the stop rule)? Are `old_text` and `new_text`
+  the text just before and after that row's change, which exists in no committed version for a row
+  applied in one commit with another row under the same rule ("the second re-run's rows were
+  committed checklist by checklist"; ANA-037 and ANA-038, both under the bias rule), or the text
+  before and after its round, and which of a rule's texts do they hold: the spec's protocol
+  paragraph, its research section or the requirement it takes as content? Is the `direction` of a
+  row listed under a rule whose stated direction is "no change" ("selection and the nonlinearity
+  choice rule (D4): no change"; "the FUT-SEC-8 demonstration: no change") always `settled`, with its
+  `readings` written when the log is created, whatever the row's kind; and is it stated what follows
+  if the owner, at the tasks approval, does not confirm a list or takes a row out of it, given that
+  "a row left out would be a protocol change outside the log"? [Clarity, Spec §FR-044, §Review &
+  Approval "Tasks approval"; data-model §18; checklist-choices.md "Status", "Rows that change the
+  protocol"]
+- [ ] CHK052 Does class 5's rule place the planted bits where the bias tool's validation needs them,
+  given that each set j = 0…99 plants its bit "at position j mod S" while S = 4b is 2¹², 2¹⁴ and 2¹⁶
+  at the three sizes, so that j mod S is j and every planted bit falls in positions 0 to 99 "in the
+  test's bit order", an order no document states beyond S counting "the b bits after Π and the b
+  bits after Π⁻¹ in each set"? A counting defect in the later bits, in the bits after Π⁻¹ or in the
+  second set would then pass the validation. Is the planted position spread over the S bits by a
+  stated rule, fixed before first use since "No value or index is picked after any output is seen",
+  and is the test's bit order stated, which each set's SHA-256 also covers? And after "an approved
+  numpy upgrade the old record stands, and a new validation runs as a new record": does the new
+  validation draw from the same seeds (`phycoweb-004/dev/synthetic/n<n>/<j>`), giving new counts for
+  sets that are "never replaced", and which record decides the tool's validation if the new one
+  fires outside 82 to 97 of the 100 sets? [Coverage, Spec §FR-039, §FR-040; research R3, R4;
+  data-model §2, §7]
+- [ ] CHK053 Is it stated who decides whether a candidate that became `rejected` or `ineligible` is
+  replaced, by when, and how that decision is recorded? The edge case says that "another candidate
+  may be entered in its place within the stop rule's budget before the set closes", "or the feature
+  recommends stopping", with no rule between the two, and `round_rule.py --close` writes
+  `set-closed` "once every candidate has a final decision and no replacement is pending", while no
+  event of the candidate log (`proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`,
+  `correction`, `repair`, `set-closed`) records a replacement as pending or declined, so that
+  `--close` cannot tell from the log. Since that decision can be taken after every other candidate's
+  R at 4×4 is known, is it bound by a rule fixed in advance (for example, a replacement is always
+  entered while its family has fewer than three evaluated candidates), given that "never because
+  another's R is high" binds an entry but not a decision not to enter one? And may the further
+  candidate that a decline admits (the decline "reopens the set once, for one further candidate")
+  itself be replaced if it becomes `rejected` or `ineligible`? [Gap, Spec §Edge Cases,
+  §Pre-registered Design Protocol "Eligibility and selection", "Stop rule"; data-model §3; cli
+  contract `round_rule.py`]
+- [ ] CHK054 Is it stated whether the candidates of the family that D4 does not choose get the
+  production-width analysis, and when? Research R6 computes the choice "before the production-width
+  analysis of the chosen family starts" and sends "both representatives" on to it only in an exact
+  tie, while selection takes "Of the eligible candidates of the chosen family, or of the other
+  family if the chosen one has none, the one with the smallest R at 4×4", eligibility needs a
+  candidate that "has an established R_bound at every claimable size", and `round_rule.py --close`
+  waits until "every candidate has a final decision", although `withdrawn` is allowed only "before
+  its first tool run" and the other family's candidates have had their reduced-width runs. If they
+  are not analysed, is their final decision `ineligible` for "R_bound not established", so that the
+  fallback to the other family can never select one, or does the set stay open until the chosen
+  family's outcome is known, and in which order do the two families' runs go? Is "final decision"
+  defined as one of the decisions the log writer accepts? [Gap, Spec §Pre-registered Design Protocol
+  "Nonlinearity choice rule (D4)", "Eligibility and selection"; research R6, R7; data-model §3, §9;
+  plan phase 5]
+- [ ] CHK055 Is it stated how selection is made again when, after `selection.json` exists and before
+  the freeze, the selected candidate becomes ineligible (a raised R whose measurements its row
+  cannot hold, after which "selection proceeds among the others within the stop rule", or a later
+  addition to the refused list, which "makes each candidate it touches fail FR-023") or its R at 4×4
+  rises above another eligible candidate's while it stays eligible, given that "the one with the
+  smallest R at 4×4 is frozen" and that FR-043 provides only for a later change: "Any change after
+  the owner design review (R raised, a new finding, a corrected document) makes a new
+  design-document version"? Does `round_rule.py --select` run again, rewriting
+  `freeze/selection.json`, a fixed-name file whose earlier content is kept as
+  `versions/<sha256>.json`, although data-model §9 says that "`selection.json` stays as the script
+  wrote it" and gives `selection-2.json` only to a decline that ends in a further candidate? Is a
+  tie choice in `freeze/selection-tie-choice.json`, "never changed" and made against the earlier
+  record's `seen_sha256`, then void, and is the security-target review, "Held after the selection
+  and before the owner design review", held again for a newly selected candidate? [Gap, Spec §Edge
+  Cases, §Pre-registered Design Protocol "Eligibility and selection", §FR-043, §FR-044, §Review &
+  Approval; data-model introduction, §9; cli contract `round_rule.py`]
+- [ ] CHK056 Is the feature's total of run hours bounded as research R7 states, "The most the
+  feature can spend is six candidates × 66 h, about 16.5 days of runs", since "A cap on the feature
+  as a whole follows from the three-candidate limit", given the heavy runs that charge no
+  candidate's row: "Validation runs on published values (R12's table) charge no candidate and have
+  their own cap of 8 h per instance", with no limit on their number, re-validations after a failure
+  included; a reproduction, where "a heavy kind is reproduced only on request, one at a time, as a
+  heavy run", with "its projection charged to no row" and "n = 1, 2, … for successive reproductions
+  of that record", with no limit on n; FR-053's test, which "charges no candidate"; and the
+  FUT-SEC-8 vector check and sweep, which "fall under the demonstration's own budget row"? Is it
+  stated whose request starts a heavy reproduction (the owner's, a reviewer's or the agent's),
+  whether a heavy run outside every candidate's row needs the owner's go-ahead, and whether the
+  total is a cap that stops runs or an estimate of the candidates' rows only? [Clarity, Spec
+  §FR-045, User Story 4; research R7, R12, R16; cli contract "Reproduction"]
+- [ ] CHK057 Does the spec's Status line agree with its Review & Approval table, given that it reads
+  "checklist choices of the first run and of the re-run answered and applied (2026-11-01)", while
+  the table holds a third round, "Checklist choices, second re-run", Approved and applied the same
+  day, and checklist-choices.md's Status reads "all 306 rows answered"? Is it stated which status
+  line follows which, and when each is updated (at each answered round and each ⛔ gate), so that the
+  spec's status cannot fall behind the gates it summarizes? [Consistency, Spec §Status, §Review &
+  Approval; checklist-choices.md "Status"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
