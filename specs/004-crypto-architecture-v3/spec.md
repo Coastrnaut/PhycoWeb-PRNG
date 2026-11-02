@@ -272,9 +272,10 @@ last gate.
 
 A decline is logged with its reasons and ends, at each gate, in one of these outcomes. At the
 FUT-SEC-8 result review: a corrected demonstration report, as a new version reviewed in a row of its
-own, with a defect fixed and the sweep repeated under `--repeat-after-defect` where the review finds
-one; or a stop; key loading stays refused (cli contract, "Order of US1") until such a row reads
-Approved. At the security-target review: a revised chapter, as a new version reviewed in a row of
+own, with a defect fixed and the sweep repeated under `--repeat-after-defect`, on the
+owner's request, where the review finds one; or a stop; key loading stays
+refused (cli contract, "Order of US1") until such a row reads Approved. At the
+security-target review: a revised chapter, as a new version reviewed in a row of
 its own, its security-target parameters changing only in their stricter direction (FR-044); or a
 stop; the owner design review does not start, and `design_freeze.py create` exits 2, while the
 security-target review is not Approved. At the owner design review: the outcomes its row and FR-043
@@ -525,8 +526,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 - **The demonstration misses its target**: the search tool is defective and fails its
   validation. The defect is reported and fixed, and the sweep is repeated under
-  `--repeat-after-defect`, its record written beside the first, which stays, and naming the defect
-  and the record it supersedes (data-model §4); every run is reported. The
+  `--repeat-after-defect`, on the owner's request and charged to research R7's feature-wide row
+  (Pre-registered Design Protocol, "FUT-SEC-8 demonstration"), its record written beside the
+  first, which stays, and naming the defect, the record it supersedes and the
+  owner's request with its date (data-model §4); every run is reported. The
   demonstration uses development seeds and decides nothing about a design, so a
   repeat is not re-seeding until passing.
 - **More matches than expected**: any extra match after three words is listed and separated with
@@ -1763,8 +1766,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   on published values or on any other known result, charge no candidate: they have their own cap of
   8 h per instance, and a heavy one projects first against research R7's feature-wide row and is
   refused, exit 2, once it does not fit; the D4 reduced-width searches count against their
-  candidate's trail budget, and the FUT-SEC-8 vector check and sweep against the
-  demonstration's own budget.
+  candidate's trail budget, and the FUT-SEC-8 vector check and sweep, one pass per target, against
+  the demonstration's own budget, which holds nothing else, while a repeat after a fixed tool
+  defect, its vector check included, is charged to research R7's feature-wide row and runs only on
+  the owner's request (Pre-registered Design Protocol).
 
 **Protocol**
 
@@ -1906,14 +1911,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
   looser than any reading of the existing text. The plan's rules for an exact D4 tie, for no
   scored family and for a representative found ineligible first were settled that way, at plan
   approval. Every change is recorded in the protocol change log,
-  `research/004/protocol-changes.jsonl`, chained and locked like the candidate log, with per
-  entry the date, the rule, the old and new text, the reason, the direction (below), the readings
+  `research/004/protocol-changes.jsonl`, chained and locked like the candidate log and written only
+  by `scripts/protocol_change.py` (`protocol/changelog.py`; cli contract), with per entry the date,
+  the rule, the old and new text, the reason, the direction (below), the readings
   compared for a settled case, the approver, the last record ID that existed before it, so that
-  "before any result it affects" can be checked, and the results known at the time of the change.
+  "before any result it affects" can be checked, and the results known at the time of the change;
+  the writer refuses, exit 2, an entry without its direction, a settled one
+  without its readings, or one without the last record ID or the results known.
   Its first entries, written when it is created, are the answered rows of every checklist round
   answered before then, by the per-round lists "Rows that change the protocol" of
   checklist-choices.md, in round order, each holding, per rule its row is listed under, that rule's
-  text before and after its round was applied (data-model §18). The owner's answer to a round
+  text before and after its round was applied (data-model §18). A row is listed under every rule
+  whose text its Changes cell names or its applied change altered, and before the log is created its
+  writer compares each rule's text, in each place its heading names, at the two
+  commits of each round, and exits 2, writing nothing, while a place whose text
+  changed has no row of that round listed under its rule; the comparison's
+  result is recorded with the first entries. The owner's answer to a round
   approves its list. The log is created, and no evidence run starts, only after the owner has
   confirmed every list, and a row the owner takes out of a list is recorded beside it with the
   owner's reason. A round answered after the log exists adds entries the
@@ -1965,9 +1978,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   thread, or is projected to take, or last took, more than 10 minutes; the FUT-SEC-8 sweep,
   exhaustive bijectivity and solver runs are examples. Every other kind is light, as research R7
   lists them, and FR-053's test with two worker counts is a heavy run that charges no candidate.
-  Every heavy run that charges no candidate is charged to research R7's feature-wide 66 h row and
-  refused, exit 2, once its projection does not fit the hours left there, and a heavy
-  reproduction runs only on the owner's request, quoted with its date in its record.
+  Every heavy run that charges no candidate, the FUT-SEC-8 row's one pass per target with its vector
+  check excepted, is charged to research R7's feature-wide 66 h row and refused, exit 2, once its
+  projection does not fit the hours left there, and a heavy reproduction, like a FUT-SEC-8 repeat
+  after a fixed tool defect, runs only on the owner's request, quoted with its date in its record.
   Every heavy run takes the heavy-run lock,
   projects its hours first and records `heavy_run` true, and a test checks that every budgeted kind
   and every script with a worker option takes the lock. A stale lock, left by a crash or a reboot,
@@ -2327,7 +2341,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the date, the task ID and its review status, in the feature's evidence (vhdl-genai.md R7;
   security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section. The
   review status is `pending`, `accepted` or `changes-requested`, and a review is a new provenance
-  entry, never a change to an entry or a record (FR-064; data-model §1, §14).
+  entry, never a change to an entry or a record (FR-064; data-model §1, §14). Its one writer is
+  `scripts/provenance.py` (`protocol/provenance.py`), whose `add` writes an entry and `review` a
+  review, each under the log-append lock, and which refuses, exit 2, an entry with a field missing
+  or a `sha256` that is not that of the named file, section or record (cli contract).
 
 **Claims discipline (security.md §1 and §15; strategy note §3.1 and §10)**
 
@@ -2441,7 +2458,7 @@ run it projects. *Stricter means*: the derivation does not change.
 | Random baseline | False matches expected per target: about 1 after one word (2³² candidates, 32-bit words), about 2⁻³² after two, about 2⁻⁶⁴ after three. Agreement is tested on the one-word count of each target against a Poisson distribution of mean (2³² − 1)/2³², and of the three pooled against three times that mean, two-sided at level 0.01; any false match after two or three words is reported as a deviation. The baseline assumes each candidate's output words uniform and independent of the target's; `phyco-v2`'s biases (S12, S14) could make false matches more frequent, so a count above the baseline is an observation about `phyco-v2`, reported as such, and does not change the success criterion. A disagreement is a finding (FR-060), never a reason to sweep again |
 | Cost | Steps and time per candidate, measured; the total; the extrapolation to 2⁶⁴ candidates. Expected: about 2³² × 257 steps per target, about 3.6 core-hours at 8.5 × 10⁷ steps/s |
 | Check before the sweep | The search tool reproduces the `phyco-v2` golden vectors |
-| Budget | One pass over the 2³² candidates per target, for three targets; a repeat only after a tool defect is fixed (Edge Cases). Checking a record's listed matches and recovered seeds runs no sweep and is not a repeat. Nor is a reproduction after the FUT-SEC-8 result review: a heavy run that writes its own record, compared field by field with the original, which can neither replace the demonstration record nor change the review; a difference is a finding |
+| Budget | One pass over the 2³² candidates per target, for three targets, with its vector check, and nothing else. A repeat, only after a tool defect is fixed (Edge Cases), its vector check included, is a heavy run charged to research R7's feature-wide row: it projects first, is refused, exit 2, once its projection does not fit the hours left there, and runs only on the owner's request, quoted with its date in its record as `owner_request`, so that the agent never starts one; each repeat follows a defect that no earlier record names, and the feature-wide row's hours bound their number. Checking a record's listed matches and recovered seeds runs no sweep and is not a repeat. Nor is a reproduction after the FUT-SEC-8 result review: a heavy run that writes its own record, compared field by field with the original, which can neither replace the demonstration record nor change the review; a difference is a finding |
 | Report | security.md §12.4, with T1 as the attacker, who knows the position of the observed words |
 
 *Stricter means*: no change.

@@ -246,6 +246,8 @@ protocol/
 ├── devinputs_v3.py           # new: development inputs and uniform controls (R3)
 ├── evidence.py               # new: the one writer of evidence records (R16)
 ├── candidates.py             # new: hash-chained candidate log, appended under a lock (FR-041, R16)
+├── changelog.py              # new: the one writer of the protocol change log (FR-044)
+├── provenance.py             # new: the one writer of the provenance log (FR-067)
 ├── design_freeze.py          # new: the freeze's code, create, approve and validate (FR-043)
 ├── claims.json               # new: claim and evidence register (FR-069)
 └── disclaimer.py             # gains DESIGN_DISCLAIMER; DISCLAIMER unchanged (FR-068)
@@ -279,6 +281,8 @@ scripts/
 ├── recheck_004.py            # recomputes every verdict (FR-065)
 ├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
 ├── owner_record.py           # the owner's environment records and owner-provided values (R1, R19)
+├── protocol_change.py        # the protocol change log's create and propose (FR-044)
+├── provenance.py             # the provenance log's add and review (FR-067)
 ├── clear_lock.py             # removes a stale lock, only once its holder is shown gone (R16)
 └── check_claims.py           # register against README, security.md, disclaimers
 
@@ -294,7 +298,8 @@ tests/
 ├── v3_reference.py           # second transcription, separate session (FR-057)
 ├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze;
 │                             # no key loaded into any state before the FUT-SEC-8 review (FR-001);
-│                             # every seed-set load is dev-only (FR-040)
+│                             # every seed-set load is dev-only (FR-040);
+│                             # the two log writers' refusals (FR-044, FR-067)
 ├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
 │                             # mark of every hashed path (FR-053)

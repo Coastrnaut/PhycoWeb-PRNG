@@ -702,21 +702,25 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     tool defect. The D4 reduced-width searches are trail searches on
     their candidate and count against its trail row, and so do the rotation-amount searches of R15,
     at each width searched: each instance is capped at 8 h, and its projection reserves hours like
-    any other run. The FUT-SEC-8 vector check and sweep fall under the demonstration's own budget
-    row (spec, Pre-registered Design Protocol). A uniform control (R4) belongs to no candidate and
+    any other run. The FUT-SEC-8 vector check and sweep, one pass per target, fall under the
+    demonstration's own budget row, which holds nothing else (spec, Pre-registered Design Protocol);
+    a repeat after a fixed tool defect, its vector check included, is charged to the
+    feature-wide row (below). A uniform control (R4) belongs to no candidate and
     runs once per test and size, but every candidate's 12 h row is charged, at each size, that
     size's control hours, whether the control ran for it or before it, and the row's reservation
     counts them by projection until they exist; the control projects first and runs only if every
     entered candidate's row can hold it, and it writes no candidate-log entry: the Budget guard
     reads the control records when it charges each row (cli contract).
   - **The feature-wide row.** Beside the six candidates' rows and the FUT-SEC-8 row, one
-    feature-wide row of 66 h holds every heavy run that charges no candidate: validations and
-    re-validations, on published values or on any other known result ("What else is
-    charged", above; R12), heavy reproductions (R16) and FR-053's test with two
-    worker counts. Each projects first, as every heavy run does, and is refused, exit 2, once its
-    projection does not fit the hours left in the row. A heavy reproduction runs only on the owner's
-    request, quoted with its date in its record; the agent never starts one on its own, and a light
-    reproduction needs no request.
+    feature-wide row of 66 h holds every heavy run that charges no candidate, the FUT-SEC-8 row's
+    one pass per target excepted: validations and re-validations, on published values or on any
+    other known result ("What else is charged", above; R12), heavy reproductions (R16), FUT-SEC-8
+    repeats after a fixed tool defect, each with its vector check, and FR-053's test with two worker
+    counts. Each projects first, as every heavy run does, and is refused, exit 2, once its
+    projection does not fit the hours left in the row. A heavy reproduction or a FUT-SEC-8 repeat
+    runs only on the owner's request, quoted with its date in its record as `owner_request`; the
+    agent never starts one on its own, and a light reproduction needs no request. Each repeat
+    follows a defect that no earlier record names, and the row's hours bound their number.
   - **Order of sizes.** Each kind of evidence runs at 4×4, then 8×8, then 16×16. A larger size
     starts only when the smaller one's run of that kind has finished without making the
     candidate ineligible, so a candidate that fails at 4×4 spends none of its 16×16 hours
@@ -787,8 +791,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the candidate's committed reference outputs for R8's 16 Π inputs before its first run (R11),
     not on the `phyco-v3` vectors, which exist only after selection. Counts and budgets never
     change to make a run fit, and the record keeps the projection beside the time used.
-  - The most the feature can spend is six candidates × 66 h, the feature-wide row's 66 h and the
-    FUT-SEC-8 row, which holds one pass per target: 462 h, about 19.3 days of runs, beside that
+  - The most the feature can spend is six candidates × 66 h, the feature-wide row's 66 h, which
+    holds every FUT-SEC-8 repeat, and the FUT-SEC-8 row, which holds one pass per
+    target and nothing else: 462 h, about 19.3 days of runs, beside that
     pass. It is a cap: every heavy run is charged to one of these rows, and each row refuses a run
     once it is spent.
 - **Stricter means**: every budget may only be lowered (stop rule), and a lowered budget applies

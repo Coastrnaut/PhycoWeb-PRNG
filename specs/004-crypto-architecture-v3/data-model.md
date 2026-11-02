@@ -377,10 +377,14 @@ proposed ─► entered-d4 ─► scored ─┐       (only candidates entered b
 | `model_sha256` | `1260142d…` for `phycoweb/model_v2.py`, checked |
 | `report` | the nine items of security.md §12.4, with T1 as the attacker |
 | `supersedes`, `defect` | in a repeat after a tool defect, the earlier record's ID and the ID of the recorded defect it follows (cli contract, `fut_sec8.py`); `none` in the first record |
+| `owner_request` | in a repeat after a tool defect, the owner's request, quoted with its date, without which the repeat exits 2, the repeat being a heavy run charged to research R7's feature-wide row (cli contract, `fut_sec8.py`); `none` in the first record |
 
 Each record is named by its `record_id`, which begins with `demonstration`, so that a repeat after a
 defect writes beside the first, which stays; a run exits 2 while a record exists and no new defect
-is named (cli contract). The record is the search tool's validation record (security.md §12.5). The
+is named, or without the owner's request; a repeat, its vector check included, is a heavy run
+charged to research R7's feature-wide row, against which it projects first, while the first
+record's pass falls under the demonstration's own budget row (cli contract).
+The record is the search tool's validation record (security.md §12.5). The
 FUT-SEC-8 result review names the record it reviews by ID and SHA-256 in its row, and security.md's
 best-attack register row for exhaustive seed search cites that record (FR-003).
 
@@ -833,9 +837,13 @@ drafted in parts: `seq` and `prev_sha256`, chained as the candidate log is
 `section`, with `follows`, the `seq` of the entry it follows, and `sha256`, the SHA-256 of the
 section text reviewed; the latest entry for a path and section gives its status, and no entry
 changes. The review of an evidence record is an entry that names the record's ID
-and SHA-256, the record's `reviewer` staying as written (section 1). Every
-append takes `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired
-as in section 3. The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
+and SHA-256, the record's `reviewer` staying as written (section 1). Every append takes
+`data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
+section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenance.py add` for an
+entry and `review` for a review entry (cli contract), which refuses, exit 2, appending
+nothing, an entry with a field of its kind missing or a `sha256` that is not
+that of the named file, the named section's text or the named record. The
+entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
 its own, with its SHA-256, before the first entry of the tool it validates. Each tool's second known
 result (section 7) has an entry of its own before the tool's first validation, with its source: a
@@ -966,6 +974,7 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `rule` | the pre-registered rule changed, by its name in the spec's protocol or its research section; a first entry (below) holds `rules` instead |
 | `rules` | for a first entry only: one object per rule its row is listed under, each with `rule`, `old_text`, `new_text`, `direction` and `readings`, the texts being that rule's text, in each place its heading names, at the commit before the row's round was applied and at the commit that completed it, each commit named by its hash |
 | `row`, `granularity` | for a first entry only: the row's ID, question and chosen option; and `round`, since a round's rows were committed together, so that a row's own before and after exist in no commit |
+| `place_check` | for a first entry only: the result of the writer's comparison for the entry's round (below): the round's two commits, each place whose text changed between them, and the rows of that round listed under its rule |
 | `old_text`, `new_text` | the rule's text before and after; for a first entry, per rule in `rules` |
 | `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md |
 | `direction` | `stricter`, in the rule's stated stricter direction, or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
@@ -981,8 +990,13 @@ stricter change applies, also under the current rules, listing both; a disagreem
 reported. The log's first entries, written when it is created, are the answered rows of every
 checklist round answered before the log is created, by the lists "Rows that change the protocol" of
 [checklist-choices.md](./checklist-choices.md), in round order: one entry per listed row, whose
-applied change altered the text of a pre-registered rule, whatever its kind, the 61 rows tagged
-Stricter or Settle (26 and 35) among them. Each holds `rules`, every rule its row is listed under,
+applied change altered the text of a pre-registered rule, whatever its kind, the 70 rows tagged
+Stricter or Settle (26 and 44) among them. A row is listed under every rule whose text its Changes
+cell names or its applied change altered (PRO-058), and before the log is created its writer
+compares each rule's text, in each place its heading names, at the two commits of each round, and
+exits 2, writing nothing, while a place whose text changed has no row of that round
+listed under its rule; each first entry records that comparison for its round
+in `place_check`. Each holds `rules`, every rule its row is listed under,
 with `old_text` and `new_text` per rule: that rule's text, in each place its heading names, at the
 commit before the row's round was applied and at the commit that completed it; with the row's ID,
 question and chosen option, marked `granularity: round`. Each rule takes `stricter`, in its stated
@@ -998,8 +1012,13 @@ with four classes and with five. Among them, the
 constant rule's values (research R15) and the SHA-256 of its refused list are `settled` entries
 written before the first candidate is scored. Every later addition to the refused list is a
 `stricter` entry, proposed by the agent and approved by the owner, with the list's new SHA-256. The
-spec's Clarifications point to the log. Approving an entry is the owner's own act, which the agent
-never performs (spec FR-044): the writer's approval step prints the SHA-256 of the entry, or of the
+spec's Clarifications point to the log. Its one writer is `protocol/changelog.py`, run as
+`scripts/protocol_change.py` (cli contract): `create` writes the first entries, after the comparison
+above, and `propose FILE` a later entry, each ending in the approval step below, and it refuses,
+exit 2, appending nothing, an entry, or a rule of a first entry, without `direction`, a `settled`
+one without `readings`, and an entry without `last_record_id` or `results_known`.
+Approving an entry is the owner's own act, which the agent never performs (spec
+FR-044): the writer's approval step prints the SHA-256 of the entry, or of the
 first entries together when the log is created, and appends nothing unless standard input is an
 interactive terminal and the owner types its first 16 hex digits; each entry records that
 confirmation in `approver`. The history cannot show who acted, so the owner's review at each ⛔ gate

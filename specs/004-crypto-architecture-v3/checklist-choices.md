@@ -668,16 +668,22 @@ created, are these rows, one entry per row, in round order (data-model §18); a 
 the log exists adds its entries the usual way, proposed by the agent and approved by the owner (spec
 FR-044).
 
-A row is listed under a rule when its Changes cell names that rule's text: the rule in the spec's
-Pre-registered Design Protocol, the research section that holds its values, a requirement the rule
+A row is listed under every rule whose text its Changes cell names or its
+applied change altered (PRO-058): the rule in the spec's Pre-registered Design
+Protocol, the research section that holds its values, a requirement the rule
 takes as its content, as each heading below names them, or the plan's table "Values this plan
 fixes". Every Stricter or Settle row is listed, since its kind says that it changes a rule; REP-023
 is the one that names none of these texts, and it is listed under the hashes of research R16, which
 it settles. This reading is the inclusive one: a listed row that changes no rule costs one log
-entry, while a row left out would be a protocol change outside the log.
+entry, while a row left out would be a protocol change outside the log. Before the log is created,
+its writer, `scripts/protocol_change.py create`, compares each rule's text, in each place its
+heading names, at the two commits of each round, and exits 2, writing nothing, while a place whose
+text changed has no row of that round listed under its rule; the comparison's result is recorded
+with the first entries (data-model §18).
 
-The first three lists were written on 2026-11-01, after their rounds were answered, by that reading,
-so they await the owner's confirmation, asked for at the tasks approval. A later round's list is
+The first three lists were written on 2026-11-01, after their rounds were answered, by
+their rows' Changes cells, the reading before PRO-058, so they await the
+owner's confirmation, asked for at the tasks approval. A later round's list is
 written with its rows, before the answer that approves it, and if the answer chooses another option
 for a row, the list follows the option chosen before the change log takes it. The fourth list, the
 third re-run's, was written with its rows on 2026-11-01, and the owner's answer to that round, "all
@@ -798,6 +804,13 @@ From the third re-run, 50 of its 70 rows:
 - **Constant rule** (research R15; FR-023): RAT-051, RAT-053, RAT-057, RAT-058, RAT-059, ANA-046,
   ANA-047, ANA-054, HW-070.
 - **Protocol changes and their directions** (FR-044): SEC-056, PRO-050, PRO-051, PRO-055.
+
+Added beside this list on 2026-11-02 by PRO-058, and approved by the owner's answer to the fourth
+re-run: PRO-056 under the heading below, since its applied change, commit 810cbe2, altered the row
+"Analysis budget per candidate (stop rule)" of the plan's table "Values this plan fixes before first
+use", which its Changes cell does not name.
+
+- **Values this plan fixes** (the plan's table): PRO-056.
 
 From the fourth re-run, 18 of its 36 rows:
 

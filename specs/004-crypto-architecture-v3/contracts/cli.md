@@ -139,10 +139,11 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   writes nothing but its `projection` record, and its time counts against the row of the run it
   projects (data model §1). Every candidate's 12 h row is charged, at each size, the hours of that
   size's uniform controls (research R4), read from the `control` records, which append nothing to
-  the candidate log, or by projection until they exist. Every heavy run that charges no
-  candidate, a validation or re-validation, on a published value or on any other
-  known result (research R7), a heavy reproduction or FR-053's test with two
-  worker counts, projects first against research R7's feature-wide 66 h row and exits 2, writing
+  the candidate log, or by projection until they exist. Every heavy run that charges no candidate,
+  the FUT-SEC-8 row's one pass per target excepted, a validation or re-validation, on a published
+  value or on any other known result (research R7), a heavy reproduction, a FUT-SEC-8
+  repeat after a tool defect or FR-053's test with two worker counts, projects
+  first against research R7's feature-wide 66 h row and exits 2, writing
   nothing but its `projection` record, unless its projection fits the hours left there.
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
@@ -171,7 +172,8 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 ## `scripts/fut_sec8.py` (WSL)
 
 ```text
-fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8 [--repeat-after-defect ID]
+fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8
+            [--repeat-after-defect ID --owner-request "WORDS (DATE)"]
 fut_sec8.py --verify RECORD
 fut_sec8.py --reproduce RECORD --binary fast/build/seed_search
 ```
@@ -179,9 +181,14 @@ fut_sec8.py --reproduce RECORD --binary fast/build/seed_search
 Takes the targets from `protocol.seedsets.load("dev", allow=("dev",))[:3]`, computes the
 observations with `phycoweb/model_v2.py`, runs the vector check, then one sweep per target,
 separates any extra three-word match with the fourth word, and writes a demonstration record,
-`fut-sec-8/<record_id>.json` (data model §4). A second run exits 2 unless `--repeat-after-defect`
-names a recorded tool defect that no earlier record names (spec Edge Cases); the repeat writes
-beside the first, holding `supersedes`, the earlier record's ID, and `defect`, the defect's. Exit 1
+`fut-sec-8/<record_id>.json` (data model §4). The first run is the demonstration's one pass per
+target, with its vector check, under its own budget row (spec, Pre-registered Design Protocol). A
+second run exits 2 unless `--repeat-after-defect` names a recorded tool defect that no earlier
+record names (spec Edge Cases) and `--owner-request` quotes the owner's request with its date, so
+that the agent never starts a repeat; the repeat, its vector check included, is a heavy
+run charged to research R7's feature-wide row, against which it projects
+first (Budget, above), and writes beside the first, holding `supersedes`, the
+earlier record's ID, `defect`, the defect's, and `owner_request`. Exit 1
 if a target is not recovered.
 
 Neither of the other two modes is a demonstration attempt, and each takes a demonstration record by
@@ -546,6 +553,50 @@ and `approval_confirmed`, keeping the fixed-name file's current content under `v
 (data model introduction). The owner then adds and commits its Review & Approval row, "Environment
 record <n>" or "Owner-provided value <n>", with that SHA-256, which the Environment guard and
 `validate_tool.py`'s source guard read at HEAD (Approvals, above).
+
+## `scripts/protocol_change.py`
+
+```text
+protocol_change.py create                 # the first entries, from checklist-choices.md
+protocol_change.py propose FILE           # one later entry, its fields in FILE
+```
+
+The one writer of the protocol change log, `research/004/protocol-changes.jsonl`, through
+`protocol/changelog.py` (spec FR-044; data model §18). `create` runs only while the log does not
+exist, and exits 2 once it does. It reads the lists "Rows that change the protocol" of
+checklist-choices.md, in round order, and each listed rule's text, in each place its heading names,
+at the two commits of each round, and compares them first: it exits 2, writing nothing, while a
+place whose text changed between a round's two commits has no row of that round listed under its
+rule, and otherwise builds one first entry per listed row, with `rules`, `row`, `granularity` and
+`place_check`. `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
+which the agent may write as a proposal. Each refuses, exit 2, appending nothing, an entry, or a
+rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
+`last_record_id` or `results_known`. Each then ends in the approval step, an owner's own act that
+the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
+together, taken over their canonical JSON without the approval fields, and appends nothing unless
+standard input is an interactive terminal and the owner types its first 16 hex digits, which
+`approver` records as `approval_confirmed`. Every append takes `data/log-append.lock` and checks the
+chain first (Hash-chained logs, above). It writes log entries and no record, and so has no
+`--reproduce` mode (spec FR-061). `tests/test_protocol_004.py` covers each refusal.
+
+## `scripts/provenance.py`
+
+```text
+provenance.py add FILE                    # one entry, its fields in FILE (data model §14)
+provenance.py review FILE                 # one review entry, with `follows`
+```
+
+The one writer of the provenance log, `$REP/provenance.jsonl`, through `protocol/provenance.py`
+(spec FR-067; data model §14). FILE is a JSON object holding the entry's fields but `seq`,
+`prev_sha256` and `date_utc`, which the writer adds. `add` appends an entry for a file, or a section
+of one, drafted or repaired with an AI tool, or for a known result this feature writes itself or a
+tool's second known result; `review` appends a review entry, with `follows`, the `seq` of the entry
+it follows, and the status the review gives, or the review of an evidence record, naming the
+record's ID and SHA-256. Each refuses, exit 2, appending nothing, an entry with a field of its kind
+missing or a `sha256` that is not that of the named file, the named section's text or the named
+record. Every append takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
+above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
+`tests/test_protocol_004.py` covers each refusal.
 
 ## `scripts/clear_lock.py`
 
