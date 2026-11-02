@@ -649,9 +649,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     can neither replace evidence nor add any. The original stands, and a
     reproduction that differs from it on a field that enters a verdict is a finding that blocks the
     candidate's eligibility, `blocked`, as an unverified hypothesis does (spec FR-060), until it is
-    resolved; in the environment that made the original it is a tool defect, which gives this one
-    re-run, a new measurement in the original's row, whose own result raises R by the round rule if
-    it fires. A difference in a field that decides no verdict, such as a p-value, is reported and
+    resolved; since it ran in the environment that made the original (R1), it is a tool defect,
+    which gives this one re-run, a new measurement in the original's row,
+    whose own result raises R by the round rule if it fires. A difference
+    in a field that decides no verdict, such as a p-value, is reported and
     blocks nothing.
   - **Stricter changes during a candidate's runs.** A stricter change of a rule is applied first
     by recomputing the verdicts from saved outputs. New measurements it needs, such as more
@@ -1511,10 +1512,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     and is not a re-run under R7, so it can neither replace evidence nor add any; it is
     a heavy run where R7 says so, run only on the owner's request, quoted
     with its date in its record, and charged to R7's feature-wide row, and a
-    difference is a finding, exit 1: the original stands, a difference in a field
-    that enters a verdict blocks the candidate's eligibility, `blocked`, until it is resolved, as a
-    tool defect of R7 where it arises in the environment that made the original, whose one re-run is
-    new evidence in the original's row, and a difference in a field that decides no verdict, such as
+    difference is a finding, exit 1: the original stands; a difference in a field that enters
+    a verdict blocks the candidate's eligibility, `blocked`, until it is
+    resolved, and, since it ran in the environment that made the original
+    (below), it is a tool defect of R7, whose one re-run is new evidence in the
+    original's row; and a difference in a field that decides no verdict, such as
     a p-value, is reported and blocks nothing. It compares the fields data-model §1 lists for
     its kind and reports every other field only, timings and raw solver logs among them; a different
     source hash makes it a new run, not a reproduction. A `p_values` output, marked `deterministic`
