@@ -1229,8 +1229,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     are replicated, one copy at each food node or node, all started by that reset and running
     in lockstep, so that no counter value crosses the grid. The latency is given as three figures
     in cycles, fixed by public values: from reset released to the self-test done and the state
-    zeroized (ready for a key), the self-test's key and nonce words fed through the chains included
-    (FR-059); key loading, from the last key word accepted to the key held, for a finished load, a
+    zeroized (ready for a key), the self-test's key and nonce words fed through the chains and, for
+    rate lanes, through the absorption tree into the nonce registers included (FR-059); key loading,
+    from the last key word accepted to the key held, for a finished load, a
     call of its own whose cycle count joins FR-020's list; and instantiate, from the last nonce or
     personalization word accepted to instantiate done, its forget call complete and the core
     `instantiated` and ready for a command, the trees' latency and the nonce chain's length included
@@ -1348,8 +1349,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     self-test, and a generate request before then is refused with an error signal, as the model
     raises `CallSequenceError`. The self-test's blocks go only to its comparator, which takes each
     whole r-bit block as the output buffer receives it, with no consumer handshake, so they never
-    reach the output port, and the zeroization after the self-test clears what
-    it computed, both chains included (FR-059). In the model, zeroization
+    reach the output port, and the zeroization after the self-test clears what it computed, both
+    chains and the rate lanes' nonce registers included (FR-059). In the model, zeroization
     overwrites the object's own `bytearray` copy of the key with zeros in place and drops it, and
     drops the state's integers, which Python cannot overwrite; as with constant time, this is a
     discipline that governs what the object keeps, not what Python's memory may still hold, and the
@@ -2302,8 +2303,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   interfaces. Its comparator, r bits wide, takes each whole r-bit block as the output buffer
   receives it, compares it with the matching block of the expected output, stated per claimable size
   from the frozen vectors, and holds the result until the last block; the comparator and the
-  expected output's storage are parts of FR-026's estimate. The self-test then
-  zeroizes, both chains included; on failure it zeroizes, blocks every call and
+  expected output's storage are parts of FR-026's estimate. The self-test then zeroizes, both chains
+  and the rate lanes' nonce registers included; on failure it zeroizes, blocks every call and
   sets the `selftest_fail` output, an output of its own, latched until the
   next reset (state `failed`, FR-025 "Call sequence"); every reset runs the
   self-test again, and a pass clears the latch, as a new `Generator` runs it again in
