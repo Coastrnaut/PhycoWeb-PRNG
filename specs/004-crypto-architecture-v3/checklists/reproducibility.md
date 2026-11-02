@@ -654,7 +654,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK074 Is it stated what a disagreement of the re-check blocks, given that FR-065, research
+- [x] CHK074 Is it stated what a disagreement of the re-check blocks, given that FR-065, research
   R16 and data-model §18 say only that "a disagreement in either is reported", the cli contract has
   `recheck_004.py` exit 1 "on any disagreement, with each listed", data-model §1 classifies every
   `recheck` record `none`, and `round_rule.py` reads "the `reproduction` records of the candidate's
@@ -670,7 +670,7 @@ and an item is ticked only under the rule in the Notes below.
   reproduction, which runs anywhere? [Gap, Conflict, Spec §FR-060, §FR-065, §Edge Cases "A run is
   suspected of a tool defect"; research R7, R16; data-model §1 "Classification", "Reproduction",
   §18; cli contract `recheck_004.py`, `round_rule.py`]
-- [ ] CHK075 Does `fut_sec8.py --reproduce` take the owner's request that every heavy reproduction
+- [x] CHK075 Does `fut_sec8.py --reproduce` take the owner's request that every heavy reproduction
   needs, given that FR-045 and FR-053 run a heavy reproduction only on the owner's request, quoted
   with its date in its record, that the cli contract's introduction runs it "only with
   `--owner-request "WORDS (DATE)"`", exiting 2 without one, taking the lock, projecting first and

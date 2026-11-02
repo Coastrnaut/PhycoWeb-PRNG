@@ -521,7 +521,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK074 Do the reset figure, the self-test's zeroization and the plan's Complexity Tracking row
+- [x] CHK074 Do the reset figure, the self-test's zeroization and the plan's Complexity Tracking row
   on the chains name the rate lanes' nonce path as FR-025 and FR-059 now give it, given that FR-059
   feeds "the nonce's words for rate lanes through the absorption tree's input in the same way, with
   their cycles in the reset figure", filling the nonce register at each rate lane that holds nonce

@@ -446,7 +446,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK074 Is the "L1 recorded" row tied to the review rows it rests on, given that a review held
+- [x] CHK074 Is the "L1 recorded" row tied to the review rows it rests on, given that a review held
   again is a numbered row of its own, "FUT-SEC-8 result review <k>" or "Security-target review <k>",
   held after a decline, for the changed parts after an approval, or for another candidate that a
   later selection record selects ("this review and every later one are held again for it"), while

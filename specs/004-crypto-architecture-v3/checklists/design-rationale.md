@@ -453,7 +453,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK067 Does the re-decided feature-002 FR-007 row state the refused-list match as FR-023 and
+- [x] CHK067 Does the re-decided feature-002 FR-007 row state the refused-list match as FR-023 and
   research R15 now state it, given that the row still reads "a run of consecutive table words of at
   least 64 bits equal to consecutive words of a listed constant set read from any multiple of w,
   also after one word rotation or the complement of every word", the wording that RAT-058's answer

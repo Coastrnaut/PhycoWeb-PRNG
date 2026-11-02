@@ -444,7 +444,7 @@ and an item is ticked only under the rule in the Notes below.
   probability up to about 1 − 0.995¹⁰⁰, near 0.39? Is a set counted only when its planted bit fires,
   and is an unplanted bit that fires reported, counted or a failed validation? [Measurability, Spec
   §FR-039; research R3, R4; data-model §7; cli contract `validate_tool.py`]
-- [ ] CHK062 Are the round counts at which the avalanche test's planted results are tested stated,
+- [x] CHK062 Are the round counts at which the avalanche test's planted results are tested stated,
   with the bits expected to fire at each, given that data-model §7 re-finds the planted gap only if,
   "at every round count tested, every difference bit of the unmixed lane fires and no other bit
   does", while at a round count below the variant's full diffusion the difference bits that the
@@ -510,7 +510,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK068 Can the avalanche test's validation pass for a correct test at the round counts below
+- [x] CHK068 Can the avalanche test's validation pass for a correct test at the round counts below
   its variant's full diffusion? FR-039, research R4 and R13 and data-model §7 re-find each planted
   result at every round count from 1 to its variant's R "only if exactly that set fires", the
   expected set being the planted bits and every bit that the exact dependency matrices show
@@ -524,7 +524,7 @@ and an item is ticked only under the rule in the Notes below.
   where the exact matrices show every other bit dependent on the flipped bit, no other bit fires,
   with the chance that a correct test fires there on a uniform bit stated beside it? [Measurability,
   Conflict, Spec §FR-039; research R4, R13; data-model §7]
-- [ ] CHK069 Can a cross-check cover a difference between a known result's kind and a tool's use,
+- [x] CHK069 Can a cross-check cover a difference between a known result's kind and a tool's use,
   given that FR-039 states "Each known result is of the kind of its use, or a cross-check covers the
   difference", while FR-039 and research R12 also say that the cross-checks at w = 4 and 8 "check
   each candidate's boxes and never widen a kind", that a search's results "count only at a width so
@@ -537,7 +537,7 @@ and an item is ticked only under the rule in the Notes below.
   on the same known results, widens the kind, against "count only at a width so covered"? [Conflict,
   Ambiguity, Spec §FR-039; research R12 "Validated widths", "Cross-checks between kinds",
   "Re-validation"; data-model §7 `validated_kind`; cli contract "Tool validation"]
-- [ ] CHK070 Are the validated kinds of the active-S-box counter, the long-trail active-box counter
+- [x] CHK070 Are the validated kinds of the active-S-box counter, the long-trail active-box counter
   and the exhaustive tables stated, with their word widths, operation sets and kinds of model, given
   that research R12 says only "Each other tool's kind states its widths in the same way", that their
   known results are PRESENT's minimum of 10 active S-boxes over 5 rounds (4-bit S-boxes and a bit
@@ -550,7 +550,7 @@ and an item is ticked only under the rule in the Notes below.
   use without one write `not evaluated`, so that the D4 score, the cross-checks and R_bound do not
   rest on a use that no known result covers? [Gap, Spec §FR-022, §FR-039; research R6, R12 "Box
   widths", "Validated widths"; data-model §7 `validated_kind`]
-- [ ] CHK071 Does every tool whose verdict counts have a stated known result, given that FR-039 says
+- [x] CHK071 Does every tool whose verdict counts have a stated known result, given that FR-039 says
   "Every tool whose verdict counts has one" and lists the symmetry check, the dependency
   propagation, exhaustive bijectivity, the avalanche test, the cost model and the degree derivation,
   while research R13's invariant checks fail a candidate on a form kept on every test state and

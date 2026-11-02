@@ -483,7 +483,7 @@ and an item is ticked only under the rule in the Notes below.
   does not exit 2 on lists the owner has already confirmed? [Gap, Ambiguity, Spec §FR-044;
   data-model §18 `rules`, `place_check`; cli contract `protocol_change.py`; checklist-choices.md
   "Rows that change the protocol"]
-- [ ] CHK062 Is a guard stated for FR-044's "The log is created, and no evidence run starts, only
+- [x] CHK062 Is a guard stated for FR-044's "The log is created, and no evidence run starts, only
   after the owner has confirmed every list", given that the guards shared by every script
   (Environment, Committed code, Inputs, Operation lists, Heavy runs, Hash-chained logs, Order of
   sizes, Approvals, Order of US1, Tool validation, Budget, Trail tools) hold none that refuses an
