@@ -254,6 +254,7 @@ research/004/
 ├── ir.py                     # operation lists, interpreters, inverse (R11)
 ├── candidates/               # A1–A3 and B1–B3 at most, one module each, with reference outputs
 │   ├── <id>/superseded/      # every replaced operation list, as <sha256>.py, unchanged
+│   ├── <id>/constants/       # GENERATED: each variant's constant table, before the freeze (R15)
 │   └── superseded.json       # committed inventory of every superseded hash and path
 ├── tools/                    # bijectivity, dependency, bias, symmetry, invariants, costmodel
 │   ├── critical_counts.json  # integer critical counts per (N, S) and (N_a, S_A) (R4)
@@ -271,7 +272,7 @@ scripts/
 ├── d4_choice.py              # the D4 score and choice (R5, R6)
 ├── round_rule.py             # R, eligibility, selection, stop rule
 ├── mode_limits_v3.py         # the theorem's bound at the limits and the size profile (R9; FR-010)
-├── gen_constants_v3.py       # constants and their checks (R15)
+├── gen_constants_v3.py       # constants and their checks; candidates' tables (R15)
 ├── gen_vectors_v3.py         # vectors and known-answer tests (R8)
 ├── gen_constructed_v3.py     # constructed-state vectors (FR-054)
 ├── design_freeze.py          # the freeze command, calling protocol/design_freeze.py
@@ -416,8 +417,9 @@ source and binary.
   Each heavy run is projected on the candidate itself first and starts only if it fits its
   budget row (R7); counts and lengths are never reduced to fit.
 - **False raises of R**: the spec's bias rule bounds its error per size and round count, so on a
-  sound Π a chance firing raises R with probability about 21% at R = 32, or 23% with the
-  avalanche test (R4). It can only raise R, and the rule cannot be loosened (FR-044); the final
+  sound Π a chance firing raises R with probability about 21% at R = 32, or 23% with the avalanche
+  test, with one constant stream, and about 62% or 64% with four call types on distinct streams
+  (R4). It can only raise R, and the rule cannot be loosened (FR-044); the final
   report states it.
 - **Selection bias**: choosing among up to six candidates on development inputs is stated in the
   final report (FR-041).

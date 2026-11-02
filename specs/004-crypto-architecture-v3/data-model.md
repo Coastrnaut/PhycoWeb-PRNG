@@ -211,9 +211,9 @@ design document, which the table names; for every other kind it is reported, and
 | Statistical evidence (section 5: `frequency`, `avalanche`, `control`) | the fields of its row and the items of security.md §11.6 above: counts, critical counts and fired bits byte for byte, and the p-values by value | as for structural evidence |
 | Trail bound and trail (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap; of a `trail` record, `trail_kind`, `characteristic` and `weight` | of `budget`, the hours used; the raw solver log; `design_sha256` |
 | Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `second_known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
-| Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r, the tool's value, the exhaustive value and whether they are equal | the projected and used hours; `design_sha256` |
+| Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r and width, the tool's value beside each exhaustive one with its outcome: for an ARX-box, the internal-trail search's value at w = 4 and whether they are equal, and the floor at w = 4 and 8 and whether the value lies at or above it; for the active-S-box counter, the exhaustive minimum and whether they are equal | the projected and used hours; `design_sha256` |
 | D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
-| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15) | the measured speed and the generation time |
+| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15); for a candidate's tables (`--candidate`), each check's verdict as well | the measured speed and the generation time |
 | Generator run, vectors and constructed states (`gen_vectors_v3.py`, `gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
 | Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s | `design_sha256` for the other generators' |
 | Re-check (`recheck`; above) | per record, each recomputed verdict, its agreement with the recorded one and the commit whose functions computed it; the counts of agreements and disagreements | the interpreter, the platform and the `pip freeze` it ran with |
@@ -401,12 +401,12 @@ its ID, so that every earlier record stays reproducible and every run is reporte
 | `inverse` | sizes and variants; the 16 vector inputs and 2¹⁰ test states; both directions | `pass` if 0 mismatches |
 | `bijectivity` | variant 2×2, w = 4; 2³² inputs; ones in the output bitmap; bitmap SHA-256 | `pass` if 2³² distinct outputs |
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
-| `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
-| `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
+| `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b per call type's permutation, each permutation at its own threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
+| `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b per call type's permutation, each permutation at its own threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
 | `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order, each pattern on its own (the K sets of amounts placed by their rule among them); symmetries that fix a pattern; the relations checked between the constants of one call (R13); at 2×2 and 3×3, the statement that the placements of the food nodes and of the amounts were checked together with the round constants as one pattern (R13) | `pass` if none |
-| `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
-| `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, w − 1 for a w-bit addition), a round's count the product of its phases'; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, w for an addition of two variable words, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
+| `invariant` | the size and variant, at every supported size and every variant used as evidence, after one round and after a full call; forms and differences checked, over the whole state and over each colour class of the size's schedule (two at even n, three at odd n by research R14's colouring), each set with its level, the colour forms at odd n being a new set tested in addition (R13); any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
+| `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list by R13's bottom-up rule (input lanes 1 and a constant 0; XOR, NOT, rotations and shifts the largest of their arguments; a bitwise function the largest sum of its arguments' degrees over its algebraic normal form's monomials, 2 for AND or OR of two lanes; ⊞ and ⊟ w − 1 times the larger operand's, a subtraction counting as an addition; an update its result's; a phase the largest of its updates', an unwritten lane 1), a round's count the product of its phases', a box's truth-table degree being computed only at w = 4 and 8, in the derivation's validation (section 7), never here; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, by the same rules with w for ⊞ and ⊟, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
 
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
@@ -420,14 +420,18 @@ its ID, so that every earlier record stays reproducible and every run is reporte
   validation record of the tool's exact hash, whose `created_utc` is earlier (FR-039; SC-007).
 - **Call types.** Where the call types draw on distinct constant streams (spec FR-023), the
   `inverse`, `symmetry`, `invariant`, `frequency` and `avalanche` records are made for each call
-  type's permutation, each naming it in `call_type`, and R is the largest over the call types; a
+  type's permutation, each naming it in `call_type`, each permutation's bias tests at their own
+  thresholds, S and S_A counting its bits only, with the chance of a raise stated beside a firing
+  for the T call types tested (research R4), and R is the largest over the call types; a
   `dependency` record and a trail-bound record (section 6) read no constant value, cover one
   permutation for all and state that reason. Where the streams are not distinct, one permutation is
   covered.
 - **Constants cited.** Every record whose result depends on the constants names the constant table
   it read by path and SHA-256, so that a result on one table is never cited for another; a rise of R
   makes a new table, and with distinct streams it changes every later call type's constants from
-  round 1 (research R15).
+  round 1 (research R15). Before the freeze the table is the candidate's,
+  `research/004/candidates/<id>/constants/<variant>.json`, which `gen_constants_v3.py --candidate`
+  writes before the first record that reads it (section 11; research R15).
 - **Unvalidated tools.** A trail or distinguisher found by a tool not yet validated is recorded
   as an unverified hypothesis (FR-060), with `status` `blocked`, and it blocks the candidate's
   eligibility until a validated tool, or direct evaluation of the trail with the validated
@@ -445,7 +449,7 @@ its ID, so that every earlier record stays reproducible and every run is reporte
 | `tool`, `validation` | the tool, and the ID and SHA-256 of the validation record of its exact hash, whose `created_utc` must be earlier (FR-039; SC-007); a tool used outside its validated kind writes `not evaluated` |
 | `solver` | for `milp`, the fixed settings of R12: `mip_rel_gap` 0, the `time_limit`, the solver status, the proven dual bound used (never the best solution found), and HiGHS's built-in tolerances and thread count in the pinned scipy, recorded as such; the record states that its status rests on those tolerances (R12); the raw solver log is an output marked not deterministic, which a reproduction reports only (section 1) |
 | `scope` | "single trails under the usual independence assumptions; clustering into differentials and linear hulls, and key-dependent effects, open for feature 005" |
-| `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash: before the amounts are chosen, the cross-check on the first amounts of the candidate's space in tie order, which runs first in its trail row; after it, the cross-check of the chosen amounts scaled to w = 4 and 8, which the production-width searches need (R7, R12). The cross-check record lists per r the tool's value and the exhaustive one, equal by exact equality (section 7); a bound without a passed cross-check does not count, and `d4_choice.py` uses none |
+| `cross_check` | for a bound from the ARX search or the active-S-box counter, the ID of the cross-check record of that candidate and that tool's exact hash: before the amounts are chosen, the cross-check on the first amounts of the candidate's space in tie order, which runs first in its trail row; after it, the cross-check of the chosen amounts scaled to w = 4 and 8, which the production-width searches need (R7, R12). The cross-check record lists per r the tool's value beside each exhaustive one, compared as section 7 states: for an ARX-box, equal at w = 4 to the exhaustive internal-trail search's and at w = 4 and 8 at or above the floor of the box's tables; for the active-S-box counter, equal to the exhaustive minimum; a bound without a passed cross-check does not count, and `d4_choice.py` uses none |
 | `budget` | hours used, a timing that a reproduction reports only (section 1), and the cap; only a proven result gives a `bound` (R12), and a capped or timed-out search has `status` `inconclusive` and no `bound` |
 
 A bound from a tool not yet validated never counts; a trail it finds is an unverified hypothesis
@@ -471,8 +475,10 @@ characteristic that a search of Π returns with its weight is one, written besid
 downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
 and value, or the `owner-provided` entry of a value the owner provides, written by the
 owner with `scripts/owner_record.py owner-provided` and Approved in its own
-Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind`
-(word width, operation set and kind of model; R12), `known_result` (paper,
+Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind` (the word widths its
+known results cover, the operation set and the kind of model; a search's results count only at a
+width so covered, the ARX search's at w = 16 from SPECK32 and at w = 32 only once it re-finds a
+known result at 32-bit words, and the cross-checks never widen a kind; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
 known result fixed before the tool's first validation, with its source and its provenance-log entry,
 section 14, or `none`, which the first validation record states), `found`, `outcome`
@@ -487,10 +493,11 @@ same kind and of the tool's exact hash exists.
   deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
   S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; the planted torus
   symmetries of the stated lists at n = 3 and 4 found, and none on the list without one; each
-  structural tool's counts and matrices, entry by entry; the avalanche test's three
-  planted results, the bits that fire matching each stated set bit for bit
-  at every round count tested; the degree derivation's count by the rule,
-  exactly, with the exact degree from the truth table reported beside it and the upper bound at
+  structural tool's counts and matrices, entry by entry; the avalanche test's three planted results,
+  the bits that fire matching each round count's expected set bit for bit at every round count from
+  1 to its variant's R; the degree derivation's count by research R13's bottom-up rule, exactly, on
+  a stated list at w = 4 holding an ARX-box spread over two phases and a bitwise S-box, with the
+  exact degree from the truth table reported beside it and the upper bound at
   least that degree, and its hand-derived inside-out count; R5's counts; and FUT-SEC-8's
   three seeds and its vector check. A measured fraction, such as S13's 41%
   and 32% or S14's bit frequencies, matches when the tool's count lies in the binomial interval
@@ -504,23 +511,30 @@ same kind and of the tool's exact hash exists.
   Results of the failed version never count; results already counted from an earlier validated
   version stand, since they cite its hash.
 - **The bias test** (R4): S14's bias re-found on `phyco-v2`, and, on each of two families of 100
-  sets of synthetic binomial counts with one bit planted at the 90%-power biases, a firing in 82 to
-  97 of the family's 100 sets: class 5 of section 2, j = 0…99, and the second family, a known result
+  sets of synthetic binomial counts with one bit planted at the 90%-power biases, a firing of the
+  planted bit in 82 to 97 of the family's 100 sets, a set counting only when its planted bit fires,
+  with at most 3 of them holding a firing of an unplanted bit, each reported with its set,
+  position and count, more making the validation `not re-found` (research
+  R4): class 5 of section 2, j = 0…99, and the second family, a known result
   added, j = 100…199, drawn the same way, each set planting its bit at position ⌊(j − 100)·S/100⌋,
   so that the planted bits spread over all S bits, both sets and both directions (research R4). The
   sets are local-only (section 1, `outputs`) and never replaced; the record commits each set's
   SHA-256 (section 2), the numpy version and a per-set summary, the planted bit's count and every
-  fired bit, so a fresh clone recomputes both 82-to-97 verdicts from committed files and a
+  fired bit, so a fresh clone recomputes both families' verdicts from committed files and a
   regeneration checks every count. A later draw must reproduce every hash in an environment with
   that numpy version, and a draw that differs is reported and counts for nothing; after an approved
   numpy upgrade the old record stays the validation in the old environment, and a new validation, a
-  new record, decides in the new one: outside 82 to 97 in either family the tool is unvalidated
-  there, its results `not evaluated`, until a defect is found and fixed.
-- **The avalanche test** (R4): R13's three planted results re-found, one per path: the planted gap
-  only if, at every round count tested, every difference bit of the unmixed lane fires
-  and no other bit does, bit for bit against the stated set, and the key
-  and nonce bits that never reach a stated lane and the lane that commutes
-  with word rotation, each flagged exactly; its verdict function, applied to
+  new record, decides in the new one: outside 82 to 97, or with more than 3 sets holding an
+  unplanted firing, in either family the tool is unvalidated there, its results `not evaluated`,
+  until a defect is found and fixed.
+- **The avalanche test** (R4): R13's three planted results re-found, one per path, each at every
+  round count from 1 to its variant's R against that round count's expected set, the planted bits
+  and every bit that the exact dependency matrices show independent of the flipped bit at that round
+  count, and only if exactly that set fires, bit for bit: for the flip set the difference bits of
+  the unmixed lane, a lane that no update writes, which others may read; for the related-key and
+  related-nonce set the stated lane's bits for the stated key bit and nonce bit that never reach it;
+  and for the rotational pairs the bits of the lane that commutes with word rotation, these two with
+  their sets from their own dependency matrices; its verdict function, applied to
   every count 0 to N_a of one difference bit, fires exactly on the counts at or beyond the two
   critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
   computed exactly from the binomial distribution, is at least 0.9. One record per size covers the
@@ -530,11 +544,13 @@ same kind and of the tool's exact hash exists.
   (section 1, Record files), once per candidate and tool version, charged
   to its trail row; a failed one is a tool defect. Each lists, for every r
   from 1 to the largest at which the exhaustive computation finishes within its 8 h cap, the tool's
-  value and the exhaustive one, which must be equal: the ARX search's optimal single-trail weight
-  over r rounds of the box against the best product of one-round table entries over r rounds, one
-  round equalling the table's best entry, and the active-S-box counter's minimum over r rounds at
-  4×4 against the exhaustive minimum from the nonlinear layer's tables. A trail weight above a
-  differential's weight, as clustering gives, is expected and not compared. They run first in the
+  value beside the exhaustive ones: for an ARX-box, at w = 4 the optimal single-trail weight over r
+  rounds of an exhaustive search over the box's internal trails, run by the exhaustive-tables tool,
+  which the ARX search's must equal, and at w = 4 and 8 the best product of one-round entries of the
+  box's exhaustive tables over r rounds, a floor, since a table entry sums every trail through the
+  box's internal additions, below which no result of the search may lie; and for the
+  active-S-box counter, the exhaustive minimum over r rounds at 4×4 from the
+  nonlinear layer's tables, which its minimum must equal. They run first in the
   candidate's trail row, on the first amounts of its space in tie order, and again on the
   chosen amounts scaled to w = 4 and 8 (research R7, R12). The validations on
   published values stay validation records, charged to no candidate.
@@ -726,7 +742,12 @@ every file sits in the one directory `vectors/phyco-v3/`, with no directory per 
 **Generator runs** (FR-061). Each run of `gen_constants_v3.py`, `gen_vectors_v3.py` or
 `gen_constructed_v3.py` writes, beside its sidecar entry, a `generator-run` record,
 `generator-runs/<record_id>.json`, with the common fields of section 1 and each written file's path
-and SHA-256, which its reproduction compares in memory (section 1, Reproduction).
+and SHA-256, which its reproduction compares in memory (section 1, Reproduction). The exception is
+`gen_constants_v3.py --candidate ID --variant VARIANT`, run before the freeze: it writes that
+candidate's table for the variant (n, w, R), with each call type's stream where its streams are
+distinct, as `research/004/candidates/<id>/constants/<variant>.json`, `<variant>` being the variant
+ID's part after the design, and a `generator-run` record holding each table's path and SHA-256 and
+each check's verdict, and adds no sidecar entry; after the freeze it exits 2 (research R15).
 
 **Generator checks** (SC-009). `--check` writes a `generator-check` record,
 `generator-checks/<record_id>.json`, with the common fields of section 1 (FR-061), each generated
@@ -759,7 +780,9 @@ copy against its manifest hash and its live source (SC-012).
   version, from its header, which holds its title, the disclaimer and the version line and
   nothing else, `create` exiting 2 on any other header line); `rationale.md`,
   versioned with it and carrying the same version; `phycoweb/model_v3.py`;
-  `phycoweb/constants_v3.py`, with its table per supported (n, w); `phycoweb/selftest_v3.py`
+  `phycoweb/constants_v3.py`, with its table per supported (n, w), which `create`
+  checks, exit 2 otherwise, to equal the selected candidate's tables at each
+  supported (n, w) and its final R (research R15); `phycoweb/selftest_v3.py`
   (section 11); every vector file, including the constructed-state vectors, the constant tables
   beside them and the sidecar `MANIFEST.json`, frozen with them as the record of the runs that
   produced them (section 11); the scripts that generate the constants and the vectors; the selected
