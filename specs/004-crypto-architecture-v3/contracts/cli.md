@@ -108,7 +108,10 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   or "Owner design review <k>" (k = 2, 3, …), and a guard that reads such a family reads its row
   with the highest k, which must name by path and SHA-256 what the run cites: the latest
   demonstration record (Order of US1), or the chapter's version and the design document's version
-  with the latest selection record (`design_freeze.py create`). A guard opens on Approved alone,
+  with the latest selection record (`design_freeze.py create`). L1 is recorded
+  again after a later row of either review family in "L1 recorded <k>", which
+  names the highest-k row of each family, and `check_claims.py` reads the
+  "L1 recorded" row with the highest k. A guard opens on Approved alone,
   except that `design_freeze.py create` also takes done or "not arranged" on the external review's
   row and `round_rule.py --select` takes "Not needed" on the "D4 tie" row (data model §17).
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
@@ -642,8 +645,10 @@ checklist-choices.md and, once written, tasks.md among them, and it scans every
 Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`,
 the checklists and checklist-choices.md included, README, security.md, and the comments and
 docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
-of the register, with its reason (data model §15). It reads the spec's Review & Approval row "L1
-recorded" as committed at HEAD (Approvals, above), and a register that gives `phyco-v3` a level
-above L0 while that row does not read Approved is a finding. Exit 1 on any finding (SC-018).
+of the register, with its reason (data model §15). It reads the spec's Review & Approval rows "L1
+recorded" and "L1 recorded <k>" and those of the FUT-SEC-8 result review and the security-target
+review as committed at HEAD (Approvals, above), and a register that gives `phyco-v3` a level above
+L0 is a finding unless the "L1 recorded" row with the highest k reads Approved and names the
+highest-k row of each review family, both Approved. Exit 1 on any finding (SC-018).
 `tests/test_claims.py` runs it. It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).

@@ -863,13 +863,17 @@ review adds a review entry for each, so that the frozen text carries no status (
 
 One entry per model ID (`float-v0`, `lut-v1`, `phyco-v2`, `phyco-v3`): `claim_level` (L0…L6, the
 ladder of security.md §15), `in_progress`, `claim` (`no claim`), `bound` (for example "at most 64
-bits" for `phyco-v2`), `evidence` (record paths), `updated`. `phyco-v3` starts at L0 and moves to L1
-only when the spec's "L1 recorded" row reads Approved, after the FUT-SEC-8 result review and the
-security-target review, security.md §15's L1 gate since version 2.13 (FR-012); `check_claims.py`
-reads that row at HEAD and fails, exit 1, while `claim_level` is above L0 and the row does not read
-Approved. The spec approval recorded no level.
+bits" for `phyco-v2`), `evidence` (record paths), `updated`, `history` (each earlier level with its
+dates and the rows it rested on). `phyco-v3` starts at L0 and moves to L1 only when the spec's "L1
+recorded" row, or "L1 recorded <k>" with the highest k, reads Approved and names the highest-k row
+of the FUT-SEC-8 result review and of the security-target review, both Approved, security.md §15's
+L1 gate since version 2.13 (FR-012); `check_claims.py` reads those rows at HEAD and fails, exit 1,
+while `claim_level` is above L0 and they do not. The spec approval recorded no level.
 
-- `claim_level` keeps the highest level reached (L0 or L1 in this feature). `in_progress` names
+- `claim_level` holds the level whose gate holds at HEAD (L0 or L1 in this feature): a
+  later row of either review family makes L1 lapse, the register returning to
+  L0, until "L1 recorded <k>" records it again, and `history` keeps each
+  earlier level with its dates and the rows it rested on. `in_progress` names
   a level started and not reached, L2, with its start date and "not reached". The claim test checks
   that no document states a level above `claim_level`, and refuses a value outside L0…L6.
 - `fut_sec`, for `phyco-v3`: each FUT-SEC requirement's status in the terms of the spec's
@@ -941,7 +945,8 @@ owner's action.
 - **Claim level of `phyco-v3`**: `claim_level` L0 now; L1 once its gate has passed after the
   review of FUT-SEC-8 and of the security-target chapter (FR-012), recorded in the Review & Approval
   row "L1 recorded", which the owner sets and commits and `check_claims.py` reads at HEAD
-  (section 15). While any theorem the mode chapter uses is "unverified" (R10),
+  (section 15); back to L0 while a review held again is pending, until a row "L1 recorded <k>" names
+  the later reviews. While any theorem the mode chapter uses is "unverified" (R10),
   that row reads "blocked" and names the missing paper. L0 needs no row. L2 is never
   `claim_level` in this feature: `in_progress` names it from the first counted trail-bound
   record, with its start date and "not reached". Every level carries "no claim".
@@ -957,15 +962,17 @@ owner's action.
   document (section 1), so a later draft does not make an earlier record differ.
 - **Gates** (spec Review & Approval table): a row's Decision is `_pending_`, Approved or Declined,
   for every gate; also "Not needed" for the "D4 tie", "Selection tie" and "Selection tie <k>" rows,
-  done or not arranged for the external design review, and blocked, naming the missing paper, for
-  "L1 recorded". A row goes from `_pending_` to another of its values, with date and notes; one row
+  done or not arranged for the external design review, and blocked, naming
+  the missing paper, for "L1 recorded" and "L1 recorded <k>". A row goes
+  from `_pending_` to another of its values, with date and notes; one row
   per download approval. Each guard opens on Approved alone, except that `design_freeze.py create`
   also takes done or not arranged on the external review's row, and `round_rule.py --select` "Not
   needed" on the "D4 tie" row. A Declined gate ends in one of the outcomes the note under the spec's
   table states for it, logged with its reasons, and a gate held again is a row of its own,
   "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>" (k = 2,
   3, … in order), naming what it reviews by path and SHA-256; each guard reads its family's row with
-  the highest k at HEAD.
+  the highest k at HEAD, and L1 is recorded again in "L1 recorded <k>" once the later review rows
+  read Approved.
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
   or a fired control; `blocked` while a gate it needs is pending; otherwise the computed verdict.
 

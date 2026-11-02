@@ -240,7 +240,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
 | Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
-| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The owner sets this row and commits it, and `check_claims.py` reads it at HEAD and fails, exit 1, while the register gives `phyco-v3` a level above L0 and the row does not read Approved (FR-069) |
+| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register gives `phyco-v3` a level above L0 unless that row reads Approved and names the highest-k row of each review family, both Approved (FR-069) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
@@ -270,8 +270,10 @@ tie and each "Selection tie <k>" of a later selection record, read the same way
 by `design_freeze.py create`; the Security-target review and each "Security-target review <k>", the
 Owner design review and each "Owner design review <k>", and the External design review, read by
 `design_freeze.py create` in the rows held for the candidate that the latest selection record
-selects; L1 recorded, read by `check_claims.py`, which fails, exit 1, while the register gives
-`phyco-v3` a level above L0 and the row does not read Approved; each "Log repair <n>",
+selects; L1 recorded and each "L1 recorded <k>", read by `check_claims.py` in
+the row with the highest k, which fails, exit 1, while the register gives
+`phyco-v3` a level above L0 unless that row reads Approved and names the
+highest-k row of each review family, both Approved; each "Log repair <n>",
 read by `repair_log.py`; each "Environment record <n>", read by the evidence scripts' environment
 guard (cli contract, "Environment"); each "Owner-provided value <n>", read by `validate_tool.py`'s
 source guard; and the Second transcription go-ahead, read by the test of the
@@ -306,7 +308,11 @@ SHA-256: the demonstration record, the chapter's version, or the design document
 selection record. Each guard reads the row of its family with the highest k at HEAD, which must
 review what the guard's run cites (cli contract, "Approvals"). A row's Decision holds one of the
 values data-model §17 lists for it, and each guard opens only on the values that section names for
-it.
+it. L1 rests on two of these families: "L1 recorded" names the FUT-SEC-8 result review's and the
+security-target review's rows it rests on, by family and k, and once a later row of either family is
+added, L1 is recorded again in a row of its own, "L1 recorded <k>", k = 2, 3, … in order, when the
+later rows read Approved, naming them; until then the register keeps `phyco-v3` at L0 (FR-012,
+FR-069).
 
 This table is the source of the feature's status. The Status line at the top of this spec names
 every round of checklist choices the table holds, with its state, and the Status of
@@ -828,8 +834,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   edge case on it states: another theorem of research R10's list, in a new
   version reviewed again, or a stop. The L1 gate of security.md §15 reads
   "FUT-SEC-8 result review and security-target review" (version 2.13), and L1 is recorded in a row
-  of its own, "L1 recorded", once both reviews read Approved, a row the owner sets and the
-  claim test reads at HEAD (FR-069); that row reads "blocked", naming the
+  of its own, "L1 recorded", once both reviews read Approved, naming the two review rows by family
+  and k with what each reviewed, a row the owner sets and the claim test reads at HEAD (FR-069); a
+  later row of either review family makes it lapse, and L1 is then recorded again
+  in a row "L1 recorded <k>" once the later rows read Approved (the notes under
+  the Review & Approval table); each such row reads "blocked", naming the
   missing paper, while any theorem the mode chapter uses is "unverified" (research R10). The spec
   approval of 2026-11-01 started the design work and recorded no level, so the register keeps
   `phyco-v3` at L0 until "L1 recorded" reads Approved. For L1, FUT-SEC-4 is met by statement, since
@@ -838,7 +847,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   research R4's first-order related-key and related-nonce differences, whose records the
   security-target review cites, so that nothing remains to measure, and stays open for feature 005's
   analysis (FR-049); the register records the same split. The register's `claim_level` holds the
-  highest level reached (L0 or L1), and a separate `in_progress` field names L2 with its start date,
+  level whose gate holds at HEAD (L0 or L1), so that it returns to L0 while a review held
+  again is pending, with each earlier L1 and its dates kept in the entry's
+  `history`, and a separate `in_progress` field names L2 with its start date,
   that of the first counted trail-bound record, and "not reached"; the claim-register test checks
   that no document states a level above `claim_level`.
 
@@ -2394,8 +2405,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   claim level, its claim or "no claim", its bound and its evidence records (D10). An automated test
   MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the register,
   that hand-written documents carry the disclaimer of FR-068, the checklists and tasks.md among
-  them, and that the register gives `phyco-v3` no level above L0 while the Review &
-  Approval row "L1 recorded" does not read Approved at HEAD, and MUST report any
+  them, and that the register gives `phyco-v3` no level above L0 unless the Review & Approval
+  row "L1 recorded" with the highest k reads Approved at HEAD and names the
+  highest-k row of each review family, both Approved, and MUST report any
   use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
   feature-003 T041). Its scope is every document of this feature, that is every Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the checklists and
