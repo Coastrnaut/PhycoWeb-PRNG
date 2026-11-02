@@ -288,21 +288,28 @@ scripts/
 
 tests/
 ├── test_devinputs_v3.py
-├── test_ir.py
+├── test_ir.py                # proper colouring at every odd n from 3 to 15 (FR-018); the phase
+│                             # rule on every list at every size (FR-019)
 ├── test_costmodel.py
-├── test_tools_004.py         # tool validations on known results
+├── test_tools_004.py         # tool validations on known results; their order and hashes (FR-039);
+│                             # critical_counts.json only appended to (data-model §5)
 ├── test_seed_search.py       # WSL; skips on Windows
 ├── test_model_v3.py          # FR-058's list, refusals, call sequences
 ├── test_vectors_v3.py
-├── test_v3_transcription.py  # model against tests/v3_reference.py, step by step
+├── test_v3_transcription.py  # model against tests/v3_reference.py, step by step;
+│                             # the second transcription's provenance (FR-057)
 ├── v3_reference.py           # second transcription, separate session (FR-057)
 ├── test_protocol_004.py      # candidate log and its lock, budgets, size order, stop rule, freeze;
 │                             # no key loaded into any state before the FUT-SEC-8 review (FR-001);
 │                             # every seed-set load is dev-only (FR-040);
-│                             # the two log writers' refusals (FR-044, FR-067)
+│                             # the two log writers' refusals (FR-044, FR-067); the first list
+│                             # of approvals and the guards agree both ways; the three status
+│                             # lines agree; the heavy-run lock's coverage (FR-045)
 ├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
-│                             # mark of every hashed path (FR-053)
+│                             # mark of every hashed path, each code_sha256 entry against its blob
+│                             # and the header of every committed .gz (FR-053); the re-check's
+│                             # imports (FR-065)
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
@@ -339,8 +346,9 @@ reports/004-crypto-architecture-v3/
 **Structure Decision**: extend the single project. Feature-002 and feature-003 files are used
 read-only: `phycoweb/model_v2.py`, `protocol/seedsets.py` for the FUT-SEC-8 targets, the golden
 vectors and `fast/lut_table.h`. `fast/phyco_stream.c`, `fast/Makefile` and the built
-`fast/build/phyco_stream` stay untouched, because the feature-003 freeze hashes the stream's
-source and binary.
+`fast/build/phyco_stream` stay untouched, because the feature-003 freeze hashes the stream's source
+and binary. Each test that a requirement names has its file in the tests tree above, and tasks.md
+takes each from there.
 
 ## Phases and gates (for /speckit-tasks)
 

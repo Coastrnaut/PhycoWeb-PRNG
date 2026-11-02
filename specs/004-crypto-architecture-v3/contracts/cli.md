@@ -465,8 +465,9 @@ runs with `git_dirty` false and writes the record as `draft`; (3) the owner runs
 writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others
-`rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the verdict
-scripts, both freeze files, every evidence record behind R by ID and by SHA-256, and the last `seq`
+`rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the
+verdict scripts, `validate_tool.py` and `fut_sec8.py` among them, both freeze
+files, every evidence record behind R by ID and by SHA-256, and the last `seq`
 and line SHA-256 of the candidate log, the provenance log and the protocol change log. The freeze's
 code is `protocol/design_freeze.py`, with create, approve and validate as functions, and this script
 is the command that calls it, as the other scripts call `protocol/evidence.py`; the record hashes
@@ -503,7 +504,12 @@ recheck_004.py --reproduce RECORD
 ```
 
 Recomputes every verdict of the feature from saved outputs (FR-065) and compares it with the
-recorded one. Exit 1 on any disagreement, with each listed. Every verdict is recomputable on a
+recorded one. Its kinds are those of FR-065's list: the demonstration; the tool validations and
+re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
+uniform-control, symmetry, invariant, degree and bound checks; the D4 choice; the check of generated
+files on each platform; the size profile's generic-bound checks and the bound at the limits;
+eligibility and selection, each recomputed from committed counts by exact arithmetic. Exit 1
+on any disagreement, with each listed. Every verdict is recomputable on a
 fresh clone from committed files, so it works from the committed per-round summaries, for
 example R_f from the per-round flag "every output bit depends on every input bit". Where
 local-only outputs are present, it also re-derives each committed summary from them. Its output

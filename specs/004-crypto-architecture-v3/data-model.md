@@ -797,10 +797,11 @@ copy against its manifest hash and its live source (SC-012).
   beside them and the sidecar `MANIFEST.json`, frozen with them as the record of the runs that
   produced them (section 11); the scripts that generate the constants and the vectors; the selected
   operation list; `research/004/ir.py` with its tools; and the scripts that compute verdicts:
-  `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`,
-  `protocol/devinputs_v3.py` and `protocol/evidence.py`; the freeze's code,
-  `protocol/design_freeze.py`, and its command, `scripts/design_freeze.py`; and the security
-  target's files `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
+  `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
+  `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
+  `protocol/evidence.py`; the freeze's code, `protocol/design_freeze.py`, and
+  its command, `scripts/design_freeze.py`; and the security target's files
+  `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
   every one of which must be `verified`, with each precondition marked met, marks that count only
   under an Approved security-target review row (section 10; research R10).
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence

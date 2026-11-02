@@ -1902,8 +1902,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   hold the SHA-256 of the design document, `rationale.md`, the model, the vectors (constructed-state
   vectors included), the scripts that generate the constants and the vectors, the selected operation
   list, `research/004/ir.py` with its tools, and the scripts that compute verdicts
-  (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`,
-  `protocol/devinputs_v3.py`, `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py`
+  (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
+  `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py`,
+  `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py`
   and its command `scripts/design_freeze.py`; the security target's files `parameters.json`
   and `limits.json`, with each theorem's status; R with every input of the round rule and every
   evidence record behind R, by ID and by SHA-256; the last `seq` and line SHA-256 of the candidate
@@ -2110,7 +2111,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     reproducibility that blocks no candidate, since a p-value decides nothing. The
     verdict is recomputed under the spec version, the research version and the protocol change-log
     entry the original cites, and a reproduction runs in the environment that made the original, as
-    recorded (research R1).
+    recorded, a `recheck` record's reproduction excepted, which runs anywhere, as the re-check does
+    (research R1).
   - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
     The model hash is that of the candidate's operation list before selection and that of
     `model_v3.py` after it. Code is committed before every evidence run; `git_dirty` may be true for
@@ -2132,23 +2134,25 @@ freeze hashes and the baseline manifest; run the claim-register test.
     is recorded is hashed over its raw bytes and MUST have a pinned line ending in
     `.gitattributes` (LF, or `binary`), so that its raw and normalized content agree on every
     checkout: `reports/004-crypto-architecture-v3/**`, `research/004/**` and `protocol/*.json` are
-    pinned to LF, and `*.gz` to `binary`. Files
-    committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`, and
-    `protocol/evidence.py` refuses any other suffix there. Every `.gz` file this feature writes is
-    written by `gzip.compress(data, compresslevel=9, mtime=0)`, and its record also holds the
-    SHA-256 of the uncompressed content, which a reproduction compares for every `.gz` file but a
-    `p_values` file, whose values it compares instead (data-model §1). A test checks the header of
-    every committed `.gz` file under this feature's paths (`reports/004-crypto-architecture-v3/`,
-    `research/004/`, `vectors/phyco-v3/` and `baseline/phyco-v2/`); feature 003's `.gz` files,
-    listed with their hashes in its `SHA256SUMS`, are outside its scope and stay unchanged.
-    An existing `text=auto` file that a new record hashes, such as `security.md` or `README.md`,
-    is hashed over its LF-normalized content, and no existing pin changes. The CRLF-pinned
-    freeze records of features 002 and 003 keep their recorded hashes over CRLF bytes. A test
-    lists every path whose hash a committed record, manifest or freeze record holds and checks
-    with `git check-attr text eol` that each has an explicit rule or `binary`, or that its
-    record marks the hash `lf-normalized`; it replaces the one-off check of 2026-10-31 and runs from
-    plan phase 1 on, so that a path missed later fails it as soon as the first record that cites it
-    is committed.
+    pinned to LF, and `*.gz` to `binary`. Files committed under
+    `reports/004-crypto-architecture-v3/` are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt`
+    and `.gz`, and `protocol/evidence.py` refuses any other suffix there, as research R16 and the
+    data-model introduction state; `research/004/**` holds the plan's Python code beside files of
+    those suffixes, and `protocol/*.json` JSON only, each pinned to LF as above. Every `.gz` file
+    this feature writes is written by `gzip.compress(data, compresslevel=9, mtime=0)`, and its
+    record also holds the SHA-256 of the uncompressed content, which a reproduction compares for
+    every `.gz` file but a `p_values` file, whose values it compares instead (data-model §1). A test
+    checks the header of every committed `.gz` file under this feature's paths
+    (`reports/004-crypto-architecture-v3/`, `research/004/`, `vectors/phyco-v3/` and
+    `baseline/phyco-v2/`); feature 003's `.gz` files, listed with their hashes in its `SHA256SUMS`,
+    are outside its scope and stay unchanged. An existing `text=auto` file that a new record hashes,
+    such as `security.md` or `README.md`, is hashed over its LF-normalized content, and no existing
+    pin changes. The CRLF-pinned freeze records of features 002 and 003 keep their recorded hashes
+    over CRLF bytes. A test lists every path whose hash a committed record, manifest or freeze
+    record holds and checks with `git check-attr text eol` that each has an explicit rule or
+    `binary`, or that its record marks the hash `lf-normalized`; it replaces the one-off check of
+    2026-10-31 and runs from plan phase 1 on, so that a path missed later fails it as soon as the
+    first record that cites it is committed.
   - **Encoding.** Every new text file is UTF-8 without a byte-order mark, with LF line endings.
     Scripts write with `encoding="utf-8"` and `newline="\n"`, the line-ending test also looks
     for a byte-order mark, and no hashed file is written by Windows PowerShell 5.1, whose
@@ -2321,10 +2325,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   holding the `seq` of the entry it follows and the SHA-256 of the section text reviewed, and the
   latest entry for that path and section gives the status, so that no entry changes; the frozen text
   carries no status (FR-034, FR-067).
-- **FR-065**: Every verdict of this feature (the demonstration; the inverse, bijectivity,
-  dependency, bias, symmetry, invariant and bound checks; the check of generated files on each
-  platform; the size profile's generic-bound checks and the bound at the limits; eligibility and
-  selection) and every record's classification (FR-060) MUST be computed by code from saved outputs
+- **FR-065**: Every verdict of this feature (the demonstration; the tool validations and
+  re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
+  uniform-control, symmetry, invariant, degree and bound checks; the D4 choice; the
+  check of generated files on each platform; the size profile's generic-bound
+  checks and the bound at the limits; eligibility and selection) and every
+  record's classification (FR-060) MUST be computed by code from saved outputs
   and be recomputable by a re-check script, never taken from a narrative (security.md §16.1). No
   phase, test or gate MAY be recorded as passed because its documents exist; where evidence is
   missing, the status MUST be "not evaluated", "inconclusive" or "blocked" (security.md §16.3). The

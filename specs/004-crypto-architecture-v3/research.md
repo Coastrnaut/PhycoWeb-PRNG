@@ -1534,6 +1534,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`: raw
     counts and p-values are JSON or gzip-compressed JSON, never `.npy`, and a solver's log is
     `.txt`, since `*.log` is ignored; `protocol/evidence.py` refuses any other suffix there (R18).
+    The limit governs that directory only: `research/004/**` holds the plan's Python code beside
+    files of those suffixes, and `protocol/*.json` JSON only, each pinned to LF (R18; FR-053).
   - Records up to 10 MB, compressed with gzip, are committed. Larger outputs, such as full
     dependency matrices at 16×16 (about 32 MB per round and direction) and the synthetic sets of the
     bias test's validation (8,601,600 counts, about 60 MB as text; R3, R4), stay local, under
@@ -1631,14 +1633,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     compared by its `uncompressed_sha256`. Its verdict is recomputed under the spec version, the
     research version and the protocol change-log entry the original cites
     (`spec-versions/<sha256>.md`, `research-versions/<sha256>.md`), so a later change cannot alter
-    it, and it runs in the environment that made the original, as recorded, and in no other (R1).
+    it, and it runs in the environment that made the original, as recorded, and in no other, a
+    `recheck` record's reproduction excepted, which runs anywhere, as the re-check does (R1).
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
     test reproduces, per kind, its latest light run and, where one exists, a light run made before
     the last change to its code (R7), and leaves out, each with its reason, the claim test, which
     writes no record and runs as a test, a `lock-cleared` record, which records an event, a tie
     choice, an owner's own act, and the reproduction records, which are not reproduced.
-  - `scripts/recheck_004.py` recomputes every verdict from the saved outputs and compares it with
-    the recorded verdict (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
+  - `scripts/recheck_004.py` recomputes every verdict from the saved outputs, of every
+    kind FR-065 lists, the tool validations, the cross-checks between kinds
+    and the D4 choice among them, and compares it with the recorded verdict
+    (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
     committed files, so the committed per-round summaries must suffice, for example R_f from the
     per-round flag "every output bit depends on every input bit". Local-only outputs serve only
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
@@ -1779,7 +1784,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     stored as binary, so none changes, and R16's header test leaves them out.
     `research/004/** text eol=lf` and `protocol/*.json text eol=lf` follow the reports line, before
     the `*.hex`, `*.bin` and `*.gz` lines, so that those keep precedence; they were added when the
-    second re-run's choices were applied (2026-11-01), while neither path held a file.
+    second re-run's choices were applied (2026-11-01), while neither path held a file. The suffix
+    limit above governs the reports directory only (R16): `research/004/**` holds the plan's Python
+    code beside files of those suffixes, and `protocol/*.json` JSON only, each pinned to LF by these
+    lines.
   - **Hashes and pins.** A new record or the review package hashes an existing `text=auto` file
     over its LF-normalized content and says so (`lf-normalized`, R16), so the hash is the same
     on every checkout, and no existing file's pin changes. A test lists every path whose hash a
