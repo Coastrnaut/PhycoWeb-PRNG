@@ -648,6 +648,42 @@ and an item is ticked only under the rule in the Notes below.
   [Consistency, Spec §FR-053, §FR-065; research R1, R16; data-model §1 "Reproduction"; cli contract
   `recheck_004.py`]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK074 Is it stated what a disagreement of the re-check blocks, given that FR-065, research
+  R16 and data-model §18 say only that "a disagreement in either is reported", the cli contract has
+  `recheck_004.py` exit 1 "on any disagreement, with each listed", data-model §1 classifies every
+  `recheck` record `none`, and `round_rule.py` reads "the `reproduction` records of the candidate's
+  records", not the `recheck` records, so that a verdict the re-check cannot recompute from saved
+  outputs leaves the candidate's eligibility and the record's classification as they were? Is a
+  disagreement under the rules in force at a record's entry stated to block the candidate as a
+  differing reproduction does (`unverified hypothesis`, `blocked`), and one under a later stricter
+  change stated to apply as that change's recomputed verdict, as `results_known` records it
+  (data-model §18)? Are the two lists of tool defects, the spec's Edge Cases and research R7's,
+  aligned on the re-check's disagreement and on the failed cross-check between kinds, which R7 lists
+  and the Edge Cases leave out, and is the rule that makes a differing reproduction a tool defect
+  "since it ran in the environment that made the original" stated for a `recheck` record's
+  reproduction, which runs anywhere? [Gap, Conflict, Spec §FR-060, §FR-065, §Edge Cases "A run is
+  suspected of a tool defect"; research R7, R16; data-model §1 "Classification", "Reproduction",
+  §18; cli contract `recheck_004.py`, `round_rule.py`]
+- [ ] CHK075 Does `fut_sec8.py --reproduce` take the owner's request that every heavy reproduction
+  needs, given that FR-045 and FR-053 run a heavy reproduction only on the owner's request, quoted
+  with its date in its record, that the cli contract's introduction runs it "only with
+  `--owner-request "WORDS (DATE)"`", exiting 2 without one, taking the lock, projecting first and
+  charging research R7's feature-wide row, and says that "`fut_sec8.py --reproduce` is this mode for
+  the demonstration, under the conditions of its section", while that section's synopsis,
+  `fut_sec8.py --reproduce RECORD --binary fast/build/seed_search`, has no `--owner-request`, the
+  section says only that it "re-runs the sweep as a heavy run" after the FUT-SEC-8 result review,
+  and data-model §4 gives `owner_request` only to a repeat after a tool defect? Are the synopsis,
+  the section and data-model §4 aligned with the introduction, so that a reproduction of the sweep,
+  about 2³² × 257 steps per target, never starts without the owner's request? [Consistency, Spec
+  §FR-045, §FR-053; research R7; data-model §1 "Reproduction", §4; cli contract "Reproduction",
+  `fut_sec8.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
