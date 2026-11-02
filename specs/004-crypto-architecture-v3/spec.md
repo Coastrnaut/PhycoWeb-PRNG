@@ -275,8 +275,8 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
 | Security-target review (the design document's chapters "Security target" and "Mode", with the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
-| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows (FR-069) |
-| External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names nothing |
+| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, with every hash those review rows name matching the file at HEAD, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows, and its return to L0 after a change to what those rows reviewed in the commit that makes the change, or right after an owner's commit that makes it (FR-069; SEC-079) |
+| External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names the latest selection record, by path and SHA-256, when it is written. Each row of this family names the selection record it applies to, a done row through its manifest, which carries that record, and a "not arranged" row by naming the latest selection record when it is written; `design_freeze.py create` reads the highest-k row that names the latest selection record and exits 2 while none does, so that a new selection record needs a row of its own, done or "not arranged", for the candidate it selects, and a review done for another candidate stays done in its row and is cited, in the freeze record's "External review" and in the final report, for the candidate and the version it read only (SC-013; SEC-078). |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
 
@@ -309,7 +309,8 @@ create` in the rows held for the candidate that the latest selection record
 selects; L1 recorded and each "L1 recorded <k>", read by `check_claims.py` in
 the row with the highest k, which fails, exit 1, while the register's level for `phyco-v3` differs
 from the one those rows give, L1 while that row reads Approved and names the highest-k row of
-each review family, both Approved, and L0 otherwise; each "Log repair <n>",
+each review family, both Approved, with every hash those review rows name
+matching the file at HEAD (SEC-079), and L0 otherwise; each "Log repair <n>",
 read by `repair_log.py`; each "Environment record <n>", read by the evidence scripts' environment
 guard (cli contract, "Environment"); each "Owner-provided value <n>", read by `validate_tool.py`'s
 source guard; the Place check and each "Place check <k>", read by `protocol_change.py create` in the
@@ -363,10 +364,25 @@ FR-069). The agent writes the register's change, `phyco-v3`'s entry in `protocol
 its line in security.md §15, in a commit of its own right after the owner's commit that sets "L1
 recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family, which
 makes L1 lapse, and never before that commit, and `check_claims.py` fails while the register's level
-differs from the one the rows give, in either direction (SEC-076). Once the external design review
+differs from the one the rows give, in either direction (SEC-076). L1 holds at HEAD only while what
+its rows name holds there: `check_claims.py` compares with the files at HEAD each hash named by the
+review rows that the "L1 recorded" row with the highest k names, the chapter's version item by item
+and the demonstration record with its report, and gives L0 while any differs, so that a change to
+the reviewed set makes L1 lapse from the commit that makes it, as a later row does; the agent
+writes the register's return to L0 in that commit, or, where an owner's commit
+makes the change, in a commit of its own right after it, `history` keeping
+the earlier L1 with its dates, its rows and the version reviewed, until "L1
+recorded <k>" records L1 again (SEC-079). Once the external design review
 is done, its row names the review package's manifest it read by SHA-256, and the owner may have
 later changes reviewed in a row of its own, "External design review <k>", which names its manifest
-the same way and which `design_freeze.py create` reads with the highest k (FR-043, FR-063; SEC-077).
+the same way (FR-043, FR-063; SEC-077). Each row of the external review's family names the selection
+record it applies to, a done row through its manifest, which carries that record, and a "not
+arranged" row by naming the latest selection record when it is written; `design_freeze.py create`
+reads the highest-k row that names the latest selection record and exits 2 while none does, so that
+a new selection record needs a row of its own, done or "not arranged", for the candidate it selects,
+and a review done for another candidate stays done in its row and is cited, in the freeze record's
+"External review" and in the final report, for the candidate and the version it read only (SC-013;
+SEC-078).
 
 This table is the source of the feature's status. The Status line at the top of this spec names
 every round of checklist choices the table holds, with its state, and the Status of
@@ -704,8 +720,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   not arranged (security.md §7).
 - **A request exceeds an output limit, or production is asked for a reduced variant**: the
   interface refuses with an error. It never wraps, truncates or carries on silently.
-- **Nonce reuse**: the same key, nonce and personalization string give the same output. This is
-  stated behaviour (T7), not detected, within one object or across objects. No bounded record
+- **Nonce reuse**: the same key, nonce and personalization string give the same output; more
+  generally, under one key and nonce, two instantiations' states agree until the first call or input
+  word that differs takes effect (the personalization string, a request's length, a reseed's input
+  or the order of calls), and the output blocks given while they agree repeat, the design document's
+  chapter "Mode" naming, for each case, which blocks repeat, as it derives them from the mode's
+  calls; the mode's bound covers a repeated nonce only through the collision term of the nonces
+  FR-006 calls "random 128-bit nonces" (research R9), and a nonce the caller
+  repeats by error or by force lies outside it, so that no goal of T7 is
+  claimed for those instantiations (FR-006; SEC-083). This is stated behaviour
+  (T7), not detected, within one object or across objects. No bounded record
   could cover the per-key instantiation limit, other objects or other devices, and the RTL keeps
   no nonce history, so a partial check would make the model differ from the hardware and
   suggest a protection that does not exist. A test shows the stated behaviour (FR-058).
@@ -804,7 +828,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   this limit applies to every key whatever its nonces: one instantiation counter per object, and
   across objects a usage rule (research R9). An optional personalization string MUST have a stated
   maximum length and MUST NOT replace the nonce. The behaviour on a repeated nonce MUST be stated
-  (T7). A keyed reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
+  (T7) for each case: under one key and nonce, two instantiations' states agree until the first call
+  or input word that differs takes effect (the personalization string, a request's length, a
+  reseed's input or the order of calls), and the output blocks given while they agree repeat, the
+  design document's chapter "Mode" naming, for each case, which blocks repeat, as it derives them
+  from the mode's calls; the mode's bound covers a repeated nonce only through the collision term of
+  the nonces this requirement calls "random 128-bit nonces" (research R9),
+  and a nonce the caller repeats by error or by force lies outside it, so
+  that no goal of T7 is claimed for those instantiations (SEC-083). A keyed
+  reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
   size-profile row states s = c/2 as a bound on that variant only, with status `research` and
   "no claim" (FR-032).
 - **FR-007**: The security target MUST specify the maximum output per instantiation (key and
@@ -828,7 +860,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   position of every output block it observes. T4 is adopted as constant time by construction
   (FR-020); power, electromagnetic and fault-injection attacks and the behaviour on reset and
   clock glitches are deferred to feature 008, with the risk stated: a state read by a probe, or
-  changed by a fault, in mid-request exposes that request back to its last forget call. The 128-bit
+  changed by a fault, in mid-request exposes that request back to its last forget call, and a
+  self-test selector held on its constants by a design error or a fault would run every instantiate
+  on the self-test's key, a public development input, in place of the host's, or on
+  nonce 0, with no sign at the ports, a risk that feature 008's tests cover
+  with a key load and an instantiate after a passed self-test, the output
+  differing from the self-test's expected output (FR-059; SEC-082). The 128-bit
   target is a classical one, so against T11 this feature covers only single-target key search, k/2 ≥
   s, which k = 256 meets with equality and no margin at s = 128 (FR-010). Multi-target quantum key
   search, which in some cost models costs about 2^((k − log₂ u)/2) and so falls below 2^s for every
@@ -911,16 +948,28 @@ freeze hashes and the baseline manifest; run the claim-register test.
   research R4's first-order related-key and related-nonce differences, whose records the
   security-target review cites, so that nothing remains to measure, and stays open for feature 005's
   analysis (FR-049); the register records the same split. The register's `claim_level` holds the
-  level whose gate holds at HEAD (L0 or L1), so that it returns to L0 while a review held
-  again is pending, with each earlier L1 and its dates kept in the entry's
-  `history`, and a separate `in_progress` field names L2 with its start date,
-  that of the first counted trail-bound record, and "not reached"; the claim-register test checks
-  that no document states a level above `claim_level`. The agent writes `phyco-v3`'s entry in
-  `protocol/claims.json`, its `claim_level`, `updated` and `history`, and its line in
-  security.md §15's register in a commit of its own right after the owner's commit that sets "L1
+  level whose gate holds at HEAD (L0 or L1), so that it returns to L0 while a review held again is
+  pending, or while a hash its review rows name differs from the file at
+  HEAD (SEC-079), with each earlier L1 and its dates kept in the entry's
+  `history`, and a separate `in_progress` field, `none` before the first counted trail-bound record,
+  names L2 with its start date, that record's date, and "not reached", written by
+  the agent in the commit that writes that record and checked by the claim
+  test against the records at HEAD (SEC-080); the claim-register test checks
+  that no document states a level above `claim_level`. Plan phase 1 creates `phyco-v3`'s entry in
+  `protocol/claims.json` at L0, with "no claim" and `in_progress` `none`, and its line at L0 in
+  security.md §15's register (SEC-081). The agent writes each change that the rows
+  bring to the entry's `claim_level`, `updated` and `history`, and to that
+  line, in a commit of its own right after the owner's commit that sets "L1
   recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family,
   which makes L1 lapse, and never before that commit; the claim test checks the register against
-  those rows both ways (FR-069; SEC-076).
+  those rows both ways (FR-069; SEC-076). L1 holds at HEAD only while what its rows name holds
+  there: `check_claims.py` compares with the files at HEAD each hash named by the review rows that
+  the "L1 recorded" row with the highest k names, the chapter's version item by item and the
+  demonstration record with its report, and gives L0 while any differs, so that a change to the
+  reviewed set makes L1 lapse from the commit that makes it, as a later row does; the agent writes
+  the register's return to L0 in that commit, or, where an owner's commit makes the change, in a
+  commit of its own right after it, `history` keeping the earlier L1 with its dates, its rows and
+  the version reviewed, until "L1 recorded <k>" records L1 again (SEC-079).
 
 **Mode (D1)**
 
@@ -1344,7 +1393,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     error and the codes start at 1, and output-valid stays low until a reset has run the self-test
     (FR-059); feature 008's board wrapper also holds reset after configuration, until the MMCM locks
     and for a stated number of cycles after lock ("Key loading and reset"). `resetting` runs from
-    reset released to the self-test done and the state zeroized. `failed`, after a failed self-test,
+    reset released to the self-test done and the state zeroized, and is the only state in which the
+    self-test's selectors select its constants; every other state selects
+    the interfaces (FR-059; SEC-082). `failed`, after a failed self-test,
     accepts no call until the next reset, with `selftest_fail`, an output of its own, latched. In
     `not-reset`, `resetting` and `failed` the core holds ready low on the command, key-loading and
     absorption interfaces and output-valid low, so no call is accepted and no error code is raised.
@@ -1700,7 +1751,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     only each component's place in the metaphor (FR-030). The hardware structures among them name
     their functional need, and the paths that carry secret data, the key registers, which hold the
     key between instantiates, the key chain and the selectors, also the attack class they meet (no
-    read-back, zeroization), fault attacks staying with feature 008, while the self-test's stored
+    read-back, zeroization), fault attacks staying with feature 008, and the selectors also the risk
+    FR-008 states of one held on its constants (SEC-082), while the self-test's stored
     key, nonce and expected output are development inputs of the frozen vectors and carry no secret;
     the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
     the key registers under the row on the key and nonce chains and the output buffer under the row
@@ -2049,8 +2101,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `versions/` holds; where the design changed after that review, the row stays done for the version
   it names, the freeze record and the final report state that the external review read that earlier
   version, list the design-document versions since and cite the review for that version only
-  (SC-013), and the owner may have the changes reviewed in a row of its own, "External
-  design review <k>", which `create` reads with the highest k (SEC-077). A
+  (SC-013), and the owner may have the changes reviewed in a row of its own, "External design review
+  <k>" (SEC-077). Each row of the external review's family names the selection record it applies to,
+  a done row through its manifest, which carries that record, and a "not arranged" row by naming the
+  latest selection record when it is written; `create` reads the highest-k row that names the latest
+  selection record and exits 2 while none does, so that a new selection record needs a row of its
+  own, done or "not arranged", for the candidate it selects, and a review done for another candidate
+  stays done in its row and is cited, in the freeze record's "External review" and in the final
+  report, for the candidate and the version it read only (SC-013; SEC-078). A
   decline at the owner design review states its reasons and ends in one of: a
   revision of the design document or rationale (same candidate, new version, logged
   under the candidate with its old and new version, review repeated); a fix
@@ -2313,7 +2371,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   lessons table does, and for S2, S5–S7 and S11–S15 the rows of the design
   document's chapter "Replaced mechanisms" with their records), a row in §1.1, a
   validation-phase table like §1.3, the §20.1 decision (recorded in
-  2.11 on 2026-11-01; FR-017), the claim-register entry, the status of roadmap stage 5a.1 and
+  2.11 on 2026-11-01; FR-017), the claim-register entry as it then stands
+  (its line for `phyco-v3` at L0 is added in plan phase 1, in a security.md
+  version of its own; FR-069; SEC-081), the status of roadmap stage 5a.1 and
   a mention in §23. security.md keeps policy, status and registers, and derivations and other
   per-model detail go to research notes or reports (strategy note G16 and §7.1). A finding that
   breaks the target on the full rounds MUST be recorded at once, with a history entry and a
@@ -2471,7 +2531,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   repeated instantiation; long runs; invalid parameters, invalid states and invalid call
   sequences such as generate before instantiate; and every supported configuration. Every
   data-flow direction stated in the design document (FR-027) MUST be tested (checklist group
-  F). The tests also show the stated behaviour on a repeated nonce (edge case "Nonce reuse"),
+  F). The tests also show the stated behaviour on a repeated nonce in each case the
+  model can run, each beside the same calls under the same key and nonce:
+  another personalization string, other request lengths, another order of
+  calls and a reseed with another input (edge case "Nonce reuse"; SEC-083),
   every zeroization path of FR-025 (a refused request, a failed self-test, an exception after
   the state has changed, a call refused at a per-key limit), the refusal of a generate request
   after reset or zeroization until an instantiate completes, and that the key, given once at
@@ -2514,8 +2577,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (HW-077). It feeds the key and nonce chains from its constants through a
   selector at each chain's input, word by word as the host would, the nonce's words for rate lanes
   through the absorption tree's input in the same way, with their cycles in the reset figure
-  (FR-025) and no parallel load path; afterwards the selectors return to the
-  interfaces. Its comparator, r bits wide, takes each whole r-bit block as the output buffer
+  (FR-025) and no parallel load path; afterwards the selectors return to the interfaces. The
+  selectors' control is a function of FR-025's call states: the constants are selected in
+  `resetting` only, and every other state selects the interfaces, so that no call
+  accepted from the host runs on the self-test's constants (SEC-082). Its
+  comparator, r bits wide, takes each whole r-bit block as the output buffer
   receives it, compares it with the matching block of the expected output, stated per claimable size
   from the frozen vectors, and holds the result until the last block; the comparator and the
   expected output's storage are parts of FR-026's estimate. The self-test then zeroizes, both chains
@@ -2686,16 +2752,23 @@ freeze hashes and the baseline manifest; run the claim-register test.
   that hand-written documents carry the disclaimer of FR-068, the checklists and tasks.md among
   them, and that the register gives `phyco-v3` the level the Review & Approval rows give at HEAD, L1
   while the "L1 recorded" row with the highest k reads Approved and names the highest-k row of each
-  review family, both Approved, and L0 otherwise, with security.md §15's line stating the same level
-  and `history` holding every L1 that a later row ended, with its dates and the rows
-  it rested on, so that a register below the rows' level, or one missing a
-  lapsed L1, fails as one above it does (FR-012; SEC-076), and MUST report any
+  review family, both Approved, with every hash those review rows name matching the file at HEAD,
+  the chapter's version item by item and the demonstration record (SEC-079), and L0 otherwise, with
+  security.md §15's line stating the same level and `history` holding every L1 that a later row or a
+  change to the reviewed set ended, with its dates, the rows it rested on and the version reviewed,
+  so that a register below the rows' level, or one missing a lapsed L1, fails as one above it does
+  (FR-012; SEC-076), and that its `in_progress` reads `none` while no counted
+  trail-bound record exists at HEAD and names L2, "not reached", with the
+  first such record's date once one exists (SEC-080), and MUST report any
   use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
   feature-003 T041). Its scope is every document of this feature, that is every Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the checklists and
   checklist-choices.md included, with README and security.md, since FR-051 changes both, and the
   comments and docstrings of every file it adds or changes (`phycoweb/`, `protocol/`, `scripts/`,
-  `research/004/`, `tests/` and `fast/seed_search.c`). In its rules "near" and "beside" mean the
+  `research/004/`, `tests/` and `fast/seed_search.c`). The test runs from plan phase 1 on, as
+  research R18's line-ending test does, so that every document that the security-target review, the
+  owner design review and the review package (FR-063) read has been checked first, and phase 9 runs
+  it again over the final documents (SEC-081). In its rules "near" and "beside" mean the
   same sentence or table row, as they do for "target", and every rule matches whole words, ignoring
   case, with these inflections, each root's forms in full: prove, proves, proved, proving, proven
   and provably; comply, complies, complied, complying, compliant and compliance; conform, conforms,

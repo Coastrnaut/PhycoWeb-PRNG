@@ -858,10 +858,12 @@ copy against its manifest hash and its live source (SC-012).
   protocol change log.
 - **Selection**: the `variant_map` of the `selected` entry (section 3), with the operation
   list's SHA-256.
-- **External review**: the external design review's row, "External design review <k>" with the
-  highest k where one exists, its value, done or not arranged, and for done the review package's
-  manifest SHA-256 and the design-document version it names, with the design-document versions since
-  where the design changed after that review, as the final report states them (spec FR-043, SC-013).
+- **External review**: the row of the external design review's family that `create` reads, the one
+  with the highest k among the rows that name the latest selection record, its value, done or not
+  arranged, the selection record it names, and for done the review package's manifest SHA-256 and
+  the design-document version it names, with the design-document versions since where the design
+  changed after that review, and each review done for another candidate, cited for the candidate and
+  the version it read only, as the final report states them (spec FR-043, SC-013; SEC-078).
 - Tool versions; `git_head`; `git_dirty`, which must be false; `draft_sha256`, written by `create`:
   the SHA-256 of the record's canonical JSON without that field and the approval fields; and
   `status`, `draft` until the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
@@ -944,20 +946,32 @@ dates and the rows it rested on). `phyco-v3` starts at L0 and moves to L1 only w
 recorded" row, or "L1 recorded <k>" with the highest k, reads Approved and names the highest-k row
 of the FUT-SEC-8 result review and of the security-target review, both Approved, security.md §15's
 L1 gate since version 2.13 (FR-012); `check_claims.py` reads those rows at HEAD and fails, exit 1,
-unless `claim_level` is the level they give, L1 while they do and L0 otherwise, security.md §15's
-line states the same level, and `history` holds every L1 that a later row ended, with its dates and
-the rows it rested on, so that a register below the rows' level, or one missing a lapsed L1, fails
+unless `claim_level` is the level they give, L1 while they do and every hash the two review rows
+name matches the file at HEAD, the chapter's version item by item and the demonstration record
+(SEC-079), and L0 otherwise, security.md §15's line states the same level, `history` holds every L1
+that a later row or a change to the reviewed set ended, with its dates, the rows it rested on and
+the version reviewed, and `in_progress` reads `none` while no counted trail-bound record exists at
+HEAD and names L2 with the first such record's date and "not reached" once one exists (SEC-080), so
+that a register below the rows' level, or one missing a lapsed L1, fails
 as one above it does; `tests/test_claims.py` covers each case. The agent writes `phyco-v3`'s
 `claim_level`, `updated` and `history`, and its line in security.md §15, in a commit of its own
 right after the owner's commit that sets "L1 recorded" or "L1 recorded <k>" to Approved, or that
 adds a later row of either review family, which makes L1 lapse, and never before that commit
-(SEC-076). The spec approval recorded no level.
+(SEC-076). It writes the return to L0 that a change to the reviewed set brings in the commit that
+makes the change, or, where an owner's commit makes it, in a commit of its own right after it
+(SEC-079), and `in_progress` in the commit that writes the first counted trail-bound record
+(SEC-080). Plan phase 1 creates the register, with an entry for each model ID and `phyco-v3` at L0
+with "no claim" and `in_progress` `none`, with `scripts/check_claims.py` and `tests/test_claims.py`,
+and adds `phyco-v3`'s line at L0 to security.md §15 in the same phase, in a security.md version of
+its own (spec FR-051; SEC-081). The spec approval recorded no level.
 
 - `claim_level` holds the level whose gate holds at HEAD (L0 or L1 in this feature): a
-  later row of either review family makes L1 lapse, the register returning to
-  L0, until "L1 recorded <k>" records it again, and `history` keeps each
-  earlier level with its dates and the rows it rested on. `in_progress` names
-  a level started and not reached, L2, with its start date and "not reached". The claim test checks
+  later row of either review family, or a change to what those rows reviewed (SEC-079), makes L1
+  lapse, the register returning to L0, until "L1 recorded <k>" records it again, and `history` keeps
+  each earlier level with its dates, the rows it rested on and the version
+  reviewed. `in_progress` is `none` until the first counted trail-bound record,
+  and then names a level started and not reached, L2, with that record's
+  date as its start date and "not reached" (SEC-080). The claim test checks
   that no document states a level above `claim_level`, and refuses a value outside L0…L6.
 - `fut_sec`, for `phyco-v3`: each FUT-SEC requirement's status in the terms of the spec's
   traceability table. FUT-SEC-4 is met by statement (D7); FUT-SEC-5 is met by specification for
@@ -1032,13 +1046,17 @@ nor kept under `versions/` (spec FR-043).
 - **Claim level of `phyco-v3`**: `claim_level` L0 now; L1 once its gate has passed after the
   review of FUT-SEC-8 and of the security-target chapter (FR-012), recorded in the Review & Approval
   row "L1 recorded", which the owner sets and commits and `check_claims.py` reads at HEAD
-  (section 15); back to L0 while a review held again is pending, until a row "L1 recorded <k>" names
-  the later reviews; the agent writes each change of the register in a commit of its own right after
-  the owner's commit that changes these rows, and `check_claims.py` checks it against them both ways
-  (section 15). While any theorem the mode chapter uses is "unverified" (R10),
+  (section 15); back to L0 while a review held again is pending, or while a hash the review rows
+  name differs from the file at HEAD, until a row "L1 recorded <k>" names the later reviews; the
+  agent writes each change of the register that these rows bring in a commit of its own right after
+  the owner's commit that changes them, and the return to L0 that a change to a reviewed file brings
+  in the commit that makes the change, or right after an owner's commit that makes
+  it, and `check_claims.py` checks it against them both ways (section 15;
+  SEC-079). While any theorem the mode chapter uses is "unverified" (R10),
   that row reads "blocked" and names the missing paper. L0 needs no row. L2 is never
-  `claim_level` in this feature: `in_progress` names it from the first counted trail-bound
-  record, with its start date and "not reached". Every level carries "no claim".
+  `claim_level` in this feature: `in_progress` is `none` before the first counted trail-bound record
+  and names it from that record, with its date as the start date and "not reached", written in the
+  commit that writes the record (section 15; SEC-080). Every level carries "no claim".
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
 - **Design document**: draft versions 0.<k>, the next with each committed change before the freeze,
@@ -1055,9 +1073,10 @@ nor kept under `versions/` (spec FR-043).
   the missing paper, for "L1 recorded" and "L1 recorded <k>". A row goes
   from `_pending_` to another of its values, with date and notes; one row
   per download approval. Each guard opens on Approved alone, except that `design_freeze.py create`
-  also takes done, naming the manifest the review read by SHA-256, or not arranged on the
-  external review's row, "External design review <k>" with the highest k
-  where the owner has had changes reviewed, and `round_rule.py --select` "Not
+  also takes done, naming the manifest the review read by SHA-256, or not arranged on the external
+  review's row, the one with the highest k among the rows of its family that name the latest
+  selection record, each row naming the selection record it applies to, so that a new selection
+  record needs a row of its own (spec FR-043; SEC-078), and `round_rule.py --select` "Not
   needed" on the "D4 tie" row. A Declined gate ends in one of the outcomes the note under the spec's
   table states for it, logged with its reasons, and a gate held again is a row of its own,
   "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>" (k = 2,

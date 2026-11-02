@@ -130,8 +130,9 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   `research/004/place-check.json` by SHA-256, and `protocol_change.py create` reads
   the one with the highest k (PRO-063). A guard opens on Approved alone,
   except that `design_freeze.py create` also takes done, naming the manifest the review read by
-  SHA-256, or "not arranged" on the external review's row, the one with the highest k where the
-  owner has had changes reviewed in "External design review <k>", and `round_rule.py --select` takes
+  SHA-256, or "not arranged" on the external review's row, the one with the highest k among the rows
+  of its family, "External design review" and "External design review <k>", that name
+  the latest selection record (SEC-078), and `round_rule.py --select` takes
   "Not needed" on the "D4 tie" row (data model §17).
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
   exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table, or the
@@ -524,10 +525,13 @@ change to the chapters "Security target" or "Mode" or to `parameters.json` or
 `limits.json` after the review, a `verified` or met mark included, exits 2 until a
 "Security-target review <k>" naming the changed set reads Approved, while a change
 elsewhere in the design document leaves that review standing; and the design
-document's version with the latest selection record; if the external review row, "External
-design review <k>" with the highest k where one exists, is neither done nor
-"not arranged", or reads done and names no manifest, or one that neither
-`review-package/MANIFEST.json` nor its `versions/` holds, if the latest selection record has a tie
+document's version with the latest selection record; if no row of the external review's family names
+the latest selection record (each row names the selection record it applies to, a done row through
+its manifest and a "not arranged" row when it is written), or if the highest-k row that does is
+neither done nor "not arranged", or reads done and names no manifest, or one that neither
+`review-package/MANIFEST.json` nor its `versions/` holds, so that a new selection record needs a row
+of its own and a review done for another candidate is cited for the candidate and the version it
+read only (spec FR-043; SEC-078), if the latest selection record has a tie
 and its row, "Selection tie" or "Selection tie <k>", does not read Approved
 with the SHA-256 of its choice record, if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
@@ -757,12 +761,22 @@ of the register, with its reason (data model §15). It reads the spec's Review &
 recorded" and "L1 recorded <k>" and those of the FUT-SEC-8 result review and the security-target
 review as committed at HEAD (Approvals, above), and a register whose level for `phyco-v3` differs
 from the one those rows give is a finding: L1 while the "L1 recorded" row with the highest k reads
-Approved and names the highest-k row of each review family, both Approved, and L0 otherwise, with
-security.md §15's line stating the same level and `history` holding every L1 that a later row ended,
-with its dates and the rows it rested on. The agent writes the register's change in a commit of its
-own right after the owner's commit that changes those rows, so that at the owner's
-commit the check reports the register behind the rows (data model §15). Exit 1
-on any finding (SC-018). `tests/test_claims.py` runs it, with a register
-above, below and at the rows' level and a `history` missing a lapsed L1 among
-its cases. It writes no record and runs as a test, so FR-061's reproduction
+Approved and names the highest-k row of each review family, both Approved, and every hash those
+review rows name, the chapter's version item by item and the demonstration record, matches the file
+at HEAD (SEC-079), and L0 otherwise, with security.md §15's line stating the same level and
+`history` holding every L1 that a later row or a change to the reviewed set ended, with its dates,
+the rows it rested on and the version reviewed. An `in_progress` that names L2
+while no counted trail-bound record exists at HEAD, names a start date other
+than the first such record's, or reads `none` once one exists is a finding
+too (SEC-080). The agent writes the register's change in a commit of its
+own right after the owner's commit that changes those rows, so that at the owner's commit the check
+reports the register behind the rows (data model §15); it writes the return to L0 that a
+change to a reviewed file brings in the commit that makes the change, or
+right after an owner's commit that makes it, and `in_progress` in the commit
+that writes the first counted trail-bound record (SEC-079, SEC-080). Exit 1
+on any finding (SC-018). `tests/test_claims.py` runs it, with a register above, below and at the
+rows' level, a `history` missing a lapsed L1, a reviewed file changed at HEAD with the register at
+L1 and at L0, and an `in_progress` naming L2 with no counted trail-bound record, naming
+another start date, or reading `none` once one exists among its cases (SEC-079,
+SEC-080). It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).

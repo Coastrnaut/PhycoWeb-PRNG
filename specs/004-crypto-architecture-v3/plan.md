@@ -370,7 +370,12 @@ takes each from there.
    test, which runs from this phase on (FR-053); (2) the writers before what they write:
    `DESIGN_DISCLAIMER`, `protocol/evidence.py`, `protocol/provenance.py` with
    `scripts/provenance.py`, `protocol/changelog.py` with `scripts/protocol_change.py`,
-   `scripts/clear_lock.py`, `scripts/owner_record.py` and `scripts/downloads.py` (REP-076); (3) the
+   `scripts/clear_lock.py`, `scripts/owner_record.py` and `scripts/downloads.py` (REP-076), then the
+   claim register `protocol/claims.json`, with an entry for each model ID and `phyco-v3` at L0 with
+   "no claim" and `in_progress` `none`, with `phyco-v3`'s line at L0 in security.md §15's register,
+   in a security.md version of its own, and `scripts/check_claims.py` and `tests/test_claims.py`, so
+   that the claim-register test, with FR-069's wording rules and its disclaimer check, runs from
+   this phase on, as R18's line-ending test does (FR-051, FR-069; SEC-081); (3) the
    provenance log, its first entries those of the files drafted before it (FR-067; data-model §14;
    REP-080); (4) the protocol change log, after the owner's confirmation of every list at the tasks
    approval and before every file written through `protocol/evidence.py` but a `lock-cleared` record
@@ -420,15 +425,18 @@ takes each from there.
    selection and before the owner design review: it cites the selected candidate's records of
    FR-029's diffusion through instantiation and of R4's first-order differences, and closes FR-011's
    functionality class; L1 recorded when its gate passes (security.md §15, 2.13: the FUT-SEC-8
-   result review and the security-target review); then the rationale; the security.md version of
+   result review and the security-target review), the agent then changing `phyco-v3`'s entry,
+   created at L0 in phase 1, and its §15 line in a commit of its own right after the owner's
+   commit (FR-012; SEC-081); then the rationale; the security.md version of
    FR-051 (2.11 already records the §20.1
    decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design
    review**; external review recorded as done or not arranged; the owner commits the feature
    files (Principle IX); ⛔ **design freeze**.
 9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
    checklist group F corrected, and an addendum to the feature-002 phase report, whose
-   "invertible-looking ARX" S13 contradicts (FR-051); claim-register test; re-check of every
-   verdict; final phase report, citing the evidence for every redesign-checklist item this
+   "invertible-looking ARX" S13 contradicts (FR-051); the claim-register test, run since phase 1,
+   again over the final documents (SEC-081); re-check of every verdict; final
+   phase report, citing the evidence for every redesign-checklist item this
    feature covers (FR-048) → ⛔ **final result review**.
 
 ## Risks
