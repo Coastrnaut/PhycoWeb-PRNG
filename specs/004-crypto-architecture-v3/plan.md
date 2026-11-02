@@ -59,7 +59,7 @@ before the first candidate is scored.
 | Development inputs (FR-040) | Key, nonce, personalization string, reseed input and test state i = SHA-256 of the ASCII string `phycoweb-004/dev/<kind>/<i>` (test states: `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>`); uniform controls under `phycoweb-004/control/`; the loader refuses every other namespace and any index outside a use's declared range; fingerprints checked at load; no held-out set. Beside the derivation, a closed class of constructed inputs fixed by public rules before first use (R3; data-model §2) | R3 | the derivation does not change |
 | Inputs per bias measurement (bias rule) | Two sets of N = 2²⁰ instantiation states per claimable size, key i with nonce i and key 0 with nonce i, through Π and Π⁻¹, S = 4b bits per round count; the avalanche measurement of FR-037 also feeds R_dist: N_a = 2¹³ states per flipped bit, per key or nonce bit flipped in instantiation states and per rotation amount, threshold 0.005/(128·S_A) with S_A = (2·\|F\| + 384 + 2(w − 1))·b, so it adds at most 0.005 per size to the chance of a false firing; each avalanche run cross-checked against the exact dependency matrices; controls with the same counts; verdicts from integer critical counts | R4 | only a change that can add firings and never remove one: N, N_a, F and the sets only grow, every recorded firing stands, and a larger N, N_a or F, or a new set, is tested in addition, so R can only rise |
 | Operation-count cost model (D4) | 6-input LUTs per node and round: 0 for rotations, constant shifts and wiring; w per bitwise word operation with fan-in k ≤ 6; w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no fusion | R5 | no stricter direction, so in effect no change from plan approval, and none after the first score. FR-026's reported figures decide nothing; a correction to them, such as counting P cycles per round, is a change-log entry |
-| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind per candidate, only after a recorded tool defect, inside the budget; each kind of evidence at 4×4, then 8×8, then 16×16; a run starts only if its projection, with the probes of the larger sizes, fits its row | R7 | every budget and the candidate limit only fall; a budget lowered below the hours used leaves zero hours |
+| Analysis budget per candidate (stop rule) | 48 h of trail searches (at most 8 h per search instance), 6 h of structural checks, 12 h of frequency and avalanche tests; one re-run per evidence kind per candidate, only after a recorded tool defect, inside the budget; each kind of evidence at 4×4, then 8×8, then 16×16; a run starts only if its projection, with the probes of the larger sizes, fits its row; beside the six candidates' rows, one feature-wide 66 h row for the heavy runs that charge no candidate | R7 | every budget and the candidate limit only fall; a budget lowered below the hours used leaves zero hours |
 | Vector lengths at large sizes (FR-036) | The same at every size: 16 Π and Π⁻¹ inputs with 4 traced phase by phase; 2 development keys × 10,000 words for the mode; a SHA-256 digest of 2²⁰ words over their 4·2²⁰ raw bytes; no shortening at 8×8 or 16×16 | R8 | lengths only grow |
 | Target advantage for the output limits (FR-007) | ε = 2⁻⁶⁴ at N = 2¹²⁸ offline evaluations of Π or Π⁻¹, with every online quantity at its limit; per-request cap 2¹⁹ bits; instantiations per key held at the random-nonce limit, at most 2³², whatever the nonces | R9 | ε only falls and N only rises; u, every output limit and the cap only fall |
 | The D4 choice (FR-022) | Once, by code, over the entered set recorded before the first score; at 4×4 and the widest reduced width, 16 or else 8, with a common r* ≥ 2; score (min(W_D, W_L)/r*)/L, compared exactly; an exact tie waits for R at 4×4; one family scored, chosen by default; none, the smallest R at 4×4 | R6 | no stricter direction, so in effect no change from plan approval, and none after the first score |
@@ -271,6 +271,7 @@ scripts/
 ├── design_freeze.py          # create, approve and validate the freeze
 ├── recheck_004.py            # recomputes every verdict (FR-065)
 ├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
+├── owner_record.py           # the owner's environment records and owner-provided values (R1, R19)
 ├── clear_lock.py             # removes a stale lock, only once its holder is shown gone (R16)
 └── check_claims.py           # register against README, security.md, disclaimers
 
@@ -298,7 +299,7 @@ vectors/phyco-v3/             # Π and Π⁻¹ KATs, mode vectors, digests, cons
 baseline/phyco-v2/            # byte-exact copies and MANIFEST.json (FR-042)
 
 reports/004-crypto-architecture-v3/
-├── environment-windows.json  # the environment records, written at setup (R1)
+├── environment-windows.json  # the environment records, written by the owner (R1)
 ├── environment-wsl.json
 ├── downloads.json            # the downloads manifest (R19)
 ├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
@@ -334,8 +335,9 @@ source and binary.
    Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and
    installed; the downloads manifest `downloads.json`, one entry per file of R19's tables from setup
    on, each with its `status` (`approved`, `fetched` or `not obtained`), and an `owner-provided`
-   entry for each value the owner provides (R19); the
-   environment records of both platforms (R1); corrected `requirements.txt`;
+   entry for each value the owner provides (R19); the environment records of both
+   platforms (R1), these records and those entries written by the owner with
+   `scripts/owner_record.py`, each with its Review & Approval row; corrected `requirements.txt`;
    `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with fingerprints; `protocol/evidence.py`;
    the provenance log; the protocol change log, whose first entries are the answered rows of every
    checklist round answered before it is created, by the per-round lists of checklist-choices.md, in
@@ -357,7 +359,10 @@ source and binary.
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
    choice; production-width bounds, structural checks with the `degree` records, frequency and
    avalanche tests, in that order at each size, the bias tests starting at the R the earlier kinds
-   give and extended to every later rise of R (R4); R by the round rule; eligibility; the stop rule.
+   give and extended to every later rise of R (R4); R by the round rule; eligibility; the stop
+   rule. The production-width analysis covers the chosen family; the other
+   family is analysed there only if the chosen one ends with no eligible
+   candidate, and its candidates are otherwise `ineligible` (research R6, R7).
    One heavy run at a time, each projected first, and each kind of evidence at 4×4, then 8×8, then
    16×16 (R7).
 6. **US3 model and vectors**: the design document complete; constants; `model_v3.py`; vectors

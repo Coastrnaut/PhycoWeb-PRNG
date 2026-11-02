@@ -44,7 +44,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| V1 | `python scripts/validate_tool.py --tool <tool> --known s13-transport --out-dir $REP/validation`, and the same for `s12`, `s13-decay`, `s14`, `s15` and for each structural tool's known result of research R13 (symmetry, dependency propagation, exhaustive bijectivity, avalanche, cost model) | `re-found` records, one for every counted tool (SC-007); the bias test's record also shows it firing in 82 to 97 of the 100 synthetic sets (R4) |
+| V1 | `python scripts/validate_tool.py --tool <tool> --known s13-transport --out-dir $REP/validation`, and the same for `s12`, `s13-decay`, `s14`, `s15` and for each structural tool's known result of research R13 (symmetry, dependency propagation, exhaustive bijectivity, avalanche, cost model) | `re-found` records, one for every counted tool (SC-007); the bias test's record also shows it firing in 82 to 97 of each family's 100 synthetic sets (R4) |
 | V2 | `validate_tool.py --tool <trail tool> --known speck32-diff` (and `speck32-lin`, `present-5r`, `sparkle-box`) | `re-found`; exit 2 without a recorded source for the value |
 
 ## Security target (T, US2)

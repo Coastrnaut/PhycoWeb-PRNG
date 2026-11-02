@@ -10,11 +10,13 @@ files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` an
 `protocol/evidence.py` refuses any other suffix there (research R16, R18). A record is never
 overwritten: a repeat run writes a new record with a new identifier, and the old one stays. The
 stated exceptions are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
-`freeze/selection.json`, `security-target/parameters.json` and `limits.json`, the environment
-records, `downloads.json` and `review-package/MANIFEST.json`. Before one changes,
+`security-target/parameters.json` and `limits.json`, the environment records,
+`downloads.json` and `review-package/MANIFEST.json`. Before one changes,
 `protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
 the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
-re-check resolves either from the versions (research R16). The freeze record changes only by the
+re-check resolves either from the versions (research R16). The selection records are
+written once each and never rewritten: a later selection is a new record,
+`freeze/selection-<k>.json` (section 9). The freeze record changes only by the
 owner's approval, which `design_freeze.py approve` writes into it, its draft checked by
 `draft_sha256` (section 13).
 
@@ -61,7 +63,7 @@ implementation can write byte-identical files:
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head` (research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), which the start check compared the running environment with as a whole (Python, every package of `pip freeze`, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
+| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze`, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (the Windows Python, or `~/.venvs/phycoweb/bin/python` in WSL), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
@@ -125,9 +127,11 @@ the class.
   contract) and writes its outputs and a `reproduction` record into
   `reproductions/<record_id>/<n>/`, n = 1, 2, … for successive reproductions of that record. The
   record holds the original's ID and SHA-256, each compared field with its outcome, the reported
-  fields, and `match` or `differs`. A reproduction appends nothing to the candidate log, charges no
-  budget row and is not a re-run under research R7, so it can neither replace evidence nor add any,
-  and a difference is a finding: the original stands; a difference in a field that enters a verdict
+  fields, and `match` or `differs`. A reproduction appends nothing to the candidate
+  log, charges no candidate's budget row and is not a re-run under research
+  R7, so it can neither replace evidence nor add any; a heavy one runs only on the owner's request,
+  quoted with its date in the record's `owner_request`, and is charged to research R7's feature-wide
+  row. A difference is a finding: the original stands; a difference in a field that enters a verdict
   (every compared field but the p-values) makes the candidate's eligibility `blocked`, as an
   unverified hypothesis does (FR-060), until it is resolved, and in the environment that made the
   original it is a tool defect of research R7, whose one re-run is a new measurement in the
@@ -213,7 +217,7 @@ no value or index is picked after any output is seen.
 | 2 | edge states | the design document's list (FR-054) |
 | 3 | derived from development inputs | the avalanche flips x ⊕ e_j, the key and nonce bit flips and the word rotations, for every j, bit and k the rule names (R4) |
 | 4 | feature 002's `dev` seeds | for FUT-SEC-8 only (R2), the one external development set |
-| 5 | synthetic counts | for the bias test's validation only (R4): set j = 0…99 at each size from numpy's `Generator(PCG64(s))`, s being its seed, which `load` returns for the kind `synthetic`; one `binomial(N, 1/2)` count per tested bit, in the test's bit order, except the planted bit at position j mod S, drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033); `validate_tool.py` draws the counts, which are local-only (research R16) and never replaced; a set's SHA-256 covers its counts as decimal text, one per line in the test's bit order, each line ending in LF, and the validation record commits it with the numpy version and a per-set summary (section 7) |
+| 5 | synthetic counts | for the bias test's validation only (R4): set j = 0…99 at each size from numpy's `Generator(PCG64(s))`, s being its seed, which `load` returns for the kind `synthetic`; one `binomial(N, 1/2)` count per tested bit, in the test's bit order, except the planted bit at position j mod S, drawn as `binomial(N, 1/2 + δ)` at that size's δ (0.0030, 0.0031 or 0.0033); `validate_tool.py` draws the counts, which are local-only (research R16) and never replaced; a set's SHA-256 covers its counts as decimal text, one per line in the test's bit order, each line ending in LF, and the validation record commits it with the numpy version and a per-set summary (section 7); the test's bit order is research R4's: set 1, then set 2, within each the b bits after Π, then the b bits after Π⁻¹, lanes in the design document's index order and bits most significant first; the validation's second family, j = 100…199, is drawn the same way, each set planting its bit at position ⌊(j − 100)·S/100⌋ (section 7) |
 
 ## 3. Candidate log (`research/004/candidates.jsonl`; FR-041, SC-011)
 
@@ -228,7 +232,7 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry (spec FR-030, FR-034). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry (spec FR-030, FR-034). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
@@ -242,16 +246,26 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
 
 - **Decisions.** `rejected` and `ineligible` are given only for the rules' reasons: a failed
   inverse or bijectivity test, a failed eligibility item (FR-018 to FR-031, FR-037, R_bound
-  not established, inconclusive evidence) or a spent budget. A candidate may be `withdrawn`
+  not established, inconclusive evidence), a spent budget, or, for a candidate of the family D4 did
+  not choose that was not analysed at the production width, "not analysed at the production width:
+  D4 chose the other family" (spec "Nonlinearity choice rule"). A candidate may be `withdrawn`
   before its first tool run, for any recorded reason, and it still counts towards the stop
   rule. The log writer refuses any other decision. A raised R is never by itself a reason for a
   decision: the measurements it needs run as new measurements in their budget rows, and a row that
   cannot hold them makes the candidate `ineligible` for a spent budget (spec Edge Cases).
 - **Entered set.** Candidates are entered before any is scored (R6's entered set). A further
-  candidate is entered later only in place of one that became `rejected` or `ineligible`, within the
-  stop rule's three per family, never because another's R is high. The set closes at a `set-closed`
+  candidate is entered later only in place of one that became `rejected` or `ineligible`, never
+  because another's R is high, and one is entered for every such candidate while its family has
+  fewer than three evaluated candidates and the budget allows: the agent proposes it, and the owner
+  approves its entry, quoted with its date in its `proposed` entry, which closes the
+  `replacement` entry logged with the decision; a stated reason, the family full or
+  the budget spent, closes it otherwise. The set closes at a `set-closed`
   entry, written by `round_rule.py --close` once every candidate has a final decision and no
-  replacement is pending; `--select` exits 2 before it, and no candidate is entered after it.
+  `replacement` entry is `pending`; `--select` exits 2 before it, and no candidate is entered after
+  it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate,
+  its round-rule record at every claimable size (section 9); the other family's candidates, analysed
+  at the production width only if D4's chosen family ends with no eligible candidate, are otherwise
+  `ineligible` (Decisions, above).
 - **New candidate or variant.** A change makes a new candidate if it touches the operation
   list's structure: the nonlinear component, the round structure (its operations, their forms
   or order), the colour schedule, or the rule that generates the constants or the rotation
@@ -269,8 +283,9 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   computable, and only while its family has fewer than three evaluated candidates; before its
   `proposed` entry, the decline's log entry states what the rules need to
   select it, an R at 4×4 below the declined one's or a tie. Where none can be
-  entered, the decline ends in one of spec FR-043's other outcomes. The further
-  candidate is entered and evaluated like any other; once it has a final
+  entered, the decline ends in one of spec FR-043's other outcomes. The further candidate is
+  entered and evaluated like any other, and replaced the same way if it becomes
+  `rejected` or `ineligible`, within the one reopening; once it has a final
   decision, a second `set-closed` entry closes the set, and `round_rule.py --select` runs again over
   the whole set: if the rules select the further candidate, it goes to the review; if they select
   the declined one again, the outcome is a stop, logged with the review's reasons. The declined
@@ -393,8 +408,10 @@ characteristic that a search of Π returns with its weight is one, written besid
 
 `tool`, `version`, `tool_sha256`, `licence`, `source` (in the repository, or an entry of the
 downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
-and value, or the `owner-provided` entry of a value the owner provides),
-`validated_kind` (word width, operation set and kind of model; R12), `known_result` (paper,
+and value, or the `owner-provided` entry of a value the owner provides, written by the
+owner with `scripts/owner_record.py owner-provided` and Approved in its own
+Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind`
+(word width, operation set and kind of model; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
 known result fixed before the tool's first validation, with its source and its provenance-log entry,
 section 14, or `none`, which the first validation record states), `found`, `outcome`
@@ -425,16 +442,19 @@ same kind and of the tool's exact hash exists.
   after a failed validation, its results `not evaluated`. Every attempt is a record of its own.
   Results of the failed version never count; results already counted from an earlier validated
   version stand, since they cite its hash.
-- **The bias test** (R4): S14's bias re-found on `phyco-v2`, and on 100 sets of synthetic
-  binomial counts with one bit planted at the 90%-power biases it fires in 82 to 97 of the 100
-  sets.
-  The sets are class 5 of section 2, local-only (section 1, `outputs`) and never replaced; the
-  record commits each set's SHA-256 (section 2), the numpy version and a per-set summary, the
-  planted bit's count and every fired bit, so a fresh clone recomputes the 82-to-97 verdict from
-  committed files and a regeneration checks every count. A later draw must reproduce every hash in
-  an environment with that numpy version, and a draw that differs is reported and counts for
-  nothing; after an approved numpy upgrade the old record stands, and a new validation runs as a new
-  record.
+- **The bias test** (R4): S14's bias re-found on `phyco-v2`, and, on each of two families of 100
+  sets of synthetic binomial counts with one bit planted at the 90%-power biases, a firing in 82 to
+  97 of the family's 100 sets: class 5 of section 2, j = 0…99, and the second family, a known result
+  added, j = 100…199, drawn the same way, each set planting its bit at position ⌊(j − 100)·S/100⌋,
+  so that the planted bits spread over all S bits, both sets and both directions (research R4). The
+  sets are local-only (section 1, `outputs`) and never replaced; the record commits each set's
+  SHA-256 (section 2), the numpy version and a per-set summary, the planted bit's count and every
+  fired bit, so a fresh clone recomputes both 82-to-97 verdicts from committed files and a
+  regeneration checks every count. A later draw must reproduce every hash in an environment with
+  that numpy version, and a draw that differs is reported and counts for nothing; after an approved
+  numpy upgrade the old record stays the validation in the old environment, and a new validation, a
+  new record, decides in the new one: outside 82 to 97 in either family the tool is unvalidated
+  there, its results `not evaluated`, until a defect is found and fixed.
 - **The avalanche test** (R4): R13's three planted results re-found, one per path: the planted gap
   only if, at every round count tested, every difference bit of the unmixed lane fires
   and no other bit does, bit for bit against the stated set, and the key
@@ -517,24 +537,35 @@ candidate, decided once in the mode chapter, and the self-test's expected output
 generated from the selected candidate's vectors and cannot fail. A missing item fails eligibility,
 and so does a `reproduction` record of one of the candidate's records that differs on a field that
 enters a verdict, until a re-run after a recorded tool defect resolves it (section 1; research R7).
+The record at every claimable size is an eligible candidate's final decision (section 3); a
+candidate of the family D4 did not choose gets it at the production width only if the chosen family
+ends with no eligible candidate, and is otherwise `ineligible` (spec "Nonlinearity choice rule").
 The design document restates them for the selected candidate, and the owner design review checks
-that the two agree. `selection.json`, a fixed-name file too, written only after the candidate log's
-`set-closed` entry (section 3): the eligible candidates of the
+that the two agree. `selection.json`, the first selection record, written once, only after the
+candidate log's `set-closed` entry (section 3), and never rewritten: the eligible candidates of the
 chosen family, or of the other family if it has none, or of both families if D4 was not
 computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule outcome with its
-reason. After a decline at the owner design review that ends in a further candidate, entered only
-where the rules can select it (section 3), `--select` runs again over the whole
-set, the declined candidate included, and writes `selection-2.json`, citing
-`selection.json`, which stays; selecting the declined candidate again is a stop, with the review's
-reasons (section 3). The owner's choice in a tie is made only after `selection.json` exists and
-recorded beside it: `round_rule.py --choose ID --seen SHA256 --by NAME`, run by the owner, prints
-`selection.json`'s SHA-256 and exits 2 unless standard input is an interactive terminal and the
-owner types its first 16 hex digits; it writes `freeze/selection-tie-choice.json` with the choice,
-who, when, `seen_sha256` and `choice_confirmed`, and exits 2 if that hash differs from
-`selection.json`'s, if no tie exists or if a choice exists, so the choice never changes. Running it
-is the owner's own act, which the agent never performs (spec FR-043). `selection.json` stays as the
-script wrote it, and the Review & Approval row "Selection tie" holds the date, the choice and both
-records' SHA-256.
+reason. Any change before the freeze that touches any candidate's eligibility or R at 4×4 after a
+selection record exists makes `--select` run again over the whole set and write the next record,
+`selection-<k>.json`, k = 2, 3, …, which cites the previous one by path and SHA-256; earlier records
+stay. A decline's re-selection is one such record: after a decline at the owner design review that
+ends in a further candidate, entered only where the rules can select it (section 3), `--select` runs
+again over the whole set, the declined candidate included, and selecting the
+declined candidate again is a stop, with the review's reasons (section 3).
+The owner's choice in a tie is made only after the selection record exists and recorded beside it:
+`round_rule.py --choose ID --seen SHA256 --by NAME`, run by the owner, prints the latest selection
+record's SHA-256 and exits 2 unless standard input is an interactive terminal and the owner types
+its first 16 hex digits; it writes `freeze/selection-tie-choice.json`, or
+`freeze/selection-<k>-tie-choice.json` for `selection-<k>.json`, with the choice, who, when,
+`seen_sha256` and `choice_confirmed`, and exits 2 if that hash differs from the record's, if the
+record has no tie or if a choice for it exists, so the choice never changes. Running it
+is the owner's own act, which the agent never performs (spec FR-043). Every selection record stays
+as the script wrote it. A choice binds only the record whose hash it names, so a tie in a later
+record needs a new choice, and the Review & Approval row "Selection tie", or "Selection tie <k>" for
+`selection-<k>.json`, holds the date, the choice and both records' SHA-256. If a later record
+selects another candidate, the security-target review and every later review are held again for it,
+each in a row of its own; if it selects the same one, the reviews held stand for what did not change
+(spec FR-043).
 
 ## 10. Size profile and security target (`security-target/`)
 
@@ -788,10 +819,12 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 |-------|------|
 | `seq`, `prev_sha256` | as in section 3 |
 | `date_utc` | ISO 8601 |
-| `rule` | the pre-registered rule changed, by its name in the spec's protocol or its research section |
-| `old_text`, `new_text` | the rule's text before and after |
+| `rule` | the pre-registered rule changed, by its name in the spec's protocol or its research section; a first entry (below) holds `rules` instead |
+| `rules` | for a first entry only: one object per rule its row is listed under, each with `rule`, `old_text`, `new_text`, `direction` and `readings`, the texts being that rule's text, in each place its heading names, at the commit before the row's round was applied and at the commit that completed it, each commit named by its hash |
+| `row`, `granularity` | for a first entry only: the row's ID, question and chosen option; and `round`, since a round's rows were committed together, so that a row's own before and after exist in no commit |
+| `old_text`, `new_text` | the rule's text before and after; for a first entry, per rule in `rules` |
 | `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md |
-| `direction` | `stricter`, in the rule's stated stricter direction, or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044) |
+| `direction` | `stricter`, in the rule's stated stricter direction, or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
 | `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
 | `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
@@ -804,9 +837,16 @@ stricter change applies, also under the current rules, listing both; a disagreem
 reported. The log's first entries, written when it is created, are the answered rows of every
 checklist round answered before the log is created, by the lists "Rows that change the protocol" of
 [checklist-choices.md](./checklist-choices.md), in round order: one entry per listed row, whose
-applied change altered the text of a pre-registered rule, whatever its kind, the 42 rows tagged
-Stricter or Settle (19 and 23) among them. Each cites its row ID and the rules it is listed under,
-and takes `stricter`, in the rule's stated direction, or `settled`. The owner's answer to a round
+applied change altered the text of a pre-registered rule, whatever its kind, the 61 rows tagged
+Stricter or Settle (26 and 35) among them. Each holds `rules`, every rule its row is listed under,
+with `old_text` and `new_text` per rule: that rule's text, in each place its heading names, at the
+commit before the row's round was applied and at the commit that completed it; with the row's ID,
+question and chosen option, marked `granularity: round`. Each rule takes `stricter`, in its stated
+direction, or `settled`: under a rule whose direction is "no change" the direction is `settled`,
+with its `readings`, whatever the row's kind, and a row listed under several rules has a direction
+per rule. The log is created, and no evidence run starts, only after the owner has confirmed every
+list; a row the owner takes out of a list is recorded beside that list in checklist-choices.md with
+the owner's reason, that it changed no rule. The owner's answer to a round
 approves its list; a round answered after the log exists adds entries the usual way, proposed by the
 agent and approved by the owner (spec FR-044). The entry for the re-run's REP-029, which added the
 synthetic counts as class 5, records the protocol's "Development inputs" paragraph before and after,

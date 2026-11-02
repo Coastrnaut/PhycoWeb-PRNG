@@ -33,7 +33,9 @@ each checklist's rows once they were written into every document they name. Wher
 names research R16, R17 or R18 for `.gitignore` or `requirements.txt`, the row changes that research
 passage, and the file itself changes at setup (plan phase 1), as the passage says. A row that also
 names a later feature or a document not yet written (the design document, a test, the final report)
-is held there by the spec requirement its Changes cell names.
+is held there by the spec requirement its Changes cell names. This Status follows the spec's Review
+& Approval table, which is the source, and is updated in the same commit as each table row and each
+answered round, as the spec's Status line is (PRO-057).
 
 ## How to answer
 
@@ -606,7 +608,10 @@ so they await the owner's confirmation, asked for at the tasks approval. A later
 written with its rows, before the answer that approves it, and if the answer chooses another option
 for a row, the list follows the option chosen before the change log takes it. The fourth list, the
 third re-run's, was written with its rows on 2026-11-01, and the owner's answer to that round, "all
-recommended" on 2026-11-02, approved it as written (FR-044).
+recommended" on 2026-11-02, approved it as written (FR-044). Each listed row enters the log with its
+rules' texts before and after its round, as data-model §18 states (PRO-051). The log is created, and
+no evidence run starts, only after the owner has confirmed every list; a row the owner takes out of
+a list is recorded here, beside that list, with the owner's reason, that it changed no rule.
 
 From the first run, 147 of its 206 rows:
 

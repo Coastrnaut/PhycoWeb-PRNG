@@ -16,12 +16,16 @@ included. `REP=reports/004-crypto-architecture-v3`. Every record is written thro
 `--reproduce RECORD` (data model §1): it runs the recorded command's configuration with its output
 directory replaced by `$REP/reproductions/<record_id>/<n>/`, n = 1, 2, … for successive
 reproductions of that record, and writes a `reproduction` record there: the original's ID and
-SHA-256, each compared field with its outcome, the reported fields, and `match` or `differs`. It
-appends nothing to the candidate log, charges no budget row and is not a re-run under research R7,
-so it can neither replace evidence nor add any; the Budget and Order of sizes guards, which concern
+SHA-256, each compared field with its outcome, the reported fields, and `match` or
+`differs`. It appends nothing to the candidate log, charges no candidate's
+budget row and is not a re-run under research R7, so it can neither replace
+evidence nor add any; the Budget and Order of sizes guards, which concern
 evidence, do not refuse it, and every other guard applies, so a search that reached its cap is not
-reproduced (Trail tools). It is a heavy run where research R7 says so: it takes the lock and
-projects first, its projection charged to no row. A difference is a finding, exit 1: the original
+reproduced (Trail tools). It is a heavy run where research R7 says so: it then runs only
+with `--owner-request "WORDS (DATE)"`, the owner's request quoted with its
+date, which its record keeps, and exits 2 without one; it takes the lock,
+projects first and is charged to research R7's feature-wide row. A light
+reproduction needs no request. A difference is a finding, exit 1: the original
 stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
 until it is resolved, and in the environment that made the original it is a tool defect of research
 R7, whose one re-run is new evidence in the original's row; a difference in the
@@ -34,8 +38,11 @@ p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
   platform's environment record in force (research R1) as a whole: Python, every package and version
   of `pip freeze` (one added, upgraded or removed), gcc and make in WSL, and the Windows build or
   the WSL distribution and kernel. Any difference exits 2, naming it, a Windows or WSL update
-  included; the owner then approves a new environment record, with R1 updated first when a pinned
-  version changes, and each later record cites the record in force (data model §1). A new record is
+  included; the owner then writes a new environment record with `scripts/owner_record.py
+  environment` and approves it, with R1 updated first when a pinned version changes, and each later
+  record cites the record in force (data model §1). It also exits 2 unless
+  the record in force has its Review & Approval row, "Environment record
+  <n>", Approved at HEAD with its SHA-256 (Approvals, below). A new record is
   written only when its Python and pinned packages match R1 and the pins of `requirements.txt` for
   that platform. `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed
   counts by exact integer arithmetic and imports only the standard library and `protocol/` (its
@@ -79,8 +86,9 @@ p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
-- **Approvals**: every guard that reads the spec's Review & Approval table (Order of US1, below;
-  `round_rule.py --select`; `design_freeze.py create`; `repair_log.py`; the test of the second
+- **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
+  Order of US1, below; `round_rule.py --select`; `design_freeze.py create`;
+  `repair_log.py`; `validate_tool.py`'s source guard; the test of the second
   transcription's provenance) reads it as committed at HEAD, never the working tree,
   and exits 2 while the working tree's table differs from HEAD's. The rows that open a guard are set
   to Approved and committed by the owner (the note under that table), so an uncommitted row opens
@@ -111,7 +119,10 @@ p-values, which decide no verdict, blocks nothing (data model §1). `fut_sec8.py
   writes nothing but its `projection` record, and its time counts against the row of the run it
   projects (data model §1). Every candidate's 12 h row is charged, at each size, the hours of that
   size's uniform controls (research R4), read from the `control` records, which append nothing to
-  the candidate log, or by projection until they exist.
+  the candidate log, or by projection until they exist. Every heavy run that charges no candidate, a
+  validation or re-validation on published values, a heavy reproduction or FR-053's test with two
+  worker counts, projects first against research R7's feature-wide 66 h row and exits 2, writing
+  nothing but its `projection` record, unless its projection fits the hours left there.
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has
@@ -183,24 +194,30 @@ Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `
 `sparkle-box`, or a structural tool's known result of research R13) and writes a validation
 record (data model §7). Exit 1 if not re-found. A published value needs its source recorded, an
 entry of `$REP/downloads.json` (research R19): a `fetched` file's entry with the paper's table and
-value, or the `owner-provided` entry of a value the owner provides with its source; any other entry,
-or none, exits 2. A tool's first validation records its second known result, fixed with its source
+value, or the `owner-provided` entry of a value the owner provides with its source, written by
+`scripts/owner_record.py owner-provided`, whose Review & Approval row "Owner-provided value <n>"
+reads Approved at HEAD (Approvals, above); any other entry, or none, exits 2. A
+tool's first validation records its second known result, fixed with its source
 in the provenance log before that validation, or the statement that it has none (data model §7,
 §14); after a failed validation, the re-validation re-finds the second as well as the first, and for
 a tool with none it exits 2, leaving the tool unvalidated. `--reproduce RECORD` runs that record's
 validation again, as the introduction describes, and compares the fields data model §1 lists for a
 validation.
 
-For the bias test's validation, `validate_tool.py` draws the 100 synthetic sets of class 5 at each
-size from numpy's `Generator(PCG64(s))`, with the seeds s from
-`protocol.devinputs_v3.load('dev', 'synthetic', allow=('dev',), count=100, n=n)` (data model §2).
+For the bias test's validation, `validate_tool.py` draws at each size the 100 synthetic sets of
+class 5, j = 0…99, and the 100 of the second family, j = 100…199, which plant their bit at position
+⌊(j − 100)·S/100⌋, from numpy's `Generator(PCG64(s))`, with the seeds s from
+`protocol.devinputs_v3.load('dev', 'synthetic', allow=('dev',), count=200,
+n=n)` (data model §2, §7); each family must fire in 82 to 97 of its 100 sets.
 The sets are local-only, under `data/local/004/<record_id>/`, and regenerated by this deterministic
 command; the record commits each set's SHA-256, the numpy version and a per-set summary, the planted
-bit's count and every fired bit, so a fresh clone recomputes the 82-to-97 verdict from committed
+bit's count and every fired bit, so a fresh clone recomputes both 82-to-97 verdicts from committed
 files and a regeneration checks every count (data model §7). No set is ever replaced: a later draw,
 `--reproduce` included, must reproduce every hash in an environment with that numpy version, and a
 draw that differs is reported and counts for nothing. After an approved numpy upgrade the old record
-stands, and a new validation runs as a new record (research R3, R4).
+stays the validation in the old environment, and a new validation, a new record, decides in the new
+one: outside 82 to 97 the tool is unvalidated there, its results `not evaluated`, until a defect is
+found and fixed (research R3, R4).
 
 ## `scripts/evidence_v3.py`
 
@@ -261,15 +278,17 @@ owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the cho
 
 ```text
 round_rule.py --candidate ID           # writes candidates/<ID>/round-rule.json
-round_rule.py --select                 # writes $REP/freeze/selection.json
+round_rule.py --select                 # writes $REP/freeze/selection.json, later selection-<k>.json
 round_rule.py --close                  # writes the candidate log's set-closed entry
-round_rule.py --choose ID --seen SHA256 --by NAME   # writes $REP/freeze/selection-tie-choice.json
+round_rule.py --choose ID --seen SHA256 --by NAME   # writes the latest selection's tie choice
 round_rule.py --reproduce RECORD       # a round-rule or selection record (introduction)
 ```
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
 ID. `--close` writes the candidate log's `set-closed` entry once every candidate has a final
-decision and no replacement is pending, and exits 2 otherwise. `--select` exits 2 before that entry,
+decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule
+record at every claimable size) and no `replacement` entry of the log is `pending`
+(data model §3), and exits 2 otherwise. `--select` exits 2 before that entry,
 and after a D4 tie until the spec's "D4 tie" row reads Approved at HEAD with the SHA-256 of
 `d4/tie-choice.json` (Approvals, above); it applies eligibility, the fallback to the other family
 and the stop rule; exit 1 if the outcome is a stop. Eligibility is decided for every candidate from
@@ -283,20 +302,26 @@ operation list's declarations; FR-030's mapping from its `mapping` log entry.
 FR-025's interface formats, call sequence and zeroization rules are the mode's,
 decided once in the mode chapter. A missing item fails eligibility, and so does a `reproduction`
 record of one of the candidate's records that differs on a field that enters a verdict, until a
-re-run after a recorded tool defect resolves it (data model §1). After a
-decline at the owner design review that ends in a further candidate, `--select`
-runs again over the whole set, the declined candidate included, and writes `selection-2.json`,
-citing `selection.json`; if it selects the declined candidate again, the outcome is a stop, exit 1.
-The decline reopens the set once, for one further candidate, and `--close` writes a second
-`set-closed` entry before `--select` runs again. `--choose`, run by the owner after a tie in
-`selection.json`, prints `selection.json`'s SHA-256 and exits 2 unless standard input is an
-interactive terminal and the owner types its first 16 hex digits; it writes
-`freeze/selection-tie-choice.json` with the choice, who, when, `seen_sha256` and `choice_confirmed`,
-and exits 2 if that hash differs from `selection.json`'s, if no tie exists or if a choice exists.
+re-run after a recorded tool defect resolves it (data model §1). Any change before the freeze that
+touches any candidate's eligibility or R at 4×4 after a selection record exists makes `--select` run
+again over the whole set and write the next record, `selection-<k>.json`, k = 2, 3, …, citing the
+previous one by path and SHA-256; earlier records stay. After a decline at the owner design review
+that ends in a further candidate, that re-selection includes the declined candidate, and
+if it selects the declined candidate again, the outcome is a stop, exit 1.
+The decline reopens the set once, for one further candidate, replaced the same way if it becomes
+`rejected` or `ineligible`, and `--close` writes a second `set-closed` entry
+before `--select` runs again. `--choose`, run by the owner after a tie in the latest selection
+record, prints that record's SHA-256 and exits 2 unless standard input is an interactive terminal
+and the owner types its first 16 hex digits; it writes `freeze/selection-tie-choice.json`, or
+`freeze/selection-<k>-tie-choice.json` for `selection-<k>.json`, with the choice, who, when,
+`seen_sha256` and `choice_confirmed`, and exits 2 if that hash differs from the record's, if the
+record has no tie or if a choice for it exists. A choice binds only the record whose hash it names:
+a tie in a later record needs a new choice and a row of its own, "Selection tie
+<k>", which `design_freeze.py create` reads as it reads "Selection tie".
 Running `--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
-`round-rule.json` and `selection.json` keep fixed names: before one changes, `protocol/evidence.py`
-keeps its current content as `versions/<sha256>.json` beside it, and the new content holds
-`previous_sha256` (data model introduction).
+`round-rule.json` keeps its fixed name: before it changes, `protocol/evidence.py` keeps its current
+content as `versions/<sha256>.json` beside it, and the new content holds `previous_sha256` (data
+model introduction). A selection record is never rewritten.
 
 ## `scripts/mode_limits_v3.py`
 
@@ -368,8 +393,9 @@ SHA-256 of the candidate log, the provenance log and the protocol change log.
 
 `create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
 security-target review or the owner design review row is not Approved, if the external review row is
-neither done nor "not arranged", if a selection tie exists and the "Selection tie" row does not read
-Approved with the SHA-256 of `freeze/selection-tie-choice.json`, if a theorem the mode chapter uses
+neither done nor "not arranged", if the latest selection record has a tie
+and its row, "Selection tie" or "Selection tie <k>", does not read Approved
+with the SHA-256 of its choice record, if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
 theorem (research R10), or if `git_dirty` is true. `create` stores `draft_sha256`, the
 SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
@@ -421,6 +447,26 @@ at HEAD and exits 2 unless that row reads Approved and names the same log and th
 break. The broken file is kept unchanged with its SHA-256, and a `repair` entry records the break's
 position, its cause and what was restored. Entries after the break count only where the records they
 cite corroborate them, and the final report states the repair (research R16).
+
+## `scripts/owner_record.py`
+
+```text
+owner_record.py environment --platform windows|wsl --by NAME   # $REP/environment-<platform>.json
+owner_record.py owner-provided --known KNOWN_ID --value TEXT --source TEXT --words TEXT --by NAME
+```
+
+Run by the owner only: each mode is an owner's own act, outside the standing authorization for local
+commits, which the agent never performs (spec FR-044). `environment` records the running environment
+as research R1 lists it, only when its Python and pinned packages match R1 and the pins of
+`requirements.txt` for that platform; `owner-provided` adds an entry to `$REP/downloads.json` with
+the owner's words, the source the owner names, the date and the value's SHA-256 (research R19). Each
+mode prints the SHA-256 of what it writes, taken over its canonical JSON without the approval
+fields, and exits 2, writing nothing, unless standard input is an interactive terminal and the owner
+types its first 16 hex digits; it then writes the record or entry with `approved_by`, `approved_utc`
+and `approval_confirmed`, keeping the fixed-name file's current content under `versions/` first
+(data model introduction). The owner then adds and commits its Review & Approval row, "Environment
+record <n>" or "Owner-provided value <n>", with that SHA-256, which the Environment guard and
+`validate_tool.py`'s source guard read at HEAD (Approvals, above).
 
 ## `scripts/clear_lock.py`
 
