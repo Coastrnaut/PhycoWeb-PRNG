@@ -261,7 +261,7 @@ Items found when the checklist was run a fourth time, over the complete document
 repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK049 Is the degree-based term of R_dist required to count distinguishers that combine the
+- [x] CHK049 Is the degree-based term of R_dist required to count distinguishers that combine the
   forward and the inverse bounds, given that research R13 and data-model §5 raise R_dist at each
   round count whose own bound d, for Π or for Π⁻¹ taken separately, is at most 126, while a zero-sum
   built from a middle state, over a subspace of dimension max(d_f, d_b) + 1 taken r₁ rounds forward
@@ -270,7 +270,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   `degree` record's verdict, so that the distinguishers "that the candidate's `degree` records
   admit" include it? [Coverage, Spec §FR-034, §Pre-registered Design Protocol "Round rule"; research
   R13; data-model §5 `degree`; security.md §12.1]
-- [ ] CHK050 Are the stated operation degrees that the `degree` records use upper bounds, and is the
+- [x] CHK050 Are the stated operation degrees that the `degree` records use upper bounds, and is the
   route that the claimable sizes use the one that is validated? Research R13 and data-model §5 give
   "w − 1 for a w-bit addition", while the most significant bit of the sum of two variable w-bit
   words has degree w (bit i has degree i + 1; at w = 2 it is x₁ ⊕ y₁ ⊕ x₀y₀), and w − 1 holds only
@@ -283,7 +283,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   given that FR-034 calls the records "upper bounds" and that the cost 2^(d + 1) of each raised
   round count holds only for an upper bound? [Conflict, Spec §FR-034, §FR-039; research R11, R13;
   data-model §5 `degree`, §7]
-- [ ] CHK051 May every node use the same rotation amounts? Research R13's symmetry check covers
+- [x] CHK051 May every node use the same rotation amounts? Research R13's symmetry check covers
   "every per-node constant, such as the rotation amounts", and an assignment equal at every node is
   mapped to itself by every translation, so it fails the check, and FR-024 asks for amounts "with no
   non-trivial grid symmetry", while FR-022 gives the 2w-bit ARX-box one set of trail bounds ("the
@@ -294,7 +294,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   assignment from n stated, given that research R11 and R14 change the amounts only with w, by the
   scaling rule? [Conflict, Spec §FR-022, §FR-024, §FR-037; research R6, R7, R11, R13, R14, R15;
   security.md FUT-GRID-4, S8]
-- [ ] CHK052 Is research R13's check of "the placement of the food nodes", a pattern of its own
+- [x] CHK052 Is research R13's check of "the placement of the food nodes", a pattern of its own
   beside each round's constants, consistent with the food-node rule? A placement of one food node is
   mapped to itself by a rotation about it, one of two food nodes by the half-turn about their
   midpoint, one with every node a food node by every symmetry, and every placement at 2×2 by a
@@ -305,7 +305,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   least number of food nodes and an arrangement with no symmetry required per size, and is 2×2's
   verdict stated? [Conflict, Spec §FR-018, §FR-023, §FR-037, §Pre-registered Design Protocol
   "Eligibility and selection"; research R13; data-model §5 `symmetry`]
-- [ ] CHK053 Is it stated how the other items of FR-018 to FR-031 that are written as duties of the
+- [x] CHK053 Is it stated how the other items of FR-018 to FR-031 that are written as duties of the
   design document or the rationale are decided for every candidate before selection, given that the
   eligibility rule gives a form only for FR-026's figures, FR-027's semantics and FR-030's mapping,
   while FR-018 asks for the folding rule and the longest link, the food nodes with their reason,
@@ -317,7 +317,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   shared by every candidate, decided once, and which are checked on the selected candidate only?
   [Completeness, Spec §Pre-registered Design Protocol "Eligibility and selection", §FR-018, §FR-020,
   §FR-022 to §FR-025; data-model §3 `parameters`, §9]
-- [ ] CHK054 Is the mapping chapter's restatement of the candidate's `mapping` log entry consistent
+- [x] CHK054 Is the mapping chapter's restatement of the candidate's `mapping` log entry consistent
   with the chapter's own rule, given that FR-030 has the chapter restate, for the selected
   candidate, each component's place in the metaphor "and the attack class, bound or need it serves",
   with every component naming "at least one attack class it resists", while the chapter "contains no
@@ -326,7 +326,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   rationale's component list (FR-034), with the chapter restating only each component's place in the
   metaphor, or is a stated form of the restatement exempt, with its allow-list entry? [Conflict,
   Spec §FR-030, §FR-034, §FR-069; data-model §3 `mapping`, §15 `allow_list`]
-- [ ] CHK055 Does the mapping chapter's word rule cover the arguments FR-030 forbids, and can the
+- [x] CHK055 Does the mapping chapter's word rule cover the arguments FR-030 forbids, and can the
   test find the chapter? FR-069 flags "the arguments FR-030 forbids" there beside the word list, but
   "emergent complexity" contains no listed word, and a mixing or diffusion claim made through the
   mapping, which FR-030 forbids as "evidence of mixing or security", is flagged elsewhere only when
@@ -334,7 +334,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   (a fixed heading, or a file of its own) are not stated, so the rule's scope is not defined. Are
   the words or phrases that stand for each forbidden argument listed, and is the chapter's heading
   fixed? [Measurability, Spec §FR-030, §FR-069; data-model §15]
-- [ ] CHK056 Is it stated from which family the further candidate after a decline may come, and what
+- [x] CHK056 Is it stated from which family the further candidate after a decline may come, and what
   follows when the declined candidate's family already has three candidates? The declined candidate
   stays eligible, selection takes the eligible candidates of the chosen family first, and a
   candidate added later "does not change the recorded choice", so, unless D4 was not computable, a
@@ -345,7 +345,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   candidate), so that a further candidate's hours are not spent on one the rules cannot select?
   [Coverage, Spec §Pre-registered Design Protocol "Eligibility and selection", "Stop rule", §FR-041,
   §FR-043, §Review & Approval "Owner design review"; research R6; data-model §3, §9]
-- [ ] CHK057 Where a candidate's call types draw on distinct constant streams, is it stated which of
+- [x] CHK057 Where a candidate's call types draw on distinct constant streams, is it stated which of
   the permutations they define each kind of evidence covers: all four (instantiate, generate, forget
   and reseed), or one, with the reason the others share its results? Only the refused-list check
   names "each call type's stream"; research R13's symmetry check reads "each round's constants", and
@@ -353,14 +353,14 @@ start open, and an item is ticked only under the rule in the Notes below.
   type. Is each kind's coverage stated, given that the constants differ between the permutations and
   that FR-023 requires that "the mode theorem's preconditions MUST still hold"? [Coverage, Spec
   §FR-014, §FR-023, §FR-037; research R4, R13, R15; data-model §5]
-- [ ] CHK058 Is the set of transforms under which a refused-list match is sought stated exactly,
+- [x] CHK058 Is the set of transforms under which a refused-list match is sought stated exactly,
   given that "after one word rotation or the complement applied to every word" leaves open which
   rotation amounts count (every k from 1 to w − 1, the same k for every word of the run) and whether
   a rotation combined with the complement matches, while FR-023's "differ" relation within a call
   covers "rotations of complements" and the stated chance of an accidental match, T·L·2w·2⁻⁶⁴,
   counts 2w transforms per position, w rotations each with and without the complement? [Clarity,
   Spec §FR-023, §Re-decided feature-002 requirements "FR-007"; research R15]
-- [ ] CHK059 Are the rotation search's space of amounts and ranking measure set by one rule for
+- [x] CHK059 Are the rotation search's space of amounts and ranking measure set by one rule for
   every candidate, or chosen for each candidate in its log entry, given that research R15 and
   data-model §3 let each candidate's entry record its own space, measure and rounds before its
   search, that every point needs a differential and a linear bound at the search width, so that the

@@ -252,7 +252,7 @@ Items found when the checklist was run a fourth time, over the complete document
 repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK046 Is it stated which evidence other than the bias tests is made again when R rises after
+- [x] CHK046 Is it stated which evidence other than the bias tests is made again when R rises after
   the structural checks, and in which row and order? The round rule "extends every bias test already
   run at that size to the new R", while other results depend on R: the invariant check runs "after
   one round and after a full call", the inverse tests run "at every supported size and variant" and
@@ -265,7 +265,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   in plan phase 5's order"), and may a check made again at the new R raise R again? [Gap, Spec
   §Pre-registered Design Protocol "Round rule", §FR-032; research R4, R7, R11, R13, R15; data-model
   §9]
-- [ ] CHK047 Is it stated whether the constants of rounds 1 to R of a call depend on R, so that
+- [x] CHK047 Is it stated whether the constants of rounds 1 to R of a call depend on R, so that
   results already measured at those rounds hold for the variant with a raised R? Research R15 reads
   each table "in the order call type (if the streams are distinct), round, food node", so that,
   where the call types draw on distinct streams, every call type after the first starts after the
@@ -276,7 +276,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   independent of R, for example by a fixed start for each call type's stream, or is every result of
   rounds 1 to R measured again on the new variant? [Consistency, Spec §FR-023, §Pre-registered
   Design Protocol "Round rule"; research R4, R15; data-model §5]
-- [ ] CHK048 Is it stated how "a reproduction's finding" raises R, given that the round rule lists
+- [x] CHK048 Is it stated how "a reproduction's finding" raises R, given that the round rule lists
   it among the rises that extend the bias tests, while a reproduction "can neither replace evidence
   nor add any", charges no row, is not a re-run, and has its verdict "recomputed under the spec
   version, the research version and the protocol change-log entry the original cites"? When a
@@ -287,7 +287,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   evidence that raises R, in which row and with which class? [Conflict, Spec §Pre-registered Design
   Protocol "Round rule"; research R4, R7, R16; data-model §1 "Reproduction"; cli contract
   "Reproduction"]
-- [ ] CHK049 Are a record and a scope given for "a trail found with probability or squared
+- [x] CHK049 Are a record and a scope given for "a trail found with probability or squared
   correlation above 2⁻¹²⁸", a source of R_dist? No field of data-model §6's bound record holds a
   trail, its probability or the round count it distinguishes, although data-model §1 classifies "a
   trail found by a validated tool" and `round-rule.json` holds R_dist "with its evidence records,
@@ -299,7 +299,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   R_bound counts as one, given that, if it does, 2·R_dist is at least 2·(R_bound − 1), which is at
   least R_bound + Δ whenever R_bound ≥ 4, so that the term R_bound + Δ never decides R? [Ambiguity,
   Spec §Pre-registered Design Protocol "Round rule", §FR-038; research R12; data-model §1, §6, §9]
-- [ ] CHK050 Is it stated which budget the uniform controls are charged to, given that research R7's
+- [x] CHK050 Is it stated which budget the uniform controls are charged to, given that research R7's
   12 h row, a row per candidate, holds the frequency and avalanche tests "with their controls" and
   runs them "each with its control", while research R4, data-model §5 and the cli contract give each
   test one control record per size that "serves every candidate" and say that "A `control` run
@@ -311,7 +311,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   stated, and does the first candidate to reach a size pay for every candidate's control there, or
   does the reservation of each candidate's 12 h row count the controls? [Gap, research R4, R7;
   data-model §1, §5 `control`; cli contract "Heavy runs", "Budget", `scripts/evidence_v3.py`]
-- [ ] CHK051 Is it stated what must match for the avalanche test's planted gap, "a stated variant
+- [x] CHK051 Is it stated what must match for the avalanche test's planted gap, "a stated variant
   that leaves one lane unmixed": that exactly that lane's difference bits fire, at every round
   count, and no other bit, or only that the lane's bits fire, given that data-model §7 asks only
   that "the planted gap of R13 re-found" and that its list of "exact equality for every
@@ -323,7 +323,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   pairs" for the verdict code and the power, and that "R13's planted gap and the cross-check keep
   validating the counting" only for differences that never flip? [Measurability, Coverage, Spec
   §FR-039; research R4, R13; data-model §7]
-- [ ] CHK052 Is the second known result that a re-validation needs after a failed validation, "a
+- [x] CHK052 Is the second known result that a re-validation needs after a failed validation, "a
   second known result of its kind as well as the first, named in the defect record before the fix
   runs", fixed for each tool before its first validation, with its source? For the trail tools, a
   second published value needs a paper, and research R19 approves eight with "Nothing else is
@@ -334,7 +334,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   known results, their sources and the order rule that applies to them stated, and what follows when
   a tool has no second known result of its kind? [Gap, Spec §FR-039, §FR-046; research R12, R13,
   R19; data-model §7, §14]
-- [ ] CHK053 Is the comparison that decides a cross-check between kinds stated, as data-model §7
+- [x] CHK053 Is the comparison that decides a cross-check between kinds stated, as data-model §7
   states what must match for a known result? Research R12 says that the ARX search "must reproduce
   the exhaustive box tables" of each ARX candidate's ARX-box at w = 4 and 8, while a trail search
   gives the weight of an optimal trail and a difference or linear table gives differentials and
@@ -346,7 +346,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   which quantity is compared with which, over which rounds and sizes, and whether a trail weight
   above the table's differential weight, as clustering gives, passes? [Measurability, Spec §FR-039;
   research R7, R12; data-model §6 `cross_check`, §7]
-- [ ] CHK054 Is the order of the 48 h row consistent with the rule that the ARX search counts at w =
+- [x] CHK054 Is the order of the 48 h row consistent with the rule that the ARX search counts at w =
   16 and 32 only after its cross-check? Research R7 fixes the row as "the reduced-width and
   rotation-amount searches, then box tables, box-trail searches, active-box or active-S-box counting
   and the solver cross-checks", and the cross-checks between kinds run "as the solver cross-checks
@@ -360,7 +360,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   that does not yet count, so that neither the D4 choice nor the rotation amounts wait for a check
   that needs their own result? [Conflict, Spec §FR-039, §Pre-registered Design Protocol
   "Nonlinearity choice rule (D4)"; research R6, R7, R12, R15; data-model §6, §8]
-- [ ] CHK055 Is the grid to which a floating-point solver value is rounded stated, given that
+- [x] CHK055 Is the grid to which a floating-point solver value is rounded stated, given that
   research R12 and data-model §6 turn it into a rational "by rounding in the direction that weakens
   it" and say that "a weight is rounded down, never up", while every floating-point value is already
   an exact binary rational, 2^(−W) is irrational for every weight W that is not an integer, and the
@@ -370,7 +370,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   integral objective be taken as the integer when it lies within a stated tolerance below it, given
   that one active box can move R_bound by a round and that the D4 score compares the rational bounds
   exactly? [Clarity, Spec §FR-038; research R6, R12; data-model §6 `bound`]
-- [ ] CHK056 Can a bound carried from one claimable size to a larger one serve a candidate's round
+- [x] CHK056 Can a bound carried from one claimable size to a larger one serve a candidate's round
   rule before selection, given that FR-038 and research R12 carry it "only by a proof in the design
   document", while the design document is completed in plan phase 6, after selection, for the
   selected candidate only, and an eligible candidate "has an established R_bound at every claimable
@@ -381,7 +381,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   every larger claimable size", still reserves the searches that a carried bound replaces? [Gap,
   Spec §FR-034, §FR-038, §Pre-registered Design Protocol "Eligibility and selection"; research R7,
   R12; data-model §1 "Fields compared, per kind", §6, §9]
-- [ ] CHK057 Is the phase rule, "within one phase no update reads a lane that another update of that
+- [x] CHK057 Is the phase rule, "within one phase no update reads a lane that another update of that
   phase writes", checked by code on each operation list at every supported size, as the two
   operation forms are ("A list not made of these two forms is refused before any test") and as the
   odd-n colouring is ("checked link by link by a committed test")? Are the interpreters' semantics
@@ -392,7 +392,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   through the neighbourhood; is it stated that bijectivity, which FR-032 transfers from 2×2 as a
   property that does not depend on the neighbourhood, holds at every size for the reading the
   hardware uses? [Gap, Spec §FR-019, §FR-025, §FR-032; research R11, R13, R14]
-- [ ] CHK058 Does data-model §1's classification table give one class for every kind and outcome,
+- [x] CHK058 Does data-model §1's classification table give one class for every kind and outcome,
   given that its rows name only "No finding", a firing or a trail that raises R, "A test that does
   not fire" and a finding of a tool not yet validated, while records of other kinds and outcomes
   exist: a reproduction that differs, where "a difference is a finding"; a `dependency` record

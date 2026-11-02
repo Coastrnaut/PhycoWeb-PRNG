@@ -328,7 +328,7 @@ Items found when the checklist was run a fourth time, over the complete document
 repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK058 Is the nonce's path specified so that it can coexist with the key's? FR-025 loads the
+- [x] CHK058 Is the nonce's path specified so that it can coexist with the key's? FR-025 loads the
   key "once per key along a registered shift chain through those nodes", copied "in one cycle at
   every instantiate", while "the nonce reaches its lanes through the absorption tree where they are
   rate lanes, and along the same chain otherwise", that is at every instantiate. Where are the
@@ -342,7 +342,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   lanes that FR-013 has set to "the rest of it set to stated constants" are set in hardware at each
   instantiate, in the same cycle as the copy? [Gap, Spec §FR-013, §FR-025 "Key loading and reset",
   "Zeroization"; plan "Complexity Tracking"; constitution Principle III]
-- [ ] CHK059 Is the path by which the host starts each call specified, with the port list it belongs
+- [x] CHK059 Is the path by which the host starts each call specified, with the port list it belongs
   to? FR-025 names three interfaces, "Each interface (key loading, absorption, output) uses valid
   and ready", while the host must also choose among a key load, instantiate, generate, reseed and
   zeroize, and "A generate request gives its length in 32-bit words" on no named interface; inside
@@ -353,7 +353,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   design-level criteria cite "the port list with no read-back path", which no requirement asks the
   design document to give? [Gap, Spec §FR-025 "Flow control", "Call sequence", "Registers and
   read-back", §FR-059, §Security Policy traceability "FUT-HW-5"; FUT-HW-5]
-- [ ] CHK060 Is the end of FR-025's instantiate figure an event the core controls, given that it
+- [x] CHK060 Is the end of FR-025's instantiate figure an event the core controls, given that it
   runs "from the last nonce or personalization word accepted to the first output valid", while
   instantiate gives no output ("forget MUST follow every generate request and end every
   instantiate") and the first output valid follows a generate request whose arrival the host sets,
@@ -361,7 +361,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   core accepts a generate request, with a generate request's own figure from its acceptance to its
   first output valid, or does it assume a generate request issued at once, of a stated length?
   [Clarity, Spec §FR-025 "Key loading and reset", §FR-013, §FR-020, §FR-029]
-- [ ] CHK061 Is the response to a call stated for each stretch in which the state table opens no
+- [x] CHK061 Is the response to a call stated for each stretch in which the state table opens no
   call: in `not-reset`, which "refuses every call" while "every register of the core has a stated
   initial value of zero", the error-code register among them; in `failed`, which "refuses every call
   with `selftest_fail` set until the next reset"; and during the reset sequence itself, while the
@@ -374,7 +374,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   the self-test, which "every reset runs the self-test again" says of reset, and that a failed
   self-test's zeroization does not start another? [Gap, Spec §FR-025 "Call sequence", "Zeroization",
   §FR-059, §FR-020]
-- [ ] CHK062 Are abandoned calls specified: a key load the host stops after some of the key's words,
+- [x] CHK062 Are abandoned calls specified: a key load the host stops after some of the key's words,
   and a generate request whose consumer never takes a block? The state table has no state for a key
   load in progress, and `no-key` "accepts a key load only", so a zeroize is refused while a partial
   key sits in the chain and the key-loading buffer, and only a reset clears it; nothing says whether
@@ -384,7 +384,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   the buffer and delays the next call", for as long as the consumer likes; is a zeroize accepted
   while the buffer waits, and what does it clear? [Gap, Edge Case, Spec §FR-025 "Call sequence",
   "Flow control", "Zeroization", §FR-020]
-- [ ] CHK063 Is the path by which the self-test's key and nonce reach the key registers and the
+- [x] CHK063 Is the path by which the self-test's key and nonce reach the key registers and the
   lanes stated, given that "The self-test runs instantiate with the key and nonce 0 of the frozen
   vectors", that FR-026 counts "the self-test's key, nonce and expected output held as constants",
   and that FR-025 loads a key from the key-loading interface "along a registered shift chain"? Does
@@ -393,7 +393,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   for a key)", or load each key register in parallel; and is the comparator's width stated, a whole
   block of r bits as it is produced or the interface's width, given that "Its blocks go only to its
   comparator"? [Gap, Spec §FR-059, §FR-025 "Key loading and reset", "Zeroization", §FR-026]
-- [ ] CHK064 Does FR-020's counting rule count the cycles in which the core computes while no
+- [x] CHK064 Does FR-020's counting rule count the cycles in which the core computes while no
   transfer takes place: "counting the cycles in which the core works: on output, the cycles with
   ready high, and on input (key loading, a personalization string, a reseed input), the cycles with
   valid high while the core's ready is high"? Read literally, a generate request's calls of Π are
@@ -405,7 +405,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   host (output valid high with ready low; on an input, the core's ready high with valid low), with a
   call's start and end defined at the ports? [Measurability, Spec §FR-020, §FR-025 "Flow control";
   FUT-HW-5]
-- [ ] CHK065 Does FR-026's rate count what FR-020's cycle formulas include, given that the implied
+- [x] CHK065 Does FR-026's rate count what FR-020's cycle formulas include, given that the implied
   rate is "r/(P·R + ⌈r/i⌉) bits per cycle", with "768 bits in 64 + 24 = 88 cycles" at 4×4, while
   FR-020's formulas include "the output buffer's hand-over, its clearing and that of the trees when
   a request ends, and the start signal's fan-out latency", the start signal crossing its tree at
@@ -415,7 +415,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   count "each request's output calls plus its forget call, with instantiate's calls spread over a
   stated number of requests per instantiation", without the trees, and none counts the clearing at a
   request's end? [Consistency, Spec §FR-020, §FR-026; research R5; data-model §10]
-- [ ] CHK066 Can a pipeline stage hold the two serial carry chains that FR-025 allows, "Each
+- [x] CHK066 Can a pipeline stage hold the two serial carry chains that FR-025 allows, "Each
   pipeline stage of the round structure needs at most two serial w-bit carry chains", given that "A
   stage is one colour phase and takes one clock cycle", that each update `dst ← dst ⊙ F(srcs)` adds
   at most one chain, with "F built from rotations, shifts, bitwise functions and round constants",
@@ -427,7 +427,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   and the XOR that reads its result, which then needs a stage that is not one colour phase, with P,
   the cycle formulas and research R5's depth rule ("and one more for each dependent operation on the
   path") read accordingly? [Consistency, Spec §FR-025 "Stages", §FR-019; research R5, R11]
-- [ ] CHK067 Does FR-026's estimate, "each part with its own figure", which feature 008 "checks part
+- [x] CHK067 Does FR-026's estimate, "each part with its own figure", which feature 008 "checks part
   by part against Vivado's hierarchical utilization report", name the parts that FR-025 adds beside
   those it lists: the registered fan-out trees of reset and of the start signal, with the call type
   "as a field of ⌈log₂ t⌉ bits for t call types registered beside it at every node"; the selector at
@@ -436,7 +436,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   signal"; and the self-test's comparator and sequencer? Is each counted, or stated to be negligible
   with its reason, given that the lane selectors alone could take a LUT per state bit, 2w·n² at a
   size? [Completeness, Spec §FR-026, §FR-025, §FR-059; FUT-HW-2; research R5]
-- [ ] CHK068 Is the hardware format of a key or a nonce that is not a whole number of 32-bit words
+- [x] CHK068 Is the hardware format of a key or a nonce that is not a whole number of 32-bit words
   stated, given "32-bit transfers on the key-loading and absorption interfaces" and "the key and the
   nonce as whole words in a stated word and byte order, matching the model's", while "The
   key-loading interface is generic in c: a c-bit key and a c/2-bit nonce" and c need only be "a
@@ -445,7 +445,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   of 64 for keyed variants, or are the unused bits of a last partial key or nonce word stated, zero
   and refused otherwise, as for a personalization string? [Edge Case, Spec §FR-025 "Key loading and
   reset", "Flow control"; research R14; model contract "Variant IDs"]
-- [ ] CHK069 Is the reset that the board wrapper gives the core specified against the clock the
+- [x] CHK069 Is the reset that the board wrapper gives the core specified against the clock the
   wrapper derives? "feature 008's board wrapper also holds reset for a stated number of cycles after
   configuration", while it "derives the clock from the 100 MHz oscillator through an MMCM", whose
   output is not usable until it locks, and "Reset is synchronous", so that a reset request from the
@@ -454,7 +454,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   synchronously to the derived clock, and to hold the core in reset again if lock is lost, with
   these carried to feature 008 as the clock split is? [Gap, Spec §FR-025 "Key loading and reset",
   "Call sequence"; FUT-HW-1, FUT-HW-2; constitution Principle III]
-- [ ] CHK070 Is "supported" one set of sizes throughout? The model contract's "Supported values: n =
+- [x] CHK070 Is "supported" one set of sizes throughout? The model contract's "Supported values: n =
   2…16 where the design document's update schedule covers n" and research R14's "The research
   interface accepts every n from 2 to 16 for exploration" admit n = 5, 6, 7 and 9…15, which FR-018
   counts as not supported ("any size from 2×2 to 16×16 that is not supported MUST be listed with the

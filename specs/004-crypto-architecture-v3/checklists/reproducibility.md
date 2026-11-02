@@ -395,7 +395,7 @@ Items found when the checklist was run a fourth time, over the complete document
 repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK056 Is the FUT-SEC-8 reproduction one record of one kind at one path? The cli contract's
+- [x] CHK056 Is the FUT-SEC-8 reproduction one record of one kind at one path? The cli contract's
   introduction says that every script that writes evidence "also runs as `--reproduce RECORD`",
   "with its output directory replaced by `$REP/reproductions/<record_id>/<n>/`", writing a
   `reproduction` record that holds "the original's ID and SHA-256, each compared field with its
@@ -411,7 +411,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   its own; and is `--out-dir` taken by a mode whose output directory is replaced? [Conflict,
   data-model §1 "Reproduction", §4; cli contract "Reproduction", `fut_sec8.py`; plan "Project
   Structure"; Spec §FR-053]
-- [ ] CHK057 Is the file name of a second demonstration record stated? The demonstration record is
+- [x] CHK057 Is the file name of a second demonstration record stated? The demonstration record is
   `fut-sec-8/demonstration.json`, a name without the `record_id` that is "unique; part of the file
   name" of every record, and it is not among the files kept under a fixed name, while "A record is
   never overwritten: a repeat run writes a new record with a new identifier, and the old one stays",
@@ -422,7 +422,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   register cite ("security.md's best-attack register row for exhaustive seed search cites it") and
   `--reproduce RECORD` compare with? [Gap, Edge Case, Spec §Edge Cases, §FR-003, §FR-053; data-model
   introduction, §1, §4; cli contract `fut_sec8.py`]
-- [ ] CHK058 Is the place of a reproduction's outputs stated consistently with the storage rules? A
+- [x] CHK058 Is the place of a reproduction's outputs stated consistently with the storage rules? A
   reproduction "writes its outputs and a `reproduction` record into
   `reproductions/<record_id>/<n>/`", under `reports/004-crypto-architecture-v3/`, while local-only
   files are "written under `data/local/004/<record_id>/` and never under this directory",
@@ -436,7 +436,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   `reproductions/<record_id>/<n>/` itself committed? [Conflict, data-model introduction, §1
   "Reproduction", `outputs`, §5, §11; research R16; cli contract "Reproduction", "Generators of
   constants and vectors"]
-- [ ] CHK059 Is the comparison of a `p_values` output stated one way? FR-053 and data-model §1
+- [x] CHK059 Is the comparison of a `p_values` output stated one way? FR-053 and data-model §1
   compare "each deterministic output's `sha256` and `bytes`", and an output is marked
   `deterministic` false only when it is not, "such as a raw solver log with timings", while a
   `p_values` file is "compared by its values", "its `uncompressed_sha256` is reported only", and
@@ -450,7 +450,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   a reproduction compares them within a relative tolerance of 10⁻⁶" state the same rule as section
   1's, which also lets two values below 2⁻¹⁰²² agree? [Consistency, Spec §FR-053; data-model §1
   "Reproduction", `outputs`, §5 "Exact verdicts"; research R4, R16]
-- [ ] CHK060 Does a generator run leave a record that its reproduction can compare with? A run of
+- [x] CHK060 Does a generator run leave a record that its reproduction can compare with? A run of
   `gen_constants_v3.py`, `gen_vectors_v3.py` or `gen_constructed_v3.py` writes its files and "one
   entry per generator run with its `record_id`" in the sidecar, holding "the command (script and
   arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform,
@@ -468,7 +468,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   synopsis gives as one `gen_vectors_v3.py --reproduce RECORD` line, commented "each generator"?
   [Gap, Spec §FR-053, §FR-061, §FR-036; data-model §1 "Fields compared, per kind", §11; cli contract
   "Generators of constants and vectors"]
-- [ ] CHK061 Is it stated which code a reproduction and the re-check run for a record whose code
+- [x] CHK061 Is it stated which code a reproduction and the re-check run for a record whose code
   files have changed since its run? A reproduction compares "each source file's entry in
   `code_sha256`", a different hash makes it "a new run, not a reproduction", and the cli contract
   applies to it every guard but Budget and Order of sizes, which would include the committed-code
@@ -485,7 +485,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   module for a record made under an earlier version of it before the freeze? [Gap, Spec §FR-053,
   §FR-061, §FR-065; data-model §1 "Reproduction", `code_sha256`; research R16; cli contract
   "Reproduction", "Guards shared by every script", `recheck_004.py`]
-- [ ] CHK062 Are the committed data files that records cite by SHA-256 kept as cited, when they are
+- [x] CHK062 Are the committed data files that records cite by SHA-256 kept as cited, when they are
   neither code nor among the files kept under a fixed name? Every frequency and avalanche record
   holds "the critical-count table it used (path and SHA-256)",
   `research/004/tools/critical_counts.json`, whose counts "are derived once" per (N, S) and (N_a,
@@ -499,7 +499,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   it committed before any run that cites it; and is `critical_counts.json` code, under
   "`research/004/ir.py` and its tools", or data? [Consistency, Gap, data-model introduction, §1
   `dirty_paths`, `code_sha256`, §3, §5 "Exact verdicts", §11; research R4, R7, R16]
-- [ ] CHK063 Can every light kind be reproduced as FR-061's test requires, "through the script's
+- [x] CHK063 Can every light kind be reproduced as FR-061's test requires, "through the script's
   `--reproduce` mode"? Research R7 calls light "one this section does not budget that runs with one
   worker in under 10 minutes, such as the constants, the vectors and the constructed states,
   `mode_limits_v3.py`, the round rule, the D4 choice, the claim register and the re-check", while
@@ -512,7 +512,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   take, or last took, more than 10 minutes", so that one kind may be light at 4×4 and heavy at
   16×16? [Coverage, Spec §FR-061, §FR-053, §User Story 4 Independent Test; research R7, R16;
   data-model §1; cli contract `recheck_004.py`, `check_claims.py`, `clear_lock.py`]
-- [ ] CHK064 Is the loader's response stated for test states at an (n, w) that has no recorded
+- [x] CHK064 Is the loader's response stated for test states at an (n, w) that has no recorded
   fingerprint, and how one is added? Research R3 records "The fingerprint of each kind, of the state
   kind at every supported n and w" in the module, written in plan phase 1
   ("`protocol/devinputs_v3.py` with fingerprints"), and `load` checks "the kind's fingerprint (for
@@ -525,7 +525,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   hashes, so that an addition after the first record makes every earlier record's source hash differ
   from HEAD's? [Gap, Edge Case, Spec §FR-040; data-model §2, §3, §13; research R3; plan "Phases and
   gates"]
-- [ ] CHK065 Does a reproduction run only in the environment that made the original, or in either of
+- [x] CHK065 Does a reproduction run only in the environment that made the original, or in either of
   research R1's two? Research R1 says "A reproduction that re-runs evidence may run in either
   environment, whichever made the original, and in no other", data-model §1 that "the environment is
   either of research R1's two, as recorded", and FR-053 that "the environment is either of the two
@@ -536,7 +536,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   environment stated per kind, and is a reproduction in the other environment, where allowed,
   compared on the same fields, with what a difference there means? [Consistency, Spec §FR-053;
   research R1, R12, R16; data-model §1 "Reproduction", §6, §7; cli contract `validate_tool.py`]
-- [ ] CHK066 Is the Windows environment of research R1 stated as it is installed, with the way its
+- [x] CHK066 Is the Windows environment of research R1 stated as it is installed, with the way its
   package list is read? A probe on 2026-11-01 found the Microsoft Store distribution of Python
   3.10.11, run through an alias in the user's WindowsApps folder from a prefix under Program Files
   whose name carries the package's version (3.10.3056.0), with numpy, scipy, nistrng and pip 26.2.2
@@ -550,7 +550,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   the wheels are installed into the user site while the download rule holds? [Gap, Dependency,
   research R1, R18, R19; data-model §1 `command`, `environment`; Spec §FR-061; plan "Phases and
   gates"]
-- [ ] CHK067 Is `requirements.txt` stated for the case that research R17 and R19 allow, a Hypothesis
+- [x] CHK067 Is `requirements.txt` stated for the case that research R17 and R19 allow, a Hypothesis
   wheel not obtained ("If it cannot be obtained, its absence is an open item (FR-058)")? Research
   R18 adds `hypothesis==6.168.5` and `sortedcontainers==2.4.0` with no marker, for both
   environments, once Hypothesis is approved rather than once it is installed, while an environment
@@ -562,7 +562,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   tests skipped and listed as the open item or failing quickstart P0, which expects "all tests pass,
   existing and new"? [Edge Case, Dependency, Spec §FR-058, §FR-053; research R1, R17, R18, R19;
   quickstart P0]
-- [ ] CHK068 Is each record's `kind` named, with one rule for its file name? `kind` is "one of the
+- [x] CHK068 Is each record's `kind` named, with one rule for its file name? `kind` is "one of the
   kinds of sections 4–11, `projection`, `lock-cleared`, `reproduction` or `recheck`", every
   reproduction compares it, and `record_id` is `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, but only
   section 5's kinds, `bound`, `cost`, `generator-check` and `fut-sec-8-reproduction` have names: the
@@ -574,7 +574,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   listed, every file name built by one stated rule, and the eight hex digits of `record_id` stated
   as random or derived, so that another implementation writes the same names? [Clarity, data-model
   §1, §4 to §11; cli contract `evidence_v3.py`; Spec §FR-061]
-- [ ] CHK069 Does the plan's source tree agree with the contracts on the files it lists? It lists
+- [x] CHK069 Does the plan's source tree agree with the contracts on the files it lists? It lists
   two `design_freeze.py`, one under `protocol/` ("new: freeze create, approve and validate
   (FR-043)") and one under `scripts/` ("create, approve and validate the freeze"), while the cli
   contract and quickstart F1 run `scripts/design_freeze.py` only and the freeze record hashes
