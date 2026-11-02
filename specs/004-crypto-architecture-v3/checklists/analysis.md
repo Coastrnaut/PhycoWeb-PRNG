@@ -565,6 +565,27 @@ and an item is ticked only under the rule in the Notes below.
   published values and the bias test's synthetic families? [Gap, Coverage, Spec §FR-039, §SC-007;
   research R12, R13; data-model §7; cli contract `validate_tool.py`; quickstart V1]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK072 Are the word widths that the active-S-box counter's known result covers stated, given
+  that research R12 asks every tool's validated kind to state "its word widths, operation set and
+  kind of model", says that a search's results "count only at a width so covered" and that the
+  cross-checks at 4×4 with w = 4 cover a candidate's operation set and "never a word width", while
+  it states the counter's kind as "4-bit S-boxes under a bit permutation", from PRESENT's minimum
+  of 10 active S-boxes over 5 rounds on a 64-bit state that has no word width w, and lets that kind
+  serve the counter's "uses on the Boolean candidates' layers at the D4 and production widths", 16
+  or else 8, and 32? Is it stated what a word width is for that counter, whose S-box width on a
+  Boolean layer need not be w, and whether PRESENT's result covers w = 8, 16 and 32, or each of
+  those uses needs a further known result fixed before the tool's first validation, as R12 asks of
+  the ARX search at w = 32 and of the long-trail counter at the D4 width, a use without one writing
+  `not evaluated`, so that the D4 score and R_bound of a Boolean candidate do not rest on a use that
+  no known result covers? [Clarity, Consistency, Spec §FR-022, §FR-039; research R6, R12
+  "Validated widths", "Cross-checks between kinds"; data-model §7 `validated_kind`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
