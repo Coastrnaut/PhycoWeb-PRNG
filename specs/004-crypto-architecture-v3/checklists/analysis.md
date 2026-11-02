@@ -586,6 +586,69 @@ start open, and an item is ticked only under the rule in the Notes below.
   no known result covers? [Clarity, Consistency, Spec §FR-022, §FR-039; research R6, R12
   "Validated widths", "Cross-checks between kinds"; data-model §7 `validated_kind`]
 
+## Seventh re-run (2026-11-02)
+
+Items found when the checklist was run an eighth time, over the complete documents and the
+repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK073 Does the replacement rule apply to every `ineligible` decision, given that one is
+  entered for every candidate that became `rejected` or `ineligible` "while its family has fewer
+  than three evaluated candidates and the budget allows", that the `replacement` entry logged with
+  the decision stays `pending` until the replacement's `proposed` entry or a stated reason, "the
+  family full" or "the budget spent", closes it, and that `round_rule.py --close` writes
+  `set-closed` only once "no replacement is pending"? Some decisions have a cause that no
+  replacement can escape: each candidate of the family D4 did not choose that was not analysed at
+  the production width gets `ineligible`, "not analysed at the production width: D4 chose the other
+  family", when the chosen family has an eligible candidate, and a replacement entered in its family
+  would get the same decision, and so would the next, until the family holds three; a uniform
+  control that fires makes the bias evidence of its size inconclusive "for every candidate", and the
+  feature "recommends stopping", as it does when no trail route is validated; and a match in the
+  shared polynomial "touches every candidate and ends in a stop". Is it stated which decisions call
+  for no replacement, and the reason that closes their `replacement` entries, so that the set can
+  close and the stop rule apply without entering candidates that cannot become eligible? [Conflict,
+  Gap, Spec §Pre-registered Design Protocol "Nonlinearity choice rule", "Eligibility and selection",
+  "Stop rule", §Edge Cases; data-model §3 "Decisions", "Entered set"; research R4 "Uniform control",
+  R7 "The other family", R12, R15; cli contract `round_rule.py`]
+- [ ] CHK074 Is it stated whose 12 h rows a uniform control's hours must fit, and what follows when
+  one cannot hold them? The cli contract runs a control once per test and size, "before that test's
+  first use at that size by any candidate", and "only if every entered candidate's 12 h row can hold
+  its hours", since every candidate's row is charged them "whether the control ran for it or before
+  it" (research R7), each row reserving them by projection until they exist; while the control
+  projects first, against reservations made from earlier projections, and a budget lowered below the
+  hours already used "leaves zero hours", so that the row of a candidate already `rejected` or
+  `ineligible`, which will never use that size, can keep the control from running, and with it every
+  other candidate's test at that size. Is it stated whether the rows of candidates with a final
+  decision count, and whether a control that cannot run leaves that test's evidence at that size
+  `blocked` or inconclusive for every candidate, waits, or is charged otherwise? [Gap, Consistency,
+  Spec §Pre-registered Design Protocol "Bias rule", "Stop rule"; research R4 "Uniform control", R7
+  "What else is charged"; data-model §3 `budget_used_h`; cli contract "Budget", `evidence_v3.py`]
+- [ ] CHK075 Is the R in the family-wise rate stated beside a firing defined? FR-028 and research R4
+  give the rate as 1 − 0.995^(3⌈R/2⌉·T), or 1 − 0.995^(T·(3⌈R/2⌉ + 3)) with the avalanche test,
+  counting the round counts r with 2r > R, "⌈R/2⌉ of them per size", over the three claimable sizes
+  as if they shared one R, while FR-028 has R "computed per claimable size", so that it "may differ
+  between sizes", and R4 notes that "A raised R adds round counts". Is it stated whether the rate
+  takes each size's own R, summing ⌈R/2⌉ over the sizes, and which R it takes, the one before the
+  firing, the one after it or the one at the freeze, so that the rate stated beside each firing,
+  repeated in the final report and in FR-041's statement of the selection bias, can be computed by
+  code from the records? [Clarity, Measurability, Spec §FR-028, §FR-041, §Pre-registered Design
+  Protocol "Bias rule"; research R4 "False firing"]
+- [ ] CHK076 Is it stated which known results a tool is validated again on after a failed validation
+  when it has more than one, given that research R12 and data-model §7 give each counted tool one
+  known result and one second known result, fixed before its first validation, and that after a
+  failure "the re-validation re-finds the second as well as the first" (cli contract), "so that a
+  fix cannot be tuned to one value" (R12), while R12's validated widths give several tools further
+  known results, one per width, each fixed before the tool's first validation: the ARX search one at
+  32-bit words beside SPECK32's at 16, the active-S-box counter one at each of its widths, 16 or
+  else 8, and 32, since PRESENT's covers none, the long-trail counter one at the D4 width beside
+  SPARKLE's at 32, and the exhaustive tables those for the boxes of 8 and 16 bits and for the
+  cross-checks' internal-trail search beside the PRESENT S-box's? Is it stated whether each further
+  known result has a second of its own at its width, fixed before the tool's first validation, and
+  which known results a re-validation re-finds after a failure at one width, so that a use at that
+  width does not count again on a fix tuned to its one value? [Clarity, Consistency, Spec §FR-039;
+  research R12 "Validated widths", "A failed validation", "Second known results"; data-model §7; cli
+  contract `validate_tool.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
