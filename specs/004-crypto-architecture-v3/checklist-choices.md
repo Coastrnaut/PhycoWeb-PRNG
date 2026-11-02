@@ -828,6 +828,15 @@ From the fourth re-run, 18 of its 36 rows:
 - **Constant rule** (research R15; FR-023): ANA-065, HW-073.
 - **Protocol changes and their directions** (FR-044): PRO-058, PRO-060.
 
+Added beside this list on 2026-11-02 under PRO-058's reading, which the owner's answer to the fourth
+re-run approves: the five rows of this round whose applied changes altered research R16, the place
+that the heading below names, as their Changes cells also say (SEC-073 in commit 2d78666, RAT-061 in
+commit d5c2ee5, and REP-070, REP-071 and REP-073 in commit 2826842), so that the round enters the
+log with 23 of its 36 rows. The same comparison of every place the headings name, between commits
+812415c and 2826842, found no other place changed without a row of the round listed under its rule.
+
+- **Records and their hashes** (research R16): SEC-073, RAT-061, REP-070, REP-071, REP-073.
+
 ## After the answer
 
 The options chosen for the 29 rows of the re-run were written into the documents their Changes cells
