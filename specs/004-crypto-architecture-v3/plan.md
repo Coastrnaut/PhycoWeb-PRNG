@@ -18,9 +18,11 @@ The feature runs in the spec's order, and each step needs the one before it:
    both `phyco-v2` golden vector files, sweeps all 2³² candidates for the last two seed words of
    three development targets, under an hour on 32 threads (research R2). The owner reviews the
    result (⛔) before any `phyco-v3` key-loading code exists.
-2. **Security target (US2)**: chapter 1 of the design document states the properties sought,
-   s = 128, the 256-bit key and 128-bit nonce, threats T1–T11, every generic bound per size, and
-   the keyed-duplex theorem with its preconditions. The output limits follow from the theorem at
+2. **Security target (US2)**: chapter 1 of the design document, "Security target", states the
+   properties sought, s = 128, the 256-bit key and 128-bit nonce, threats T1–T11 and every generic
+   bound per size, and the mode chapter beside it, "Mode", the keyed-duplex theorem with its
+   preconditions; the security-target review covers both, with the security
+   target's files (SEC-075). The output limits follow from the theorem at
    a target advantage of 2⁻⁶⁴ (R9, R10). Reading each theorem paper is a download; the owner
    approved every file of R19, as listed with its source, size and licence, on 2026-11-01.
 3. **Design (US3)**: every candidate Π is written once as an operation list made only of

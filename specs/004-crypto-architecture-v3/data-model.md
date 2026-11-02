@@ -739,7 +739,11 @@ theorem's number and page, `verified` or `unverified`, and each precondition wit
 section that meets it, marked met or not), which `design_freeze.py create` reads (section 13):
 `mode_limits_v3.py` refuses `verified`, exit 2, without such an entry or when the file on disk has
 another SHA-256, and the marks count only once the security-target review row, which reviews the
-chapter by its version, reads Approved, `create` reading them as `unverified` until then; the
+chapter by its version, reads Approved, `create` reading them as `unverified` until then: that
+version is the set the spec's notes under the Review & Approval table define, the SHA-256 of the
+chapters "Security target" and "Mode" and of this file and `parameters.json`, with the design
+document's version read, so that a mark set after the review counts only once
+a "Security-target review <k>" naming the changed set reads Approved; the
 limits per instantiation, per request and per key, each in calls of Π, the theorem's unit, which is
 primary, and in bits at every claimable size (a request of n bits takes ⌈n/r⌉ output calls plus one
 forget call, and instantiate's calls are stated); every other online quantity the bound counts with
@@ -832,13 +836,19 @@ copy against its manifest hash and its live source (SC-012).
   its command, `scripts/design_freeze.py`; and the security target's files
   `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
   every one of which must be `verified`, with each precondition marked met, marks that count only
-  under an Approved security-target review row (section 10; research R10).
+  under an Approved security-target review row naming the set the record freezes, the SHA-256 of the
+  chapters "Security target" and "Mode" and of these two files, which `create` compares item by item
+  (section 10; research R10).
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the
   protocol change log.
 - **Selection**: the `variant_map` of the `selected` entry (section 3), with the operation
   list's SHA-256.
+- **External review**: the external design review's row, "External design review <k>" with the
+  highest k where one exists, its value, done or not arranged, and for done the review package's
+  manifest SHA-256 and the design-document version it names, with the design-document versions since
+  where the design changed after that review, as the final report states them (spec FR-043, SC-013).
 - Tool versions; `git_head`; `git_dirty`, which must be false; `draft_sha256`, written by `create`:
   the SHA-256 of the record's canonical JSON without that field and the approval fields; and
   `status`, `draft` until the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
@@ -897,7 +907,14 @@ dates and the rows it rested on). `phyco-v3` starts at L0 and moves to L1 only w
 recorded" row, or "L1 recorded <k>" with the highest k, reads Approved and names the highest-k row
 of the FUT-SEC-8 result review and of the security-target review, both Approved, security.md §15's
 L1 gate since version 2.13 (FR-012); `check_claims.py` reads those rows at HEAD and fails, exit 1,
-while `claim_level` is above L0 and they do not. The spec approval recorded no level.
+unless `claim_level` is the level they give, L1 while they do and L0 otherwise, security.md §15's
+line states the same level, and `history` holds every L1 that a later row ended, with its dates and
+the rows it rested on, so that a register below the rows' level, or one missing a lapsed L1, fails
+as one above it does; `tests/test_claims.py` covers each case. The agent writes `phyco-v3`'s
+`claim_level`, `updated` and `history`, and its line in security.md §15, in a commit of its own
+right after the owner's commit that sets "L1 recorded" or "L1 recorded <k>" to Approved, or that
+adds a later row of either review family, which makes L1 lapse, and never before that commit
+(SEC-076). The spec approval recorded no level.
 
 - `claim_level` holds the level whose gate holds at HEAD (L0 or L1 in this feature): a
   later row of either review family makes L1 lapse, the register returning to
@@ -966,7 +983,10 @@ its LF-normalized content and marked `lf-normalized`, so the hash is the same on
 checkout, and no existing file's pin changes (R18). The manifest is a fixed-name file
 (introduction): a rebuilt package keeps the earlier manifest as
 `review-package/versions/<sha256>.json`. Assembling the package is in scope; sending it is the
-owner's action.
+owner's action. Once the external design review is done, its Review & Approval row names the
+manifest it read by SHA-256, with the design-document version and the selection record it carried,
+and `design_freeze.py create` exits 2 while that manifest is neither `review-package/MANIFEST.json`
+nor kept under `versions/` (spec FR-043).
 
 ## 17. State transitions
 
@@ -975,7 +995,9 @@ owner's action.
   review of FUT-SEC-8 and of the security-target chapter (FR-012), recorded in the Review & Approval
   row "L1 recorded", which the owner sets and commits and `check_claims.py` reads at HEAD
   (section 15); back to L0 while a review held again is pending, until a row "L1 recorded <k>" names
-  the later reviews. While any theorem the mode chapter uses is "unverified" (R10),
+  the later reviews; the agent writes each change of the register in a commit of its own right after
+  the owner's commit that changes these rows, and `check_claims.py` checks it against them both ways
+  (section 15). While any theorem the mode chapter uses is "unverified" (R10),
   that row reads "blocked" and names the missing paper. L0 needs no row. L2 is never
   `claim_level` in this feature: `in_progress` names it from the first counted trail-bound
   record, with its start date and "not reached". Every level carries "no claim".
@@ -995,11 +1017,14 @@ owner's action.
   the missing paper, for "L1 recorded" and "L1 recorded <k>". A row goes
   from `_pending_` to another of its values, with date and notes; one row
   per download approval. Each guard opens on Approved alone, except that `design_freeze.py create`
-  also takes done or not arranged on the external review's row, and `round_rule.py --select` "Not
+  also takes done, naming the manifest the review read by SHA-256, or not arranged on the
+  external review's row, "External design review <k>" with the highest k
+  where the owner has had changes reviewed, and `round_rule.py --select` "Not
   needed" on the "D4 tie" row. A Declined gate ends in one of the outcomes the note under the spec's
   table states for it, logged with its reasons, and a gate held again is a row of its own,
   "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>" (k = 2,
-  3, … in order), naming what it reviews by path and SHA-256; each guard reads its family's row with
+  3, … in order), naming what it reviews by path and SHA-256, the chapter's version being a set of
+  hashes (spec, the notes under the Review & Approval table); each guard reads its family's row with
   the highest k at HEAD, and L1 is recorded again in "L1 recorded <k>" once the later review rows
   read Approved.
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search

@@ -954,7 +954,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   `mode_limits_v3.py` refuses `verified`, exit 2, without one or when the file on disk has another
   SHA-256, and the agent's `verified` and met marks count only once the security-target review row,
   which reviews the chapter by its version, reads Approved; until then `create` reads them as
-  `unverified` (data-model §10). A paper that cannot be obtained or read leaves its theorem
+  `unverified` (data-model §10). That version is a set, the SHA-256 of the chapters "Security
+  target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version
+  read, so that a mark set after the review counts only once a "Security-target review <k>"
+  naming the changed set reads Approved (spec, the notes under the Review &
+  Approval table). A paper that cannot be obtained or read leaves its theorem
   `unverified`, recorded in `downloads.json` as `not obtained` with the reason. Where another
   theorem of this list covers the same call and its paper is on disk and read, the mode chapter uses
   it, in a new design-document version reviewed again; where none does, no published theorem's

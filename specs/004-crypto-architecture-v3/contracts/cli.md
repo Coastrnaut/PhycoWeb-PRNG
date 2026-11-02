@@ -115,12 +115,17 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   or "Owner design review <k>" (k = 2, 3, …), and a guard that reads such a family reads its row
   with the highest k, which must name by path and SHA-256 what the run cites: the latest
   demonstration record (Order of US1), or the chapter's version and the design document's version
-  with the latest selection record (`design_freeze.py create`). L1 is recorded
+  with the latest selection record (`design_freeze.py create`), the chapter's version being a set
+  that `create` compares item by item, the SHA-256 of the chapters "Security target" and "Mode" and
+  of `parameters.json` and `limits.json`, with the design document's version
+  read (spec, the notes under the Review & Approval table). L1 is recorded
   again after a later row of either review family in "L1 recorded <k>", which
   names the highest-k row of each family, and `check_claims.py` reads the
   "L1 recorded" row with the highest k. A guard opens on Approved alone,
-  except that `design_freeze.py create` also takes done or "not arranged" on the external review's
-  row and `round_rule.py --select` takes "Not needed" on the "D4 tie" row (data model §17).
+  except that `design_freeze.py create` also takes done, naming the manifest the review read by
+  SHA-256, or "not arranged" on the external review's row, the one with the highest k where the
+  owner has had changes reviewed in "External design review <k>", and `round_rule.py --select` takes
+  "Not needed" on the "D4 tie" row (data model §17).
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
   exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table, or the
   "FUT-SEC-8 result review <k>" with the highest k once the review has been held again, reads
@@ -501,9 +506,15 @@ both files (data model §13).
 `create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
 security-target review's or the owner design review's row, the one with the highest k where
 the review has been held again, is not Approved or does not review what the
-record freezes, by path and SHA-256: the chapter's version, and the design
-document's version with the latest selection record; if the external review row is
-neither done nor "not arranged", if the latest selection record has a tie
+record freezes, by path and SHA-256: the chapter's version, compared item by item, so that a
+change to the chapters "Security target" or "Mode" or to `parameters.json` or
+`limits.json` after the review, a `verified` or met mark included, exits 2 until a
+"Security-target review <k>" naming the changed set reads Approved, while a change
+elsewhere in the design document leaves that review standing; and the design
+document's version with the latest selection record; if the external review row, "External
+design review <k>" with the highest k where one exists, is neither done nor
+"not arranged", or reads done and names no manifest, or one that neither
+`review-package/MANIFEST.json` nor its `versions/` holds, if the latest selection record has a tie
 and its row, "Selection tie" or "Selection tie <k>", does not read Approved
 with the SHA-256 of its choice record, if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
@@ -683,8 +694,14 @@ the checklists and checklist-choices.md included, README, security.md, and the c
 docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
 of the register, with its reason (data model §15). It reads the spec's Review & Approval rows "L1
 recorded" and "L1 recorded <k>" and those of the FUT-SEC-8 result review and the security-target
-review as committed at HEAD (Approvals, above), and a register that gives `phyco-v3` a level above
-L0 is a finding unless the "L1 recorded" row with the highest k reads Approved and names the
-highest-k row of each review family, both Approved. Exit 1 on any finding (SC-018).
-`tests/test_claims.py` runs it. It writes no record and runs as a test, so FR-061's reproduction
+review as committed at HEAD (Approvals, above), and a register whose level for `phyco-v3` differs
+from the one those rows give is a finding: L1 while the "L1 recorded" row with the highest k reads
+Approved and names the highest-k row of each review family, both Approved, and L0 otherwise, with
+security.md §15's line stating the same level and `history` holding every L1 that a later row ended,
+with its dates and the rows it rested on. The agent writes the register's change in a commit of its
+own right after the owner's commit that changes those rows, so that at the owner's
+commit the check reports the register behind the rows (data model §15). Exit 1
+on any finding (SC-018). `tests/test_claims.py` runs it, with a register
+above, below and at the rows' level and a `history` missing a lapsed L1 among
+its cases. It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).
