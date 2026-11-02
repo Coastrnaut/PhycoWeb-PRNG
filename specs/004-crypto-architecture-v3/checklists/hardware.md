@@ -595,6 +595,98 @@ start open, and an item is ticked only under the rule in the Notes below.
   gives? [Gap, Clarity, Spec §FR-025 "Zeroization", "Flow control", "Registers and read-back";
   FUT-HW-5]
 
+## Seventh re-run (2026-11-02)
+
+Items found when the checklist was run an eighth time, over the complete documents and the
+repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK079 Is "call type" used in one sense, with t stated? FR-023's call types are "(instantiate,
+  generate, forget, reseed)", calls of Π that may "draw on distinct constant streams", of which one
+  generate request or instantiate makes several, its forget call among them, and research R4 reckons
+  its hours "at four call types"; the command word carries "the call type (key load, instantiate,
+  generate, reseed, zeroize)", of which a key load and a zeroize run no call of Π; and the start
+  tree carries "a field of ⌈log₂ t⌉ bits for t call types" that "selects each food node's ROM
+  stream", while FR-026 charges t_s, the start tree's latency, to every call of Π. Is it stated
+  which set t counts, whether a start signal goes out for each call of Π with that call's own type,
+  so that a forget call starts with the type "forget" where the streams are distinct, and whether a
+  key load or a zeroize sends one, so that the field's width, FR-018's ROM depth of "R entries per
+  call type", FR-020's public "call type" and FR-026's t_s each read the set they need? [Clarity,
+  Consistency, Spec §FR-018, §FR-020, §FR-023, §FR-025 "Flow control", §FR-026; research R4, R15;
+  plan "Complexity Tracking"]
+- [ ] CHK080 Is each input interface's ready stated for the states that take no word on it? FR-025
+  holds "ready low on the command, key-loading and absorption interfaces" in `not-reset`,
+  `resetting` and `failed`, has `loading` accept "the key words and zeroize only" and
+  `instantiating` and `reseeding` each accept "its input's words on the absorption interface", and
+  lets a refusal follow "only a command word or an input word of the call it ends", so that a word
+  offered outside a call that takes it is never refused; while no passage says that such a word is
+  held off, with ready low until a call takes it, on the key-loading interface in `no-key`,
+  `key-held`, `instantiating`, `reseeding` and `instantiated`, or on the absorption interface in
+  `no-key`, `loading`, `key-held` and `instantiated`, a generate request included. Is it stated, so
+  that the core neither takes such a word nor raises an error for it, and do the tests that "cover a
+  call in each state of the table" cover a word offered on each input interface in each state? [Gap,
+  Edge Case, Spec §FR-025 "Call sequence", "Flow control", "Zeroization", §FR-020]
+- [ ] CHK081 Is the moment at which `selftest_fail` clears stated once, with its value after reset?
+  FR-059 has the output "latched until the next reset" and then "every reset runs the self-test
+  again, and a pass clears the latch", and FR-025 has `failed` accept no call "until the next reset,
+  with `selftest_fail`, an output of its own, latched", while the port list gives "every port's
+  direction, width, value after configuration and value after reset" and states only the error
+  signal and the error-code output, "the last two zero after reset". Read one way, the reset clears
+  the output and a second failure sets it again; read the other, it stays set through `resetting`
+  until a pass, so that a host watching the port while the self-test runs reads another value, and
+  after a second failure sees no change on the port. Is it stated which, so that feature 008's test
+  of the output, and the test of a call made "one while the self-test runs", each have one expected
+  value? [Clarity, Consistency, Spec §FR-059, §FR-025 "Call sequence", "Registers and read-back"]
+- [ ] CHK082 Are the self-test's reseed input and its length word among its stored constants, and
+  fed by a stated path? FR-059 runs, "if the design has a reseed, a reseed with reseed input 0 of
+  research R3", which R3 gives as "the 32-byte digest" of `phycoweb-004/dev/reseed/0`, and
+  `selftest_<variant>.json` holds it, while FR-026's estimate counts the self-test's "key, nonce and
+  expected output held as constants", FR-034's components list "the storage of its key, nonce and
+  expected output", and FR-059 feeds "the key and nonce chains from its constants through a selector
+  at each chain's input" and the empty personalization string's length word "through the absorption
+  interface's selector as the host would", naming no path for the reseed input's length word and its
+  eight words. Is it stated that they are held as constants and fed through the absorption
+  interface's selector as the host would, with their storage in FR-026's estimate and the
+  rationale's list, and their cycles in FR-020's self-test formula and the reset figure? [Gap,
+  Consistency, Spec §FR-059, §FR-026, §FR-034 "Components", §FR-020; research R3, R8; data-model
+  §11]
+- [ ] CHK083 Is the class of an instantiate's length check stated, given the order of its input? An
+  instantiate's input is "the nonce's words, in the model's word order, then the personalization
+  string's length word, then the string's words", and its first figure runs "from the nonce's last
+  word accepted to the copy done", so that the copy sets every lane from the key and the nonce
+  before the length word, "refused above the design's maximum", is checked; while the model raises
+  `ValueError` for "a personalization string or reseed input over its maximum", after which "nothing
+  changes, and the object stays usable", `instantiate` "may be called again with a new nonce", and
+  FR-025 makes a refusal that changes nothing only of "a bad request that valid and ready refuse
+  before anything changes". Is it stated whether that refusal is an error path that zeroizes and
+  needs a new key, unlike the model's, or a refusal that changes nothing, with the copy then held
+  until the length word is accepted or the length word placed before the nonce's words, and what a
+  refused instantiate in `instantiated` leaves of the state it would have replaced? [Conflict, Gap,
+  Spec §FR-025 "Flow control", "Key loading and reset", "Zeroization", §FR-058; model contract
+  "Lengths", "Failure paths", "Call sequence"]
+- [ ] CHK084 Is the criterion that fixes k measurable? FR-059 states k per claimable size "as the
+  least for which every node, every lane, every constant ROM entry of the calls run, both trees and
+  the counters take part", and "FR-020's self-test formula, the reset figure and FR-026's storage
+  count follow from k", while "take part" is not defined, and one call of Π already runs every node
+  and lane through R rounds and reads each ROM entry of its call type's stream, so that on one
+  reading k = 1 meets the criterion at every size. Is "take part" defined, for example as each
+  lane's value changed, each ROM entry read, each register of both trees loaded or each bit of a
+  named counter toggled, with the counters named (the round and phase counters, the limit counters,
+  a block count within a request), so that k can be computed from the model's run, written to
+  `selftest_<variant>.json` and checked by a test? [Measurability, Clarity, Spec §FR-059, §FR-020,
+  §FR-026; research R8; data-model §11]
+- [ ] CHK085 Do the three statements of what a zeroize clears agree? "Zeroization" clears the lanes,
+  every pipeline register, both trees' registers, the key chain's and the nonce chain's registers,
+  the rate lanes' nonce registers, the held key and its copies and the output register, and "returns
+  the round, phase and limit counters to their reset values"; "Call sequence" has a zeroize during a
+  call clear "the lanes, every pipeline register, both trees, both chains, the nonce registers, the
+  held key and its copies and the output buffer" and go to `no-key`, without the counters; and "Flow
+  control" has a zeroize while a block waits clear "the buffer, the trees and the state", without
+  the key, the chains or the nonce registers. Is one list stated in "Zeroization" and cited from the
+  others, so that a zeroize in any stretch is read to clear the key and return the counters, as the
+  tests of each state expect? [Consistency, Spec §FR-025 "Zeroization", "Call sequence", "Flow
+  control"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
