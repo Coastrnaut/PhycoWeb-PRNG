@@ -847,8 +847,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   loads the stored key into the state, so no key is ever compared with another. In hardware the key
   is loaded once, along a registered shift chain, into key registers at the nodes whose lanes hold
   key bits, and zeroized with the state; at every instantiate the host gives the nonce on the
-  absorption interface, and in one cycle a selector at every lane sets the lane from a key register,
-  the nonce or its stated constant (FR-025 "Key loading and reset").
+  absorption interface, and in one cycle a selector at every lane sets the lane from one of four
+  sources: a key register, the nonce chain, the nonce register of a rate lane that holds nonce bits,
+  or its stated constant (FR-025 "Key loading and reset").
 - **FR-014**: Padding and domain separation MUST be specified so that every absorbed input (key,
   nonce, personalization string, reseed input) and every call type can be decoded uniquely from
   the absorbed blocks and is separated from every other, and this injectivity MUST be shown in
@@ -927,10 +928,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   2×2 to 16×16 that is not supported MUST be listed with the reason as an open item against
   FUT-GRID-1. Supported, wherever this feature's documents use the word, means these listed sizes:
   2×2, 3×3 where the design document specifies its three-colour schedule, 4×4, 8×8 and 16×16. Any
-  other n from 2 to 16 is for exploration only, from a table that the constant script writes for
-  that (n, w) on demand and checks as for a supported size (FR-023), kept
-  under `research/004/exploration/`, never frozen and never evidence; an
-  exploration variant's ID carries its R (model contract, "Variant IDs"). The
+  other n from 2 to 16 is for exploration only, from a table that
+  `gen_constants_v3.py --exploration N W` writes for that (n, w), before or after the freeze, and
+  checks as for a supported size (FR-023), kept under `research/004/exploration/`, never frozen and
+  never evidence; an exploration variant's ID carries its R (model contract, "Variant IDs"). The
   list names each size's keyed variants: the production variant at every
   claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced variant, such
   as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce; keyless variants are listed as
@@ -1088,9 +1089,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   eligibility item, so that candidate is `ineligible` and the rules select among the others; a match
   in the shared polynomial touches every candidate and ends in a stop. The rule is never changed to
   escape a match. A match found after the freeze is a finding recorded at once (FR-051), and
-  `phyco-v3` stays as frozen. The design document restates the values, and the script
-  checks that the two agree. The script writes one table per supported (n, w), and an exploration
-  table for another (n, w) on demand, with every check of this requirement (FR-018), and, before the
+  `phyco-v3` stays as frozen; so is a failed check of an exploration table, a
+  refused-list match included, which leaves that (n, w) without a table, its
+  record stating why. The design document restates the values, and the script
+  checks that the two agree. The script writes one table per supported (n, w), and an
+  exploration table for another (n, w), before or after the freeze, with
+  `--exploration N W` and every check of this requirement (FR-018), and, before the
   freeze, the table of each variant (n, w, R) a candidate uses, with each call type's stream where
   its streams are distinct, from the instance of the rule in its log entry's
   `parameters`, before the first record that reads it, a rise of R writing the new
@@ -1176,9 +1180,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     research-only, are the only places that show state (FR-033); Python cannot make memory
     unreadable, so this rule concerns the interface.
   - **Key loading and reset.** The design document specifies the key-loading interface and the
-    reset sequence: serial or parallel key loading, the three latencies stated below,
-    an output-valid signal, and the zeroization of key and state. The key-loading interface is
-    generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
+    reset sequence: serial key loading along the registered shift chain below, the three latencies
+    stated below, an output-valid signal, and the zeroization of key and state. The key-loading
+    interface is generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
     absorption interface (research R14), 256 and 128 bits at every claimable
     size, both whole 32-bit words, since a keyed variant's c is a multiple of
     64; keyless variants have none, and FUT-GRID-2's key loading "for every
@@ -1212,13 +1216,20 @@ freeze hashes and the baseline manifest; run the claim-register test.
     instantiate, in the model's word order; it reaches its lanes through the absorption tree where
     they are rate lanes, and otherwise along a nonce chain of its own beside the key's, through the
     nodes that hold nonce bits in lanes outside the rate, so the key chain shifts only at key
-    loading. Each chain passes, registered, through the nodes between those that hold its bits, so
+    loading. Each rate lane that holds nonce bits has a nonce register at its node, filled through
+    the absorption tree from the nonce words' transfer on the absorption interface; at the copy the
+    selector writes that register into the lane, never as an XOR, so that every lane is set in that
+    one cycle and the initial state is the one FR-013 and research R10 place. Each chain
+    passes, registered, through the nodes between those that hold its bits, so
     no path of neighbours is required, and its length counts those registers. At each instantiate a
-    selector at every lane sets the lane, in the same cycle as the copy, from a key register, the
-    nonce chain or its stated constant (FR-013), and the selectors are parts of FR-026's estimate.
-    The key chain's length enters the key-loading figure, the nonce chain's length and the copy the
-    instantiate figure, the plan's Complexity Tracking lists both chains as local data paths of
-    public length, and zeroization clears both chains and every copy.
+    selector at every lane sets the lane, in the same cycle as the copy, from one of
+    four sources: a key register, the nonce chain, the nonce register of a
+    rate lane that holds nonce bits, or its stated constant (FR-013), and
+    the selectors and the nonce registers are parts of FR-026's estimate.
+    The key chain's length enters the key-loading figure, the nonce chain's
+    length, the nonce registers' transfer and the copy the instantiate figure,
+    the plan's Complexity Tracking lists both chains as local data paths of
+    public length, and zeroization clears both chains, the nonce registers and every copy.
   - **Call sequence.** The design document gives the call sequence as a state table, with the calls
     each state accepts, each call starting with its command word on the command interface ("Flow
     control"). `not-reset`, the state after FPGA configuration and before the first reset, accepts
@@ -1279,8 +1290,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     not a whole number of words cannot be expressed, as the model refuses an `nbits` that is not a
     positive multiple of 32, and a length of zero is refused.
   - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees, the
-    key-loading buffer (the key chain's registers) and the nonce chain beside
-    it, the held key and its copies, and the output register (the one-block
+    key-loading buffer (the key chain's registers) and the nonce chain beside it, the rate lanes'
+    nonce registers, the held key and its copies, and the output register (the one-block
     buffer of "Flow control"), and returns the round, phase
     and limit counters to their reset values. Its triggers are reset, an explicit zeroize, a
     failed self-test, an error path and a call refused at a per-key limit (the call that would pass
@@ -1349,8 +1360,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   claimable size, each part with its own figure: the nodes and stages (LUTs per node and round × n²
   for the stages built), the absorption and output trees, the reset and start fan-out trees with the
   call-type field at every node, the ROMs, the output buffer (r bits, 16,128 at 16×16) with its
-  read-out to the interface width, the key registers and the key-loading buffer, the nonce chain,
-  the instantiate lane selectors (up to 2w·n² bits, estimated per state bit and stated where merged
+  read-out to the interface width, the key registers and the key-loading buffer,
+  the nonce chain and the rate lanes' nonce registers, the instantiate lane
+  selectors (up to 2w·n² bits, estimated per state bit and stated where merged
   with stage logic), the command interface, the controller with the call-state table, the error-code
   register, the replicated round and phase counters, the limit counters, the self-test's sequencer,
   its comparator of r bits, its input selectors and its key, nonce and expected output held as
@@ -1518,8 +1530,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     lanes per node, the coupling function, the vein accumulator, the colour schedule, the local
     linear layer between boxes, the food nodes and their placement, the rotation amounts, the
     round constants, the padding rule, the domain separators, forget, the absorption and output
-    trees, the key shift chain and the nonce chain, the selector at every lane, the start tree with
-    its call-type field, the reset tree that every zeroization trigger drives, the replicated
+    trees, the key shift chain, the nonce chain and the rate lanes' nonce registers,
+    the selector at every lane, the start tree with its call-type field,
+    the reset tree that every zeroization trigger drives, the replicated
     round and phase counters with the constant ROMs they index, and every
     component the chosen candidate adds. Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's

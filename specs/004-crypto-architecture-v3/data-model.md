@@ -119,7 +119,8 @@ the class.
   kind's place: `fut-sec-8/` for a `demonstration`; `candidates/<id>/` for the kinds of sections 5
   and 6 but `control`, and for a `cross-check` and a `cost` record; `controls/` for a `control`;
   `validation/`, `generator-runs/`, `generator-checks/`, `projections/` and `rechecks/` for the
-  kinds they are named after; `locks/` for a `lock-cleared` record; and
+  kinds they are named after, but an exploration table's `generator-run` record, which sits beside
+  its table in `research/004/exploration/` (section 11); `locks/` for a `lock-cleared` record; and
   `reproductions/<record_id>/<n>/`, with the original's ID, for a `reproduction`. Files whose names
   this data model states keep them: the fixed-name files, with `versions/` (introduction); those
   written once under a stated name, a second write being refused: `d4/choice.json`, `d4/tie.json`
@@ -213,7 +214,7 @@ design document, which the table names; for every other kind it is reported, and
 | Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `second_known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
 | Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r and width, the tool's value beside each exhaustive one with its outcome: for an ARX-box, the internal-trail search's value at w = 4 and whether they are equal, and the floor at w = 4 and 8 and whether the value lies at or above it; for the active-S-box counter, the exhaustive minimum and whether they are equal | the projected and used hours; `design_sha256` |
 | D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
-| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15); for a candidate's tables (`--candidate`), each check's verdict as well | the measured speed and the generation time |
+| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15); for a candidate's tables (`--candidate`) and an exploration table (`--exploration`), each check's verdict as well | the measured speed and the generation time |
 | Generator run, vectors and constructed states (`gen_vectors_v3.py`, `gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
 | Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s | `design_sha256` for the other generators' |
 | Re-check (`recheck`; above) | per record, each recomputed verdict, its agreement with the recorded one and the commit whose functions computed it; the counts of agreements and disagreements | the interpreter, the platform and the `pip freeze` it ran with |
@@ -726,7 +727,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
-| `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check` or `--reproduce`, which write their records under `reports/004-crypto-architecture-v3/` and never to the sidecar |
+| `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
 
 The header of a mode vector file reads, for example:
 
@@ -751,7 +752,12 @@ and SHA-256, which its reproduction compares in memory (section 1, Reproduction)
 candidate's table for the variant (n, w, R), with each call type's stream where its streams are
 distinct, as `research/004/candidates/<id>/constants/<variant>.json`, `<variant>` being the variant
 ID's part after the design, and a `generator-run` record holding each table's path and SHA-256 and
-each check's verdict, and adds no sidecar entry; after the freeze it exits 2 (research R15).
+each check's verdict, and adds no sidecar entry; after the freeze it exits 2 (research R15). The
+other exception is `gen_constants_v3.py --exploration N W`, run before or after the freeze: it
+writes the table of an (n, w) outside the supported sizes as
+`research/004/exploration/constants_n<n>_w<w>.json` and, beside it, its check record, a
+`generator-run` record with `exploration` true and each check's verdict, adds no sidecar entry,
+writes no frozen file and no evidence, and refuses a supported (n, w), exit 2 (research R15).
 
 **Generator checks** (SC-009). `--check` writes a `generator-check` record,
 `generator-checks/<record_id>.json`, with the common fields of section 1 (FR-061), each generated

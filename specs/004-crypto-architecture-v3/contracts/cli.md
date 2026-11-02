@@ -393,6 +393,7 @@ either file, which the freeze record pins (data model §13).
 ```text
 gen_constants_v3.py [--check]                    # writes phycoweb/constants_v3.py
 gen_constants_v3.py --candidate ID --variant VARIANT   # before the freeze (research R15)
+gen_constants_v3.py --exploration N W            # outside the supported sizes (research R15)
 gen_vectors_v3.py [--check] [--variant ID ...]   # writes vectors/phyco-v3/ (research R8)
 gen_constructed_v3.py [--check]                  # writes the constructed-state vectors
 gen_constants_v3.py --reproduce RECORD           # a generator-run or generator-check record
@@ -413,8 +414,9 @@ generated file byte for byte with the committed one and writes a `generator-chec
 SHA-256 and the verdict `match` or `differs`; it exits 1 on any byte difference. SC-009's evidence
 is each generator's pair of such records, one per platform, which quickstart M1 to M3 and the final
 report cite. The sidecar is frozen with the vectors (data model §13), as the record of the runs that
-produced them: after the freeze a generator runs only with `--check` or `--reproduce`, which write
-their records under `$REP` and never to the sidecar, and writing over a frozen file exits 2.
+produced them: after the freeze a generator runs only with `--check`, `--reproduce` or, for
+`gen_constants_v3.py`, `--exploration`, which write their records under `$REP`, an exploration run's
+beside its table (below), and never to the sidecar, and writing over a frozen file exits 2.
 `--reproduce RECORD` (introduction), on each generator, runs the command of that `generator-run`
 record again and compares every file it generates, in memory, with the SHA-256 the record holds
 rather than with the file on disk, so that a later regeneration changes nothing, or, for a
@@ -431,6 +433,15 @@ after the design, with every check of research R15, and a `generator-run` record
 nothing to the sidecar and exits 2 after the freeze. A table is written before the first record that
 reads it, a rise of R writing the new variant's first (research R7), and a failed check or a
 refused-list match makes the candidate fail FR-023, logged.
+
+`gen_constants_v3.py --exploration N W` writes, before or after the freeze, the table of an (n, w)
+outside the supported sizes, with every check of research R15, as
+`research/004/exploration/constants_n<n>_w<w>.json`, and beside it its check record, a
+`generator-run` record with `exploration` true, written through `protocol/evidence.py` to that
+directory; it writes no frozen file, no sidecar entry and no evidence, and refuses a supported
+(n, w), exit 2. A failed check, a refused-list match included, leaves that (n, w) without a table,
+its record stating why, and is a finding recorded at once in security.md and the report (spec
+FR-051), as a match found after the freeze is; `phyco-v3` stays as frozen.
 
 They run in three steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and

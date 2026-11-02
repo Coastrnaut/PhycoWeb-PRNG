@@ -59,8 +59,8 @@ frozen R at those sizes; c a multiple of w and of 16 with 0 < c < b, a multiple 
 variant, and c = 256 at every claimable size (research R14). Every other n from 2 to 16 is for
 exploration only, where the design document's update schedule covers n (even n, and odd n only with
 a three-colour schedule): the research interface accepts its ID, which carries its R, with the table
-that `gen_constants_v3.py` writes for that (n, w) under `research/004/exploration/`, never frozen
-and never evidence (spec FR-018).
+that `gen_constants_v3.py --exploration N W` writes for that (n, w) under
+`research/004/exploration/`, never frozen and never evidence (spec FR-018).
 
 ## Permutation (research interface)
 
