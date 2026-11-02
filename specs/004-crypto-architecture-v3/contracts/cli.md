@@ -482,10 +482,12 @@ FR-051), as a match found after the freeze is; `phyco-v3` stays as frozen.
 
 They run in three steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
-`ResearchDuplex`, which runs no self-test, and also writes `phycoweb/selftest_v3.py`, the
-self-test's inputs and expected output, copied from the vectors, so its `--check` covers that file
-too; (3) `Generator` imports `phycoweb.selftest_v3` inside its constructor only and runs its
-self-test from it, so step (2) imports the model before that module exists (model contract, Module
+`ResearchDuplex`, which runs no self-test, and also writes, from the same `ResearchDuplex` run, each
+claimable size's `selftest_<variant>.json`, the self-test's inputs and every expected
+block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those
+files, so its `--check` covers them too (HW-077); (3) `Generator` imports
+`phycoweb.selftest_v3` inside its constructor only and runs its self-test from it, so
+step (2) imports the model before that module exists (model contract, Module
 rules). Tests check that `Generator` reproduces the vectors and that `selftest_v3` equals them, and
 the freeze hashes `selftest_v3.py` with the vectors (data model §13).
 

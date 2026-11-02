@@ -1063,10 +1063,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   public even when its content is secret, as the threat model states. A cycle count may depend
   on public values and on nothing else, and the design document gives, per call (key loading,
   counted for a finished load; instantiate, ending with its forget call complete and the core
-  `instantiated` and ready for a command; generate of n bits with its forget; reseed of m bytes; a
+  `instantiated` and ready for a command, the nonce's transfer, the copy and every block of the
+  personalization string with its calls of Π included, of which FR-025's two instantiate figures are
+  parts (HW-075); generate of n bits with its forget; reseed of m bytes; a
   refused request that changes nothing; a refused request that zeroizes (a per-key limit or an error
-  path, adding the zeroization's latency); zeroization, from each state that accepts it, `loading`
-  among them; the start-up self-test), a formula in cycles from the variant and the public lengths
+  path, adding the zeroization's latency); zeroization, from each state that accepts it,
+  `loading`, `instantiating` and `reseeding` among them (HW-076); the start-up
+  self-test), a formula in cycles from the variant and the public lengths
   only, counting every cycle of the call from its start to its end except those in which the core
   waits for the host: on output, the cycles with valid high and ready low, and on an input (key
   loading, a nonce, a personalization string, a reseed input), the cycles with the core's ready high
@@ -1248,8 +1251,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     any debug core (an integrated logic analyser, JTAG user registers): feature 008 builds the
     production bitstream with readback security set and no debug core, and records it. The design
     document gives the port list, with every port's direction, width, value after configuration and
-    value after reset, the command interface's ports, `selftest_fail` and the error-code output
-    among them, and the rule of no read-back path is checked against it (FUT-HW-5).
+    value after reset, the command interface's ports, `selftest_fail`, the error
+    signal and the error-code output among them, the last two zero after reset
+    (HW-078), and the rule of no read-back path is checked against it (FUT-HW-5).
     Constructed states (FR-054) run on the RTL in simulation only, loaded by the testbench
     (VHDL-2008 external names or `force`), so the synthesizable RTL has no load or read-back
     port; on the board, FUT-HW-4's equivalence uses the vectors a key reaches, through the
@@ -1258,7 +1262,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
     research-only, are the only places that show state (FR-033); Python cannot make memory
     unreadable, so this rule concerns the interface.
   - **Key loading and reset.** The design document specifies the key-loading interface and the
-    reset sequence: serial key loading along the registered shift chain below, the three latencies
+    reset sequence: serial key loading along the registered shift chain below, the four latencies
     stated below, an output-valid signal, and the zeroization of key and state. The key-loading
     interface is generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
     absorption interface (research R14), 256 and 128 bits at every claimable
@@ -1278,15 +1282,20 @@ freeze hashes and the baseline manifest; run the claim-register test.
     synchronous and reaches the nodes through a registered
     fan-out tree whose latency is part of the reset sequence, and the round and phase counters
     are replicated, one copy at each food node or node, all started by that reset and running
-    in lockstep, so that no counter value crosses the grid. The latency is given as three figures
-    in cycles, fixed by public values: from reset released to the self-test done and the state
+    in lockstep, so that no counter value crosses the grid. The latency is given as four figures in
+    cycles, fixed by public values: from reset released to the self-test done and the state
     zeroized (ready for a key), the self-test's key and nonce words fed through the chains and, for
     rate lanes, through the absorption tree into the nonce registers included (FR-059); key loading,
     from the last key word accepted to the key held, for a finished load, a
-    call of its own whose cycle count joins FR-020's list; and instantiate, from the last nonce or
-    personalization word accepted to instantiate done, its forget call complete and the core
-    `instantiated` and ready for a command, the trees' latency and the nonce chain's length included
-    (FR-018). A generate request's own figure runs from its acceptance on the command interface
+    call of its own whose cycle count joins FR-020's list; and instantiate, as two figures: from the
+    nonce's last word accepted to the copy done, the nonce registers' transfer, the nonce chain's
+    length and the copy included, and from the personalization string's last word accepted, its
+    length word for the empty string, to instantiate done, its forget call complete and the core
+    `instantiated` and ready for a command, the last block's absorption, the calls of Π, the trees'
+    latency and forget included (FR-018). The cycles between the two, the string's earlier blocks
+    and their calls of Π, are in FR-020's instantiate formula, which counts every cycle of the
+    call but those in which the core waits for the host (HW-075). A generate
+    request's own figure runs from its acceptance on the command interface
     ("Flow control") to its first output valid, and the figure of a zeroize from `loading`
     ("Call sequence") is stated with the other triggers' ("Zeroization").
     The key path is specified with them: a key register at each node that holds key bits, loaded
@@ -1306,7 +1315,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
     rate lane that holds nonce bits, or its stated constant (FR-013), and
     the selectors and the nonce registers are parts of FR-026's estimate.
     The key chain's length enters the key-loading figure, the nonce chain's
-    length, the nonce registers' transfer and the copy the instantiate figure,
+    length, the nonce registers' transfer and the copy the instantiate's first figure,
     the plan's Complexity Tracking lists both chains as local data paths of
     public length, and zeroization clears both chains, the nonce registers and every copy.
   - **Call sequence.** The design document gives the call sequence as a state table, with the calls
@@ -1322,26 +1331,43 @@ freeze hashes and the baseline manifest; run the claim-register test.
     `not-reset`, `resetting` and `failed` the core holds ready low on the command, key-loading and
     absorption interfaces and output-valid low, so no call is accepted and no error code is raised.
     `no-key`, after a reset with a passed self-test or after a zeroization, accepts a key load only,
-    which enters `loading` at its first key word; `loading` runs from the first key word to the last
-    and accepts the remaining words and zeroize only, the key being held only after
-    the last word, so an instantiate is refused with its code and changes
-    nothing, and a zeroize clears the chain and returns to `no-key`, where
-    a new load starts afresh; `key-held` accepts instantiate and zeroize;
-    `instantiated` accepts the calls the model's call sequence allows, and zeroize. Every other call
+    which enters `loading` at its command word; `loading` runs from that command word to the last
+    key word and accepts the key words and zeroize only, the key being held only after the last
+    word, so an instantiate is refused with its code and changes nothing, and a zeroize, one before
+    the first key word included, clears the chain and returns to `no-key`, where a new load starts
+    afresh; `key-held` accepts instantiate and zeroize; an instantiate is in a state of its own,
+    `instantiating`, from its command word to instantiate done, and a reseed in `reseeding`, from
+    its command word to its end, each accepting its input's words on the absorption interface and,
+    on the command interface, zeroize only; `instantiated` accepts the calls the model's call
+    sequence allows, and zeroize. From any call's command word to its end, whether the core waits
+    for the host or runs Π, the stretch while a block waits in the buffer included, the command
+    interface accepts zeroize only: every other command word is refused with the code of a call out
+    of sequence and changes nothing, and a zeroize clears the lanes, every pipeline register, both
+    trees, both chains, the nonce registers, the held key and its copies and the output buffer and
+    goes to `no-key`, as an explicit zeroize does in `instantiated` (HW-076). Every other call
     is refused with its error code ("Zeroization") and changes nothing, among them a key load while
     a key is held (zeroize first, so no state from the old key survives into the new key's use) and
     an instantiate with no key. The refusals match the model's `CallSequenceError` rules where the
     model has the state, and FUT-HW-5's "key zeroization on reset" is tested from the ports: after a
-    reset, an instantiate is refused as `no-key`. The tests cover a call in each state of the table.
+    reset, an instantiate is refused as `no-key`. The tests cover a call in each state of the table,
+    `instantiating` and `reseeding` among them, and FR-020's zeroization formula covers each state
+    that accepts a zeroize (FR-059; HW-076).
   - **Flow control.** Each interface (command, key loading, absorption, output) uses valid and
     ready. The command interface takes one 32-bit word per call, with the call type (key load,
     instantiate, generate, reseed, zeroize) in stated bits and, for generate, the length in 32-bit
-    words in the rest; a refused command is answered on the error-code output ("Zeroization"), and
-    the length word of a personalization string or a reseed input stays on the absorption interface.
+    words in the rest; a refused command is answered on the error signal and the
+    error-code output, which hold its code until the next command word is
+    accepted or a reset ("Zeroization"; HW-078), and the length word of a
+    personalization string or a reseed input stays on the absorption interface.
+    An instantiate's input on the absorption interface is the nonce's words, in the model's word
+    order, then the personalization string's length word, then the string's words, if any; the empty
+    string's length word is a personalization word, so every instantiate has one (HW-075).
     The core never stalls in mid-call: output leaves through a buffer of one block (r bits), and the
     next call starts only after the consumer has taken the block, so a stall, which the consumer
     sets in public, holds only the buffer and delays the next call, and no cycle count depends on
-    secret data. While a block waits in the buffer, the command interface accepts zeroize, which
+    secret data. From any call's command word to its end, whether the core waits for the host or
+    runs Π, the command interface accepts zeroize only ("Call sequence";
+    HW-076): while a block waits in the buffer, it accepts zeroize, which
     clears the buffer, the trees and the state, and no other call is accepted
     until the block is taken or a zeroize or reset clears it. Draining a
     block therefore never overlaps the next call of Π, and FR-026's rate
@@ -1371,19 +1397,31 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees, the
     key-loading buffer (the key chain's registers) and the nonce chain beside it, the rate lanes'
     nonce registers, the held key and its copies, and the output register (the one-block
-    buffer of "Flow control"), and returns the round, phase
-    and limit counters to their reset values. Its triggers are reset, an explicit zeroize, a
-    failed self-test, an error path and a call refused at a per-key limit (the call that would pass
+    buffer of "Flow control"), and returns the round, phase and limit counters to their reset
+    values. A zeroizing refusal's zeroization keeps the error signal and the error-code register, so
+    that its code stays readable; every other trigger clears them with the
+    rest (HW-078). Its triggers are reset, an explicit zeroize, accepted
+    in `loading`, `key-held`, `instantiating`, `reseeding` and `instantiated` and from any call's
+    command word to its end ("Call sequence"; HW-076), a failed self-test, an error
+    path and a call refused at a per-key limit (the call that would pass
     the limit; nothing happens when a counter merely reaches it), each with its latency in cycles
-    and output-valid low throughout. Every trigger drives the reset's registered fan-out tree, so a
-    zeroization reaches every register within the reset's latency, which each trigger's figure
-    counts. A zeroization by an explicit zeroize, an error path or a per-key limit runs no self-test
+    and output-valid low throughout. Every trigger drives the reset's registered
+    fan-out tree, so a zeroization reaches every register it clears within the
+    reset's latency, which each trigger's figure counts. A zeroization by an
+    explicit zeroize, an error path or a per-key limit runs no self-test
     and goes to `no-key`; a failed self-test's zeroization goes to `failed` and starts nothing
     further; only reset runs the self-test ("Call sequence"). The core has a
     registered error-code output beside the error signal and valid with it,
     with one code for each refusal that changes nothing (a length, a call out of sequence, any other
     limit) and one for each zeroizing refusal (a per-key limit, an error path), listed in the design
-    document, so the host can tell from the ports which refusals zeroized. An error path is a
+    document, so the host can tell from the ports which refusals zeroized. The error signal and its
+    code are registered and stay valid from the refusal until the next command word is accepted on
+    the command interface, or until a reset, which returns both to zero, their value after reset
+    being in the port list; a refusal follows only a command word or an input word of the call it
+    ends, so a code is replaced only once the host has sent another command, after as many cycles as
+    it likes to read it. The host reads the code from the ports with no handshake, as it reads
+    `selftest_fail`, and FUT-HW-5's tests cover a code kept through its zeroization
+    and a code replaced by the next command (HW-078). An error path is a
     condition the RTL detects after the state has changed: the design document lists every such
     condition, each of which zeroizes, raises the error signal with a zeroizing code and needs a new
     key, among them a last partial word with a nonzero unused byte ("Flow control"), and lists every
@@ -2429,10 +2467,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   frozen vectors (which the vector script copies, in the model, into `phycoweb/selftest_v3.py`,
   imported only in `Generator`'s constructor, so that a `Generator` built before that file exists
   fails its self-test; FR-036), its expected output, its behaviour on failure, and the zeroization
-  of the whole state after it, before the first instantiate. The self-test runs instantiate with the
-  key and nonce 0 of the frozen vectors, then a generate long enough that every node, every
-  lane, every constant ROM entry of the calls run, both trees and the counters take part, then a
-  reseed if the design has one. It feeds the key and nonce chains from its constants through a
+  of the whole state after it, before the first instantiate. The self-test runs instantiate with key
+  and nonce 0 and the empty personalization string, its length word fed through the absorption
+  interface's selector as the host would; then one generate request of k whole blocks, k·r bits, k
+  stated per claimable size in the design document as the least for which every node, every lane,
+  every constant ROM entry of the calls run, both trees and the counters take part; then, if the
+  design has a reseed, a reseed with reseed input 0 of research R3 and a second generate request of
+  k whole blocks, so that the reseed's effect is compared. `gen_vectors_v3.py` writes these inputs
+  and every expected block, whole, from the same `ResearchDuplex` run, as a vector file of its own,
+  `selftest_<variant>.json`, frozen with the vectors, from which `phycoweb/selftest_v3.py` is
+  copied, so that the frozen vectors hold every value the comparator compares; FR-020's
+  self-test formula, the reset figure and FR-026's storage count follow from k
+  (HW-077). It feeds the key and nonce chains from its constants through a
   selector at each chain's input, word by word as the host would, the nonce's words for rate lanes
   through the absorption tree's input in the same way, with their cycles in the reset figure
   (FR-025) and no parallel load path; afterwards the selectors return to the

@@ -761,6 +761,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `pi_<variant>.json` | 16 inputs and their Π and Π⁻¹ outputs, as lanes in hex in the design document's order; the state after every phase of every round for the first 4, as `pi_trace` returns it |
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
+| `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 and the second request of k whole blocks, written by `gen_vectors_v3.py` from the same `ResearchDuplex` run as the vectors; `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
 | `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
@@ -803,10 +804,11 @@ the final report cite.
 
 **Order of generation** (FR-036, FR-059): three steps, each generator's `--check` passing in this
 order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
-vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes
-`phycoweb/selftest_v3.py`, the self-test's inputs and expected output, copied from the vectors.
-(3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. The model imports
-that module inside `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and
+vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes, from the same
+`ResearchDuplex` run, each claimable size's `selftest_<variant>.json`, the self-test's inputs and
+every expected block, whole, and `phycoweb/selftest_v3.py`, copied from those files (spec FR-059;
+HW-077). (3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. The model
+imports that module inside `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and
 `ResearchDuplex` import without it and step (2) runs before it exists; a `Generator` built before
 then fails its self-test and leaves no object (model contract, Module rules). Tests check that
 `Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
