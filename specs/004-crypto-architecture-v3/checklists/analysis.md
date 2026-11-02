@@ -504,6 +504,67 @@ and an item is ticked only under the rule in the Notes below.
   contract's Budget guard name only validations on published values? [Consistency, Spec §FR-039,
   §FR-045; research R7, R12, R13; cli contract "Budget"]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK068 Can the avalanche test's validation pass for a correct test at the round counts below
+  its variant's full diffusion? FR-039, research R4 and R13 and data-model §7 re-find each planted
+  result at every round count from 1 to its variant's R "only if exactly that set fires", the
+  expected set being the planted bits and every bit that the exact dependency matrices show
+  independent of the flipped bit at that round count, while a bit that does depend on the flipped
+  bit can still fire there, for example one that receives it only through an XOR, which flips on
+  every input, so that a correct test fires outside the expected set and its validation reads
+  `not re-found`, the case that CHK062 leaves open. Is the comparison stated as one that a correct
+  test meets, for example that every bit of the expected set fires at every round count from 1 to R,
+  that any other firing is reported with its round count, position and count and decides nothing
+  below the variant's R, and that at the variant's R, fixed with the known result at a round count
+  where the exact matrices show every other bit dependent on the flipped bit, no other bit fires,
+  with the chance that a correct test fires there on a uniform bit stated beside it? [Measurability,
+  Conflict, Spec §FR-039; research R4, R13; data-model §7]
+- [ ] CHK069 Can a cross-check cover a difference between a known result's kind and a tool's use,
+  given that FR-039 states "Each known result is of the kind of its use, or a cross-check covers the
+  difference", while FR-039 and research R12 also say that the cross-checks at w = 4 and 8 "check
+  each candidate's boxes and never widen a kind", that a search's results "count only at a width so
+  covered", and that "A tool used outside its validated kind writes `not evaluated`"? Is it stated
+  whether a cross-check is itself a use of the tool, given that the cross-checks run the ARX search
+  at w = 4 and 8, outside its kind of w = 16, and the active-S-box counter at 4×4 with w = 4, so
+  that, read literally, their values are `not evaluated` and each run is "a use at a word width,
+  operation set or kind of model outside its validated kind" that calls for a validation again; and
+  does the cli contract's "until then its results are `not evaluated`" mean that a validation again,
+  on the same known results, widens the kind, against "count only at a width so covered"? [Conflict,
+  Ambiguity, Spec §FR-039; research R12 "Validated widths", "Cross-checks between kinds",
+  "Re-validation"; data-model §7 `validated_kind`; cli contract "Tool validation"]
+- [ ] CHK070 Are the validated kinds of the active-S-box counter, the long-trail active-box counter
+  and the exhaustive tables stated, with their word widths, operation sets and kinds of model, given
+  that research R12 says only "Each other tool's kind states its widths in the same way", that their
+  known results are PRESENT's minimum of 10 active S-boxes over 5 rounds (4-bit S-boxes and a bit
+  permutation), a long-trail bound of SPARKLE from its published box bounds (32-bit words) and the
+  tables of the 4-bit PRESENT S-box, while their uses lie elsewhere: the exhaustive tables for boxes
+  of 8 and 16 bits at w = 4 and 8 ("Box widths", the cross-checks), the long-trail counter at the D4
+  width, 16 or 8, and the active-S-box counter for the Boolean candidates' layers at 4×4 with w = 4
+  and at the D4 and production widths? Since "a search's results count only at a width so covered",
+  is each use covered by a stated known result fixed before the tool's first validation, or does a
+  use without one write `not evaluated`, so that the D4 score, the cross-checks and R_bound do not
+  rest on a use that no known result covers? [Gap, Spec §FR-022, §FR-039; research R6, R12 "Box
+  widths", "Validated widths"; data-model §7 `validated_kind`]
+- [ ] CHK071 Does every tool whose verdict counts have a stated known result, given that FR-039 says
+  "Every tool whose verdict counts has one" and lists the symmetry check, the dependency
+  propagation, exhaustive bijectivity, the avalanche test, the cost model and the degree derivation,
+  while research R13's invariant checks fail a candidate on a form kept on every test state and
+  raise R_dist on a probabilistic invariant, and neither FR-039, R13's table of known results nor
+  data-model §7 names a known result for them? Is the tool that re-finds each `phyco-v2` result
+  named, given that FR-039 and data-model §7 make S12's ranges and classes, S13(a)'s merged pair,
+  S13's 41% and 32% and S15's 16 steps and bound known results to re-find, that the cli contract's
+  `validate_tool.py --tool NAME --known s12` (and `s13-decay`, `s13-transport`, `s15`) leaves the
+  tool open, and that the invariant checks take S13(b)'s transport mode as an input difference? Do
+  SC-007 and quickstart V1, which name the symmetry, dependency, bijectivity, avalanche and
+  cost-model checks, also cover the degree derivation, the invariant checks, the trail tools'
+  published values and the bias test's synthetic families? [Gap, Coverage, Spec §FR-039, §SC-007;
+  research R12, R13; data-model §7; cli contract `validate_tool.py`; quickstart V1]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
