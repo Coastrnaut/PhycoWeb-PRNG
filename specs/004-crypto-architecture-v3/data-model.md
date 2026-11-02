@@ -481,9 +481,12 @@ downloads manifest `downloads.json`, research R19: a `fetched` file's entry with
 and value, or the `owner-provided` entry of a value the owner provides, written by the
 owner with `scripts/owner_record.py owner-provided` and Approved in its own
 Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind` (the word widths its
-known results cover, the operation set and the kind of model; a search's results count only at a
-width so covered, the ARX search's at w = 16 from SPECK32 and at w = 32 only once it re-finds a
-known result at 32-bit words, and the cross-checks never widen a kind; R12), `known_result` (paper,
+known results cover, the operation set and the kind of model, with each use this plan makes of the
+tool and the known result that covers it, a use without one writing `not evaluated`; a search's
+results count only at a width so covered, the ARX search's at w = 16 from SPECK32 and at w = 32 only
+once it re-finds a known result at 32-bit words, and the cross-checks never widen a kind: a
+cross-check is not a use, covers a candidate's operation set only, writes no
+`not evaluated` and calls for no validation again; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
 known result fixed before the tool's first validation, with its source and its provenance-log entry,
 section 14, or `none`, which the first validation record states), `found`, `outcome`
@@ -495,12 +498,18 @@ same kind and of the tool's exact hash exists.
   PRESENT, the stated minimum of active S-boxes over 5 rounds. Any difference is `not
   re-found`.
   For the known results that are not published values, what must match is exact equality for every
-  deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
-  S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; the planted torus
+  deterministic fact: S12's ranges and classes and S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴,
+  both re-found by the bias test's count on the vein lanes (research R4); S13(a)'s merged pair
+  16m + 15 and 16m + 16 and S13(b)'s transport sums, unchanged on every probed state with all four
+  veins in class 1, both re-found by the invariant checks (research R13); the
+  planted invariants of the invariant checks' stated lists found, and none on
+  the list without one; S7's three rotation relations; the planted torus
   symmetries of the stated lists at n = 3 and 4 found, and none on the list without one; each
   structural tool's counts and matrices, entry by entry; the avalanche test's three planted results,
-  the bits that fire matching each round count's expected set bit for bit at every round count from
-  1 to its variant's R; the degree derivation's count by research R13's bottom-up rule, exactly, on
+  every bit of each round count's expected set firing at every round count from 1 to its
+  variant's R and, at the variant's R, the bits that fire matching the expected
+  set bit for bit, any other firing below it reported (research R4); the
+  degree derivation's count by research R13's bottom-up rule, exactly, on
   a stated list at w = 4 holding an ARX-box spread over two phases and a bitwise S-box, with the
   exact degree from the truth table reported beside it and the upper bound at
   least that degree, and its hand-derived inside-out count; R5's counts; and FUT-SEC-8's
@@ -515,7 +524,9 @@ same kind and of the tool's exact hash exists.
   after a failed validation, its results `not evaluated`. Every attempt is a record of its own.
   Results of the failed version never count; results already counted from an earlier validated
   version stand, since they cite its hash.
-- **The bias test** (R4): S14's bias re-found on `phyco-v2`, and, on each of two families of 100
+- **The bias test** (R4): S14's bias re-found on `phyco-v2`, with S12's ranges and classes and S15's
+  16 steps from its count on the vein lanes, bit 31 of each vein lane set after 16 steps from
+  uniform starting states only on a lane equal to 2³¹, and, on each of two families of 100
   sets of synthetic binomial counts with one bit planted at the 90%-power biases, a firing of the
   planted bit in 82 to 97 of the family's 100 sets, a set counting only when its planted bit fires,
   with at most 3 of them holding a firing of an unplanted bit, each reported with its set,
@@ -532,10 +543,14 @@ same kind and of the tool's exact hash exists.
   new record, decides in the new one: outside 82 to 97, or with more than 3 sets holding an
   unplanted firing, in either family the tool is unvalidated there, its results `not evaluated`,
   until a defect is found and fixed.
-- **The avalanche test** (R4): R13's three planted results re-found, one per path, each at every
-  round count from 1 to its variant's R against that round count's expected set, the planted bits
-  and every bit that the exact dependency matrices show independent of the flipped bit at that round
-  count, and only if exactly that set fires, bit for bit: for the flip set the difference bits of
+- **The avalanche test** (R4): R13's three planted results re-found, one per path, each checked at
+  every round count from 1 to its variant's R against that round count's expected set, the planted
+  bits and every bit that the exact dependency matrices show independent of the flipped bit at that
+  round count: every bit of the set fires at every round count, any other firing is reported with
+  its round count, position and count and decides nothing below the variant's R, and at the
+  variant's R, fixed with the known result as a round count at which every bit outside the set
+  depends on the flipped bit, the result is re-found only if exactly that set fires, bit for bit,
+  with the chance of a false firing there stated beside it: for the flip set the difference bits of
   the unmixed lane, a lane that no update writes, which others may read; for the related-key and
   related-nonce set the stated lane's bits for the stated key bit and nonce bit that never reach it;
   and for the rotational pairs the bits of the lane that commutes with word rotation, these two with
@@ -544,7 +559,10 @@ same kind and of the tool's exact hash exists.
   critical values of `critical_counts.json`; and its power at δ_A = 0.0443, 0.0451 and 0.0465,
   computed exactly from the binomial distribution, is at least 0.9. One record per size covers the
   three paths, the flip set, the related-key and related-nonce set and the rotational pairs.
-- **Cross-checks between kinds** (R12) are records of the candidate they run on, of
+- **Cross-checks between kinds** (R12) check a tool on a candidate's own boxes and layers and are
+  not uses of it: their values are compared, by exact equality and against the floor, never counted,
+  they write no `not evaluated` and call for no validation again, and they cover the
+  candidate's operation set only. They are records of the candidate they run on, of
   kind `cross-check`, written by `evidence_v3.py` into `candidates/<id>/`
   (section 1, Record files), once per candidate and tool version, charged
   to its trail row; a failed one is a tool defect. Each lists, for every r
@@ -563,9 +581,9 @@ same kind and of the tool's exact hash exists.
   lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted torus symmetries and
   the one with none, the map with collisions, the variant with a planted gap, the
   instantiation variant with a key bit and a nonce bit that never reach a
-  lane, the operation list with a lane that commutes with word rotation, R5's
-  hand-counted examples, the small operation list of known degree with its
-  inside-out count) is written under `research/004/`, whose files are pinned to
+  lane, the operation list with a lane that commutes with word rotation, the lists with planted
+  invariants and the one with none, R5's hand-counted examples, the small operation list of known
+  degree with its inside-out count) is written under `research/004/`, whose files are pinned to
   LF (research R18), with its SHA-256, and entered in the provenance log
   (section 14) before the tool it validates is drafted, so its entry's `seq` comes before the tool's
   first entry. A self-written second known result (above) is written and entered in the same way.

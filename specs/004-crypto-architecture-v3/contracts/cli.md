@@ -131,7 +131,12 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   until a validated tool, or direct evaluation with the validated exact models, settles it
   (data model §5). A tool is validated again after any change to its code (its SHA-256 differs), a
   dependency upgrade, or a use at a word width, operation set or kind of model outside its validated
-  kind; until then its results are `not evaluated`. A re-validated version of a tool in the fixed
+  kind; until then its results are `not evaluated`. A use at a word width or kind of model outside
+  its validated kind counts only once a further known result covering it, fixed with its source
+  before the tool's first validation, is re-found, since a validation on the known results the tool
+  had never widens its kind; a candidate's operation set is covered by that candidate's
+  cross-checks, which are checks of the tool, not uses: they write no `not evaluated` and call for
+  no validation again (research R12). A re-validated version of a tool in the fixed
   set may serve searches not yet run, never a search that reached its cap (Trail tools).
 - **Budget**: a script refuses work on a candidate whose budget row is spent (R7), exit 2, and a
   search that reaches its per-instance cap writes `inconclusive`. A heavy run first projects its
@@ -227,8 +232,11 @@ validate_tool.py --reproduce RECORD
 
 Runs the tool on its known result (`s12`, `s13-decay`, `s13-transport`, `s14`, `s15`,
 `fut-sec-8`, a published value such as `speck32-diff`, `speck32-lin`, `present-5r`,
-`sparkle-box`, or a structural tool's known result of research R13) and writes a validation
-record (data model §7). Exit 1 if not re-found. A published value needs its source recorded, an
+`sparkle-box`, or a structural tool's known result of research R13) and writes a validation record
+(data model §7). Each known result names its tool, as research R13 states: the invariant
+checks re-find `s13-decay` and `s13-transport`, the bias test `s12`, `s14` and
+`s15`, `fut_sec8.py`'s tools `fut-sec-8`, and each trail tool its published
+value. Exit 1 if not re-found. A published value needs its source recorded, an
 entry of `$REP/downloads.json` (research R19): a `fetched` file's entry with the paper's table and
 value, or the `owner-provided` entry of a value the owner provides with its source, written by
 `scripts/owner_record.py owner-provided`, whose Review & Approval row "Owner-provided value <n>"

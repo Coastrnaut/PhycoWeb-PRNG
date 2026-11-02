@@ -200,8 +200,9 @@ lanes' nonce registers being registers at their own nodes, filled through the
 absorption tree: each is stricter, adds a check, or settles an open case by its
 most conservative reading before any result it affects, at every claimable size, RAT-036 and RAT-052
 changing a check only at the research sizes, where as written it fails every candidate, and ANA-062
-stating the round counts at which the avalanche test's validation is checked and the
-bits that must fire at each, where as written it fails every correct test
+and ANA-068 stating the round counts at which the avalanche test's validation
+is checked and the bits that must fire at each, where as written it fails
+every correct test, ANA-068 asking for the exact set at the variant's R alone
 (checklist-choices.md, "How to answer"), and each protocol change among them
 becomes an entry of the protocol change log (FR-044). The start signal reaches the nodes and the
 replicated counters through a registered fan-out tree, as reset does, and output leaves through a

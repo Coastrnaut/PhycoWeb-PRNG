@@ -1714,17 +1714,28 @@ freeze hashes and the baseline manifest; run the claim-register test.
   returns with its weight counts as a trail.
 - **FR-039**: Before any result of an analysis tool counts, positive or negative, the tool MUST
   re-find a known result of its kind (security.md §12.5): on `phyco-v2`, the FUT-SEC-8
-  recovery, both merging mechanisms of S13, the vein bounds of S12 and S15, and the bias of S14;
-  for trail search, a published optimal trail of a reference design. Every tool whose verdict
+  recovery, both merging mechanisms of S13, the vein bounds of S12 and S15, and the bias of S14,
+  each re-found by the tool research R13 names for it, the FUT-SEC-8 recovery by `fut_sec8.py`,
+  S13's mechanisms by the invariant checks and the others by the bias test; for trail search, a
+  published optimal trail of a reference design. Every tool whose verdict
   counts has one: the symmetry check re-finds S7's rotation structure of `phyco-v2`'s constants and
   the planted torus symmetries of stated lists at n = 3 and 4, and clears a list with none; the
   dependency propagation re-finds the hand-derived matrices of a stated small operation list at 3×3
   and 4×4; exhaustive bijectivity re-finds a known permutation (2³² distinct outputs) and
-  a stated map with collisions (fewer); the avalanche test re-finds a planted result on each of its
-  three paths, each flagged exactly, bit for bit, at every round count from 1 to its variant's R
-  against that round count's expected set, the planted bits and every bit that the exact dependency
-  matrices show independent of the flipped bit at that round count, and re-found only if exactly
-  that set fires: for the flip set a stated variant that leaves one lane unmixed, a lane that no
+  a stated map with collisions (fewer); the invariant checks re-find S13's two merging mechanisms on
+  `phyco-v2`, the transport difference of S13(b) and the merged pair of S13(a), and
+  the planted invariants of stated lists at 3×3 and 4×4, and clear a list
+  with none; the avalanche test re-finds a planted result on each of its
+  three paths, checked at every round count from 1 to its variant's R against that round count's
+  expected set, the planted bits and every bit that the exact dependency matrices show independent
+  of the flipped bit at that round count, each of which flips always or never: every bit of that set
+  fires at every such round count, any other firing is reported with its round count, position and
+  count and decides nothing below the variant's R, and at the variant's R, a round count fixed with
+  the known result before the tool is drafted at which the exact dependency matrices show every bit
+  outside the set dependent on the flipped bit, the result is re-found only if exactly that set
+  fires, bit for bit, with the chance that a correct test fires there on a uniform bit, at most b
+  times the threshold 0.005/(128·S_A) per flipped bit, stated beside it: for the
+  flip set a stated variant that leaves one lane unmixed, a lane that no
   update writes, which others may read, the difference bits of that lane being the planted bits; for
   the related-key and related-nonce set a stated instantiation variant in which a stated key bit and
   a stated nonce bit never reach a stated lane; and for the rotational pairs a stated operation list
@@ -1754,8 +1765,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `not evaluated`, until a defect is found and fixed (research R3, R4). Each known result
   this feature writes itself (the small operation lists with their hand-derived matrices, the lists
   with planted symmetries and the one with none, the map with collisions, the variant with a planted
-  gap, the instantiation variant with a key bit and a nonce bit that never reach a lane, the
-  operation list with a lane that commutes with word rotation, research R5's
+  gap, the instantiation variant with a key bit and a nonce bit that never reach a
+  lane, the operation list with a lane that commutes with word rotation,
+  the lists with planted invariants and the one with none, research R5's
   hand-counted examples, the small operation list of known degree) is written
   with its SHA-256 and entered in the provenance log before the tool it validates is drafted; the
   validation record cites both entries, and a test checks their order and that the hashes still
@@ -1769,7 +1781,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   equality for every deterministic fact, and
   for a measured fraction a count in the binomial interval around the recorded fraction at the
   tool's sample size, with at most 0.005 in each tail; anything else is `not re-found`. Each known
-  result is of the kind of its use, or a cross-check covers the difference: for every r from 1 to
+  result is of the kind of its use in word width and kind of model, and the cross-checks cover each
+  candidate's operation set, which no known result shares: for every r from 1 to
   the largest at which the exhaustive computation finishes within its 8 h cap, the ARX search's
   optimal single-trail weight over r rounds of each distinct ARX-box of each ARX candidate equals,
   at w = 4 (boxes of 8 bits), that of an exhaustive search over the box's internal trails, run by
@@ -1787,10 +1800,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
   count only after it re-finds a known result at 32-bit words, fixed with its source before its
   first validation as a further known result, and otherwise its results at w = 32 are
   `not evaluated`; the cross-checks at w = 4 and 8 check each candidate's boxes and never widen a
-  kind (research R12). A tool used outside its validated kind writes `not evaluated`. A tool is
-  validated again after any change to its code (its SHA-256 differs), a dependency upgrade, or a use
-  at a word width, operation set or kind of model outside its validated kind, and each counted
-  result cites the validation record of the tool's exact hash. The trail tools are a fixed set once
+  kind (research R12). Each other trail tool's kind, the active-S-box counter's from PRESENT, the
+  long-trail counter's from SPARKLE and the exhaustive tables' from the PRESENT S-box, is stated in
+  the same way, with each use this plan makes of it and the known result that covers it; a use that
+  no known result covers gets a further one, fixed with its source before the tool's first
+  validation, or writes `not evaluated` (research R12). A cross-check checks a tool on a candidate's
+  own boxes and layers and is not a use: its values are compared, by exact equality and against the
+  floor, never counted, and it writes no `not evaluated` and calls for no validation again; a use on
+  a candidate's operation set counts once that candidate's cross-checks pass, in place of a
+  validation again, which on the same known results could not cover it. A tool used outside its
+  validated kind writes `not evaluated`. A tool is validated again after any change to its code (its
+  SHA-256 differs), a dependency upgrade, or a use at a word width, operation set or kind of model
+  outside its validated kind, except that at a candidate's operation set the cross-checks stand in
+  for it; a use at a word width or kind of model outside the kind counts only once a further known
+  result covering it, fixed with its source before the tool's first validation, is re-found, since a
+  validation again on the known results the tool had never widens its kind; and each counted result
+  cites the validation record of the tool's exact hash. The trail tools are a fixed set once
   the first trail search starts, named by research R12's rows (ARX search, active-S-box counting,
   long-trail active-box counting, exhaustive tables): a fixed or faster version of a named tool is
   the same tool and, re-validated, may serve searches not yet run, and a search that reached its cap
@@ -2979,11 +3004,14 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   every claimable size, and every repeat elsewhere is recorded (FR-023); and 0 non-trivial grid
   translations or rotations preserve any constant pattern at any supported size.
 - **SC-007**: 100% of counted tool results have a validation record older than they are: its
-  `created_utc` is earlier, and the counted record cites its ID and SHA-256. Every counted tool
-  has a known result (FR-039): S12, S13, S14, S15 and the FUT-SEC-8 recovery are re-found on
-  `phyco-v2`, a published optimal trail is re-found, and the symmetry, dependency, bijectivity,
-  avalanche and cost-model checks re-find their stated known results, each by the comparison
-  data-model §7 states for it.
+  `created_utc` is earlier, and the counted record cites its ID and SHA-256. Every counted tool has
+  a known result (FR-039): S12, S13, S14, S15 and the FUT-SEC-8 recovery are re-found on `phyco-v2`,
+  each by the tool research R13 names for it; each trail tool re-finds its published value (the ARX
+  search, the active-S-box counter, the long-trail counter and the exhaustive tables); the symmetry
+  check, the dependency propagation, exhaustive bijectivity, the invariant checks, the avalanche
+  test, the cost model and the degree derivation re-find their stated known results; and the bias
+  test's planted bit fires in each of its two synthetic families at the rate FR-039 states; each by
+  the comparison data-model §7 states for it.
 - **SC-008**: Every claimable size has an established R_bound from recorded trail bounds, each
   citing its method, tool and validation.
 - **SC-009**: 100% of the generated files (the vectors, known-answer tests, constants and

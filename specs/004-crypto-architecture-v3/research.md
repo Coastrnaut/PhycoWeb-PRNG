@@ -14,10 +14,10 @@ those of the third and fourth re-runs on 2026-11-02, the fourth's given in
 advance, are applied in the sections below. Each that changes a protocol
 value is stricter, or settles an open case by its most conservative reading
 before any result it affects, at every claimable size, RAT-036 and RAT-052 changing a check only at
-the research sizes, where as written it fails every candidate, and ANA-062 stating
-the round counts at which the avalanche test's validation is checked and
-the bits that must fire at each, where as written it fails every correct
-test (checklist-choices.md, "How to answer"), and becomes an entry of the
+the research sizes, where as written it fails every candidate, and ANA-062 and ANA-068 stating the
+round counts at which the avalanche test's validation is checked and the bits that must fire at
+each, where as written it fails every correct test, ANA-068 asking for the exact set at the
+variant's R alone (checklist-choices.md, "How to answer"), and becomes an entry of the
 protocol change log `research/004/protocol-changes.jsonl` when that log is created, by the per-round
 lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18).
 
@@ -353,7 +353,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     candidate uses it (R7). A control runs again, with the same counts, only after a recorded tool
     defect in its own code.
   - **Validation.** Before its first counted use, the bias test's validation record (R12;
-    data-model §7) shows that it re-finds S14's bias on `phyco-v2`, and that on each of two families
+    data-model §7) shows that it re-finds S14's bias on `phyco-v2`, and S12's ranges and classes and
+    S15's 16 steps from its count on the vein lanes, bit 31 of each vein lane being set after 16
+    steps from uniform starting states only on a lane equal to 2³¹, exactly, S15's bound
+    2¹²⁸ · (2³¹ + 1)⁴ following from that range (R13), and that on each of two families
     of 100 sets of synthetic binomial counts with one bit planted at the 90%-power biases above
     (0.0030, 0.0031 and 0.0033 at the three sizes) its planted bit fires in 82 to 97 of the family's
     100 sets, the binomial interval around 90% with at most 0.005 in each tail, a set
@@ -387,7 +390,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     rotational pairs), and the cross-check keep validating the counting; each planted result states
     the round counts tested, 1 to its variant's R, and at each round count its expected set, the
     planted bits and every bit that the exact dependency matrices show independent of the flipped
-    bit at that round count, and is re-found only if exactly that set fires; "unmixed" means a lane
+    bit at that round count, each of which flips always or never; every bit of the expected set must
+    fire at every round count, any other firing is reported with its round count, position and count
+    and decides nothing below the variant's R, and at the variant's R, fixed with the known result
+    before the tool is drafted as a round count at which the exact dependency matrices show
+    every bit outside the expected set dependent on the flipped bit, the
+    result is re-found only if exactly that set fires, with the chance that a
+    correct test fires there on a uniform bit, at most b times the threshold
+    0.005/(128·S_A) per flipped bit, stated beside it; "unmixed" means a lane
     that no update writes, which others may read, and the related-key, related-nonce and rotational
     planted results state their sets in the same way, from their own dependency matrices (R13). One
     record per size covers the three paths, which share N_a and the threshold.
@@ -1089,10 +1099,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 
     | Tool | Kind | Known result to re-find |
     |------|------|-------------------------|
-    | ARX differential and linear search | ARX trails with the exact models of addition | the weights of the optimal trails of SPECK32 over the first rounds (Biryukov and Velichkov, 2014; Liu, Wang and Rijmen, 2016) |
-    | Active S-box counting | MILP counting of active S-boxes | PRESENT: every 5-round differential characteristic has at least 10 active S-boxes, the stated minimum (Bogdanov et al., 2007) |
-    | Long-trail active-box counting | MILP counting of active ARX-boxes | a published long-trail bound of SPARKLE (Beierle et al., 2020), from its published box bounds |
-    | Exhaustive box and S-box tables | exhaustive tables | every entry of the PRESENT S-box's published difference and linear tables |
+    | ARX differential and linear search | ARX trails with the exact models of addition; validated kind: 16-bit words, from SPECK32 (Validated widths, below) | the weights of the optimal trails of SPECK32 over the first rounds (Biryukov and Velichkov, 2014; Liu, Wang and Rijmen, 2016) |
+    | Active S-box counting | MILP counting of active S-boxes; validated kind: 4-bit S-boxes under a bit permutation, from PRESENT | PRESENT: every 5-round differential characteristic has at least 10 active S-boxes, the stated minimum (Bogdanov et al., 2007) |
+    | Long-trail active-box counting | MILP counting of active ARX-boxes; validated kind: ARX-boxes on 32-bit words, from SPARKLE | a published long-trail bound of SPARKLE (Beierle et al., 2020), from its published box bounds |
+    | Exhaustive box and S-box tables | exhaustive tables; validated kind: 4-bit S-boxes, from the PRESENT S-box | every entry of the PRESENT S-box's published difference and linear tables |
 
   - **What must match.** For each row, the exact published value over the stated rounds: for a
     trail search, the weight of the optimal trail, not the trail itself, since several trails
@@ -1111,8 +1121,25 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     32-bit words, fixed with its source before its first validation as a further known result, for
     example SPECK64's optimal trails where one of R19's approved papers gives them, and otherwise
     its results at w = 32 are `not evaluated`. The cross-checks at w = 4 and 8 (below) check each
-    candidate's boxes and never widen a kind. Each other tool's kind states its widths in the same
-    way.
+    candidate's boxes and never widen a kind: each runs a tool on a candidate's own boxes and layers
+    and is not a use, its values compared, by exact equality and against the floor, never counted,
+    and it writes no `not evaluated` and calls for no validation again; it covers the candidate's
+    operation set, which no known result shares, and never a word width or a kind of model, so that
+    a use on that operation set counts once the candidate's cross-checks pass. Each other tool's
+    kind is stated in the same way, its word widths, operation set and kind of model (the table
+    above), beside each use this plan makes of it and the known result that covers that use: the
+    active-S-box counter's, from PRESENT, is 4-bit S-boxes under a bit permutation, for its uses on
+    the Boolean candidates' layers at the D4 and production widths, which the cross-checks at 4×4
+    with w = 4 check on each candidate's own layers; the long-trail counter's, from SPARKLE, is
+    ARX-boxes on 32-bit words, which covers its use at the production width and not its use at the
+    D4 width (16 or else 8, R6); and the exhaustive tables', from the 4-bit PRESENT S-box, is 4-bit
+    S-boxes, which covers none of their uses, the boxes of 8 and 16 bits at w = 4 and 8 and the
+    cross-checks' internal-trail search. A use that no known result covers gets a further known
+    result, fixed with its source before the tool's first validation, from R19's approved papers
+    where one of its kind is there, or else self-written and logged before the tool is drafted, for
+    example the difference and linear tables of (x, y) ↦ (x ⊞ y, y) at w = 4 and 8, whose entries
+    the formulas of Lipmaa and Moriai and of Wallén give exactly; a use without one writes
+    `not evaluated`.
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
     8 h (R7): for each distinct ARX-box of each ARX candidate, two checks, for every r from 1 to the
@@ -1136,9 +1163,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     other known result, stays a validation run charged to no candidate, capped at 8 h per instance,
     a heavy one projecting first against R7's feature-wide row and refused, exit 2, once it does not
     fit (R7). A tool used outside its validated kind writes `not evaluated`.
-  - **Re-validation.** A tool is validated again after any change to its code (its SHA-256
-    differs), a dependency upgrade, or a use at a word width, operation set or kind of model
-    outside its validated kind. Each counted result cites the validation record of the tool's exact
+  - **Re-validation.** A tool is validated again after any change to its code (its SHA-256 differs),
+    a dependency upgrade, or a use at a word width, operation set or kind of model outside its
+    validated kind. A use at a word width or kind of model outside that kind counts only once a
+    further known result covering it, fixed with its source before the tool's first validation, is
+    re-found, since a validation again on the known results the tool had never widens its kind; a
+    use at an operation set outside it, a candidate's own boxes or layers, is
+    covered by that candidate's cross-checks, which stand in for the validation
+    again. Each counted result cites the validation record of the tool's exact
     hash. A re-validated version of a named trail tool serves only searches not yet run (Fixed tool
     set).
   - **A failed validation.** The defect is recorded with its cause and fixed, and the tool is
@@ -1298,16 +1330,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Symmetry check | S7's rotation structure of `phyco-v2`'s constants; and stated lists with planted torus symmetries (a translation, a rotation by 90° and a reflection) at n = 3 and 4, which it must find, and one with none, which it must clear |
     | Dependency propagation | the hand-derived matrices of a stated small operation list at 3×3 and at 4×4 |
     | Exhaustive bijectivity | a known permutation (2³² ones in the bitmap) and a stated map with collisions (fewer) |
-    | Avalanche test | one planted result per path, each flagged exactly, bit for bit, at every round count from 1 to its variant's R against that round count's expected set, the planted bits and every bit that the exact dependency matrices show independent of the flipped bit there, and re-found only if exactly that set fires: for the flip set, a stated variant that leaves one lane unmixed (a lane that no update writes, which others may read), the difference bits of that lane being the planted bits; for the related-key and related-nonce set, a stated instantiation variant in which a stated key bit and a stated nonce bit never reach a stated lane; for the rotational pairs, a stated operation list in which one stated lane commutes with word rotation, these two with their sets from their own dependency matrices; and, without new inputs, its verdict code on every count 0 to N_a and its exact power at R4's δ_A (R4) |
+    | Invariant checks | S13(b) on `phyco-v2`: with all four veins in class 1, the transport difference (2, −2, 2, −2) leaves every transport sum unchanged on every probed state, exactly, and the successors coincide in a fraction within the binomial interval around 32%; S13(a): the vein decay maps 16m + 15 and 16m + 16 to one value for every m tested, exactly, and about 41% of states have such a partner, a measured fraction, the difference mode reporting coinciding successors beside unchanged differences; and stated lists at 4×4 with a planted conserved sum modulo 2^w and a planted kept XOR, and at 3×3 with a planted colour-class form, which it must find, and one with none, which it must clear |
+    | Avalanche test | one planted result per path, checked at every round count from 1 to its variant's R against that round count's expected set, the planted bits and every bit that the exact dependency matrices show independent of the flipped bit there: every bit of that set fires at every round count, any other firing is reported and decides nothing below the variant's R, and at the variant's R, fixed with the known result as a round count at which every other bit depends on the flipped bit, the result is re-found only if exactly that set fires, bit for bit, with the chance of a false firing there stated (R4): for the flip set, a stated variant that leaves one lane unmixed (a lane that no update writes, which others may read), the difference bits of that lane being the planted bits; for the related-key and related-nonce set, a stated instantiation variant in which a stated key bit and a stated nonce bit never reach a stated lane; for the rotational pairs, a stated operation list in which one stated lane commutes with word rotation, these two with their sets from their own dependency matrices; and, without new inputs, its verdict code on every count 0 to N_a and its exact power at R4's δ_A (R4) |
     | Cost model (R5) | R5's hand-counted examples |
     | Degree bound | on a stated small operation list at w = 4 that holds an ARX-box spread over two phases and a bitwise S-box, over a few rounds: the rule's count, reproduced exactly, with the exact degree from its truth table reported beside it and the upper bound checked to be at least that degree; and a hand-derived inside-out count at w = 4, reproduced exactly |
 
     Each known result this feature writes itself, the small operation lists with their hand-derived
     matrices, the lists with planted symmetries and the one with none, the map with collisions, the
     variant with a planted gap, the instantiation variant with a key bit and a nonce bit
-    that never reach a lane, the operation list with a lane that commutes
-    with word rotation, R5's hand-counted examples and the small operation
-    list of known degree with its hand-derived inside-out count, is written
+    that never reach a lane, the operation list with a lane that commutes with word rotation, the
+    lists with planted invariants and the one with none, R5's hand-counted examples and the small
+    operation list of known degree with its hand-derived inside-out count, is written
     with its SHA-256 and entered in the provenance log (data-model §14) before
     the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry; each
     structural tool's second known result is self-written in the same way, written and logged before
@@ -1316,7 +1349,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     match. What must match is stated per known result in data-model §7. Only the validation of tools
     whose behaviour does not depend on the neighbourhood transfers from 2×2 (box and S-box tables,
     the bijectivity bitmap, the cost model's counts), which is why the dependency propagation and
-    the symmetry check are validated at 3×3 and 4×4 (FR-032).
+    the symmetry check are validated at 3×3 and 4×4 (FR-032). The `phyco-v2` results of spec FR-039
+    are re-found by these tools and the bias test: S13(a) and S13(b) by the invariant checks, as the
+    table states; S12's ranges and classes, S14's bias and S15's 16 steps by the bias test (R4),
+    whose count on the vein lanes after 16 steps from uniform starting states sets bit 31 of each
+    vein lane only on a lane equal to 2³¹, exactly, S15's bound 2¹²⁸ · (2³¹ + 1)⁴ following from
+    that range; and the FUT-SEC-8 recovery by `fut_sec8.py` (R2).
 - **Stricter means**: counts may only rise; symmetries, constant relations, forms and sources of
   R_dist may only be added.
 - **Rationale**: structural dependency is the standard full-diffusion measure. Checking that it
