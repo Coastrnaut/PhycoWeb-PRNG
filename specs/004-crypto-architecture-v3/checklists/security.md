@@ -460,6 +460,47 @@ and an item is ticked only under the rule in the Notes below.
   §Review & Approval "Security-target review", "L1 recorded" and the notes under the table;
   data-model §15, §17; cli contract "Approvals", `check_claims.py`]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK075 Is "the chapter's version" defined, which the security-target review row and "L1
+  recorded" name by path and SHA-256 and `design_freeze.py create` compares with what the record
+  freezes, given that the security-target chapter is chapter 1 of `design.md`, not a file of its
+  own, while the design document's SHA-256 and version change with every committed change to any
+  chapter? Is it stated whether the mode chapter, which states the theorems the bound uses and
+  their preconditions, is part of that chapter (plan Summary item 2 puts "the keyed-duplex theorem
+  with its preconditions" in chapter 1, while plan phase 4 lists chapter 1 and the mode chapter
+  apart), and so whether the agent's `verified` and met marks, which "count only once the
+  security-target review row, which reviews the chapter by its version, reads Approved", count
+  when set after that row reads Approved, which FR-012 allows while a theorem is "unverified",
+  with no review held again of the version that holds them? [Ambiguity, Gap, Spec §FR-012,
+  §FR-034, §Review & Approval "Security-target review", "L1 recorded"; research R10; data-model
+  §10, §13; cli contract "Approvals", `design_freeze.py create`; plan Summary, phase 4]
+- [ ] CHK076 Is it stated who writes the change to `phyco-v3`'s entry in `protocol/claims.json`
+  (`claim_level`, `history`, `updated`) and to its line in security.md §15's register, and in which
+  commit, when an "L1 recorded" row reads Approved and when a later review row makes L1 lapse,
+  given that FR-012 and data-model §15 say that `claim_level` "holds the level whose gate holds at
+  HEAD", returning to L0 while a review held again is pending, with each earlier L1 and its dates
+  kept in `history`? Can that be checked, given that `check_claims.py` fails only on a level above
+  L0 that the rows do not support, so that a register left at L0 after L1 is recorded, or a
+  `history` that omits a lapsed L1 with its dates and the rows it rested on, passes?
+  [Measurability, Gap, Spec §FR-012, §FR-069, §Review & Approval "L1 recorded"; data-model §15,
+  §17; cli contract `check_claims.py`]
+- [ ] CHK077 Is the External design review row tied to what was reviewed, as the other rows that
+  `design_freeze.py create` reads are, given that the FUT-SEC-8 result review, security-target
+  review and owner design review rows each name what they reviewed by path and SHA-256 and are
+  held again for a changed version, while this row reads only done or "not arranged", and the
+  review package's manifest is rebuilt, its earlier version kept, when what it carries changes, so
+  that "done" for a package built from an earlier design-document version would stand at the
+  freeze of a revised one? Is it stated that the row names the package's manifest by SHA-256 with
+  the design-document version it carried, and what the row and the final report state when the
+  design changes after the review (SC-013)? [Consistency, Gap, Spec §FR-043, §FR-063, §SC-013,
+  §Review & Approval "External design review"; data-model §16, §17; cli contract
+  `design_freeze.py create`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy
