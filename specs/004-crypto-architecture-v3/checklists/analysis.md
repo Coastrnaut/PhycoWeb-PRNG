@@ -593,7 +593,12 @@ and an item is ticked only under the rule in the Notes below.
   count as the planted bits and every bit independent of the flipped bit, while below full diffusion
   a bit that depends on the flipped bit can flip with a frequency far from 1/2 and fire, one XORed
   with it at round 1 flipping every time, so that "only if exactly that set
-  fires" refuses a correct test. The fifth re-run takes it up. A tick here
+  fires" refuses a correct test. The fifth re-run takes it up. The 4 items of the fifth re-run,
+  CHK068 to CHK071, verified in the same way once their answers were applied, were ticked in commit
+  68dd149, and with them CHK062, which ANA-068 completes: below the variant's R a
+  correct test may fire outside the expected set, a firing that is reported and
+  decides nothing, and at the variant's R exactly that set must fire. CHK071
+  held once commit 7562bbf completed ANA-071 in quickstart V1. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

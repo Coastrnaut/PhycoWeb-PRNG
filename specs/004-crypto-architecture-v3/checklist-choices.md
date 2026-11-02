@@ -11,8 +11,8 @@ found in the text those answers changed, the 71 that the second re-run of 2026-1
 complete documents and the repository and the 70 that the third re-run of 2026-11-01 found over
 them, all answered and applied, the third re-run's on 2026-11-02, the 36 that the fourth re-run of
 2026-11-02 found over the complete documents and the repository, answered in advance and applied on
-2026-11-02, and the 11 that the fifth re-run of 2026-11-02 found over them, answered in advance
-on 2026-11-02. The 55 items marked `[Conflict]` come first, the 3 of the
+2026-11-02, and the 11 that the fifth re-run of 2026-11-02 found over them, answered in advance and
+applied on 2026-11-02. The 55 items marked `[Conflict]` come first, the 3 of the
 fifth re-run before the 11 of the fourth re-run, the 9 of the third re-run,
 the 15 of the second re-run, the 4 of the re-run and the 13 of the first
 run: where two texts disagree, every other item would be checked against a moving target until they
@@ -27,16 +27,15 @@ item, the owner asked the agent to verify each item against the text and
 tick it if it holds; each checklist's Notes record those instructions, their dates and the commits
 that ticked items, and the owner's tasks approval includes the review of those ticks (PRO-045).
 
-**Status: all 423 rows answered: the 376 of the first four rounds "all recommended" (owner), the 206
-of the first run, the 29 of the re-run and the 71 of the second re-run on 2026-11-01 and the 70 of
-the third re-run on 2026-11-02, and the 47 of the fourth and fifth re-runs in advance on 2026-11-02,
-by the owner's approval of all suggestions; the 36 of the fourth re-run were applied the same day.**
-The 11 rows of the fifth re-run are being applied checklist by checklist, and each checklist's rows
-are committed once they are written into every document they name. Option A of every row of the
-first five rounds is applied where its Changes cell names a document: the spec,
-plan.md, research.md, data-model.md, the two contracts, quickstart.md, the eight
-checklist files (SEC-066), security.md (versions 2.11, 2.12 and 2.13) and `.gitattributes`; the
-second, third and fourth re-runs' rows were committed checklist by checklist, each checklist's rows
+**Status: all 423 rows answered and applied: the 376 of the first four rounds "all recommended"
+(owner), the 206 of the first run, the 29 of the re-run and the 71 of the second re-run on
+2026-11-01 and the 70 of the third re-run on 2026-11-02, and the 47 of the fourth and fifth re-runs
+in advance on 2026-11-02, by the owner's approval of all suggestions, each round applied the same
+day.** Option A of every row is applied where its Changes cell names a document: the spec, plan.md,
+research.md, data-model.md, the two contracts, quickstart.md, the eight checklist files
+(SEC-066), security.md (versions 2.11, 2.12 and 2.13), `.gitattributes` and this
+document's lists "Rows that change the protocol" (PRO-061); the second to fifth
+re-runs' rows were committed checklist by checklist, each checklist's rows
 once they were written into every document they name. Where a Changes cell names research R16, R17
 or R18 for `.gitignore` or `requirements.txt`, the row changes that research passage, and the file
 itself changes at setup (plan phase 1), as the passage says. A row that also names a later feature
@@ -125,7 +124,7 @@ answered round, as the spec's Status line is (PRO-057).
 The 55 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
 
 From the fifth re-run of 2026-11-02, answered in advance on 2026-11-02 with the recommended options,
-in checklist order:
+and applied, in checklist order:
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -219,7 +218,7 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 The 8 items other than conflicts that the fifth re-run of 2026-11-02 found over the complete
 documents and the repository, in checklist order: 1 security, 1 design-rationale, 2 analysis, 2
 protocol, 1 hardware and 1 reproducibility. They were answered in advance on 2026-11-02 with the
-recommended options, as were the 3 conflicts above.
+recommended options, and applied, as were the 3 conflicts above.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -950,11 +949,11 @@ From the fifth re-run, 9 of its 11 rows:
 - **Protocol changes and their directions** (FR-044): PRO-061, PRO-062.
 - **Records and their hashes** (research R16): PRO-062, REP-074.
 
-Its round's two commits (PRO-061) are c9f5cb1 and the commit that completes its alignment, which
-writes the comparison's results beside these lists and is named here once it exists. The comparison
-over c9f5cb1 and d046012, which applied its last rows, found a row of the round listed under every
-rule whose place changed, and the check of each row's Changes cell found each row listed under every
-heading whose place it names; the alignment edits only this file, which holds no such place.
+Its round's two commits (PRO-061) are c9f5cb1 and 285584c, the commit that completed its alignment:
+3db9139 wrote the comparison's results beside these lists, 7562bbf completed ANA-071 in quickstart
+V1, and 285584c dropped a repeated clause from PRO-062's text in research R16. The comparison over
+them found a row of the round listed under every rule whose place changed, and the check of each
+row's Changes cell found each row listed under every heading whose place it names.
 
 Over every span from the plan-approval commit, 65bcbf2, to c9f5cb1 outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
@@ -1024,12 +1023,12 @@ checklist files. The protocol changes among them enter the protocol change log w
 before any result exists (FR-044; data-model §18), with the five rows that altered research R16
 listed beside this round's list under PRO-058's reading. Each of the 36 items was then verified
 against the complete documents: 35 hold and are ticked, as each checklist's Notes record, and
-analysis CHK062 stays open, since ANA-062, applied as written, gives the expected set at each round
+analysis CHK062 stayed open, since ANA-062, applied as written, gives the expected set at each round
 count as the planted bits and every bit independent of the flipped bit, while below full diffusion a
 bit that depends on the flipped bit can flip with a frequency far from 1/2 and fire, one XORed with
-it at round 1 flipping every time, so that "only if exactly that set fires" refuses a correct test.
-A fifth re-run of the six checklists over the complete documents and the repository then found 11
-more items.
+it at round 1 flipping every time, so that "only if exactly that set fires" refuses a correct test;
+it was ticked with the fifth re-run's items once ANA-068 completed ANA-062. A fifth re-run of the
+six checklists over the complete documents and the repository then found 11 more items.
 
 Of the 11 rows of the fifth re-run, 3 are conflicts and 8 come from its other items: 1 security, 1
 design-rationale, 2 analysis, 2 protocol, 1 hardware and 1 reproducibility. By kind, their
@@ -1040,8 +1039,16 @@ open: below the variant's R it asks that every bit of the expected set fire, eac
 always or never, and reports any other firing, since there a bit that depends on the flipped bit may
 still fire on a correct test; at the variant's R it asks exactly what the text asks. The owner's
 approval of all suggestions, given in advance on 2026-11-02, answers these rows with their
-recommended options and approves this round's list above, and the chosen options are being written
-into the documents their Changes cells name, each with its reason; the protocol changes among them
-enter the protocol change log when it is created, before any result exists (FR-044; data-model §18);
-the six checklists are re-read; and `/speckit-tasks` follows once a re-run finds no new item, up to
-the ⛔ tasks approval.
+recommended options and approves this round's list above, and the chosen options were written the
+same day into the documents their Changes cells name, each change with its reason: spec.md, plan.md,
+research.md, data-model.md, the cli contract, quickstart.md and this document's lists "Rows that
+change the protocol", beside which the results of PRO-061's comparison now stand, with the rows that
+PRO-058's reading adds to the first four lists and ad2c195's change to research R3 recorded for the
+owner. The protocol changes among them enter the protocol change log when it is created, before any
+result exists (FR-044; data-model §18). Each of the 11 items was then verified against the complete
+documents: 10 hold and are ticked, and with them analysis CHK062, which ANA-068 completes, as each
+checklist's Notes record; protocol CHK061 stays open, since no text says who makes PRO-061's
+comparison before the tasks approval, while `scripts/protocol_change.py check`, whose comparison it
+is, is written only in implementation, after that approval. A sixth re-run of the six checklists
+over the complete documents and the repository follows, and `/speckit-tasks` once a re-run finds no
+new item, up to the ⛔ tasks approval.

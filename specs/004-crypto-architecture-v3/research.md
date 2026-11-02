@@ -10,7 +10,7 @@ fixes" lists every value marked protocol here, so one list names them all.
 
 The answers to the checklist choices ([checklist-choices.md](./checklist-choices.md), "all
 recommended"), those of the first run, the re-run and the second re-run on 2026-11-01 and
-those of the third and fourth re-runs on 2026-11-02, the fourth's given in
+those of the third, fourth and fifth re-runs on 2026-11-02, the fourth's and the fifth's given in
 advance, are applied in the sections below. Each that changes a protocol
 value is stricter, or settles an open case by its most conservative reading
 before any result it affects, at every claimable size, RAT-036 and RAT-052 changing a check only at
