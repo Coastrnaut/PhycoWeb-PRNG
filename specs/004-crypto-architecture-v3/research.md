@@ -899,7 +899,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   design review and the freeze need every theorem the mode chapter uses `verified` in `limits.json`,
   with each precondition marked met in the mode chapter: `design_freeze.py create` exits 2
   otherwise, naming the theorem, and the freeze record holds `limits.json`'s SHA-256 and each
-  theorem's status (data-model §13).
+  theorem's status (data-model §13). Each theorem's entry in `limits.json` cites the paper's
+  `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page;
+  `mode_limits_v3.py` refuses `verified`, exit 2, without one or when the file on disk has another
+  SHA-256, and the agent's `verified` and met marks count only once the security-target review row,
+  which reviews the chapter by its version, reads Approved; until then `create` reads them as
+  `unverified` (data-model §10). A paper that cannot be obtained or read leaves its theorem
+  `unverified`, recorded in `downloads.json` as `not obtained` with the reason. Where another
+  theorem of this list covers the same call and its paper is on disk and read, the mode chapter uses
+  it, in a new design-document version reviewed again; where none does, no published theorem's
+  preconditions can be shown met, and the feature recommends stopping (spec stop rule). Another copy
+  of a paper, from any source, is a new download that needs the owner's permission for that file
+  (R19).
 - **If a call does not match a theorem exactly**, the call is changed to the theorem's form
   (forget as a duplexing call that overwrites the outer part, reseed as a domain-separated
   absorption), or the feature stops (Edge Cases). A mode without a matching theorem is never
@@ -1494,7 +1505,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     "never overwritten" (data-model introduction): before one changes, `protocol/evidence.py` keeps
     its current content as `<dir>/versions/<sha256>.json` beside it, and the new content holds
     `previous_sha256`. A record that cites one gives its path and SHA-256, and the re-check resolves
-    either from the versions. The selection records are not among them: each is written once, and a
+    either from the versions. After the freeze, `protocol/evidence.py` refuses, exit 2, to write
+    over one that the freeze record pins, `parameters.json`, `limits.json` and the selected
+    candidate's `round-rule.json` among them, as the generators refuse (cli contract).
+    The selection records are not among them: each is written once, and a
     later selection is a new record, `freeze/selection-<k>.json` (data-model §9). Three files are
     append-only instead, their earlier entries never changing:
     `research/004/tools/critical_counts.json` (R4), the sidecar `vectors/phyco-v3/MANIFEST.json` and
@@ -1810,4 +1824,7 @@ kept as `versions/<sha256>.json` beside it (R16). A validation record's `source`
 entry: a `fetched` file's, with the paper's table and value, or an `owner-provided` one (data-model
 §7). If a paper's value cannot be obtained, the tool it validates stays unvalidated and its results
 `not evaluated` (R12); the owner may provide the value with its source, as an `owner-provided`
-entry.
+entry. A theorem paper that cannot be obtained or read is recorded `not obtained` with the reason,
+and R10 states the outcome; another copy of any paper listed here, from any source, is a new
+download that needs the owner's permission for that file. `limits.json` cites each theorem paper by
+its `fetched` entry's SHA-256 (R10).

@@ -172,7 +172,7 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 | V. Reproducibility, archival, provenance | Inputs from public strings (R3); every record holds the §17.2 fields (R16); `phyco-v2` archived with SHA-256 in `baseline/phyco-v2/` (FR-042); pinned requirements and line endings (R18); a re-check script recomputes every verdict | Pass |
 | VI. Specification before implementation | Spec and plan approved 2026-11-01; tasks await approval. Candidates are research objects under the approved rules; the reference model is written from the design document after selection, and the design is frozen only after the owner design review | Pass |
 | VII. Requirements traceability | Tasks will cite FR and SC identifiers; the spec's traceability tables map FUT-SEC, FUT-GRID and FUT-HW; the final report lists every requirement without evidence as open | Pass (enforced in tasks) |
-| VIII. Human review gates | Plan approval; downloads (every file of R19 approved on 2026-11-01, any other file separately); FUT-SEC-8 review; go-ahead for the second transcription; owner design review; design freeze; final result review | Pass |
+| VIII. Human review gates | Every gate of the spec's Review & Approval table, which is the source: spec approval; plan approval; the checklist choices of each round; tasks approval; tool acquisition (every file of R19 approved on 2026-11-01, any other file separately); FUT-SEC-8 result review; the D4 and selection ties, where a tie reaches the owner; go-ahead for the second transcription; security-target review; owner design review; L1 recorded; external design review, recorded as done or not arranged; design freeze; final result review; and the rows added when needed: each environment record, owner-provided value and log repair, and each review held again | Pass |
 | IX. Outward actions | The agent makes local commits only under the owner's standing authorization and never pushes, tags, releases or publishes; downloads only with per-file permission; sending the review package is the owner's action | Pass |
 | Security Policy | FUT-SEC-1 to FUT-SEC-9 carried and traced (FR-049); key 256 bits and reachable secret state ≥ 256 bits at every claimable size (FR-009, FR-010); no claim, only a target at L1; restriction stated wherever use is described (FR-050) | Pass |
 | Technical constraints | Python 3.8+ for the model (standard library only); numpy with explicit dtypes; scipy for analysis only; a test checks that the model imports no analysis dependency. Adds C tooling for the sweep | Justified (Complexity Tracking) |
@@ -383,9 +383,9 @@ source and binary.
 7. **Second transcription**: ⛔ **owner go-ahead**, the Review & Approval row "Second transcription
    go-ahead", which the owner sets and commits and the provenance test reads at HEAD; a separate
    session writes `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
-8. **US5**: first the security-target review, with its Review & Approval row, after the selection
-   and before the owner design review: it cites the selected candidate's records of FR-029's
-   diffusion through instantiation and of R4's first-order differences, and closes FR-011's
+8. **US5**: first the ⛔ **security-target review**, with its Review & Approval row, after the
+   selection and before the owner design review: it cites the selected candidate's records of
+   FR-029's diffusion through instantiation and of R4's first-order differences, and closes FR-011's
    functionality class; L1 recorded when its gate passes (security.md §15, 2.13: the FUT-SEC-8
    result review and the security-target review); then the rationale; the security.md version of
    FR-051 (2.11 already records the §20.1

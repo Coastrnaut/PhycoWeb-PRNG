@@ -17,7 +17,9 @@ are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
 `downloads.json` and `review-package/MANIFEST.json`. Before one changes,
 `protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
 the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
-re-check resolves either from the versions (research R16). The selection records are
+re-check resolves either from the versions (research R16). After the freeze, `protocol/evidence.py`
+refuses, exit 2, to write over one that the freeze record pins, `parameters.json`, `limits.json` and
+the selected candidate's `round-rule.json` among them (section 13). The selection records are
 written once each and never rewritten: a later selection is a new record,
 `freeze/selection-<k>.json` (section 9). Three committed files are append-only, their earlier
 entries never changing: `research/004/tools/critical_counts.json`, which is code (section 5), the
@@ -672,8 +674,12 @@ size:
   eligibility rule.
 
 `limits.json`, a fixed-name file too: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), each theorem the mode chapter
-uses (paper, theorem number, `verified` or `unverified`, and each precondition with the mode-chapter
-section that meets it, marked met or not), which `design_freeze.py create` reads (section 13); the
+uses (the paper, cited by its `fetched` entry in `downloads.json` with that entry's SHA-256, the
+theorem's number and page, `verified` or `unverified`, and each precondition with the mode-chapter
+section that meets it, marked met or not), which `design_freeze.py create` reads (section 13):
+`mode_limits_v3.py` refuses `verified`, exit 2, without such an entry or when the file on disk has
+another SHA-256, and the marks count only once the security-target review row, which reviews the
+chapter by its version, reads Approved, `create` reading them as `unverified` until then; the
 limits per instantiation, per request and per key, each in calls of Π, the theorem's unit, which is
 primary, and in bits at every claimable size (a request of n bits takes ⌈n/r⌉ output calls plus one
 forget call, and instantiate's calls are stated); every other online quantity the bound counts with
@@ -750,7 +756,8 @@ copy against its manifest hash and its live source (SC-012).
   `protocol/devinputs_v3.py` and `protocol/evidence.py`; the freeze's code,
   `protocol/design_freeze.py`, and its command, `scripts/design_freeze.py`; and the security
   target's files `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
-  every one of which must be `verified`, with each precondition marked met (research R10).
+  every one of which must be `verified`, with each precondition marked met, marks that count only
+  under an Approved security-target review row (section 10; research R10).
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the
@@ -775,7 +782,10 @@ local-only outputs are in the record by SHA-256 anyway. `validate` recomputes `d
 every hash and checks the format rules; it exits 1 if anything but the approval fields changed or a
 hash does not match, and 2 while `status` is `draft`. After approval the frozen files must not
 change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code that
-produced the verdicts. The approval status of the design document and the rationale stays outside
+produced the verdicts. `protocol/evidence.py` refuses, exit 2, to write over a fixed-name file the
+record pins, `parameters.json`, `limits.json` and the selected candidate's `round-rule.json` among
+them, and after the freeze `mode_limits_v3.py` runs only with `--reproduce`, whose record goes under
+`$REP/reproductions/`. The approval status of the design document and the rationale stays outside
 the frozen files (FR-034).
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
@@ -799,8 +809,9 @@ One entry per model ID (`float-v0`, `lut-v1`, `phyco-v2`, `phyco-v3`): `claim_le
 ladder of security.md §15), `in_progress`, `claim` (`no claim`), `bound` (for example "at most 64
 bits" for `phyco-v2`), `evidence` (record paths), `updated`. `phyco-v3` starts at L0 and moves to L1
 only when the spec's "L1 recorded" row reads Approved, after the FUT-SEC-8 result review and the
-security-target review, security.md §15's L1 gate since version 2.13 (FR-012); the spec approval
-recorded no level.
+security-target review, security.md §15's L1 gate since version 2.13 (FR-012); `check_claims.py`
+reads that row at HEAD and fails, exit 1, while `claim_level` is above L0 and the row does not read
+Approved. The spec approval recorded no level.
 
 - `claim_level` keeps the highest level reached (L0 or L1 in this feature). `in_progress` names
   a level started and not reached, L2, with its start date and "not reached". The claim test checks
@@ -818,9 +829,16 @@ recorded no level.
   "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence or row
   carries "target" or quotes a rule. It also flags "random" with its inflections and "high-entropy"
   in every line it scans, since Principle IV forbids describing the generator so beyond what
-  committed evidence supports, and applies FR-069's other rules, "constant time", "related-key
+  committed evidence supports, and "secure", "securely" and "unbreakable", "cryptographically
+  secure" and "proven secure" among their uses, in every line too, since FR-050 forbids them and
+  SC-015 counts them, and applies FR-069's other rules, "constant time", "related-key
   analysis" and "weak-key analysis" in every line among them. Every rule matches whole words,
-  ignoring case, with the inflections FR-069 lists, a word being a run of letters and digits, so
+  ignoring case, with the inflections FR-069 lists, each root's forms in full (prove, proves,
+  proved, proving, proven and provably; comply, complies, complied, complying, compliant and
+  compliance; conform, conforms, conformed, conforming, conformance and conformant; approve,
+  approves, approved, approving and approval; random, randomly, randomness, randomize, randomizes,
+  randomized, randomizing and randomization, with their spellings in -ise; secure
+  and securely; unbreakable), a word being a run of letters and digits, so
   "random-nonce", "random_state" and `numpy.random` hold "random" and `os.urandom` does not. "Near"
   and "beside" in its rules mean the same sentence or table row. A flagged line passes only through
   this list, a rule's own text included, one entry per rule line. A standing entry is one fixed
@@ -831,15 +849,20 @@ recorded no level.
   in the disclaimer; "hash randomization" in the rule that nothing depends on it; and every other
   form the test finds gets a phrase of its own, listed here with its reason, or a line entry. The
   project's name holds no flagged word and needs no entry. Standing entries also let these lines
-  stand: security.md §6's rows, which state a standard's own status; the spec's FR-025 sentence on
+  stand: security.md §6's rows, which state a standard's own status; the spec's rule lines of FR-050
+  and SC-015, which name the words they forbid, and the negative statements on "secure"
+  and "unbreakable", such as README's "**not** cryptographically secure",
+  each through a fixed phrase with its reason; the spec's FR-025 sentence on
   zeroization in the model, which says what the model does not promise; the
   mapping chapter's one fixed negative statement, the chapter's only entry
   (FR-030); the spec's negative statements of FR-011, FR-049, FR-059 and
   the section "Context", which say what no artifact may call a model, a test or a review; and, in
   the checklists and checklist-choices.md, which quote the documents they review, a flagged word
   inside a quotation, in quotation marks or backticks, any other flagged line there needing an entry
-  of its own (FR-069). A test runs every rule and every standing phrase on sample sentences that
-  must and must not be flagged. Inside the mapping chapter, the design document's section headed
+  of its own (FR-069). A test runs every rule and every standing phrase on
+  sample sentences that must and must not be flagged, with one that must be
+  flagged for each form FR-069 lists and "phyco-v3 is unbreakable" among
+  them. Inside the mapping chapter, the design document's section headed
   "Slime-mould mapping" up to the next heading of the same level, the rule matches
   FR-030's list, the words for the arguments it forbids among them, as whole
   words, ignoring case, with their inflections, and the test exits 1 if the
@@ -860,8 +883,9 @@ owner's action.
 
 - **Candidate**: the diagram in section 3.
 - **Claim level of `phyco-v3`**: `claim_level` L0 now; L1 once its gate has passed after the
-  review of FUT-SEC-8 and of the security-target chapter (FR-012), recorded in the Review &
-  Approval row "L1 recorded". While any theorem the mode chapter uses is "unverified" (R10),
+  review of FUT-SEC-8 and of the security-target chapter (FR-012), recorded in the Review & Approval
+  row "L1 recorded", which the owner sets and commits and `check_claims.py` reads at HEAD
+  (section 15). While any theorem the mode chapter uses is "unverified" (R10),
   that row reads "blocked" and names the missing paper. L0 needs no row. L2 is never
   `claim_level` in this feature: `in_progress` names it from the first counted trail-bound
   record, with its start date and "not reached". Every level carries "no claim".
@@ -871,10 +895,17 @@ owner's action.
   as 1.0. After the freeze any change is a new model ID (FR-028). A record's `design_sha256` names
   the version its run saw, and a reproduction compares it only for the kinds whose code reads the
   document (section 1), so a later draft does not make an earlier record differ.
-- **Gates** (spec Review & Approval table): `_pending_` to Approved or Declined, with date and
-  notes; one row per download approval. A Declined gate ends in one of the outcomes the note under
-  the spec's table states for it, logged with its reasons, and a gate held again is a row of its
-  own.
+- **Gates** (spec Review & Approval table): a row's Decision is `_pending_`, Approved or Declined,
+  for every gate; also "Not needed" for the "D4 tie", "Selection tie" and "Selection tie <k>" rows,
+  done or not arranged for the external design review, and blocked, naming the missing paper, for
+  "L1 recorded". A row goes from `_pending_` to another of its values, with date and notes; one row
+  per download approval. Each guard opens on Approved alone, except that `design_freeze.py create`
+  also takes done or not arranged on the external review's row, and `round_rule.py --select` "Not
+  needed" on the "D4 tie" row. A Declined gate ends in one of the outcomes the note under the spec's
+  table states for it, logged with its reasons, and a gate held again is a row of its own,
+  "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>" (k = 2,
+  3, … in order), naming what it reviews by path and SHA-256; each guard reads its family's row with
+  the highest k at HEAD.
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
   or a fired control; `blocked` while a gate it needs is pending; otherwise the computed verdict.
 

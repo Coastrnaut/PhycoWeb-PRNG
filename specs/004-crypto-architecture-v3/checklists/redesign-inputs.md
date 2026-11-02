@@ -1,5 +1,9 @@
 # Redesign Inputs Checklist: the seed-entropy note's §5.3, item by item
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Purpose**: Verify that every item of the redesign checklist of
 [`seed-entropy-bound.md`](../../../research/security/seed-entropy-bound.md) §5.3 is handled by
 this feature's spec and plan (FR-048), and that the requirements behind it are traced.
@@ -8,10 +12,6 @@ every recommended option of research.md's "Choices for owner review". The owner'
 this file is pending.
 **Feature**: [spec.md](../spec.md). Its table "Redesign checklist" gives the dispositions group
 by group; this file checks them one item at a time against the requirements and the plan.
-
-> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
-> to generate secrets; use an established cryptographic random-number generator for keys,
-> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
 A ticked item has a disposition that meets its wording, of one of four kinds: **Covered** by a
 requirement of this feature, **By design** (the form of `phyco-v3` removes the issue),

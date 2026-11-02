@@ -222,9 +222,9 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | D4 tie (only if the nonlinearity choice rule ends in an exact tie) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
-| Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a row of its own (FR-043) |
-| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a row of its own (FR-043) |
-| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper |
+| Security-target review (the design document's security-target chapter; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. The chapter is drafted in phase 4 and marked "draft, under review"; the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
+| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
+| L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The owner sets this row and commits it, and `check_claims.py` reads it at HEAD and fails, exit 1, while the register gives `phyco-v3` a level above L0 and the row does not read Approved (FR-069) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
@@ -244,20 +244,24 @@ guard accepts an `owner-provided` entry only while its row does, as `repair_log.
 repair <n>" (cli contract, "Environment", `validate_tool.py`).
 
 Two lists of rows are set by the owner and committed, as "Log repair <n>" is. The first holds the
-rows a guard reads at HEAD, each with its guard: the FUT-SEC-8 result review, read by the evidence
-scripts' guard (cli contract, "Order of US1"); the D4 tie, read by `round_rule.py --select`, which
+rows a guard reads at HEAD, each with its guard: the FUT-SEC-8 result review and
+each "FUT-SEC-8 result review <k>", read by the evidence scripts' guard (cli
+contract, "Order of US1"); the D4 tie, read by `round_rule.py --select`, which
 exits 2 after a D4 tie until the row reads Approved with the choice record's SHA-256; the Selection
 tie and each "Selection tie <k>" of a later selection record, read the same way
-by `design_freeze.py create`; the Security-target review, the Owner design review and the External
-design review, read by `design_freeze.py create` in the rows held for the
-candidate that the latest selection record selects; each "Log repair <n>",
+by `design_freeze.py create`; the Security-target review and each "Security-target review <k>", the
+Owner design review and each "Owner design review <k>", and the External design review, read by
+`design_freeze.py create` in the rows held for the candidate that the latest selection record
+selects; L1 recorded, read by `check_claims.py`, which fails, exit 1, while the register gives
+`phyco-v3` a level above L0 and the row does not read Approved; each "Log repair <n>",
 read by `repair_log.py`; each "Environment record <n>", read by the evidence scripts' environment
 guard (cli contract, "Environment"); each "Owner-provided value <n>", read by `validate_tool.py`'s
 source guard; and the Second transcription go-ahead, read by the test of the
 transcription's provenance. The second holds the rows that record an owner's own act that no guard
-reads: the Design freeze. A test checks that the first list and the contracts' guards agree both
-ways. Any other approval is written by the agent only on the owner's explicit word for
-that row, quoted with its date in the row's notes. Every guard that reads this table reads it as
+reads: the Design freeze. A test checks that the first list, its numbered families included,
+and the contracts' guards agree both ways. Any other approval is written
+by the agent only on the owner's explicit word for that row, quoted with
+its date in the row's notes. Every guard that reads this table reads it as
 committed at HEAD and exits 2 while the working tree's table differs from HEAD's (cli contract,
 "Approvals"). The agent commits under the owner's standing authorization (constitution 1.3.0,
 Principle IX), and its commits carry no AI co-author line, so the history cannot show who wrote or
@@ -274,6 +278,16 @@ stop; the owner design review does not start, and `design_freeze.py create` exit
 security-target review is not Approved. At the owner design review: the outcomes its row and FR-043
 state. At any other gate: a revision of what it reviews, reviewed again in a row of its own, or a
 stop.
+
+A review held again, after a decline, for the changed parts after an approval, or for another
+candidate that a later selection record selects, is a row of its own, added when it is held:
+"FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>", with
+k = 2, 3, … in order, the unnumbered row being the first. It names what it reviews by path and
+SHA-256: the demonstration record, the chapter's version, or the design document's version with the
+selection record. Each guard reads the row of its family with the highest k at HEAD, which must
+review what the guard's run cites (cli contract, "Approvals"). A row's Decision holds one of the
+values data-model §17 lists for it, and each guard opens only on the values that section names for
+it.
 
 This table is the source of the feature's status. The Status line at the top of this spec names
 every round of checklist choices the table holds, with its state, and the Status of
@@ -560,6 +574,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   its results are `not evaluated`; the owner may provide the value with its source (research
   R19). If no trail route is validated, no candidate can establish R_bound, none is eligible,
   and the feature recommends stopping (stop rule).
+- **A paper that a mode theorem rests on cannot be obtained or read**: its theorem stays
+  `unverified`, and `downloads.json` records the file as `not obtained` with the reason (research
+  R19). Where another theorem of research R10's list covers the same call and its paper is on disk
+  and read, the mode chapter uses it, in a new design-document version reviewed again; where none
+  does, no published theorem's preconditions can be shown met, and the feature recommends stopping
+  (stop rule). Another copy of the paper, from any source, is a new download that needs the owner's
+  permission for that file (FR-046; research R19).
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
   established for that candidate within its analysis budget, and it cannot be frozen. The gap is
   reported, and the candidate is `ineligible`; another candidate is entered in its place, before the
@@ -581,8 +602,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   selection"). A raised R is never by itself a reason to drop a candidate. A finding that breaks the
   target on the full rounds is recorded at once
   (FR-051). If it comes after the owner design review, the design document gets a new version,
-  the rationale is revised, the review is repeated for the changed parts and recorded in a row
-  of its own, and the review package is rebuilt (FR-043).
+  the rationale is revised, the review is repeated for the changed parts and recorded in a row of
+  its own, "Owner design review <k>" (the notes under the Review & Approval table), and the review
+  package is rebuilt (FR-043).
 - **A change is needed after the freeze** (to a frozen file, a raise of R by feature 005, a new
   claimable size): it is a new model ID with its own vectors and freeze (FR-028), and the frozen
   files are never edited. Before the freeze, a change is a new design-document version and a
@@ -775,9 +797,17 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a row of its own, or a stop (the note under the Review & Approval table). The security-target
   review may read Approved while a theorem the mode chapter uses is "unverified"; the owner design
   review and the freeze need every such theorem `verified` in `limits.json`, with each precondition
-  marked met in the mode chapter (FR-043; research R10). The L1 gate of security.md §15 reads
+  marked met in the mode chapter (FR-043; research R10). Each theorem's entry there cites the
+  paper's `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page;
+  `mode_limits_v3.py` refuses `verified` without one, or when the file on disk has another SHA-256,
+  and the agent's `verified` and met marks count only once the security-target review row, which
+  reviews the chapter by its version, reads Approved: until then `design_freeze.py create` reads
+  them as `unverified`. A paper that cannot be obtained or read ends as the
+  edge case on it states: another theorem of research R10's list, in a new
+  version reviewed again, or a stop. The L1 gate of security.md §15 reads
   "FUT-SEC-8 result review and security-target review" (version 2.13), and L1 is recorded in a row
-  of its own, "L1 recorded", once both reviews read Approved; that row reads "blocked", naming the
+  of its own, "L1 recorded", once both reviews read Approved, a row the owner sets and the
+  claim test reads at HEAD (FR-069); that row reads "blocked", naming the
   missing paper, while any theorem the mode chapter uses is "unverified" (research R10). The spec
   approval of 2026-11-01 started the design work and recorded no level, so the register keeps
   `phyco-v3` at L0 until "L1 recorded" reads Approved. For L1, FUT-SEC-4 is met by statement, since
@@ -1772,14 +1802,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   instead; or a stop. Each is logged with its reasons, and where no further candidate can be entered
   the decline ends in one of the others. Any change after the owner design review (R
   raised, a new finding, a corrected document) makes a new design-document version: the rationale is
-  revised, the review is repeated for the changed parts and recorded in a row of its own, and the
+  revised, the review is repeated for the changed parts and recorded in a row of its own, "Owner
+  design review <k>" (the notes under the Review & Approval table), and the
   review package is rebuilt, its earlier manifest kept as `review-package/versions/<sha256>.json`
   (data-model introduction). A change before the freeze that touches any candidate's eligibility or
   R at 4×4 after a selection record exists makes `round_rule.py --select` run again over the whole
   set and write the next record (section "Pre-registered Design Protocol", "Eligibility and
   selection"): if it selects another candidate, the security-target review and every later review
-  are held again for that candidate, each in a row of its own; if it selects the same one, the
-  reviews held stand for what did not change, and the changed parts are reviewed
+  are held again for that candidate, each in a numbered row of its own; if it selects the same one,
+  the reviews held stand for what did not change, and the changed parts are reviewed
   again as above. The freeze runs in this order: (1) the owner commits the
   feature files (Principle IX); (2) `design_freeze.py create` runs with `git_dirty` false and
   writes the record as `draft`; (3) the owner's approval is written into it by `design_freeze.py
@@ -1787,7 +1818,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
   having checked against the draft's SHA-256 that nothing but the approval changed.
   `design_freeze.py create` exits 2 unless every theorem the mode chapter uses is `verified` in
-  `limits.json`, with each precondition marked met, naming the theorem otherwise (research R10).
+  `limits.json`, with each precondition marked met, naming the theorem otherwise, and reads those
+  marks as `unverified` while the security-target review row does not read Approved (FR-012;
+  research R10); a theorem whose paper cannot be obtained or read is replaced by another of research
+  R10's list, in a new version reviewed again, or the feature stops (Edge Cases).
   Steps (1), (3) and (4) are the owner's own acts: like a constitution amendment, they fall outside
   the standing authorization for local commits (constitution 1.3.0, Principle IX), and the agent
   never performs them, even when asked in general terms. The tie choices are owner's own acts of the
@@ -1812,7 +1846,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `git_dirty`; and the owner's approval. After the freeze, the frozen files MUST NOT change: a fix
   to a verdict script is a new file, so that the re-check (FR-065) runs the code that produced the
   verdicts, and the frozen model and vectors stay the expected values (FR-056) even when they
-  disagree with the frozen design document (edge cases; FR-028).
+  disagree with the frozen design document (edge cases; FR-028). `protocol/evidence.py` refuses,
+  exit 2, to write over a fixed-name file that the freeze record pins, `parameters.json`,
+  `limits.json` and the selected candidate's `round-rule.json` among them, as the generators refuse,
+  and after the freeze `mode_limits_v3.py` runs only with `--reproduce`, whose record goes under
+  `$REP/reproductions/`.
 - **FR-044**: After spec approval the pre-registered design protocol MAY only become stricter,
   and every change MUST be recorded with its reason before any result it affects, with the
   owner's recorded approval: the agent may propose a stricter change but not make it. Settling a
@@ -1916,9 +1954,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   order, weak-key classes and key-dependent effects, and that analysis MUST stay open in the
   final report. The boundary keys of FR-058 are tests of the model, not a weak-key analysis. No
   claim, evaluation or certification may follow from this feature alone (FR-052).
-- **FR-050**: Every report and document of this feature MUST carry the design-form disclaimer,
-  the block directly under this spec's title (FR-068), MUST use only the vocabulary of
-  security.md §15 ("proven bound", "best known attack", "no attack found within budget", "not
+- **FR-050**: Every report and document of this feature, each checklist and tasks.md
+  included, MUST carry the design-form disclaimer, the block directly under this
+  spec's title (FR-068), MUST use only the vocabulary of security.md §15
+  ("proven bound", "best known attack", "no attack found within budget", "not
   evaluated"), and MUST label every target as a target. No artifact MAY describe `phyco-v3`, or
   any model, as secure, proven secure, unbreakable, random, truly random or high-entropy, or credit
   it with randomness, or state a security strength as achieved: Principle IV names "random" and
@@ -2244,11 +2283,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   defined once in code as `DESIGN_DISCLAIMER`, holding exactly that text, beside the existing
   disclaimer constant, which stays unchanged. Every generated report and record of this feature
   MUST take it from there, every hand-written document MUST carry the same text (strategy note
-  §3.1), and the claim-register test compares every document's copy with the constant.
+  §3.1), the eight checklists under `checklists/` and checklist-choices.md under their titles and
+  tasks.md from its first version, and the claim-register test compares every document's copy with
+  the constant.
 - **FR-069**: A machine-readable claim and evidence register MUST list every model ID with its
-  claim level, its claim or "no claim", its bound and its evidence records (D10). An automated
-  test MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the
-  register and that hand-written documents carry the disclaimer of FR-068, and MUST report any
+  claim level, its claim or "no claim", its bound and its evidence records (D10). An automated test
+  MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the register,
+  that hand-written documents carry the disclaimer of FR-068, the checklists and tasks.md among
+  them, and that the register gives `phyco-v3` no level above L0 while the Review &
+  Approval row "L1 recorded" does not read Approved at HEAD, and MUST report any
   use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
   feature-003 T041). Its scope is every document of this feature, that is every Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the checklists and
@@ -2256,10 +2299,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   comments and docstrings of every file it adds or changes (`phycoweb/`, `protocol/`, `scripts/`,
   `research/004/`, `tests/` and `fast/seed_search.c`). In its rules "near" and "beside" mean the
   same sentence or table row, as they do for "target", and every rule matches whole words, ignoring
-  case, with these inflections: random, randomly, randomness, randomize and its forms,
-  randomization; high-entropy; proven, provably; compliant, compliance; conform, conforms,
-  conformance, conforming; approve, approved, approval; constant time and constant-time; and
-  FR-030's list with its own. A word is a run of letters and digits, so "random-nonce",
+  case, with these inflections, each root's forms in full: prove, proves, proved, proving, proven
+  and provably; comply, complies, complied, complying, compliant and compliance; conform, conforms,
+  conformed, conforming, conformance and conformant; approve, approves, approved, approving and
+  approval; random, randomly, randomness, randomize, randomizes, randomized, randomizing
+  and randomization, with their spellings in -ise; high-entropy; secure and
+  securely; unbreakable; constant time and constant-time; and FR-030's list
+  with its own. A word is a run of letters and digits, so "random-nonce",
   "random_state" and `numpy.random` hold "random" and `os.urandom` does not. A flagged line, a
   rule's own text included, passes only through an allow-list entry in the register, each with its
   reason, so "outside the rules that forbid it" is met by one entry per rule line; standing entries,
@@ -2269,12 +2315,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   what no artifact may call a model, a test or a review, and, in the checklists and
   checklist-choices.md, which quote the documents they review, a flagged word inside a quotation, in
   quotation marks or backticks; any other flagged line there needs an entry of its own. A test runs
-  every rule and every standing phrase on sample sentences that must and must not be flagged, as
+  every rule and every standing phrase on sample sentences that must and must not be flagged, with
+  one that must be flagged for each form listed above and "phyco-v3 is unbreakable" among them, as
   research R18's test does for the mapping chapter's rule. The rules flag:
   - a strength not labelled as a target: a number of bits beside "security", "strength" or
     "secure", or a cost such as 2¹²⁸ beside "security", unless the same sentence or row carries
     "target" or quotes a rule;
-  - "proven" or "provably" without its object and its record (FR-050);
+  - "proven" or "provably", with the other forms of "prove", without its object and its record
+    (FR-050);
   - frequency, avalanche or battery results offered as evidence of security or of mixing, and
     any text that implies prediction resistance (FR-050);
   - "compliant", "conforms" and "approved", with their inflections, near a standard's name, outside
@@ -2301,6 +2349,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     nonce", "random-nonce limit" or "hash randomization", gets a standing phrase of its own, listed
     with its reason in data-model §15, or a line entry. The project's name holds no flagged word and
     needs no entry. Any other flagged line needs an entry of its own (data-model §15).
+  - "secure", "securely" and "unbreakable", "cryptographically secure" and "proven secure" among
+    their uses, in every scanned line, as "random" is (FR-050; SC-015). Standing phrases, each with
+    its reason, let stand the rule lines of FR-050 and SC-015, which name the words they forbid, and
+    the negative statements, such as README's "**not** cryptographically secure" and security.md's
+    "is not thereby cryptographically secure"; in the checklists and checklist-choices.md a flagged
+    word inside a quotation passes as above, and any other flagged line needs an entry of its own.
 
 ### Pre-registered Design Protocol
 
@@ -2507,8 +2561,10 @@ candidate's logged rules derive (w, n, R, c), or corrects a value to what those 
 reduced variant, a round count, or a fix to the model that leaves the design unchanged is not a new
 candidate. When in doubt, it is a new candidate. The analysis budget per candidate, such as the
 solver time for trail bounds, is fixed in the plan before the first candidate is scored. The feature
-recommends stopping (security.md §21, option C) if none of the evaluated candidates is eligible, or
-if no published theorem's preconditions can be met by the mode. No candidate is eligible, for
+recommends stopping (security.md §21, option C) if none of the evaluated candidates is
+eligible, or if no published theorem's preconditions can be met by the mode,
+or shown met, as when no theorem of research R10's list that covers a call
+has its paper on disk and read (Edge Cases). No candidate is eligible, for
 example, when an attack below the target reaches the full rounds of every candidate, or when R_bound
 is not established at the production width for any of them (strategy note §10; D10). The budget may
 only be lowered (FR-044): a budget lowered below the hours already used leaves zero hours, and a
@@ -2820,7 +2876,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   have a recorded disposition.
 - **SC-015**: No report, document, code comment or docstring (in the files FR-069 scans)
   describes `phyco-v3`, or any model, as cryptographically secure, proven secure, unbreakable,
-  random, truly random or high-entropy (FR-050), or states a security strength as achieved, and
+  random, truly random or high-entropy (FR-050), words the claim test flags in every
+  line it scans (FR-069), or states a security strength as achieved, and
   every report carries the disclaimer.
 - **SC-016**: 100% of the edge states the design document lists have a constructed-state
   vector, reproduced on both platforms of SC-009, and the second transcription agrees with the

@@ -1,5 +1,9 @@
 # Design Rationale Checklist: Cryptographic Architecture and phyco-v3 Design
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Purpose**: Unit tests for the requirements on the design document and its rationale: every
 component, constant and round count justified, the inverse specified, and no security argument
 resting on the slime-mould mapping.

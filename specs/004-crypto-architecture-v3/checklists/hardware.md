@@ -1,5 +1,9 @@
 # Hardware Readiness Checklist: Cryptographic Architecture and phyco-v3 Design
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Purpose**: Unit tests for the requirements that prepare `phyco-v3` for RTL and the board: carry
 chains per stage, constant time, zeroization, grid generics, the width, signedness and shift kind
 of every operation, FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5.

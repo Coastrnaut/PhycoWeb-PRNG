@@ -1,5 +1,9 @@
 # Reproducibility Checklist: Cryptographic Architecture and phyco-v3 Design
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Purpose**: Unit tests for the reproducibility requirements of feature 004: commands, versions,
 hashes, deterministic outputs and line endings.
 **Created**: 2026-11-01

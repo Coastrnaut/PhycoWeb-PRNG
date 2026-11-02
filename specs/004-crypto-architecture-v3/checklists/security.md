@@ -1,5 +1,9 @@
 # Security Checklist: Cryptographic Architecture and phyco-v3 Design
 
+> This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
+> to generate secrets; use an established cryptographic random-number generator for keys,
+> nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
+
 **Purpose**: Unit tests for the security requirements of feature 004: the key, the nonce, the
 capacity, the reachable secret state, FUT-SEC-1 to FUT-SEC-9 by specification, claim wording and
 the Security Policy's order.

@@ -99,14 +99,23 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
   Order of US1, below; `round_rule.py --select`; `design_freeze.py create`;
-  `repair_log.py`; `validate_tool.py`'s source guard; the test of the second
+  `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`; the test of the second
   transcription's provenance) reads it as committed at HEAD, never the working tree,
   and exits 2 while the working tree's table differs from HEAD's. The rows that open a guard are set
   to Approved and committed by the owner (the note under that table), so an uncommitted row opens
-  none, and the owner's review at each ⛔ gate lists the approval commits since the last gate.
+  none, and the owner's review at each ⛔ gate lists the approval commits since the last gate. A
+  review held again is a numbered row, "FUT-SEC-8 result review <k>", "Security-target review <k>"
+  or "Owner design review <k>" (k = 2, 3, …), and a guard that reads such a family reads its row
+  with the highest k, which must name by path and SHA-256 what the run cites: the latest
+  demonstration record (Order of US1), or the chapter's version and the design document's version
+  with the latest selection record (`design_freeze.py create`). A guard opens on Approved alone,
+  except that `design_freeze.py create` also takes done or "not arranged" on the external review's
+  row and `round_rule.py --select` takes "Not needed" on the "D4 tie" row (data model §17).
 - **Order of US1**: any script that loads a key into a state of `phyco-v3` or of any candidate
-  exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table reads
-  Approved at HEAD (Approvals, above; FR-001, FR-003). Key loading is code that loads a key into
+  exits 2 unless the "FUT-SEC-8 result review" row of the spec's Review & Approval table, or the
+  "FUT-SEC-8 result review <k>" with the highest k once the review has been held again, reads
+  Approved at HEAD and names the latest demonstration record by path and SHA-256
+  (Approvals, above; FR-001, FR-003). Key loading is code that loads a key into
   such a state: the mode's instantiate in the model, the research duplex, and any script that runs
   instantiate, such as the instantiation states of research R4. It is not the development-input
   loader, which derives keys but loads none, nor a keyless operation list of Π, nor the design
@@ -350,12 +359,17 @@ mode_limits_v3.py --reproduce RECORD
 
 Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴ and
 N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
-`theorem` is `unverified` until its paper has been read. It also writes the size profile
+`theorem` is `unverified` until its paper has been read: each theorem's entry cites the paper's
+`fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page, and the
+script refuses `verified`, exit 2, without such an entry or when the file on
+disk has another SHA-256 (data model §10). It also writes the size profile
 `parameters.json` beside `limits.json` (data model §10), each row from the variant table and the
 design document's layout, with FR-010's generic-bound checks computed by code; exit 1 on any
 violation at a claimable size. Both files keep their fixed names: before one changes, its current
 content is kept as `security-target/versions/<sha256>.json`, and the new content holds
-`previous_sha256` (data model introduction).
+`previous_sha256` (data model introduction). After the freeze it runs only with `--reproduce`, whose
+record goes under `$REP/reproductions/`, and `protocol/evidence.py` refuses, exit 2, to write over
+either file, which the freeze record pins (data model §13).
 
 ## Generators of constants and vectors
 
@@ -420,12 +434,16 @@ is the command that calls it, as the other scripts call `protocol/evidence.py`; 
 both files (data model §13).
 
 `create` reads the spec's Review & Approval table at HEAD (Approvals, above) and exits 2 if the
-security-target review or the owner design review row is not Approved, if the external review row is
+security-target review's or the owner design review's row, the one with the highest k where
+the review has been held again, is not Approved or does not review what the
+record freezes, by path and SHA-256: the chapter's version, and the design
+document's version with the latest selection record; if the external review row is
 neither done nor "not arranged", if the latest selection record has a tie
 and its row, "Selection tie" or "Selection tie <k>", does not read Approved
 with the SHA-256 of its choice record, if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
-theorem (research R10), or if `git_dirty` is true. `create` stores `draft_sha256`, the
+theorem, those marks being read as `unverified` while the security-target review row does not read
+Approved (research R10), or if `git_dirty` is true. `create` stores `draft_sha256`, the
 SHA-256 of the record's canonical JSON without that field and the approval fields. `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
 the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
@@ -527,10 +545,13 @@ check_claims.py
 
 Runs FR-069's test as written, with its scope, rules, strength rule and allow-list: it checks
 README, security.md §1.1 and §15 and the disclaimers against `protocol/claims.json` and that every
-hand-written document of this feature carries the design-form disclaimer, and it scans every
+hand-written document of this feature carries the design-form disclaimer, the eight checklists,
+checklist-choices.md and, once written, tasks.md among them, and it scans every
 Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`,
 the checklists and checklist-choices.md included, README, security.md, and the comments and
 docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
-of the register, with its reason (data model §15). Exit 1 on any finding (SC-018).
+of the register, with its reason (data model §15). It reads the spec's Review & Approval row "L1
+recorded" as committed at HEAD (Approvals, above), and a register that gives `phyco-v3` a level
+above L0 while that row does not read Approved is a finding. Exit 1 on any finding (SC-018).
 `tests/test_claims.py` runs it. It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).
