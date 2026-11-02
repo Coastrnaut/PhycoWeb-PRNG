@@ -496,6 +496,63 @@ and an item is ticked only under the rule in the Notes below.
   §FR-044; data-model §1, §18; research R16; cli contract "Guards shared by every script",
   `protocol_change.py`]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK063 Is it stated who makes PRO-061's comparison before the tasks approval, and with what
+  tool, so that the results written beside the lists can be reproduced from the repository, given
+  that FR-044 and data-model §18 call it "the comparison of `scripts/protocol_change.py check`",
+  while that script, like every script of the cli contract, is written only in implementation,
+  after the tasks approval, and the repository holds no tool that makes it, which leaves CHK061
+  open? Is a place's text delimited for that comparison ("each rule's text compared in each place
+  its heading names": an FR item, a research section, a paragraph of the protocol, the plan's
+  table), and is the result the owner confirms held in a form that `create` can compare with its
+  own, given that `create` exits 2 "while its result differs from the one the owner confirmed" and
+  that its spans run "to HEAD", which by then holds commits made after that confirmation? Is the
+  pair of a round with no alignment commit, such as the second re-run's, stated in the rule, which
+  names only "the commit that completed its alignment"? [Gap, Measurability, Spec §FR-044;
+  data-model §18 `place_check`; cli contract `protocol_change.py`; checklist-choices.md "Rows that
+  change the protocol"]
+- [ ] CHK064 Are the fields of a first entry made from a place that the owner confirms as an entry
+  of its own stated, given that data-model §18 gives a first entry `rules`, with each rule's
+  `old_text` and `new_text` "at the commit before the row's round was applied and at the commit
+  that completed it", `row` and `granularity` with "the row's ID, question and chosen option", and
+  `place_check` "for the entry's round", while such an entry has no row, its edit has a commit of
+  its own, and an edit between two rounds, such as ad2c195's change to research R3, lies in no
+  round's pair? Is it stated which texts it holds (for example at the edit's parent and at its
+  commit), what stands in `row`, `granularity`, `reason`, `direction` and `readings`, which round's
+  `place_check` it carries, which list an edit between two rounds is recorded beside, and which
+  "round's place" in the log's order its entry takes, given that checklist-choices.md records
+  ad2c195 beside the re-run's list? [Gap, Clarity, Spec §FR-044; data-model §18; cli contract
+  `protocol_change.py`; checklist-choices.md "Rows that change the protocol"]
+- [ ] CHK065 Can a stale `data/log-append.lock` be cleared before the protocol change log exists,
+  given that `protocol_change.py create` and `provenance.py`, whose entries for drafted files and
+  self-written known results precede the log, take that lock, that only `clear_lock.py` removes a
+  stale lock, writing a `lock-cleared` record under `locks/`, a record kind of data-model §1, and
+  that every record holds `protocol_seq` and `protocol_line_sha256` "since the shared guard
+  'Protocol log' refuses every run that writes evidence before the log exists"? Is the
+  `lock-cleared` record exempt from that guard, with its `protocol_seq` stated for a lock cleared
+  before the log exists, or is the clearing of such a lock stated otherwise, so that a writer that
+  dies holding the lock before or while the log is created does not leave the log's creation
+  blocked for good? [Gap, Edge Case, Spec §FR-044, §FR-067; data-model §1 `kind`,
+  `protocol_seq`, "Record files"; research R16 "Stale locks"; cli contract "Protocol log",
+  "Hash-chained logs", `clear_lock.py`]
+- [ ] CHK066 Is a stricter direction stated for every heading of the lists "Rows that change the
+  protocol", given that each rule of a first entry takes `stricter`, "in its stated direction", or
+  `settled` under a rule whose direction is "no change", that the writer refuses a rule without
+  `direction`, and that FR-044's list of directions names the rules of the section "Pre-registered
+  Design Protocol", the constant rule, the security-target parameters and the plan's values, while
+  the lists also hold "Structural checks" (research R13), "Vector lengths" (R8), "Protocol changes
+  and their directions" (FR-044) and "Records and their hashes" (R16), the last two with no stated
+  direction, R16 having no "Stricter means", with rows under it in every round's list? Is each such
+  rule's direction stated, or is it stated that a row under a rule with none takes `settled`, with
+  its readings, as under "no change"? [Gap, Consistency, Spec §FR-044, §Pre-registered Design
+  Protocol; data-model §18 `direction`, `rules`; research R8, R13, R16; checklist-choices.md "Rows
+  that change the protocol"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
