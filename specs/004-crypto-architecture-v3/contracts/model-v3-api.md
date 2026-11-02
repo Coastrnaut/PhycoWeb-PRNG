@@ -50,20 +50,24 @@ shown as `<…>` are fixed by the design document.
 | Constant or function | Contract |
 |----------------------|----------|
 | `PRODUCTION_VARIANTS` | exactly the three IDs at n = 4, 8 and 16, w = 32, c = 256 and the frozen R of each size |
-| `parse_variant(variant_id)` | returns `(n, w, R, c)`; raises `VariantRefused` for a malformed ID or an unsupported value |
+| `parse_variant(variant_id)` | returns `(n, w, R, c)`; raises `VariantRefused` for a malformed ID or a value neither supported nor open to exploration |
 | `is_production(variant_id)` | true only for the three production IDs |
 
-Supported values: n = 2…16 where the design document's update schedule covers n (even n, and
-odd n only with a three-colour schedule); w ∈ {4, 8, 16, 32}, with w = 4 at 2×2 only; R from 1
-to the frozen R; c a multiple of w and of 16 with 0 < c < b, and c = 256 at every claimable
-size (research R14).
+Supported values: n ∈ {2, 4, 8, 16}, and 3 where the design document specifies a three-colour
+schedule, the sizes spec FR-018 lists; w ∈ {4, 8, 16, 32}, with w = 4 at 2×2 only; R from 1 to the
+frozen R at those sizes; c a multiple of w and of 16 with 0 < c < b, a multiple of 64 for a keyed
+variant, and c = 256 at every claimable size (research R14). Every other n from 2 to 16 is for
+exploration only, where the design document's update schedule covers n (even n, and odd n only with
+a three-colour schedule): the research interface accepts its ID, which carries its R, with the table
+that `gen_constants_v3.py` writes for that (n, w) under `research/004/exploration/`, never frozen
+and never evidence (spec FR-018).
 
 ## Permutation (research interface)
 
 ```text
-pi(lanes, variant_id) -> list[int]
-pi_inv(lanes, variant_id) -> list[int]
-pi_trace(lanes, variant_id) -> list[list[int]]
+pi(lanes, variant_id, table=None) -> list[int]
+pi_inv(lanes, variant_id, table=None) -> list[int]
+pi_trace(lanes, variant_id, table=None) -> list[list[int]]
 ```
 
 - `lanes`: 2n² integers in the design document's node and lane order, each 0 ≤ x < 2^w; any
@@ -71,8 +75,13 @@ pi_trace(lanes, variant_id) -> list[list[int]]
 - `pi_inv(pi(x, v), v) == x` and `pi(pi_inv(x, v), v) == x` for every input (FR-019).
 - `pi_trace` returns the state after every phase of every round, the first entry being the
   input; it is the step-by-step record the second transcription is compared against (FR-057).
-- These functions accept every supported variant, reduced ones included: they are the research
-  interface, not the production interface.
+- These functions accept every supported variant, reduced ones included, and an exploration ID with
+  its table: they are the research interface, not the production interface.
+- `table`: for an exploration ID only (Variant IDs), the table that the caller reads from
+  `research/004/exploration/`, since the model imports no other data module (Module rules); a
+  supported variant takes its table from `constants_v3` and refuses a `table`, and an exploration ID
+  without a table, or with one whose (n, w) or number of rounds differs from the ID's, raises
+  `VariantRefused`.
 
 ## Generator (production interface; FR-007, FR-013 to FR-016, FR-033)
 
@@ -139,8 +148,9 @@ variants, except two: it runs no self-test, since `gen_vectors_v3.py` writes the
 self-test data copied from them, through it (data model §11), so its constructor checks the variant
 and then the key length only; and the lengths: a key of c/8 bytes and a nonce of c/16 bytes for the
 variant's capacity c, so 32 and 16 bytes at every claimable size (research R14). Other lengths raise
-`ValueError`. A keyless variant, whose key and nonce leave no room in the state for the padding
-and domain bits, raises `VariantRefused`; only the permutation interface applies to it. It is
+`ValueError`. A keyless variant, whose c is not a multiple of 64 or whose key and nonce
+leave no room in the state for the padding and domain bits (research R14),
+raises `VariantRefused`; only the permutation interface applies to it. It is
 not the production interface: it is named in the model's docstring as research only, and
 `Generator` never delegates to it.
 
@@ -148,7 +158,7 @@ not the production interface: it is named in the model's docstring as research o
 
 | Exception | Base | Raised when |
 |-----------|------|-------------|
-| `VariantRefused` | `ValueError` | an unsupported or reduced variant at `Generator`; a keyless variant at `ResearchDuplex`; an unsupported value anywhere |
+| `VariantRefused` | `ValueError` | an unsupported or reduced variant at `Generator`; a keyless variant at `ResearchDuplex`; an unsupported value anywhere; an exploration ID without its table, or with a table that does not match it |
 | `CallSequenceError` | `RuntimeError` | a call out of the order above |
 | `LimitExceeded` | `ValueError` | a request or total beyond a limit; at a per-key limit the object is also zeroized and ended |
 | `SelfTestError` | `RuntimeError` | the start-up self-test fails; any state it used is zeroized, and no object exists |

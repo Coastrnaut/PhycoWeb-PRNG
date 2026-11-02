@@ -776,8 +776,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   held until zeroization: each instantiate takes the nonce and the personalization string and
   loads the stored key into the state, so no key is ever compared with another. In hardware the key
   is loaded once, along a registered shift chain, into key registers at the nodes whose lanes hold
-  key bits, copied into those lanes in one cycle at every instantiate, and zeroized with the state
-  (FR-025).
+  key bits, and zeroized with the state; at every instantiate the host gives the nonce on the
+  absorption interface, and in one cycle a selector at every lane sets the lane from a key register,
+  the nonce or its stated constant (FR-025 "Key loading and reset").
 - **FR-014**: Padding and domain separation MUST be specified so that every absorbed input (key,
   nonce, personalization string, reseed input) and every call type can be decoded uniquely from
   the absorbed blocks and is separated from every other, and this injectivity MUST be shown in
@@ -854,7 +855,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   without such a rule, odd sizes are unsupported with the reason (research R14). The supported sizes
   MUST be listed with b, c, r, R and their status (claimable or research variant), and any size from
   2×2 to 16×16 that is not supported MUST be listed with the reason as an open item against
-  FUT-GRID-1. The list names each size's keyed variants: the production variant at every
+  FUT-GRID-1. Supported, wherever this feature's documents use the word, means these listed sizes:
+  2×2, 3×3 where the design document specifies its three-colour schedule, 4×4, 8×8 and 16×16. Any
+  other n from 2 to 16 is for exploration only, from a table that the constant script writes for
+  that (n, w) on demand and checks as for a supported size (FR-023), kept
+  under `research/004/exploration/`, never frozen and never evidence; an
+  exploration variant's ID carries its R (model contract, "Variant IDs"). The
+  list names each size's keyed variants: the production variant at every
   claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced variant, such
   as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce; keyless variants are listed as
   permutation-only. Per claimable size it gives the start-up self-test's expected output
@@ -890,8 +897,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   check on every list at every size, with a stated list that breaks the rule at one size only, which
   it must refuse. The interpreters apply a phase as the hardware does, each update
   reading the values at the phase's start, which equals list order where the
-  rule holds, checked on the vectors, so bijectivity by construction holds
-  wherever the check passes (research R11). Π⁻¹ is written out at the same level
+  rule holds, checked on the vectors, so bijectivity by construction holds wherever the check passes
+  (research R11). Since each update adds at most one carry chain and the phase rule keeps any path
+  within a phase from passing through two updates, a stage holds at most one carry chain from the
+  round's updates on any path (FR-025 "Stages"). Π⁻¹ is written out at the same level
   of detail as Π (the phases in reverse order, the constants in reverse, each operation's width,
   signedness and place in the update order) and checked against the inverse generated from the
   operation list. Its roles are stated: R_b, attacks in the inverse direction, and the exposure
@@ -904,15 +913,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
   personalization string, of the reseed input and of every request; a reseed input's length is
   public even when its content is secret, as the threat model states. A cycle count may depend
   on public values and on nothing else, and the design document gives, per call (key loading,
-  instantiate, generate of n bits with its forget, reseed of m bytes, a refused request that changes
-  nothing, a refused request that zeroizes (a per-key limit or an error path, adding the
-  zeroization's latency), zeroization, the start-up self-test), a formula in cycles from the variant
-  and the public lengths only, counting the cycles in which the core works: on output, the cycles
-  with ready high, and on input (key loading, a personalization string, a reseed input), the cycles
-  with valid high while the core's ready is high, so a pause by the host on any interface is
-  excluded and a measured count matches its formula at any pace the host keeps; the output buffer's
-  hand-over, its clearing and that of the trees when a request ends, and the start signal's fan-out
-  latency are included (FR-025); feature 008 compares measured counts with them (FUT-HW-5). For
+  counted for a finished load; instantiate, ending with its forget call complete and the core
+  `instantiated` and ready for a command; generate of n bits with its forget; reseed of m bytes; a
+  refused request that changes nothing; a refused request that zeroizes (a per-key limit or an error
+  path, adding the zeroization's latency); zeroization, from each state that accepts it, `loading`
+  among them; the start-up self-test), a formula in cycles from the variant and the public lengths
+  only, counting every cycle of the call from its start to its end except those in which the core
+  waits for the host: on output, the cycles with valid high and ready low, and on an input (key
+  loading, a nonce, a personalization string, a reseed input), the cycles with the core's ready high
+  and valid low. A call starts when its command is accepted on the command interface (the self-test
+  when reset is released) and ends when the core is ready for the next command (FR-025 "Flow
+  control"), so a pause by the host on any interface is excluded and a measured count matches its
+  formula at any pace the host keeps; the output buffer's hand-over, its clearing and that of the
+  trees when a request ends, and the start signal's fan-out latency are included
+  (FR-025). A call made in `not-reset`, `resetting` or `failed` is never
+  accepted and has no count (FR-025 "Call sequence"). Feature 008 measures the
+  counts at the ports and compares them with the formulas (FUT-HW-5). For
   eligibility, decided for every candidate before selection, these cycles per call come, with
   FR-026's figures, from the candidate's `cost` records (section "Pre-registered Design Protocol").
   Constant time by construction is a property of the design's sequence of
@@ -990,8 +1006,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   string (its words in published order, most significant bit first) from any multiple of w, under
   one of 2w transforms, each rotating every word of the run by the same k, k = 0…w − 1, with or
   without the complement of every word (k = 0 without the complement is the plain match), so that
-  rotations of complements match, as in "differ" above; the check covers every table the
-  script writes, one per supported (n, w), and each call type's stream, and its record states the
+  rotations of complements match, as in "differ" above; the check covers every
+  table the script writes, one per supported (n, w) and each exploration
+  table (FR-018), and each call type's stream, and its record states the
   chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so that a
   failure shows reuse rather than chance (research R15). An addition to the list is proposed by the
   agent and approved by the owner as a stricter change in the protocol change log, with the list's
@@ -1002,7 +1019,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   in the shared polynomial touches every candidate and ends in a stop. The rule is never changed to
   escape a match. A match found after the freeze is a finding recorded at once (FR-051), and
   `phyco-v3` stays as frozen. The design document restates the values, and the script
-  checks that the two agree. The script writes one table per supported (n, w) (FR-018); every
+  checks that the two agree. The script writes one table per supported (n, w), and an exploration
+  table for another (n, w) on demand, with every check of this requirement (FR-018); every
   constant of Π and the mode, padding constants and domain separators included, has its rule and
   reason in the rationale (FR-034).
 - **FR-024**: Rotation amounts and every other per-node constant MUST be generated by stated
@@ -1049,8 +1067,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the key path come from the candidate's operation-list declarations, checked by code; the interface
   formats, the call sequence and the zeroization rules are properties of the mode, the same for
   every candidate, decided once in the mode chapter (section "Pre-registered Design Protocol"):
-  - **Stages.** Each pipeline stage of the round structure needs at most two serial w-bit carry
-    chains, so the same count applies at every width (FR-022). A stage is one colour phase and takes
+  - **Stages.** On any path, each pipeline stage of the round structure holds at most one serial
+    w-bit carry chain from the round's updates, by the phase rule (FR-019), and at most one more
+    from a public counter held as 32-bit words on the same path, so the same count applies at every
+    width (FR-022); a candidate whose ARX-box needs an addition and a dependent operation in one
+    step spreads them over two phases. A stage is one colour phase and takes
     one clock cycle, so a round of P phases takes P cycles, where P is the number of phases in one
     round of the candidate's operation list at that size: a colour visited twice counts twice, and P
     = 2 is the case of a red-black schedule that visits each colour once. FR-020's formulas,
@@ -1068,7 +1089,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - **Registers and read-back.** All state is registered, and there is no read-back path for
     key or state. This covers the RTL's ports and, on the board, the configuration readback and
     any debug core (an integrated logic analyser, JTAG user registers): feature 008 builds the
-    production bitstream with readback security set and no debug core, and records it.
+    production bitstream with readback security set and no debug core, and records it. The design
+    document gives the port list, with every port's direction, width, value after configuration and
+    value after reset, the command interface's ports, `selftest_fail` and the error-code output
+    among them, and the rule of no read-back path is checked against it (FUT-HW-5).
     Constructed states (FR-054) run on the RTL in simulation only, loaded by the testbench
     (VHDL-2008 external names or `force`), so the synthesizable RTL has no load or read-back
     port; on the board, FUT-HW-4's equivalence uses the vectors a key reaches, through the
@@ -1079,46 +1103,83 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - **Key loading and reset.** The design document specifies the key-loading interface and the
     reset sequence: serial or parallel key loading, the three latencies stated below,
     an output-valid signal, and the zeroization of key and state. The key-loading interface is
-    generic in c: a c-bit key and a c/2-bit nonce (research R14), 256 and 128 bits at every
-    claimable size; keyless variants have none, and FUT-GRID-2's key loading "for every
+    generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
+    absorption interface (research R14), 256 and 128 bits at every claimable
+    size, both whole 32-bit words, since a keyed variant's c is a multiple of
+    64; keyless variants have none, and FUT-GRID-2's key loading "for every
     supported size" is met through the keyed variant each size has (FR-018). The core is
     vendor-neutral and takes its clock as an input, on the device's clock network; clock generation
     belongs to the board wrapper: a wrapper of feature 008, outside the core and the only file with
     vendor primitives, derives the clock from the 100 MHz oscillator through an MMCM, and the
-    reports give the wrapper's and the core's timing apart (FUT-HW-1, FUT-HW-2). Reset is
+    reports give the wrapper's and the core's timing apart (FUT-HW-1, FUT-HW-2). The wrapper's
+    duties toward the core's reset are stated here and carried to feature 008, as the clock split
+    is: it holds the core's reset while the MMCM reports no lock and for a stated number of cycles
+    after lock, releases it synchronously to the derived clock through a two-stage
+    synchronizer, synchronizes every asynchronous reset request (from the board,
+    a button or the host) the same way, and asserts reset again whenever
+    lock is lost, so that the core sees only a synchronous reset. Reset is
     synchronous and reaches the nodes through a registered
     fan-out tree whose latency is part of the reset sequence, and the round and phase counters
     are replicated, one copy at each food node or node, all started by that reset and running
     in lockstep, so that no counter value crosses the grid. The latency is given as three figures
     in cycles, fixed by public values: from reset released to the self-test done and the state
-    zeroized (ready for a key); key loading, from the last key word accepted to the key held, a call
-    of its own whose cycle count joins FR-020's list; and instantiate, from the last nonce or
-    personalization word accepted to the first output valid, the trees' latency included (FR-018).
+    zeroized (ready for a key), the self-test's key and nonce words fed through the chains included
+    (FR-059); key loading, from the last key word accepted to the key held, for a finished load, a
+    call of its own whose cycle count joins FR-020's list; and instantiate, from the last nonce or
+    personalization word accepted to instantiate done, its forget call complete and the core
+    `instantiated` and ready for a command, the trees' latency and the nonce chain's length included
+    (FR-018). A generate request's own figure runs from its acceptance on the command interface
+    ("Flow control") to its first output valid, and the figure of a zeroize from `loading`
+    ("Call sequence") is stated with the other triggers' ("Zeroization").
     The key path is specified with them: a key register at each node that holds key bits, loaded
     once per key along a registered shift chain through those nodes and copied into its lanes in one
-    cycle at every instantiate; the nonce reaches its lanes through the absorption tree where they
-    are rate lanes, and along the same chain otherwise. The chain's length enters the key-loading
-    figure and the copy the instantiate figure, the plan's Complexity Tracking lists the chain as a
-    local data path of public length, and zeroization clears every copy.
+    cycle at every instantiate. The host gives the nonce on the absorption interface at each
+    instantiate, in the model's word order; it reaches its lanes through the absorption tree where
+    they are rate lanes, and otherwise along a nonce chain of its own beside the key's, through the
+    nodes that hold nonce bits in lanes outside the rate, so the key chain shifts only at key
+    loading. Each chain passes, registered, through the nodes between those that hold its bits, so
+    no path of neighbours is required, and its length counts those registers. At each instantiate a
+    selector at every lane sets the lane, in the same cycle as the copy, from a key register, the
+    nonce chain or its stated constant (FR-013), and the selectors are parts of FR-026's estimate.
+    The key chain's length enters the key-loading figure, the nonce chain's length and the copy the
+    instantiate figure, the plan's Complexity Tracking lists both chains as local data paths of
+    public length, and zeroization clears both chains and every copy.
   - **Call sequence.** The design document gives the call sequence as a state table, with the calls
-    each state accepts. `not-reset`, the state after FPGA configuration and before the first reset,
-    refuses every call: every register of the core has a stated initial value of zero, given as
-    initial values in the VHDL that configuration applies, and output-valid stays low until a reset
-    has run the self-test (FR-059); feature 008's board wrapper also holds reset for a stated number
-    of cycles after configuration. `failed`, after a failed self-test, refuses every call with
-    `selftest_fail` set until the next reset. `no-key`, after a reset with a passed self-test or
-    after a zeroization, accepts a key load only; `key-held` accepts instantiate and zeroize;
+    each state accepts, each call starting with its command word on the command interface ("Flow
+    control"). `not-reset`, the state after FPGA configuration and before the first reset, accepts
+    no call: every register of the core has a stated initial value of zero, given as initial values
+    in the VHDL that configuration applies, the error-code register among them, where zero means no
+    error and the codes start at 1, and output-valid stays low until a reset has run the self-test
+    (FR-059); feature 008's board wrapper also holds reset after configuration, until the MMCM locks
+    and for a stated number of cycles after lock ("Key loading and reset"). `resetting` runs from
+    reset released to the self-test done and the state zeroized. `failed`, after a failed self-test,
+    accepts no call until the next reset, with `selftest_fail`, an output of its own, latched. In
+    `not-reset`, `resetting` and `failed` the core holds ready low on the command, key-loading and
+    absorption interfaces and output-valid low, so no call is accepted and no error code is raised.
+    `no-key`, after a reset with a passed self-test or after a zeroization, accepts a key load only,
+    which enters `loading` at its first key word; `loading` runs from the first key word to the last
+    and accepts the remaining words and zeroize only, the key being held only after
+    the last word, so an instantiate is refused with its code and changes
+    nothing, and a zeroize clears the chain and returns to `no-key`, where
+    a new load starts afresh; `key-held` accepts instantiate and zeroize;
     `instantiated` accepts the calls the model's call sequence allows, and zeroize. Every other call
     is refused with its error code ("Zeroization") and changes nothing, among them a key load while
     a key is held (zeroize first, so no state from the old key survives into the new key's use) and
     an instantiate with no key. The refusals match the model's `CallSequenceError` rules where the
     model has the state, and FUT-HW-5's "key zeroization on reset" is tested from the ports: after a
-    reset, an instantiate is refused as `no-key`.
-  - **Flow control.** Each interface (key loading, absorption, output) uses valid and ready.
+    reset, an instantiate is refused as `no-key`. The tests cover a call in each state of the table.
+  - **Flow control.** Each interface (command, key loading, absorption, output) uses valid and
+    ready. The command interface takes one 32-bit word per call, with the call type (key load,
+    instantiate, generate, reseed, zeroize) in stated bits and, for generate, the length in 32-bit
+    words in the rest; a refused command is answered on the error-code output ("Zeroization"), and
+    the length word of a personalization string or a reseed input stays on the absorption interface.
     The core never stalls in mid-call: output leaves through a buffer of one block (r bits), and the
     next call starts only after the consumer has taken the block, so a stall, which the consumer
     sets in public, holds only the buffer and delays the next call, and no cycle count depends on
-    secret data. Draining a block therefore never overlaps the next call of Π, and FR-026's rate
+    secret data. While a block waits in the buffer, the command interface accepts zeroize, which
+    clears the buffer, the trees and the state, and no other call is accepted
+    until the block is taken or a zeroize or reset clears it. Draining a
+    block therefore never overlaps the next call of Π, and FR-026's rate
     counts the drain; a design that overlaps them needs a second buffer, which the design document
     may describe as a variant with its own cycle formula, size and clearing rule. The one-block
     buffer is the output register that zeroization clears, and it and the registers of both trees
@@ -1130,25 +1191,31 @@ freeze hashes and the baseline manifest; run the claim-register test.
     type travels with it on that tree, as a field of ⌈log₂ t⌉ bits for t call types registered
     beside it at every node, and selects each food node's ROM stream where the call types draw on
     distinct streams (FR-023). The buffer's size and the tree's latency enter the cycle formulas of
-    FR-020, which count the cycles in which the core works on every interface, and the plan's
-    Complexity Tracking. The design document states the interface formats: 32-bit transfers on the
-    key-loading and absorption interfaces; a personalization string or a reseed input preceded by
+    FR-020, which count every cycle of a call except those in which the core waits for
+    the host, on every interface, and the plan's Complexity Tracking. The
+    design document states the interface formats: 32-bit transfers on the command, key-loading and
+    absorption interfaces; a personalization string or a reseed input preceded by
     one 32-bit word giving its length in bytes, refused above the design's maximum; unused bytes of
     a last partial word that must be zero, a word with a nonzero unused byte being an error path,
     with its error code ("Zeroization"), since it can arrive after earlier blocks of the same input
-    have been absorbed; and the key and the nonce as whole words in a stated word and byte order,
-    matching the model's. A generate request gives its length in 32-bit words, so a length that is
+    have been absorbed; and the key and the nonce as whole 32-bit words, since a keyed variant's c
+    is a multiple of 64 (research R14), in a stated word and byte order, matching the model's. A
+    generate request gives its length in 32-bit words in its command word, so a length that is
     not a whole number of words cannot be expressed, as the model refuses an `nbits` that is not a
     positive multiple of 32, and a length of zero is refused.
-  - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees,
-    the key-loading buffer, the held key and its copies, and the output register (the one-block
+  - **Zeroization.** It clears the lanes, every pipeline register, the registers of both trees, the
+    key-loading buffer (the key chain's registers) and the nonce chain beside
+    it, the held key and its copies, and the output register (the one-block
     buffer of "Flow control"), and returns the round, phase
     and limit counters to their reset values. Its triggers are reset, an explicit zeroize, a
     failed self-test, an error path and a call refused at a per-key limit (the call that would pass
     the limit; nothing happens when a counter merely reaches it), each with its latency in cycles
     and output-valid low throughout. Every trigger drives the reset's registered fan-out tree, so a
     zeroization reaches every register within the reset's latency, which each trigger's figure
-    counts. The core has a registered error-code output beside the error signal and valid with it,
+    counts. A zeroization by an explicit zeroize, an error path or a per-key limit runs no self-test
+    and goes to `no-key`; a failed self-test's zeroization goes to `failed` and starts nothing
+    further; only reset runs the self-test ("Call sequence"). The core has a
+    registered error-code output beside the error signal and valid with it,
     with one code for each refusal that changes nothing (a length, a call out of sequence, any other
     limit) and one for each zeroizing refusal (a per-key limit, an error path), listed in the design
     document, so the host can tell from the ports which refusals zeroized. An error path is a
@@ -1167,8 +1234,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     register holds zeros until an instantiate requested by the host completes after a passed
     self-test, and a generate request before then is refused with an error signal, as the model
     raises `CallSequenceError`. The self-test's blocks go only to its comparator, which takes each
-    block as it is produced with no consumer handshake, so they never reach the output port, and the
-    zeroization after the self-test clears what it computed (FR-059). In the model, zeroization
+    whole r-bit block as the output buffer receives it, with no consumer handshake, so they never
+    reach the output port, and the zeroization after the self-test clears what
+    it computed, both chains included (FR-059). In the model, zeroization
     overwrites the object's own `bytearray` copy of the key with zeros in place and drops it, and
     drops the state's integers, which Python cannot overwrite; as with constant time, this is a
     discipline that governs what the object keeps, not what Python's memory may still hold, and the
@@ -1183,27 +1251,37 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-026**: The design document MUST state, for every supported size, the output bits per call
   of Π (r) and per round (r/R), and the throughput these imply at the 200 MHz target with the
   stated pipeline. With P phases per round (FR-025) and an output interface of i bits per cycle, the
-  implied rate is r/(P·R + ⌈r/i⌉) bits per cycle, since the next call starts only after the consumer
-  has taken the block (FR-025 "Flow control"), and the cost per output bit counts P·R cycles per
+  implied rate per call, on FR-020's formulas, is r/(P·R + ⌈r/i⌉ + t_s + t_o) bits per cycle, with
+  t_s the start tree's latency and t_o the output tree's where it is not overlapped,
+  since the next call starts only after the consumer has taken the block
+  (FR-025 "Flow control"), and the cost per output bit counts P·R cycles per
   call of Π. The output interface's width is
   stated per size (for example 32 bits per cycle at every size, as the vector files list words,
   or a stated wider bus), and the implied throughput follows from that rate, with r/(P·R) and i
   reported beside it. It is stated for stated request sizes (the
-  2¹⁹-bit cap, and 4,096 words as in the long-run digest), counting each request's output calls
-  plus its forget call and the trees' latency, with instantiate's calls spread over a stated
-  number of requests per instantiation; the rate before forget calls is reported beside it as
-  an upper bound. A rate below the goal of 10⁸ words per second (for example about 0.55 × 10⁸ at 4×4
-  with R = 32, P = 2 and i = 32: 768 bits in 64 + 24 = 88 cycles, about 8.7 bits per cycle, before
-  forget calls) is reported and is never an eligibility rule. It MUST also give the estimated
+  2¹⁹-bit cap, and 4,096 words as in the long-run digest), counting each request's
+  output calls, its forget call, the trees' latency and the clearing at the
+  request's end, with instantiate's calls spread over a stated number of requests
+  per instantiation; the rate before forget calls is reported beside it as
+  an upper bound. A rate below the goal of 10⁸ words per second (for example at most about
+  0.55 × 10⁸ at 4×4 with R = 32, P = 2 and i = 32 before the trees' latencies are stated: 768 bits
+  in 64 + 24 = 88 cycles plus t_s + t_o, about 8.7 bits per cycle at t_s = t_o = 0, before forget
+  calls; the design document computes the example again once it states the trees' latencies) is
+  reported and is never an eligibility rule. It MUST also give the estimated
   hardware cost per output bit, from the operation-count model of the nonlinearity choice rule,
   so that feature 008 can test it against Ascon, Trivium and Grain-128AEAD on the same board
   (strategy note §10), and, from the same model, the estimated LUTs, flip-flops and block RAM per
   claimable size, each part with its own figure: the nodes and stages (LUTs per node and round × n²
-  for the stages built), the trees, the ROMs, the output buffer (r bits, 16,128 at 16×16) with its
-  read-out to the interface width, the key registers and the key-loading buffer, the replicated
-  round and phase counters, the limit counters, the self-test's key, nonce and expected output held
-  as constants, and the 2w·n² state flip-flops with the pipeline registers; block RAM is expected to
-  be 0 unless a ROM is mapped to it. The total is compared with the XC7A100T's 63,400 LUTs and
+  for the stages built), the absorption and output trees, the reset and start fan-out trees with the
+  call-type field at every node, the ROMs, the output buffer (r bits, 16,128 at 16×16) with its
+  read-out to the interface width, the key registers and the key-loading buffer, the nonce chain,
+  the instantiate lane selectors (up to 2w·n² bits, estimated per state bit and stated where merged
+  with stage logic), the command interface, the controller with the call-state table, the error-code
+  register, the replicated round and phase counters, the limit counters, the self-test's sequencer,
+  its comparator of r bits, its input selectors and its key, nonce and expected output held as
+  constants, and the 2w·n² state flip-flops with the pipeline registers; block RAM is expected to be
+  0 unless a ROM is mapped to it. A part is stated negligible only with its figure
+  and the reason. The total is compared with the XC7A100T's 63,400 LUTs and
   126,800 flip-flops, naming the largest size expected to fit, as an estimate that feature 008
   checks part by part against Vivado's hierarchical utilization report. Measured throughput belongs
   to features 006 and 008 (FUT-HW-3). For eligibility, every candidate's figures are computed before
@@ -1982,18 +2060,28 @@ freeze hashes and the baseline manifest; run the claim-register test.
   fails its self-test; FR-036), its expected output, its behaviour on failure, and the zeroization
   of the whole state after it, before the first instantiate. The self-test runs instantiate with the
   key and nonce 0 of the frozen vectors, then a generate long enough that every node, every
-  lane, every constant ROM entry of the calls run, both trees and the counters take part, then
-  a reseed if the design has one. It compares the output with the expected output stated per
-  claimable size from the frozen vectors and then zeroizes; on failure it zeroizes, blocks
-  every call and sets a `selftest_fail` output, latched until the next reset; every reset runs the
-  self-test again, and a pass clears the latch, as a new `Generator` runs it again in the model. The
-  design document lists the output with the ports, and feature 008 tests it. Its cycle count is
+  lane, every constant ROM entry of the calls run, both trees and the counters take part, then a
+  reseed if the design has one. It feeds the key and nonce chains from its constants through a
+  selector at each chain's input, word by word as the host would, the nonce's words for rate lanes
+  through the absorption tree's input in the same way, with their cycles in the reset figure
+  (FR-025) and no parallel load path; afterwards the selectors return to the
+  interfaces. Its comparator, r bits wide, takes each whole r-bit block as the output buffer
+  receives it, compares it with the matching block of the expected output, stated per claimable size
+  from the frozen vectors, and holds the result until the last block; the comparator and the
+  expected output's storage are parts of FR-026's estimate. The self-test then
+  zeroizes, both chains included; on failure it zeroizes, blocks every call and
+  sets the `selftest_fail` output, an output of its own, latched until the
+  next reset (state `failed`, FR-025 "Call sequence"); every reset runs the
+  self-test again, and a pass clears the latch, as a new `Generator` runs it again in
+  the model. The design document lists the output in the port list (FR-025
+  "Registers and read-back"), and feature 008 tests it. Its cycle count is
   stated (FR-020), and the reset latency of FR-025 runs from reset released to the self-test done
   and the state zeroized. Features 006 and 008 implement it in the RTL (strategy note §10; D10). It
   is not a FIPS 140-3 self-test and MUST NOT be described as one (FR-011). Its blocks go only to its
   comparator and never to the output port, with output-valid low throughout (FR-025 "Zeroization"),
-  and its tests cover a call made before the first reset, which the `not-reset` state refuses
-  (FR-025 "Call sequence").
+  and its tests cover a call made in each state of FR-025's call-state table, among them one before
+  the first reset and one while the self-test runs, which the core does not accept in `not-reset`
+  and `resetting` ("Call sequence").
 
 **Findings, evidence and review (security.md §9.1, §14, §16 and §17)**
 
@@ -2410,16 +2498,16 @@ that takes it, as the FUT-SEC-7 and FUT-GRID-1 cells do.
 | FUT-SEC-7 Re-validation | FR-035, FR-036, FR-043 | New model ID, vectors, design freeze | Partly met; the statistical programme open for feature 007 |
 | FUT-SEC-8 Demonstration first | FR-001 to FR-003 | Demonstration record and its review | Done |
 | FUT-SEC-9 Certification route | FR-011 | Named route (D8), with "class unconfirmed" beside it until the AIS 20/31 version 3.0 download is read | Met by specification; the functionality class an open item, closed at the security-target review |
-| FUT-GRID-1 Parameterised size | FR-018 | Generics and the list of supported sizes; the three-colour rule's proper-colouring test at every odd n (FR-018) | Partly met: the generics cover n = 2…16 in the model, the supported sizes are listed, and n = 5, 6, 7 and 9…15 are open items with their reason (FR-018); the odd sizes cite the colouring test's result |
+| FUT-GRID-1 Parameterised size | FR-018 | Generics and the list of supported sizes; the three-colour rule's proper-colouring test at every odd n (FR-018) | Partly met: the generics cover n = 2…16 in the model, through constant tables generated on demand at the other sizes, the supported sizes are listed, and n = 5, 6, 7 and 9…15 are open items with their reason (FR-018); the odd sizes cite the colouring test's result |
 | FUT-GRID-2 Key fills the state at every size | FR-009, FR-017, FR-018, FR-025 | Parameter table; the 2×2 decision; a keyed variant at every supported size | Met at every claimable size; not met at the research sizes 2×2 and 3×3, a conflict decided by D3 (FR-017; security.md §20.1, option 1). Key and nonce loading is defined for every supported size through its keyed variant (FR-018) |
 | FUT-GRID-3 Mixing across the grid | FR-015, FR-029 | R_f, R_b; diffusion through instantiation; the output is the rate part after a full call of Π, and every output bit depends on every input bit after R_f rounds | Met by evidence; the clause "output taps MUST NOT depend only on a local neighbourhood" met by specification |
 | FUT-GRID-4 Per-node constants by rule | FR-023, FR-024, FR-031 | Constant script; symmetry checks | Met by evidence; the clause "disruption behaviour MUST be re-established at each size" not applicable, since D5 removes the disruption (FR-031) |
 | FUT-GRID-5 Validation per size | FR-036 | Vectors per size | Vectors met; the statistics per size open for feature 007 |
-| FUT-HW-1 Generic VHDL | FR-018, FR-020, FR-027, FR-055, FR-056 | Generics, exact semantics, a sign-free datapath, the frozen oracle. Design-level criteria: every operation's width, signedness and shift kind stated (FR-027); a sign-free datapath (FR-055); no multiplication in the operation set, for 0 DSP blocks, with an instruction to feature 006 that synthesis must not map additions to DSP slices | Specified; RTL, GHDL equivalence and 0 DSP blocks open for feature 006; the core takes its clock as an input, and the board wrapper that holds the MMCM, the only file with vendor primitives, is open for feature 008 (FR-025) |
-| FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Carry chains per stage; output bits per round; estimated cost. Design-level criteria: the chain and LUT-level counts per stage (FR-025) and the size estimate against the device, part by part with block RAM (FR-026); the clock from the 100 MHz oscillator through an MMCM in feature 008's board wrapper, outside the core (FR-025) | Designed for; Vivado post-route results, the hierarchical utilization report part by part and the wrapper's and the core's timing open for feature 008 |
+| FUT-HW-1 Generic VHDL | FR-018, FR-020, FR-027, FR-055, FR-056 | Generics, exact semantics, a sign-free datapath, the frozen oracle. Design-level criteria: every operation's width, signedness and shift kind stated (FR-027); a sign-free datapath (FR-055); no multiplication in the operation set, for 0 DSP blocks, with an instruction to feature 006 that synthesis must not map additions to DSP slices | Specified; RTL, GHDL equivalence and 0 DSP blocks open for feature 006; the core takes its clock as an input, and the board wrapper that holds the MMCM, the only file with vendor primitives, is open for feature 008, with its reset duties: reset held until lock and for the stated cycles after it, released through a two-stage synchronizer, every asynchronous reset request synchronized, and reset asserted again on loss of lock (FR-025 "Key loading and reset") |
+| FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Carry chains per stage; output bits per round; estimated cost. Design-level criteria: the chain and LUT-level counts per stage (FR-025) and the size estimate against the device, part by part with block RAM, the control parts FR-025 adds among them, each with its figure (FR-026); the clock from the 100 MHz oscillator through an MMCM in feature 008's board wrapper, outside the core, with the wrapper's reset duties (FR-025 "Key loading and reset") | Designed for; Vivado post-route results, the hierarchical utilization report part by part and the wrapper's and the core's timing open for feature 008 |
 | FUT-HW-3 Performance on the board | FR-026 | Throughput implied at 200 MHz. Design-level criterion: the implied throughput for the stated request sizes and output interface (FR-026) | Open for features 006 and 008: words per second by on-chip counters at the achieved clock, per claimable size that fits, compared with the C stream; and, in feature 008, power through the board's VCCINT current sensor and the XADC, beside Vivado's estimate (FR-052). This feature supplies the implied throughput only |
 | FUT-HW-4 Equivalence and statistics from hardware output | FR-036, FR-054, FR-056 | Vectors, constructed-state vectors, the oracle. Design-level criterion: vectors traced at stage granularity (FR-036) | Open for feature 008, whose spec states which battery levels run on hardware output and which on the C stream |
-| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test. Design-level criteria: the cycle formulas (FR-020), the port list with no read-back path, the zeroization list with its error codes, and the call-state table with its `not-reset` state (FR-025); the counting rule on every interface (FR-020) | Open for feature 008, whose spec lists the board tests, among them key zeroization on reset, tested from the ports (after a reset, an instantiate is refused as `no-key`), and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
+| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test. Design-level criteria: the cycle formulas (FR-020), the port list with every port's direction, width and values after configuration and after reset, against which no read-back path is checked, and the command interface's format, the zeroization list with its error codes, and the call-state table with its `not-reset`, `resetting`, `loading` and `failed` states (FR-025); the counting rule on every interface, every cycle of a call but those in which the core waits for the host, measured at the ports (FR-020) | Open for feature 008, whose spec lists the board tests, among them key zeroization on reset, tested from the ports (after a reset, an instantiate is refused as `no-key`), and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
 
 ### Redesign checklist (`seed-entropy-bound.md` §5.3)
 

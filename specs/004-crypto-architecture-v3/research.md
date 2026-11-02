@@ -442,8 +442,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     visits each colour once), recorded in the candidate's log entry. Carry chains are counted per
     phase (R11).
   - Serial carry chains per round = the most additions on any dependency path within one round
-    (the D4 tie-break). Per pipeline stage the count must be at most two serial w-bit carry
-    chains (FR-025). A subtraction counts as one chain, as an addition does. A public counter
+    (the D4 tie-break). Per pipeline stage, on any path, at most one serial w-bit carry chain comes
+    from the round's updates, by the phase rule (R11), and at most one more
+    from a public counter held as 32-bit words on the same path (FR-025). A
+    subtraction counts as one chain, as an addition does. A public counter
     held as 32-bit words counts where it sits on a stage's path, and not when it is registered
     on a path of its own.
   - **Depth.** Beside the chain count, the LUT levels on each stage's longest path are reported
@@ -456,26 +458,35 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     output bit, for an implementation that computes one phase per clock cycle.
   - **Size estimate.** From the cost model, the design document estimates LUTs, flip-flops and block
     RAM per claimable size, each part with its own figure (the nodes and stages, LUTs per node and
-    round × n² for the stages built; the trees; the ROMs; the output buffer of r bits with its
-    read-out; the key registers and the key-loading buffer; the replicated counters; the limit
-    counters; the self-test's stored key, nonce and expected output; 2w·n² state flip-flops plus
+    round × n² for the stages built; the absorption and output trees; the reset and start fan-out
+    trees with the call-type field at every node; the ROMs; the output buffer of r bits with its
+    read-out; the key registers and the key-loading buffer; the nonce chain; the instantiate lane
+    selectors, up to 2w·n² bits, estimated per state bit and stated where merged with stage logic;
+    the command interface; the controller with the call-state table; the error-code register; the
+    replicated counters; the limit counters; the self-test's sequencer, r-bit comparator, input
+    selectors and stored key, nonce and expected output; 2w·n² state flip-flops plus
     pipeline registers; block RAM, expected to be 0 unless a ROM is mapped to it) against the
     device's 63,400 LUTs and 126,800 flip-flops, and names the largest size expected to fit, as an
     estimate that feature 008 checks part by part against Vivado's hierarchical utilization report
-    (FR-026).
+    (FR-026). A part is stated negligible only with its figure and reason.
   - **Throughput goal** (checklist C3): 10⁸ 32-bit words per second at the 200 MHz target, at
     every claimable size. It is the goal feature 003 set for the C stream, which design 1.0
     missed at 8.5 × 10⁷. The design document reports FR-026's implied throughput beside it; the
-    goal is reported, never an eligibility rule. The implied rate is r/(P·R + ⌈r/i⌉) bits per cycle
-    for an output interface of i bits per cycle, a width the design document states per size (for
-    example 32 bits per cycle, as the vector files list words, or a stated wider bus), since the
-    next call starts only after the consumer has taken the block (FR-025); r/(P·R) and i are
+    goal is reported, never an eligibility rule. The implied rate per call, on FR-020's formulas,
+    is r/(P·R + ⌈r/i⌉ + t_s + t_o) bits per cycle for an output interface
+    of i bits per cycle, a width the design document states per size (for
+    example 32 bits per cycle, as the vector files list words, or a stated wider bus), with t_s the
+    start tree's latency and t_o the output tree's where it is not overlapped, since the next call
+    starts only after the consumer has taken the block (FR-025); r/(P·R) and i are
     reported beside it. It is stated for stated request sizes, the 2¹⁹-bit
-    cap and 4,096 words, counting each request's output calls plus its forget call, with
-    instantiate's calls spread over a stated number of requests per instantiation; the rate
-    before forget calls is reported beside it as an upper bound. At 4×4 with P = 2 and i = 32, the
-    rate before forget calls is 768 bits per 88 cycles, about 0.55 × 10⁸ words per second, at R =
-    32, and 768 bits per 152 cycles, about 0.32 × 10⁸, at R = 64, both below the goal.
+    cap and 4,096 words, counting each request's output calls, its forget call, the
+    trees' latency and the clearing at the request's end, with instantiate's
+    calls spread over a stated number of requests per instantiation; the rate
+    before forget calls is reported beside it as an upper bound. At 4×4 with P = 2 and i = 32,
+    before the trees' latencies are stated (t_s = t_o = 0), the rate before forget calls is at most
+    768 bits per 88 cycles, about 0.55 × 10⁸ words per second, at R = 32, and 768 bits per 152
+    cycles, about 0.32 × 10⁸, at R = 64, both below the goal; the design document computes them
+    again with the trees' latencies (FR-026).
   - `research/004/tools/costmodel.py` computes every number from the operation list, and a test
     checks the table above on hand-counted examples, written with their SHA-256 and entered in the
     provenance log before `costmodel.py` is drafted (R13; data-model §14).
@@ -892,7 +903,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     bijectivity by construction, and with it spec FR-032's transfer from 2×2,
     rests on the rule at each size. A phase is a pipeline stage for FR-025:
     it takes one clock cycle, so a round of P phases takes P cycles, and carry chains are counted
-    per phase (R5). A round may visit a colour class more than once, so P counts phases, not
+    per phase (R5). Since F holds no addition and the phase rule keeps any path within a phase from
+    passing through two updates, a phase holds at most one carry chain from the updates
+    on any path (FR-025 "Stages"), and an ARX-box that needs an addition
+    and a dependent operation in one step spreads them over two phases. A
+    round may visit a colour class more than once, so P counts phases, not
     colours; in a three-colour schedule the classes form a proper colouring of the torus (R14).
   - **Channels.** A channel is one w-bit word passed from a node to a neighbour in one phase. A
     node receives at most four channels per phase, for example one from each neighbour or two
@@ -1221,8 +1236,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     variant, such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce (quickstart M6). A
     supported 3×3 gets one as well. Keyless variants are listed as permutation-only. FUT-GRID-2's
     "defined for every supported size" is met through the keyed variant each size has.
-  - The research interface accepts every n from 2 to 16 for exploration, but n = 5, 6, 7 and
-    9…15 have no vectors, R_f, R_b or bounds in this feature. Each is listed as an open item
+  - Supported means the sizes above, as FR-018 lists them: 2×2, 3×3 where specified, 4×4, 8×8 and
+    16×16. The research interface also accepts every other n from 2 to 16, for exploration only,
+    from a table that `gen_constants_v3.py` writes for that (n, w) on demand and checks as for a
+    supported size (R15), kept under `research/004/exploration/`, never frozen and never
+    evidence; an exploration ID carries its R, and n = 5, 6, 7 and 9…15 have no
+    vectors, R_f, R_b or bounds in this feature. Each is listed as an open item
     against FUT-GRID-1, with that reason (FR-018).
   - Widths: 4 (exhaustive checks, at 2×2 only), 8, 16 and 32. Rotation amounts are chosen at the
     D4 width (R6) and scale with w by the design document's rule, stated before the search
@@ -1238,12 +1257,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     only the three production IDs and refuses every other ID with an error (FR-033).
   - **Keys of reduced variants** (FUT-GRID-2; checklist A7): a keyed variant of capacity c takes
     a c-bit key and a c/2-bit nonce, so 256 and 128 bits at every claimable size, and its row of
-    the size profile checks FR-010's relations at s = c/2. c is a multiple of 16 as well as of w,
-    so both lengths are whole bytes. A variant whose key and nonce leave no room in the state for
-    the padding and domain bits is keyless: the research duplex refuses it, and only the
+    the size profile checks FR-010's relations at s = c/2. c is a multiple of 16 as well as of w, so
+    both lengths are whole bytes, and a keyed variant's c is a multiple of 64, so the key and the
+    nonce are whole 32-bit words on the hardware's interfaces (FR-025); keyless variants keep
+    the wider rule. `n2-w16-R8-c64` meets it, and a keyed 2×2 variant needs
+    w ≥ 16. A variant whose c is not a multiple of 64, or whose key and nonce leave no room in the
+    state for the padding and domain bits, is keyless: the research duplex refuses it, and only the
     permutation interface applies. The model contract and data-model §10 take these lengths.
-    The key-loading interface is generic in c in the same way (FR-025): a c-bit key and a
-    c/2-bit nonce, and none for a keyless variant.
+    The key-loading interface is generic in c in the same way (FR-025): a c-bit key, with the
+    c/2-bit nonce on the absorption interface, and none for a keyless variant.
 - **Rationale**: the strategy note's table (§4.5). Every claimable size needs an established
   R_bound at the production width, so each one added costs trail searches. Powers of two keep
   the folded-torus layout regular. A key of c bits keeps key loading the same construction at
@@ -1299,8 +1321,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     equal to as many consecutive w-bit words of a listed string read from any multiple of w, under
     one of 2w transforms, each rotating every word of the run by the same k, k = 0…w − 1, with or
     without the complement of every word (k = 0 without the complement is the plain match), so that
-    rotations of complements match, as in the relations of R13. The check covers every table
-    the script writes, one per supported (n, w), and each call type's stream. Its record states the
+    rotations of complements match, as in the relations of R13. The check
+    covers every table the script writes, one per supported (n, w) and each
+    exploration table (R14), and each call type's stream. Its record states the
     chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so a
     failure shows reuse rather than chance. An addition to the list is proposed by the agent and
     approved by the owner as a stricter change in the protocol change log, since the list only
@@ -1345,8 +1368,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (n, w), and the script also writes each as JSON beside the vectors,
     `vectors/phyco-v3/constants_n<n>_w<w>.json`, frozen with them (data-model §11, §13).
     Feature 006 turns them into packages and the RTL selects one by its generics; the LFSR stays
-    in the script. A size without a table cannot be built until one is generated by the same
-    script.
+    in the script. A size without a table cannot be built until one is generated by the same script.
+    An exploration table, for an (n, w) outside the supported sizes (R14), is written by the same
+    script on demand with every check of this section, kept under `research/004/exploration/` with
+    its check record, never frozen and never cited as evidence.
   - **Where the constants live** (checklist A11): each food node holds its own constants, its
     column of the table, in a small ROM indexed by the round counter and, where the call types draw
     on distinct streams, by the call type that travels with the start signal (FR-025), so no data

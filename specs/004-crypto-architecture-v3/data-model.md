@@ -601,11 +601,15 @@ size:
   equality and no margin at k = 256 and s = 128, recorded as met with equality), and the
   stated behaviour on nonce reuse, with its test.
 - At claimable sizes, `throughput_implied`, in 32-bit words per second at 200 MHz (FR-026): computed
-  from the rate r/(P·R + ⌈r/i⌉) bits per cycle, where i is the output interface's
-  `interface_bits_per_cycle`, since the next call starts only after the consumer has taken the block
+  from the per-call rate r/(P·R + ⌈r/i⌉ + t_s + t_o) bits per cycle, on FR-020's formulas, where
+  i is the output interface's `interface_bits_per_cycle` and t_s and t_o,
+  recorded as `start_tree_latency` and `output_tree_latency` in cycles, are the
+  start tree's latency and the output tree's where it is not overlapped,
+  since the next call starts only after the consumer has taken the block
   (FR-025), with r/(P·R) and i reported beside it; per stated request size (the 2¹⁹-bit cap and
-  4,096 words), counting each request's output calls plus its forget call, with instantiate's calls
-  spread over a stated number of requests per instantiation; and `rate_before_forget` beside it as
+  4,096 words), counting each request's output calls, its forget call, the trees' latency and the
+  clearing at the request's end, with instantiate's calls spread over a stated
+  number of requests per instantiation; and `rate_before_forget` beside it as
   an upper bound (R5). Beside them, `throughput_goal` (10⁸; R5), which is reported and never an
   eligibility rule.
 
