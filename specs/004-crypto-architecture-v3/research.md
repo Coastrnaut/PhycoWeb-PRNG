@@ -1105,7 +1105,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Tool | Kind | Known result to re-find |
     |------|------|-------------------------|
     | ARX differential and linear search | ARX trails with the exact models of addition; validated kind: 16-bit words, from SPECK32 (Validated widths, below) | the weights of the optimal trails of SPECK32 over the first rounds (Biryukov and Velichkov, 2014; Liu, Wang and Rijmen, 2016) |
-    | Active S-box counting | MILP counting of active S-boxes; validated kind: 4-bit S-boxes under a bit permutation, from PRESENT | PRESENT: every 5-round differential characteristic has at least 10 active S-boxes, the stated minimum (Bogdanov et al., 2007) |
+    | Active S-box counting | MILP counting of active S-boxes; validated kind: 4-bit S-boxes under a bit permutation, from PRESENT, whose result has no word width w and covers none of the counter's uses, at w = 8, 16 and 32, each of which counts only once a further known result at its width is re-found (Validated widths, below) | PRESENT: every 5-round differential characteristic has at least 10 active S-boxes, the stated minimum (Bogdanov et al., 2007) |
     | Long-trail active-box counting | MILP counting of active ARX-boxes; validated kind: ARX-boxes on 32-bit words, from SPARKLE | a published long-trail bound of SPARKLE (Beierle et al., 2020), from its published box bounds |
     | Exhaustive box and S-box tables | exhaustive tables; validated kind: 4-bit S-boxes, from the PRESENT S-box | every entry of the PRESENT S-box's published difference and linear tables |
 
@@ -1133,9 +1133,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     a use on that operation set counts once the candidate's cross-checks pass. Each other tool's
     kind is stated in the same way, its word widths, operation set and kind of model (the table
     above), beside each use this plan makes of it and the known result that covers that use: the
-    active-S-box counter's, from PRESENT, is 4-bit S-boxes under a bit permutation, for its uses on
-    the Boolean candidates' layers at the D4 and production widths, which the cross-checks at 4×4
-    with w = 4 check on each candidate's own layers; the long-trail counter's, from SPARKLE, is
+    active-S-box counter's, from PRESENT, is 4-bit S-boxes under a bit permutation, on a 64-bit
+    state of sixteen S-boxes, which has no word width w: the counter's word width is the w of the
+    words whose bit positions a Boolean layer's S-boxes take, one S-box per bit position of a group
+    of words, so that PRESENT's result covers none of its uses on the Boolean candidates' layers, at
+    the D4 width (16 or else 8, R6) and at the production width, w = 32. Each of those uses counts
+    only once a further known result at its width is re-found, for example the r-round minimum of a
+    layer whose linear part rotates every word by one amount, which is r at every w, since the
+    rotation moves the one active column of a round to one column of the next and a bijective layer
+    leaves no round without an active column; the cross-checks at 4×4 with w = 4 check each
+    candidate's own layers and widen no width (ANA-072); the long-trail counter's, from SPARKLE, is
     ARX-boxes on 32-bit words, which covers its use at the production width and not its use at the
     D4 width (16 or else 8, R6); and the exhaustive tables', from the 4-bit PRESENT S-box, is 4-bit
     S-boxes, which covers none of their uses, the boxes of 8 and 16 bits at w = 4 and 8 and the
@@ -1144,7 +1151,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     where one of its kind is there, or else self-written and logged before the tool is drafted, for
     example the difference and linear tables of (x, y) ↦ (x ⊞ y, y) at w = 4 and 8, whose entries
     the formulas of Lipmaa and Moriai and of Wallén give exactly; a use without one writes
-    `not evaluated`.
+    `not evaluated`, so that a Boolean candidate's D4 score and R_bound rest on no use that no known
+    result covers (ANA-072).
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
     8 h (R7): for each distinct ARX-box of each ARX candidate, two checks, for every r from 1 to the

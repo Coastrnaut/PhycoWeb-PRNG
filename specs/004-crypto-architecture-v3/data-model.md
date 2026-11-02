@@ -492,7 +492,10 @@ Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind` (t
 known results cover, the operation set and the kind of model, with each use this plan makes of the
 tool and the known result that covers it, a use without one writing `not evaluated`; a search's
 results count only at a width so covered, the ARX search's at w = 16 from SPECK32 and at w = 32 only
-once it re-finds a known result at 32-bit words, and the cross-checks never widen a kind: a
+once it re-finds a known result at 32-bit words, the active-S-box counter's at w = 8, 16 and 32 only
+once it re-finds a further known result at that width, since PRESENT's result has no word width w,
+the counter's word width being the w of the words whose bit positions a Boolean
+layer's S-boxes take (ANA-072), and the cross-checks never widen a kind: a
 cross-check is not a use, covers a candidate's operation set only, writes no
 `not evaluated` and calls for no validation again; R12), `known_result` (paper,
 table and value, or the security.md finding S12–S15 or FUT-SEC-8), `second_known_result` (the second
