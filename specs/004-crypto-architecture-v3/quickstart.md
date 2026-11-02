@@ -74,7 +74,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | M2 | `python scripts/gen_vectors_v3.py --check` on Windows; `wpy scripts/gen_vectors_v3.py --check` in WSL | exit 0 on both, each writing a `generator-check` record, as in M1 (SC-009) |
 | M3 | `python scripts/gen_constructed_v3.py --check` on Windows; `wpy scripts/gen_constructed_v3.py --check` in WSL | exit 0 on both, each writing a `generator-check` record, as in M1 (SC-016, SC-009) |
 | M4 | `python -c "from phycoweb.model_v3 import Generator; Generator('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `VariantRefused` (SC-010) |
-| M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, call-sequence errors including any call after `zeroize`, boundaries (FR-058) |
+| M5 | `python -W ignore -m unittest tests.test_model_v3` | refusals beyond every limit, reached through `ResearchDuplex.from_state` from chosen counter values (REP-078), call-sequence errors including any call after `zeroize`, boundaries (FR-058) |
 | M6 | `python -c "from phycoweb.model_v3 import ResearchDuplex as D; D('phyco-v3/n2-w16-R8-c64', bytes(32))"` | `ValueError` at construction: that variant takes an 8-byte key, and a 4-byte nonce at `instantiate` (R14) |
 
 ## Second transcription (X)

@@ -480,16 +480,20 @@ directory; it writes no frozen file, no sidecar entry and no evidence, and refus
 its record stating why, and is a finding recorded at once in security.md and the report (spec
 FR-051), as a match found after the freeze is; `phyco-v3` stays as frozen.
 
-They run in three steps, each generator's `--check` passing before the next step (data model §11):
+They run in four steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
 `ResearchDuplex`, which runs no self-test, and also writes, from the same `ResearchDuplex` run, each
 claimable size's `selftest_<variant>.json`, the self-test's inputs and every expected
 block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those
 files, so its `--check` covers them too (HW-077); (3) `Generator` imports
 `phycoweb.selftest_v3` inside its constructor only and runs its self-test from it, so
-step (2) imports the model before that module exists (model contract, Module
-rules). Tests check that `Generator` reproduces the vectors and that `selftest_v3` equals them, and
-the freeze hashes `selftest_v3.py` with the vectors (data model §13).
+step (2) imports the model before that module exists (model contract, Module rules);
+(4) `gen_constructed_v3.py`, run once step (3)'s self-test has passed, which writes the
+constructed-state vectors through `pi`, `pi_inv` and `ResearchDuplex` only, its research path to
+chosen states included (model contract, Research duplex; REP-077, REP-078). Tests check that
+`Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
+`selftest_v3.py` with the vectors and the three generators, `gen_constants_v3.py`,
+`gen_vectors_v3.py` and `gen_constructed_v3.py` (data model §13; REP-077).
 
 ## `scripts/design_freeze.py`
 
@@ -622,6 +626,27 @@ and `approval_confirmed`, keeping the fixed-name file's current content under `v
 record <n>" or "Owner-provided value <n>", with that SHA-256, which the Environment guard and
 `validate_tool.py`'s source guard read at HEAD (Approvals, above).
 
+## `scripts/downloads.py`
+
+```text
+downloads.py init                                    # the approved entries, from research R19
+downloads.py fetched NAME PATH [--pypi-sha256 HEX]   # --pypi-sha256 required for a wheel
+downloads.py not-obtained NAME --reason TEXT
+```
+
+Run by the agent. It writes the downloads manifest, `$REP/downloads.json`, through
+`protocol/evidence.py` (research R19; data model introduction). `init` writes one `approved` entry
+per file of research R19's two tables, as research.md holds them at HEAD, with its name, source,
+size and licence, and exits 2 once the manifest exists. `fetched` computes the SHA-256 and the size
+from the downloaded file itself, read under `-I` from its own directory and never run, refuses a
+size that differs from a size R19 gives in bytes and, for a wheel, a SHA-256 that differs from
+PyPI's for that file, and writes the entry `fetched` with its SHA-256, the download date and the
+local path. `not-obtained` writes `not obtained` with the reason. Each mode refuses, exit 2, writing
+nothing, a name that no `approved` entry holds, and keeps the manifest's earlier content under
+`versions/` first (data model introduction). An `owner-provided` entry stays the owner's own act,
+written by `owner_record.py owner-provided` (above). `tests/test_protocol_004.py` covers each
+refusal (REP-076).
+
 ## `scripts/protocol_change.py`
 
 ```text
@@ -684,9 +709,15 @@ The one writer of the provenance log, `$REP/provenance.jsonl`, through `protocol
 of one, drafted or repaired with an AI tool, or for a known result this feature writes itself or a
 tool's second known result; `review` appends a review entry, with `follows`, the `seq` of the entry
 it follows, and the status the review gives, or the review of an evidence record, naming the
-record's ID and SHA-256. Each refuses, exit 2, appending nothing, an entry with a field of its kind
-missing or a `sha256` that is not that of the named file, the named section's text or the named
-record. Every append takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
+record's ID and SHA-256. Each computes the `sha256` and `sha256_kind` of the named file, section or
+record as data model §14 states, over the file's bytes, LF-normalized for an existing `text=auto`
+file and raw otherwise, a section from its heading line to the line before the next heading of the
+same or a higher level, or to the file's end, and refuses, exit 2, appending nothing, an entry with
+a field of its kind missing or a `sha256` or kind that differs (REP-079). Right after
+the log's creation, before any other entry, `add` writes one entry per file
+drafted before the log, with `drafted_from`, `drafted_to` and the other fields
+data model §14 lists for such an entry (spec FR-067; REP-080). Every append
+takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
 above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
 `tests/test_protocol_004.py` covers each refusal.
 

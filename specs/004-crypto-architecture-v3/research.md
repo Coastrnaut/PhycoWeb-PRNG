@@ -109,9 +109,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   `-I` would disable. `pip freeze`, for the environment record and for the start check, is that
   interpreter's `-m pip freeze --all`, run without `-I`.
   - One environment record per platform, `environment-windows.json` and `environment-wsl.json`
-    under `reports/004-crypto-architecture-v3/`, is written at setup and on any change by
-    `scripts/owner_record.py environment`, which the owner runs, an owner's own act (spec FR-044):
-    the Windows build, the WSL distribution, its version and the kernel, Python, gcc, make and the
+    under `reports/004-crypto-architecture-v3/`, is written at setup, once the wheels of R19 are
+    installed and R18's pins are in `requirements.txt`, in plan phase 1's order (REP-081),
+    and on any change by `scripts/owner_record.py environment`, which the
+    owner runs, an owner's own act (spec FR-044): the Windows build, the
+    WSL distribution, its version and the kernel, Python, gcc, make and the
     full `pip freeze`, with `approved_by`, `approved_utc` and `approval_confirmed`. The script
     prints the record's SHA-256, taken without those fields, and writes nothing unless standard
     input is an interactive terminal and the owner types its first 16 hex digits; the owner then
@@ -1960,8 +1962,11 @@ Python, so that pip reads the downloaded files under `-I`, and in WSL by
 pip refuses a user install under `-I`, the install stops for the owner's decision, and
 nothing runs from the download directory. A check after each install compares
 `pip freeze` with R18's pins, which enter `requirements.txt` only then (R18). The
-licences allow use in a GPL-3.0 project, and nothing here is committed or distributed. Each
-file's SHA-256 is checked against PyPI's after download and recorded.
+licences allow use in a GPL-3.0 project, and nothing here is committed or distributed. Each file's
+SHA-256 is checked against PyPI's after download and recorded. The wheels are fetched, recorded and
+installed in plan phase 1's order: the manifest's `approved` entries first, then each wheel in its
+own new directory, checked by `scripts/downloads.py fetched` and installed, then R18's pins written
+into the corrected `requirements.txt`, and only then the environment records (R1; REP-081).
 
 | File | Source | Size | Licence | Use | Without it |
 |------|--------|------|---------|-----|-----------------|
@@ -1985,7 +1990,17 @@ recorded against its row.
 A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds from
 setup on one entry per file of these tables, each with its name, source, size and licence and a
 `status`: `approved`, not yet fetched, with no SHA-256, date or path; `fetched`, with its SHA-256,
-download date and local path; or `not obtained`, with the reason. A value the owner provides gets an
+download date and local path; or `not obtained`, with the reason. Those entries are written by a
+script of its own, `scripts/downloads.py`, through `protocol/evidence.py`, run by the agent: `init`
+writes one `approved` entry per file of the two tables, as research.md holds them at HEAD, with its
+name, source, size and licence, and exits 2 once the manifest exists; `fetched NAME PATH` computes
+the SHA-256 and the size from the downloaded file itself, read under `-I` from its own directory and
+never run, refuses a size that differs from a size this section gives in bytes and, for a wheel, a
+SHA-256 that differs from PyPI's for that file, given as `--pypi-sha256 HEX`, and writes the
+entry `fetched` with its SHA-256, the download date and the local path; and
+`not-obtained NAME --reason TEXT` writes `not obtained` with the reason. Each mode refuses, exit 2,
+writing nothing, a name that no `approved` entry holds, and keeps the manifest's earlier
+content under `versions/` first (REP-076). A value the owner provides gets an
 entry of its own, `owner-provided`, with the owner's words, the source the owner names, the date and
 the value's SHA-256, written by `scripts/owner_record.py owner-provided`, which the owner runs, an
 owner's own act (spec FR-044): the script prints the entry's SHA-256 and writes nothing unless

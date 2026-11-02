@@ -106,7 +106,7 @@ g.zeroize()                             # clears the whole state and the key; th
 | Per-request limit | nbits above min(per-instantiation limit, 2¹⁹) raises `LimitExceeded`, with no output and no state change |
 | Per-instantiation limit | output that would pass the limit raises `LimitExceeded`, with no output and no state change; a new nonce is needed; `reseed` never resets a counter |
 | Other limits | every other online quantity the theorem's bound counts (for example calls of Π per key, instantiations per key, held at research R9's random-nonce limit whatever the nonces, and reseeds per instantiation) has the design document's limit and a counter; a call that would pass one raises `LimitExceeded`, with no output and no state change, except at a per-key limit, which also ends the object (below; research R9) |
-| Per-key limit | a `Generator` holds one key, from construction; output under all its nonces counts against the per-key limit, and its instantiations against the random-nonce limit of research R9, at most 2³², whatever nonces the caller uses, since the object cannot tell a random nonce from a counter value; and a call refused at a per-key limit raises `LimitExceeded`, zeroizes and ends the object, since nothing more may be done with that key; the counters are never reset, since `zeroize` ends the object |
+| Per-key limit | a `Generator` holds one key, from construction; output under all its nonces counts against the per-key limit, and its instantiations against the random-nonce limit of research R9, at most 2³², whatever nonces the caller uses, since the object cannot tell a random nonce from a counter value; and a call refused at a per-key limit raises `LimitExceeded`, zeroizes and ends the object, since nothing more may be done with that key; the counters are never reset, since `zeroize` ends the object; the refusals at this limit and at the per-instantiation limit are tested through `ResearchDuplex.from_state`, which applies the same limit function (Research duplex; REP-078) |
 | Keys u, and limits across objects | u is a parameter of the bound, stated in the security target. Across objects, processes and devices, the per-key limits and u are usage rules that the design document states for the caller; the model enforces them only within one object |
 | Nonce reuse | the same key, nonce and personalization string give the same output; stated behaviour (T7), not detected |
 | Lengths | a key other than 32 bytes at construction, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` |
@@ -141,6 +141,7 @@ and the design document lists them with the other usage rules (FR-007, FR-025).
 
 ```text
 d = ResearchDuplex(variant_id, key)     # any supported keyed variant, reduced ones included
+d = ResearchDuplex.from_state(variant_id, key, lanes, counters)   # research only: chosen state
 ```
 
 The same calls and rules as `Generator`, on any supported variant, for evidence on reduced
@@ -153,6 +154,16 @@ leave no room in the state for the padding and domain bits (research R14),
 raises `VariantRefused`; only the permutation interface applies to it. It is
 not the production interface: it is named in the model's docstring as research only, and
 `Generator` never delegates to it.
+
+`ResearchDuplex.from_state(variant_id, key, lanes, counters)`, a call `Generator` lacks and
+research-only, starts the mode from a chosen state and chosen counter values, each within its range,
+and refuses any other with `ValueError`. `Generator` has no such path: a test checks that it has
+none and that `Generator` and `ResearchDuplex` enforce every limit through one shared function, so
+that a refusal reached through `from_state` tests the rule `Generator` applies. The refusals at a
+per-key or per-instantiation limit (spec FR-058) and quickstart M5's refusals beyond every limit are
+tested through it, every other path through the normal calls, and `gen_constructed_v3.py` writes
+through it the constructed-state vectors that the design document's list of edge states marks as
+covered only from a chosen state (data model §11; REP-078).
 
 ## Exceptions
 

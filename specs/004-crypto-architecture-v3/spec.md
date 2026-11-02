@@ -1763,8 +1763,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   with its reason and stays covered by simulation. The generators run in a fixed order, each
   `--check` passing before the next: the constant tables; then the vectors, written through `pi` and
   `ResearchDuplex`, which runs no self-test, together with `phycoweb/selftest_v3.py`, the
-  self-test's inputs and expected output copied from them; and only then `Generator`, which imports
-  it and runs the self-test (FR-059; data-model §11).
+  self-test's inputs and expected output copied from them; then `Generator`, which imports it and
+  runs the self-test; and only then the constructed-state vectors of FR-054, written by
+  `gen_constructed_v3.py` through `pi`, `pi_inv` and `ResearchDuplex` only, its research path to
+  chosen states included, so that every generator and module it reads has passed its check before it
+  runs (FR-059; data-model §11; REP-077).
 
 **Structural evidence and bounds**
 
@@ -2079,8 +2082,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   untracked file not ignored; ignored files (the locks, the local-only outputs under `data/local/`)
   do not count, and local-only outputs are in the record by SHA-256 anyway. The freeze record MUST
   hold the SHA-256 of the design document, `rationale.md`, the model, the vectors (constructed-state
-  vectors included), the scripts that generate the constants and the vectors, the selected operation
-  list, `research/004/ir.py` with its tools, and the scripts that compute verdicts
+  vectors included), the scripts that generate the constants and the vectors, `gen_constants_v3.py`,
+  `gen_vectors_v3.py` and `gen_constructed_v3.py` (REP-077), the selected operation list,
+  `research/004/ir.py` with its tools, and the scripts that compute verdicts
   (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
   `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py`,
   `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py`
@@ -2408,7 +2412,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   counter, every output limit reached and one request beyond it, and every domain separator.
   These vectors are part of the frozen vectors (FR-043; vhdl-genai.md R3 and §5.3, step 1). On
   the RTL they run in simulation only, loaded by the testbench (FR-025), and the record of an
-  edge state that no key reaches says that it is covered in simulation only.
+  edge state that no key reaches says that it is covered in simulation only. The design document's
+  list of edge states marks each as reached by the normal calls from development keys within a
+  stated number of calls of Π, or covered only from a chosen state, which the research interface's
+  `ResearchDuplex.from_state` sets (model contract), and `gen_constructed_v3.py` writes each vector
+  the way the list names, the vector saying which (REP-078).
 - **FR-055**: Every operation on state words in Π and the mode MUST give the same bits whether
   its operands are read as signed or unsigned: addition and subtraction modulo 2^w, XOR, AND,
   OR, NOT, rotations and logical shifts. An arithmetic shift, a signed comparison or a sign
@@ -2449,7 +2457,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   every zeroization path of FR-025 (a refused request, a failed self-test, an exception after
   the state has changed, a call refused at a per-key limit), the refusal of a generate request
   after reset or zeroization until an instantiate completes, and that the key, given once at
-  construction, is never compared with another (FR-013). A failed construction, by a refused
+  construction, is never compared with another (FR-013). The refusals at a per-key or
+  per-instantiation limit, and quickstart M5's refusals beyond every limit, are tested through
+  `ResearchDuplex.from_state`, research-only, which starts the mode from a chosen state and chosen
+  counter values, each within its range, and every other path through the normal calls;
+  `Generator` has no such path, and a test checks that it has none and that
+  `Generator` and `ResearchDuplex` enforce every limit through one shared
+  function (model contract; REP-078). A failed construction, by a refused
   variant, a wrong key length or a failed self-test, leaves no object: the constructor checks in
   that order, and each refusal is tested with an input that would also fail every later check, so
   the order shows. After `zeroize`, the key buffer the object held reads all zeros and the object no
@@ -2457,9 +2471,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   Hypothesis) MUST be added if the owner approves the download; otherwise their absence MUST be
   recorded as an open item. Until the approved wheels are installed and checked, the property tests
   skip with a reason naming that open item and none fails, and the final report lists the skipped
-  tests; once the wheels are installed, the pins take effect, a new environment record is
-  approved, and the property tests run before any later record (research R17,
-  R18). They run under a settings profile registered by the test package,
+  tests; once the wheels are installed and the pins take effect, the first environment records are
+  written, in plan phase 1's order, and the property tests run before any later record; a wheel
+  installed after a record needs a new environment record, approved before any later record
+  (research R17, R18; REP-081). They run under a settings profile registered by the test package,
   with `derandomize=True` and `database=None`, so that every run tries the same examples and a
   failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
@@ -2625,7 +2640,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   entry, never a change to an entry or a record (FR-064; data-model §1, §14). Its one writer is
   `scripts/provenance.py` (`protocol/provenance.py`), whose `add` writes an entry and `review` a
   review, each under the log-append lock, and which refuses, exit 2, an entry with a field missing
-  or a `sha256` that is not that of the named file, section or record (cli contract).
+  or a `sha256` that is not that of the named file, section or record (cli contract). Files drafted
+  or repaired before the log exists, the planning documents, the checklists and checklist-choices.md
+  among them, and the files of plan phase 1 written before it, are in this requirement's scope:
+  right after the log's creation, before any other entry, `provenance.py add` writes one entry per
+  such file, holding `sha256` and its kind (REP-079) of the file as committed then, `date_utc` as
+  the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and last commits that
+  changed the file, `session` "several, not recorded" unless one is known, `tool` and `model` as
+  known and otherwise "not recorded", `task_id` `none` for a file drafted before tasks.md existed
+  and the task's ID for a file of plan phase 1, and `review_status` `pending` until the owner
+  reviews it, a review entry following then. The entries, not the history, state that an AI tool
+  drafted them, and a later change to such a file gets an entry as any file does (data-model §14;
+  REP-080).
 
 **Claims discipline (security.md §1 and §15; strategy note §3.1 and §10)**
 

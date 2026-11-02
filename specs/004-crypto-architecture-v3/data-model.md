@@ -17,7 +17,10 @@ are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
 `downloads.json` and `review-package/MANIFEST.json`. Before one changes,
 `protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
 the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
-re-check resolves either from the versions (research R16). After the freeze, `protocol/evidence.py`
+re-check resolves either from the versions (research R16). The downloads manifest's `approved`,
+`fetched` and `not obtained` entries are written by `scripts/downloads.py`, run by the agent, and
+its `owner-provided` entries by `scripts/owner_record.py owner-provided`, the owner's own act, both
+through `protocol/evidence.py` (research R19; REP-076). After the freeze, `protocol/evidence.py`
 refuses, exit 2, to write over one that the freeze record pins, `parameters.json`, `limits.json` and
 the selected candidate's `round-rule.json` among them (section 13). The selection records are
 written once each and never rewritten: a later selection is a new record,
@@ -762,7 +765,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 and the second request of k whole blocks, written by `gen_vectors_v3.py` from the same `ResearchDuplex` run as the vectors; `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
-| `constructed_<variant>.json` | per edge state: name, construction, whether a key reaches it, inputs, outputs |
+| `constructed_<variant>.json` | per edge state: name, construction, whether the normal calls reach it from a development key within the number of calls of Π the design document's list states or it is covered only from a chosen state, set by `ResearchDuplex.from_state` (REP-078), inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
 
@@ -802,7 +805,7 @@ file's path and SHA-256 and the verdict `match` or `differs`, computed by code (
 evidence is each generator's pair of such records, one per platform, which quickstart M1 to M3 and
 the final report cite.
 
-**Order of generation** (FR-036, FR-059): three steps, each generator's `--check` passing in this
+**Order of generation** (FR-036, FR-059): four steps, each generator's `--check` passing in this
 order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
 vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes, from the same
 `ResearchDuplex` run, each claimable size's `selftest_<variant>.json`, the self-test's inputs and
@@ -810,9 +813,13 @@ every expected block, whole, and `phycoweb/selftest_v3.py`, copied from those fi
 HW-077). (3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. The model
 imports that module inside `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and
 `ResearchDuplex` import without it and step (2) runs before it exists; a `Generator` built before
-then fails its self-test and leaves no object (model contract, Module rules). Tests check that
+then fails its self-test and leaves no object (model contract, Module rules).
+(4) `gen_constructed_v3.py`, once step (3)'s self-test has passed, writes the constructed-state
+vectors, running Π, Π⁻¹ and the mode through `pi`, `pi_inv` and `ResearchDuplex` only, its research
+path to chosen states, `ResearchDuplex.from_state`, included, so that every generator and module it
+reads has passed its check before it runs (REP-077, REP-078). Tests check that
 `Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
-`selftest_v3.py` with the vectors (section 13).
+`selftest_v3.py` with the vectors and the three generators (section 13).
 
 ## 12. Baseline archive (`baseline/phyco-v2/MANIFEST.json`; FR-042)
 
@@ -833,7 +840,8 @@ copy against its manifest hash and its live source (SC-012).
   supported (n, w) and its final R (research R15); `phycoweb/selftest_v3.py`
   (section 11); every vector file, including the constructed-state vectors, the constant tables
   beside them and the sidecar `MANIFEST.json`, frozen with them as the record of the runs that
-  produced them (section 11); the scripts that generate the constants and the vectors; the selected
+  produced them (section 11); the scripts that generate the constants and the vectors,
+  `gen_constants_v3.py`, `gen_vectors_v3.py` and `gen_constructed_v3.py` (REP-077); the selected
   operation list; `research/004/ir.py` with its tools; and the scripts that compute verdicts:
   `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
   `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
@@ -882,11 +890,17 @@ the frozen files (FR-034).
 
 One line per file drafted or repaired with an AI tool, and per section where a file is
 drafted in parts: `seq` and `prev_sha256`, chained as the candidate log is
-(section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`,
-`section`, `sha256`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`, which is
-`pending`, `accepted` or `changes-requested`. A review is a new entry for the same `path` and
-`section`, with `follows`, the `seq` of the entry it follows, and `sha256`, the SHA-256 of the
-section text reviewed; the latest entry for a path and section gives its status, and no entry
+(section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`, `section`,
+`sha256` and `sha256_kind`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`,
+which is `pending`, `accepted` or `changes-requested`. An entry's `sha256` is over the named file's
+bytes, LF-normalized for an existing `text=auto` file such as security.md or README.md and raw
+otherwise, as research R16 hashes, with `sha256_kind` (`raw` or `lf-normalized`) beside it; a
+section's text runs from its heading line, included, to the line before the next heading of the same
+or a higher level, or to the file's end, each line with its final LF, taken from those bytes, and
+`section` names its heading as it stands (REP-079). A review is a new entry for the same `path` and
+`section`, with `follows`, the `seq` of the entry it follows, and `sha256`,
+the SHA-256 of the section text reviewed, computed the same way, with its
+kind; the latest entry for a path and section gives its status, and no entry
 changes. A chapter of the design document under review carries no mark in the file: its status is
 its entries' `review_status`, `pending` from its drafting, with its Review & Approval row, and the
 security-target review adds a review entry for each chapter it covers, "Security target"
@@ -897,9 +911,9 @@ and SHA-256, the record's `reviewer` staying as written (section 1). Every appen
 `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
 section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenance.py add` for an
 entry and `review` for a review entry (cli contract), which refuses, exit 2, appending
-nothing, an entry with a field of its kind missing or a `sha256` that is not
-that of the named file, the named section's text or the named record. The
-entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
+nothing, an entry with a field of its kind missing or a `sha256` or `sha256_kind` that is not that
+of the named file, the named section's text or the named record, each computed by the writer as
+above (REP-079). The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
 its own, with its SHA-256, before the first entry of the tool it validates. Each tool's second known
 result (section 7) has an entry of its own before the tool's first validation, with its source: a
@@ -907,6 +921,19 @@ second published value from research R19's approved papers (paper, table and val
 self-written result with its SHA-256, entered before the tool's first entry. `section` names a part
 of a file: each AI-drafted section of the rationale has its own entries, to which the owner design
 review adds a review entry for each, so that the frozen text carries no status (FR-034).
+
+Files drafted or repaired before the log exists are in FR-067's scope: the spec, the plan, research,
+this data model, the contracts, the quickstart, the checklists and checklist-choices.md, drafted and
+repaired with an AI tool over several sessions before any task existed, and the files of plan
+phase 1 written before the log. Right after the log's creation, before any other entry,
+`provenance.py add` writes one entry per such file, holding `sha256` and its kind (REP-079) of the
+file as committed then, `date_utc` as the writer adds it, `drafted_from` and `drafted_to`, the dates
+of the first and last commits that changed the file, `session` "several, not recorded" unless one is
+known, `tool` and `model` as known and otherwise "not recorded", `task_id` `none` for a file drafted
+before tasks.md existed and the task's ID for a file of plan phase 1, and `review_status` `pending`
+until the owner reviews it, a review entry following then. The entries, not the history, state that
+an AI tool drafted them, and a later change to such a file gets an entry as any file does (spec
+FR-067; REP-080).
 
 ## 15. Claim and evidence register (`protocol/claims.json`; FR-069)
 

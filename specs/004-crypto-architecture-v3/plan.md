@@ -291,6 +291,7 @@ scripts/
 ├── recheck_004.py            # recomputes every verdict (FR-065)
 ├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
 ├── owner_record.py           # the owner's environment records and owner-provided values (R1, R19)
+├── downloads.py              # the downloads manifest's other entries, run by the agent (R19)
 ├── protocol_change.py        # the protocol change log's create and propose (FR-044)
 ├── provenance.py             # the provenance log's add and review (FR-067)
 ├── clear_lock.py             # removes a stale lock, only once its holder is shown gone (R16)
@@ -362,25 +363,31 @@ takes each from there.
 
 ## Phases and gates (for /speckit-tasks)
 
-1. **Setup**: directories; `.gitattributes` pins and the `.gitignore` entries for both locks and for
-   `data/local/`, where local-only outputs go (R16, R18; the pins for
-   `reports/004-crypto-architecture-v3/**`, `research/004/**`, `protocol/*.json` and `*.gz` were
-   added on 2026-11-01), with R18's line-ending test, which runs from this phase on (FR-053); the
-   Hypothesis wheels of R19 downloaded, checked against PyPI's SHA-256 and installed from
-   outside the download directory under `-I`, as R19 states, then checked
-   against R18's pins, which enter `requirements.txt` only then; the downloads
-   manifest `downloads.json`, one entry per file of R19's tables from setup
-   on, each with its `status` (`approved`, `fetched` or `not obtained`), and an `owner-provided`
-   entry for each value the owner provides (R19); the environment records of both
-   platforms (R1), these records and those entries written by the owner with
-   `scripts/owner_record.py`, each with its Review & Approval row; corrected `requirements.txt`;
-   `DESIGN_DISCLAIMER`; `protocol/devinputs_v3.py` with the fingerprints of every allowed (n, w), at
-   most 16 pairs, and of the synthetic seeds (R3); `protocol/evidence.py`;
-   the provenance log; the protocol change log, whose first entries are the answered rows of every
-   checklist round answered before it is created, by the per-round lists of checklist-choices.md, in
-   round order, approved by the owner at the log's approval step (FR-044; data-model §18); the
-   `phyco-v2` archive (FR-042). (The status of the strategy note and of security.md §22 rows 5a and
-   5a.1 was updated during planning, in security.md 2.10.)
+1. **Setup**, in this order, each step after the steps it needs (REP-081): (1) directories, the
+   `.gitattributes` pins and the `.gitignore` entries for both locks and for `data/local/`, where
+   local-only outputs go (R16, R18; the pins for `reports/004-crypto-architecture-v3/**`,
+   `research/004/**`, `protocol/*.json` and `*.gz` were added on 2026-11-01), with R18's line-ending
+   test, which runs from this phase on (FR-053); (2) the writers before what they write:
+   `DESIGN_DISCLAIMER`, `protocol/evidence.py`, `protocol/provenance.py` with
+   `scripts/provenance.py`, `protocol/changelog.py` with `scripts/protocol_change.py`,
+   `scripts/clear_lock.py`, `scripts/owner_record.py` and `scripts/downloads.py` (REP-076); (3) the
+   provenance log, its first entries those of the files drafted before it (FR-067; data-model §14;
+   REP-080); (4) the protocol change log, after the owner's confirmation of every list at the tasks
+   approval and before every file written through `protocol/evidence.py` but a `lock-cleared` record
+   (PRO-065), its first entries the answered rows of every checklist round answered before it is
+   created, by the per-round lists of checklist-choices.md, in round order, approved by the owner at
+   the log's approval step (FR-044; data-model §18); (5) the downloads manifest `downloads.json`,
+   its `approved` entries, one per file of R19's tables, written by `scripts/downloads.py init`
+   before any download, each later `fetched` or `not obtained`, and an `owner-provided` entry for
+   each value the owner provides, written by the owner with `scripts/owner_record.py` (R19); (6) the
+   Hypothesis wheels of R19, each downloaded into its own new directory, checked against PyPI's
+   SHA-256, recorded `fetched` and installed from outside the download directory under `-I`, as R19
+   states, then checked against R18's pins, which are written into the corrected `requirements.txt`
+   only then; (7) the environment records of both platforms (R1), matching those pins, written by
+   the owner with `scripts/owner_record.py`, each with its Review & Approval row;
+   (8) `protocol/devinputs_v3.py` with the fingerprints of every allowed (n, w), at most 16 pairs,
+   and of the synthetic seeds (R3); (9) the `phyco-v2` archive (FR-042). (The status of the strategy
+   note and of security.md §22 rows 5a and 5a.1 was updated during planning, in security.md 2.10.)
 2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check, with progress written by the
    main thread only (R2); the sweep, a heavy run → demonstration record → ⛔ **FUT-SEC-8 result
    review**. No key-loading code before it.
