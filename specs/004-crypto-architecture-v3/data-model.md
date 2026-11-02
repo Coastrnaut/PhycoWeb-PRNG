@@ -214,9 +214,9 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves. A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry (spec FR-030, FR-034). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
-| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not; R15); the rotation search's space of amounts, ranking measure, rounds, width (16 first) and tie order (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, measure, rounds and tie order; and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
+| `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
 | `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
 | `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) |
@@ -250,7 +250,13 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   `oplist_sha256` in the log stays checkable. The re-check verifies the inventory.
 - **Decline at the owner design review.** The declined candidate stays eligible and in the set, and
   the decline's reasons are logged under it. The decline reopens the set once, for one further
-  candidate within the stop rule, entered and evaluated like any other; once it has a final
+  candidate within the stop rule that the rules can select: from the chosen family, or from the
+  other family only where the declined candidate was selected by the fallback or D4 was not
+  computable, and only while its family has fewer than three evaluated candidates; before its
+  `proposed` entry, the decline's log entry states what the rules need to
+  select it, an R at 4×4 below the declined one's or a tie. Where none can be
+  entered, the decline ends in one of spec FR-043's other outcomes. The further
+  candidate is entered and evaluated like any other; once it has a final
   decision, a second `set-closed` entry closes the set, and `round_rule.py --select` runs again over
   the whole set: if the rules select the further candidate, it goes to the review; if they select
   the declined one again, the outcome is a stop, logged with the review's reasons. The declined
@@ -311,9 +317,9 @@ and every recovered seed with `model_v2`, with no sweep.
 | `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b, threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
 | `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b, threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
 | `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired. One record per test and size, `controls/<test>-<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
-| `symmetry` | patterns and symmetries checked, in the stated enumeration order; symmetries that fix a pattern; the relations checked between the constants of one call (R13) | `pass` if none |
+| `symmetry` | patterns and symmetries checked, in the stated enumeration order, each pattern on its own (the K sets of amounts placed by their rule among them); symmetries that fix a pattern; the relations checked between the constants of one call (R13); at 2×2 and 3×3, the statement that the placements of the food nodes and of the amounts were checked together with the round constants as one pattern (R13) | `pass` if none |
 | `invariant` | forms and differences checked; any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
-| `degree` | per claimable size, for Π and Π⁻¹: each round's degree bound from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, for example w − 1 for a w-bit addition); the bound d for r rounds, the product of the per-round degrees capped at b − 1; the round counts with d ≤ 126 (R13) | each such round count raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
+| `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list (from each box's or S-box's truth table where its width allows, otherwise from each operation's stated degree, w − 1 for a w-bit addition), a round's count the product of its phases'; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, w for an addition of two variable words, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |
 
 - **Exact verdicts.** The critical-count table, `research/004/tools/critical_counts.json`,
   holds per (N, S) and (N_a, S_A) the integer critical counts derived by exact integer
@@ -323,6 +329,12 @@ and every recovered seed with `model_v2`, with no sweep.
   critical counts and verdicts byte for byte (section 1).
 - **Validation cited.** Every counted record holds `validation`, the ID and SHA-256 of the
   validation record of the tool's exact hash, whose `created_utc` is earlier (FR-039; SC-007).
+- **Call types.** Where the call types draw on distinct constant streams (spec FR-023), the
+  `inverse`, `symmetry`, `invariant`, `frequency` and `avalanche` records are made for each call
+  type's permutation, each naming it in `call_type`, and R is the largest over the call types; a
+  `dependency` record and a trail-bound record (section 6) read no constant value, cover one
+  permutation for all and state that reason. Where the streams are not distinct, one permutation is
+  covered.
 - **Unvalidated tools.** A trail or distinguisher found by a tool not yet validated is recorded
   as an unverified hypothesis (FR-060), with `status` `blocked`, and it blocks the candidate's
   eligibility until a validated tool, or direct evaluation of the trail with the validated
@@ -364,8 +376,10 @@ same kind and of the tool's exact hash exists.
   deterministic fact: S12's ranges and classes; S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴;
   S13(a)'s merged pair 16m + 15 and 16m + 16; S7's three rotation relations; the planted torus
   symmetries of the stated lists at n = 3 and 4 found, and none on the list without one; each
-  structural tool's counts and matrices, entry by entry; the degree bound's exact degree; R5's
-  counts; and FUT-SEC-8's three seeds and its vector check. A measured fraction, such as S13's 41%
+  structural tool's counts and matrices, entry by entry; the degree derivation's count by the rule,
+  exactly, with the exact degree from the truth table reported beside it and the upper bound at
+  least that degree, and its hand-derived inside-out count; R5's counts; and FUT-SEC-8's
+  three seeds and its vector check. A measured fraction, such as S13's 41%
   and 32% or S14's bit frequencies, matches when the tool's count lies in the binomial interval
   around the recorded fraction, for the tool's sample size, with at most 0.005 in each tail.
   Anything else is `not re-found`.
@@ -395,8 +409,9 @@ same kind and of the tool's exact hash exists.
 - **Self-written known results.** Each known result this feature writes itself (the small operation
   lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted torus symmetries and
   the one with none, the map with collisions, the variant with a planted gap, R5's
-  hand-counted examples, the small operation list of known degree) is written under `research/004/`,
-  whose files are pinned to LF (research R18), with its SHA-256, and entered in the provenance log
+  hand-counted examples, the small operation list of known degree with its
+  inside-out count) is written under `research/004/`, whose files are pinned to
+  LF (research R18), with its SHA-256, and entered in the provenance log
   (section 14) before the tool it validates is drafted, so its entry's `seq` comes before the tool's
   first entry. The validation record cites both entries, and a test checks their order and that the
   hashes still match.
@@ -431,18 +446,26 @@ choice and both records' SHA-256.
 `candidates/<id>/round-rule.json`, a fixed-name file (introduction), per claimable size: `R_f`,
 `R_b`, `R_bound` (with its bound records), `R_dist` (with its evidence records, the `degree` records
 among them), `delta` = 2, `R`, and `eligible` with each item of FR-018 to FR-031 and FR-037 and its
-evidence, decided for every candidate before selection: FR-026's figures from its `cost` record per
-claimable size (`candidates/<id>/cost-<record_id>.json`, written by
-`research/004/tools/costmodel.py` from the
-operation list, P and R); FR-027's semantics from the operation list's own declarations, which the
-framework requires for every operation; FR-030's mapping from the candidate's `mapping` log entry.
+evidence, decided for every candidate before selection: FR-018's folding rule, longest link, food
+nodes with their reason and tree figures from the operation list and its `parameters` entry
+(section 3); FR-020's cycles per call, with FR-026's figures, from its `cost` records per claimable
+size (`candidates/<id>/cost-<record_id>.json`, written by `research/004/tools/costmodel.py` from the
+operation list, P and R); FR-022's bounds from its bound records (section 6); FR-023's statement on
+the streams, with its reason, and FR-024's report on the ranking after scaling from its log entries;
+FR-025's stages, chains per phase and key path from the operation list's declarations, checked by
+code; FR-027's semantics from the operation list's own declarations, which the framework requires
+for every operation; FR-030's mapping from the candidate's `mapping` log entry. FR-025's interface
+formats, call sequence and zeroization rules are properties of the mode, the same for every
+candidate, decided once in the mode chapter, and the self-test's expected output (FR-018) is
+generated from the selected candidate's vectors and cannot fail. A missing item fails eligibility.
 The design document restates them for the selected candidate, and the owner design review checks
 that the two agree. `selection.json`, a fixed-name file too, written only after the candidate log's
 `set-closed` entry (section 3): the eligible candidates of the
 chosen family, or of the other family if it has none, or of both families if D4 was not
 computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule outcome with its
-reason. After a decline at the owner design review that ends in a further candidate, `--select` runs
-again over the whole set, the declined candidate included, and writes `selection-2.json`, citing
+reason. After a decline at the owner design review that ends in a further candidate, entered only
+where the rules can select it (section 3), `--select` runs again over the whole
+set, the declined candidate included, and writes `selection-2.json`, citing
 `selection.json`, which stays; selecting the declined candidate again is a stop, with the review's
 reasons (section 3). The owner's choice in a tie is made only after `selection.json` exists and
 recorded beside it: `round_rule.py --choose ID --seen SHA256 --by NAME`, run by the owner, prints
@@ -648,14 +671,18 @@ recorded no level.
   form the test finds gets a phrase of its own, listed here with its reason, or a line entry. The
   project's name holds no flagged word and needs no entry. Standing entries also let these lines
   stand: security.md §6's rows, which state a standard's own status; the spec's FR-025 sentence on
-  zeroization in the model, which says what the model does not promise; the mapping chapter's one
-  fixed negative statement (FR-030); the spec's negative statements of FR-011, FR-049, FR-059 and
+  zeroization in the model, which says what the model does not promise; the
+  mapping chapter's one fixed negative statement, the chapter's only entry
+  (FR-030); the spec's negative statements of FR-011, FR-049, FR-059 and
   the section "Context", which say what no artifact may call a model, a test or a review; and, in
   the checklists and checklist-choices.md, which quote the documents they review, a flagged word
   inside a quotation, in quotation marks or backticks, any other flagged line there needing an entry
   of its own (FR-069). A test runs every rule and every standing phrase on sample sentences that
-  must and must not be flagged. Inside the mapping chapter the rule matches FR-030's list
-  as whole words, ignoring case, with their inflections. Any other flagged line needs an entry of
+  must and must not be flagged. Inside the mapping chapter, the design document's section headed
+  "Slime-mould mapping" up to the next heading of the same level, the rule matches
+  FR-030's list, the words for the arguments it forbids among them, as whole
+  words, ignoring case, with their inflections, and the test exits 1 if the
+  heading is missing or appears twice. Any other flagged line needs an entry of
   its own.
 
 ## 16. Review package (`review-package/MANIFEST.json`; FR-063)

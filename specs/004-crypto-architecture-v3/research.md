@@ -283,6 +283,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     that size to the new R, as a new measurement of the same kind charged to the 12 h row (R7); if
     the row cannot hold it, that size's bias evidence is inconclusive and the candidate
     `ineligible`.
+  - **Call types.** Where the call types draw on distinct constant streams (spec FR-023), both
+    tests, with every set, run on each call type's permutation, each record naming its call type,
+    and R_cur is the largest over the call types, so a firing in any of them raises it; the uniform
+    controls read no constant and serve every call type.
   - **Uniform control.** Before its first use at each size by any candidate, each test is applied
     once, with the same counts and the same threshold, to uniform control inputs: two sets of 2²⁰
     control states, and N_a·(|F| + 384 + w − 1) XOR differences of two independent control states,
@@ -366,8 +370,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   operation in batches of 2¹⁶ and 0.66 ns per counted bit. At R = 32 and 64 numpy operations per
   node and round, the frequency test then takes about 0.7 h per candidate over its two input
   sets, the three sizes and both directions, and the avalanche test about 3.1 h with its related
-  and rotational sets, mostly counting bits: 3.8 h in all. A raise of R to 64 doubles that to
-  7.7 h, still inside the 12 h of R7. The avalanche test complements the exact dependency
+  and rotational sets, mostly counting bits: 3.8 h in all. A raise of R to 64 doubles that to 7.7 h,
+  still inside the 12 h of R7. Where the call types draw on distinct streams, both tests run once
+  per call type (Call types, above), so at four call types the 3.8 h become about 15 h at R = 32,
+  more than the 12 h row holds; at the same cost per round, the row then holds such a candidate's
+  bias evidence only up to about R = 25. The avalanche test complements the exact dependency
   matrices (R13), which also check it, and its budget sets N_a and F. The second input set holds
   the key fixed, as the many nonces under one key do, and the related and rotational sets let
   their results raise R before the freeze instead of only in feature 005 (checklist B4).
@@ -473,8 +480,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `rejected` log decision. A capped search counts as no bound at that width, so the choice
     proceeds once every entered candidate has an outcome, whatever it is, and the choice record
     lists each outcome; no search is retried to reach a score (R12). A candidate added later, only
-    in place of one `rejected` or `ineligible` (spec "Eligibility and selection"), counts towards
-    the stop rule but does not change the recorded choice.
+    in place of one `rejected` or `ineligible`, or once after a decline at the owner design review,
+    counts towards the stop rule but does not change the recorded choice; after a decline it comes
+    from the chosen family, or from the other only where the declined one was selected by the
+    fallback or D4 was not computable, so that the rules can select it (spec "Eligibility and
+    selection").
   - **Where**: at 4×4, at the widest reduced width, 16 or else 8, at which at least one entered
     candidate of each family has both a differential and a linear trail bound for a common
     number of rounds of at least 2; r* is the largest such common number. Only candidates with
@@ -501,12 +511,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Neither family scored.** No family is chosen, and the record says that D4 was not
     computable. Selection then takes the eligible candidate with the smallest R at 4×4 from
     either family, with a tie going to the owner's recorded choice; the stop rule still applies.
-  - **Rotation amounts** are chosen at this width (R15). Each candidate's amounts are searched first
+  - **Rotation amounts** are chosen at this width (R15), ranked by this score's own measure,
+    min(W_D, W_L) at the search width, at one number of rounds for every candidate
+    (R15's one ranking rule). Each candidate's amounts are searched first
     at 16, the width this rule tries first, with the width recorded in its log entry before the
     search. If this rule then fixes the width at 8, every entered candidate's amounts are searched
-    again at 8, with the same recorded space of amounts, ranking measure, rounds and tie order, as a
-    new log entry, and the scores at 8 use the amounts found at 8; no choice is involved, since this
-    rule fixes the width. The scaling rule to every other width is stated before the search. R_bound
+    again at 8, with the same recorded space of amounts, K and placement rule, under the same
+    ranking rule, as a new log entry, and the scores at 8 use the amounts
+    found at 8; no choice is involved, since this rule fixes the width. The
+    scaling rule to every other width is stated before the search. R_bound
     at w = 32 is computed with the scaled amounts, and
     the rationale reports whether the ranking held after scaling, without choosing again.
   - The D4 record states r* (data-model §8).
@@ -530,7 +543,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Work | Budget |
   |------|--------|
   | Trail-bound searches of every kind, width and size together (the reduced-width and rotation-amount searches, box tables, box-trail searches, active-box or active-S-box counting, solver cross-checks) | 48 h; each search instance at most 8 h |
-  | Structural checks (inverse tests, exhaustive bijectivity, dependency matrices, symmetry and invariant checks, degree bounds) | 6 h |
+  | Structural checks (inverse tests, exhaustive bijectivity, dependency matrices, symmetry and invariant checks, `degree` records) | 6 h |
   | Frequency and avalanche tests with their controls (R4) | 12 h |
 
   - A search gives a bound only when the solver proves it: an optimal or infeasible status with
@@ -610,7 +623,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     this reserves the hours of every later run without fixing a split. Each row's kinds run in a
     fixed order: the 12 h row the frequency test, then the avalanche test, each with its control;
     the 6 h row the inverse tests, exhaustive bijectivity, dependency matrices, symmetry and
-    invariant checks and the degree bounds; the 48 h row the reduced-width and rotation-amount
+    invariant checks and the `degree` records; the 48 h row the reduced-width and rotation-amount
     searches, then box tables, box-trail searches, active-box or active-S-box counting and the
     solver cross-checks. The order of sizes stays.
     Otherwise the engine is made faster first, with more worker processes or with a C evaluator
@@ -787,8 +800,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (FR-018).
   - **One structure at every width and size.** The list's structure (its operations, their
     forms and order, and the colour schedule's rule) is the same at every width and size. Only
-    w, n and values derived from them by stated rules change: rotation amounts by the scaling
-    rule (R15), constants by the constant rule, the colour count by n's parity, food-node
+    w, n and values derived from them by stated rules change: rotation amounts by the
+    scaling rule and the placement of their K sets by its rule from n (R15),
+    constants by the constant rule, the colour count by n's parity, food-node
     positions by their rule, c and the key and nonce lengths (R14). Anything else makes a
     different design, a new candidate (stop rule).
   - From the list: a scalar interpreter (Python integers) and a batch interpreter (numpy
@@ -819,10 +833,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     self-written exhaustive tables (differential and linear) for boxes and S-boxes at reduced
     widths, in numpy or C; a self-written branch-and-bound trail search for ARX in C (WSL), with
     the exact models of addition (Lipmaa and Moriai, 2001; Wallén, 2003).
-  - **Box widths.** Full difference and linear tables are computed for boxes of up to 16 bits
-    (w ≤ 8; FR-022). At w = 16 and 32, a box's trail bounds come from the validated ARX search
-    with the exact models of addition, within the 8 h per instance of R7, and the bound for Π
-    follows by counting active boxes. The active-box counting also checks the rationale's branch
+  - **Box widths.** Full difference and linear tables are computed for each distinct box of up to 16
+    bits (w ≤ 8; FR-022), the K sets of rotation amounts making K boxes (R15). At w = 16 and 32,
+    each distinct box's trail bounds come from the validated ARX search with the exact models of
+    addition, each box within the 8 h per instance of R7 and the candidate's 48 h row, and the bound
+    for Π follows by counting active boxes, each at the smallest of the K
+    boxes' bounds. The active-box counting also checks the rationale's branch
     numbers or activation rule (R6).
   - **Solver settings**, fixed and recorded in every record: `mip_rel_gap` 0, the 8 h
     `time_limit`, and the proven dual bound (`mip_dual_bound`) used, never the best solution
@@ -881,9 +897,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     in each tail; anything else is `not re-found`.
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
-    8 h (R7): the ARX search must reproduce the exhaustive box tables of each ARX candidate's
-    ARX-box at w = 4 and 8 (boxes of 8 and 16 bits) before its searches at w = 16 and 32 count, and
-    the active-S-box counter must reproduce the exhaustive trail optima of each Boolean candidate's
+    8 h (R7): the ARX search must reproduce the exhaustive box tables of each distinct
+    ARX-box of each ARX candidate at w = 4 and 8 (boxes of 8 and 16 bits)
+    before its searches at w = 16 and 32 count, and the active-S-box counter
+    must reproduce the exhaustive trail optima of each Boolean candidate's
     nonlinear layer at w = 4, whatever its form. A failed cross-check is a tool defect (R7). The
     validations of the table above, on published values, stay validation runs charged to no
     candidate. A tool used outside its validated kind writes `not evaluated`.
@@ -932,8 +949,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     are stated, and the propagation through instantiate as a whole shows every state bit
     depending on every key and nonce bit before the first output, with the margin over R_f
     stated (FR-029).
-  - **Food nodes**: per supported size, the design document states the number of food nodes,
-    their positions by the rule and the reason, for example the number of rounds until every
+  - **Food nodes**: per supported size, the design document states the number of food nodes, at
+    least three in an asymmetric arrangement at every claimable size (Symmetry, below), their
+    positions by the rule and the reason, for example the number of rounds until every
     lane depends on a constant injected in round 1, from this propagation.
   - **Symmetry**: at every supported size, no symmetry of the torus that moves a node may map a
     constant pattern to itself: no composition of translations, rotations by 90°, 180° and 270°,
@@ -941,8 +959,20 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     constants to themselves: XOR, AND, NOT and rotations commute with that rotation and additions
     keep it with a fixed probability, so without shifts only the constants break it (rotational
     cryptanalysis). The spec names translations and rotations; reflections, compositions and
-    word rotations are added. The patterns checked are each round's constants, the placement of
-    the food nodes and every per-node constant, such as the rotation amounts.
+    word rotations are added. The patterns checked are each round's constants, the placement of the
+    food nodes and every per-node constant, such as the rotation amounts, each pattern on its own;
+    amounts equal at every node, which every translation maps to themselves, fail, so the amounts
+    differ between nodes, K ≥ 2 sets placed by a rule from n (R15). One food node is fixed by a
+    rotation about it and two by the half-turn about their midpoint, so the food-node rule takes at
+    least three food nodes in an asymmetric arrangement, such as (0,0), (0,1) and (1,2), which no
+    symmetry that moves a node maps to itself at 4×4, 8×8 and 16×16 (computed on 2026-11-01), so
+    none maps to itself one set of amounts at those nodes against another elsewhere; at every
+    claimable size this check stays as written. At 2×2 and 3×3, where every placement of food nodes,
+    and so every placement of one set of amounts against another, has a symmetry that moves a node
+    (computed the same day), the placements of the food nodes and of the amounts are checked
+    together with the round constants as one pattern; the `symmetry` record says so, the size
+    profile marks the variant, and no claim covers it (D3), as for the constants at 2×2 with w = 4
+    below.
   - **Constants within a call**: no two constants of one call of Π are equal, equal up to a word
     rotation by k = 1…w − 1, complements of one another, or rotations of complements. The
     constant script checks this beside the symmetry checks (R15).
@@ -969,14 +999,32 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     count.
   - **Algebraic degree**: for every candidate, and essential for the Boolean family, a `degree`
     record per claimable size, for Π and for Π⁻¹, computed in plan phase 5 after the other
-    structural checks and before the frequency and avalanche tests. Each round's degree comes from
+    structural checks and before the frequency and avalanche tests. Each phase's degree comes from
     the operation list: from each box's or S-box's truth table where its width allows, otherwise
-    from the stated degree of each operation, for example w − 1 for a w-bit addition. The degree of
-    r rounds is bounded by the product of the per-round degrees, capped at b − 1, which needs no
-    search tool. A zero-sum over a cube of dimension d + 1 then costs 2^(d + 1), so every round
-    count whose bound d is at most 126 is a distinguisher of the round rule and raises R_dist like
-    any other. The derivation is validated under FR-039 on a known result (below), and the rationale
-    cites the records.
+    from the stated degree of each operation, w − 1 for a w-bit addition, and a round of P phases
+    counts the product of its phases' degrees. The count of r rounds is the product of the per-round
+    counts, capped at b − 1, which needs no search tool. The stated w − 1 is an upper bound only
+    where one operand is constant, since the top bit of the sum of two variable w-bit words has
+    degree w (bit i has degree i + 1), so the record says that its count is the rule's, not an upper
+    bound, and holds beside it an upper bound, w for an addition of two variable words, with the
+    round counts at which that bound is at most 126. R_dist rises at every round count whose count d
+    by the rule is at most 126, so no round count that the pre-registered rule raises is dropped: a
+    zero-sum over a cube of dimension d + 1 costs 2^(d + 1), a distinguisher of the round rule like
+    any other. The inside-out count adds to these: for each pair (r₁, r₂), with the rule's counts
+    d_f(r₁) for Π and d_b(r₂) for Π⁻¹, a zero-sum built from a middle state over a subspace of
+    dimension max(d_f, d_b) + 1, taken r₁ rounds forward and r₂ rounds backward, distinguishes
+    r₁ + r₂ rounds at a cost of 2^(max(d_f, d_b) + 1) when max(d_f, d_b) is at most 126; the largest
+    such r₁ + r₂ is recorded with its cost against 2¹²⁸ and raises R_dist as a forward or a backward
+    count does. The derivation is validated under FR-039 on known results (below): it reproduces the
+    rule's count exactly at w = 4, with the exact degree from the truth table reported beside it and
+    the upper bound checked to be at least that degree, and a hand-derived inside-out count; the
+    rationale cites the records.
+  - **Call types**: where the call types draw on distinct constant streams (spec FR-023), the
+    inverse tests, the symmetry checks, the checks of the constants within a call and the invariant
+    checks run on each call type's permutation, or its stream, each record naming its call type, as
+    the bias tests of R4 do, and R is the largest over the call types; the dependency matrices read
+    no constant value and cover one permutation for all, each record stating that reason, as the
+    trail bounds do (spec FR-023). Where the streams are not distinct, one permutation is covered.
   - **Order.** At each size these checks run after the trail bounds and before the frequency and
     avalanche tests, the `degree` records last among them (R4, "Rounds measured").
   - **Known results.** Each structural tool re-finds a known result before its results count
@@ -989,13 +1037,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     | Exhaustive bijectivity | a known permutation (2³² ones in the bitmap) and a stated map with collisions (fewer) |
     | Avalanche test | a planted gap: a stated variant that leaves one lane unmixed; and, without new inputs, its verdict code on every count 0 to N_a and its exact power at R4's δ_A (R4) |
     | Cost model (R5) | R5's hand-counted examples |
-| Degree bound | the exact degree of a stated small operation list, for example one box at w = 4, over a few rounds, from its truth table |
+    | Degree bound | on a stated small operation list, for example one box at w = 4, over a few rounds: the rule's count, reproduced exactly, with the exact degree from its truth table reported beside it and the upper bound checked to be at least that degree; and a hand-derived inside-out count at w = 4, reproduced exactly |
 
     Each known result this feature writes itself, the small operation lists with their hand-derived
     matrices, the lists with planted symmetries and the one with none, the map with collisions, the
     variant with a planted gap, R5's hand-counted examples
-    and the small operation list of known degree, is written with its SHA-256 and entered in the
-    provenance log (data-model §14) before
+    and the small operation list of known degree with its hand-derived inside-out count, is written
+    with its SHA-256 and entered in the provenance log (data-model §14) before
     the tool it validates is drafted, so its entry's `seq` comes before the tool's first entry. The
     validation record cites both entries, and a test checks their order and that the hashes still
     match. What must match is stated per known result in data-model §7. Only the validation of tools
@@ -1065,8 +1113,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   reads the sequence in a stated order over (call type, round, food node), checks that within one
   call of Π no two constants are equal, equal up to a word rotation by k = 1…w − 1, complements of
   one another, or rotations of complements (R13), runs the symmetry checks of R13, and writes
-  `phycoweb/constants_v3.py`. The design document states whether the call types draw on
-  distinct constant streams (FR-023).
+  `phycoweb/constants_v3.py`. The design document states whether the call types draw on distinct
+  constant streams (FR-023); where they do, the script's checks run on each call type's stream, and
+  every kind of evidence whose result depends on the constants covers each call type's permutation
+  (R4, R13).
   - **The rule, fixed early** (**protocol**): the polynomial, seed, reading order and whether
     the call types draw on distinct streams are fixed by one stated rule before the first
     candidate is scored, and each candidate's instance of it before its first tool run,
@@ -1094,8 +1144,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     or if a table contains a listed sequence. Each listed constant set is read as one bit string,
     its words in published order and most significant bit first, and a match is a run of consecutive
     table words of at least 64 bits (16 words at w = 4, 8 at w = 8, 4 at w = 16 and 2 at w = 32)
-    equal to as many consecutive w-bit words of a listed string read from any multiple of w, also
-    after one word rotation or the complement applied to every word. The check covers every table
+    equal to as many consecutive w-bit words of a listed string read from any multiple of w, under
+    one of 2w transforms, each rotating every word of the run by the same k, k = 0…w − 1, with or
+    without the complement of every word (k = 0 without the complement is the plain match), so that
+    rotations of complements match, as in the relations of R13. The check covers every table
     the script writes, one per supported (n, w), and each call type's stream. Its record states the
     chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so a
     failure shows reuse rather than chance. An addition to the list is proposed by the agent and
@@ -1110,19 +1162,31 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     standard polynomials matter: a plain search in ascending order finds x⁶⁴ + x⁴ + x³ + x + 1 first
     (computed on 2026-11-01), which is CMAC's R₆₄, a MAC's constant that re-decided feature-002
     FR-007 forbids, and also the CRC-64 polynomial of ISO 3309.
-  - **Rotation amounts** come from a stated search over the possible amounts, ranked by the
-    trail bounds they give, with ties to the smallest amounts in a stated order. The search runs at
-    the D4 width (R6): first at 16, the width R6 tries first, and again at 8, with the same recorded
-    space of amounts, ranking measure, rounds and tie order, as a new log entry, if R6's rule fixes
-    the D4 width at 8, so that the scores at 8 use the amounts found at 8. The scaling rule to every
-    other width is stated before it, and every scaled amount lies in 1 to w − 1 (R14). Its searches
-    are trail searches on the candidate and count against its 48 h row, each instance capped at 8 h
-    (R7). A point whose search reaches its cap has no bound and ranks below every point with both
-    bounds, in the stated tie order among such points, and the full ranking records each point's
-    bounds or `inconclusive`. If no point has both bounds at the search width, the candidate has no
-    amounts there, so it is not scored at that width (R6). Before the search runs, the candidate's
-    log entry records its space of amounts, ranking measure, rounds, width and tie order. The full
-    ranking is a committed record, and the amounts chosen are its first entry.
+  - **Rotation amounts** come from a stated search over the possible amounts, ranked by the trail
+    bounds they give. Amounts equal at every node fail the symmetry check (R13), so each candidate
+    states K ≥ 2 sets of amounts and a placement rule from n whose placement has no symmetry of the
+    torus that moves a node at any claimable size, such as one set at (0,0), (0,1) and (1,2) and
+    another elsewhere (R13); a point of the search is an assignment of amounts to the K sets. The
+    ranking is one rule for every candidate (**protocol**), recorded as a `settled` entry of the
+    protocol change log before the first rotation search (data-model §18): the measure is the D4
+    score's own, min(W_D, W_L) at the search width (R6), at one number of rounds for every
+    candidate, fixed in that entry; ties go to the smallest amounts in the order that entry states;
+    and an assignment ranks by its weakest box where the K sets make distinct boxes (R12). The space
+    of amounts, K and the placement rule stay per candidate, recorded in its log entry with the
+    width before its search. The search runs at the D4 width (R6): first at 16, the width R6 tries
+    first, and again at 8, with the same recorded space, K and placement rule, under the same rule,
+    as a new log entry, if R6's rule fixes the D4 width at 8, so that the scores at 8 use the
+    amounts found at 8. The scaling rule to every other width is stated before it, and every scaled
+    amount lies in 1 to w − 1 (R14). Its searches are trail searches on the candidate and count
+    against its 48 h row, each instance capped at 8 h (R7); a space whose projection, with the row's
+    other runs, does not fit the 48 h row is refused by the Budget guard (cli contract), so the
+    search is inconclusive and the candidate `ineligible`, and a smaller space makes a new candidate
+    within the stop rule. A point whose search reaches its cap has no bound and ranks below every
+    point with both bounds, in the stated tie order among such points, and the full ranking records
+    each point's bounds or `inconclusive`. If no point has both bounds at the search width, the
+    candidate has no amounts there, so it is not scored at that width (R6). The amounts never change
+    after a point's bound is seen. The full ranking is a committed record, and the amounts chosen
+    are its first entry.
   - **Tables per size.** The frozen `phycoweb/constants_v3.py` holds one table per supported
     (n, w), and the script also writes each as JSON beside the vectors,
     `vectors/phyco-v3/constants_n<n>_w<w>.json`, frozen with them (data-model §11, §13).
@@ -1409,7 +1473,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     table row, every rule matches whole words, ignoring case, with FR-069's inflections, and every
     flagged line, a rule's own line included, passes only through an allow-list entry with its
     reason (data-model §15). A test runs every rule and every standing phrase on sample sentences
-    that must and must not be flagged, the mapping chapter's rule among them.
+    that must and must not be flagged, the mapping chapter's rule among them, with FR-030's list and
+    the words it gives for the arguments FR-030 forbids; the chapter is the design document's
+    section headed "Slime-mould mapping", up to the next heading of the same level, and the test
+    exits 1 if the heading is missing or appears twice.
 - **Rationale**: these are the spec's named fixes (checklist groups E and F). Markers keep one
   file correct for both environments.
 - **Alternatives**: two requirements files (more drift).

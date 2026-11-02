@@ -257,10 +257,16 @@ decision and no replacement is pending, and exits 2 otherwise. `--select` exits 
 and after a D4 tie until the spec's "D4 tie" row reads Approved at HEAD with the SHA-256 of
 `d4/tie-choice.json` (Approvals, above); it applies eligibility, the fallback to the other family
 and the stop rule; exit 1 if the outcome is a stop. Eligibility is decided for every candidate from
-its own records (data model §9): FR-026's figures from its `cost` record per size, written by
-`research/004/tools/costmodel.py` from the operation list, P and R; FR-027's semantics from the
-operation list's declarations; FR-030's mapping from its `mapping` log entry. A missing item fails
-eligibility. After a decline at the owner design review that ends in a further candidate, `--select`
+its own records (data model §9): FR-018's folding rule, longest link, food nodes and tree figures
+from the operation list and its `parameters` entry; FR-020's cycles per call and FR-026's figures
+from its `cost` records per size, written by `research/004/tools/costmodel.py` from the operation
+list, P and R; FR-022's bounds from its bound records; FR-023's statement on the streams and
+FR-024's ranking report from its log entries; FR-025's stages, chains per phase and key path from
+the operation list's declarations, checked by code; FR-027's semantics from the
+operation list's declarations; FR-030's mapping from its `mapping` log entry.
+FR-025's interface formats, call sequence and zeroization rules are the mode's,
+decided once in the mode chapter. A missing item fails eligibility. After a
+decline at the owner design review that ends in a further candidate, `--select`
 runs again over the whole set, the declined candidate included, and writes `selection-2.json`,
 citing `selection.json`; if it selects the declined candidate again, the outcome is a stop, exit 1.
 The decline reopens the set once, for one further candidate, and `--close` writes a second
