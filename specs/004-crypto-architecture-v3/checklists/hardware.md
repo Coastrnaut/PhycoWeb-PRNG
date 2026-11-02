@@ -515,6 +515,26 @@ and an item is ticked only under the rule in the Notes below.
   "FUT-GRID-1"; research R14, R15; data-model §13; model contract "Variant IDs"; cli contract
   "Generators of constants and vectors"]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK074 Do the reset figure, the self-test's zeroization and the plan's Complexity Tracking row
+  on the chains name the rate lanes' nonce path as FR-025 and FR-059 now give it, given that FR-059
+  feeds "the nonce's words for rate lanes through the absorption tree's input in the same way, with
+  their cycles in the reset figure", filling the nonce register at each rate lane that holds nonce
+  bits, while FR-025's reset figure counts "the self-test's key and nonce words fed through the
+  chains", FR-025's Zeroization and FR-059 say that the zeroization after the self-test clears what
+  it computed, "both chains included", naming neither the nonce registers nor the absorption tree,
+  which the Zeroization list clears, and the plan's row says that "the nonce chain's length and the
+  one-cycle copy into the lanes enter the instantiate figure", where FR-025 has "the nonce chain's
+  length, the nonce registers' transfer and the copy"? Are the three passages aligned, so that the
+  reset and instantiate figures count the same transfers and the zeroization after the self-test is
+  stated to clear every register the self-test filled? [Consistency, Spec §FR-025 "Key loading and
+  reset", "Zeroization", §FR-059; plan "Complexity Tracking"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
