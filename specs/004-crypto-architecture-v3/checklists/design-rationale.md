@@ -465,6 +465,54 @@ and an item is ticked only under the rule in the Notes below.
   whether a rotation of a complement matches? [Consistency, Spec §Re-decided feature-002
   requirements "FR-007", §FR-023; research R15]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK068 Is the security-target chapter's mark "draft, under review" consistent with FR-034's
+  rule that the design document's approval status is kept outside the frozen file, in the
+  provenance log, given that FR-012 and plan phase 4 mark the chapter so "until the
+  security-target review of phase 8", while the header rule keeps a status out of the header only?
+  Is it stated where in `design.md` the mark stands, who removes it and when, and whether its
+  removal is a committed change that makes the next 0.<k>, so that the version the security-target
+  review approved, with the mark, would not be the version `design_freeze.py create` freezes, which
+  the review's row must have reviewed by path and SHA-256? [Conflict, Spec §FR-012, §FR-034
+  "Version", §Review & Approval "Security-target review"; plan phase 4; cli contract
+  `design_freeze.py create`]
+- [ ] CHK069 Are the design document's chapters listed, each with its heading and what it holds,
+  given that the reviews, the guards and the claim test refer to "the security-target chapter"
+  (chapter 1 in the plan), "the mode chapter", which holds the padding constants and the domain
+  separators (FR-034 "Constants"), "the design document's section on key loading", which the
+  security-target review accepts (data-model §15), and the mapping chapter, while only the mapping
+  chapter has a fixed heading ("Slime-mould mapping", FR-030)? Is it stated which chapters each
+  review covers, the security-target review's row naming only "the design document's
+  security-target chapter", so that a reviewer and a test can find what was reviewed? [Gap,
+  Clarity, Spec §FR-012, §FR-030, §FR-034, §Review & Approval "Security-target review";
+  data-model §15; plan Summary item 2, phase 4]
+- [ ] CHK070 Does FR-034's component list cover the hardware structures that FR-025 and FR-059 add
+  for every candidate beside those it names: the key register at each node that holds key bits,
+  where the held key is kept between instantiates, apart from the key shift chain that loads it
+  ("the key-loading buffer (the key chain's registers)" and "the held key and its copies" are
+  listed apart under "Zeroization"); the one-block output buffer, which zeroization clears; the
+  controller of the call-state table with its error-code register; and the self-test's selector
+  at each chain's input, its r-bit comparator and its stored key, nonce and expected output? Is
+  each given its role and reason, the key registers also the attack class they meet as a path that
+  carries secret data (no read-back, zeroization), or stated as outside the rationale, with the
+  design document's justification cited instead? [Completeness, Spec §FR-034 "Components",
+  §FR-025 "Key loading and reset", "Flow control", "Zeroization", §FR-059]
+- [ ] CHK071 Is the place of FR-030's replacement rows stated: for each failed `phyco-v2`
+  mechanism, the rule of Π that replaces it and the evidence record, or the section and test, that
+  shows the failure does not recur, which FR-030 asks "the design document" to give beside "the
+  slime-mould mapping of every component"? If the rows stand in the mapping chapter, they are
+  statements on evidence, such as S11's trail-bound records, while the chapter "contains no
+  security statement, and none cites it", restates "each component's place in the metaphor only",
+  and its word rule flags "resist", "strength", "diffusion" and "battery" there; if they stand
+  elsewhere, for example in the rationale's attack classes or in a section of their own that
+  FR-051's lessons table also cites, is that section named? [Ambiguity, Conflict, Spec §FR-030,
+  §FR-034, §FR-051, §FR-069; data-model §15]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
