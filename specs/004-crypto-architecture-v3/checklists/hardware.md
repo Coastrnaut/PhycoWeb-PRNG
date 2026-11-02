@@ -535,6 +535,66 @@ and an item is ticked only under the rule in the Notes below.
   stated to clear every register the self-test filled? [Consistency, Spec §FR-025 "Key loading and
   reset", "Zeroization", §FR-059; plan "Complexity Tracking"]
 
+## Sixth re-run (2026-11-02)
+
+Items found when the checklist was run a seventh time, over the complete documents and the
+repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK075 Does the instantiate figure hold the cycles it is said to include? FR-025 runs it "from
+  the last nonce or personalization word accepted to instantiate done, its forget call complete and
+  the core `instantiated` and ready for a command", and has "the nonce chain's length, the nonce
+  registers' transfer and the copy" enter it, while FR-013 has the personalization string "absorbed
+  over the rate only" into the state that the copy sets. With a string that is not empty, the
+  nonce's transfer, the chain's shift, the copy and the calls of Π between the string's blocks all
+  come before the string's last word, outside the figure. Is the order of the nonce's words, the
+  string's length word and the string's words on the absorption interface stated, which no passage
+  does; is the length word of the empty string, which the mode vectors use (`pers=empty`), a
+  "personalization word"; and is the figure restated so that every cycle the text names falls
+  inside the figure that counts it, for example as one figure from the nonce's last word to the copy
+  done beside one from the string's last word to the core ready, with the cycles between them in
+  FR-020's instantiate formula? [Consistency, Clarity, Spec §FR-025 "Key loading and reset", "Flow
+  control", §FR-013, §FR-014, §FR-020; data-model §11]
+- [ ] CHK076 Does the call-state table cover the stretches in which an accepted call waits for the
+  host's words on an input interface: an instantiate between its command word and the nonce's last
+  word, and after the copy while a personalization string's words arrive; a reseed while its
+  input's words arrive; and a key load between its command word and its first key word, before
+  `loading` begins, while `no-key` "accepts a key load only"? Since "a pause by the host on any
+  interface is excluded" from the counts, a pause may last as long as the host likes, and once the
+  copy has set the lanes, or blocks of an input have been absorbed, the core holds key-dependent
+  state in a call that has not finished. Is it stated which commands the command interface accepts
+  in each such stretch, zeroize among them, as it is accepted "While a block waits in the buffer"
+  and in `loading`; whether every other command is held off with ready low or refused with its
+  code; and which state a zeroize from such a stretch leaves? [Gap, Edge Case, Spec §FR-025 "Call
+  sequence", "Flow control", "Zeroization", §FR-020]
+- [ ] CHK077 Is the self-test's generate request stated, with its length, and is its expected output
+  one the frozen vectors hold? FR-059 runs "a generate long enough that every node, every lane,
+  every constant ROM entry of the calls run, both trees and the counters take part", with no length,
+  and its comparator "takes each whole r-bit block as the output buffer receives it" and "compares
+  it with the matching block of the expected output, stated per claimable size from the frozen
+  vectors", while the mode vectors hold requests of 1, 7, 64 and 1,000 words with a forget after
+  each (research R8), so that at every claimable size each request keeps only part of its last
+  block, and the first keeps 32 of r bits. Is the self-test's request schedule stated, for example
+  the vectors' first requests with the comparator limited to the words kept, or whole blocks whose
+  expected output the vector script writes with the vectors; where do the input and the expected
+  output of "a reseed if the design has one" come from, given that the vectors hold no reseed and
+  that FR-059 names no generate after it; and is the empty personalization string's length word fed
+  "as the host would"? FR-020's formula for the self-test, the reset figure and FR-026's count of
+  the expected output's storage depend on the answer. [Gap, Consistency, Spec §FR-059, §FR-020,
+  §FR-026, §FR-036; research R8; data-model §11]
+- [ ] CHK078 Is the error output's lifetime stated: how long the error signal and its code stay
+  valid after a refusal (one cycle, until the next command is accepted, or until reset), what a
+  second refusal does to a code the host has not read, and whether the error-code register is kept
+  through the zeroization that a zeroizing refusal starts? FR-025 gives "a registered error-code
+  output beside the error signal and valid with it", so that "the host can tell from the ports which
+  refusals zeroized", while "Every trigger drives the reset's registered fan-out tree, so a
+  zeroization reaches every register within the reset's latency", the zeroization list neither
+  names nor excepts the error-code register, and the error output, unlike the four interfaces, of
+  which each "uses valid and ready", has no ready from the host. Does a zeroizing refusal's own
+  zeroization, through that tree, return the code to its value after reset, which the port list
+  gives? [Gap, Clarity, Spec §FR-025 "Zeroization", "Flow control", "Registers and read-back";
+  FUT-HW-5]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
