@@ -763,6 +763,138 @@ start open, and an item is ticked only under the rule in the Notes below.
   files it writes, so that the tasks can follow them? [Consistency, Spec §FR-058; plan "Phases and
   gates"; research R1, R18, R19; cli contract `owner_record.py`]
 
+## Seventh re-run (2026-11-02)
+
+Items found when the checklist was run an eighth time, over the complete documents and the
+repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK082 Can plan phase 1 run in its stated order under the guard "Environment"?
+  `protocol/evidence.py` "checks at start the running environment against the platform's environment
+  record in force" and "also exits 2 unless the record in force has its Review & Approval row,
+  "Environment record <n>", Approved at HEAD with its SHA-256", `scripts/recheck_004.py` "alone"
+  being exempt; while step (5) writes the downloads manifest's `approved` entries with
+  `scripts/downloads.py init` and step (6) records each wheel `fetched`, both through that module,
+  before step (7) writes "the environment records of both platforms", fixed-name files that the same
+  module keeps, the first of them while no record is in force, as FR-058 has them written only "once
+  the wheels are installed and the pins take effect". Is it stated which of these writes the guard
+  admits before the first record is in force and approved, on what condition (for example the
+  running environment checked against research R1 and the pins of `requirements.txt` directly), and
+  what, if anything, the manifest's early entries and the first records name as their environment,
+  so that the tasks can follow the order and every file still names the environment that wrote it?
+  [Conflict, Gap, Spec §FR-058; plan "Phases and gates" phase 1; research R1, R19; data-model
+  introduction, §1 `environment`; cli contract "Environment", `downloads.py`, `owner_record.py`]
+- [ ] CHK083 Is it stated which SHA-256 names an environment record and an `owner-provided` entry,
+  and over which bytes? `owner_record.py` "prints the SHA-256 of what it writes, taken over its
+  canonical JSON without the approval fields", the Review & Approval row names "that SHA-256", and
+  the environment guard accepts a record in force "only while its row reads Approved at HEAD with
+  that SHA-256", while every record's `environment` field holds the "path and SHA-256 of the
+  platform's environment record in force", "Every SHA-256 a record holds is recorded beside its
+  kind, `raw` or `lf-normalized`", a fixed-name file's earlier content is kept as
+  `<dir>/versions/<sha256>.json` with `previous_sha256` in the new content, and "canonical JSON",
+  used for this hash, for a `record_id`'s eight digits and for `draft_sha256`, is not defined beside
+  the format rules' "two-space indentation in a `.json` file and one object per line in a `.jsonl`
+  log". Is it stated whether the `environment` field, the versions' names and `previous_sha256` hold
+  the file's raw SHA-256 or the one without the approval fields, with a kind for the latter, and
+  which bytes "canonical JSON" is (indentation, separators, final newline), so that the guard, the
+  re-check and a later reader resolve the same record from either hash? [Clarity, Consistency, Spec
+  §Review & Approval notes; data-model introduction "Format rules", §1 `record_id`, `environment`,
+  "Hashes", §13; research R1, R16; cli contract "Environment", `owner_record.py`]
+- [ ] CHK084 Is `status` among the approval fields that `draft_sha256` leaves out? `create` stores
+  `draft_sha256`, "the SHA-256 of the record's canonical JSON without that field and the approval
+  fields", with `status` `draft`; `approve` "changes `status` from `draft` to `approved`, adds
+  `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
+  else"; and `validate` "recomputes `draft_sha256`" and "exits 1 if anything but the approval fields
+  changed". No passage lists the approval fields, and if `status` is not one of them, the hash
+  recomputed over `approved` differs from the one stored over `draft`, so that step (5) cannot exit
+  0 once the owner has approved. Is the list stated, with `status` in it, or `validate` stated to
+  recompute with `status` set back to `draft`, so that the approved record can be checked again by
+  every later run? [Clarity, Measurability, Spec §FR-043; data-model §13; research R16 "The design
+  freeze"; cli contract `design_freeze.py`]
+- [ ] CHK085 Is it stated which fields the files without a kind hold, which module and script write
+  them, and whether those scripts reproduce them? Data-model §1 gives "every evidence record" the
+  common fields and lists the kinds, with no kind for an environment record, `downloads.json`,
+  `freeze/freeze.json` or `review-package/MANIFEST.json`, while "Every record is written through
+  `protocol/evidence.py`" and the freeze record changes "through the freeze code of
+  `protocol/design_freeze.py`"; research R16 gives "Every script that writes evidence or generated
+  files" a mode `--reproduce RECORD`, while `downloads.py`, `owner_record.py` and `design_freeze.py`
+  have none and state no reason, as `provenance.py` and `protocol_change.py` state theirs ("writes
+  log entries and no record"); and no script, in the cli contract or the plan's tree, writes the
+  review package's manifest. Is each file's field set stated (the common fields, those of its own
+  section, or both), the module and the script that write it, and each such script given
+  `--reproduce` or left out with its reason, so that every file a record or the freeze cites can be
+  traced to the command and the code that wrote it? [Gap, Consistency, Spec §FR-061, §FR-063;
+  data-model introduction, §1 `kind`, §13, §16; research R1, R16, R19; cli contract introduction,
+  `downloads.py`, `owner_record.py`, `design_freeze.py`; plan "Project Structure"]
+- [ ] CHK086 Is it stated what shows that step (3) of the generators' order has passed, on each
+  platform? The order runs "four steps, each generator's `--check` passing in this order", step (3)
+  being "`Generator` imports `phycoweb.selftest_v3` and runs the self-test from it", which is no
+  generator, has no `--check` and writes no record, while step (4) runs "once step (3)'s self-test
+  has passed" and SC-009's evidence is "each generator's pair of check records, one per platform".
+  Is the gate stated, for example a named test of `tests/test_model_v3.py` or a record that
+  `gen_constructed_v3.py` and its `--check` require on the platform where they run, or is the
+  dependency dropped, given that step (4) runs Π, Π⁻¹ and the mode "through `pi`, `pi_inv` and
+  `ResearchDuplex` only", which import without `selftest_v3`? [Gap, Measurability, Spec §FR-036,
+  §SC-009; data-model §11 "Order of generation"; cli contract "Generators of constants and vectors";
+  model contract "Module rules"]
+- [ ] CHK087 Are `ResearchDuplex.from_state`'s arguments and the state it starts in stated, and does
+  a constructed-state vector hold them? The model contract has it start "the mode from a chosen
+  state and chosen counter values, each within its range", and data-model §11 has
+  `constructed_<variant>.json` hold, per edge state, "name, construction", whether the normal calls
+  reach it or it is covered only from a chosen state, and "inputs, outputs", while no passage says
+  which counters `counters` names and in what form (the design document's counters by name, those
+  held as 32-bit words with the carry rule included), which calls the object then accepts
+  (`generate` and `reseed`, as after `instantiate`, or `instantiate` first, which would set the
+  lanes again), or what "construction" holds and in which format, although FR-036's generated files
+  follow "a fully specified text format" and FR-054's vectors run on the RTL "loaded by the
+  testbench". Is each stated, so that `gen_constructed_v3.py --check` and a later implementation
+  regenerate each vector byte for byte and start from the state it names? [Gap, Clarity, Spec
+  §FR-036, §FR-054; model contract "Research duplex", "Other limits"; data-model introduction
+  "Format rules", §11]
+- [ ] CHK088 Is a heading defined for the bounds of a provenance entry's section? A section's text
+  "runs from its heading line, included, to the line before the next heading of the same or a higher
+  level, or to the file's end", and `section` "names its heading as it stands", while no passage
+  says what counts as a heading, and the files the entries cover hold heading-like lines inside
+  fenced code: security.md, which FR-051 changes, holds in §16.4 a fenced block with the line
+  `# Cryptanalysis — Instructions` and five lines that begin `## `, and data-model §11's example
+  header line begins `# model=phyco-v3`. Is a heading defined, for example an ATX heading outside
+  fenced code blocks as CommonMark reads it, and is a heading text that occurs twice in one file
+  named so that `section` stays unique, so that the writer, `provenance.py`'s check and a later
+  reader take the same bytes? [Clarity, Spec §FR-051, §FR-067; data-model §14; research R16; cli
+  contract `provenance.py`]
+- [ ] CHK089 Do the provenance log's first entries cover every file that this feature's AI sessions
+  drafted or repaired before the log? FR-067 puts in scope "Files drafted or repaired before the log
+  exists, the planning documents, the checklists and checklist-choices.md among them, and the files
+  of plan phase 1 written before it", data-model §14 lists the spec, the plan, research, the data
+  model, the contracts, the quickstart, the checklists and checklist-choices.md, and each entry
+  holds `drafted_from` and `drafted_to`, "the dates of the first and last commits that changed the
+  file", while `research/004/place_check.py`, committed for the tasks approval, the constitution,
+  amended to 1.3.0 during planning, and security.md, whose versions 2.10 and 2.11 this feature's
+  sessions wrote, are named nowhere, and security.md's first commit predates this feature, so that
+  its `drafted_from` would date another feature's work. Is it stated whether each such file is in
+  scope, recorded whole or per section changed, as a file drafted in parts is, and with dates from
+  this feature's commits only? [Gap, Coverage, Spec §FR-067, §FR-051; data-model §14; plan "Phases
+  and gates" phase 1; cli contract `provenance.py`]
+- [ ] CHK090 Does the plan's tree show every directory the records write? Data-model §1 has the
+  first record that cites a design-document version store "that document as
+  `design-versions/<sha256>.md`, committed with the records, as spec versions are", while the plan's
+  tree under `reports/004-crypto-architecture-v3/` lists `spec-versions/` and `research-versions/`
+  and no `design-versions/`, after CHK069 asked for the tree to be completed. Is the directory added
+  there, so that every place a record writes is in the tree the tasks follow? [Consistency,
+  data-model §1 `design_version`; research R16 "Spec and research versions"; plan "Project
+  Structure"]
+- [ ] CHK091 Does the freeze hash the modules that the frozen scripts import? Data-model §13 hashes
+  "the scripts that compute verdicts", `protocol/devinputs_v3.py` and `protocol/evidence.py` among
+  them, so that "the re-check (FR-065) runs the code that produced the verdicts", while the plan's
+  tree adds `protocol/candidates.py`, the candidate log's module, from whose entries `round_rule.py`
+  takes FR-023's statement on the streams, FR-024's report and FR-030's mapping and to which it
+  writes `set-closed`, and the freeze hashes no such module, though the re-check runs "HEAD's"
+  verdict functions under the current rules. Is every module that a frozen script imports among the
+  frozen files, or the reason for leaving it out stated, so that a change after the freeze to code
+  on the path of a verdict cannot pass with every frozen hash still matching? [Coverage,
+  Consistency, Spec §FR-043, §FR-065; data-model §13; research R16; plan "Project Structure"; cli
+  contract `round_rule.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
