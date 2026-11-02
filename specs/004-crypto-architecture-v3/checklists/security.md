@@ -440,6 +440,26 @@ and an item is ticked only under the rule in the Notes below.
   exit 2 when writing over a frozen file? [Consistency, Spec §FR-043; data-model introduction, §10,
   §13; cli contract `mode_limits_v3.py`, "Generators of constants and vectors"]
 
+## Fifth re-run (2026-11-02)
+
+Items found when the checklist was run a sixth time, over the complete documents and the repository,
+after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK074 Is the "L1 recorded" row tied to the review rows it rests on, given that a review held
+  again is a numbered row of its own, "FUT-SEC-8 result review <k>" or "Security-target review <k>",
+  held after a decline, for the changed parts after an approval, or for another candidate that a
+  later selection record selects ("this review and every later one are held again for it"), while
+  "L1 recorded" is one unnumbered row that the owner sets "once both reviews read Approved", naming
+  neither those rows nor the demonstration record, the chapter's version and the selection record
+  they reviewed, and `check_claims.py` reads only that row? Is it stated what becomes of a recorded
+  L1 when either review is held again, for example that the row names both review rows by family and
+  k and lapses when a later row of either family is added, with a numbered "L1 recorded <k>" after
+  them, so that the register cannot keep `phyco-v3` at L1 on a security target reviewed for another
+  candidate or on a superseded chapter or demonstration report? [Gap, Consistency, Spec §FR-012,
+  §Review & Approval "Security-target review", "L1 recorded" and the notes under the table;
+  data-model §15, §17; cli contract "Approvals", `check_claims.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy
