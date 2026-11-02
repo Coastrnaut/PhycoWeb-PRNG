@@ -372,6 +372,77 @@ start open, and an item is ticked only under the rule in the Notes below.
   candidate? [Consistency, Spec §FR-024, §Pre-registered Design Protocol "Nonlinearity choice rule",
   "Stop rule"; research R6, R7, R15; data-model §3 `parameters`]
 
+## Fourth re-run (2026-11-02)
+
+Items found when the checklist was run a fifth time, over the complete documents and the repository,
+after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
+and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK060 Does FR-034's component list cover every part of `phyco-v3` that the plan's Complexity
+  Tracking justifies as an exception to Principle III, given that it names the absorption and output
+  trees but not the key shift chain, the nonce chain beside it, the selector at every lane, the
+  start signal with its call type, the reset tree that every zeroization trigger drives, or the
+  replicated round and phase counters with the constant ROMs they index (FR-013, FR-025; research
+  R15), each with a functional need or an attack class to state, such as zeroization or a path that
+  carries secret data? Is each named in the list, or the hardware structure stated as outside the
+  rationale, with the design document's justification cited instead? [Completeness, Spec §FR-034
+  "Components", §FR-013, §FR-025; plan Complexity Tracking; research R15]
+- [ ] CHK061 Is the design document's version defined: its form (feature 002's `design.md` carries
+  "1.0" in its header), where it is stated so that `protocol/evidence.py` can write each record's
+  `design_version` (FR-061), which changes make a new version (FR-028's "a change" before the
+  freeze, FR-043's change after the owner design review, a revision after a decline), which log
+  entry records each, whether `rationale.md` takes the same version, and how earlier versions are
+  kept for a review "repeated for the changed parts"? Is the header's content limited so that no
+  approval or review status enters a frozen file, as feature 002's header "Status: awaiting owner
+  design review" did, and is that checked at the freeze or by a test? [Clarity, Measurability, Spec
+  §FR-028, §FR-034, §FR-043, §FR-061; data-model §1 `design_version`, §13; feature-002 O5]
+- [ ] CHK062 Is it stated how the owner design review "updates" the review status of an AI-drafted
+  section of the rationale, given that FR-064 and data-model §14 keep that status in the provenance
+  log, whose lines are hash-chained and only appended, so that no entry can change, and that §14
+  also says "one line per file" while each section has its own entry? Is an update a new entry for
+  the same `path` and `section`, naming the `seq` of the entry it follows and the SHA-256 of the
+  section text reviewed, with the latest entry taken as the status, and are the values of
+  `review_status` listed? Is the same stated for an evidence record's `reviewer`, which "stays
+  `pending` until a review is recorded" in a record that is never overwritten? [Conflict, Spec
+  §FR-034, §FR-064, §FR-067; data-model introduction, §1, §14]
+- [ ] CHK063 Is the condition under which the owner's D4 choice is needed stated the same way
+  everywhere, given that an exact tie goes first to the smaller R at 4×4, then to fewer serial carry
+  chains per round, and only then to the owner's recorded choice, while the Review & Approval row
+  "D4 tie" applies "only if the nonlinearity choice rule ends in an exact tie" and reads "Not
+  needed" only "if the rule decides without a tie", and `round_rule.py --select` exits 2 "after a D4
+  tie until the spec's 'D4 tie' row reads Approved at HEAD with the SHA-256 of
+  `d4/tie-choice.json`", a file that exists only when the tie-breaks reach the owner's choice? Is it
+  stated what the row reads and what `--select` accepts when `d4/tie.json` decides the tie by R or
+  by the carry chains, so that selection is not held for a choice that is never made? [Conflict,
+  Spec §Pre-registered Design Protocol "Nonlinearity choice rule", §Review & Approval "D4 tie";
+  data-model §8; cli contract `d4_choice.py`, `round_rule.py`]
+- [ ] CHK064 Does the spec's selection sentence cover every outcome of the D4 record, given that it
+  selects "of the eligible candidates of the chosen family, or of the other family if the chosen one
+  has none", while the record's `outcome` may be `not computable`, with no chosen family, where
+  data-model §9 and research R6 select from both families, and the spec names that case only in the
+  D4 rule ("both families are analysed") and in FR-043's decline, and the cli contract's `--select`
+  applies only "the fallback to the other family"? [Consistency, Spec §Pre-registered Design
+  Protocol "Eligibility and selection", "Nonlinearity choice rule", §FR-043; data-model §8, §9;
+  research R6; cli contract `round_rule.py`]
+- [ ] CHK065 Is "the budget allows", the condition under which a replacement candidate is entered,
+  defined, and with it "the budget spent", the stated reason that closes a `replacement` entry,
+  given that research R7 gives each of the six candidates its own rows of 66 h, so that a family
+  with fewer than three evaluated candidates always has rows for a further one unless a budget has
+  been lowered, and that no other budget that a candidate's entry spends is named? Is it stated
+  which row, with how many hours left, makes a replacement impossible, and how the log writer checks
+  that reason when it closes the entry? [Clarity, Spec §Edge Cases, §Pre-registered Design Protocol
+  "Eligibility and selection", "Stop rule"; data-model §3; research R7]
+- [ ] CHK066 Does FR-034's Alternatives chapter cite every record that decided the outcome, given
+  that it names "the D4 record and the selection record" while a re-selection writes
+  `selection-<k>.json` beside `selection.json`, each citing the one before, a tie writes
+  `d4/tie.json` or the selection record with the owner's choice beside it (`d4/tie-choice.json`,
+  `freeze/selection-tie-choice.json` or `freeze/selection-<k>-tie-choice.json`), and a decline
+  writes its log entry with what the rules need to select the further candidate? Is the chapter
+  required to cite each selection record, each tie record and choice, and each decline, by record ID
+  or by path and SHA-256, so that the reason given for every candidate not selected can be traced to
+  the record that decided it? [Completeness, Spec §FR-034 "Alternatives", §FR-043, §Pre-registered
+  Design Protocol "Nonlinearity choice rule", "Eligibility and selection"; data-model §8, §9]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
