@@ -1627,7 +1627,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   in the metaphor) and what it does not, in the fixed sentence below, answering security.md §8 both
   ways. For eligibility, every candidate's mapping is an entry of its own in the candidate log,
   written before its first score, naming each component's place in the metaphor and the attack
-  class, bound or need it serves. For the selected candidate, the mapping chapter restates each
+  class, bound or need it serves. The entry holds the candidate's own components, the five above,
+  its key path and any other it adds; the structures that every candidate shares, those of the mode
+  and the core (the output buffer, the call-state controller with its error-code register and the
+  `selftest_fail` latch, and the self-test's selectors, comparator and stored inputs) take their
+  roles from FR-025 and FR-059, which FR-034's component list cites for them in place of the
+  entry, and have no place in the metaphor, which the mapping chapter states
+  once, in a sentence of its own that uses none of the words its rule lists
+  (RAT-073). For the selected candidate, the mapping chapter restates each
   component's place in the metaphor only, so that it stays free of security statements, and the
   attack class, bound or need each component serves is stated in the rationale's component list
   (FR-034), which cites the `mapping` entry; the owner design review checks that the chapter and
@@ -1723,12 +1730,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
     "Mode" (the calls, the initial state, the theorem with each precondition and the feature that
     meets it, padding and domain separation with their constants and FR-014's proof, forget, the
     limits and counters, the interface formats, the call sequence and the zeroization rules that
-    FR-025 makes properties of the mode, and its section "Key loading", which the security-target
-    review accepts, data-model §15); "Permutation" (the operation list, the colour schedule, the
-    rotation amounts, the round constants and the variant table); "Hardware structure" (the rest of
+    FR-025 makes properties of the mode, and its sections "Key loading", which the security-target
+    review accepts, data-model §15, and "Diffusion through instantiation", FR-029's statement of the
+    calls of Π and the rounds between key loading and the first output with the margin
+    over R_f); "Permutation" (the operation list, the colour schedule, the
+    rotation amounts, the round constants and the variant table, with its sections
+    "Inverse", Π⁻¹ written out at Π's level of detail, FR-019, FR-027, and
+    "Network questions", the answers to security.md §8's eight questions,
+    which concern the grid and its update); "Hardware structure" (the rest of
     FR-025, FR-020's cycle formulas, FR-026's estimate and FR-059's self-test); "Replaced
-    mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each edge state of FR-054
-    stands in the chapter of what it concerns. The security-target review covers "Security target"
+    mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each edge state of
+    FR-054, and every other Phase 0 item of security.md §8, stands in the
+    chapter of what it concerns, and the chapters' test checks each named
+    section (RAT-074). The security-target review covers "Security target"
     and "Mode", with the security target's files (the notes under the Review & Approval table), and
     the owner design review every chapter, with the rationale, whose Alternatives chapter is its own
     (RAT-069).
@@ -1746,13 +1760,23 @@ freeze hashes and the baseline manifest; run the claim-register test.
     storage of its key, nonce and expected output), and every component the
     chosen candidate adds (RAT-070). Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's
-    `mapping` log entry records it, which the list cites; a component with none is labelled "kept
+    `mapping` log entry records it for the candidate's own components, which the list cites, and as
+    FR-025 and FR-059 state it for the structures that every candidate shares, those of the mode and
+    the core (the output buffer, the call-state controller with its error-code register and the
+    `selftest_fail` latch, and the self-test's selectors, comparator and stored inputs), which the
+    list cites for them in place of the entry (RAT-073); a component with none is labelled "kept
     for the mapping only", with its cost stated, or is removed, and the mapping chapter restates
-    only each component's place in the metaphor (FR-030). The hardware structures among them name
-    their functional need, and the paths that carry secret data, the key registers, which hold the
-    key between instantiates, the key chain and the selectors, also the attack class they meet (no
-    read-back, zeroization), fault attacks staying with feature 008, and the selectors also the risk
-    FR-008 states of one held on its constants (SEC-082), while the self-test's stored
+    only each component's place in the metaphor, stating once that the shared structures
+    have none (FR-030; RAT-073). The hardware structures among them name
+    their functional need, and the paths that carry secret data, every structure that holds one of
+    FR-008's assets, also the attack class they meet: the key registers, which hold the key between
+    instantiates, the key chain and the selectors (the key); the lanes and every pipeline register
+    (the capacity part and the whole state within a request); the output tree's registers and the
+    one-block output buffer (the state within a request and each output block before the caller
+    takes it); and the limit counters (their integrity); each meets no read-back and zeroization
+    (FR-025), the counters' integrity resting on FR-025's refusals at each limit, fault attacks on
+    any of them staying with feature 008, and the selectors also name the risk FR-008 states of one
+    held on its constants (SEC-082; RAT-076), while the self-test's stored
     key, nonce and expected output are development inputs of the frozen vectors and carry no secret;
     the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
     the key registers under the row on the key and nonce chains and the output buffer under the row
@@ -1762,8 +1786,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
     rotation amounts, padding constants and domain separators, the last two in the mode
     chapter.
   - **Attack classes.** The rationale takes each attack class of security.md §12.1 in turn and
-    names the design feature meant to resist it, or marks the class open for feature 005 with
-    its reason. It names a resisting feature, never "open", for the classes this feature's
+    names the design feature meant to resist it, or marks the class open for feature 005 with its
+    reason, or, for a class or the part of one that another feature takes up, "deferred to feature
+    <n>", citing the requirement that defers it and the risk it states: "Side-channel and fault"
+    names FR-020's fixed operations as the feature that meets its timing part (T4, FR-008) and is
+    marked "deferred to feature 008 (FR-008)" for power, electromagnetic and fault-injection attacks
+    and the behaviour on reset and clock glitches, with FR-008's stated risk, and "open for feature
+    005" stays for a class whose analysis feature 005 takes up (RAT-075). It
+    names a resisting feature, never "open", for the classes this feature's
     evidence addresses: differential and linear (trail bounds), slide (round constants),
     invariant subspace (invariant checks, constants), rotational and rotational-XOR (symmetry
     checks, the rotational pairs of research R4), the inverse direction (R_b, Π⁻¹ in the bias
@@ -1776,7 +1806,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     cube of dimension d + 1 costs 2^(d + 1), less than 2¹²⁸; and the inside-out count, the largest
     r₁ + r₂ for which max(d_f(r₁), d_b(r₂)), the counts of r₁ rounds of Π and r₂ of Π⁻¹, is at most
     126, at a cost of 2^(max(d_f, d_b) + 1). Each such round count raises R_dist (round rule).
-  - **Network questions.** Each of the eight questions is answered for the duplex as designed,
+  - **Network questions.** The rationale cites the answers that the design
+    document's chapter "Permutation" gives in its section "Network questions"
+    (RAT-074): each of the eight questions is answered for the duplex as designed,
     and a question that does not fit gets the reason: for question 6, the output is the rate
     lanes themselves; for question 4, the cycle structure of Π takes the place of absorbing
     states, covered by the generic bound (research R13, choice R13.2).
@@ -2673,10 +2705,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   review is not independent cryptanalysis (security.md §14), and a security argument drafted by
   an AI tool is a draft for review, not evidence (security.md §2.1 and §16.3; vhdl-genai.md
   §2.5). The final report MUST record who took each role of security.md §16.2 in this feature,
-  and mark every role that was not staffed. Each AI-drafted section of the rationale is recorded in
+  and mark every role that was not staffed, computed from the provenance log's review entries, whose
+  `reviewer` names who reviewed (RAT-077). Each AI-drafted section of the rationale is recorded in
   the provenance log with its review status. A review is a new entry for the same path and section,
-  holding the `seq` of the entry it follows and the SHA-256 of the section text reviewed, and the
-  latest entry for that path and section gives the status, so that no entry changes; the frozen text
+  holding the `seq` of the entry it follows and the SHA-256 of the section text reviewed, with
+  `reviewer`, the role and name of who reviewed, the owner for the security-target review and the
+  owner design review and an outside reviewer by name where one took part, never an AI tool or
+  session, `row`, the Review & Approval row by name and k, and `reviewed_sha256`, the SHA-256 that
+  row names; the agent runs `provenance.py review` only on the owner's explicit word for that entry,
+  quoted with its date in it, as for a row's approval (RAT-077); and the latest entry for that path
+  and section gives the status, so that no entry changes; the frozen text
   carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the tool validations and
   re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
@@ -2724,7 +2762,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   entry, never a change to an entry or a record (FR-064; data-model §1, §14). Its one writer is
   `scripts/provenance.py` (`protocol/provenance.py`), whose `add` writes an entry and `review` a
   review, each under the log-append lock, and which refuses, exit 2, an entry with a field missing
-  or a `sha256` that is not that of the named file, section or record (cli contract). Files drafted
+  or a `sha256` that is not that of the named file, section or record, or a review entry whose `row`
+  does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
+  for `accepted` and Declined for `changes-requested`, or whose `reviewer`
+  names an AI tool or session (FR-064; RAT-077; cli contract). Files drafted
   or repaired before the log exists, the planning documents, the checklists and checklist-choices.md
   among them, and the files of plan phase 1 written before it, are in this requirement's scope:
   right after the log's creation, before any other entry, `provenance.py add` writes one entry per
@@ -2957,8 +2998,14 @@ family ends with no eligible candidate, once every candidate of the chosen famil
 decision (Eligibility and selection), in research R7's order, its rows reserved meanwhile; if the
 chosen family has an eligible candidate, each candidate of the other family not analysed there gets
 `ineligible`, with the reason "not analysed at the production width: D4 chose the other family",
-which the final report states. Where D4 is not computable both families are analysed, and an exact
-tie sends both representatives on (research R6). *Stricter means*: no change.
+which the final report states. Where D4 is not computable both families are analysed. An exact tie
+sends both representatives on (research R6): while it waits, the two alone are analysed at the
+production width, at 4×4 and only as far as R at 4×4 needs, and every other candidate of both
+families waits; once the tie-breaks choose, the chosen family goes on as after any D4 choice, and
+the losing representative stops, its records standing: it is its family's fallback with the family's
+other candidates, and at the set's close it takes `ineligible`, with the reason "D4 chose the other
+family by its tie-breaks", unless the chosen family ends with no eligible candidate, when its family
+is analysed as research R7 states (RAT-072). *Stricter means*: no change.
 
 **Tool validation.** A tool's result, positive or negative, counts only after its validation
 record exists (FR-039). *Stricter means*: known results and re-validation triggers are only
@@ -3008,9 +3055,10 @@ stated reason (the family full, the budget spent) closes it, records each case
 (data-model §3). The set closes at a `set-closed` entry of the candidate log, written by
 `round_rule.py --close` once every candidate has a final decision and no replacement is pending, and
 selection runs only after it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for
-an eligible candidate, its round-rule record at every claimable size; a candidate of the family
-D4 did not choose gets its final decision as the nonlinearity choice rule
-says. A decline at the owner design review reopens the set once, for one
+an eligible candidate, its round-rule record at every claimable size; a candidate of
+the family D4 did not choose, the representative that lost an exact D4 tie
+among them, gets its final decision as the nonlinearity choice rule says
+(RAT-072). A decline at the owner design review reopens the set once, for one
 further candidate that the rules can select (FR-043): it comes from the chosen family, or from the
 other family only where the declined candidate was selected by the fallback or D4 was not
 computable; it is entered only while its family has fewer than three evaluated candidates;

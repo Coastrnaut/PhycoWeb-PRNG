@@ -293,7 +293,7 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping: each component's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry (spec FR-030, FR-034). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, its key path and any other it adds: each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
@@ -308,8 +308,10 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
 - **Decisions.** `rejected` and `ineligible` are given only for the rules' reasons: a failed
   inverse or bijectivity test, a failed eligibility item (FR-018 to FR-031, FR-037, R_bound
   not established, inconclusive evidence), a spent budget, or, for a candidate of the family D4 did
-  not choose that was not analysed at the production width, "not analysed at the production width:
-  D4 chose the other family" (spec "Nonlinearity choice rule"). A candidate may be `withdrawn`
+  not choose that was not analysed at the production width, "not analysed at the
+  production width: D4 chose the other family", and, for the representative
+  that lost an exact D4 tie, "D4 chose the other family by its tie-breaks"
+  (spec "Nonlinearity choice rule"; RAT-072). A candidate may be `withdrawn`
   before its first tool run, for any recorded reason, and it still counts towards the stop
   rule. The log writer refuses any other decision. A raised R is never by itself a reason for a
   decision: the measurements it needs run as new measurements in their budget rows, and a row that
@@ -328,9 +330,10 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   entry, written by `round_rule.py --close` once every candidate has a final decision and no
   `replacement` entry is `pending`; `--select` exits 2 before it, and no candidate is entered after
   it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate,
-  its round-rule record at every claimable size (section 9); the other family's candidates, analysed
-  at the production width only if D4's chosen family ends with no eligible candidate, are otherwise
-  `ineligible` (Decisions, above).
+  its round-rule record at every claimable size (section 9); the other family's candidates, the
+  representative that lost an exact D4 tie among them, analysed at the production width, or further,
+  only if D4's chosen family ends with no eligible candidate, are otherwise `ineligible` (Decisions,
+  above; RAT-072).
 - **New candidate or variant.** A change makes a new candidate if it touches the operation
   list's structure: the nonlinear component, the round structure (its operations, their forms
   or order), the colour schedule, or the rule that generates the constants or the rotation
@@ -901,9 +904,15 @@ section's text runs from its heading line, included, to the line before the next
 or a higher level, or to the file's end, each line with its final LF, taken from those bytes, and
 `section` names its heading as it stands (REP-079). A review is a new entry for the same `path` and
 `section`, with `follows`, the `seq` of the entry it follows, and `sha256`,
-the SHA-256 of the section text reviewed, computed the same way, with its
-kind; the latest entry for a path and section gives its status, and no entry
-changes. A chapter of the design document under review carries no mark in the file: its status is
+the SHA-256 of the section text reviewed, computed the same way, with its kind, and with `reviewer`,
+the role and name of who reviewed, the owner for the security-target review and the owner design
+review and an outside reviewer by name where one took part, never an AI tool or session (spec
+FR-064); `row`, the Review & Approval row by name and k; `reviewed_sha256`, the SHA-256 that row
+names; and `owner_word`, the owner's explicit word for the entry, quoted with its date, on which
+alone the agent runs `provenance.py review`, as for a row's approval (RAT-077). The latest entry for
+a path and section gives its status, and no entry changes, and the final report's record of who took
+each role of security.md §16.2 is computed from the review entries (spec FR-064; RAT-077). A chapter
+of the design document under review carries no mark in the file: its status is
 its entries' `review_status`, `pending` from its drafting, with its Review & Approval row, and the
 security-target review adds a review entry for each chapter it covers, "Security target"
 and "Mode", naming its heading as `section`, so that the file the review
@@ -915,7 +924,10 @@ section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenanc
 entry and `review` for a review entry (cli contract), which refuses, exit 2, appending
 nothing, an entry with a field of its kind missing or a `sha256` or `sha256_kind` that is not that
 of the named file, the named section's text or the named record, each computed by the writer as
-above (REP-079). The entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
+above (REP-079), or a review entry whose `row` does not read at HEAD, with its `reviewed_sha256`,
+the decision the entry records, Approved for `accepted` and Declined for
+`changes-requested`, or whose `reviewer` names an AI tool or session (RAT-077). The
+entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
 its own, with its SHA-256, before the first entry of the tool it validates. Each tool's second known
 result (section 7) has an entry of its own before the tool's first validation, with its source: a

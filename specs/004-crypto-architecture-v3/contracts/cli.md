@@ -341,8 +341,11 @@ each bound kind at 16 and, where research R6 needs it, at 8: a bound record, the
 record of a capped search, or an `ineligible` or `rejected` log decision; the choice record lists
 each outcome, and no search is retried to reach a score. After an exact tie, `--tie` writes
 `tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible, with
-`decided_by` (`R at 4×4`, `carry chains`, `ineligible` or `owner`); before
-that, or if `tie.json` exists, it exits 2. `--choose`, run by the owner after `tie.json` exists,
+`decided_by` (`R at 4×4`, `carry chains`, `ineligible` or `owner`); before that, or if `tie.json`
+exists, it exits 2. While the tie waits, only the two representatives are analysed at the production
+width, at 4×4 and only as far as R at 4×4 needs, and every other candidate of both families waits;
+once `tie.json` decides, the losing representative stops, its records standing, as its family's
+fallback (research R6, R7; RAT-072). `--choose`, run by the owner after `tie.json` exists,
 prints `tie.json`'s SHA-256 and exits 2 unless standard input is an interactive terminal and the
 owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the choice, who, when,
 `seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash differs from
@@ -363,8 +366,11 @@ round_rule.py --reproduce RECORD       # a round-rule or selection record (intro
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record
 ID. `--close` writes the candidate log's `set-closed` entry once every candidate has a final
 decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule
-record at every claimable size) and no `replacement` entry of the log is `pending`
-(data model §3), and exits 2 otherwise. `--select` exits 2 before that entry,
+record at every claimable size) and no `replacement` entry of the log is `pending` (data model §3),
+and exits 2 otherwise. The representative that lost an exact D4 tie has its final decision as the
+other family's candidates have theirs: `ineligible`, with the reason "D4 chose the other family by
+its tie-breaks", unless the chosen family ends with no eligible candidate, when its family is
+analysed as research R7 states (RAT-072). `--select` exits 2 before the `set-closed` entry,
 and after a D4 tie until the spec's "D4 tie" row reads, at HEAD (Approvals, above), Approved with
 the SHA-256 of `d4/tie-choice.json` where `d4/tie.json`'s `decided_by` is `owner`, or "Not needed",
 naming the tie record and its tie-break, where a tie-break decided it, the family then taken
@@ -717,7 +723,12 @@ record's ID and SHA-256. Each computes the `sha256` and `sha256_kind` of the nam
 record as data model §14 states, over the file's bytes, LF-normalized for an existing `text=auto`
 file and raw otherwise, a section from its heading line to the line before the next heading of the
 same or a higher level, or to the file's end, and refuses, exit 2, appending nothing, an entry with
-a field of its kind missing or a `sha256` or kind that differs (REP-079). Right after
+a field of its kind missing or a `sha256` or kind that differs (REP-079), or a review entry whose
+`row` does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
+for `accepted` and Declined for `changes-requested`, or whose `reviewer` names an AI tool or
+session; a review entry holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
+runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
+row's approval (spec FR-064, FR-067; data model §14; RAT-077). Right after
 the log's creation, before any other entry, `add` writes one entry per file
 drafted before the log, with `drafted_from`, `drafted_to` and the other fields
 data model §14 lists for such an entry (spec FR-067; REP-080). Every append

@@ -610,11 +610,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     W = min(W_D, W_L), decided exactly as W_A·L_B > W_B·L_A, since 2^(−W) is irrational for a W that
     is not an integer.
   - **Exact tie.** The spec's first tie-break, the smaller R, needs R_bound at the production
-    width, which does not exist yet at the moment of the choice. The choice then waits: both
-    representatives go on to the production-width analysis within their own budgets, and
+    width, which does not exist yet at the moment of the choice. The choice then waits: the two
+    representatives alone go on to the production-width analysis, within their own budgets, at 4×4
+    and only as far as R at 4×4 needs, while every other candidate of both families waits, and
     `d4_choice.py --tie` applies the spec's tie-breaks in order (the smaller R at 4×4, then fewer
     serial carry chains per round, then the owner's recorded choice) once both values of R at 4×4
-    exist. A representative found ineligible first loses the tie.
+    exist. A representative found ineligible first loses the tie. Once the tie-breaks choose, the
+    chosen family goes on as after any D4 choice, and the losing representative stops, its records
+    standing: it is its family's fallback with the family's other candidates (R7, "The other
+    family"), and at the set's close it takes `ineligible`, with the reason "D4 chose the other
+    family by its tie-breaks", unless the chosen family ends with no eligible candidate, when its
+    family is analysed as R7 states (RAT-072).
   - **One family scored.** That family is chosen by default, and the record says so.
   - **Neither family scored.** No family is chosen, and the record says that D4 was not
     computable. Selection then takes the eligible candidate with the smallest R at 4×4 from
@@ -751,7 +757,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     their rows reserved: they are analysed at the production width, in this section's order, only if
     the chosen family ends with no eligible candidate, once every candidate of the chosen family has
     its final decision; otherwise each that was not analysed there is `ineligible`, with the reason
-    "not analysed at the production width: D4 chose the other family".
+    "not analysed at the production width: D4 chose the other family". While an exact tie waits
+    (R6), only its two representatives are analysed at the production width, at 4×4 and only as far
+    as R at 4×4 needs, and every other candidate of both families waits; the representative that
+    loses the tie then waits with its family's other candidates, its records standing, and is
+    analysed further, in this section's order, only if the chosen family ends with no eligible
+    candidate; otherwise it is `ineligible`, with the reason "D4 chose the other family by its
+    tie-breaks" (RAT-072).
   - **Replacements.** A candidate entered in place of one `rejected` or `ineligible` (spec stop
     rule) has rows of its own, at their current values after any lowering. "The budget allows" its
     entry while each of those rows holds more than zero hours, and "the budget spent", which closes
