@@ -9,9 +9,12 @@ turns out differently. No such fallback may loosen a rule. The plan's table "Val
 fixes" lists every value marked protocol here, so one list names them all.
 
 The answers to the checklist choices ([checklist-choices.md](./checklist-choices.md), "all
-recommended", 2026-11-01), those of the first run, the re-run and the second re-run the same day,
-are applied in the sections below. Each that changes a protocol value is stricter, or settles an
-open case by its most conservative reading before any result it affects, and becomes an entry of the
+recommended"), those of the first run, the re-run and the second re-run on 2026-11-01 and those of
+the third re-run on 2026-11-02, are applied in the sections below. Each that changes a protocol
+value is stricter, or settles an open case by its most conservative reading
+before any result it affects, at every claimable size, RAT-036 and RAT-052
+changing a check only at the research sizes, where as written it fails every
+candidate (checklist-choices.md, "How to answer"), and becomes an entry of the
 protocol change log `research/004/protocol-changes.jsonl` when that log is created, by the per-round
 lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18).
 

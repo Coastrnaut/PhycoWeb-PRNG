@@ -427,6 +427,8 @@ start open, and an item is ticked only under the rule in the Notes below.
   holds. The agent did so, with its evidence for each item in its report, and the 40 items it found
   to hold were ticked in commit b3a30e8 ("checlists verified"). The 9 items of the second re-run,
   CHK041 to CHK049, verified in the same way once their answers were applied, were ticked in
-  commit 5798640. A tick here therefore records a determination the owner delegated, and the owner's
+  commit 5798640. The 8 items of the third re-run, CHK050 to CHK057, verified in the same way once
+  their answers were applied, were ticked in commit 8d340b4. A tick here
+  therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.

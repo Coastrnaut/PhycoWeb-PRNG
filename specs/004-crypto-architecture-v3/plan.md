@@ -189,12 +189,16 @@ projection before every heavy run, and sizes in order (R7); keys of reduced vari
 constants held at each food node (R15); and a lock for every append to a hash-chained log
 (R16). The numpy interpreter of the operation lists is analysis code that the model never
 imports (R11, R17). The constant ROMs at the food nodes remove the grid-wide data path that one
-central LFSR would need, so the absorption and output trees, the key chain, and the clock, reset,
-start signal and replicated counters, are Principle III's only exceptions, each justified in
-Complexity Tracking. The checklist answers of 2026-11-01, of the first run, the re-run and the
+central LFSR would need, so the absorption and output trees, the key chain and the nonce
+chain beside it, and the clock, reset, start signal and replicated counters,
+are Principle III's only exceptions, each justified in Complexity Tracking.
+The checklist answers of 2026-11-01, of the first run, the re-run and the
 second re-run, add no violation beyond the key chain, which the second re-run's answers make
-explicit and Complexity Tracking justifies: each is stricter, adds a check, or settles an open case
-by its most conservative reading before any result it affects, and each protocol change among them
+explicit, and those of 2026-11-02, of the third re-run, none beyond the nonce chain beside it, both
+justified in Complexity Tracking: each is stricter, adds a check, or settles an open case by its
+most conservative reading before any result it affects, at every claimable size, RAT-036 and RAT-052
+changing a check only at the research sizes, where as written it fails every candidate
+(checklist-choices.md, "How to answer"), and each protocol change among them
 becomes an entry of the protocol change log (FR-044). The start signal reaches the nodes and the
 replicated counters through a registered fan-out tree, as reset does, and output leaves through a
 buffer of one block, so the core never stalls in mid-call (FR-025).
