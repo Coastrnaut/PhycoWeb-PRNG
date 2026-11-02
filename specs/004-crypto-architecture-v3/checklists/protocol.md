@@ -466,7 +466,7 @@ Items found when the checklist was run a sixth time, over the complete documents
 after the fourth re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK061 Are the two commits of each round named where `scripts/protocol_change.py create` reads
+- [x] CHK061 Are the two commits of each round named where `scripts/protocol_change.py create` reads
   them, and does the comparison run before the owner confirms the lists? FR-044, data-model §18 and
   the cli contract compare each rule's text "at the two commits of each round", "the commit before
   the row's round was applied" and "the commit that completed it, each commit named by its hash",
@@ -502,7 +502,7 @@ Items found when the checklist was run a seventh time, over the complete documen
 repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK063 Is it stated who makes PRO-061's comparison before the tasks approval, and with what
+- [x] CHK063 Is it stated who makes PRO-061's comparison before the tasks approval, and with what
   tool, so that the results written beside the lists can be reproduced from the repository, given
   that FR-044 and data-model §18 call it "the comparison of `scripts/protocol_change.py check`",
   while that script, like every script of the cli contract, is written only in implementation,
@@ -516,7 +516,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   names only "the commit that completed its alignment"? [Gap, Measurability, Spec §FR-044;
   data-model §18 `place_check`; cli contract `protocol_change.py`; checklist-choices.md "Rows that
   change the protocol"]
-- [ ] CHK064 Are the fields of a first entry made from a place that the owner confirms as an entry
+- [x] CHK064 Are the fields of a first entry made from a place that the owner confirms as an entry
   of its own stated, given that data-model §18 gives a first entry `rules`, with each rule's
   `old_text` and `new_text` "at the commit before the row's round was applied and at the commit
   that completed it", `row` and `granularity` with "the row's ID, question and chosen option", and
@@ -540,7 +540,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   blocked for good? [Gap, Edge Case, Spec §FR-044, §FR-067; data-model §1 `kind`,
   `protocol_seq`, "Record files"; research R16 "Stale locks"; cli contract "Protocol log",
   "Hash-chained logs", `clear_lock.py`]
-- [ ] CHK066 Is a stricter direction stated for every heading of the lists "Rows that change the
+- [x] CHK066 Is a stricter direction stated for every heading of the lists "Rows that change the
   protocol", given that each rule of a first entry takes `stricter`, "in its stated direction", or
   `settled` under a rule whose direction is "no change", that the writer refuses a rule without
   `direction`, and that FR-044's list of directions names the rules of the section "Pre-registered

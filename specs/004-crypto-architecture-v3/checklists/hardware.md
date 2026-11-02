@@ -541,7 +541,7 @@ Items found when the checklist was run a seventh time, over the complete documen
 repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK075 Does the instantiate figure hold the cycles it is said to include? FR-025 runs it "from
+- [x] CHK075 Does the instantiate figure hold the cycles it is said to include? FR-025 runs it "from
   the last nonce or personalization word accepted to instantiate done, its forget call complete and
   the core `instantiated` and ready for a command", and has "the nonce chain's length, the nonce
   registers' transfer and the copy" enter it, while FR-013 has the personalization string "absorbed
@@ -555,7 +555,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   done beside one from the string's last word to the core ready, with the cycles between them in
   FR-020's instantiate formula? [Consistency, Clarity, Spec §FR-025 "Key loading and reset", "Flow
   control", §FR-013, §FR-014, §FR-020; data-model §11]
-- [ ] CHK076 Does the call-state table cover the stretches in which an accepted call waits for the
+- [x] CHK076 Does the call-state table cover the stretches in which an accepted call waits for the
   host's words on an input interface: an instantiate between its command word and the nonce's last
   word, and after the copy while a personalization string's words arrive; a reseed while its
   input's words arrive; and a key load between its command word and its first key word, before
@@ -567,7 +567,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   and in `loading`; whether every other command is held off with ready low or refused with its
   code; and which state a zeroize from such a stretch leaves? [Gap, Edge Case, Spec §FR-025 "Call
   sequence", "Flow control", "Zeroization", §FR-020]
-- [ ] CHK077 Is the self-test's generate request stated, with its length, and is its expected output
+- [x] CHK077 Is the self-test's generate request stated, with its length, and is its expected output
   one the frozen vectors hold? FR-059 runs "a generate long enough that every node, every lane,
   every constant ROM entry of the calls run, both trees and the counters take part", with no length,
   and its comparator "takes each whole r-bit block as the output buffer receives it" and "compares
@@ -582,7 +582,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   "as the host would"? FR-020's formula for the self-test, the reset figure and FR-026's count of
   the expected output's storage depend on the answer. [Gap, Consistency, Spec §FR-059, §FR-020,
   §FR-026, §FR-036; research R8; data-model §11]
-- [ ] CHK078 Is the error output's lifetime stated: how long the error signal and its code stay
+- [x] CHK078 Is the error output's lifetime stated: how long the error signal and its code stay
   valid after a refusal (one cycle, until the next command is accepted, or until reset), what a
   second refusal does to a code the host has not read, and whether the error-code register is kept
   through the zeroization that a zeroizing refusal starts? FR-025 gives "a registered error-code

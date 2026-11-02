@@ -571,7 +571,7 @@ Items found when the checklist was run a seventh time, over the complete documen
 repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK072 Are the word widths that the active-S-box counter's known result covers stated, given
+- [x] CHK072 Are the word widths that the active-S-box counter's known result covers stated, given
   that research R12 asks every tool's validated kind to state "its word widths, operation set and
   kind of model", says that a search's results "count only at a width so covered" and that the
   cross-checks at 4×4 with w = 4 cover a candidate's operation set and "never a word width", while

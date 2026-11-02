@@ -690,7 +690,7 @@ Items found when the checklist was run a seventh time, over the complete documen
 repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK076 Is a writer named for the downloads manifest's entries other than `owner-provided`: the
+- [x] CHK076 Is a writer named for the downloads manifest's entries other than `owner-provided`: the
   `approved` entries that it holds "from setup on", and the change of an entry to `fetched`, "with
   its SHA-256, download date and local path", or to `not obtained`, "with the reason"? Records are
   "written by one module, `protocol/evidence.py`", which keeps a fixed-name file's content under
@@ -702,7 +702,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   and that it refuses an entry for a file that no `approved` entry names? [Gap, Spec §FR-046;
   research R16, R19; data-model introduction, §7, §10; cli contract `owner_record.py`,
   `validate_tool.py`]
-- [ ] CHK077 Does the generators' fixed order place `gen_constructed_v3.py`? FR-036 says "The
+- [x] CHK077 Does the generators' fixed order place `gen_constructed_v3.py`? FR-036 says "The
   generators run in a fixed order, each `--check` passing before the next": the constant tables,
   then the vectors with `phycoweb/selftest_v3.py`, and only then `Generator`; the cli contract and
   data-model §11 give the same three steps. The third generator, which writes the constructed-state
@@ -713,7 +713,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   among "the scripts that generate the constants and the vectors" that the freeze hashes, as its
   vectors are? [Gap, Consistency, Spec §FR-036, §FR-043, §FR-054; data-model §11, §13; cli contract
   "Generators of constants and vectors"; quickstart M3]
-- [ ] CHK078 Is it stated through which interface the constructed-state vectors and FR-058's tests
+- [x] CHK078 Is it stated through which interface the constructed-state vectors and FR-058's tests
   reach the mode's edge states? FR-054 asks for "the first and last value of every counter, every
   output limit reached and one request beyond it", FR-058 tests "a call refused at a per-key
   limit", and quickstart M5 expects "refusals beyond every limit", while the model contract gives
@@ -725,7 +725,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   those covered only from chosen states, so that every such vector and test can be regenerated as
   written? [Gap, Spec §FR-007, §FR-054, §FR-058; model contract "Research duplex", "Per-key
   limit"; research R8, R9; quickstart M5]
-- [ ] CHK079 Are the bytes defined that a provenance entry's `sha256` covers? `provenance.py`
+- [x] CHK079 Are the bytes defined that a provenance entry's `sha256` covers? `provenance.py`
   refuses "a `sha256` that is not that of the named file, the named section's text or the named
   record", and a review entry holds "the SHA-256 of the section text reviewed", while no passage
   says where a section's text starts and ends (from its heading to the next heading of the same
@@ -736,7 +736,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   entry's hash kind stated, so that the writer, the review and a later reader compute the same
   value? [Clarity, Spec §FR-051, §FR-064, §FR-067; data-model §1 "Hashes", §14; research R16; cli
   contract `provenance.py`]
-- [ ] CHK080 Is the provenance stated of the files drafted with an AI tool before the provenance log
+- [x] CHK080 Is the provenance stated of the files drafted with an AI tool before the provenance log
   exists? FR-067 records "Every file of this feature drafted or repaired with an AI tool" with "the
   tool and model, the date, the task ID and its review status", and plan phase 1 creates the log,
   while the spec, the plan, research, the data model, the contracts, the quickstart, the checklists

@@ -471,7 +471,7 @@ Items found when the checklist was run a seventh time, over the complete documen
 repository, after the fifth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK068 Is the security-target chapter's mark "draft, under review" consistent with FR-034's
+- [x] CHK068 Is the security-target chapter's mark "draft, under review" consistent with FR-034's
   rule that the design document's approval status is kept outside the frozen file, in the
   provenance log, given that FR-012 and plan phase 4 mark the chapter so "until the
   security-target review of phase 8", while the header rule keeps a status out of the header only?
@@ -481,7 +481,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   the review's row must have reviewed by path and SHA-256? [Conflict, Spec §FR-012, §FR-034
   "Version", §Review & Approval "Security-target review"; plan phase 4; cli contract
   `design_freeze.py create`]
-- [ ] CHK069 Are the design document's chapters listed, each with its heading and what it holds,
+- [x] CHK069 Are the design document's chapters listed, each with its heading and what it holds,
   given that the reviews, the guards and the claim test refer to "the security-target chapter"
   (chapter 1 in the plan), "the mode chapter", which holds the padding constants and the domain
   separators (FR-034 "Constants"), "the design document's section on key loading", which the
@@ -491,7 +491,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   security-target chapter", so that a reviewer and a test can find what was reviewed? [Gap,
   Clarity, Spec §FR-012, §FR-030, §FR-034, §Review & Approval "Security-target review";
   data-model §15; plan Summary item 2, phase 4]
-- [ ] CHK070 Does FR-034's component list cover the hardware structures that FR-025 and FR-059 add
+- [x] CHK070 Does FR-034's component list cover the hardware structures that FR-025 and FR-059 add
   for every candidate beside those it names: the key register at each node that holds key bits,
   where the held key is kept between instantiates, apart from the key shift chain that loads it
   ("the key-loading buffer (the key chain's registers)" and "the held key and its copies" are
@@ -502,7 +502,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   carries secret data (no read-back, zeroization), or stated as outside the rationale, with the
   design document's justification cited instead? [Completeness, Spec §FR-034 "Components",
   §FR-025 "Key loading and reset", "Flow control", "Zeroization", §FR-059]
-- [ ] CHK071 Is the place of FR-030's replacement rows stated: for each failed `phyco-v2`
+- [x] CHK071 Is the place of FR-030's replacement rows stated: for each failed `phyco-v2`
   mechanism, the rule of Π that replaces it and the evidence record, or the section and test, that
   shows the failure does not recur, which FR-030 asks "the design document" to give beside "the
   slime-mould mapping of every component"? If the rows stand in the mapping chapter, they are
