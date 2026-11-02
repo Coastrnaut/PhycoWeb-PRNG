@@ -417,7 +417,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK058 Is a row listed under a rule by the text its Changes cell names or by the text its
+- [x] CHK058 Is a row listed under a rule by the text its Changes cell names or by the text its
   applied change altered, given that checklist-choices.md's lists name "every row whose option
   altered the text of a pre-registered rule" under "each rule it alters", while "A row is listed
   under a rule when its Changes cell names that rule's text", and that PRO-056, whose Changes cell
@@ -432,7 +432,7 @@ and an item is ticked only under the rule in the Notes below.
   round's commits altered is covered by a row listed under it, so that no change made beyond a row's
   Changes cell stays outside the log? [Conflict, Spec §FR-044; plan "Values this plan fixes before
   first use"; data-model §18; checklist-choices.md "Rows that change the protocol"]
-- [ ] CHK059 Is it stated which budget row holds a FUT-SEC-8 repeat after a tool defect is fixed,
+- [x] CHK059 Is it stated which budget row holds a FUT-SEC-8 repeat after a tool defect is fixed,
   and how many repeats may follow, given that the demonstration's table allows "a repeat only after
   a tool defect is fixed (Edge Cases)", that `fut_sec8.py --repeat-after-defect` admits a repeat for
   each recorded tool defect "that no earlier record names", with no limit on their number, where a
@@ -445,7 +445,7 @@ and an item is ticked only under the rule in the Notes below.
   request? [Gap, Conflict, Spec §Pre-registered Design Protocol "FUT-SEC-8 demonstration", §Edge
   Cases, §FR-039, §FR-045; research R7; data-model §4 `supersedes`, `defect`; cli contract
   `fut_sec8.py`]
-- [ ] CHK060 Is a writer named, with its command, for the protocol change log and for the provenance
+- [x] CHK060 Is a writer named, with its command, for the protocol change log and for the provenance
   log, given that the plan's tree names `protocol/candidates.py` as the candidate log's writer and
   `scripts/owner_record.py` for the owner's environment records and owner-provided values, while
   data-model §18 leaves the owner's approval to "the writer's approval step", which "prints the

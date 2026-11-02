@@ -416,7 +416,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK059 Is each counted tool's `validated_kind` stated, with the word widths, operation set and
+- [x] CHK059 Is each counted tool's `validated_kind` stated, with the word widths, operation set and
   kind of model its known results cover, and how the cross-checks between kinds at w = 4 and 8 bear
   on it, given that data-model §7 records the kind's word width, that research R12 makes "a use at a
   word width, operation set or kind of model outside its validated kind" a trigger for validating
@@ -424,7 +424,7 @@ and an item is ticked only under the rule in the Notes below.
   SPECK32's optimal trails, has 16-bit words while its counted searches run at w = 16 and 32 and its
   cross-checks at w = 4 and 8, with no known result at w = 32 named for it? [Clarity, Conflict, Spec
   §FR-039; research R12; data-model §7 `validated_kind`]
-- [ ] CHK060 Can the cross-check between kinds of an ARX candidate pass for a correct search and
+- [x] CHK060 Can the cross-check between kinds of an ARX candidate pass for a correct search and
   fail for one that misses optimal trails? Research R12 compares, by exact equality, the ARX
   search's optimal single-trail weight over r rounds of the box, a trail through the box's additions
   under the exact models of addition, with the best product of one-round entries of the box's
@@ -437,7 +437,7 @@ and an item is ticked only under the rule in the Notes below.
   box's internal trails at w = 4, with the table's weight as a floor that no search result may go
   below? [Measurability, Conflict, Spec §FR-038, §FR-039; research R7, R12; data-model §6
   `cross_check`, §7]
-- [ ] CHK061 Is "a firing" in the bias test's validation defined, given that research R4 and
+- [x] CHK061 Is "a firing" in the bias test's validation defined, given that research R4 and
   data-model §7 count the sets of each family in which the test fires, 82 to 97 of 100, and record
   "the planted bit's count and every fired bit", while each set also holds S − 1 unplanted bits
   tested at 0.005/S, so that a family of 100 sets holds a firing of an unplanted bit with
@@ -454,7 +454,7 @@ and an item is ticked only under the rule in the Notes below.
   one of its own bits is flipped? Do the related-key path's and the rotational path's stated sets
   likewise give the bits that fire where their flips have not yet reached the whole state?
   [Measurability, Conflict, Spec §FR-039; research R4, R13; data-model §7]
-- [ ] CHK063 Does the bias rule's S count the bits of every call type where the call types draw on
+- [x] CHK063 Does the bias rule's S count the bits of every call type where the call types draw on
   distinct constant streams? The spec defines S as "the number of bits tested at that size and round
   count", and research R4 runs both tests "on each call type's permutation", while R4 and data-model
   §5 fix S = 4b, and S_A, per permutation, so that at T call types T·4b bits are tested at
@@ -464,7 +464,7 @@ and an item is ticked only under the rule in the Notes below.
   T call types stated beside every firing, or does S count every call type's bits? [Consistency,
   Spec §Pre-registered Design Protocol "Bias rule", §FR-023, §FR-028; research R4; data-model §5
   `frequency`, `avalanche`]
-- [ ] CHK064 Is the rule's degree count defined for every operation an operation list may hold and
+- [x] CHK064 Is the rule's degree count defined for every operation an operation list may hold and
   for the way they combine? Research R13 and data-model §5 state one degree, w − 1 for a w-bit
   addition, take "each phase's degree" from a box's or S-box's truth table where its width allows,
   and multiply the phases' degrees for a round, while research R11's forms also hold subtraction,
@@ -475,7 +475,7 @@ and an item is ticked only under the rule in the Notes below.
   enters the product stated, so that two implementations of the pre-registered rule give the same
   count and raise R_dist at the same round counts? [Clarity, Spec §Pre-registered Design Protocol
   "Round rule", §FR-034; research R11, R13; data-model §5 `degree`]
-- [ ] CHK065 Are a writer, a path and a record stated for each candidate's constant tables before
+- [x] CHK065 Are a writer, a path and a record stated for each candidate's constant tables before
   selection, one per variant (n, w, R) and call type, given that `gen_constants_v3.py` takes no
   candidate and writes only `phycoweb/constants_v3.py` and
   `vectors/phyco-v3/constants_n<n>_w<w>.json`, that research R15 runs the refused-list check and the
@@ -486,14 +486,14 @@ and an item is ticked only under the rule in the Notes below.
   table makes it fail FR-023, an eligibility item? [Gap, Spec §FR-023, §Pre-registered Design
   Protocol "Round rule", "Eligibility and selection"; research R7, R15; data-model §5 "Constants
   cited"; cli contract "Generators of constants and vectors"]
-- [ ] CHK066 Are the sizes at which the invariant checks run, and their forms per colour class at
+- [x] CHK066 Are the sizes at which the invariant checks run, and their forms per colour class at
   odd n, stated, given that research R13 checks the sums and XORs of the pressure and vein lanes
   "over each colour of the checkerboard (even n)" and names no form for the three colour classes of
   a schedule at odd n, which a supported 3×3 has (research R14), and that FR-037, research R13 and
   data-model §5 state no size for the invariant check, as "every supported size and variant" is
   stated for the inverse tests? [Coverage, Spec §FR-018, §FR-037; research R11, R13, R14; data-model
   §5 `invariant`]
-- [ ] CHK067 Is a budget row stated for the heavy validation runs on known results that are not
+- [x] CHK067 Is a budget row stated for the heavy validation runs on known results that are not
   published values, given that research R7 makes heavy every run of a kind it budgets, so that the
   validations of the exhaustive-bijectivity tool on a known permutation and a map with collisions
   over 2³² inputs, of the frequency test on S14's bias, of the avalanche test on its three planted

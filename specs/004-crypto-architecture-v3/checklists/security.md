@@ -370,7 +370,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK064 Does the claim-register test flag "secure", "unbreakable" and "cryptographically
+- [x] CHK064 Does the claim-register test flag "secure", "unbreakable" and "cryptographically
   secure" said of a model outside the mapping chapter and away from a number of bits, given that
   FR-050 forbids describing any model so, SC-015 counts those words and FR-069 requires the test to
   report any use of the wording FR-050 forbids, while FR-069's rules and data-model §15 flag them
@@ -378,7 +378,7 @@ and an item is ticked only under the rule in the Notes below.
   unbreakable" passes the test? Are the uses that stay allowed named, such as the rule lines of
   FR-050 and SC-015 themselves? [Gap, Spec §FR-050, §FR-069, §SC-015, §SC-018; data-model §15
   `allow_list`]
-- [ ] CHK065 Do FR-069's listed inflections cover every form its whole-word rules must catch:
+- [x] CHK065 Do FR-069's listed inflections cover every form its whole-word rules must catch:
   "proved", "prove" and "proves" beside "proven" and "provably" (FR-050; FR-060 itself writes "until
   it is proved or reproduced"), "comply", "complies" and "complying" beside "compliant" and
   "compliance", "conformed" and "conformant" beside "conforms", "approves" and "approving" beside
@@ -386,13 +386,13 @@ and an item is ticked only under the rule in the Notes below.
   randomized, randomizing, and the spellings in -ise)? Is the list stated as complete, so that the
   sample-sentence test can check each form? [Measurability, Spec §FR-050, §FR-060, §FR-069;
   data-model §15]
-- [ ] CHK066 Do the eight checklist files under `checklists/` carry the design-form disclaimer,
+- [x] CHK066 Do the eight checklist files under `checklists/` carry the design-form disclaimer,
   given that FR-050 requires it of every document of this feature and FR-068 of every hand-written
   document, and that FR-069 and the cli contract's `check_claims.py` check it over a scope that
   names the checklists, while none of the eight carries it and checklist-choices.md does? Is it
   stated whether `tasks.md`, which `/speckit-tasks` writes into the same directory, carries it too?
   [Conflict, Spec §FR-050, §FR-068, §FR-069; cli contract `scripts/check_claims.py`]
-- [ ] CHK067 Are the names of the Review & Approval rows that a gate held again takes stated, with
+- [x] CHK067 Are the names of the Review & Approval rows that a gate held again takes stated, with
   the rule by which each guard finds the one it reads: a corrected FUT-SEC-8 report or a revised
   security-target chapter "reviewed in a row of its own" after a decline, the review of the changed
   parts after an owner design review, and the security-target review and every later review "held
@@ -401,25 +401,25 @@ and an item is ticked only under the rule in the Notes below.
   list needs their names, as "Selection tie <k>" and "Log repair <n>" have theirs. [Gap, Spec
   §Review & Approval, §FR-043; data-model §9, §17; cli contract "Approvals", "Order of US1",
   `design_freeze.py`]
-- [ ] CHK068 Are the values a gate row's Decision may hold defined in one place, given that
+- [x] CHK068 Are the values a gate row's Decision may hold defined in one place, given that
   data-model §17 lets a gate go from `_pending_` to Approved or Declined only, while the table uses
   "Not needed" for the two tie rows, "done" and "not arranged" for the external design review and
   "blocked" for "L1 recorded", and `design_freeze.py create` exits 2 unless the external review row
   is done or "not arranged"? Does each guard state which values open it? [Clarity, data-model §17;
   Spec §Review & Approval; cli contract `design_freeze.py`]
-- [ ] CHK069 Does a guard read the "L1 recorded" row, so that the claim register's `claim_level` for
+- [x] CHK069 Does a guard read the "L1 recorded" row, so that the claim register's `claim_level` for
   `phyco-v3` cannot read L1 while that row is not Approved at HEAD, given that data-model §15 moves
   `phyco-v3` to L1 only when the row reads Approved, that the claim test checks the documents
   against `claim_level` only, and that the row is in neither of the note's two lists, which makes it
   one of the approvals the agent writes on the owner's word? [Gap, Spec §FR-012, §Review & Approval;
   data-model §15, §17]
-- [ ] CHK070 Does the plan's Constitution Check VIII list every human review gate of the spec's
+- [x] CHK070 Does the plan's Constitution Check VIII list every human review gate of the spec's
   Review & Approval table, given that it names neither the tasks approval, the gate that comes next,
   nor the security-target review, whose decline ends in a revised chapter or a stop and which
   `design_freeze.py create` reads? Does plan phase 8 mark the security-target review as a ⛔ gate, as
   it marks the owner design review and the design freeze? [Consistency, plan Constitution Check
   VIII, "Phases and gates" 8; Spec §Review & Approval, §FR-012]
-- [ ] CHK071 Is the outcome stated when a paper that a mode theorem rests on cannot be obtained or
+- [x] CHK071 Is the outcome stated when a paper that a mode theorem rests on cannot be obtained or
   read, given that research R19 says only "the mode chapter stays unverified; L1 cannot be recorded"
   for `Daemen.pdf`, `SpongePRNG.pdf` and `169.pdf`, the last of which comes only through the owner's
   browser, that the owner design review and the freeze need every such theorem `verified`, and that
@@ -427,13 +427,13 @@ and an item is ticked only under the rule in the Notes below.
   that a paper that cannot be had leaves the feature with no stated end? Is another copy of such a
   paper a new download that needs its own permission (R19)? [Gap, Edge Case, Spec §FR-012, §FR-043,
   §Stop rule; research R10, R19]
-- [ ] CHK072 Is it stated who marks a theorem `verified` in `limits.json`, and each precondition
+- [x] CHK072 Is it stated who marks a theorem `verified` in `limits.json`, and each precondition
   met, and on what evidence, given that `mode_limits_v3.py` takes the status from the mode chapter,
   which the agent drafts, and `design_freeze.py create` trusts it? Does each theorem's entry cite
   the paper's `fetched` entry in `downloads.json` with its SHA-256, the theorem's number and its
   page, so that code can refuse `verified` for a paper that is not on disk? [Clarity, Spec §FR-012,
   §FR-043; data-model §10 `limits.json`, §13; research R10, R19]
-- [ ] CHK073 Is a refusal to rewrite a frozen fixed-name file stated for the security target's
+- [x] CHK073 Is a refusal to rewrite a frozen fixed-name file stated for the security target's
   files, given that FR-043 says the frozen files MUST NOT change and the freeze record pins
   `parameters.json` and `limits.json`, while `mode_limits_v3.py` keeps their current content under
   `versions/` and writes the new content under the fixed name, and only the generators are said to

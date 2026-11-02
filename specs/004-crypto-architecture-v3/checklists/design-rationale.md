@@ -382,7 +382,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK060 Does FR-034's component list cover every part of `phyco-v3` that the plan's Complexity
+- [x] CHK060 Does FR-034's component list cover every part of `phyco-v3` that the plan's Complexity
   Tracking justifies as an exception to Principle III, given that it names the absorption and output
   trees but not the key shift chain, the nonce chain beside it, the selector at every lane, the
   start signal with its call type, the reset tree that every zeroization trigger drives, or the
@@ -391,7 +391,7 @@ and an item is ticked only under the rule in the Notes below.
   carries secret data? Is each named in the list, or the hardware structure stated as outside the
   rationale, with the design document's justification cited instead? [Completeness, Spec §FR-034
   "Components", §FR-013, §FR-025; plan Complexity Tracking; research R15]
-- [ ] CHK061 Is the design document's version defined: its form (feature 002's `design.md` carries
+- [x] CHK061 Is the design document's version defined: its form (feature 002's `design.md` carries
   "1.0" in its header), where it is stated so that `protocol/evidence.py` can write each record's
   `design_version` (FR-061), which changes make a new version (FR-028's "a change" before the
   freeze, FR-043's change after the owner design review, a revision after a decline), which log
@@ -400,7 +400,7 @@ and an item is ticked only under the rule in the Notes below.
   approval or review status enters a frozen file, as feature 002's header "Status: awaiting owner
   design review" did, and is that checked at the freeze or by a test? [Clarity, Measurability, Spec
   §FR-028, §FR-034, §FR-043, §FR-061; data-model §1 `design_version`, §13; feature-002 O5]
-- [ ] CHK062 Is it stated how the owner design review "updates" the review status of an AI-drafted
+- [x] CHK062 Is it stated how the owner design review "updates" the review status of an AI-drafted
   section of the rationale, given that FR-064 and data-model §14 keep that status in the provenance
   log, whose lines are hash-chained and only appended, so that no entry can change, and that §14
   also says "one line per file" while each section has its own entry? Is an update a new entry for
@@ -409,7 +409,7 @@ and an item is ticked only under the rule in the Notes below.
   `review_status` listed? Is the same stated for an evidence record's `reviewer`, which "stays
   `pending` until a review is recorded" in a record that is never overwritten? [Conflict, Spec
   §FR-034, §FR-064, §FR-067; data-model introduction, §1, §14]
-- [ ] CHK063 Is the condition under which the owner's D4 choice is needed stated the same way
+- [x] CHK063 Is the condition under which the owner's D4 choice is needed stated the same way
   everywhere, given that an exact tie goes first to the smaller R at 4×4, then to fewer serial carry
   chains per round, and only then to the owner's recorded choice, while the Review & Approval row
   "D4 tie" applies "only if the nonlinearity choice rule ends in an exact tie" and reads "Not
@@ -420,7 +420,7 @@ and an item is ticked only under the rule in the Notes below.
   by the carry chains, so that selection is not held for a choice that is never made? [Conflict,
   Spec §Pre-registered Design Protocol "Nonlinearity choice rule", §Review & Approval "D4 tie";
   data-model §8; cli contract `d4_choice.py`, `round_rule.py`]
-- [ ] CHK064 Does the spec's selection sentence cover every outcome of the D4 record, given that it
+- [x] CHK064 Does the spec's selection sentence cover every outcome of the D4 record, given that it
   selects "of the eligible candidates of the chosen family, or of the other family if the chosen one
   has none", while the record's `outcome` may be `not computable`, with no chosen family, where
   data-model §9 and research R6 select from both families, and the spec names that case only in the
@@ -428,7 +428,7 @@ and an item is ticked only under the rule in the Notes below.
   applies only "the fallback to the other family"? [Consistency, Spec §Pre-registered Design
   Protocol "Eligibility and selection", "Nonlinearity choice rule", §FR-043; data-model §8, §9;
   research R6; cli contract `round_rule.py`]
-- [ ] CHK065 Is "the budget allows", the condition under which a replacement candidate is entered,
+- [x] CHK065 Is "the budget allows", the condition under which a replacement candidate is entered,
   defined, and with it "the budget spent", the stated reason that closes a `replacement` entry,
   given that research R7 gives each of the six candidates its own rows of 66 h, so that a family
   with fewer than three evaluated candidates always has rows for a further one unless a budget has
@@ -436,7 +436,7 @@ and an item is ticked only under the rule in the Notes below.
   which row, with how many hours left, makes a replacement impossible, and how the log writer checks
   that reason when it closes the entry? [Clarity, Spec §Edge Cases, §Pre-registered Design Protocol
   "Eligibility and selection", "Stop rule"; data-model §3; research R7]
-- [ ] CHK066 Does FR-034's Alternatives chapter cite every record that decided the outcome, given
+- [x] CHK066 Does FR-034's Alternatives chapter cite every record that decided the outcome, given
   that it names "the D4 record and the selection record" while a re-selection writes
   `selection-<k>.json` beside `selection.json`, each citing the one before, a tie writes
   `d4/tie.json` or the selection record with the owner's choice beside it (`d4/tie-choice.json`,

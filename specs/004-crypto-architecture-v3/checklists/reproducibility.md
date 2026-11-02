@@ -594,7 +594,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK070 Is the limit on committed suffixes stated for the paths it governs, given that FR-053
+- [x] CHK070 Is the limit on committed suffixes stated for the paths it governs, given that FR-053
   pins `reports/004-crypto-architecture-v3/**`, `research/004/**` and `protocol/*.json` to LF and
   then says "Files committed there are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt` and
   `.gz`, and `protocol/evidence.py` refuses any other suffix there", while the plan's tree puts code
@@ -606,7 +606,7 @@ and an item is ticked only under the rule in the Notes below.
   of `protocol/evidence.py` refuses the committed code? [Conflict, Spec §FR-053 "Hashes and line
   endings", §FR-043; plan "Source Code (repository root)"; research R16, R18; data-model
   introduction, §13]
-- [ ] CHK071 Do FR-043's "scripts that compute verdicts" and FR-065's list of verdicts cover every
+- [x] CHK071 Do FR-043's "scripts that compute verdicts" and FR-065's list of verdicts cover every
   verdict that decides whether a result counts? The freeze hashes `evidence_v3.py`, `round_rule.py`,
   `d4_choice.py`, `mode_limits_v3.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
   `protocol/evidence.py`, but not `scripts/validate_tool.py`, whose record's `outcome` decides
@@ -621,7 +621,7 @@ and an item is ticked only under the rule in the Notes below.
   those verdicts one that the re-check recomputes? [Consistency, Coverage, Spec §FR-039, §FR-043,
   §FR-065; research R12, R16; data-model §7, §13; cli contract `validate_tool.py`, `fut_sec8.py`,
   `recheck_004.py`]
-- [ ] CHK072 Is each test that a requirement names given a place in the plan's tests tree, given
+- [x] CHK072 Is each test that a requirement names given a place in the plan's tests tree, given
   that the tree names the subjects of `test_protocol_004.py` (the candidate log and its lock,
   budgets, size order, the stop rule, the freeze, no key loaded before the FUT-SEC-8 review,
   dev-only seed-set loads) and of `test_records_004.py` (reproductions, the two-worker test, the
@@ -637,7 +637,7 @@ and an item is ticked only under the rule in the Notes below.
   file of the tree, so that every test the requirements name can be traced from a requirement to a
   file? [Traceability, Completeness, Spec §Review & Approval, §FR-018, §FR-045, §FR-053, §FR-065;
   plan "Source Code (repository root)"; data-model §5]
-- [ ] CHK073 Is the environment of a re-check's reproduction stated the same way everywhere, given
+- [x] CHK073 Is the environment of a re-check's reproduction stated the same way everywhere, given
   that FR-053 counts "the re-check's" `--reproduce` among the reproductions and says that "a
   reproduction runs in the environment that made the original, as recorded (research R1)", and
   research R16 that a reproduction "runs in the environment that made the original, as recorded, and

@@ -477,7 +477,7 @@ Items found when the checklist was run a fifth time, over the complete documents
 after the third re-run's answers of 2026-11-02 were applied and its items ticked. They start open,
 and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK071 Is the form of key loading stated once, given that FR-025 asks the design document to
+- [x] CHK071 Is the form of key loading stated once, given that FR-025 asks the design document to
   specify "serial or parallel key loading", while the same requirement fixes the key path as "a key
   register at each node that holds key bits, loaded once per key along a registered shift chain
   through those nodes", FR-013 loads the key "once, along a registered shift chain", FR-059 feeds
@@ -487,7 +487,7 @@ and an item is ticked only under the rule in the Notes below.
   FR-025's list, so that a parallel load, which the rest of the text excludes, cannot be read as
   allowed? [Conflict, Spec §FR-025 "Key loading and reset", §FR-013, §FR-059; plan "Complexity
   Tracking"; constitution Principle III]
-- [ ] CHK072 Are the sources of the selector at every lane stated the same way everywhere, with the
+- [x] CHK072 Are the sources of the selector at every lane stated the same way everywhere, with the
   absorption tree among them where a rate lane holds nonce bits, given that FR-025 has the nonce
   reach "its lanes through the absorption tree where they are rate lanes" while its selector sets
   each lane "from a key register, the nonce chain or its stated constant", FR-013's "from a key
@@ -501,7 +501,7 @@ and an item is ticked only under the rule in the Notes below.
   registers that hold them among those that zeroization clears and among the parts of FR-026's
   estimate? [Gap, Consistency, Spec §FR-013, §FR-018, §FR-025 "Key loading and reset",
   "Zeroization", §FR-026; plan "Complexity Tracking"; research R10]
-- [ ] CHK073 Is the writing of an exploration table specified as a command, with the time it may
+- [x] CHK073 Is the writing of an exploration table specified as a command, with the time it may
   run, given that FR-018, research R14 and R15 and the model contract have `gen_constants_v3.py`
   write a table "for that (n, w) on demand" under `research/004/exploration/` "with its check
   record", and that FUT-GRID-1's "Partly met" rests on "constant tables generated on demand at the
