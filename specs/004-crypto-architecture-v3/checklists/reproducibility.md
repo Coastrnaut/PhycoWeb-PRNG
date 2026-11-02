@@ -389,6 +389,201 @@ every other item; the reviewer ticks them.
   nor a manifest entry? [Consistency, research R19; plan "Phases and gates"; data-model §7; cli
   contract `validate_tool.py`]
 
+## Third re-run (2026-11-01)
+
+Items found when the checklist was run a fourth time, over the complete documents and the
+repository, after the second re-run's answers of 2026-11-01 were applied and its items ticked. They
+start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK056 Is the FUT-SEC-8 reproduction one record of one kind at one path? The cli contract's
+  introduction says that every script that writes evidence "also runs as `--reproduce RECORD`",
+  "with its output directory replaced by `$REP/reproductions/<record_id>/<n>/`", writing a
+  `reproduction` record that holds "the original's ID and SHA-256, each compared field with its
+  outcome, the reported fields, and `match` or `differs`", and that "`fut_sec8.py --reproduce` is
+  this mode for the demonstration, under the conditions of its section"; that section runs
+  `fut_sec8.py --reproduce RECORD --binary fast/build/seed_search --out-dir $REP/fut-sec-8` and
+  writes a `fut-sec-8-reproduction` record, which data-model §4 places at
+  `fut-sec-8/reproduction-<record_id>.json`, where "It holds the same fields and is compared field
+  by field with the demonstration record". The plan's tree allows both, `fut-sec-8/` holding "any
+  reproduction" and `reproductions/` "one directory per reproduced record and reproduction". Which
+  kind, path and fields does it write; is the `<record_id>` in its file name the original's, so that
+  a second reproduction, which n numbers everywhere else, finds an existing record and exits 2, or
+  its own; and is `--out-dir` taken by a mode whose output directory is replaced? [Conflict,
+  data-model §1 "Reproduction", §4; cli contract "Reproduction", `fut_sec8.py`; plan "Project
+  Structure"; Spec §FR-053]
+- [ ] CHK057 Is the file name of a second demonstration record stated? The demonstration record is
+  `fut-sec-8/demonstration.json`, a name without the `record_id` that is "unique; part of the file
+  name" of every record, and it is not among the files kept under a fixed name, while "A record is
+  never overwritten: a repeat run writes a new record with a new identifier, and the old one stays",
+  the edge case on a missed target says "The defect is reported and fixed, and the sweep is
+  repeated; every run is reported", `fut_sec8.py` allows that repeat with `--repeat-after-defect
+  ID`, and an existing record is one of the refusals with exit 2. Where does the repeat write its
+  record, and which of the two records does the FUT-SEC-8 result review take, the best-attack
+  register cite ("security.md's best-attack register row for exhaustive seed search cites it") and
+  `--reproduce RECORD` compare with? [Gap, Edge Case, Spec §Edge Cases, §FR-003, §FR-053; data-model
+  introduction, §1, §4; cli contract `fut_sec8.py`]
+- [ ] CHK058 Is the place of a reproduction's outputs stated consistently with the storage rules? A
+  reproduction "writes its outputs and a `reproduction` record into
+  `reproductions/<record_id>/<n>/`", under `reports/004-crypto-architecture-v3/`, while local-only
+  files are "written under `data/local/004/<record_id>/` and never under this directory",
+  `protocol/evidence.py` "refuses a committed output above 10 MB, naming it" and "refuses any other
+  suffix there", and the originals include outputs far above 10 MB (the bijectivity bitmap of 2³²
+  bits, 512 MiB; "full dependency matrices at 16×16 (about 32 MB per round and direction)"; the
+  synthetic sets, about 60 MB as text) and generated files with other suffixes, which a generator's
+  reproduction also writes "into `$REP/reproductions/<record_id>/<n>/`": `phycoweb/constants_v3.py`,
+  `phycoweb/selftest_v3.py` and the `.hex` mode vectors. Is each output of a reproduction committed,
+  kept local-only under a stated path, or compared in memory and discarded, and is the directory
+  `reproductions/<record_id>/<n>/` itself committed? [Conflict, data-model introduction, §1
+  "Reproduction", `outputs`, §5, §11; research R16; cli contract "Reproduction", "Generators of
+  constants and vectors"]
+- [ ] CHK059 Is the comparison of a `p_values` output stated one way? FR-053 and data-model §1
+  compare "each deterministic output's `sha256` and `bytes`", and an output is marked
+  `deterministic` false only when it is not, "such as a raw solver log with timings", while a
+  `p_values` file is "compared by its values", "its `uncompressed_sha256` is reported only", and
+  research R4 says that "a `p_values` file's hash and `uncompressed_sha256` may differ between the
+  two environments of R1 and are reported only". Is a `p_values` output marked deterministic, so
+  that its `sha256` and `bytes` are compared and differ between environments, or not, and is the raw
+  hash of an uncompressed JSON `p_values` file then reported only? When p-values fall outside the
+  tolerance, does the reproduction end in `differs`, a finding with exit 1 ("a difference is a
+  finding"), or in `match`, since a `p_values` file "decides nothing" and "values outside are
+  listed, and none decides a verdict"; and does data-model §5's "scipy's p-values are reported only:
+  a reproduction compares them within a relative tolerance of 10⁻⁶" state the same rule as section
+  1's, which also lets two values below 2⁻¹⁰²² agree? [Consistency, Spec §FR-053; data-model §1
+  "Reproduction", `outputs`, §5 "Exact verdicts"; research R4, R16]
+- [ ] CHK060 Does a generator run leave a record that its reproduction can compare with? A run of
+  `gen_constants_v3.py`, `gen_vectors_v3.py` or `gen_constructed_v3.py` writes its files and "one
+  entry per generator run with its `record_id`" in the sidecar, holding "the command (script and
+  arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform,
+  the measured speed (calls of Π and words per second) and the generation time", and none of
+  FR-061's other fields (`code_sha256`, `design_sha256`, `versions`, `environment`, `git_head`,
+  `inputs`, the outputs with their SHA-256, `exit_status`). Yet the comparison table compares for
+  the constant tables "every file it writes, byte for byte, and `design_sha256`", the Reproduction
+  bullet compares "each source file's entry in `code_sha256`" ("A different source hash makes it a
+  new run, not a reproduction"), and a generator's reproduction "compares every file it writes with
+  the committed one", that is with the files as last committed, which a later regeneration before
+  the freeze replaces, not with the files the named run wrote. Does each generator run write a
+  record of data-model §1 beside its sidecar entry, with each written file's SHA-256, so that
+  FR-053's "Deterministic kinds (vectors, constants, dependency matrices, counts, digests) reproduce
+  byte for byte" can be checked for every run; and does each generator have `--reproduce`, which the
+  synopsis gives as one `gen_vectors_v3.py --reproduce RECORD` line, commented "each generator"?
+  [Gap, Spec §FR-053, §FR-061, §FR-036; data-model §1 "Fields compared, per kind", §11; cli contract
+  "Generators of constants and vectors"]
+- [ ] CHK061 Is it stated which code a reproduction and the re-check run for a record whose code
+  files have changed since its run? A reproduction compares "each source file's entry in
+  `code_sha256`", a different hash makes it "a new run, not a reproduction", and the cli contract
+  applies to it every guard but Budget and Order of sizes, which would include the committed-code
+  guard, exiting 2 "unless every source file in its `code_sha256` matches HEAD". The `protocol/`
+  modules a run uses are in its `code_sha256`, and nothing keeps `protocol/evidence.py`, the one
+  writer of every record, written at setup, or `protocol/devinputs_v3.py` unchanged until the
+  freeze, so that, read together, a record can be reproduced only while HEAD holds the very code it
+  ran, and the first edit to any of its files leaves it without a reproduction. Does `--reproduce`
+  run the code at the original's `git_head`, for example from a separate worktree that the
+  reproduction record names, or refuse with exit 2, naming the changed files; and which records does
+  FR-061's test of one light command per light kind reproduce? Does the re-check, which recomputes
+  every verdict "with the verdict functions of `protocol/evidence.py` that the scripts which wrote
+  the records call, so that it runs the frozen code that produced each verdict", run the current
+  module for a record made under an earlier version of it before the freeze? [Gap, Spec §FR-053,
+  §FR-061, §FR-065; data-model §1 "Reproduction", `code_sha256`; research R16; cli contract
+  "Reproduction", "Guards shared by every script", `recheck_004.py`]
+- [ ] CHK062 Are the committed data files that records cite by SHA-256 kept as cited, when they are
+  neither code nor among the files kept under a fixed name? Every frequency and avalanche record
+  holds "the critical-count table it used (path and SHA-256)",
+  `research/004/tools/critical_counts.json`, whose counts "are derived once" per (N, S) and (N_a,
+  S_A), although a stricter change may need "more inputs", "a new measurement of the same kind under
+  the changed rule", and so counts for a new N; the sidecar `vectors/phyco-v3/MANIFEST.json`, one
+  entry per generator run, is rewritten at every run until the freeze hashes it; and
+  `research/004/candidates/superseded.json` grows with every superseded operation list. Code must
+  match HEAD before a run, but `dirty_paths` "may be data and report files only", so a table read
+  while modified gives a SHA-256 that no commit holds. Is each such file written once, append-only
+  with its earlier content unchanged, or kept under `versions/` as the fixed-name files are, and is
+  it committed before any run that cites it; and is `critical_counts.json` code, under
+  "`research/004/ir.py` and its tools", or data? [Consistency, Gap, data-model introduction, §1
+  `dirty_paths`, `code_sha256`, §3, §5 "Exact verdicts", §11; research R4, R7, R16]
+- [ ] CHK063 Can every light kind be reproduced as FR-061's test requires, "through the script's
+  `--reproduce` mode"? Research R7 calls light "one this section does not budget that runs with one
+  worker in under 10 minutes, such as the constants, the vectors and the constructed states,
+  `mode_limits_v3.py`, the round rule, the D4 choice, the claim register and the re-check", while
+  `check_claims.py` writes no record and `recheck_004.py [--kind KIND]` has no `--reproduce` mode,
+  and the `generator-check` records of `--check`, the `lock-cleared` records of `clear_lock.py`, the
+  cross-checks between kinds and the reproduction records themselves have neither a reproduction
+  mode nor a row of data-model §1's "Fields compared, per kind". Is each light kind given the script
+  that reproduces it and its row in that table, or stated to be outside the test, with the reason;
+  and is light a property of a kind or of each run, given that a run is heavy if it "is projected to
+  take, or last took, more than 10 minutes", so that one kind may be light at 4×4 and heavy at
+  16×16? [Coverage, Spec §FR-061, §FR-053, §User Story 4 Independent Test; research R7, R16;
+  data-model §1; cli contract `recheck_004.py`, `check_claims.py`, `clear_lock.py`]
+- [ ] CHK064 Is the loader's response stated for test states at an (n, w) that has no recorded
+  fingerprint, and how one is added? Research R3 records "The fingerprint of each kind, of the state
+  kind at every supported n and w" in the module, written in plan phase 1
+  ("`protocol/devinputs_v3.py` with fingerprints"), and `load` checks "the kind's fingerprint (for
+  `state` at the given n and w, for `synthetic` at the given n)", while each candidate logs its own
+  reduced variants after setup, with its parameters ("the reduced variants used as evidence (widths,
+  sizes, round counts, capacities)"), and research R3 freezes the rule ("nothing may change; the
+  rule is frozen at plan approval"). Does `load` refuse an (n, w) without a fingerprint with exit 2,
+  and is adding one a change to a frozen module, recorded in the protocol change log, given that
+  `protocol/devinputs_v3.py` is among the code a run's `code_sha256` holds and among the freeze's
+  hashes, so that an addition after the first record makes every earlier record's source hash differ
+  from HEAD's? [Gap, Edge Case, Spec §FR-040; data-model §2, §3, §13; research R3; plan "Phases and
+  gates"]
+- [ ] CHK065 Does a reproduction run only in the environment that made the original, or in either of
+  research R1's two? Research R1 says "A reproduction that re-runs evidence may run in either
+  environment, whichever made the original, and in no other", data-model §1 that "the environment is
+  either of research R1's two, as recorded", and FR-053 that "the environment is either of the two
+  of research R1, as recorded", while some compared values depend on the environment: the synthetic
+  sets must reproduce "in an environment with that numpy version" (2.2.6 on Windows, 2.5.4 in WSL),
+  a MILP bound's compared `solver` fields come from "HiGHS's built-in tolerances and thread count in
+  the pinned scipy" (1.15.3 or 1.18.1), and the C tools are built and run in WSL only. Is the
+  environment stated per kind, and is a reproduction in the other environment, where allowed,
+  compared on the same fields, with what a difference there means? [Consistency, Spec §FR-053;
+  research R1, R12, R16; data-model §1 "Reproduction", §6, §7; cli contract `validate_tool.py`]
+- [ ] CHK066 Is the Windows environment of research R1 stated as it is installed, with the way its
+  package list is read? A probe on 2026-11-01 found the Microsoft Store distribution of Python
+  3.10.11, run through an alias in the user's WindowsApps folder from a prefix under Program Files
+  whose name carries the package's version (3.10.3056.0), with numpy, scipy, nistrng and pip 26.2.2
+  in the user site and pip 23.0.1 in the prefix. Research R19 runs any Python that reads a
+  downloaded file with `-I`, which disables the user site: on that probe the interpreter run with
+  `-I` imported no numpy and ran pip 23.0.1, so which pip installs the Hypothesis wheels, and where,
+  is open, though R19 says "Installed from the downloaded files into the two existing environments",
+  and "the full `pip freeze`" that the environment record holds and the start check compares differs
+  with and without `-I`. Is it stated which interpreter path a record's `command` gives for "the
+  Windows Python", how `pip freeze` is taken for the record and by `protocol/evidence.py`, and how
+  the wheels are installed into the user site while the download rule holds? [Gap, Dependency,
+  research R1, R18, R19; data-model §1 `command`, `environment`; Spec §FR-061; plan "Phases and
+  gates"]
+- [ ] CHK067 Is `requirements.txt` stated for the case that research R17 and R19 allow, a Hypothesis
+  wheel not obtained ("If it cannot be obtained, its absence is an open item (FR-058)")? Research
+  R18 adds `hypothesis==6.168.5` and `sortedcontainers==2.4.0` with no marker, for both
+  environments, once Hypothesis is approved rather than once it is installed, while an environment
+  record "is written only when its Python and pinned packages match this section and the pins of
+  `requirements.txt` for that platform", and every evidence script checks the running environment
+  against that record at start. Without either wheel, does `requirements.txt` leave the pins out on
+  that platform, by a marker or a stated edit, or does the environment record wait, so that no
+  evidence runs there; and is the test suite's behaviour without Hypothesis stated, its property
+  tests skipped and listed as the open item or failing quickstart P0, which expects "all tests pass,
+  existing and new"? [Edge Case, Dependency, Spec §FR-058, §FR-053; research R1, R17, R18, R19;
+  quickstart P0]
+- [ ] CHK068 Is each record's `kind` named, with one rule for its file name? `kind` is "one of the
+  kinds of sections 4–11, `projection`, `lock-cleared`, `reproduction` or `recheck`", every
+  reproduction compares it, and `record_id` is `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, but only
+  section 5's kinds, `bound`, `cost`, `generator-check` and `fut-sec-8-reproduction` have names: the
+  demonstration, a tool validation, a cross-check between kinds, the D4 choice, its tie and tie
+  choice, a round rule, a selection, the size profile, the limits and a generator run have none. The
+  file names differ in form: `candidates/<id>/<kind>-<record_id>.json`, which repeats the kind that
+  `record_id` begins with, `controls/<test>-<record_id>.json`, `validation/<tool>-<record_id>.json`,
+  `rechecks/<record_id>.json`, and fixed names such as `d4/choice.json`. Is every kind's name
+  listed, every file name built by one stated rule, and the eight hex digits of `record_id` stated
+  as random or derived, so that another implementation writes the same names? [Clarity, data-model
+  §1, §4 to §11; cli contract `evidence_v3.py`; Spec §FR-061]
+- [ ] CHK069 Does the plan's source tree agree with the contracts on the files it lists? It lists
+  two `design_freeze.py`, one under `protocol/` ("new: freeze create, approve and validate
+  (FR-043)") and one under `scripts/` ("create, approve and validate the freeze"), while the cli
+  contract and quickstart F1 run `scripts/design_freeze.py` only and the freeze record hashes
+  neither, so that which file holds the freeze's code, and which one a test or a record hashes, is
+  open; and its reports tree omits `locks/`, where `clear_lock.py` writes each `lock-cleared` record
+  ("under `$REP/locks/`"), and the `versions/` directory kept beside each fixed-name file. Is the
+  tree completed, with each file's role stated once? [Consistency, plan "Project Structure"; cli
+  contract `design_freeze.py`, `clear_lock.py`; data-model introduction, §13; quickstart F1]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
