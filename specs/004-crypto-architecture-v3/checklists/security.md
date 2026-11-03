@@ -688,6 +688,66 @@ They start open, and an item is ticked only under the rule in the Notes below.
   §FR-068, §FR-069; data-model §15; plan phase 1; cli contract `check_claims.py`; README;
   security.md]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK093 Is it defined which text in a disclaimer line the claim test reads as a bound and which
+  as a claim, given that FR-069 compares "a bound or a claim stated in a disclaimer", line by line,
+  with the register entries of the models the line names, a bound being beyond the register's when
+  an entry holds `none` or a bound below the line's, while README's line on the 64-bit seed holds
+  three numbers of bits, "64-bit seed", "at 64 bits" and "the 112-bit minimum", of which only the
+  second bounds the models whose seed it describes, so that a test reading each number of bits as a
+  bound finds README's own line beyond the entries' "at most 64 bits"? Is it stated which forms the
+  test reads as a bound, whether a figure that bounds no model, such as a seed's size or a
+  standard's minimum, may stand in a block, which text it reads as a claim, a property or a strength
+  stated for a model, and how it reads a negation, such as "no claim" in FR-051's sentence on
+  `phyco-v3` or "does not show cryptographic security" in security.md's opening block?
+  [Measurability, Ambiguity, Spec §FR-051, §FR-069; data-model §15; cli contract `check_claims.py`;
+  README status block; security.md]
+- [ ] CHK094 Is it stated which of the claim test's findings an allow-list entry can pass, given
+  that FR-069 lets "a flagged line, a rule's own text included," pass only through an entry of the
+  register, that the agent drafts each entry and the owner reviews it only at the next ⛔ gate, and
+  that each disclaimer, which must "state no level, claim or bound beyond the register's", is
+  decided "by the rule on a level, claim or bound beyond the register's", whose part on a level is
+  the level rule, a rule that flags lines as the others do, so that a line entry for a disclaimer
+  line naming a level above `claim_level` would pass it, while the comparison of a bound or a claim,
+  the fixed sentence and the checks of the register against the rows and the files are stated as
+  findings with no word on entries? Is it stated whether an entry can pass a finding in a disclaimer
+  block, or any finding other than a wording rule's flag, so that the three blocks and the
+  register's level, `bound`, `evidence` and `in_progress` stand only as the rules give them?
+  [Clarity, Consistency, Spec §FR-069; data-model §15; cli contract `check_claims.py`]
+- [ ] CHK095 Is it stated how the claim test compares security.md §1.1 and README with the register,
+  and who keeps §1.1 in step with it, given that FR-069 has the test check that "README, security.md
+  §1.1 and §15, and the disclaimers agree with the register", while a comparison is stated only for
+  §15's line, which states "the same level", and for the disclaimers; that §1.1 is a table whose
+  column "Claim level (section 15)" reads "L0; no claim" for each model and holds no row for
+  `phyco-v3` until FR-051's security.md version, which plan phase 8 writes after the security-target
+  review, while the register holds `phyco-v3`'s entry from plan phase 1; that README, outside its
+  status block, names no level and states a bound in its passage on the seed's size; and that FR-012
+  and data-model §15 have the agent write `claim_level`, `updated`, `history` "and its line in
+  security.md §15" after each owner's commit that changes the rows, naming no change to §1.1? Is it
+  stated which column and cell text of §1.1 the test reads against `claim_level` and `claim`,
+  whether a register entry with no row in §1.1 is a finding, which README lines it compares, and
+  that §1.1's row changes in the same commit as §15's line, so that §1.1 never states a level the
+  register has left? [Gap, Consistency, Spec §FR-012, §FR-051, §FR-069; data-model §15; plan
+  phases 1 and 8; cli contract `check_claims.py`; security.md §1.1; README]
+- [ ] CHK096 Is a research variant's bound stated once, given that FR-006 and FR-032 have a keyed
+  reduced variant's size-profile row state "s = c/2 as a bound on that variant only", FR-017 has
+  each research row state "its key entropy c, its s = c/2", and research R14 and data-model §10
+  check FR-010's relations "at s = c/2", while FR-009, as SEC-090 left it, reads "That bound is the
+  size profile's `bound_bits`", which FR-010 and data-model §10 make, at the variant's own k, nonce
+  bits and c, the least of six terms, one of them k − log₂ u "at the u that `limits.json` states", a
+  single u that research R9 derives for the claimable sizes at k = 256, where typical keyed-duplex
+  terms "would give" about 2⁶⁴ keys, so that at `n2-w16-R8-c64`, with k = 64, that term can fall to
+  zero, below c/2 = 32, and while a keyless research variant has a key entropy of 0 and the bound
+  `none`? Is it stated which u a research row's term takes, whether the row's bound is `bound_bits`
+  or c/2, whether s is a field of the row, which no field of data-model §10 holds, or only the level
+  at which its checks are made, and what FR-017's sentence says of a keyless row? [Conflict, Spec
+  §FR-006, §FR-009, §FR-010, §FR-017, §FR-032; data-model §10; research R9, R14]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy
