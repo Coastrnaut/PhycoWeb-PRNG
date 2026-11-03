@@ -1639,14 +1639,41 @@ agent's reading is that it changed no rule, since §18 already gave the mark to 
 that kind that the agent finds before the log is created (PRO-079), and that, read as a change, it
 is stricter: `protocol_change.py create` refuses until the owner decides two more readings.
 
+After those, on the owner's answer of 2026-11-03, "all recommended", to nine items that the agent
+raised after the loop, each with a recommended solution, three commits changed places of rules with
+edits that no row made. Commit b6a93f0 changed the cli contract, a place that the heading "Records
+and their hashes" names: FR-012 and research R10 had said that each precondition of a mode theorem
+is marked met in the mode chapter, while data-model §10, FR-043 and the contract hold the mark in
+`limits.json`, beside the mode-chapter section that meets it; the commit states the mark there in
+each of them, and `design_freeze.py create` also exits 2 when a precondition names, as that section,
+none of the mode chapter's sections in the version of the design document it reads. Commit 252512a
+changed spec FR-039, research R4 and the cli contract, places that the headings "Tool validation",
+"Bias rule" and "Records and their hashes" name: their passages on what follows "an approved numpy
+upgrade", as data-model §7's, now take as their trigger any numpy version other than the one
+research R1 pins, which only an owner's own decision outside the protocol could bring, since PRO-078
+keeps R1's pins unchanged and no approval in the protocol can approve an upgrade, each consequence
+staying word for word. Commit 797c6da changed spec FR-020, FR-025 and FR-026 and research R5 and R8,
+places that the headings "Eligibility and selection", "Nonlinearity choice rule (D4)" and "Vector
+lengths" name: FR-013 states that the reseed call is part of the design, D1's "optional reseed"
+meaning only that a host need not call it, and the qualifier "where the design has a reseed", which
+SEC-088's option A did not hold, goes from those places and from FR-008, FR-059 and data-model §11,
+so that the start-up self-test and feature 008's tests always run a reseed. Each is recorded here
+for the owner to confirm at the tasks approval as an entry of its own or as no change of rule, with
+the reason; the agent's reading is that each is stricter: b6a93f0 adds a refusal, 252512a widens a
+trigger whose consequences stay, and 797c6da closes a reading under which the self-test and the test
+skip the reseed step. The other two commits of that answer changed no place: 3c8eccb, which says in
+FR-034 that "the mode chapter" is the design document's chapter "Mode", and 7e61f4f, which notes in
+the security checklist where CHK085's quoted sentence stands.
+
 Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
 recorded beside the re-run's list above; the span from 832bd4d to 930494d, between the ninth and
-tenth re-runs' pairs, changed no place; and after this round's pair, the span from 974ffef to
-57bd909 changed three places, research R16 and the cli contract by 1c67100 and data-model §18 by
-57bd909, each recorded beside this list above, the other commits, 744ded0, ccaf8f0, 388551a
-and the commit that recorded 57bd909, changing none, the last two editing
-only this file. Before the tasks approval the script compares every pair and
+tenth re-runs' pairs, changed no place; and after this round's pair, the span from 974ffef changed
+places in five commits, research R16 and the cli contract by 1c67100, data-model §18 by 57bd909, the
+cli contract by b6a93f0, spec FR-039, research R4 and the cli contract by 252512a, and spec FR-020,
+FR-025 and FR-026 and research R5 and R8 by 797c6da, each recorded beside this list above, the other
+commits, 744ded0, ccaf8f0, 388551a, 82bb979, 3c8eccb, 7e61f4f and the commit that recorded the last
+three of the five, changing none. Before the tasks approval the script compares every pair and
 span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
 and which the owner confirms in the row "Place check" (PRO-063).
 
@@ -1843,7 +1870,11 @@ and the chosen options were written on 2026-11-03 into the documents their Chang
 change with its reason: spec.md, plan.md, research.md, data-model.md, the cli contract,
 quickstart.md and this document's lists "Rows that change the protocol", beside which the results of
 the comparison now stand. The protocol changes among them enter the protocol change log when it is
-created, before any result exists (FR-044; data-model §18). Each of the 15 items was then verified
+created, before any result exists (FR-044; data-model §18). The seven alternatives marked "looser"
+stay unchosen: option A of each is applied, and FR-044 lets the protocol only become stricter, so
+that none of them can be chosen now, as for every round's alternatives marked so, the tenth re-run's
+twenty-two among them (the owner's answer of 2026-11-03 to the agent's items
+after the loop, "all recommended"). Each of the 15 items was then verified
 against the complete documents: all 15 hold and are ticked, as each checklist's Notes record, and no
 item of the eight checklists stays open. A tenth re-run of the six checklists over the complete
 documents and the repository then found 28 more items.
@@ -1876,6 +1907,7 @@ checklists stays open. As the owner asked on 2026-11-03 ("after this iteration, 
 speckit-checklists loop"), the loop of re-runs stopped after this round, though no re-run had yet
 found no new item, so that no eleventh re-run was made, and `/speckit-tasks` waits for the owner's
 word, up to the ⛔ tasks approval.
+
 After the loop stopped, the owner gave two items on 2026-11-03: "consider and fix these two items
 after the loop stops". The first, that the guard "Environment" would refuse the downloads manifest
 and a `lock-cleared` record in plan phase 1's steps (5) and (6), the environment records existing
@@ -1889,3 +1921,47 @@ the two rules open. On the question that record raised, the owner added REP-063 
 readings set aside the same day ("yes, add REP-063 and REP-085 to the set-aside readings"), so that
 fifteen first entries mark one reading each `set_aside` for the owner's decision in the row
 "Readings set aside" ("How to answer"; spec, Clarifications, Session 2026-11-03).
+
+After those, the agent raised nine items the same day, three observations of the tenth re-run's
+report and six carried from earlier reports, each with a recommended solution, and the owner
+answered "all recommended" (spec, Clarifications, Session 2026-11-03). Three of them changed places
+of rules, in b6a93f0, 252512a and 797c6da, recorded beside the tenth re-run's list above; 3c8eccb
+says in FR-034 that "the mode chapter" is the design document's chapter "Mode", every theorem that
+`rationale.md`'s chapter "Mode" states the mode rests on being one the mode chapter uses; 7e61f4f
+notes in the security checklist that CHK085's quoted sentence stands in data-model §17, not §15; and
+the ninth re-run's paragraph above says why its seven alternatives marked "looser" stay unchosen.
+The rest of the answer asks that this document record what the rows' applied text holds beyond their
+words, for the owner to confirm at the tasks approval, as the ticks are, which the next two
+paragraphs do.
+
+Seven rows were applied with a reading wider than option A's words, each stricter or the one reading
+under which option A holds together. SEC-085 gives each line its own `claim_level`, from the models
+the line names and L0 where it names none, so that a line naming no model stays held to L0 once
+`phyco-v3` reaches L1. SEC-086 counts both of security.md's blocks among the disclaimers, so that
+more text is checked. ANA-078 makes "the budget spent" the reason that closes exactly the
+`replacement` entries that "the budget allows" refuses, the edge case on trail bounds restating that
+condition, so that no such entry is left without a reason to close. HW-087 keeps the command
+interface's ready high in `generating`, the key-loading and absorption interfaces' ready low, since
+option A's "every input interface's ready low" would refuse the zeroize that option A requires.
+HW-090 adds to FR-025 "Call sequence" that a malformed word refused while a call runs takes its own
+code, restating option A's "in every state". SEC-091 reads `phyco-v3`'s bound as the least of its
+sizes' bounds unless a line names a size by its variant ID, the conservative reading, and fixes the
+register's bound "at most 64 bits" for `float-v0`, `lut-v1` and `phyco-v2`, from their 64-bit seed,
+a ceiling and no claim, which README's line on the seed needs to pass, the owner's answer keeping
+those caps, as the agent recommended, over the stricter alternative of a bound `none` for `float-v0`
+and `lut-v1` with that line moved out of README's block. ANA-080 adds data-model §3's paragraph on
+the candidate log's writers, names `candidate_log.py replace` in the "Stop rule", has `decide`
+refuse the `selected` and `not selected` decisions, which `round_rule.py --decide` alone writes, and
+has the script take the lock, with no `--reproduce`, since it writes log entries and no record, each
+a refusal added or a restatement.
+
+Text was also written beyond the rows' Changes cells, each passage restating there a rule that a row
+of its round wrote where its cell names: in the eighth re-run, the cli contract's sections
+`repair_log.py` and `clear_lock.py`, research R1, R5 and R16, the FUT-HW-5 row, the spec's Key
+Entities, quickstart F2, FR-067's pointer and FR-061; in the ninth, SEC-089's text in FR-012,
+HW-091's in FR-025 "Zeroization", REP-097's in data-model §9, RAT-085's split of data-model §1's row
+and RAT-083's naming of `tests/test_protocol_004.py`. The comparison counts the places among them as
+made, each round's rows being listed under every rule whose place its commits changed, HW-089 under
+"Nonlinearity choice rule (D4)" by the eighth re-run's alignment, for its counters in research R5,
+as recorded beside that list, so that none of them needs an entry of "Place check"; the owner
+confirms them at the tasks approval with the rows.

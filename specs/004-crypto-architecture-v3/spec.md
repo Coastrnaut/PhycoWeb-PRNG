@@ -319,6 +319,23 @@ and the design document leaves an implementer, human or model, nothing to guess.
   with that case, for the owner's decision in the Review & Approval row "Readings set aside", which
   now names fifteen such entries; the earlier Clarifications keep each answer as given
   (checklist-choices.md, "How to answer"; PRO-079).
+- Q: After the loop stopped, the agent raised nine items, each with a recommended solution: where a
+  mode theorem's precondition is marked met, the passages on an approved numpy upgrade, what "the
+  mode chapter" means, the section that security CHK085 quotes, SEC-088's qualifier "where the
+  design has a reseed", the readings wider than option A in SEC-085, SEC-086, ANA-078, HW-087,
+  HW-090, SEC-091 and ANA-080, HW-089's listing under D4, the text written beyond the rows' Changes
+  cells and the ninth re-run's seven alternatives marked "looser". Which solutions apply? → A: All
+  recommended (owner, 2026-11-03): "all recommended". Each precondition is marked met in
+  `limits.json`, beside the mode-chapter section that meets it, which `design_freeze.py create`
+  checks (FR-012, FR-043; research R10); a numpy version other than research R1's pin, which only an
+  owner's own decision outside the protocol could bring, keeps the old validation and takes a new
+  one (FR-039; research R4; PRO-078); "the mode chapter" is the design document's chapter "Mode"
+  (FR-034); the reseed call is part of the design, so that the start-up self-test and feature 008's
+  tests always run a reseed (FR-013; SEC-088); a note in the security checklist places CHK085's
+  sentence in data-model §17; and checklist-choices.md records the readings beyond option A, the
+  text beyond the Changes cells, HW-089's listing and why the looser alternatives stay unchosen, for
+  the owner's confirmation at the tasks approval, the edits to places of rules standing beside the
+  tenth re-run's list for the row "Place check" (FR-044; PRO-063).
 
 ## Review & Approval *(Constitution Principle VIII)*
 
