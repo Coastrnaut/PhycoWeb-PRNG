@@ -730,6 +730,90 @@ They start open, and an item is ticked only under the rule in the Notes below.
   count that the other family reaches? [Ambiguity, Conflict, Spec §Nonlinearity choice rule (D4);
   research R6; data-model §8 `outcome`; cli contract `d4_choice.py`]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK083 Are an event and a writer stated for the candidate-log entries that the owner design
+  review's outcomes need, given that FR-043, the Review & Approval row and data-model §3 and §17
+  have a decline's reasons "logged under" the declined candidate, its log entry stating "what the
+  rules need to select" a further candidate before that one's `proposed` entry, a revision "logged
+  under the candidate with its old and new version", a fix "logged under the candidate" and a stop
+  "logged with the review's reasons", while data-model §3's `event` field allows only `proposed`,
+  `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`
+  and `set-closed`, its decisions hold no decline, and FR-041, data-model §3 and the cli contract
+  give every kind of entry one writer and name none for these (ANA-080)? Is it also stated how
+  `candidate_log.py propose` admits the further candidate's `proposed` entry after the first
+  `set-closed` entry, after which "no candidate is entered", only once such a decline entry exists
+  and within the one reopening? [Gap, Completeness, Spec §FR-034 "Version", §FR-041, §FR-043,
+  §Review & Approval "Owner design review", §Pre-registered Design Protocol "Stop rule"; data-model
+  §3, §17; cli contract `candidate_log.py`]
+- [ ] CHK084 Is the D4 outcome stated for every combination of the families' reduced-width results,
+  given that research R6 and the spec's nonlinearity choice rule (ANA-082) take the widest of 16 and
+  8 at which each family has a candidate with both bounds at a common number of rounds, at least 2,
+  choose a family "by default" "where at 16 and at 8 only one family has" such a candidate, the
+  width being "the widest at which it has one", and make D4 not computable "where neither family has
+  one"? Where one family has such a candidate only at 16 and the other only at 8, each width has one
+  family and "that family" names none; and where each family has one at a width but at no common
+  number of rounds, none of the three cases applies. Is the outcome of each such case stated, with
+  the width and r* it scores at, while the protocol may settle a case it leaves undefined only
+  before any result it affects exists (FR-044)? [Edge Case, Ambiguity, Spec §Pre-registered Design
+  Protocol "Nonlinearity choice rule", §FR-044; research R6 "Where", "One family scored", "Neither
+  family scored"; data-model §8]
+- [ ] CHK085 Does the latest `selected` entry's `variant_map` stay in step with the selected
+  candidate's final R at every claimable size, given that the variant IDs it maps carry R
+  (`cand-…/n…-w…-R…-c…`; FR-032), that `round_rule.py --decide` writes it only after a selection
+  record, and that a new selection record follows only a change that "touches any candidate's
+  eligibility or R at 4×4" (FR-043; data-model §9), while R at 8×8 or 16×16 can still rise after
+  selection through a stricter change applied to every candidate (FR-044) that leaves the selected
+  one eligible and its R at 4×4 as it was, and `design_freeze.py create` checks only that the entry
+  cites the latest selection record and names its candidate, the freeze record holding its
+  `variant_map`, while it checks `phycoweb/constants_v3.py` against the candidate's "final R"? Is it
+  stated that such a rise writes a new selection record or a new `selected` entry, or that `create`
+  compares the map's variant IDs with `round-rule.json`'s final R at every size? [Gap, Consistency,
+  Spec §FR-032, §FR-043, §FR-044, §Pre-registered Design Protocol "Eligibility and selection";
+  data-model §3 `variant_map`, §9, §13; cli contract `round_rule.py`, `design_freeze.py`]
+- [ ] CHK086 Does the re-check recompute the verdict of every `trail` record, given that a trail
+  found with probability or squared correlation above 2⁻¹²⁸ is a source of R_dist (round rule;
+  FR-038) and is classed "confirmed vulnerability" of the rounds it covers (data-model §1), that
+  data-model §6 writes one beside the bound record of every optimal characteristic a search of Π
+  returns, with its exact weight as a rational, and that FR-065 asks every verdict and every
+  record's classification to be recomputable by the re-check, while FR-065's list of verdicts,
+  research R16 and the cli contract's `recheck_004.py` name "the inverse, bijectivity, dependency,
+  bias, uniform-control, symmetry, invariant, degree and bound checks" and no trail? Is it stated
+  how the re-check recomputes a trail's exact weight from its committed characteristic and the
+  operation list, by exact integer arithmetic as for the other kinds, and that a disagreement blocks
+  the candidate as for any record? [Coverage, Gap, Spec §FR-038, §FR-060, §FR-065, §Pre-registered
+  Design Protocol "Round rule"; research R16; data-model §1, §6; cli contract `recheck_004.py`]
+- [ ] CHK087 Is it stated what closes a pending `replacement` entry when the owner does not approve
+  the replacement the agent proposes, given that a further candidate "is entered for every"
+  candidate `rejected` or `ineligible` for a cause of its own while its family has fewer than three
+  evaluated candidates and the budget allows, proposed by the agent and entered with the owner's
+  approval, its `proposed` entry written only on the owner's explicit word quoted with its date
+  (ANA-080), that the entry stays `pending` until that `proposed` entry or a stated reason, "the
+  family full" or "the budget spent", closes it, and that `round_rule.py --close` writes
+  `set-closed` only while no replacement is pending, so that selection never runs while the owner
+  withholds that word? Is a proposal the owner does not approve recorded, may the agent propose
+  another design in its place, and does the owner's refusal close the entry with a reason of its own
+  or end in a stop? [Edge Case, Gap, Spec §FR-041, §Pre-registered Design Protocol "Eligibility and
+  selection", "Stop rule"; data-model §3; cli contract `candidate_log.py`, `round_rule.py`]
+- [ ] CHK088 Is it stated what `candidate_log.py decide` checks before it appends a `rejected` or
+  `ineligible` decision with its `replacement` entry, given that the cli contract lists among its
+  refusals only "a decision outside the rules' reasons", while `replace` closes an entry for the
+  budget spent only when R7's rows, the record of that need and, for a lowered row, the protocol
+  change log show it (ANA-078), that the decision's reason and the entry's state, `pending` or
+  closed at once with "cause shared", decide whether a replacement is entered, and that the reasons
+  "not analysed at the production width: D4 chose the other family" and "D4 chose the other family
+  by its tie-breaks" hold only once every candidate of the chosen family has its final decision and
+  one of them is eligible? Is it stated that a decision cites the record, the round-rule record's
+  eligibility item or the D4 record that shows its reason, that the writer refuses a decision they
+  do not show and a state the rules' classification does not give, and that the re-check recomputes
+  these decisions with eligibility and selection? [Measurability, Consistency, Spec §FR-041,
+  §FR-065, §Pre-registered Design Protocol "Nonlinearity choice rule", "Eligibility and selection";
+  data-model §3 "Decisions"; cli contract `candidate_log.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
