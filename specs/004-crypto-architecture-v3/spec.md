@@ -3165,8 +3165,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     and reports the rebuild's hash only; where the rebuild's SHA-256 differs from the committed
     binary's, it runs the recorded configuration again there with the rebuild and compares that
     run with the original too, so that both the binary that ran and one built from its committed
-    source reproduce the result, a run that counts nothing and looks the tool up by its committed
-    pair of hashes, the rebuild's hash entering no guard (FR-039; research R16).
+    source reproduce the result. A rebuild that differs is a new version of the tool (FR-039):
+    where the guards Tool validation and Trail tools do not admit it, no such run is made and the
+    reproduction counts a difference in every compared field, as for a rebuild that fails, so that
+    a binary that its committed source does not give is a finding. Each make file compiles with
+    relative paths and no debug information, so that a correct tool rebuilds to the same bytes in
+    any worktree, which a test checks (research R16).
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
     count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs

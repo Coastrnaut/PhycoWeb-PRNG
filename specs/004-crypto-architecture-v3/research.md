@@ -1839,7 +1839,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the original's code, its committed binaries included, from a separate worktree of its
     `git_head` checked against that commit's blobs, and the committed-code guard applies to that
     commit; it also rebuilds each C tool's binary from that commit's source, the rebuild's hash
-    reported only, and runs the rebuild as well where it differs (Reproduction, below).
+    reported only, and runs the rebuild as well where it differs and the guards admit it
+    (Reproduction, below).
   - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
     `security-target/parameters.json` and `limits.json`, the environment
     records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to
@@ -1899,18 +1900,20 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction
     removes the committed binary from a second worktree of the commit, since make would otherwise
     take it as up to date and compile nothing, rebuilds the tool's binary there from that commit's
-    source with that commit's make file, and reports the rebuild's SHA-256 only. Where that equals
-    the committed binary's, the two binaries are identical and one run serves for both; otherwise
-    the recorded configuration runs a second time, with the rebuild, in the second worktree, the
-    committed-code guard applying there to every file but the rebuilt binary, whose
-    `--source-sha256` it still checks, and that run's outputs, placed as the first run's under a
-    further `rebuilt/` directory, are compared with the original's in the same way. That run checks
-    the binary and counts nothing, so the guards Tool validation and Trail tools, and the
-    `validation` and `cross_check` it cites, look the tool up by the pair of its source's and its
-    committed binary's SHA-256 in the original's `code_sha256` (R12), the rebuild's hash entering
-    no guard. A difference in either run counts as one, a rebuild that fails counts as a difference
-    in every compared field, and a heavy reproduction projects, and is charged for, each run it
-    makes (R7).
+    source with that commit's make file, and reports the rebuild's SHA-256 only. Each C tool's make
+    file compiles with relative paths and no debug information, so that a correct tool rebuilds to
+    the same bytes in any worktree, which a test checks. Where the rebuild's SHA-256 equals the
+    committed binary's, the two binaries are identical and one run serves for both; otherwise the
+    rebuild is a new version of the tool (R12), and the recorded configuration runs a second time,
+    with the rebuild, in the second worktree, the committed-code guard applying there to every file
+    but the rebuilt binary, whose `--source-sha256` it still checks, and that run's outputs, placed
+    as the first run's under a further `rebuilt/` directory, are compared with the original's in
+    the same way. Where the guards Tool validation and Trail tools do not admit that version, which
+    has no `re-found` record of its own, no second run is made, so that those guards apply as
+    written and a binary that its committed source does not give is a finding, not only a refusal.
+    A difference in either run counts as one, a rebuild that fails or that those guards do not
+    admit counts as a difference in every compared field, and a heavy reproduction projects, and is
+    charged for, each run it makes (R7).
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
     test reproduces, per kind, its latest light run made under the platform's environment record in
     force and, where one exists under it, a light run made before the last change to its code (R7),
