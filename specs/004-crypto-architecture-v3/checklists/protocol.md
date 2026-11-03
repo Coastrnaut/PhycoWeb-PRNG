@@ -653,7 +653,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK073 Do research R16's and quickstart F2's statements of the freeze's first two steps agree
+- [x] CHK073 Do research R16's and quickstart F2's statements of the freeze's first two steps agree
   with FR-043 as PRO-072 left it, given that R16 has step (1) be "the owner's next commit after the
   one that records the owner design review's approval, from which the agent commits no file of this
   feature" and quickstart F2 has `create` exit 2 "unless HEAD is the commit right after the owner

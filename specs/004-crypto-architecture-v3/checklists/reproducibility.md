@@ -974,7 +974,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK097 Where does `gen_vectors_v3.py` take each claimable size's k from, given that FR-059 has
+- [x] CHK097 Where does `gen_vectors_v3.py` take each claimable size's k from, given that FR-059 has
   k "stated per claimable size in the design document" as the least number of whole blocks for which
   the model's run meets each structure's taking part, "unless the design document names a structure
   that needs more, with its reason", that the self-test's vector file "holds k with the structure
@@ -989,7 +989,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   takes for FR-020's self-test formula before selection, when neither exists yet? [Gap, Conflict,
   Spec §FR-020, §FR-026, §FR-059; research R8; data-model §1 "Fields compared", §11; cli contract
   "Generators of constants and vectors"]
-- [ ] CHK098 Does research R16's rule on hashes name every hash of kind `canonical`, given that it
+- [x] CHK098 Does research R16's rule on hashes name every hash of kind `canonical`, given that it
   records `canonical` "for an approval hash, which `owner_record.py` prints and a row names, and the
   freeze record's `draft_sha256`", while data-model §1's "Hashes" adds the approval hash of the
   protocol change log's writer, taken "over one canonical JSON array of the first entries in log

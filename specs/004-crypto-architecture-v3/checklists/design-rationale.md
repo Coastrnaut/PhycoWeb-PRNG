@@ -659,7 +659,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK083 Is the owner design review's row required to name `rationale.md` by path and SHA-256,
+- [x] CHK083 Is the owner design review's row required to name `rationale.md` by path and SHA-256,
   beside the design document's version and the selection record, and does `design_freeze.py create`
   compare it, given that the row's own title names the design rationale among what it reviews, that
   the freeze record hashes `rationale.md`, that the notes under the Review & Approval table have a
@@ -670,7 +670,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   to `rationale.md` after the review's approval, before step (1), be frozen with no review row
   naming the text frozen? [Gap, Consistency, Spec §FR-034, §FR-043, §Review & Approval "Owner design
   review" and its notes; data-model §13, §14; cli contract `design_freeze.py`, `provenance.py`]
-- [ ] CHK084 Can SC-013's "covers 100% of the items of security.md §8" be counted, given that
+- [x] CHK084 Can SC-013's "covers 100% of the items of security.md §8" be counted, given that
   security.md §8 lists eight items the rationale states (the security target, the threat model and
   the claim template; the mode, the theorem it relies on and how each precondition is met; the role
   of every component, with what the mapping does and does not contribute; the sources of
@@ -686,7 +686,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   covers each item, or which chapter or record it cites for it, so that a reviewer can count the
   coverage? [Measurability, Coverage, Spec §FR-034, §SC-013, User Story 5 scenario 1;
   security.md §8]
-- [ ] CHK085 Is it stated where `mode_limits_v3.py` takes the limits, the variant table and the
+- [x] CHK085 Is it stated where `mode_limits_v3.py` takes the limits, the variant table and the
   layout from, and in what form, given that the cli contract has it evaluate the theorem's bound "at
   the limits stated in the design document" and write each row of `parameters.json` "from the
   variant table and the design document's layout", which the chapters "Mode" and "Permutation" hold

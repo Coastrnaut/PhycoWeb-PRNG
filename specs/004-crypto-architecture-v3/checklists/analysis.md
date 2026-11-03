@@ -692,7 +692,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK080 Is a command named that appends the candidate log's entries other than `evidence`,
+- [x] CHK080 Is a command named that appends the candidate log's entries other than `evidence`,
   `set-closed` and `repair`, that is `proposed` (with the owner's approval of a replacement "quoted
   with its date in its `proposed` entry"), `mapping`, `entered-d4`, `scored`, `decision`,
   `replacement` and `correction`, given that the cli contract has `evidence_v3.py` append `evidence`
@@ -705,7 +705,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   `provenance.py` and `protocol_change.py` state theirs? [Gap, Spec §FR-041, §Eligibility and
   selection, §Stop rule; data-model §3; plan "Project Structure"; cli contract `evidence_v3.py`,
   `round_rule.py`, `repair_log.py`]
-- [ ] CHK081 Is it stated who writes the candidate log's `selected` entry, with its `variant_map`,
+- [x] CHK081 Is it stated who writes the candidate log's `selected` entry, with its `variant_map`,
   and the `not selected` entries, and when, after the selection record and, where it holds a tie,
   after the owner's choice, and what a later selection record (`selection-<k>.json`) adds to the log
   when it selects another candidate or the same one, given that entries are never edited, that the
@@ -717,7 +717,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   that record's tie choice where there is one? [Gap, Clarity, Spec §FR-041, §FR-043, §Eligibility
   and selection, §User Story 5 scenario 2; data-model §3, §9, §13; cli contract `round_rule.py`,
   `design_freeze.py`]
-- [ ] CHK082 Can the D4 record's outcome `chosen by default` arise, given that research R6 fixes the
+- [x] CHK082 Can the D4 record's outcome `chosen by default` arise, given that research R6 fixes the
   width as the widest of 16 and 8 "at which at least one entered candidate of each family has both a
   differential and a linear trail bound for a common number of rounds of at least 2", r* as "the
   largest such common number" and scores only "candidates with both bounds at r* rounds", so that at

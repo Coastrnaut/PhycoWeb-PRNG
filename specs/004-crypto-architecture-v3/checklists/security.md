@@ -644,7 +644,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK089 Are the values of `phyco-v3`'s `bound` and `evidence` in the claim register stated,
+- [x] CHK089 Are the values of `phyco-v3`'s `bound` and `evidence` in the claim register stated,
   given that FR-069 asks the register to list every model ID with its claim level, its claim or "no
   claim", its bound and its evidence records, that plan phase 1 creates the entry at L0 with "no
   claim" and `in_progress` `none` and names neither field, that data-model §15 gives a `bound` only
@@ -655,7 +655,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   test checks either field against the files at HEAD, as it checks `claim_level`, `history` and
   `in_progress`? [Gap, Spec §FR-009, §FR-012, §FR-069; data-model §10, §15; plan phase 1; cli
   contract `check_claims.py`]
-- [ ] CHK090 Is the derivation of `bound_bits` in `parameters.json` stated, given that FR-009 asks
+- [x] CHK090 Is the derivation of `bound_bits` in `parameters.json` stated, given that FR-009 asks
   each supported size to state "the bound these place on any security level", that SC-003 counts
   that bound for every supported size, and that FR-010 lists the generic checks of security.md §12.2
   (the key entropy, a reachable secret state of at least 2s, multi-target search, k − log₂ u, within
@@ -665,7 +665,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   keyed reduced variant such as `n2-w16-R8-c64` gets its value? Can the value that
   `mode_limits_v3.py` writes then be checked by a test? [Clarity, Measurability, Spec §FR-009,
   §FR-010, §SC-003; data-model §10; security.md §12.2]
-- [ ] CHK091 Is it defined how the claim test compares a bound or a claim stated in a disclaimer
+- [x] CHK091 Is it defined how the claim test compares a bound or a claim stated in a disclaimer
   with the register's, given that each disclaimer must "state no level, claim or bound beyond the
   register's", that the level rule gives each line its own `claim_level`, from the models the line
   names by ID and L0 where it names none, while no such rule is stated for a bound or a claim, and
@@ -675,7 +675,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   is checked against, and what "beyond" means for a bound, for example a larger value than the
   entry's `bound` or a bound the register does not hold? [Clarity, Measurability, Spec §FR-051,
   §FR-069; data-model §15; cli contract `check_claims.py`; README status block]
-- [ ] CHK092 Is it stated how the claim test finds each of the three disclaimer blocks, README's
+- [x] CHK092 Is it stated how the claim test finds each of the three disclaimer blocks, README's
   status block and security.md's blocks, the one that opens it and the one that closes it, and by
   what criterion it decides that a block says "that PhycoWeb-PRNG, every model included, must not be
   used to generate secrets" (a fixed text, required phrases or a reading), given that none of the

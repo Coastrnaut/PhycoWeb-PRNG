@@ -767,7 +767,7 @@ Items found when the checklist was run a tenth time, over the complete documents
 repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK091 Is it stated whether a command word that the core takes and refuses while a call runs
+- [x] CHK091 Is it stated whether a command word that the core takes and refuses while a call runs
   starts a call of its own, and what `call_done` does then, given that FR-020 counts "a refused
   request that changes nothing" among its calls, each of which "starts when its command is accepted
   on the command interface" and ends "in the cycle in which `call_done` rises", that `call_done` is
@@ -784,7 +784,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   raises held through the rest of that call, so that FUT-HW-5's tests of a call in each state
   measure each count at the ports? [Ambiguity, Measurability, Spec §FR-020, §FR-025 "Call sequence",
   "Flow control", "Registers and read-back", "Zeroization"; FUT-HW-5]
-- [ ] CHK092 Does research R5's size estimate count the self-test's stored constants as FR-026 does,
+- [x] CHK092 Does research R5's size estimate count the self-test's stored constants as FR-026 does,
   given that R5 lists the self-test's "stored key, nonce, reseed input and expected output (spec
   FR-059; HW-082)", while FR-026 counts its key, its nonce, the empty personalization string's
   length word (RAT-079), the reseed input with its length word where the design has a reseed
