@@ -77,7 +77,7 @@ implementation can write byte-identical files:
 | `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below); and `environment`, `downloads`, `freeze` and `review-package`, the records kept under a name of their own (research R1, R19; sections 13, 16; below; REP-085) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
-| `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>" (1.0 once frozen; spec FR-034), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
+| `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>", and 1.0 while the design document has the SHA-256 that the approved freeze record names, the header keeping the 0.<k> that the owner design review read, which the record holds as `reviewed_version` (spec FR-034; RAT-080), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
 | `protocol_seq`, `protocol_line_sha256` | int, hex, or `none` | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract); both `none` in a `lock-cleared` record written while the log does not exist, the one kind `protocol/evidence.py` writes then, since it records an event and clearing a stale lock is what lets the log be created (PRO-065) |
@@ -315,7 +315,7 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, its key path and any other it adds: each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision where the decision's cause lies in the candidate itself, its own evidence or properties, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent); where its family or the whole set shares the cause, the entry is logged closed at once, with the reason "cause shared", and no replacement is entered for it (Decisions, below; ANA-073), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, the colour schedule, the local linear layer between boxes, the round constants, its key path, spec FR-025's key register at each node that holds key bits with the key shift chain through those nodes, from its operation-list declarations, and any other it adds (RAT-078): each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, the rest of spec FR-034's component list (RAT-078), take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision where the decision's cause lies in the candidate itself, its own evidence or properties, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent); where its family or the whole set shares the cause, the entry is logged closed at once, with the reason "cause shared", and no replacement is entered for it (Decisions, below; ANA-073), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
@@ -873,7 +873,10 @@ copy against its manifest hash and its live source (SC-012).
 
 - **Hashes**, each with its kind (`raw` or `lf-normalized`, R16): the design document (with its
   version, from its header, which holds its title, the disclaimer and the version line and
-  nothing else, `create` exiting 2 on any other header line); `rationale.md`,
+  nothing else, `create` exiting 2 on any other header line, the record naming that version 1.0,
+  with `reviewed_version`, the header's 0.<k> that the owner design review read and that
+  the record hashes, so that no file changes at or after the freeze and the
+  reviewed text is the frozen text; spec FR-034; RAT-080); `rationale.md`,
   versioned with it and carrying the same version; `phycoweb/model_v3.py`;
   `phycoweb/constants_v3.py`, with its table per supported (n, w), which `create`
   checks, exit 2 otherwise, to equal the selected candidate's tables at each
@@ -932,7 +935,15 @@ included (PRO-070; SEC-084); (2) `design_freeze.py create` runs with `git_dirty`
 false, records that commit as `owner_commit` and writes the record as `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
-never performs (spec FR-043). Dirty means a tracked file modified or an untracked file not
+never performs (spec FR-043). Before step (1), the agent writes the owner design review's review
+entries with `provenance.py review`, on the owner's word, after the commit that records that
+review's approval, leaving them in the working tree, so that the owner's commit of step (1) holds
+them and the frozen provenance log carries the status FR-034 keeps there, and `create` reads the
+provenance log at HEAD and exits 2 while an AI-drafted section of the design document or of
+`rationale.md` has a latest entry that is not a review entry reading `accepted`, or one that names a
+row other than its review's with the highest k, the security-target review's for the chapters
+"Security target" and "Mode" and the owner design review's for every other section (spec FR-034,
+FR-043; RAT-082). Dirty means a tracked file modified or an untracked file not
 ignored; ignored files (the locks, the local-only outputs under `data/local/`) do not count, and
 local-only outputs are in the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and
 every hash and checks the format rules; it exits 1 if anything but the approval fields changed or a
@@ -990,8 +1001,13 @@ nothing, an entry with a field of its kind missing, a `section` that names no se
 one (REP-088) or a `sha256` or `sha256_kind` that is not that of the named file, the
 named section's text or the named record, each computed by the writer as
 above (REP-079), or a review entry whose `row` does not read at HEAD, with its `reviewed_sha256`,
-the decision the entry records, Approved for `accepted` and Declined for
-`changes-requested`, or whose `reviewer` names an AI tool or session (RAT-077). The
+the decision the entry records, Approved for `accepted` and Declined for `changes-requested`, or
+whose `reviewer` names an AI tool or session (RAT-077), or a review entry while the named file, or,
+where the row names a chapter by its own SHA-256, the chapter, does not have at that moment the
+SHA-256 that the row names for it, while its `follows` is not the latest entry for that path and
+section, or while the section's text differs from the text whose `sha256` that entry holds, so that
+the status the latest entry gives is that of the text the reviewer read, a section changed
+after its last entry getting an `add` entry before its review (RAT-081). The
 entries for `phycoweb/model_v3.py` and `tests/v3_reference.py` must name
 different sessions (FR-057). A known result this feature writes itself (section 7) has an entry of
 its own, with its SHA-256, before the first entry of the tool it validates. Each tool's second known
@@ -999,7 +1015,13 @@ result (section 7) has an entry of its own before the tool's first validation, w
 second published value from research R19's approved papers (paper, table and value), or a
 self-written result with its SHA-256, entered before the tool's first entry. `section` names a part
 of a file: each AI-drafted section of the rationale has its own entries, to which the owner design
-review adds a review entry for each, so that the frozen text carries no status (FR-034).
+review adds a review entry for each, so that the frozen text carries no status (FR-034). The owner
+design review's review entries, for every AI-drafted section of the design document and of
+`rationale.md` but the chapters "Security target" and "Mode", whose entries the security-target
+review adds, are written by the agent on the owner's word after the commit that records that
+review's approval and before the freeze's step (1), which holds them, and `design_freeze.py create`
+exits 2 while the latest entry of such a section is not a review entry reading `accepted` that names
+its review's row with the highest k (section 13; RAT-082).
 
 Files drafted or repaired before the log exists are in FR-067's scope: the spec, the plan, research,
 this data model, the contracts, the quickstart, the checklists and checklist-choices.md, drafted and
@@ -1179,7 +1201,9 @@ compares it (cli contract; REP-085).
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
 - **Design document**: draft versions 0.<k>, the next with each committed change before the freeze,
-  `rationale.md` carrying the same; the version the owner design review approves; frozen as 1.0. A
+  `rationale.md` carrying the same; the version the owner design review approves; frozen as 1.0, the
+  name the approved freeze record gives that version, whose header and `rationale.md` keep its
+  0.<k>, which the record holds as `reviewed_version` (section 13; RAT-080). A
   revision after a decline or after the owner design review is logged under the
   candidate with its old and new version, and each version a record cites
   is kept as `design-versions/<sha256>.md` (section 1). After the freeze

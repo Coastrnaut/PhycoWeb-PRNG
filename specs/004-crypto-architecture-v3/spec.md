@@ -904,7 +904,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
   instantiate with the host's key, nonce and personalization string, each other than the
   self-test's, and, where the design has a reseed, after a reseed with an input other than the
   self-test's and a second request, so that each selector held alone, as well as all of them, gives
-  an output that differs from the model's (FR-059; SEC-082, SEC-088). The 128-bit
+  an output that differs from the model's (FR-059; SEC-082, SEC-088; RAT-079). The 128-bit
   target is a classical one, so against T11 this feature covers only single-target key search, k/2 ≥
   s, which k = 256 meets with equality and no margin at s = 128 (FR-010). Multi-target quantum key
   search, which in some cost models costs about 2^((k − log₂ u)/2) and so falls below 2^s for every
@@ -1440,7 +1440,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     ("Call sequence") is stated with the other triggers' ("Zeroization").
     The key path is specified with them: a key register at each node that holds key bits, loaded
     once per key along a registered shift chain through those nodes and copied into its lanes in one
-    cycle at every instantiate. The host gives the nonce on the absorption interface at each
+    cycle at every instantiate; this is the key path that FR-030's `mapping` entry holds among the
+    candidate's own components, its nodes coming from the candidate's operation-list declarations
+    (FR-034; RAT-078). The host gives the nonce on the absorption interface at each
     instantiate, in the model's word order; it reaches its lanes through the absorption tree where
     they are rate lanes, and otherwise along a nonce chain of its own beside the key's, through the
     nodes that hold nonce bits in lanes outside the rate, so the key chain shifts only at key
@@ -1655,8 +1657,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   selectors (up to 2w·n² bits, estimated per state bit and stated where merged
   with stage logic), the command interface, the controller with the call-state table, the error-code
   register, the replicated round and phase counters, the limit counters, the self-test's sequencer,
-  its comparator of r bits, its input selectors and its key, nonce, reseed input with its length
-  word where the design has a reseed (HW-082) and expected output, k·r bits per generate request
+  its comparator of r bits, its input selectors, the one at each chain's input and the one at the
+  absorption interface, and its key, nonce, the empty personalization string's
+  length word (RAT-079), reseed input with its length word where the design
+  has a reseed (HW-082) and expected output, k·r bits per generate request
   with k computed as FR-059 states (HW-084), held as constants, and the 2w·n²
   state flip-flops with the pipeline registers; block RAM is expected to be
   0 unless a ROM is mapped to it. A part is stated negligible only with its figure
@@ -1740,10 +1744,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   ways. For eligibility, every candidate's mapping is an entry of its own in the candidate log,
   written before its first score, naming each component's place in the metaphor and the attack
   class, bound or need it serves. The entry holds the candidate's own components, the five above,
-  its key path and any other it adds; the structures that every candidate shares, those of the mode
-  and the core (the output buffer, the call-state controller with its error-code register and the
-  `selftest_fail` latch, and the self-test's selectors, comparator and stored inputs) take their
-  roles from FR-025 and FR-059, which FR-034's component list cites for them in place of the
+  the colour schedule, the local linear layer between boxes, the round constants, its key path,
+  FR-025's key register at each node that holds key bits with the key shift chain through those
+  nodes, from the candidate's operation-list declarations, and any other it adds (RAT-078); the
+  structures that every candidate shares, those of the mode and the core, which FR-034's component
+  list names, from the padding rule, the domain separators and forget to the trees, the counters
+  with their constant ROMs, the nonce chain and its registers, the selector at every lane, the
+  output buffer, the call-state controller with its error-code register and the `selftest_fail`
+  latch and the self-test's parts (RAT-078), take their roles from FR-025
+  and FR-059, which FR-034's component list cites for them in place of the
   entry, and have no place in the metaphor, which the mapping chapter states
   once, in a sentence of its own that uses none of the words its rule lists
   (RAT-073). For the selected candidate, the mapping chapter restates each
@@ -1826,10 +1835,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
   covering every rationale item of security.md §8 (strategy note §7.2). The rationale is its own
   file, `rationale.md`, versioned with the design document and frozen with it (FR-043). Its approval
   status, like the design document's, MUST be kept outside the frozen file (feature-002 O5), in the
-  provenance log, where each review is a new entry (FR-064). The two documents MUST also meet these
+  provenance log, where each review is a new entry (FR-064), and `design_freeze.py create` reads
+  that status at HEAD and exits 2 while an AI-drafted section of the design document or of
+  `rationale.md` has a latest entry that is not a review entry reading `accepted`, or one that names
+  a row other than its review's with the highest k, the security-target review's for the
+  chapters "Security target" and "Mode" and the owner design review's for every
+  other section (FR-043; RAT-082). The two documents MUST also meet these
   rules:
   - **Version.** The design document's header holds its title, the disclaimer and "Version: 0.<k>",
-    1.0 once frozen, and nothing else, and `rationale.md` carries the same version. Each committed
+    1.0 once frozen, and nothing else, and `rationale.md` carries the same version; "1.0 once
+    frozen" is the name the freeze record gives the reviewed version, not a change of the line: the
+    header keeps the 0.<k> that the owner design review read, and the approved freeze record names
+    the design document's version 1.0, with `reviewed_version`, the header's 0.<k> that it hashes,
+    so that no file changes at or after the freeze and the reviewed text is the frozen text,
+    `rationale.md` keeping its 0.<k> the same way, and `protocol/evidence.py` gives a later record
+    `design_version` 1.0 while the design document has the SHA-256 that the approved freeze
+    record names, and the header's 0.<k> otherwise (RAT-080). Each committed
     change before the freeze makes the next 0.<k>, and a revision after a decline or after the owner
     design review is logged under the candidate with its old and new version. `protocol/evidence.py`
     reads each record's `design_version` from that line, and the first record that cites a version
@@ -1867,32 +1888,46 @@ freeze hashes and the baseline manifest; run the claim-register test.
     the reset tree that every zeroization trigger drives, the replicated round and phase counters
     with the constant ROMs they index, the key register at each node that holds key bits, apart from
     the key shift chain, the one-block output buffer, the controller of the call-state table with
-    its error-code register and the latched `selftest_fail` output, the self-test's
-    parts (the selector at each chain's input and the one at the absorption
-    interface, its r-bit comparator and the storage of its key, nonce, reseed
-    input and expected output; HW-082; SEC-088), and every component the
+    its error-code register and the latched `selftest_fail` output, the self-test's parts (the
+    selector at each chain's input and the one at the absorption interface, its r-bit
+    comparator and the storage of its key, its nonce, the empty personalization
+    string's length word, its reseed input with that input's length word and
+    its expected output; HW-082; SEC-088; RAT-079), and every component the
     chosen candidate adds (RAT-070). Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's
     `mapping` log entry records it for the candidate's own components, which the list cites, and as
     FR-025 and FR-059 state it for the structures that every candidate shares, those of the mode and
-    the core (the output buffer, the call-state controller with its error-code register and the
-    `selftest_fail` latch, and the self-test's selectors, comparator and stored inputs), which the
-    list cites for them in place of the entry (RAT-073); a component with none is labelled "kept
+    the core, which the list cites for them in place of the entry (RAT-073); the list names each
+    component's group: the candidate's own, in its `mapping` entry with a place in the metaphor, are
+    FR-030's five, the two lanes per node, the coupling function, the vein accumulator, the food
+    nodes with their placement and the rotation amounts, with the colour schedule, the local linear
+    layer between boxes, the round constants, its key path and any other it adds, the key path being
+    FR-025's, the key register at each node that holds key bits and the key shift chain through
+    those nodes, which come from the candidate's operation-list declarations; the shared structures,
+    with their roles from FR-025 and FR-059 and no place in the metaphor, are the padding rule, the
+    domain separators and forget, which the mode chapter states, the absorption and output trees,
+    the start tree with its call-type field, the reset tree, the replicated round and phase counters
+    with the constant ROMs they index, whose contents are the candidate's round constants,
+    the nonce chain and the rate lanes' nonce registers, the selector at
+    every lane, the one-block output buffer, the controller of the call-state
+    table with its error-code register and the `selftest_fail` latch, and the
+    self-test's parts (RAT-078); a component with none is labelled "kept
     for the mapping only", with its cost stated, or is removed, and the mapping chapter restates
     only each component's place in the metaphor, stating once that the shared structures
     have none (FR-030; RAT-073). The hardware structures among them name
     their functional need, and the paths that carry secret data, every structure that holds one of
     FR-008's assets, also the attack class they meet: the key registers, which hold the key between
-    instantiates, the key chain and the selectors (the key); the lanes and every pipeline register
+    instantiates, the key chain and the selectors that pass key bits, the selector at every lane and
+    the one at the key chain's input (the key; RAT-079); the lanes and every pipeline register
     (the capacity part and the whole state within a request); the output tree's registers and the
     one-block output buffer (the state within a request and each output block before the caller
     takes it); and the limit counters (their integrity); each meets no read-back and zeroization
     (FR-025), the counters' integrity resting on FR-025's refusals at each limit, fault attacks on
-    any of them staying with feature 008, and the selectors also name the risk
-    FR-008 states of each held on its constants, alone or with the others, the
-    key chain's, the nonce chain's and the absorption interface's (SEC-082,
-    SEC-088; RAT-076), while the self-test's stored key, nonce, reseed input
-    and expected output are development inputs of the frozen vectors and carry no secret;
+    any of them staying with feature 008, and the self-test's selectors, the key chain's, the nonce
+    chain's and the absorption interface's, also name the risk FR-008 states of each held on its
+    constants, alone or with the others (SEC-082, SEC-088; RAT-076, RAT-079), while the
+    self-test's stored key, nonce, length words, reseed input and expected
+    output are development inputs of the frozen vectors and carry no secret;
     the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
     the key registers under the row on the key and nonce chains and the output buffer under the row
     on the clock, reset and start signal, and the design document's chapter "Hardware structure" for
@@ -2310,8 +2345,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   owner's: a file of this feature is every file under the paths that the plan's project structure
   lists and every other file that this feature's requirements change, security.md, README,
   `.gitignore`, `.gitattributes` and `requirements.txt` among them, so that `protocol/claims.json`
-  and security.md are files of this feature; inside the window the agent writes each change of
-  `phyco-v3`'s entry and of its line in security.md §15 that SEC-076 and
+  and security.md are files of this feature; the agent writes the owner design review's review
+  entries with `provenance.py review`, on the owner's word, after the commit that records that
+  review's approval and before step (1), leaving them in the working tree, so that the owner's
+  commit of step (1) holds them and the frozen provenance log carries the status FR-034 keeps there,
+  and `design_freeze.py create` reads the provenance log at HEAD and exits 2 while an AI-drafted
+  section of the design document or of `rationale.md` has a latest entry that is not a review entry
+  reading `accepted`, or one that names a row other than its review's with the highest k, the
+  security-target review's for the chapters "Security target" and "Mode" and the owner design
+  review's for every other section (FR-034, FR-064; RAT-082); inside the window the agent writes
+  each change of `phyco-v3`'s entry and of its line in security.md §15 that SEC-076 and
   SEC-079 name in the working tree, once the owner has set the row or made the
   change there and before the owner's commit, which holds it, so that at every
   commit of the window the register gives the rows' level (FR-012; SEC-084).
@@ -2332,7 +2375,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   record keeps that confirmation (data-model §13). Dirty means a tracked file modified or an
   untracked file not ignored; ignored files (the locks, the local-only outputs under `data/local/`)
   do not count, and local-only outputs are in the record by SHA-256 anyway. The freeze record MUST
-  hold the SHA-256 of the design document, `rationale.md`, the model, the vectors (constructed-state
+  hold the SHA-256 of the design document, with its version named 1.0 and `reviewed_version`, the
+  header's 0.<k> that the owner design review read and the record hashes, the
+  files keeping that line, so that nothing changes at or after the freeze
+  (FR-034; RAT-080), `rationale.md`, the model, the vectors (constructed-state
   vectors included), the scripts that generate the constants and the vectors, `gen_constants_v3.py`,
   `gen_vectors_v3.py` and `gen_constructed_v3.py` (REP-077), the selected operation list,
   `research/004/ir.py` with its tools, and the scripts that compute verdicts
@@ -2779,7 +2825,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   k whole blocks, so that the reseed's effect is compared; the self-test holds that reseed input and
   its length word among its constants and feeds them through the absorption interface's selector,
   word by word as the host would, their storage in FR-026's estimate and their cycles in FR-020's
-  self-test formula and the reset figure (FR-025; HW-082). A structure takes part as the model's run
+  self-test formula and the reset figure (FR-025; HW-082). Its stored constants are its key, its
+  nonce, the empty personalization string's length word, its reseed input with that input's length
+  word and its expected output, and its parts are these with the selector at each chain's input, the
+  one at the absorption interface and its comparator, as FR-034's list and FR-026's
+  estimate name them (RAT-079). A structure takes part as the model's run
   shows it: a lane, and the node that holds it, once its value is computed in a call of Π of the
   run, each constant ROM entry once a call that reads it runs, the absorption tree once each kind of
   the self-test's input words has entered it, the output tree once a whole block has left it, and
@@ -2907,7 +2957,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   §2.5). The final report MUST record who took each role of security.md §16.2 in this feature,
   and mark every role that was not staffed, computed from the provenance log's review entries, whose
   `reviewer` names who reviewed (RAT-077). Each AI-drafted section of the rationale is recorded in
-  the provenance log with its review status. A review is a new entry for the same path and section,
+  the provenance log with its review status; the agent writes the owner design review's review
+  entries after the commit that records its approval and before the freeze's step (1), in the
+  working tree, which that step's commit holds, and `design_freeze.py create` exits 2 while an
+  AI-drafted section of the design document or of `rationale.md` lacks, as its latest entry, an
+  `accepted` review entry naming its review's row with the highest k (FR-034,
+  FR-043; RAT-082). A review is a new entry for the same path and section,
   holding the `seq` of the entry it follows and the SHA-256 of the section text reviewed, with
   `reviewer`, the role and name of who reviewed, the owner for the security-target review and the
   owner design review and an outside reviewer by name where one took part, never an AI tool or
@@ -2970,8 +3025,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a `section` that names no section or more than one (REP-088) or a `sha256` that is not
   that of the named file, section or record, or a review entry whose `row`
   does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
-  for `accepted` and Declined for `changes-requested`, or whose `reviewer`
-  names an AI tool or session (FR-064; RAT-077; cli contract). Files drafted
+  for `accepted` and Declined for `changes-requested`, or whose `reviewer` names an AI tool or
+  session (FR-064; RAT-077; cli contract), or a review entry while the named file, or, where the row
+  names a chapter by its own SHA-256, the chapter, does not have at that moment the SHA-256 that the
+  row names for it, while its `follows` is not the latest entry for that path and section, or while
+  the section's text differs from the text whose `sha256` that entry holds, so that the status the
+  latest entry gives is that of the text the reviewer read, a section changed after its last
+  entry getting an `add` entry before its review (RAT-081). Files drafted
   or repaired before the log exists, the planning documents, the checklists and checklist-choices.md
   among them, and the files of plan phase 1 written before it, are in this requirement's scope, with
   every file outside the feature directory that this feature's sessions changed, as `git log` from

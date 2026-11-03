@@ -554,7 +554,9 @@ SEC-084); (2) `create` runs with `git_dirty` false, records that commit as
 `owner_commit` and writes the record as `draft`; (3) the owner runs `approve`, which
 writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
-local-only outputs, do not count. The record holds what data model §13 lists: among others
+local-only outputs, do not count. The record holds what data model §13 lists: among others the
+design document's version, named 1.0, with `reviewed_version`, the header's
+0.<k> that it hashes, the files keeping that line (spec FR-034; RAT-080),
 `rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the
 verdict scripts, `validate_tool.py` and `fut_sec8.py` among them, both freeze files, every module of
 the repository that a frozen script imports, directly or through another module, listed from the
@@ -587,7 +589,11 @@ Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the 
 at a supported (n, w) and its final R (research R15), if the design document's header holds a line
 other than its title, the disclaimer and its line "Version: …" (spec FR-034), if the commit that
 follows the one recording the owner design review's approval, in its row with the highest k, the
-owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), if `check_claims.py`
+owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), if, in the provenance log at HEAD,
+an AI-drafted section of the design document or of `rationale.md` has a latest entry that is not a
+review entry reading `accepted`, or one that names a row other than its review's with the highest k,
+the security-target review's for the chapters "Security target" and "Mode" and the owner design
+review's for every other section (spec FR-034; RAT-082), if `check_claims.py`
 reports a finding at HEAD (SEC-084), or if `git_dirty` is true. `create`
 stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the
 record's canonical JSON without that field and the approval fields, `status`,
@@ -807,9 +813,18 @@ field of its kind missing, a `section` that names no section or more than one
 (REP-088) or a `sha256` or kind that differs (REP-079), or a review entry whose
 `row` does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
 for `accepted` and Declined for `changes-requested`, or whose `reviewer` names an AI tool or
-session; a review entry holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
+session, or a review entry while the named file, or, where the row names a chapter by its own
+SHA-256, the chapter, does not have at that moment the SHA-256 that the row names for it, while its
+`follows` is not the latest entry for that path and section, or while the section's text differs
+from the text whose `sha256` that entry holds, so that the status the latest entry gives is that of
+the text the reviewer read, a section changed after its last entry getting an `add` entry before its
+review, each refusal a case of `tests/test_protocol_004.py` (RAT-081); a review entry
+holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
 runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
-row's approval (spec FR-064, FR-067; data model §14; RAT-077). Right after
+row's approval (spec FR-064, FR-067; data model §14; RAT-077). It writes the owner design review's
+review entries after the commit that records that review's approval and before the freeze's step
+(1), leaving them in the working tree, which step (1)'s commit holds, so that `design_freeze.py
+create` finds them in the provenance log at HEAD (spec FR-043; RAT-082). Right after
 the log's creation, before any other entry, `add` writes one entry per file drafted before the log,
 the files outside the feature directory that this feature's sessions changed among
 them, whole or per section changed, with `drafted_from` and `drafted_to`
