@@ -895,6 +895,79 @@ start open, and an item is ticked only under the rule in the Notes below.
   Consistency, Spec §FR-043, §FR-065; data-model §13; research R16; plan "Project Structure"; cli
   contract `round_rule.py`]
 
+## Eighth re-run (2026-11-02)
+
+Items found when the checklist was run a ninth time, over the complete documents and the
+repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK092 Can a record's `record_id` and its approval hash each be computed, given that a
+  `record_id`'s eight digits are "the first eight of the SHA-256 of the record's canonical JSON
+  without `record_id`", its approval fields and every other hash included, while an environment
+  record's approval hash, printed before the owner types its first 16 digits into
+  `approval_confirmed`, is "the SHA-256 of its canonical JSON without the approval fields",
+  `record_id` included, and the freeze record's `draft_sha256` is "the SHA-256 of the record's
+  canonical JSON without that field and the approval fields", `record_id` included, so that each
+  takes the other in its input? Is it stated which is computed first and what each leaves out, and
+  whether the freeze record keeps the `record_id` that `create` gave it once `approve` adds the
+  approval fields "and changes nothing else", so that the ID no longer follows from the approved
+  content? Is the sidecar, to which each generator run appends an entry "citing the `record_id` of
+  that run's `generator-run` record", left out of that record's "each written file's path and
+  SHA-256", as it must be if the ID is derived from content that would hold the sidecar's hash after
+  that append? [Clarity, Consistency, Spec §FR-043, §FR-061; data-model introduction "Format rules",
+  §1 `record_id`, "Record files", §11, §13; cli contract `owner_record.py`, `design_freeze.py`,
+  "Generators of constants and vectors"]
+- [ ] CHK093 Which `status` does the freeze record hold, given that it is of kind `freeze` "with the
+  common fields", whose `status` is one of "`pass`, `fail`, `inconclusive`, `not evaluated` or
+  `blocked`", "computed by code (FR-065)", while data-model §13 gives it a `status` of its own,
+  "`draft` until the owner approves", then `approved`, which `draft_sha256` leaves out and
+  `validate` reads, two meanings for one key of one object? Which common fields do the four kinds
+  kept under a name of their own hold as `none`, given that each holds them "`none` where a field
+  concerns a run" while each is written by a run of a script, `owner_record.py`, `downloads.py`,
+  `design_freeze.py create` or `review_package.py`, so that `command`, `code_sha256`, `inputs`,
+  `outputs`, `exit_status`, `assertions` and `heavy_run` may each be read as concerning that run or
+  not, and the code that wrote such a file may go unrecorded, against CHK085's aim that each be
+  traced to the command and the code that wrote it? Is the list stated per kind, with the freeze
+  record's own status under a name of its own? [Conflict, Ambiguity, Spec §FR-043, §FR-061, §FR-065;
+  data-model §1 `status`, "Kinds kept under a name of their own", §13, §16; cli contract
+  `design_freeze.py`]
+- [ ] CHK094 Over which bytes is the SHA-256 taken that the owner confirms when the protocol change
+  log is created, given that its writer prints "the SHA-256 of the entry, or of the first entries
+  together, taken over their canonical JSON without the approval fields", while no passage says how
+  several entries form one canonical JSON (a JSON array in log order, or each entry's own hash in
+  turn) or which fields of an entry are its approval fields, `approver` whole or its
+  `approval_confirmed` and date, and each first entry after the one with `seq` 0 holds in
+  `prev_sha256` "the SHA-256 of the previous line's UTF-8 bytes as stored", which hold that previous
+  entry's `approver`, with the digits the owner types only after the hash is printed? Is
+  `prev_sha256` left out of that hash, or the entries hashed before they are chained, and is the
+  hash among the `canonical` hashes of data-model §1's "Hashes", which names an environment record's
+  or an `owner-provided` entry's approval hash and the freeze record's `draft_sha256` only, with
+  whether the guard "Protocol log" recomputes it, so that a later reader can check each first
+  entry's `approval_confirmed` against the log? [Clarity, Consistency, Spec §FR-044; data-model §1
+  "Hashes", §3 `prev_sha256`, §18 `approver`; cli contract `protocol_change.py`, "Protocol log"]
+- [ ] CHK095 Which sections does a file entered "per section changed, as a file drafted in parts is"
+  receive entries for, given that a section's text "runs from its heading line, included, to the
+  line before the next heading of the same or a higher level, or to the file's end", so that it
+  holds its subsections, a change in one changing every section that encloses it, and that
+  security.md's version line, which this feature's commits changed, lies in its level-1 section,
+  whose text is the whole file? Is the unit stated, for example the section of the deepest heading
+  that holds each changed line, or a section's own text up to its first subheading; what it means
+  for a commit to have changed a section, for `drafted_from` and `drafted_to`, "the dates of the
+  first and last commits from 801c6d7 on that changed the file or the section", where a heading's
+  text changed in between; and what is entered for a section that this feature's sessions removed,
+  which no entry can name, since the writer refuses "a `section` that names no section or more than
+  one"? [Clarity, Coverage, Spec §FR-067; data-model §14; cli contract `provenance.py`]
+- [ ] CHK096 Which call sequence yields the self-test's expected blocks, given that
+  `selftest_<variant>.json` is written "from the same `ResearchDuplex` run as the vectors", while
+  the mode vectors run key and nonce 0 in "generate requests of 1, 7, 64 and 1,000 words in that
+  order", "with forget after each request", and the self-test runs "one generate request of k whole
+  blocks", with one forget call at its end, then a reseed that no vector holds and a second request,
+  so that one call sequence cannot give both? Is it stated that the self-test's inputs and blocks
+  come from a `ResearchDuplex` object of their own, run through the self-test's call sequence in the
+  same generator run, so that its expected output is the one the model's and the hardware's
+  self-test compute? [Clarity, Spec §FR-036, §FR-059; data-model §11; research R8; cli contract
+  "Generators of constants and vectors"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
