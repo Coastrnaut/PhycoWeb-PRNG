@@ -552,7 +552,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     read-out; the key registers and the key-loading buffer; the nonce chain and the
     rate lanes' nonce registers; the instantiate lane selectors, up to 2w·n²
     bits, estimated per state bit and stated where merged with stage logic;
-    the command interface; the controller with the call-state table; the error-code register; the
+    the command interface; the controller with the call-state table and its
+    counters (spec FR-025 "Zeroization"; HW-089); the error-code register; the
     replicated counters; the limit counters; the self-test's sequencer, r-bit comparator, input
     selectors and stored key, nonce, reseed input and expected output (spec FR-059; HW-082);
     2w·n² state flip-flops plus pipeline registers; block RAM, expected to be
