@@ -188,6 +188,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 - **Decision**:
   - A new C program, `fast/seed_search.c`, holds its own copy of the design-1.0 step and reads
     the existing generated `fast/lut_table.h`. `fast/phyco_stream.c` stays unchanged.
+    `fast/seed_search.mk` builds into the binary the SHA-256 of `fast/seed_search.c`, which
+    `--source-sha256` prints, so that a run checks that the binary was built from its committed
+    source (R16).
   - `--check-vectors` reproduces both committed `phyco-v2` golden vector files, all 10,000 words
     of each, and must pass before any sweep (FR-002). A mismatch stops the run.
   - The sweep splits s₂ = 0…65535 over 32 POSIX threads. For each (s₂, s₃) it initialises the
@@ -199,7 +202,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `scripts/fut_sec8.py` takes the targets from `protocol.seedsets.load("dev", allow=["dev"])`
     (the first three seeds), computes the attacker's observations with `phycoweb/model_v2.py`,
     runs the tool once per target, separates any extra three-word match with the fourth word
-    (Edge Cases), and writes the demonstration record (data-model §5).
+    (Edge Cases), and writes the demonstration record (data-model §4).
   - Expected cost, from the spec: about 2³² × 257 steps per target, 3.6 core-hours at
     8.5 × 10⁷ steps/s, so under an hour of wall time for three targets on 32 threads. It is a
     heavy run (FR-045).
@@ -1819,18 +1822,23 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     owner's `approval_confirmed` (spec FR-044); a `lock-cleared` record and an environment record
     written while the log does not exist are the two exceptions, each with both fields `none` (Stale
     locks, below; PRO-065, PRO-071).
-  - **Code at HEAD.** A run that writes evidence exits 2 unless every source file in its
-    `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
-    authorization to commit makes routine. Data and report files may still be dirty, and the record
-    lists the dirty paths; a binary is rebuilt from committed source, its hash reported only. Each
-    record's code is then found at its `git_head`, and a test checks each `code_sha256` entry
-    against the blob at that commit. `research/004/tools/critical_counts.json` is code too, one of
-    `research/004/ir.py`'s tools (R4). A run also exits 2 while a file a record would cite is
+  - **Code at HEAD.** A run that writes evidence exits 2 unless every file in its `code_sha256`,
+    each C tool's binary among them, matches HEAD, committed and unmodified, which constitution
+    1.3.0's standing authorization to commit makes routine. Data and report files may still be
+    dirty, and the record lists the dirty paths. A C tool's binary is built from its committed
+    source and committed before the run that uses it (R18); its make file builds into it the
+    SHA-256 of that source, which the binary prints with `--source-sha256`, and the run also
+    exits 2 unless the printed hash equals the source's entry in `code_sha256`, so that the binary
+    that runs was built from its committed source. Each record's code is then found at its
+    `git_head`, and a test checks each `code_sha256` entry against the blob at that commit.
+    `research/004/tools/critical_counts.json` is code too, one of `research/004/ir.py`'s tools
+    (R4). A run also exits 2 while a file a record would cite is
     modified in the working tree, the spec, research.md and the design document among them, so
     that the original's `git_head` holds each version its record cites and
     `dirty_paths` never holds a cited file (REP-099). `--reproduce` runs
-    the original's code, from a separate worktree of its `git_head` checked against that commit's
-    blobs, and the committed-code guard applies to that commit (Reproduction, below).
+    the original's code, its binaries included and none rebuilt, from a separate worktree of its
+    `git_head` checked against that commit's blobs, a binary's hash reported only, and the
+    committed-code guard applies to that commit (Reproduction, below).
   - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
     `security-target/parameters.json` and `limits.json`, the environment
     records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to

@@ -3150,13 +3150,17 @@ freeze hashes and the baseline manifest; run the claim-register test.
     exiting 2 while one is modified in the working tree, so that the original's
     `git_head` holds each version its record cites (data-model §1; REP-099), and
     the record lists the dirty paths: a run that writes evidence exits 2
-    unless every source file in its `code_sha256` matches HEAD, committed and unmodified, which
-    constitution 1.3.0's standing authorization to commit makes routine, and a binary is rebuilt
-    from committed source, its hash reported only by a reproduction. Each C tool's binary is
-    committed after it is built and before the run that uses it (research R18), so that each
-    record's code, its binaries among it, is then found at its `git_head`, and a test checks each
-    `code_sha256` entry against the blob at that commit. A reproduction runs the original's code
-    at its `git_head`, its binaries included, and the guard applies to that commit.
+    unless every file in its `code_sha256`, each C tool's binary among them, matches HEAD,
+    committed and unmodified, which constitution 1.3.0's standing authorization to commit makes
+    routine. Each C tool's binary is built from its committed source and committed after it is
+    built and before the run that uses it (research R18), so that each record's code, its
+    binaries among it, is then found at its `git_head`, and a test checks each `code_sha256`
+    entry against the blob at that commit. Its make file builds into it the SHA-256 of that
+    source, which the binary prints with `--source-sha256`, and the guard also exits 2 unless
+    the printed hash equals the source's entry in `code_sha256`, so that the binary that runs
+    was built from its committed source (research R16). A reproduction runs the original's code
+    at its `git_head`, its binaries included and none rebuilt, the guard applying to that commit,
+    and reports a binary's hash only.
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
     count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs
@@ -3413,8 +3417,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   that a later run cannot regenerate (data-model §1; REP-085); the SHA-256
   of every code file the run used (`code_sha256`: the script, the
   `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
-  source and its binary), each source file committed at HEAD before the run and a binary rebuilt
-  from committed source (FR-053); the inputs or their derivation (the namespace, kind, index range
+  source and its binary), each committed at HEAD before the run and a binary built from committed
+  source (FR-053); the inputs or their derivation (the namespace, kind, index range
   and fingerprint of each input taken through the loader; data-model §2); output paths with SHA-256,
   and for each whether it is deterministic (a raw solver log is not, and a reproduction reports its
   hash only); the exit status and assertions; the classification (FR-060); the analyst and the

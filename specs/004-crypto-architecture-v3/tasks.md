@@ -171,20 +171,22 @@ or key-loading code is written here.
   `.gitkeep`); the 10 MB rule, with local-only outputs under `data/local/004/<record_id>/`; and each
   shared guard's refusal, exit 2 with nothing written: Environment, with its two exceptions, the
   environment record itself and the `lock-cleared` record, and its approval hash read at HEAD;
-  Committed code; Inputs; Operation lists; Heavy runs, with an exclusive create of
-  `data/heavy-run.lock` and a held lock named with whether its holder still runs; Protocol log, with
-  the two kinds admitted before the log exists and every other kind refused, a first entry whose
-  digits do not match, a later entry and the last line whose digits do not match, a reading marked
-  `set_aside` with no decision and a `repair` entry whose list differs; Order of sizes, a
-  `--project` probe never refused; Approvals, the table read at HEAD and a working tree that differs
-  refused; Order of US1; Tool validation; Trail tools, once the first trail search has started, a
-  tool outside research R12's fixed set or without an earlier `re-found` record of its exact hash,
-  for a C tool the pair of its source's and its binary's SHA-256, and a search that reached its cap,
-  save research R7's one re-run after a recorded tool defect; and Budget. In
-  `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the FUT-SEC-8
-  sweep among them, and every script with a worker option takes the heavy-run lock, each script as
-  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065, PRO-068,
-  PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+  Committed code, with a source file or a C tool's binary untracked, staged but not committed, or
+  modified, and a binary whose `--source-sha256` differs from its source's entry in `code_sha256`;
+  Inputs; Operation lists; Heavy runs, with an exclusive create of `data/heavy-run.lock` and a held
+  lock named with whether its holder still runs; Protocol log, with the two kinds admitted before
+  the log exists and every other kind refused, a first entry whose digits do not match, a later
+  entry and the last line whose digits do not match, a reading marked `set_aside` with no decision
+  and a `repair` entry whose list differs; Order of sizes, a `--project` probe never refused;
+  Approvals, the table read at HEAD and a working tree that differs refused; Order of US1; Tool
+  validation; Trail tools, once the first trail search has started, a tool outside research R12's
+  fixed set or without an earlier `re-found` record of its exact hash, for a C tool the pair of its
+  source's and its binary's SHA-256, and a search that reached its cap, save research R7's one
+  re-run after a recorded tool defect; and Budget. In `tests/test_protocol_004.py`, FR-045's test
+  also checks that every budgeted kind, the FUT-SEC-8 sweep among them, and every script with a
+  worker option takes the heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040,
+  FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094,
+  REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -453,11 +455,11 @@ hashes.
 ### Tests for User Story 1
 
 - [ ] T038 [P] [US1] Write `tests/test_seed_search.py`, WSL only, skipping on Windows with its
-  reason: `make -C fast -f seed_search.mk` builds `fast/build/seed_search` with `-Werror`
-  (quickstart U1); `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` compares
-  2 × 10,000 words and exits 0 (quickstart U2); `fast/build/phyco_stream` and `fast/Makefile` hash
-  the same before and after the build; only the main thread writes progress lines. (FR-001, FR-002;
-  R2)
+  reason: `make -C fast -f seed_search.mk` builds `fast/build/seed_search` with `-Werror`, and its
+  `--source-sha256` prints the SHA-256 of `fast/seed_search.c` (quickstart U1);
+  `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` compares 2 × 10,000 words and
+  exits 0 (quickstart U2); `fast/build/phyco_stream` and `fast/Makefile` hash the same before and
+  after the build; only the main thread writes progress lines. (FR-001, FR-002, FR-053; R2, R16)
 - [ ] T039 [P] [US1] Write the tests of `scripts/fut_sec8.py` in `tests/test_protocol_004.py`, on a
   mocked tool and a temporary reports directory: the targets are
   `protocol.seedsets.load("dev", allow=("dev",))[:3]`, and a held-out set exits 2; a second run
@@ -471,13 +473,14 @@ hashes.
 
 - [ ] T040 [US1] Write `fast/seed_search.c` (C99) and `fast/seed_search.mk` (contracts/cli.md; R2):
   its own copy of `phyco-v2`'s design-1.0 step; `--check-vectors FILE ...`, exit 0 only if all
-  10,000 words of every file match; and `--s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress
-  SECONDS]`, which exits 2 on any other argument, runs the 256-step warm-up for every (s₂, s₃),
-  drops a candidate at its first mismatch, and prints one JSON object with the counts after one, two
-  and three words, every three-word match, total steps, seconds, steps per second and threads, the
-  progress going to stderr from the main thread only, from counters that the workers update; built
-  in WSL into `fast/build/`, with `fast/phyco_stream.c` and `fast/Makefile` unchanged. (FR-001,
-  FR-002; R2)
+  10,000 words of every file match; `--source-sha256`, which prints the SHA-256 of the
+  `fast/seed_search.c` it was built from, which `fast/seed_search.mk` builds into it; and `--s0 S0
+  --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]`, which exits 2 on any other
+  argument, runs the 256-step warm-up for every (s₂, s₃), drops a candidate at its first mismatch,
+  and prints one JSON object with the counts after one, two and three words, every three-word match,
+  total steps, seconds, steps per second and threads, the progress going to stderr from the main
+  thread only, from counters that the workers update; built in WSL into `fast/build/`, with
+  `fast/phyco_stream.c` and `fast/Makefile` unchanged. (FR-001, FR-002, FR-053; R2, R16)
 - [ ] T041 [US1] Write `scripts/fut_sec8.py` (WSL; contracts/cli.md): the observations from
   `phycoweb/model_v2.py`, its SHA-256 `1260142d…` checked; the vector check; then one sweep per
   target under the heavy-run lock, any extra three-word match separated by the fourth word; the
@@ -632,10 +635,11 @@ hash, older than its first counted result.
   ARX differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén),
   with `research/004/tools/trails/arx_search.mk` (C99, WSL), which builds
   `research/004/tools/trails/build/arx_search`, committed after each build and before the run that
-  uses it, as `fast/build/seed_search` is (research R18); validate it on `speck32-diff` and
+  uses it, its `--source-sha256` printing the SHA-256 of the `arx_search.c` it was built from, both
+  as for `fast/build/seed_search` (research R16, R18); validate it on `speck32-diff` and
   `speck32-lin`, the weights of SPECK32's optimal trails over the first rounds, and at w = 32 on its
   known result from the same papers, each run over 10 minutes **heavy**. (FR-038, FR-039, FR-053;
-  SC-007; R12, R18)
+  SC-007; R12, R16, R18)
 - [ ] T064 [US4] Run `tests/test_tools_004.py` and `tests/test_ir.py`, `python -W ignore -m unittest
   tests.test_tools_004 tests.test_ir`, on both platforms and list for the owner every tool without a
   `re-found` record, whose results stay `not evaluated`. The trail tools are fixed when the first
@@ -1269,8 +1273,8 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-050: T020, T123
 - FR-051: T018, T112, T121, T122
 - FR-052: T126, T127
-- FR-053: T003, T004, T005, T006, T008, T009, T015, T024, T025, T037, T039, T042, T050, T063, T081,
-  T125
+- FR-053: T003, T004, T005, T006, T008, T009, T015, T024, T025, T037, T038, T039, T040, T042, T050,
+  T063, T081, T125
 - FR-054: T095, T101
 - FR-055: T095, T098
 - FR-056: T101, T102, T106

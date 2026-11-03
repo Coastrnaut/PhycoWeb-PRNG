@@ -92,14 +92,18 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   (introduction; REP-100). `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from
   committed counts by exact integer arithmetic and imports only the standard library and `protocol/`
   (its section, below).
-- **Committed code**: a run that writes evidence exits 2 unless every source file in its
-  `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
-  authorization to commit makes routine; data and report files may still be dirty, and the record
-  lists the dirty paths. A binary is rebuilt from committed source, its hash reported only, and a
-  test checks each record's `code_sha256` entries against the blobs at its `git_head` (FR-053;
-  research R16). For `--reproduce`, the commit is the original's `git_head`, checked out in a
-  separate worktree (introduction). A run that writes evidence also exits 2 while a file a record
-  would cite, such as the spec, research.md, the design document, the sidecar or
+- **Committed code**: a run that writes evidence exits 2 unless every file in its `code_sha256`,
+  each C tool's binary among them, matches HEAD, committed and unmodified, which constitution
+  1.3.0's standing authorization to commit makes routine; data and report files may still be dirty,
+  and the record lists the dirty paths. A C tool's binary, a file under a `build/` directory, is
+  built from its source, the `.c` file of its name beside that directory, and committed before the
+  run that uses it (research R18); the run also exits 2 unless the SHA-256 that the binary prints
+  with `--source-sha256`, which its make file builds into it, equals the source's entry in
+  `code_sha256`. A reproduction runs the committed binary, rebuilding none, its hash reported only,
+  and a test checks each record's `code_sha256` entries against the blobs at its `git_head`
+  (FR-053; research R16). For `--reproduce`, the commit is the original's `git_head`, checked out
+  in a separate worktree (introduction). A run that writes evidence also exits 2 while a file a
+  record would cite, such as the spec, research.md, the design document, the sidecar or
   `research/004/candidates/superseded.json`, is modified in the working tree, so that the original's
   `git_head` holds each version its record cites and `dirty_paths` never holds a cited file (data
   model introduction; REP-099).
@@ -249,10 +253,14 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
 ## `fast/build/seed_search` (C, WSL; built by `make -C fast -f seed_search.mk`)
 
 ```text
+seed_search --source-sha256
 seed_search --check-vectors FILE [FILE ...]
 seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 ```
 
+- `--source-sha256`: prints the SHA-256 of the `fast/seed_search.c` it was built from, which
+  `fast/seed_search.mk` builds into it, as 64 lowercase hex digits, exit 0; the Committed code
+  guard (above) compares it with that file's entry in `code_sha256`.
 - `--check-vectors`: regenerates every word of each `phyco-v2` vector file from the seed in its
   header and compares; exit 0 only if all 10,000 words of every file match, 1 otherwise.
 - Sweep: S0 and S1 are integers 0…65535 and W1 to W3 32-bit hex words; anything else exits 2.
