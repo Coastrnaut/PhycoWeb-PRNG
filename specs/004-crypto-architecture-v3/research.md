@@ -555,12 +555,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the command interface; the controller with the call-state table and its
     counters (spec FR-025 "Zeroization"; HW-089); the error-code register; the
     replicated counters; the limit counters; the self-test's sequencer, r-bit comparator, input
-    selectors and stored key, nonce, reseed input and expected output (spec FR-059; HW-082);
+    selectors and stored constants, as spec FR-026, FR-059's list and FR-034's components name them:
+    its key, its nonce, the empty personalization string's length word, its reseed input with that
+    input's length word where the design has a reseed, and its expected output, k·r bits per
+    generate request with k computed as FR-059 states (spec FR-026, FR-059; HW-082, HW-084, HW-092);
     2w·n² state flip-flops plus pipeline registers; block RAM, expected to be
     0 unless a ROM is mapped to it) against the device's 63,400 LUTs and
     126,800 flip-flops, and names the largest size expected to fit, as an
     estimate that feature 008 checks part by part against Vivado's hierarchical utilization report
-    (FR-026). A part is stated negligible only with its figure and reason.
+    (FR-026). A part is stated negligible only with its figure and reason, so that `costmodel.py`
+    counts the self-test's two length words and its k·r bits per generate request, or states such a
+    part negligible with its figure and reason (HW-092).
   - **Throughput goal** (checklist C3): 10⁸ 32-bit words per second at the 200 MHz target, at
     every claimable size. It is the goal feature 003 set for the C stream, which design 1.0
     missed at 8.5 × 10⁷. The design document reports FR-026's implied throughput beside it; the

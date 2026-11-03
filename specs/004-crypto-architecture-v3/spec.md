@@ -1228,19 +1228,32 @@ freeze hashes and the baseline manifest; run the claim-register test.
   check, the copy and every block of the personalization string with its
   calls of Π included, of which FR-025's two instantiate figures are parts
   (HW-075, HW-083); generate of n bits with its forget; reseed of m bytes; a
-  refused request that changes nothing; a refused request that zeroizes (a per-key limit or an error
+  refused request that changes nothing, a command word refused between calls or an instantiate or a
+  reseed refused at its length word, each from its command word to the cycle in which its code is
+  raised, a word refused while a call runs having no count of its own and leaving the running call's
+  as it would be without it (HW-091); a refused request that zeroizes (a per-key limit or an error
   path, adding the zeroization's latency); zeroization, from each state that accepts it, `loading`,
   `instantiating`, `reseeding` and `generating` among them (HW-076, HW-087); the start-up
   self-test), a formula in cycles from the variant and the public lengths
   only, counting every cycle of the call from its start to its end except those in which the core
   waits for the host: on output, the cycles with valid high and ready low, and on an input (key
   loading, a nonce, a personalization string, a reseed input), the cycles with the core's ready high
-  and valid low. A call starts when its command is accepted on the command interface (the self-test
-  when reset is released) and ends in the cycle in which `call_done` rises, the port of FR-025's
+  and valid low. A call starts when the core takes its command word on the command interface while
+  `call_done` is high, or a zeroize while a call runs (the self-test when reset is released),
+  and ends in the cycle in which `call_done` rises, the port of FR-025's
   port list that marks each call's end (FR-025 "Registers and read-back", "Flow control"; HW-086),
   so a pause by the host on any interface is excluded and a measured count matches its
   formula at any pace the host keeps; the output buffer's hand-over, its clearing and that of the
-  trees when a request ends, and the start signal's fan-out latency are included (FR-025). The
+  trees when a request ends, and the start signal's fan-out latency are included (FR-025). The core
+  takes a command word in the cycle in which the command interface's valid and ready are both high.
+  A word taken while `call_done` is high starts a call, one the state accepts or a refused request,
+  so that a refusal between calls has a call and a count of its own, to the cycle in which its error
+  code is raised, when `call_done` rises, as an instantiate or a reseed refused at its length word
+  has, from its command word; a word taken while a call runs, `call_done` low, starts no call of its
+  own, a zeroize excepted, which ends the running call and starts its zeroization, counted from that
+  word as FR-025 "Call sequence" states, and any other word is refused with its code, changes
+  nothing and leaves the running call's count, outputs and `call_done` as they
+  would be without it (FR-025 "Call sequence", "Flow control"; HW-091). The
   start-up self-test's formula follows from FR-059's k, computed from the model's run (HW-084), and
   counts every word it feeds, those of its key and nonce, the empty personalization string's length
   word and, where the design has a reseed, the reseed input's length word and words
@@ -1431,8 +1444,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
     `selftest_fail` low after configuration and, after a reset, unchanged until the
     self-test ends, when a pass clears it and a failure sets it (FR-059; HW-081), and `call_done`, a
     registered output that marks each call's end, low after configuration and after reset, low from
-    each call's start, its command word's acceptance or, for the self-test, reset's release, to that
-    call's end, and high from the cycle in which the call ends until the next call starts,
+    each call's start, its command word taken while `call_done` is high, a zeroize taken while a
+    call runs or, for the self-test, reset's release, to that call's end, a word refused while a
+    call runs leaving it as it would be without that word (FR-020; HW-091), and
+    high from the cycle in which the call ends until the next call starts,
     `failed` included, where a failed self-test's end leaves it high (FR-020;
     HW-086), and the rule of no read-back path is checked against it (FUT-HW-5).
     Constructed states (FR-054) run on the RTL in simulation only, loaded by the testbench
@@ -1558,8 +1573,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     ("Registers and read-back"; HW-086), whether the core waits for the host or runs Π, the stretch
     while a block waits in the buffer included, the command interface accepts zeroize only, save in
     `zeroizing`, which accepts none (HW-087): every other command word is refused with the code of a
-    call out of sequence, a malformed one with its own ("Flow control"; HW-090), and
-    changes nothing, and a zeroize clears what "Zeroization" lists and goes to
+    call out of sequence, a malformed one with its own ("Flow control"; HW-090), and changes
+    nothing, starting no call and leaving the running call's count, outputs and `call_done` as they
+    would be without it (FR-020; HW-091), and a zeroize clears what "Zeroization" lists and goes to
     `no-key`, as a zeroize does in every state that accepts one (HW-076; HW-085). Every other call
     is refused with its error code ("Zeroization") and changes nothing, among them a key load while
     a key is held (zeroize first, so no state from the old key survives into the new key's use) and
@@ -1567,15 +1583,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
     model has the state, and FUT-HW-5's "key zeroization on reset" is tested from the ports: after a
     reset, an instantiate is refused as `no-key`. The tests cover a call in
     each state of the table, `instantiating`, `reseeding`, `generating` and
-    `zeroizing` among them (HW-087), and a word offered on each input interface in
+    `zeroizing` among them (HW-087), each count measured at the ports, a word refused while a call
+    runs among them (FR-020; HW-091), and a word offered on each input interface in
     each state (HW-080), and FR-020's zeroization formula covers each state that accepts a zeroize,
     `generating` among them (FR-059; HW-076, HW-087).
   - **Flow control.** Each interface (command, key loading, absorption, output) uses
     valid and ready, each input interface's ready in every state given by the call-state table
     ("Call sequence"; HW-080). A call ends in the cycle in which `call_done` rises ("Registers and
     read-back"): the host sends a command word other than zeroize once `call_done`
-    and the command interface's ready are both high, and a zeroize whenever
-    that ready is high (FR-020; HW-086). The command interface takes one
+    and the command interface's ready are both high, and a zeroize whenever that ready is high
+    (FR-020; HW-086). The core takes a command word in the cycle in which the command interface's
+    valid and ready are both high; a word taken while `call_done` is high starts a call, one the
+    state accepts or a refused request, and a word taken while a call runs, `call_done` low, starts
+    no call of its own, a zeroize excepted, which ends the running call and starts its zeroization,
+    counted from that word as "Call sequence" states, and any other word is refused with its code,
+    changes nothing and leaves the running call's count, outputs and `call_done` as they
+    would be without it (FR-020; HW-091). The command interface takes one
     32-bit word per call, with the command (key load, instantiate, generate,
     reseed, zeroize) in stated bits, a field named "command", since a call
     type is a kind of call of Π (FR-023; HW-079), and, for generate, the length in 32-bit words in
@@ -1587,8 +1610,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
     names zeroize zeroizes in every state that accepts one, whatever its other bits hold, so that a
     malformed zeroize never leaves the key and the state in place, FUT-HW-5's tests covering each
     case (HW-090); a refused command is answered on the error signal and the
-    error-code output, which hold its code until the next command word is
-    accepted or a reset ("Zeroization"; HW-078), and the length word of a
+    error-code output, which hold its code until the next command word is accepted, the word that
+    starts the next call, or a reset ("Zeroization"; HW-078), the code of a word refused while a
+    call runs being held the same way unless the running call raises a code of
+    its own, which replaces it (FR-020; HW-091), and the length word of a
     personalization string or a reseed input stays on the absorption interface.
     An instantiate's input on the absorption interface is the nonce's words, in the model's word
     order, then the personalization string's length word, then the string's words, if any; the empty
@@ -1681,10 +1706,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
     zeroizing refusal (a per-key limit, an error path), listed in the design
     document, so the host can tell from the ports which refusals zeroized. The error signal and its
     code are registered and stay valid from the refusal until the next command word is accepted on
-    the command interface, or until a reset, which returns both to zero, their value after reset
+    the command interface, the word that starts the next call ("Flow control"; HW-091),
+    or until a reset, which returns both to zero, their value after reset
     being in the port list; a refusal follows only a command word or an input word of the call it
-    ends, so a code is replaced only once the host has sent another command, after as many cycles as
-    it likes to read it. The host reads the code from the ports with no handshake, as it reads
+    ends, or a command word refused while a call runs, so a code is replaced only once the host has
+    sent another command or another input word of the running call, after as many cycles as it likes
+    to read it, a running call's own code replacing that of a word refused while it runs (HW-091).
+    The host reads the code from the ports with no handshake, as it reads
     `selftest_fail`, and FUT-HW-5's tests cover a code kept through its zeroization
     and a code replaced by the next command (HW-078). An error path is a
     condition the RTL detects after the state has changed: the design document lists every such
@@ -3733,7 +3761,7 @@ that takes it, as the FUT-SEC-7 and FUT-GRID-1 cells do.
 | FUT-HW-2 Efficient on the Arty A7-100T | FR-025, FR-026 | Carry chains per stage; output bits per round; estimated cost. Design-level criteria: the chain and LUT-level counts per stage (FR-025) and the size estimate against the device, part by part with block RAM, the control parts FR-025 adds among them, each with its figure (FR-026); the clock from the 100 MHz oscillator through an MMCM in feature 008's board wrapper, outside the core, with the wrapper's reset duties (FR-025 "Key loading and reset") | Designed for; Vivado post-route results, the hierarchical utilization report part by part and the wrapper's and the core's timing open for feature 008 |
 | FUT-HW-3 Performance on the board | FR-026 | Throughput implied at 200 MHz. Design-level criterion: the implied throughput for the stated request sizes and output interface (FR-026) | Open for features 006 and 008: words per second by on-chip counters at the achieved clock, per claimable size that fits, compared with the C stream; and, in feature 008, power through the board's VCCINT current sensor and the XADC, beside Vivado's estimate (FR-052). This feature supplies the implied throughput only |
 | FUT-HW-4 Equivalence and statistics from hardware output | FR-036, FR-054, FR-056 | Vectors, constructed-state vectors, the oracle. Design-level criterion: vectors traced at stage granularity (FR-036) | Open for feature 008, whose spec states which battery levels run on hardware output and which on the C stream |
-| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test. Design-level criteria: the cycle formulas (FR-020), the port list with every port's direction, width and values after configuration and after reset, against which no read-back path is checked, and the command interface's format, the zeroization list with its error codes, and the call-state table with its `not-reset`, `resetting`, `loading`, `generating`, `zeroizing` and `failed` states and the malformed command words (FR-025; HW-087, HW-090); the counting rule on every interface, every cycle of a call but those in which the core waits for the host, measured at the ports from a call's start to the cycle in which `call_done` rises (FR-020; HW-086) | Open for feature 008, whose spec lists the board tests, among them key zeroization on reset, tested from the ports (after a reset, an instantiate is refused as `no-key`), and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
+| FUT-HW-5 Hardware security tests | FR-020, FR-025, FR-059 | Constant time by construction; no read-back; zeroization; start-up self-test. Design-level criteria: the cycle formulas (FR-020), the port list with every port's direction, width and values after configuration and after reset, against which no read-back path is checked, and the command interface's format, the zeroization list with its error codes, and the call-state table with its `not-reset`, `resetting`, `loading`, `generating`, `zeroizing` and `failed` states and the malformed command words (FR-025; HW-087, HW-090); the counting rule on every interface, every cycle of a call but those in which the core waits for the host, measured at the ports from a call's start to the cycle in which `call_done` rises (FR-020; HW-086), a call starting at a command word taken while `call_done` is high, and a word refused while a call runs, which starts none and leaves the running call's count as it would be without it, among the tests (FR-020; HW-091) | Open for feature 008, whose spec lists the board tests, among them key zeroization on reset, tested from the ports (after a reset, an instantiate is refused as `no-key`), and says whether side-channel measurement equipment exists; if not, side channels are recorded as untested |
 
 ### Redesign checklist (`seed-entropy-bound.md` §5.3)
 
