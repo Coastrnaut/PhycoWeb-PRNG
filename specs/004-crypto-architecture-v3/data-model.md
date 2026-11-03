@@ -684,8 +684,10 @@ same kind and of the tool's exact hash exists.
   SHA-256 (section 2), the numpy version and a per-set summary, the planted bit's count and every
   fired bit, so a fresh clone recomputes both families' verdicts from committed files and a
   regeneration checks every count. A later draw must reproduce every hash in an environment with
-  that numpy version, and a draw that differs is reported and counts for nothing; after an approved
-  numpy upgrade the old record stays the validation in the old environment, and a new validation, a
+  that numpy version, and a draw that differs is reported and counts for nothing; should numpy's
+  version ever differ from the one research R1 pins, which only an owner's own
+  decision outside the protocol could bring (spec FR-044; PRO-078), the old
+  record stays the validation in the old environment, and a new validation, a
   new record, decides in the new one: outside 82 to 97, or with more than 3 sets holding an
   unplanted firing, in either family the tool is unvalidated there, its results `not evaluated`,
   until a defect is found and fixed.

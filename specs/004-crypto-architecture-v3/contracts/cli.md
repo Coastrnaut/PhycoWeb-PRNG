@@ -355,8 +355,10 @@ files and a regeneration checks every count (data model §7). No set is ever rep
 `--reproduce` included, must reproduce every hash in an environment with that
 numpy version, a reproduction running only while the environment record its
 original cites is in force (introduction; REP-100), and a draw that differs is
-reported and counts for nothing. After an approved numpy upgrade the old record
-stays the validation in the old environment, and a new validation, a new record, decides in the new
+reported and counts for nothing. Should numpy's version ever differ from the one research R1 pins,
+which only an owner's own decision outside the protocol could bring (introduction,
+"Environment"; spec FR-044; PRO-078), the old record stays the validation in
+the old environment, and a new validation, a new record, decides in the new
 one: outside 82 to 97, or with more than 3 sets holding an unplanted firing, the
 tool is unvalidated there, its results `not evaluated`, until a defect is
 found and fixed (research R3, R4).
