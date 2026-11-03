@@ -1,0 +1,2622 @@
+{
+ "lists": "specs/004-crypto-architecture-v3/checklist-choices.md",
+ "plan_approval": "65bcbf2b05cc32ba3970220d25d7ea802ef89deb",
+ "compared_to": "addc940cce98ef3226b2c48005285bf4f9f22958",
+ "rules": {
+  "Development inputs": [
+   "protocol: Development inputs",
+   "R3",
+   "FR-040"
+  ],
+  "FUT-SEC-8 demonstration": [
+   "protocol: FUT-SEC-8 demonstration",
+   "FR-001",
+   "FR-002",
+   "FR-003"
+  ],
+  "Bias rule": [
+   "protocol: Bias rule",
+   "R4"
+  ],
+  "Round rule": [
+   "protocol: Round rule",
+   "FR-032",
+   "FR-038"
+  ],
+  "Nonlinearity choice rule (D4)": [
+   "protocol: Nonlinearity choice rule (D4)",
+   "R5",
+   "R6",
+   "FR-022"
+  ],
+  "Tool validation": [
+   "protocol: Tool validation",
+   "R12",
+   "FR-039"
+  ],
+  "Structural checks": [
+   "R13",
+   "FR-037"
+  ],
+  "Eligibility and selection": [
+   "protocol: Eligibility and selection",
+   "FR-018",
+   "FR-019",
+   "FR-020",
+   "FR-021",
+   "FR-022",
+   "FR-023",
+   "FR-024",
+   "FR-025",
+   "FR-026",
+   "FR-027",
+   "FR-028",
+   "FR-029",
+   "FR-030",
+   "FR-031",
+   "FR-037"
+  ],
+  "Stop rule": [
+   "protocol: Stop rule",
+   "R7",
+   "FR-041"
+  ],
+  "Vector lengths": [
+   "R8",
+   "FR-036"
+  ],
+  "Security-target parameters and output limits": [
+   "R9",
+   "FR-005",
+   "FR-006",
+   "FR-007",
+   "FR-010",
+   "FR-015"
+  ],
+  "Constant rule": [
+   "R15",
+   "FR-023"
+  ],
+  "Protocol changes and their directions": [
+   "FR-044",
+   "data-model §18",
+   "cli: protocol_change.py"
+  ],
+  "Values this plan fixes": [
+   "plan: Values this plan fixes"
+  ],
+  "Records and their hashes": [
+   "R16",
+   "R1",
+   "data-model: introduction",
+   "data-model §1",
+   "data-model §13",
+   "data-model §14",
+   "data-model §16",
+   "data-model §17",
+   "cli contract",
+   "spec: notes under the Review & Approval table"
+  ]
+ },
+ "rounds": [
+  {
+   "heading": "From the first run, 147 of its 206 rows:",
+   "commits": [
+    "0b8e6df2fc1fea7da0ff3b02a7ed3eab3e5059e3",
+    "f8c6680b03b12eecdb7905241fb3dd01a632ba7e"
+   ],
+   "changed": [
+    {
+     "rule": "Development inputs",
+     "places": [
+      "protocol: Development inputs",
+      "R3",
+      "FR-040"
+     ],
+     "rows": [
+      "PRO-001",
+      "PRO-002",
+      "PRO-003",
+      "PRO-004",
+      "PRO-005",
+      "PRO-006",
+      "PRO-007",
+      "PRO-008",
+      "PRO-009",
+      "PRO-010"
+     ]
+    },
+    {
+     "rule": "FUT-SEC-8 demonstration",
+     "places": [
+      "protocol: FUT-SEC-8 demonstration",
+      "FR-001",
+      "FR-003"
+     ],
+     "rows": [
+      "SEC-033",
+      "ANA-024",
+      "ANA-025",
+      "HW-001",
+      "REP-003"
+     ]
+    },
+    {
+     "rule": "Bias rule",
+     "places": [
+      "protocol: Bias rule",
+      "R4"
+     ],
+     "rows": [
+      "ANA-014",
+      "ANA-016",
+      "ANA-023",
+      "ANA-026",
+      "ANA-027",
+      "ANA-028",
+      "PRO-006",
+      "PRO-022",
+      "PRO-029",
+      "REP-018",
+      "REP-019"
+     ]
+    },
+    {
+     "rule": "Round rule",
+     "places": [
+      "protocol: Round rule",
+      "FR-032",
+      "FR-038"
+     ],
+     "rows": [
+      "SEC-001",
+      "SEC-016",
+      "SEC-037",
+      "RAT-007",
+      "RAT-009",
+      "RAT-014",
+      "RAT-019",
+      "RAT-021",
+      "ANA-011",
+      "ANA-012",
+      "ANA-029",
+      "ANA-030",
+      "ANA-031",
+      "ANA-032",
+      "REP-011"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R5",
+      "R6",
+      "FR-022"
+     ],
+     "rows": [
+      "RAT-007",
+      "RAT-008",
+      "RAT-014",
+      "ANA-018",
+      "PRO-019",
+      "PRO-028",
+      "HW-001",
+      "HW-002",
+      "HW-003",
+      "HW-004",
+      "HW-005",
+      "HW-006",
+      "HW-007",
+      "HW-025"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "protocol: Tool validation",
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "RAT-007",
+      "RAT-008",
+      "ANA-001",
+      "ANA-002",
+      "ANA-003",
+      "ANA-004",
+      "ANA-006",
+      "ANA-007",
+      "ANA-008",
+      "ANA-011",
+      "ANA-012",
+      "ANA-021",
+      "ANA-028",
+      "REP-005",
+      "REP-011"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13",
+      "FR-037"
+     ],
+     "rows": [
+      "RAT-009",
+      "RAT-015",
+      "RAT-016",
+      "RAT-022",
+      "RAT-025",
+      "ANA-002",
+      "ANA-010",
+      "ANA-013",
+      "ANA-015",
+      "ANA-026"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-019",
+      "FR-020",
+      "FR-021",
+      "FR-022",
+      "FR-023",
+      "FR-024",
+      "FR-025",
+      "FR-026",
+      "FR-027",
+      "FR-028",
+      "FR-029",
+      "FR-030",
+      "FR-037"
+     ],
+     "rows": [
+      "SEC-006",
+      "SEC-011",
+      "SEC-030",
+      "SEC-037",
+      "SEC-038",
+      "SEC-039",
+      "RAT-002",
+      "RAT-004",
+      "RAT-005",
+      "RAT-007",
+      "RAT-008",
+      "RAT-012",
+      "RAT-013",
+      "RAT-014",
+      "RAT-015",
+      "RAT-016",
+      "RAT-017",
+      "RAT-019",
+      "RAT-020",
+      "RAT-022",
+      "RAT-024",
+      "RAT-025",
+      "RAT-027",
+      "RAT-028",
+      "RAT-029",
+      "RAT-030",
+      "RAT-031",
+      "RAT-032",
+      "ANA-010",
+      "ANA-013",
+      "ANA-015",
+      "ANA-016",
+      "ANA-029",
+      "PRO-019",
+      "PRO-032",
+      "HW-001",
+      "HW-002",
+      "HW-003",
+      "HW-004",
+      "HW-005",
+      "HW-006",
+      "HW-007",
+      "HW-008",
+      "HW-009",
+      "HW-011",
+      "HW-012",
+      "HW-013",
+      "HW-014",
+      "HW-015",
+      "HW-016",
+      "HW-017",
+      "HW-018",
+      "HW-019",
+      "HW-020",
+      "HW-021",
+      "HW-022",
+      "HW-023",
+      "HW-024",
+      "HW-025",
+      "HW-026",
+      "HW-027",
+      "HW-028",
+      "HW-029",
+      "HW-030",
+      "HW-031",
+      "HW-032",
+      "PRO-025"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7",
+      "FR-041"
+     ],
+     "rows": [
+      "RAT-010",
+      "RAT-026",
+      "ANA-011",
+      "ANA-017",
+      "ANA-019",
+      "ANA-020",
+      "ANA-021",
+      "ANA-022",
+      "ANA-023",
+      "ANA-031",
+      "PRO-006",
+      "PRO-011",
+      "PRO-012",
+      "PRO-013",
+      "PRO-014",
+      "PRO-017",
+      "PRO-020",
+      "PRO-025",
+      "PRO-026",
+      "PRO-029",
+      "PRO-034",
+      "PRO-035",
+      "REP-018"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8",
+      "FR-036"
+     ],
+     "rows": [
+      "PRO-003",
+      "PRO-014",
+      "HW-035",
+      "HW-037",
+      "REP-015",
+      "REP-020",
+      "REP-021"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "R9",
+      "FR-005",
+      "FR-006",
+      "FR-007",
+      "FR-010",
+      "FR-015"
+     ],
+     "rows": [
+      "SEC-001",
+      "SEC-002",
+      "SEC-003",
+      "SEC-008",
+      "SEC-012",
+      "SEC-013",
+      "SEC-014",
+      "SEC-015",
+      "SEC-016",
+      "SEC-017",
+      "RAT-011",
+      "HW-015",
+      "HW-020",
+      "HW-029",
+      "HW-030",
+      "REP-020"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "RAT-011",
+      "RAT-012",
+      "RAT-013",
+      "RAT-014",
+      "RAT-015",
+      "RAT-016",
+      "RAT-017",
+      "HW-009",
+      "HW-022",
+      "HW-025",
+      "HW-028"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18"
+     ],
+     "rows": [
+      "SEC-036",
+      "RAT-012",
+      "PRO-021",
+      "PRO-022",
+      "PRO-023",
+      "PRO-024",
+      "PRO-025",
+      "PRO-026",
+      "PRO-027",
+      "PRO-035"
+     ]
+    },
+    {
+     "rule": "Values this plan fixes",
+     "places": [
+      "plan: Values this plan fixes"
+     ],
+     "rows": [
+      "SEC-036",
+      "ANA-009",
+      "PRO-022",
+      "PRO-028"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §16",
+      "data-model §17",
+      "cli contract"
+     ],
+     "rows": [
+      "REP-023",
+      "PRO-018",
+      "PRO-024",
+      "PRO-031",
+      "REP-002",
+      "REP-006",
+      "REP-013",
+      "REP-014",
+      "SEC-031",
+      "SEC-032",
+      "SEC-033",
+      "RAT-033",
+      "RAT-035",
+      "ANA-001",
+      "ANA-006",
+      "ANA-020",
+      "PRO-004",
+      "PRO-005",
+      "PRO-006",
+      "PRO-012",
+      "PRO-014",
+      "PRO-016",
+      "PRO-029",
+      "PRO-030",
+      "PRO-033",
+      "HW-022",
+      "REP-001",
+      "REP-003",
+      "REP-004",
+      "REP-005",
+      "REP-007",
+      "REP-008",
+      "REP-015",
+      "REP-017",
+      "REP-021",
+      "REP-025",
+      "REP-027"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the re-run, 20 of its 29 rows:",
+   "commits": [
+    "f8c6680b03b12eecdb7905241fb3dd01a632ba7e",
+    "f9b2e92de603f7fa9de26c427eb50b157184b504"
+   ],
+   "changed": [
+    {
+     "rule": "Development inputs",
+     "places": [
+      "R3",
+      "FR-040"
+     ],
+     "rows": [
+      "REP-029"
+     ]
+    },
+    {
+     "rule": "Bias rule",
+     "places": [
+      "R4"
+     ],
+     "rows": [
+      "REP-029",
+      "REP-031"
+     ]
+    },
+    {
+     "rule": "Round rule",
+     "places": [
+      "FR-032"
+     ],
+     "rows": [
+      "RAT-039"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "R5"
+     ],
+     "rows": [
+      "ANA-033"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "ANA-033",
+      "ANA-034",
+      "REP-029"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13"
+     ],
+     "rows": [
+      "RAT-036",
+      "ANA-033",
+      "ANA-034"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "FR-018",
+      "FR-020",
+      "FR-023",
+      "FR-025"
+     ],
+     "rows": [
+      "SEC-042",
+      "RAT-036",
+      "RAT-037",
+      "RAT-038",
+      "RAT-039",
+      "HW-038",
+      "HW-039",
+      "HW-040",
+      "HW-042"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "R7"
+     ],
+     "rows": [
+      "ANA-035",
+      "ANA-036"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "FR-036"
+     ],
+     "rows": [
+      "HW-041",
+      "REP-033"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "R9",
+      "FR-006",
+      "FR-007"
+     ],
+     "rows": [
+      "SEC-043",
+      "RAT-038"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "RAT-036",
+      "RAT-037",
+      "RAT-038"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18"
+     ],
+     "rows": [
+      "PRO-036",
+      "RAT-037",
+      "RAT-038",
+      "PRO-038",
+      "REP-032"
+     ]
+    },
+    {
+     "rule": "Values this plan fixes",
+     "places": [
+      "plan: Values this plan fixes"
+     ],
+     "rows": [
+      "RAT-037",
+      "PRO-038"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "PRO-036",
+      "PRO-037",
+      "PRO-039",
+      "PRO-040",
+      "REP-028",
+      "REP-030",
+      "REP-032",
+      "REP-034",
+      "ANA-033",
+      "ANA-035",
+      "ANA-036",
+      "REP-029",
+      "REP-031",
+      "REP-033"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the second re-run, 50 of its 71 rows:",
+   "commits": [
+    "2b1739a4aa178994ea2ef5eb5e97cf1dcbe33434",
+    "2b448f134c0b64eeca70bd32b973569e496e166d"
+   ],
+   "changed": [
+    {
+     "rule": "Development inputs",
+     "places": [
+      "protocol: Development inputs",
+      "R3",
+      "FR-040"
+     ],
+     "rows": [
+      "ANA-039",
+      "PRO-043",
+      "REP-052",
+      "REP-053",
+      "REP-054"
+     ]
+    },
+    {
+     "rule": "FUT-SEC-8 demonstration",
+     "places": [
+      "FR-001",
+      "FR-003"
+     ],
+     "rows": [
+      "SEC-047"
+     ]
+    },
+    {
+     "rule": "Bias rule",
+     "places": [
+      "protocol: Bias rule",
+      "R4"
+     ],
+     "rows": [
+      "ANA-037",
+      "ANA-038",
+      "ANA-039",
+      "REP-037",
+      "REP-052"
+     ]
+    },
+    {
+     "rule": "Round rule",
+     "places": [
+      "protocol: Round rule",
+      "FR-032",
+      "FR-038"
+     ],
+     "rows": [
+      "RAT-044",
+      "ANA-037",
+      "ANA-042",
+      "ANA-044"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R5",
+      "R6"
+     ],
+     "rows": [
+      "RAT-040",
+      "PRO-044",
+      "PRO-048",
+      "HW-043",
+      "HW-054",
+      "HW-055"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "ANA-038",
+      "ANA-040",
+      "ANA-041",
+      "ANA-042",
+      "REP-052"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13"
+     ],
+     "rows": [
+      "RAT-044",
+      "ANA-037",
+      "ANA-038",
+      "ANA-044"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-019",
+      "FR-020",
+      "FR-023",
+      "FR-024",
+      "FR-025",
+      "FR-026",
+      "FR-027",
+      "FR-030"
+     ],
+     "rows": [
+      "SEC-046",
+      "RAT-040",
+      "RAT-041",
+      "RAT-042",
+      "RAT-043",
+      "RAT-045",
+      "RAT-047",
+      "RAT-048",
+      "PRO-044",
+      "PRO-049",
+      "HW-043",
+      "HW-044",
+      "HW-045",
+      "HW-046",
+      "HW-047",
+      "HW-048",
+      "HW-049",
+      "HW-050",
+      "HW-051",
+      "HW-052",
+      "HW-053",
+      "HW-054",
+      "HW-055",
+      "HW-056"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7",
+      "FR-041"
+     ],
+     "rows": [
+      "RAT-041",
+      "RAT-046",
+      "ANA-037",
+      "ANA-039",
+      "ANA-040",
+      "ANA-041",
+      "ANA-043",
+      "PRO-046",
+      "PRO-049",
+      "REP-035",
+      "REP-036"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8",
+      "FR-036"
+     ],
+     "rows": [
+      "REP-046",
+      "REP-047"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "FR-010"
+     ],
+     "rows": [
+      "SEC-051"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "RAT-040",
+      "RAT-041",
+      "RAT-042",
+      "RAT-043",
+      "HW-047"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18"
+     ],
+     "rows": [
+      "RAT-043",
+      "PRO-042",
+      "PRO-047",
+      "REP-041",
+      "PRO-043"
+     ]
+    },
+    {
+     "rule": "Values this plan fixes",
+     "places": [
+      "plan: Values this plan fixes"
+     ],
+     "rows": [
+      "PRO-047"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §16",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "PRO-042",
+      "REP-035",
+      "REP-036",
+      "REP-037",
+      "REP-040",
+      "REP-041",
+      "REP-042",
+      "REP-043",
+      "REP-045",
+      "REP-049",
+      "REP-052",
+      "SEC-047",
+      "RAT-044",
+      "RAT-045",
+      "ANA-039",
+      "ANA-040",
+      "ANA-042",
+      "ANA-043",
+      "ANA-045",
+      "PRO-044",
+      "PRO-048",
+      "PRO-049",
+      "REP-038",
+      "REP-039",
+      "REP-046",
+      "REP-048",
+      "REP-050",
+      "REP-053",
+      "REP-055"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the third re-run, 50 of its 70 rows:",
+   "commits": [
+    "37c20b2a62b3f8a2e65cc71e3ebb28c32dfb73ec",
+    "39443d6e4eb194603df340c567e9b4aef83365e9"
+   ],
+   "changed": [
+    {
+     "rule": "Development inputs",
+     "places": [
+      "R3",
+      "FR-040"
+     ],
+     "rows": [
+      "PRO-052",
+      "REP-064"
+     ]
+    },
+    {
+     "rule": "Bias rule",
+     "places": [
+      "R4"
+     ],
+     "rows": [
+      "RAT-057",
+      "ANA-046",
+      "ANA-047",
+      "ANA-048",
+      "ANA-050",
+      "ANA-051",
+      "PRO-052",
+      "REP-059",
+      "REP-062"
+     ]
+    },
+    {
+     "rule": "Round rule",
+     "places": [
+      "protocol: Round rule",
+      "FR-032",
+      "FR-038"
+     ],
+     "rows": [
+      "RAT-049",
+      "RAT-050",
+      "ANA-046",
+      "ANA-047",
+      "ANA-048",
+      "ANA-049",
+      "ANA-055",
+      "ANA-056",
+      "ANA-057"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R5",
+      "R6",
+      "FR-022"
+     ],
+     "rows": [
+      "RAT-051",
+      "RAT-053",
+      "RAT-056",
+      "RAT-059",
+      "ANA-054",
+      "ANA-055",
+      "PRO-054",
+      "HW-065",
+      "HW-066",
+      "HW-067"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "RAT-051",
+      "ANA-049",
+      "ANA-051",
+      "ANA-052",
+      "ANA-053",
+      "ANA-054",
+      "ANA-055",
+      "ANA-056",
+      "PRO-052",
+      "PRO-056"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13",
+      "FR-037"
+     ],
+     "rows": [
+      "RAT-049",
+      "RAT-050",
+      "RAT-051",
+      "RAT-052",
+      "RAT-057",
+      "ANA-046",
+      "ANA-051",
+      "ANA-052",
+      "ANA-057"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-019",
+      "FR-020",
+      "FR-022",
+      "FR-023",
+      "FR-024",
+      "FR-025",
+      "FR-026",
+      "FR-030",
+      "FR-037"
+     ],
+     "rows": [
+      "SEC-063",
+      "RAT-051",
+      "RAT-052",
+      "RAT-053",
+      "RAT-054",
+      "RAT-055",
+      "RAT-056",
+      "RAT-057",
+      "RAT-058",
+      "RAT-059",
+      "ANA-047",
+      "ANA-056",
+      "ANA-057",
+      "PRO-053",
+      "PRO-054",
+      "PRO-055",
+      "HW-058",
+      "HW-059",
+      "HW-060",
+      "HW-061",
+      "HW-062",
+      "HW-063",
+      "HW-064",
+      "HW-065",
+      "HW-066",
+      "HW-067",
+      "HW-068",
+      "HW-069",
+      "HW-070"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7",
+      "FR-041"
+     ],
+     "rows": [
+      "RAT-056",
+      "ANA-046",
+      "ANA-048",
+      "ANA-050",
+      "ANA-054",
+      "ANA-056",
+      "PRO-053",
+      "PRO-054",
+      "PRO-056",
+      "REP-062",
+      "REP-063"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "FR-010"
+     ],
+     "rows": [
+      "SEC-062"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "RAT-051",
+      "RAT-053",
+      "RAT-057",
+      "RAT-058",
+      "RAT-059",
+      "ANA-046",
+      "ANA-047",
+      "ANA-054",
+      "HW-070"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18"
+     ],
+     "rows": [
+      "SEC-056",
+      "PRO-050",
+      "PRO-051",
+      "PRO-055"
+     ]
+    },
+    {
+     "rule": "Values this plan fixes",
+     "places": [
+      "plan: Values this plan fixes"
+     ],
+     "rows": [
+      "PRO-056"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "ANA-048",
+      "PRO-056",
+      "REP-058",
+      "REP-059",
+      "REP-061",
+      "REP-062",
+      "REP-063",
+      "REP-065",
+      "SEC-053",
+      "SEC-054",
+      "SEC-055",
+      "SEC-056",
+      "SEC-057",
+      "SEC-059",
+      "SEC-061",
+      "SEC-062",
+      "RAT-053",
+      "ANA-049",
+      "ANA-050",
+      "ANA-052",
+      "ANA-054",
+      "ANA-058",
+      "PRO-050",
+      "PRO-052",
+      "PRO-053",
+      "PRO-055",
+      "REP-056",
+      "REP-057",
+      "REP-060",
+      "REP-066",
+      "REP-068",
+      "REP-069"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the fourth re-run, 18 of its 36 rows:",
+   "commits": [
+    "812415ce8f8aedcd28b42f2e8f1074c145cddec6",
+    "4bbc3a61b4d130b5385e77a6205ba08a8405a026"
+   ],
+   "changed": [
+    {
+     "rule": "FUT-SEC-8 demonstration",
+     "places": [
+      "protocol: FUT-SEC-8 demonstration"
+     ],
+     "rows": [
+      "PRO-059"
+     ]
+    },
+    {
+     "rule": "Bias rule",
+     "places": [
+      "protocol: Bias rule",
+      "R4"
+     ],
+     "rows": [
+      "ANA-061",
+      "ANA-062",
+      "ANA-063"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "R5"
+     ],
+     "rows": [
+      "HW-072"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "ANA-059",
+      "ANA-060",
+      "ANA-061",
+      "ANA-062",
+      "ANA-067",
+      "PRO-059"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13",
+      "FR-037"
+     ],
+     "rows": [
+      "ANA-062",
+      "ANA-064",
+      "ANA-066"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-023",
+      "FR-025",
+      "FR-026",
+      "FR-028",
+      "FR-037"
+     ],
+     "rows": [
+      "RAT-064",
+      "ANA-063",
+      "ANA-065",
+      "ANA-066",
+      "HW-071",
+      "HW-072",
+      "HW-073"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7"
+     ],
+     "rows": [
+      "SEC-071",
+      "RAT-065",
+      "ANA-060",
+      "ANA-065",
+      "ANA-067",
+      "PRO-059"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "ANA-065",
+      "HW-073"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-058",
+      "PRO-060"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "SEC-073",
+      "RAT-061",
+      "REP-070",
+      "REP-071",
+      "REP-073",
+      "SEC-066",
+      "SEC-067",
+      "SEC-068",
+      "SEC-069",
+      "SEC-072",
+      "RAT-062",
+      "RAT-063",
+      "RAT-064",
+      "ANA-060",
+      "ANA-061",
+      "ANA-065",
+      "ANA-067",
+      "PRO-059",
+      "PRO-060",
+      "HW-073"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the fifth re-run, 9 of its 11 rows:",
+   "commits": [
+    "c9f5cb1fa6cf1f668a7381a55ce1a1f56a6972d8",
+    "285584c6a01c47cd0a7876cc54223323d7adf211"
+   ],
+   "changed": [
+    {
+     "rule": "Bias rule",
+     "places": [
+      "R4"
+     ],
+     "rows": [
+      "ANA-068",
+      "ANA-071"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "ANA-068",
+      "ANA-069",
+      "ANA-070",
+      "ANA-071"
+     ]
+    },
+    {
+     "rule": "Structural checks",
+     "places": [
+      "R13"
+     ],
+     "rows": [
+      "ANA-068",
+      "ANA-071"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "FR-025"
+     ],
+     "rows": [
+      "RAT-067",
+      "HW-074"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "R7"
+     ],
+     "rows": [
+      "REP-074"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-061",
+      "PRO-062",
+      "REP-074"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model §1",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "PRO-062",
+      "REP-074",
+      "SEC-074",
+      "ANA-069",
+      "ANA-071",
+      "PRO-061",
+      "REP-075"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the sixth re-run, 11 of its 22 rows:",
+   "commits": [
+    "2156dd8809f0abd7d730bffb8a50d7149d3dd1bf",
+    "239215067e1cae1f38ee18ac809e1eda7debf49d"
+   ],
+   "changed": [
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12"
+     ],
+     "rows": [
+      "ANA-072"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "FR-020",
+      "FR-025",
+      "FR-030"
+     ],
+     "rows": [
+      "RAT-071",
+      "HW-075",
+      "HW-076",
+      "HW-078"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8",
+      "FR-036"
+     ],
+     "rows": [
+      "HW-077",
+      "REP-077"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-063",
+      "PRO-064",
+      "PRO-065",
+      "PRO-066"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §16",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "PRO-065",
+      "PRO-066",
+      "SEC-075",
+      "SEC-076",
+      "SEC-077",
+      "RAT-068",
+      "PRO-063",
+      "PRO-064",
+      "HW-077",
+      "REP-076",
+      "REP-077",
+      "REP-078",
+      "REP-079",
+      "REP-080",
+      "REP-081"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the seventh re-run, 31 of its 37 rows:",
+   "commits": [
+    "3d18fed0b677eab3f0df0dd1d868e5d1afb67aab",
+    "08184f18250d0f6e835776d4593a191394b2e19b"
+   ],
+   "changed": [
+    {
+     "rule": "Bias rule",
+     "places": [
+      "protocol: Bias rule",
+      "R4"
+     ],
+     "rows": [
+      "ANA-074",
+      "ANA-075"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R5",
+      "R6"
+     ],
+     "rows": [
+      "RAT-072",
+      "HW-079",
+      "HW-082"
+     ]
+    },
+    {
+     "rule": "Tool validation",
+     "places": [
+      "R12",
+      "FR-039"
+     ],
+     "rows": [
+      "ANA-076"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-020",
+      "FR-023",
+      "FR-025",
+      "FR-026",
+      "FR-028",
+      "FR-030"
+     ],
+     "rows": [
+      "SEC-082",
+      "RAT-072",
+      "RAT-073",
+      "ANA-073",
+      "ANA-075",
+      "HW-079",
+      "HW-080",
+      "HW-081",
+      "HW-082",
+      "HW-083",
+      "HW-084",
+      "HW-085"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7",
+      "FR-041"
+     ],
+     "rows": [
+      "RAT-072",
+      "ANA-073",
+      "ANA-074",
+      "ANA-075"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8",
+      "FR-036"
+     ],
+     "rows": [
+      "HW-082",
+      "HW-084",
+      "REP-083",
+      "REP-086"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "FR-006"
+     ],
+     "rows": [
+      "SEC-083"
+     ]
+    },
+    {
+     "rule": "Constant rule",
+     "places": [
+      "R15",
+      "FR-023"
+     ],
+     "rows": [
+      "HW-079"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-067",
+      "PRO-069",
+      "REP-082"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §16",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "SEC-078",
+      "SEC-079",
+      "SEC-080",
+      "RAT-072",
+      "RAT-077",
+      "ANA-073",
+      "ANA-074",
+      "ANA-075",
+      "ANA-076",
+      "PRO-068",
+      "PRO-069",
+      "PRO-070",
+      "REP-082",
+      "REP-083",
+      "REP-084",
+      "REP-085",
+      "REP-086",
+      "REP-088",
+      "REP-089",
+      "REP-091"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the eighth re-run, 24 of its 25 rows:",
+   "commits": [
+    "aad3f94b90dc952bc14a2793749c7017cfa07cf6",
+    "01b1a4343ac74d64656810a7f68c10bbfb4abe6f"
+   ],
+   "changed": [
+    {
+     "rule": "Bias rule",
+     "places": [
+      "protocol: Bias rule",
+      "R4"
+     ],
+     "rows": [
+      "ANA-078",
+      "ANA-079"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "R5"
+     ],
+     "rows": [
+      "HW-089"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-020",
+      "FR-025",
+      "FR-026",
+      "FR-028",
+      "FR-030"
+     ],
+     "rows": [
+      "SEC-088",
+      "RAT-078",
+      "RAT-079",
+      "ANA-078",
+      "ANA-079",
+      "HW-086",
+      "HW-087",
+      "HW-088",
+      "HW-089",
+      "HW-090"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "R7",
+      "FR-041"
+     ],
+     "rows": [
+      "ANA-078",
+      "ANA-079"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-071",
+      "REP-094"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §16",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "SEC-084",
+      "SEC-085",
+      "SEC-086",
+      "SEC-087",
+      "RAT-080",
+      "RAT-081",
+      "RAT-082",
+      "ANA-079",
+      "PRO-071",
+      "PRO-072",
+      "REP-092",
+      "REP-093",
+      "REP-094",
+      "REP-095",
+      "REP-096"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the ninth re-run, 14 of its 15 rows:",
+   "commits": [
+    "5572f7a4e5dfa9510bdec940192142e47dffb21e",
+    "832bd4de8569e91b021d427a822f0107cb92ef81"
+   ],
+   "changed": [
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R5",
+      "R6"
+     ],
+     "rows": [
+      "ANA-082",
+      "HW-092"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-020",
+      "FR-025",
+      "FR-026"
+     ],
+     "rows": [
+      "ANA-080",
+      "ANA-081",
+      "HW-091",
+      "REP-097"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "protocol: Stop rule",
+      "FR-041"
+     ],
+     "rows": [
+      "ANA-080",
+      "ANA-081"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8"
+     ],
+     "rows": [
+      "REP-097"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "FR-010"
+     ],
+     "rows": [
+      "SEC-090",
+      "RAT-085"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model §1",
+      "data-model §13",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "SEC-089",
+      "SEC-090",
+      "SEC-091",
+      "SEC-092",
+      "RAT-083",
+      "RAT-085",
+      "ANA-080",
+      "ANA-081",
+      "ANA-082",
+      "PRO-073",
+      "REP-097",
+      "REP-098"
+     ]
+    }
+   ]
+  },
+  {
+   "heading": "From the tenth re-run, 27 of its 28 rows:",
+   "commits": [
+    "930494d6e27075b72761ceb25608eea0ae2df5fe",
+    "974ffef9720c698ac3083bfdc0f136edd0f25938"
+   ],
+   "changed": [
+    {
+     "rule": "Round rule",
+     "places": [
+      "FR-032"
+     ],
+     "rows": [
+      "SEC-096"
+     ]
+    },
+    {
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "protocol: Nonlinearity choice rule (D4)",
+      "R6"
+     ],
+     "rows": [
+      "ANA-084"
+     ]
+    },
+    {
+     "rule": "Eligibility and selection",
+     "places": [
+      "protocol: Eligibility and selection",
+      "FR-018",
+      "FR-025",
+      "FR-026"
+     ],
+     "rows": [
+      "ANA-087",
+      "HW-093",
+      "HW-094",
+      "HW-095"
+     ]
+    },
+    {
+     "rule": "Stop rule",
+     "places": [
+      "FR-041"
+     ],
+     "rows": [
+      "ANA-083",
+      "ANA-087"
+     ]
+    },
+    {
+     "rule": "Vector lengths",
+     "places": [
+      "R8"
+     ],
+     "rows": [
+      "HW-095"
+     ]
+    },
+    {
+     "rule": "Security-target parameters and output limits",
+     "places": [
+      "FR-006"
+     ],
+     "rows": [
+      "SEC-096"
+     ]
+    },
+    {
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "FR-044",
+      "data-model §18",
+      "cli: protocol_change.py"
+     ],
+     "rows": [
+      "PRO-076",
+      "PRO-077",
+      "PRO-078",
+      "PRO-079",
+      "REP-101"
+     ]
+    },
+    {
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "R1",
+      "data-model: introduction",
+      "data-model §1",
+      "data-model §13",
+      "data-model §14",
+      "data-model §16",
+      "data-model §17",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ],
+     "rows": [
+      "SEC-093",
+      "SEC-094",
+      "SEC-095",
+      "RAT-086",
+      "RAT-087",
+      "RAT-089",
+      "RAT-090",
+      "ANA-083",
+      "ANA-085",
+      "ANA-086",
+      "ANA-087",
+      "ANA-088",
+      "PRO-074",
+      "PRO-075",
+      "PRO-076",
+      "PRO-077",
+      "PRO-078",
+      "PRO-079",
+      "PRO-080",
+      "HW-095",
+      "REP-099",
+      "REP-100",
+      "REP-101"
+     ]
+    }
+   ]
+  }
+ ],
+ "spans": [
+  {
+   "from": "65bcbf2b05cc32ba3970220d25d7ea802ef89deb",
+   "to": "0b8e6df2fc1fea7da0ff3b02a7ed3eab3e5059e3",
+   "after": null,
+   "changes": []
+  },
+  {
+   "from": "f8c6680b03b12eecdb7905241fb3dd01a632ba7e",
+   "to": "f8c6680b03b12eecdb7905241fb3dd01a632ba7e",
+   "after": "From the first run, 147 of its 206 rows:",
+   "changes": []
+  },
+  {
+   "from": "f9b2e92de603f7fa9de26c427eb50b157184b504",
+   "to": "2b1739a4aa178994ea2ef5eb5e97cf1dcbe33434",
+   "after": "From the re-run, 20 of its 29 rows:",
+   "changes": [
+    {
+     "commit": "ad2c195ebc48e7f0af91ce258f1324a312dc9324",
+     "rule": "Development inputs",
+     "places": [
+      "R3"
+     ]
+    }
+   ]
+  },
+  {
+   "from": "2b448f134c0b64eeca70bd32b973569e496e166d",
+   "to": "37c20b2a62b3f8a2e65cc71e3ebb28c32dfb73ec",
+   "after": "From the second re-run, 50 of its 71 rows:",
+   "changes": []
+  },
+  {
+   "from": "39443d6e4eb194603df340c567e9b4aef83365e9",
+   "to": "812415ce8f8aedcd28b42f2e8f1074c145cddec6",
+   "after": "From the third re-run, 50 of its 70 rows:",
+   "changes": []
+  },
+  {
+   "from": "4bbc3a61b4d130b5385e77a6205ba08a8405a026",
+   "to": "c9f5cb1fa6cf1f668a7381a55ce1a1f56a6972d8",
+   "after": "From the fourth re-run, 18 of its 36 rows:",
+   "changes": []
+  },
+  {
+   "from": "285584c6a01c47cd0a7876cc54223323d7adf211",
+   "to": "2156dd8809f0abd7d730bffb8a50d7149d3dd1bf",
+   "after": "From the fifth re-run, 9 of its 11 rows:",
+   "changes": []
+  },
+  {
+   "from": "239215067e1cae1f38ee18ac809e1eda7debf49d",
+   "to": "3d18fed0b677eab3f0df0dd1d868e5d1afb67aab",
+   "after": "From the sixth re-run, 11 of its 22 rows:",
+   "changes": []
+  },
+  {
+   "from": "08184f18250d0f6e835776d4593a191394b2e19b",
+   "to": "aad3f94b90dc952bc14a2793749c7017cfa07cf6",
+   "after": "From the seventh re-run, 31 of its 37 rows:",
+   "changes": []
+  },
+  {
+   "from": "01b1a4343ac74d64656810a7f68c10bbfb4abe6f",
+   "to": "5572f7a4e5dfa9510bdec940192142e47dffb21e",
+   "after": "From the eighth re-run, 24 of its 25 rows:",
+   "changes": []
+  },
+  {
+   "from": "832bd4de8569e91b021d427a822f0107cb92ef81",
+   "to": "930494d6e27075b72761ceb25608eea0ae2df5fe",
+   "after": "From the ninth re-run, 14 of its 15 rows:",
+   "changes": []
+  },
+  {
+   "from": "974ffef9720c698ac3083bfdc0f136edd0f25938",
+   "to": "addc940cce98ef3226b2c48005285bf4f9f22958",
+   "after": "From the tenth re-run, 27 of its 28 rows:",
+   "changes": [
+    {
+     "commit": "1c671008c7d36e99abcaee262ee7301728953296",
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "57bd909edf1b961201c9749117a270e506ae2bf8",
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "data-model §18"
+     ]
+    },
+    {
+     "commit": "b6a93f0b75946e72c15c4f4c482d627a71486e5a",
+     "rule": "Records and their hashes",
+     "places": [
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+     "rule": "Bias rule",
+     "places": [
+      "R4"
+     ]
+    },
+    {
+     "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+     "rule": "Tool validation",
+     "places": [
+      "FR-039"
+     ]
+    },
+    {
+     "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+     "rule": "Records and their hashes",
+     "places": [
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+     "rule": "Nonlinearity choice rule (D4)",
+     "places": [
+      "R5"
+     ]
+    },
+    {
+     "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+     "rule": "Eligibility and selection",
+     "places": [
+      "FR-020",
+      "FR-025",
+      "FR-026"
+     ]
+    },
+    {
+     "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+     "rule": "Vector lengths",
+     "places": [
+      "R8"
+     ]
+    },
+    {
+     "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+     "rule": "Constant rule",
+     "places": [
+      "R15"
+     ]
+    },
+    {
+     "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "data-model §18",
+      "cli: protocol_change.py"
+     ]
+    },
+    {
+     "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+     "rule": "Records and their hashes",
+     "places": [
+      "data-model §1",
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "ccfd9d1f30bbb34337cb5e7777291a9f735171ea",
+     "rule": "Constant rule",
+     "places": [
+      "R15"
+     ]
+    },
+    {
+     "commit": "ccfd9d1f30bbb34337cb5e7777291a9f735171ea",
+     "rule": "Records and their hashes",
+     "places": [
+      "data-model §1",
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "b3eba129d7f4cba8f4110d21fd61c360c4ad5f67",
+     "rule": "Constant rule",
+     "places": [
+      "R15"
+     ]
+    },
+    {
+     "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+     "rule": "Constant rule",
+     "places": [
+      "R15"
+     ]
+    },
+    {
+     "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "data-model §18",
+      "cli: protocol_change.py"
+     ]
+    },
+    {
+     "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model: introduction",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ]
+    },
+    {
+     "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+     "rule": "Constant rule",
+     "places": [
+      "R15"
+     ]
+    },
+    {
+     "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+     "rule": "Protocol changes and their directions",
+     "places": [
+      "data-model §18",
+      "cli: protocol_change.py"
+     ]
+    },
+    {
+     "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model: introduction",
+      "cli contract",
+      "spec: notes under the Review & Approval table"
+     ]
+    }
+   ]
+  }
+ ],
+ "unmade": [
+  {
+   "commit": "ad2c195ebc48e7f0af91ce258f1324a312dc9324",
+   "rule": "Development inputs",
+   "places": [
+    "R3"
+   ],
+   "in": [
+    "f9b2e92de603f7fa9de26c427eb50b157184b504",
+    "2b1739a4aa178994ea2ef5eb5e97cf1dcbe33434"
+   ],
+   "beside": "From the re-run, 20 of its 29 rows:"
+  },
+  {
+   "commit": "1c671008c7d36e99abcaee262ee7301728953296",
+   "rule": "Records and their hashes",
+   "places": [
+    "R16",
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "57bd909edf1b961201c9749117a270e506ae2bf8",
+   "rule": "Protocol changes and their directions",
+   "places": [
+    "data-model §18"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "b6a93f0b75946e72c15c4f4c482d627a71486e5a",
+   "rule": "Records and their hashes",
+   "places": [
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+   "rule": "Bias rule",
+   "places": [
+    "R4"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+   "rule": "Tool validation",
+   "places": [
+    "FR-039"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "252512a86558f13854d3f9de6828d78e00934d42",
+   "rule": "Records and their hashes",
+   "places": [
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+   "rule": "Nonlinearity choice rule (D4)",
+   "places": [
+    "R5"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+   "rule": "Eligibility and selection",
+   "places": [
+    "FR-020",
+    "FR-025",
+    "FR-026"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "797c6da42f04ae4ab084d1f6624fad278241ac85",
+   "rule": "Vector lengths",
+   "places": [
+    "R8"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+   "rule": "Constant rule",
+   "places": [
+    "R15"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+   "rule": "Protocol changes and their directions",
+   "places": [
+    "data-model §18",
+    "cli: protocol_change.py"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "ce3cde17e0c9935b9be53925f24bbde369cb00c0",
+   "rule": "Records and their hashes",
+   "places": [
+    "data-model §1",
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "ccfd9d1f30bbb34337cb5e7777291a9f735171ea",
+   "rule": "Constant rule",
+   "places": [
+    "R15"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "ccfd9d1f30bbb34337cb5e7777291a9f735171ea",
+   "rule": "Records and their hashes",
+   "places": [
+    "data-model §1",
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "b3eba129d7f4cba8f4110d21fd61c360c4ad5f67",
+   "rule": "Constant rule",
+   "places": [
+    "R15"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+   "rule": "Constant rule",
+   "places": [
+    "R15"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+   "rule": "Protocol changes and their directions",
+   "places": [
+    "data-model §18",
+    "cli: protocol_change.py"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "5f34d5c9e84ece498d150fa409c763f2c0aea3d7",
+   "rule": "Records and their hashes",
+   "places": [
+    "R16",
+    "data-model: introduction",
+    "cli contract",
+    "spec: notes under the Review & Approval table"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+   "rule": "Constant rule",
+   "places": [
+    "R15"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+   "rule": "Protocol changes and their directions",
+   "places": [
+    "data-model §18",
+    "cli: protocol_change.py"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "7a6d0e810cb0499538ab9de2fae1af9ba21bf284",
+   "rule": "Records and their hashes",
+   "places": [
+    "R16",
+    "data-model: introduction",
+    "cli contract",
+    "spec: notes under the Review & Approval table"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "addc940cce98ef3226b2c48005285bf4f9f22958"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  }
+ ]
+}
