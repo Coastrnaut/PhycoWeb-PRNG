@@ -653,6 +653,53 @@ They start open, and an item is ticked only under the rule in the Notes below.
   log holds them, and whether `create` exits 2 while one is missing? [Gap, Spec §FR-034, §FR-043,
   §FR-064; data-model §13, §14; cli contract `design_freeze.py`]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK083 Is the owner design review's row required to name `rationale.md` by path and SHA-256,
+  beside the design document's version and the selection record, and does `design_freeze.py create`
+  compare it, given that the row's own title names the design rationale among what it reviews, that
+  the freeze record hashes `rationale.md`, that the notes under the Review & Approval table have a
+  review row name "the design document's version with the selection record" and the cli contract has
+  `create` compare only those for that review, and that `provenance.py review` refuses a review
+  entry while the named file "does not have at that moment the SHA-256 that the row names for it"
+  (RAT-081), which for a section of `rationale.md` the row does not name? Without it, can a change
+  to `rationale.md` after the review's approval, before step (1), be frozen with no review row
+  naming the text frozen? [Gap, Consistency, Spec §FR-034, §FR-043, §Review & Approval "Owner design
+  review" and its notes; data-model §13, §14; cli contract `design_freeze.py`, `provenance.py`]
+- [ ] CHK084 Can SC-013's "covers 100% of the items of security.md §8" be counted, given that
+  security.md §8 lists eight items the rationale states (the security target, the threat model and
+  the claim template; the mode, the theorem it relies on and how each precondition is met; the role
+  of every component, with what the mapping does and does not contribute; the sources of
+  nonlinearity and their bounds; diffusion in both directions; every constant with its rule; the
+  round-count rule and the margin; the known limitations and the attacks the design was built to
+  resist), that FR-034's rules for the rationale name a part for some of them ("Components",
+  "Constants", "Attack classes" and "Margin", beside "Network questions" and "Alternatives", which
+  answer other needs) and none for the security target, the threat model and the claim template, the
+  mode and its theorem, the sources of nonlinearity with their bounds or diffusion in both
+  directions, which the design document's chapters "Security target", "Mode" and "Permutation" and
+  the evidence records hold, and that `rationale.md`'s sections, unlike the design document's
+  chapters, have no fixed headings that a test checks? Is it stated which part of `rationale.md`
+  covers each item, or which chapter or record it cites for it, so that a reviewer can count the
+  coverage? [Measurability, Coverage, Spec §FR-034, §SC-013, User Story 5 scenario 1;
+  security.md §8]
+- [ ] CHK085 Is it stated where `mode_limits_v3.py` takes the limits, the variant table and the
+  layout from, and in what form, given that the cli contract has it evaluate the theorem's bound "at
+  the limits stated in the design document" and write each row of `parameters.json` "from the
+  variant table and the design document's layout", which the chapters "Mode" and "Permutation" hold
+  as written text, while data-model §1's table reports `design_sha256` only for the size profile and
+  limits, a field it compares only "for a kind whose code reads the design document", and adds "any
+  other script that reads the design document" to the table before its first run? Is it also stated
+  whether the chapter "Security target"'s parameter table, which states per size the key entropy,
+  the reachable secret state, the capacity, the rate, the round count and the resulting bound (User
+  Story 2, scenario 2), is taken from `parameters.json` or checked against it, so that the table and
+  the file that one security-target review reads cannot differ? [Conflict, Ambiguity, Spec §FR-010,
+  §FR-034 "Chapters", User Story 2; data-model §1 "Fields compared", §10; cli contract
+  `mode_limits_v3.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
