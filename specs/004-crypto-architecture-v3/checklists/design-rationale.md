@@ -593,6 +593,66 @@ start open, and an item is ticked only under the rule in the Notes below.
   SHA-256? [Gap, Measurability, Spec §FR-034, §FR-064, §FR-067, §Review & Approval and the notes
   under the table; data-model §14; cli contract `provenance.py`]
 
+## Eighth re-run (2026-11-02)
+
+Items found when the checklist was run a ninth time, over the complete documents and the
+repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK078 Does the split of FR-034's components between the candidate's `mapping` entry and the
+  structures that every candidate shares cover each component of the list, given that the entry
+  holds "the candidate's own components, the five above, its key path and any other it adds" and the
+  shared structures are named as the output buffer, the call-state controller with its error-code
+  register and the `selftest_fail` latch, and the self-test's selectors, comparator and stored
+  inputs, while FR-034's list also names the absorption and output trees, the start tree with its
+  call-type field, the reset tree, the replicated round and phase counters with the constant ROMs
+  they index, the nonce chain and the rate lanes' nonce registers, the selector at every lane, the
+  key register at each node, the padding rule, the domain separators and forget, which fall in
+  neither group? Is "key path" defined, and is it stated, for each such component, whether its role
+  comes from the entry or from FR-025, and whether it has a place in the metaphor that the mapping
+  chapter restates? [Completeness, Consistency, Spec §FR-025, §FR-030, §FR-034 "Components";
+  data-model §3 `mapping`]
+- [ ] CHK079 Does FR-034's list of the self-test's parts, "the selector at each chain's input, its
+  r-bit comparator and the storage of its key, nonce, reseed input and expected output", name every
+  part that FR-059 and FR-026 give the self-test, given that FR-059 also feeds the empty
+  personalization string's length word, and the reseed input with its length word, "through the
+  absorption interface's selector", that FR-026's estimate counts "its input selectors" and the
+  reseed input "with its length word", and that neither list names the storage of the
+  personalization string's length word? Is the selector meant by "the selectors" in FR-034's list of
+  the paths that carry secret data stated, given that the components list names both "the selector
+  at every lane" and the self-test's selectors, and that only the latter carry FR-008's stated risk
+  of one held on its constants? [Completeness, Clarity, Spec §FR-008, §FR-025 "Key loading and
+  reset", §FR-026, §FR-034 "Components", §FR-059]
+- [ ] CHK080 Is it stated when, by whom and in which commit the version line of the design
+  document's header, and that of `rationale.md`, comes to read 1.0, given that FR-034 has the header
+  hold "Version: 0.<k>", "1.0 once frozen", while "Each committed change before the freeze makes the
+  next 0.<k>", that the agent commits no file of this feature from the owner design review's
+  approval on, and that `design_freeze.py create` exits 2 unless the owner design review's row with
+  the highest k reviews what the record freezes "by path and SHA-256", so that a version line
+  changed in step (1) gives files the review did not read, and one changed after the freeze changes
+  frozen files, which `validate` reports? Is 1.0 instead the version the freeze record names, the
+  files keeping the 0.<k> reviewed, or is the line changed before the owner design review, which
+  then reviews 1.0? [Conflict, Spec §FR-034 "Version", §FR-043; data-model §13, §17; cli contract
+  `design_freeze.py`]
+- [ ] CHK081 Is a provenance review entry tied to the text that its row reviewed, given that
+  `provenance.py review` computes the entry's `sha256` from the named section of the file as it
+  stands when the entry is written, and checks `reviewed_sha256`, "the SHA-256 that row names", only
+  against the row at HEAD, so that a section changed after the review, or one whose text differs
+  from that of the entry it `follows`, would be recorded as reviewed? Is it stated that the writer
+  refuses a review entry while the file does not have the SHA-256 that the row names for it, or
+  while the section's text differs from that of the entry it follows, so that the status the latest
+  entry gives is that of the text the reviewer read? [Gap, Consistency, Spec §FR-034, §FR-064,
+  §FR-067; data-model §14; cli contract `provenance.py`]
+- [ ] CHK082 Does any guard read the approval status that FR-034 keeps "in the provenance log" for
+  the design document and `rationale.md`, given that `design_freeze.py create` reads the review rows
+  and records only the provenance log's last `seq` and line SHA-256, and that nothing refuses a
+  freeze while an AI-drafted section of either file has a latest entry that reads `pending` or
+  `changes-requested`, or names a row other than its review's with the highest k? Is it stated when
+  the owner design review's review entries are written, on the owner's word after the commit that
+  records the approval and before step (1), the owner's next commit, so that the frozen provenance
+  log holds them, and whether `create` exits 2 while one is missing? [Gap, Spec §FR-034, §FR-043,
+  §FR-064; data-model §13, §14; cli contract `design_freeze.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
