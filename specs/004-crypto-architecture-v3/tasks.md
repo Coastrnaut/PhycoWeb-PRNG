@@ -132,9 +132,12 @@ or key-loading code is written here.
   `reports/004-crypto-architecture-v3/**`, `research/004/**`, `protocol/*.json` and `*.gz`. Check
   with `git ls-files --eol` that every tracked file the new lines cover is already stored with LF,
   `fast/Makefile` among them, so that no frozen file's bytes change. (FR-053; R18)
-- [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`;
-  check with `git check-ignore` that each is ignored and that `fast/build/` stays ignored through
-  `build/`. (FR-045; R16, R18)
+- [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`, with
+  the generic lines `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`, `.vscode/`,
+  `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that a temporary file that a dying
+  `protocol_change.py create` leaves beside the log's path still shows in `git status`; check with
+  `git check-ignore` that each is ignored and that `fast/build/` stays ignored through `build/`.
+  (FR-045; R16, R18)
 - [ ] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
   hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule or
   `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no hashed
