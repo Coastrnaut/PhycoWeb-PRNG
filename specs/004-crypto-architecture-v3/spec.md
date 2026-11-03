@@ -2121,7 +2121,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
     `rationale.md`'s chapters of those names and the security target's files (the notes under the
     Review & Approval table), and the owner design review every chapter, with the rationale, whose
     Alternatives chapter is its own (RAT-069), and adds the review entries of every section of
-    `rationale.md`, its chapters "Security target" and "Mode" among them (RAT-086).
+    `rationale.md`, its chapters "Security target" and "Mode" among them (RAT-086). Wherever this
+    feature says "the mode chapter", it means the design document's chapter "Mode", and
+    `rationale.md`'s chapter of that name is named as `rationale.md`'s wherever it is meant; every
+    theorem that `rationale.md`'s chapter "Mode" states the mode rests on is one the mode chapter
+    uses, which `limits.json` lists and which must be `verified` before the owner design review and
+    the freeze, as FR-043 and research R10 state for the mode chapter's own,
+    the security-target review, which covers both chapters, checking it.
     `mode_limits_v3.py` reads three tables of the design document, each a Markdown table
     with fixed columns in a section of its own, which the chapters' test checks: the chapter
     "Permutation"'s section "Variant table", one row per variant with its ID, n, w, b, c, r, R and
