@@ -700,6 +700,88 @@ They start open, and an item is ticked only under the rule in the Notes below.
   §FR-034 "Chapters", User Story 2; data-model §1 "Fields compared", §10; cli contract
   `mode_limits_v3.py`]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK086 Are `rationale.md`'s chapters "Security target" and "Mode", which RAT-084 fixed, told
+  apart from the design document's chapters of the same names wherever a rule names those chapters,
+  given that FR-034, FR-043 and FR-064, data-model §13 and §14 and the cli contract's
+  `design_freeze.py create` give the review entries of "the chapters "Security target" and "Mode""
+  to the security-target review's row and those of "every other section" of the design document or
+  of `rationale.md` to the owner design review's, data-model §14 naming "every AI-drafted section of
+  the design document and of `rationale.md` but the chapters "Security target" and "Mode"", while
+  that review is held before the rationale is written (plan phase 8: "then the rationale") and its
+  row names the chapter's version, a set that holds no hash of `rationale.md`? An `accepted` entry
+  for either chapter of `rationale.md` can then name neither row: the security-target review's names
+  no SHA-256 of `rationale.md` for `provenance.py review` to check, and the owner design review's
+  makes `create` exit 2 as "a row other than its review's". Is it also stated which document "the
+  mode chapter" means in FR-034's bullet "Constants", which places there the rule and reason of the
+  padding constants and the domain separators, and in its component list, which has "the mode
+  chapter" state the padding rule, the domain separators and forget, now that `rationale.md` has a
+  chapter "Mode" of its own? [Conflict, Ambiguity, Spec §FR-034 "Rationale chapters", "Components",
+  "Constants", §FR-043, §FR-064; data-model §13, §14; plan phase 8; cli contract `design_freeze.py`,
+  `provenance.py`]
+- [ ] CHK087 Is it stated where and in what form `rationale.md` carries its version, which check
+  compares it with the design document's, and whether a committed change to `rationale.md` alone
+  makes the next 0.<k>, given that FR-034 "Version" fixes the design document's header, its title,
+  the disclaimer and "Version: 0.<k>" and nothing else, `design_freeze.py create` exiting 2 on any
+  other header line, and says of `rationale.md` only that it "carries the same version" and keeps
+  its 0.<k> at the freeze, while FR-068 has `rationale.md` carry the design-form disclaimer, no rule
+  or test reads a version line in `rationale.md`, and "Each committed change before the freeze makes
+  the next 0.<k>", which for a change to `rationale.md` alone would change the design document's
+  header, and with it its SHA-256 and every later record's `design_version`, or would leave the two
+  files' versions apart? Is it stated whether the freeze record's "External review" and the final
+  report, which list "the design-document versions since" the version that review read, show a
+  change to `rationale.md` made after it, which the review package's manifest hashes, given that the
+  owner design review's rows name `rationale.md` by SHA-256 (RAT-083)? [Gap, Measurability, Spec
+  §FR-034 "Version", §FR-043, §FR-063, §FR-068; data-model §13, §17 "Design document"; cli contract
+  `design_freeze.py`]
+- [ ] CHK088 Does FR-034's list of the attack classes for which the rationale names a resisting
+  feature, never "open", still hold every class this feature's evidence addresses, and are its names
+  matched to security.md §12.1's rows? RAT-003 left "algebraic, cube, integral" open for feature 005
+  when no degree evidence existed, while the round rule's R_dist now counts the degree-based
+  distinguishers, zero-sum, cube and the inside-out zero-sum, that every candidate's `degree`
+  records admit (RAT-044, RAT-049), and the chapter itself cites those records for every candidate,
+  so that §12.1's row "Cube and zero-sum" may still be marked open. And §12.1 joins two classes in a
+  row where the list names one: "Differential and related-seed", whose related part research R4's
+  first-order related-key and related-nonce differences address in part, the security-target review
+  citing them, while FR-049 leaves the attacks beyond first order to feature 005, open in the final
+  report; "Linear and correlation"; and "Invariant subspace and nonlinear invariant". Is the outcome
+  stated for each part the list leaves out, and which mark a part that feature 005 takes up carries,
+  given that FR-034 gives "open for feature 005" to a class and "deferred to feature <n>" to "a
+  class or the part of one" (RAT-075)? [Consistency, Coverage, Spec §FR-034 "Attack classes",
+  §FR-049, §Pre-registered Design Protocol "Round rule"; research R4, R13; data-model §5 `degree`;
+  security.md §12.1]
+- [ ] CHK089 Is the review package's content mapped, item by item, to security.md §14's list, and is
+  the source of its known limitations and unresolved findings stated, given that FR-063 names the
+  spec, the design document and rationale, the model source and vectors, the evidence records, the
+  threat model, the security target marked as targets and "the known limitations and unresolved
+  findings", data-model §16 has the manifest hold "every item of security.md §14", "plus the known
+  limitations and the unresolved findings", and User Story 5's scenario 6 checks the package against
+  §14, while §14 also lists "the statistical, attack and hardware reports, with the attack code" and
+  "the claims and assumptions", which FR-063's list names, if at all, only through the evidence
+  records and the security target, with no word on the tools' code, the reports, the claim register
+  or the theorem's preconditions? No document defines an unresolved finding or names the file the
+  package takes the findings and the limitations from, the rationale's chapter "Attack classes"
+  stating the known limitations (RAT-084) and each record holding its own `limitations`, while
+  `review_package.py --check` rebuilds the manifest only from the files it lists. Is it stated which
+  files stand for each item of §14, and which findings count as unresolved? [Gap, Measurability,
+  Spec §FR-063, User Story 5 scenario 6; data-model §1 `limitations`, §16; cli contract
+  `review_package.py`; security.md §14]
+- [ ] CHK090 May `rationale.md`'s chapters "Security target" and "Mode" restate values of
+  `parameters.json` and `limits.json`, given that FR-034 "Rationale chapters" lets each "state" its
+  item or cite the design document's chapter or the record that states it, while RAT-085 has a test
+  compare only the design document's parameter table and output limits with those files, row by row
+  and value by value, "so that the security-target review reads one set of values", and the owner
+  design review then reads the rationale beside them? Is it stated that the rationale cites those
+  values by chapter and section or by record ID and SHA-256, or that the same test compares every
+  value the rationale restates, so that the frozen rationale states no value that its files do not
+  hold? [Consistency, Spec §FR-010, §FR-034 "Chapters", "Rationale chapters"; data-model §10; plan
+  phase 8]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the design-rationale focus prompt of the
