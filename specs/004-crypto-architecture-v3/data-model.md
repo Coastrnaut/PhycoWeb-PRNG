@@ -1588,10 +1588,10 @@ entry by entry, and records each decision, with its reason, in its reading; `pro
 such reading of a later entry at the approval step, which records the owner's decision and reason in
 it; and the guard "Protocol log" exits 2 while a reading marked `set_aside` holds no decision
 (PRO-079). The first entries that hold one are those of RAT-036, RAT-052, ANA-062, ANA-068,
-PRO-065, PRO-068 and PRO-071, from earlier rounds, and of SEC-093, RAT-086,
-ANA-087, PRO-076, REP-100 and REP-101, from the tenth re-run, with every other
-entry of that kind that the agent finds before the log is created (PRO-079).
-Approving an entry is the owner's own act, which the agent never performs (spec
+PRO-065, PRO-068, PRO-071, REP-063 and REP-085, from earlier rounds, the last two added by the owner
+on 2026-11-03, and of SEC-093, RAT-086, ANA-087, PRO-076, REP-100 and REP-101, from the tenth
+re-run, with every other entry of that kind that the agent finds before the log is created
+(PRO-079). Approving an entry is the owner's own act, which the agent never performs (spec
 FR-044): the writer's approval step prints the SHA-256 of the entry, or of the first entries
 together when the log is created, taken over one canonical JSON array of the first entries in log
 order, or over the later entry alone, each entry without its approval field, `approver` whole, and

@@ -89,15 +89,21 @@ commit as each table row and each answered round, as the spec's Status line is (
   | Settle | Fixes a case the protocol leaves open, by its most conservative reading, before any result it affects (PRO-027) |
 
 - From plan approval the protocol may only become stricter (FR-044), and no result exists yet.
-  Thirteen recommended options set aside one reading each of the old text, under which it fails
+  Fifteen recommended options set aside one reading each of the old text, under which it fails
   every candidate or every correct tool or refuses a write the protocol needs: RAT-036 and RAT-052
   change a check only at the research sizes, where as written it fails every candidate; ANA-062 and
   ANA-068 state the round counts at which the avalanche test's validation is checked and the bits
   that must fire at each, where, read with every round count from 1 and no bit exempt, it fails
   every correct test, ANA-068 asking for the exact set at the variant's R and, below it, for the
   expected set's firing, any other firing reported; PRO-065, PRO-068 and PRO-071 admit writes that
-  the guards "Protocol log" and "Environment" refused as written; and SEC-093, RAT-086, ANA-087,
-  PRO-076, REP-100 and REP-101 do so in the tenth re-run, as their rows state. The protocol change
+  the guards "Protocol log" and "Environment" refused as written; REP-063 and REP-085 exempt
+  `clear_lock.py` and `owner_record.py`, `downloads.py` and `design_freeze.py` from the second
+  re-run's rule that every script that writes evidence or generated files has `--reproduce`, under
+  which every correct writer of those records fails, a reproduction of a `lock-cleared` record
+  finding no lock to clear and one of the others having to regenerate an owner's act or an outside
+  fact, the owner adding the two on 2026-11-03 ("yes, add REP-063 and REP-085 to the
+  set-aside readings"); and SEC-093, RAT-086, ANA-087, PRO-076, REP-100 and
+  REP-101 do so in the tenth re-run, as their rows state. The protocol change
   log's first entry for each marks that reading `set_aside`, with its case, for the owner's
   decision, entry by entry, in the spec's Review & Approval row "Readings set aside" at the tasks
   approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Every
@@ -1615,12 +1621,12 @@ It is recorded here for the owner to confirm at the tasks approval as an entry o
 change of rule, with the reason; the agent's reading is that it changed no rule beyond what REP-063,
 PRO-060, ANA-080 and REP-085 changed, since the openings then stated what their ends and those
 sections already said, and `repair_log.py`, like its siblings, writes log entries and no record. The
-agent also raises, for the owner's decision at the same approval, whether REP-063 and REP-085, which
-stated those exceptions against the universal that the second re-run had written, set aside a
-reading of the old text in PRO-079's sense, so that their first entries would carry the mark
-`set_aside` beside the thirteen: under that reading `clear_lock.py` needs a `--reproduce` that finds
-no lock to clear, and each of the three writers one that regenerates an owner's act or an outside
-fact.
+agent also asked whether REP-063 and REP-085, which stated those exceptions against the universal
+that the second re-run had written, set aside a reading of the old text in PRO-079's sense, since
+under that reading `clear_lock.py` needs a `--reproduce` that finds no lock to clear, and each of
+the three writers one that regenerates an owner's act or an outside fact. The owner answered the
+same day, "yes, add REP-063 and REP-085 to the set-aside readings", so that their first entries
+carry the mark `set_aside` beside the thirteen, by the commit recorded next.
 
 Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
@@ -1858,3 +1864,16 @@ checklists stays open. As the owner asked on 2026-11-03 ("after this iteration, 
 speckit-checklists loop"), the loop of re-runs stopped after this round, though no re-run had yet
 found no new item, so that no eleventh re-run was made, and `/speckit-tasks` waits for the owner's
 word, up to the ⛔ tasks approval.
+After the loop stopped, the owner gave two items on 2026-11-03: "consider and fix these two items
+after the loop stops". The first, that the guard "Environment" would refuse the downloads manifest
+and a `lock-cleared` record in plan phase 1's steps (5) and (6), the environment records existing
+only from step (7), asked for no change: since the seventh re-run's PRO-068 and REP-082 and the
+eighth's PRO-071, step (2a) writes each platform's first environment record before every other
+write, so that steps (3) to (6) run under it, and step (7) writes the new record that follows the
+wheels' install. The second, that `scripts/downloads.py` has no `--reproduce` while neither the cli
+contract's rule nor FR-061's list of exclusions exempts it, was answered by 1c67100, recorded beside
+the tenth re-run's list above: both already exempted it, and the commit stated the exceptions where
+the two rules open. On the question that record raised, the owner added REP-063 and REP-085 to the
+readings set aside the same day ("yes, add REP-063 and REP-085 to the set-aside readings"), so that
+fifteen first entries mark one reading each `set_aside` for the owner's decision in the row
+"Readings set aside" ("How to answer"; spec, Clarifications, Session 2026-11-03).

@@ -203,9 +203,10 @@ none, the rate lanes' nonce registers being registers at their own nodes,
 filled through the absorption tree, and those of the fifth to tenth re-runs, the same day, none.
 Each of these answers that changes a protocol value is, under every reading of the old text,
 stricter, or settles an open case by its most conservative reading before any result it affects, but
-for thirteen, each of which sets aside one reading of the old text, under which it fails every
+for fifteen, each of which sets aside one reading of the old text, under which it fails every
 candidate or every correct tool or refuses a write the protocol needs: RAT-036, RAT-052, ANA-062,
-ANA-068, PRO-065, PRO-068 and PRO-071, from earlier rounds, and SEC-093, RAT-086, ANA-087, PRO-076,
+ANA-068, PRO-065, PRO-068, PRO-071, REP-063 and REP-085, from earlier rounds, the last two
+added by the owner on 2026-11-03, and SEC-093, RAT-086, ANA-087, PRO-076,
 REP-100 and REP-101, from the tenth re-run, whose change log entries mark that reading `set_aside`
 for the owner's decision in the spec's Review & Approval row "Readings set aside"
 (checklist-choices.md, "How to answer"; PRO-079); each protocol change among them becomes an entry
