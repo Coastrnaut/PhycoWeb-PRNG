@@ -647,6 +647,29 @@ They start open, and an item is ticked only under the rule in the Notes below.
   §Review & Approval "Design freeze" and the notes under the table; data-model §13; cli contract
   `design_freeze.py`, "Environment"]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK073 Do research R16's and quickstart F2's statements of the freeze's first two steps agree
+  with FR-043 as PRO-072 left it, given that R16 has step (1) be "the owner's next commit after the
+  one that records the owner design review's approval, from which the agent commits no file of this
+  feature" and quickstart F2 has `create` exit 2 "unless HEAD is the commit right after the owner
+  design review's approval", while FR-043, data-model §13 and the cli contract make step (1) the
+  owner's next commit after the one that records that approval "in its row with the highest k", of
+  every feature file changed since or an empty commit of the owner's where none changed, and, where
+  the owner must commit "Environment record <n>" or "Log repair <n>" on its own in between, the
+  owner's next commit after the one that records the approval of the review held again in "Owner
+  design review <k>", and run the agent's window from the first commit that records an owner design
+  review's approval to the feature's end, plan phase 9 included? Read with the first approval, where
+  such a row came between, do the two texts name a commit other than the one `create` records as
+  `owner_commit`, and does R16's step (2), in the section that the lists' heading "Records and their
+  hashes" names, also state the exit while `check_claims.py` reports a finding at HEAD (SEC-084), as
+  FR-043's step (2) does? [Consistency, Spec §FR-043; research R16; quickstart F2; data-model §13;
+  cli contract `design_freeze.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
