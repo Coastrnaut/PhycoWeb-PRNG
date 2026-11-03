@@ -95,13 +95,14 @@ task of phases 1 to 9 starts before T002.
   changed by an edit that no row made, confirmed as an entry of its own or as no change of rule,
   with the reason; set the row "Readings set aside", naming each first entry whose `readings` mark a
   reading `set_aside`, with the case under which the old text fails, and deciding each, entry by
-  entry, the fifteen readings (RAT-036, RAT-052, ANA-062, ANA-068, PRO-065, PRO-068, PRO-071,
-  REP-063, REP-085, SEC-093, RAT-086, ANA-087, PRO-076, REP-100 and REP-101): the change kept, with
-  the reason, as a change FR-044's words do not allow, or the old text restored, a restoration being
-  compared again in "Place check <k>"; set the row "Tasks approval"; and commit the rows with the
-  spec's Status line and the Status of `checklist-choices.md`, which follow the table in the same
-  commit. For this review the agent lists the approval commits since the last gate. (FR-044;
-  PRO-063, PRO-079; SEC-087; Principle VIII)
+  entry, the eighteen readings (RAT-036, RAT-052, ANA-062, ANA-068, PRO-065, PRO-068, PRO-071,
+  REP-063, REP-085, SEC-093, RAT-086, ANA-087, PRO-076, REP-100 and REP-101, and those of the
+  entries made from ccfd9d1, 5f34d5c and 7a6d0e8): the change kept, with the reason, as a change
+  FR-044's words do not allow, or the old text restored, a restoration being compared again in
+  "Place check <k>"; set the row "Tasks approval"; and commit the rows with the spec's Status line
+  and the Status of `checklist-choices.md`, which follow the table in the same commit. For this
+  review the agent lists the approval commits since the last gate. (FR-044; PRO-063, PRO-079;
+  SEC-087; Principle VIII)
 
 **Checkpoint**: tasks approved; "Place check" and "Readings set aside" decided at HEAD, where
 `scripts/protocol_change.py create` reads them.

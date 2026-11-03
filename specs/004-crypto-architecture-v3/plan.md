@@ -210,7 +210,11 @@ added by the owner on 2026-11-03, and SEC-093, RAT-086, ANA-087, PRO-076,
 REP-100 and REP-101, from the tenth re-run, whose change log entries mark that reading `set_aside`
 for the owner's decision in the spec's Review & Approval row "Readings set aside"
 (checklist-choices.md, "How to answer"; PRO-079); each protocol change among them becomes an entry
-of the protocol change log (FR-044). The start signal reaches the nodes and the
+of the protocol change log (FR-044). Three edits that no row made, ccfd9d1, 5f34d5c and 7a6d0e8,
+among the `/speckit-analyze` remediations of 2026-11-03, set aside one reading each as well, and
+the first entries made from their places mark it the same way, on the owner's answer of the same
+day, so that the row "Readings set aside" decides eighteen (checklist-choices.md, beside the tenth
+re-run's list; PRO-079). The start signal reaches the nodes and the
 replicated counters through a registered fan-out tree, as reset does, and output leaves through a
 buffer of one block, so the core never stalls in mid-call (FR-025).
 

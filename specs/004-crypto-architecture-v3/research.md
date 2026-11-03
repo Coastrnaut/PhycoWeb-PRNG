@@ -21,7 +21,11 @@ PRO-076, REP-100 and REP-101, from the tenth re-run, whose change log entries ma
 `set_aside` for the owner's decision in the spec's Review & Approval row "Readings set aside"
 (checklist-choices.md, "How to answer"; PRO-079); each becomes an entry of the protocol change log
 `research/004/protocol-changes.jsonl` when that log is created, by the per-round
-lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18).
+lists "Rows that change the protocol" of checklist-choices.md (FR-044; data-model §18). Three
+edits that no row made, ccfd9d1, 5f34d5c and 7a6d0e8, among the `/speckit-analyze` remediations of
+2026-11-03, set aside one reading each as well, and the first entries made from their places mark
+it the same way, on the owner's answer of the same day, so that the row "Readings set aside"
+decides eighteen (checklist-choices.md, beside the tenth re-run's list; PRO-079).
 
 > This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used
 > to generate secrets; use an established cryptographic random-number generator for keys,

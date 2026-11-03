@@ -106,7 +106,11 @@ commit as each table row and each answered round, as the spec's Status line is (
   REP-101 do so in the tenth re-run, as their rows state. The protocol change
   log's first entry for each marks that reading `set_aside`, with its case, for the owner's
   decision, entry by entry, in the spec's Review & Approval row "Readings set aside" at the tasks
-  approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Every
+  approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Three
+  edits that no row made, ccfd9d1, 5f34d5c and 7a6d0e8, among the `/speckit-analyze` remediations
+  recorded beside the tenth re-run's list, set aside one reading each as well, and the first entry
+  made from each one's places marks it the same way, on the owner's answer of 2026-11-03,
+  "all recommended", so that the row decides eighteen such readings. Every
   other recommended option is, under every reading of the old text, in its rule's stricter
   direction or settles an open case by its most conservative reading. An
   alternative that would loosen it is marked "looser", so the choice is visible
@@ -1665,17 +1669,55 @@ skip the reseed step. The other two commits of that answer changed no place: 3c8
 FR-034 that "the mode chapter" is the design document's chapter "Mode", and 7e61f4f, which notes in
 the security checklist where CHK085's quoted sentence stands.
 
-Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
-comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
-recorded beside the re-run's list above; the span from 832bd4d to 930494d, between the ninth and
-tenth re-runs' pairs, changed no place; and after this round's pair, the span from 974ffef changed
-places in five commits, research R16 and the cli contract by 1c67100, data-model §18 by 57bd909, the
-cli contract by b6a93f0, spec FR-039, research R4 and the cli contract by 252512a, and spec FR-020,
-FR-025 and FR-026 and research R5 and R8 by 797c6da, each recorded beside this list above, the other
-commits, 744ded0, ccaf8f0, 388551a, 82bb979, 3c8eccb, 7e61f4f and the commit that recorded the last
-three of the five, changing none. Before the tasks approval the script compares every pair and
-span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
-and which the owner confirms in the row "Place check" (PRO-063).
+After those, the five commits that applied the `/speckit-analyze` remediations of 2026-11-03, on
+the owner's instructions of that day to make and commit the edits for each report's issues,
+changed places of rules with edits that no row made. Commit ce3cde1 changed research R15,
+data-model §1 and §18 and the cli contract, places that the headings "Constant rule", "Records
+and their hashes" and "Protocol changes and their directions" name: the refused list became the
+committed file `research/004/refused-constants.json`, whose SHA-256 `gen_constants_v3.py` holds
+in every record it writes and the change log's entries hold in `refused_list`, the script and
+`protocol_change.py` exiting 2 on a mismatch. Commit ccfd9d1 changed research R15, data-model §1
+and the cli contract: every record of `gen_constants_v3.py`, in each of its modes, holds
+`refused_list`, and R15's refusal compares the list with the latest entry that holds one, an
+addition's included, as the cli contract's did. Commit b3eba12 changed research R15: it states
+the entry format of the refused list. Commit 5f34d5c changed research R15 and R16, data-model's
+introduction and §18, the cli contract, its `protocol_change.py` among it, and the notes under
+the Review & Approval table: a file that research R19 does not list, the source of a refused set
+or another copy of a paper among them, needs a row of its own, "Download <n>", which
+`scripts/downloads.py approve` reads; the refused list waits for each set whose only source is a
+file, and only grows, `propose` refusing a list that drops or changes an entry of the version
+that the latest `refused_list` names. Commit 7a6d0e8 changed the same places: the growth rule
+binds the versions that a `refused_list` names, a version that none names being a draft that the
+generator refuses and the next named version may correct; `create` and `propose` also refuse a
+list that does not parse in R15's entry format; and a later copy of a listed file takes a name of
+its own. Each is recorded here for the owner to confirm at the tasks approval as an entry of its
+own or as no change of rule, with the reason; the agent's reading is that each is stricter or
+settles its case under every reading of the old text, but for three readings that the commits
+set aside, each one under which the protocol could never take a step it needs, which the first
+entries made from their places mark `set_aside`, on the owner's answer of 2026-11-03, "all
+recommended", for the owner's decision in the row "Readings set aside" (PRO-079): ccfd9d1's, of
+R15's "the latest such entry's" read as the entry that fixes the rule, under which the generator
+refuses every run after the list's first addition; 5f34d5c's, of the cli contract's "Each mode
+refuses" read over every mode of `downloads.py`, under which `approve` could permit no file; and
+7a6d0e8's, of the rule that each committed version keeps every entry of the one before it, under
+which an error committed in a draft could never be corrected. Commit addc940, the last
+remediation, changed no place.
+
+Over every span from the plan-approval commit, 65bcbf2, to addc940 outside the rounds' pairs, the
+comparison that `research/004/place_check.py` wrote to `research/004/place-check.json`, committed
+in 0a99462 with `compared_to` addc940, found eleven commits that changed places of rules with an
+edit that no row made: ad2c195's change to research R3, recorded beside the re-run's list above;
+and, in the span from 974ffef to addc940, after this round's pair, research R16 and the cli
+contract by 1c67100, data-model §18 by 57bd909, the cli contract by b6a93f0, spec FR-039, research
+R4 and the cli contract by 252512a, spec FR-020, FR-025 and FR-026 and research R5 and R8 by
+797c6da, research R15, data-model §1 and §18 and the cli contract by ce3cde1, research R15,
+data-model §1 and the cli contract by ccfd9d1, research R15 by b3eba12, and research R15 and R16,
+data-model's introduction and §18, the cli contract and the notes under the Review & Approval
+table by 5f34d5c and again by 7a6d0e8, 22 entries in all, one per commit and rule, each recorded
+beside this list above. The span from 832bd4d to 930494d, between the ninth and tenth re-runs'
+pairs, changed no place, nor did the span's other commits, 744ded0, ccaf8f0, 388551a, 82bb979,
+3c8eccb, 7e61f4f, 40768cd, e560a9c and addc940. These results restate that file, which the owner
+confirms in the row "Place check" (PRO-063).
 
 ## After the answer
 
@@ -1920,7 +1962,9 @@ the tenth re-run's list above: both already exempted it, and the commit stated t
 the two rules open. On the question that record raised, the owner added REP-063 and REP-085 to the
 readings set aside the same day ("yes, add REP-063 and REP-085 to the set-aside readings"), so that
 fifteen first entries mark one reading each `set_aside` for the owner's decision in the row
-"Readings set aside" ("How to answer"; spec, Clarifications, Session 2026-11-03).
+"Readings set aside" ("How to answer"; spec, Clarifications, Session 2026-11-03). Three more joined
+them later that day, on the owner's answer to the agent's suggestions for the tasks approval, as
+recorded beside the tenth re-run's list.
 
 After those, the agent raised nine items the same day, three observations of the tenth re-run's
 report and six carried from earlier reports, each with a recommended solution, and the owner
