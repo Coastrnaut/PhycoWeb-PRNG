@@ -1616,7 +1616,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     constant sets of R12's reference designs (SPECK32, PRESENT, SPARKLE) and of every design the
     strategy note, the spec, the plan, this document and security.md name, and the standard
     polynomials of degree 64 and 128: CMAC's R₆₄ and R₁₂₈ (SP 800-38B), GCM's (SP 800-38D), and the
-    CRC-64 polynomials of ISO 3309 and ECMA-182. The check fails if the chosen polynomial is listed,
+    CRC-64 polynomials of ISO 3309 and ECMA-182. Each entry of the list holds `name`, `kind`,
+    either `polynomial` or `constant-set`, and `source`: a file recorded `fetched` in
+    `downloads.json` with the table that gives it, or `research/004/refused_sources.py` with the
+    citation of the derivation it computes; a polynomial holds `degree` and `c`, the integer whose
+    bits are the coefficients of its lower terms, as in the values above, in hexadecimal; a
+    constant set holds `word_bits`, the width its words were published in, which the reading
+    below uses, and `words`, its words in published order, each a hexadecimal integer of at most
+    `word_bits` bits. The check fails if the chosen polynomial is listed,
     or if a table contains a listed sequence. Each listed constant set is read as one bit string,
     its words in published order and most significant bit first, and a match is a run of consecutive
     table words of at least 64 bits (16 words at w = 4, 8 at w = 8, 4 at w = 16 and 2 at w = 32)

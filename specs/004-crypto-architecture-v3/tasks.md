@@ -308,20 +308,20 @@ or key-loading code is written here.
 
 ### Step (4): the refused list and the protocol change log
 
-- [ ] T027 Write the refused list of research R15 as `research/004/refused-constants.json`, which
-  `scripts/gen_constants_v3.py` will read, before the protocol change log, so that its SHA-256
-  stands in `refused_list` of each entry that fixes the constant rule (data-model §18), the file
-  committed before T028: the standard polynomials of degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's
-  and the CRC-64 polynomials of ISO 3309 and ECMA-182) and the polynomials and constant sets of
-  every design that the strategy note, the spec, the plan, research.md and `security.md` name,
-  research R12's reference designs among them, each with its source; each set's source is a file of
-  research R19 recorded `fetched` in `downloads.json` or the design's published derivation, computed
-  by `research/004/refused_sources.py`, committed code that cites the derivation of each set it
-  computes, and a set with neither waits for a download of its own, with the owner's permission for
-  that file (FR-046); a set not on the list when the log is created, a set from a paper of R19 not
-  yet fetched among them, enters as a `stricter` entry with the list's new SHA-256, and no candidate
-  is scored before every set this task names is on the list. (FR-023, FR-044, FR-046; R15, R19;
-  RAT-038, RAT-043)
+- [ ] T027 Write the refused list of research R15 as `research/004/refused-constants.json`, in R15's
+  entry format, which `scripts/gen_constants_v3.py` will read, before the protocol change log, so
+  that its SHA-256 stands in `refused_list` of each entry that fixes the constant rule
+  (data-model §18), the file committed before T028: the standard polynomials of degree 64 and 128
+  (CMAC's R₆₄ and R₁₂₈, GCM's and the CRC-64 polynomials of ISO 3309 and ECMA-182) and the
+  polynomials and constant sets of every design that the strategy note, the spec, the plan,
+  research.md and `security.md` name, research R12's reference designs among them, each with its
+  source; each set's source is a file of research R19 recorded `fetched` in `downloads.json` or the
+  design's published derivation, computed by `research/004/refused_sources.py`, committed code that
+  cites the derivation of each set it computes, and a set with neither waits for a download of its
+  own, with the owner's permission for that file (FR-046); a set not on the list when the log is
+  created, a set from a paper of R19 not yet fetched among them, enters as a `stricter` entry with
+  the list's new SHA-256, and no candidate is scored before every set this task names is on the
+  list. (FR-023, FR-044, FR-046; R15, R19; RAT-038, RAT-043)
 - [ ] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/004/protocol-changes.jsonl`, one per listed row of every answered
@@ -745,8 +745,11 @@ candidates are otherwise `ineligible` (R6, R7).
   a `reproduction` record for `--reproduce`. Its tests, in `tests/test_protocol_004.py`, cover that
   guard: exit 2 with nothing written for a list that differs from the latest `refused_list` and for
   a log in which no entry holds one, `refused_list` in the record of each mode, and a `--reproduce`
-  run reading the list at the record's `git_head`. (FR-023, FR-024, FR-044, FR-047; SC-006; R13,
-  R15)
+  run reading the list at the record's `git_head`; and the list and its match: the committed
+  `research/004/refused-constants.json` parses in R15's entry format, each word within its
+  `word_bits`, and a set of a stated list, planted in a stated table, is found under each of the 2w
+  transforms and not found when the planted run is one word short of 64 bits. (FR-023, FR-024,
+  FR-044, FR-047; SC-006; R13, R15)
 - [ ] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
   as `research/004/candidates/cand-A1.py`, an operation list of invertible updates with its
   reference outputs, and append its `proposed` entry with

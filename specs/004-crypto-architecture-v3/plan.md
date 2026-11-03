@@ -330,7 +330,7 @@ tests/
 │                             # the two log writers' refusals (FR-044, FR-067); the first list
 │                             # of approvals and the guards agree both ways; the three status
 │                             # lines agree; the heavy-run lock's coverage (FR-045); the constants
-│                             # generator's refused-list guard (FR-023)
+│                             # generator's refused-list guard and match check (FR-023)
 ├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
 │                             # mark of every hashed path, each code_sha256 entry against its blob
