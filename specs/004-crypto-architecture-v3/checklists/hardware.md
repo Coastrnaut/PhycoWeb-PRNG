@@ -761,6 +761,41 @@ They start open, and an item is ticked only under the rule in the Notes below.
   other bits are not zero still zeroizes, so that a malformed zeroize does not leave the key and the
   state in place? [Gap, Edge Case, Spec §FR-025 "Flow control", "Zeroization"; FUT-HW-5]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK091 Is it stated whether a command word that the core takes and refuses while a call runs
+  starts a call of its own, and what `call_done` does then, given that FR-020 counts "a refused
+  request that changes nothing" among its calls, each of which "starts when its command is accepted
+  on the command interface" and ends "in the cycle in which `call_done` rises", that `call_done` is
+  low "from each call's start, its command word's acceptance" to that call's end and high "from the
+  cycle in which the call ends until the next call starts", and that from any call's command word to
+  its end the command interface "accepts zeroize only" while "every other command word is refused
+  with the code of a call out of sequence" and changes nothing, so that "accepted" reads both as
+  taken and as acted on? Where such a word starts a call, `call_done` rises at its end inside the
+  running call, which has not ended; where it starts none, FR-020's count for it cannot be measured
+  "from a call's start to the cycle in which `call_done` rises". Is it stated which refusals that
+  count covers, one made between calls, an instantiate refused at its length word and one made while
+  a call runs, the cycle in which each ends, and that a refusal made while a call runs leaves the
+  running call's count and `call_done` as they would be without it, the error signal and code it
+  raises held through the rest of that call, so that FUT-HW-5's tests of a call in each state
+  measure each count at the ports? [Ambiguity, Measurability, Spec §FR-020, §FR-025 "Call sequence",
+  "Flow control", "Registers and read-back", "Zeroization"; FUT-HW-5]
+- [ ] CHK092 Does research R5's size estimate count the self-test's stored constants as FR-026 does,
+  given that R5 lists the self-test's "stored key, nonce, reseed input and expected output (spec
+  FR-059; HW-082)", while FR-026 counts its key, its nonce, the empty personalization string's
+  length word (RAT-079), the reseed input with its length word where the design has a reseed
+  (HW-082) and the expected output, "k·r bits per generate request with k computed as FR-059 states
+  (HW-084)", as FR-059's list of stored constants and FR-034's components name them, and that every
+  candidate's FR-026 figures come before selection from its `cost` records, written by
+  `research/004/tools/costmodel.py`, which R5 describes? Is R5, a section that the lists' heading
+  "Nonlinearity choice rule (D4)" names, brought into line, so that the cost model counts both
+  length words and k·r bits per request, or states a part negligible only with its figure and
+  reason? [Consistency, Spec §FR-026, §FR-034, §FR-059; research R5; data-model §9]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
