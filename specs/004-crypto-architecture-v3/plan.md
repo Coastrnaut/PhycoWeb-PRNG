@@ -200,15 +200,16 @@ second re-run, add no violation beyond the key chain, which the second re-run's 
 explicit, those of 2026-11-02, of the third re-run, none beyond the nonce chain beside it, both
 justified in Complexity Tracking, and those of the fourth re-run, the same day,
 none, the rate lanes' nonce registers being registers at their own nodes,
-filled through the absorption tree, and those of the fifth to ninth re-runs, the same
-day, none: each is stricter, adds a check, or settles an open case by its
-most conservative reading before any result it affects, at every claimable size, RAT-036 and RAT-052
-changing a check only at the research sizes, where as written it fails every candidate, and ANA-062
-and ANA-068 stating the round counts at which the avalanche test's validation
-is checked and the bits that must fire at each, where as written it fails
-every correct test, ANA-068 asking for the exact set at the variant's R alone
-(checklist-choices.md, "How to answer"), and each protocol change among them
-becomes an entry of the protocol change log (FR-044). The start signal reaches the nodes and the
+filled through the absorption tree, and those of the fifth to tenth re-runs, the same day, none.
+Each of these answers that changes a protocol value is, under every reading of the old text,
+stricter, or settles an open case by its most conservative reading before any result it affects, but
+for thirteen, each of which sets aside one reading of the old text, under which it fails every
+candidate or every correct tool or refuses a write the protocol needs: RAT-036, RAT-052, ANA-062,
+ANA-068, PRO-065, PRO-068 and PRO-071, from earlier rounds, and SEC-093, RAT-086, ANA-087, PRO-076,
+REP-100 and REP-101, from the tenth re-run, whose change log entries mark that reading `set_aside`
+for the owner's decision in the spec's Review & Approval row "Readings set aside"
+(checklist-choices.md, "How to answer"; PRO-079); each protocol change among them becomes an entry
+of the protocol change log (FR-044). The start signal reaches the nodes and the
 replicated counters through a registered fan-out tree, as reset does, and output leaves through a
 buffer of one block, so the core never stalls in mid-call (FR-025).
 

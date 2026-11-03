@@ -853,8 +853,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   commit e75c8f9. The 3 items of the eighth re-run, CHK077 to CHK079, verified in the same
   way once their answers were applied, were ticked in commit fe2f6cb. The 3
   items of the ninth re-run, CHK080 to CHK082, verified in the same way once
-  their answers were applied, were ticked in commit 07e2a3b. A tick here
-  therefore records a determination the owner delegated, and the owner's
+  their answers were applied, were ticked in commit 07e2a3b. The 6 items of the tenth re-run, CHK083
+  to CHK088, verified in the same way once their answers were applied, were ticked in commit
+  744ded0. A tick here therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
 - On 2026-11-03 the owner asked that the loop of re-runs stop after the tenth re-run: "after this
