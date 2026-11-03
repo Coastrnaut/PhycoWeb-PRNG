@@ -1183,8 +1183,9 @@ that a later row or a change to the reviewed set ended, with its dates, the rows
 the version reviewed, and `in_progress` reads `none` while no counted trail-bound record exists at
 HEAD and names L2 with the first such record's date and "not reached" once one exists (SEC-080), so
 that a register below the rows' level, or one missing a lapsed L1, fails
-as one above it does; `tests/test_claims.py` covers each case. The agent writes `phyco-v3`'s
-`claim_level`, `updated` and `history`, and its line in security.md §15, in a commit of its own
+as one above it does; `tests/test_claims.py` covers each case. The agent
+writes `phyco-v3`'s `claim_level`, `updated` and `history`, and its line
+in security.md §15 with its row in §1.1 (SEC-095), in a commit of its own
 right after the owner's commit that sets "L1 recorded" or "L1 recorded <k>" to Approved, or that
 adds a later row of either review family, which makes L1 lapse, and never before that commit, save
 inside spec FR-043's window, where the owner's commit holds it (SEC-076; SEC-084). It writes the
@@ -1198,9 +1199,10 @@ working tree, once the owner has set the row or made the change there, and the o
 it, so that at every commit of the window the register gives the rows' level (SEC-084). Plan phase 1
 creates the register, with an entry for each model ID and `phyco-v3` at L0 with "no claim",
 `in_progress` `none`, `bound` `none` and `evidence` empty (SEC-089), with
-`scripts/check_claims.py` and `tests/test_claims.py`, and adds `phyco-v3`'s
-line at L0 to security.md §15 in the same phase, in a security.md version of
-its own (spec FR-051; SEC-081). The spec approval recorded no level. The claim test checks README's
+`scripts/check_claims.py` and `tests/test_claims.py`, and adds `phyco-v3`'s line at L0 to
+security.md §15, with its row in §1.1, "L0; no claim" under "Claim level (section 15)", in
+the same phase, in a security.md version of its own (spec FR-051; SEC-081;
+SEC-095). The spec approval recorded no level. The claim test checks README's
 status block and security.md's own blocks, the one that opens it and the one that closes it, each of
 which must say that PhycoWeb-PRNG, every model included, must not be used to generate secrets and
 state no level, claim or bound beyond the register's, against the register: the test finds each
@@ -1222,7 +1224,12 @@ names holds "no claim", README's line on the 64-bit seed naming `float-v0`,
 for the models with a 64-bit seed, gains with spec FR-051's update a sentence on `phyco-v3` that the
 test checks against its `claim_level` and `claim`, and the two documents keep their own blocks and
 carry no copy of the design-form disclaimer, which every hand-written document of this feature
-carries (spec FR-068; SEC-086).
+carries (spec FR-068; SEC-086). The test reads security.md §1.1's table row by row, the model ID of
+its first column against the register's entries and the leading level and claim of its cell under
+"Claim level (section 15)" against `claim_level` and `claim`, a register entry with no row, a row
+with no entry or a cell that differs being a finding, and reads every README line outside the status
+block that holds "security level", "strength", "claim" or a level by the rules on a bound and a
+claim of a disclaimer's line (spec FR-069; SEC-095).
 
 - `claim_level` holds the level whose gate holds at HEAD (L0 or L1 in this feature): a
   later row of either review family, or a change to what those rows reviewed (SEC-079), makes L1
@@ -1260,8 +1267,12 @@ carries (spec FR-068; SEC-086).
   or line entry; the test counts an entry from the commit that adds it; `check_claims.py` prints on
   every run each entry added since the last ⛔ gate's approval commit, and the owner's review at each
   ⛔ gate lists those entries with their reasons; an entry the owner declines is removed in the next
-  commit, the line it passed then failing the test until its text changes (spec FR-069;
-  SEC-087). The test flags any strength (a number of bits beside "security",
+  commit, the line it passed then failing the test until its text changes (spec FR-069; SEC-087).
+  Inside the three disclaimer blocks no entry passes any finding, of a wording rule, of the level
+  rule, of the comparison of a bound or a claim or of the fixed sentence, and nowhere does an entry
+  pass a finding of the checks of `claim_level`, `bound`, `evidence`, `in_progress` and `history`
+  against the rows and the files; the test exits 1 on an entry that names a line of a block or such
+  a finding (spec FR-069; SEC-094). The test flags any strength (a number of bits beside "security",
   "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence or row
   carries "target" or quotes a rule. It also flags "random" with its inflections and "high-entropy"
   in every line it scans, since Principle IV forbids describing the generator so beyond what

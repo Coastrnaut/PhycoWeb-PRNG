@@ -923,9 +923,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the nonces this requirement calls "random 128-bit nonces" (research R9),
   and a nonce the caller repeats by error or by force lies outside it, so
   that no goal of T7 is claimed for those instantiations (SEC-083). A keyed
-  reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its
-  size-profile row states s = c/2 as a bound on that variant only, with status `research` and
-  "no claim" (FR-032).
+  reduced variant takes a c-bit key and a c/2-bit nonce (research R14), and its size-profile row
+  states its `bound_bits` as a bound on that variant only, with its checks made at s = c/2, status
+  `research` and "no claim" (FR-032); s = c/2 is the level of those checks, not a field of the row
+  and not its bound, and `bound_bits`, one of whose terms is c/2, is never above it (FR-010;
+  SEC-096).
 - **FR-007**: The security target MUST specify the maximum output per instantiation (key and
   nonce), per generate request and per key across all nonces, the maximum number of keys u
   that it covers, and every other online quantity the theorem's bound counts (calls of Π,
@@ -1065,10 +1067,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a level above `claim_level`, flagging every name of a level above it in every scanned line as a
   whole word, as FR-069's rule states (SEC-085). Plan phase 1 creates `phyco-v3`'s entry
   in `protocol/claims.json` at L0, with "no claim", `in_progress` `none`,
-  `bound` `none` and `evidence` empty, and its line at L0 in security.md §15's
-  register (SEC-081; SEC-089). The agent writes each change that the rows
-  bring to the entry's `claim_level`, `updated` and `history`, and to that
-  line, in a commit of its own right after the owner's commit that sets "L1
+  `bound` `none` and `evidence` empty, and its line at L0 in security.md §15's register, with its
+  row in §1.1, "L0; no claim" under "Claim level (section 15)", in the same security.md version
+  (SEC-081; SEC-089; SEC-095). The agent writes each change that the rows
+  bring to the entry's `claim_level`, `updated` and `history`, and to that line and that row of §1.1
+  (SEC-095), in a commit of its own right after the owner's commit that sets "L1
   recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family,
   which makes L1 lapse, and never before that commit, save inside FR-043's window, where the owner's
   commit holds it (SEC-084); the claim test checks the register against those rows both ways
@@ -1147,8 +1150,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   conflict at 2×2 (security.md §20.1). By default (D3) they start at 4×4, and 2×2 and 3×3 are
   reduced research variants outside every claim. The decision MUST be recorded in security.md
   §20.1 with the reason it weakens neither requirement: FUT-SEC-1 and FUT-SEC-2 bound a claimed
-  strength, no claim covers a research size, each research row of the size profile states its
-  key entropy c, its s = c/2 and the status `research`, and the production interface refuses
+  strength, no claim covers a research size, each research row of the size profile states its key
+  entropy, its `bound_bits` and the status `research`, a keyless row stating a key entropy of 0
+  and `bound_bits` `none` (SEC-096), and the production interface refuses
   every research variant (FR-033).
 
 **Permutation Π (FUT-GRID-1 to FUT-GRID-5)**
@@ -1961,8 +1965,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   count by n's parity, the food-node positions by their rule, c, and the key and nonce lengths.
   Anything else makes a different design. Each variant MUST have its own variant ID, which
   carries its R, and its bound MUST be stated (FR-009): the size-profile row of a keyed reduced
-  variant states s = c/2 as a bound on that variant only, labelled "research variant, no claim"
-  (FR-006). A record that depends on R holds for the variant it names only, so after a rise of
+  variant states its `bound_bits` as a bound on that variant only, with its checks made at s =
+  c/2, labelled "research variant, no claim" (FR-006; SEC-096). A record
+  that depends on R holds for the variant it names only, so after a rise of
   R every such record is made again at the new variant (round rule). Each
   research variant's R is stated with its reason: the round rule's value
   where its inputs exist at that variant, or a reduced count chosen for a stated test and
@@ -2848,8 +2853,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   that answer them (FR-030), citing for each the evidence record, or the
   section and test where the answer is by specification, as the final report's
   lessons table does, and for S2, S5–S7 and S11–S15 the rows of the design
-  document's chapter "Replaced mechanisms" with their records), a row in §1.1, a
-  validation-phase table like §1.3, the §20.1 decision (recorded in
+  document's chapter "Replaced mechanisms" with their records), a row in
+  §1.1, which plan phase 1 adds with its line in §15 and this version keeps
+  (SEC-095), a validation-phase table like §1.3, the §20.1 decision (recorded in
   2.11 on 2026-11-01; FR-017), the claim-register entry as it then stands
   (its line for `phyco-v3` at L0 is added in plan phase 1, in a security.md version of its own,
   which also gives security.md's opening and closing blocks FR-069's fixed
@@ -3373,7 +3379,27 @@ freeze hashes and the baseline manifest; run the claim-register test.
   is beyond it when an entry it names holds "no claim"; README's line on the 64-bit seed names, in
   plan phase 1, when the test is written, the models whose seed it describes, `float-v0`, `lut-v1`
   and `phyco-v2`, so that FR-051's sentence on `phyco-v3` stands beside it and each is checked
-  against its own entries (SEC-091). `tests/test_claims.py` covers each of these cases. Its
+  against its own entries (SEC-091). In a disclaimer, a bound is every number of bits a line states,
+  written "<d> bits", "<d>-bit" or as a power of 2, each read as a bound of the models the line
+  names, so that a figure that bounds no model, such as a seed's size or a standard's minimum, may
+  not stand in a block: README's line on the seed states from plan phase 1, with SEC-091's change,
+  only the cap at 64 bits of the models it names, in words that no rule flags, since no entry passes
+  a finding inside a block (SEC-094), the seed's size and the 112-bit minimum standing in README's
+  section 5, outside the block; a claim is every other use, in any of its inflections, of "secure",
+  "security level", "cryptographic security", "strength", "resist" or "claim", read as negated only
+  inside the phrases "no claim", "do not show cryptographic security" and "does not show
+  cryptographic security", word for word, so that any other such use in a block is a claim of the
+  models its line names, a finding while an entry it names holds "no claim" (SEC-093). The test
+  reads security.md §1.1's table row by row, the model ID of its first column against the register's
+  entries and the leading level and claim of its cell under "Claim level (section 15)", "L<k>; no
+  claim" or "L<k>; <claim>", against `claim_level` and `claim`, a register entry with no row, a row
+  with no entry or a cell that differs being a finding; and, outside README's status block, it reads
+  every README line that holds "security level", "strength", "claim" or a level by the rules above
+  on a bound and a claim, as it reads a disclaimer's line, the lines these rules flag, the passage
+  on the seed's size in README's section 5 among them, being reworded in plan phase 1 with SEC-093's
+  change, so that the test passes from that phase (SEC-095). `tests/test_claims.py` covers each of
+  these cases, a figure that bounds no model, each of the three phrases, a negation
+  outside them and a §1.1 row missing, added or differing among them. Its
   scope is every document of this feature, that is every Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the checklists and
   checklist-choices.md included, with README and security.md, since FR-051 changes both, and the
@@ -3402,7 +3428,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   promise, the negative statements of FR-011, FR-049, FR-059 and the section "Context", which say
   what no artifact may call a model, a test or a review, and, in the checklists and
   checklist-choices.md, which quote the documents they review, a flagged word inside a quotation, in
-  quotation marks or backticks; any other flagged line there needs an entry of its own. The agent
+  quotation marks or backticks; any other flagged line there needs an entry of its own. Inside the
+  three disclaimer blocks no entry passes any finding, of a wording rule, of the level rule, of the
+  comparison of a bound or a claim or of the fixed sentence, and nowhere does an entry pass a
+  finding of the checks of the register's `claim_level`, `bound`, `evidence`, `in_progress` and
+  `history` against the rows and the files, so that the blocks and the register stand only as the
+  rules give them; outside the blocks entries pass the flags of the wording rules and of the level
+  rule, as above; the test exits 1 on an entry that names a line of a block or a finding of the
+  register's checks, and `tests/test_claims.py` covers each case. security.md's two blocks, which
+  state the restriction with "an established cryptographic random-number generator",
+  a phrase that passes only through its standing entry, word it from plan
+  phase 1, in the version that gives them the fixed sentence, as README's
+  block does, with "an established cryptographic RNG" (SEC-094). The agent
   drafts each entry, standing phrase or line entry, with its path and text, its reason, its writer
   and the date; the test counts an entry from the commit that adds it, so that it runs from plan
   phase 1 on, and prints on every run each entry added since the last ⛔ gate's approval commit, and

@@ -1013,13 +1013,26 @@ a claim stated in a disclaimer, line by line, with the register entries of the m
 by ID, a line that states one and names no model being a finding, a bound being beyond the
 register's when an entry it names holds `none` or a bound below the line's, `phyco-v3`'s bound being
 the least of its sizes' bounds unless the line names a size by its variant ID, and a claim when an
-entry it names holds "no claim" (SEC-091). It checks `phyco-v3`'s `bound` against the size profile's
+entry it names holds "no claim" (SEC-091). It reads as a bound every number of bits a block's line
+states, "<d> bits", "<d>-bit" or a power of 2, of the models the line names, so that a figure that
+bounds no model is a finding, and as a claim every other use, in any inflection, of "secure",
+"security level", "cryptographic security", "strength", "resist" or "claim", negated only inside "no
+claim", "do not show cryptographic security" and "does not show cryptographic security", word for
+word (spec FR-069; SEC-093). It reads security.md §1.1's table row by row, the model ID of its first
+column against the register's entries and the leading level and claim of its cell under "Claim level
+(section 15)" against `claim_level` and `claim`, a register entry with no row, a row with no entry
+or a cell that differs being a finding, and every README line outside the status block that holds
+"security level", "strength", "claim" or a level by the bound and claim rules of a disclaimer's
+line (SEC-095). It checks `phyco-v3`'s `bound` against the size profile's
 `bound_bits` at each claimable size and its `evidence` against the records
 its level needs, each file against the SHA-256 the entry names (data model
 §15; SEC-089). A line its rules flag passes only through an allow-list entry
 of the register, with its path and text, its reason, its writer and its date, counted from the
 commit that adds it, and every run prints each entry added since the last ⛔ gate's approval commit,
-which the owner's review at that gate lists (data model §15; SEC-087). Its level rule flags every
+which the owner's review at that gate lists (data model §15; SEC-087). No entry passes a finding
+inside the three blocks, of a wording rule, of the level rule, of the comparison or of the fixed
+sentence, nor a finding of the register's checks anywhere, and an entry that names a line of a block
+or such a finding is a finding itself (SEC-094). Its level rule flags every
 name of a level above `claim_level` in every scanned line as a whole word, `claim_level` being, for
 each line, the lowest level the register gives the models the line names by ID, and L0 where it
 names none, the lines that name a level without stating one for a model standing through the entries
@@ -1054,7 +1067,10 @@ L1 and at L0, and an `in_progress` naming L2 with no counted trail-bound record,
 another start date, or reading `none` once one exists among its cases (SEC-079, SEC-080), as are a
 `bound` that differs from the profile's `bound_bits` and an `evidence` entry missing or naming
 another SHA-256 (SEC-089), a bound above an entry's, a bound for an entry that holds `none`, a claim
-beside "no claim" and a line that states a bound and names no model (SEC-091), and a disclaimer
-block missing, one without the fixed sentence and the sentence changed by one word
-(SEC-092). It writes no record and runs as a test, so FR-061's reproduction
+beside "no claim" and a line that states a bound and names no model (SEC-091), a disclaimer block
+missing, one without the fixed sentence and the sentence changed by one word (SEC-092), a figure
+that bounds no model in a block, each of the three phrases and a negation outside them (SEC-093), an
+entry naming a line of a block or a finding of the register's checks (SEC-094), and a §1.1 row
+missing, added or differing and a README line outside the block whose bound is beyond the register's
+(SEC-095). It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).

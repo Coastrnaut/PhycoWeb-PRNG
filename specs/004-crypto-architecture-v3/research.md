@@ -1512,8 +1512,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     design is a candidate ID or, after selection, `phyco-v3`. The production interface accepts
     only the three production IDs and refuses every other ID with an error (FR-033).
   - **Keys of reduced variants** (FUT-GRID-2; checklist A7): a keyed variant of capacity c takes
-    a c-bit key and a c/2-bit nonce, so 256 and 128 bits at every claimable size, and its row of
-    the size profile checks FR-010's relations at s = c/2. c is a multiple of 16 as well as of w, so
+    a c-bit key and a c/2-bit nonce, so 256 and 128 bits at every claimable size, and its row of the
+    size profile checks FR-010's relations at s = c/2, its bound being its `bound_bits` at its own
+    k, nonce bits and c, the multi-target term at the u that `limits.json` states and a term below
+    zero counting as zero, so that it is never above c/2, one of its terms; s = c/2 is the
+    level of those checks, not a field of the row and not its bound (spec
+    FR-006, FR-010, FR-032; SEC-096). c is a multiple of 16 as well as of w, so
     both lengths are whole bytes, and a keyed variant's c is a multiple of 64, so the key and the
     nonce are whole 32-bit words on the hardware's interfaces (FR-025); keyless variants keep
     the wider rule. `n2-w16-R8-c64` meets it, and a keyed 2×2 variant needs
