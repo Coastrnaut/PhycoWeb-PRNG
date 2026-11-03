@@ -287,10 +287,12 @@ script refuses the repair unless the row reads Approved at HEAD and names the sa
 
 An environment record (research R1) and a value the owner provides for a tool's validation (research
 R19) each need a row of their own too, "Environment record <n>" or "Owner-provided value <n>", added
-when the owner writes the record or the entry with `scripts/owner_record.py`, which prints its
-SHA-256: the row names the platform or the known result, that SHA-256 and the date, and the owner
+when the owner writes the record or the entry with `scripts/owner_record.py`, which
+prints its approval hash, kind `canonical`, the SHA-256 of its canonical
+JSON without the approval fields (data-model introduction; REP-083): the row
+names the platform or the known result, that hash and the date, and the owner
 sets it to Approved and commits it. The evidence scripts' environment guard accepts a record in
-force only while its row reads Approved at HEAD with that SHA-256, and `validate_tool.py`'s source
+force only while its row reads Approved at HEAD with that hash, and `validate_tool.py`'s source
 guard accepts an `owner-provided` entry only while its row does, as `repair_log.py` reads "Log
 repair <n>" (cli contract, "Environment", `validate_tool.py`).
 
@@ -1913,9 +1915,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the state after every phase of every round for the first four inputs, so that an RTL mismatch can
   be located to one stage. Generated files hold only deterministic content, in a fully specified
   text format (data-model introduction: upper-case hexadecimal zero-padded to the word's width,
-  lanes in the design document's order, a fixed header grammar, canonical JSON, a final
-  newline, LF only), so that another implementation can write byte-identical files. The
-  command, the interpreter, the model's SHA-256, the platform, the measured speed and the
+  lanes in the design document's order, a fixed header grammar, JSON with sorted keys and two-space
+  indentation, a final newline, LF only), so that another implementation can write byte-identical
+  files. The command, the interpreter, the model's SHA-256, the platform, the measured speed and the
   generation time go to a sidecar record per generator run, which the check of generated files
   does not compare; the measured speed is stated there. The check writes a record of its own on each
   platform, with each generated file's SHA-256 and the verdict `match` or `differs`, and each
@@ -1933,7 +1935,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `--check` passing before the next: the constant tables; then the vectors, written through `pi` and
   `ResearchDuplex`, which runs no self-test, together with `phycoweb/selftest_v3.py`, the
   self-test's inputs and expected output copied from them; then `Generator`, which imports it and
-  runs the self-test; and only then the constructed-state vectors of FR-054, written by
+  runs the self-test, in a named test of `tests/test_model_v3.py` that `gen_constructed_v3.py` and
+  its `--check` run first on each platform, exiting 2 unless it passes and recording its result
+  (data-model §11; REP-086); and only then the constructed-state vectors of FR-054, written by
   `gen_constructed_v3.py` through `pi`, `pi_inv` and `ResearchDuplex` only, its research path to
   chosen states included, so that every generator and module it reads has passed its check before it
   runs (FR-059; data-model §11; REP-077).
@@ -2249,7 +2253,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `draft`; (3) the owner's approval is written into it by `design_freeze.py
   approve`, run by the owner, which changes the status and adds who, when and the wording, and
   nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
-  having checked against the draft's SHA-256 that nothing but the approval changed.
+  having checked against the draft's SHA-256, `draft_sha256`, taken without that field and the
+  approval fields, `status`, `approved_by`, `approved_utc`, `approval_wording` and
+  `approval_confirmed` (data-model §13; REP-084), that nothing but the approval changed.
   `design_freeze.py create` exits 2 unless every theorem the mode chapter uses is `verified` in
   `limits.json`, with each precondition marked met, naming the theorem otherwise, and reads those
   marks as `unverified` while the security-target review row does not read Approved (FR-012;
@@ -2273,8 +2279,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `research/004/ir.py` with its tools, and the scripts that compute verdicts
   (`evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
   `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py`,
-  `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py`
-  and its command `scripts/design_freeze.py`; the security target's files `parameters.json`
+  `protocol/evidence.py`), the freeze's code `protocol/design_freeze.py` and its command
+  `scripts/design_freeze.py`; every module of the repository that a frozen script imports, directly
+  or through another module, `protocol/candidates.py` among them and, where a frozen script imports
+  them, the log writers `protocol/changelog.py` and `protocol/provenance.py`, which
+  `design_freeze.py create` lists from the scripts' imports, so that a change after the freeze to a
+  module on the path of a verdict fails the freeze's validation and the re-check runs only code
+  whose hashes match the freeze (REP-091); the security target's files `parameters.json`
   and `limits.json`, with each theorem's status; R with every input of the round rule and every
   evidence record behind R, by ID and by SHA-256; the last `seq` and line SHA-256 of the candidate
   log, the provenance log and the protocol change log; the tool versions; `git_head` and
@@ -2782,8 +2793,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (FR-053), per kind, a run that was light by research R7's test, light being a property of each
   run: the kind's latest such run and, where one exists, one made before the last change to its
   code; the test leaves out, each with its reason, the claim test, which writes no record and runs
-  as a test, a `lock-cleared` record, which records an event, a tie choice, an owner's own
-  act, and the reproduction records, which are not reproduced; the SHA-256
+  as a test, a `lock-cleared` record, which records an event, a tie choice, an owner's own act, the
+  reproduction records, which are not reproduced, and the `environment`, `downloads` and `freeze`
+  records, whose writers have no `--reproduce`, each recording an owner's act or an outside fact
+  that a later run cannot regenerate (data-model §1; REP-085); the SHA-256
   of every code file the run used (`code_sha256`: the script, the
   `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, a C
   source and its binary), each source file committed at HEAD before the run and a binary rebuilt
@@ -2816,7 +2829,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and marked so (FR-053). Once the external design review is done, its Review & Approval row names
   the manifest it read by SHA-256, with the design-document version and the selection record it
   carried, so that a package rebuilt later leaves that review tied to the version it read (FR-043;
-  SEC-077).
+  SEC-077). `scripts/review_package.py` assembles the package and writes its manifest, a record of
+  kind `review-package` (data-model §1, §16), whose `--check` rebuilds the manifest from the files
+  it lists and compares it (REP-085).
 - **FR-064**: No AI session MAY be recorded as an independent or external reviewer: a second AI
   review is not independent cryptanalysis (security.md §14), and a security argument drafted by
   an AI tool is a draft for review, not evidence (security.md §2.1 and §16.3; vhdl-genai.md
@@ -2873,21 +2888,35 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-067**: Every file of this feature drafted or repaired with an AI tool (design document,
   model, transcription, scripts, tests and reports) MUST be recorded with the tool and model,
   the date, the task ID and its review status, in the feature's evidence (vhdl-genai.md R7;
-  security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section. The
+  security.md §17.2). A file drafted in parts, such as the rationale, is recorded per section, a
+  section running from its heading, an ATX heading outside fenced code blocks as CommonMark reads
+  it, to the line before the next one of the same or a higher level, or to the file's end,
+  and named by its heading's text, preceded, where that text occurs more
+  than once in the file, by the texts of the headings that enclose it, from
+  the highest level down, joined by " > " (data-model §14; REP-088). The
   review status is `pending`, `accepted` or `changes-requested`, and a review is a new provenance
   entry, never a change to an entry or a record (FR-064; data-model §1, §14). Its one writer is
   `scripts/provenance.py` (`protocol/provenance.py`), whose `add` writes an entry and `review` a
-  review, each under the log-append lock, and which refuses, exit 2, an entry with a field missing
-  or a `sha256` that is not that of the named file, section or record, or a review entry whose `row`
+  review, each under the log-append lock, and which refuses, exit 2, an entry with a field missing,
+  a `section` that names no section or more than one (REP-088) or a `sha256` that is not
+  that of the named file, section or record, or a review entry whose `row`
   does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
   for `accepted` and Declined for `changes-requested`, or whose `reviewer`
   names an AI tool or session (FR-064; RAT-077; cli contract). Files drafted
   or repaired before the log exists, the planning documents, the checklists and checklist-choices.md
-  among them, and the files of plan phase 1 written before it, are in this requirement's scope:
-  right after the log's creation, before any other entry, `provenance.py add` writes one entry per
-  such file, holding `sha256` and its kind (REP-079) of the file as committed then, `date_utc` as
-  the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and last commits that
-  changed the file, `session` "several, not recorded" unless one is known, `tool` and `model` as
+  among them, and the files of plan phase 1 written before it, are in this requirement's scope, with
+  every file outside the feature directory that this feature's sessions changed, as `git log` from
+  the spec's first commit, 801c6d7, shows, the log read on 2026-11-02 listing
+  `research/004/place_check.py` and `.gitattributes`, entered whole, and security.md, the
+  constitution, `.specify/memory/constitution.md`, whose amendment to 1.3.0 an AI session drafted
+  for the owner's approval, and the strategy note `research/security/crypto-redesign-strategy.md`,
+  entered per section changed, as a file drafted in parts is (REP-089): right after the log's
+  creation, before any other entry, `provenance.py add` writes one entry per such file, or per
+  section changed of a file entered per section, holding `sha256` and its
+  kind (REP-079) of the file or section as committed then, `date_utc` as
+  the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and last commits from
+  801c6d7 on that changed the file or the section, never an earlier feature's (REP-089),
+  `session` "several, not recorded" unless one is known, `tool` and `model` as
   known and otherwise "not recorded", `task_id` `none` for a file drafted before tasks.md existed
   and the task's ID for a file of plan phase 1, and `review_status` `pending` until the owner
   reviews it, a review entry following then. The entries, not the history, state that an AI tool
@@ -3527,7 +3556,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   citing its method, tool and validation.
 - **SC-009**: 100% of the generated files (the vectors, known-answer tests, constants and
   constructed-state vectors) are reproduced on both Windows and Linux, the latter in WSL, as each
-  generator's pair of check records, one per platform, shows (FR-036, FR-065).
+  generator's pair of check records, one per platform, shows, `gen_constructed_v3.py`'s pair also
+  showing that `Generator`'s self-test passed on each platform (FR-036, FR-065; REP-086).
 - **SC-010**: 100% of reduced-variant requests and 100% of requests beyond any limit of FR-007
   (output volume, calls of Π, instantiations per key, reseeds per instantiation) are refused by
   the production interface.

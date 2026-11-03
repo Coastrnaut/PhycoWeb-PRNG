@@ -13,10 +13,13 @@ overwritten: a repeat run, the demonstration's included (section 4), writes a
 new record with a new identifier beside the old one, which stays, its file
 named by its `record_id` (section 1, Record files). The stated exceptions
 are the files kept under a fixed name: `candidates/<id>/round-rule.json`,
-`security-target/parameters.json` and `limits.json`, the environment records,
-`downloads.json` and `review-package/MANIFEST.json`. Before one changes,
+`security-target/parameters.json` and `limits.json`, the environment records, `downloads.json` and
+`review-package/MANIFEST.json`; the environment records, the downloads manifest and the review
+package's manifest are records of kinds of their own, `environment`, `downloads` and
+`review-package`, as the freeze record is of kind `freeze` (section 1; REP-085). Before one changes,
 `protocol/evidence.py` keeps its current content as `<dir>/versions/<sha256>.json` beside it, and
-the new content holds `previous_sha256`; a record that cites one gives its path and SHA-256, and the
+the new content holds `previous_sha256`, both the raw SHA-256 of that content as
+committed (REP-083); a record that cites one gives its path and SHA-256, and the
 re-check resolves either from the versions (research R16). The downloads manifest's `approved`,
 `fetched` and `not obtained` entries are written by `scripts/downloads.py`, run by the agent, and
 its `owner-provided` entries by `scripts/owner_record.py owner-provided`, the owner's own act, both
@@ -43,6 +46,10 @@ implementation can write byte-identical files:
 - JSON has sorted keys and `ensure_ascii=False`, with two-space indentation in a `.json` file
   and one object per line in a `.jsonl` log. Rationals are "p/q" strings. Floats appear only in
   reported statistics and are written with `repr`.
+- Canonical JSON, over which an approval hash, `draft_sha256` and the eight hex digits of a
+  `record_id` are taken, is the object's UTF-8 JSON with keys sorted, the separators `,` and `:`
+  with no spaces, no final newline and non-ASCII characters written as they are; a hash over it is
+  of kind `canonical` (section 1; REP-083).
 - Hex words of vectors and states are upper case and zero-padded to the word's width, with lanes in
   the design document's order. Every digest is written as 64 lower-case hex digits, as the existing
   records already are. A vector file's header is `# key=value` fields in a fixed order, separated by
@@ -67,7 +74,7 @@ implementation can write byte-identical files:
 | Field | Type | Rule |
 |-------|------|------|
 | `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, the eight hex digits derived from the record's content; unique; the record's file is `<record_id>.json` unless this data model states its name (Record files, below) |
-| `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below) |
+| `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below); and `environment`, `downloads`, `freeze` and `review-package`, the records kept under a name of their own (research R1, R19; sections 13, 16; below; REP-085) |
 | `created_utc` | str | ISO 8601, seconds |
 | `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>" (1.0 once frozen; spec FR-034), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
@@ -77,7 +84,7 @@ implementation can write byte-identical files:
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below); the environment record itself, the one write the guard "Environment" admits while no record is in force or the running environment differs from it, holds `none`, with the interpreter's version and each pinned package's version that its check against research R1 and the pins of `requirements.txt` compared (PRO-068); each entry of the provenance log, the protocol change log and the downloads manifest names the record in force the same way, as its `environment` (sections 14, 18; research R19; REP-082) |
+| `environment` | object | path of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), and its two hashes, each with its kind: its SHA-256 over its bytes as committed, kind `raw`, which also names it under `versions/` and in `previous_sha256`, and its approval hash, kind `canonical`, over its canonical JSON without the approval fields (introduction, format rules), which `owner_record.py` prints, its row names and the guard compares, so that the guard, the re-check and a later reader resolve the same record from either (REP-083); written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below); the environment record itself, the one write the guard "Environment" admits while no record is in force or the running environment differs from it, holds `none`, with the interpreter's version and each pinned package's version that its check against research R1 and the pins of `requirements.txt` compared (PRO-068); each entry of the provenance log, the protocol change log and the downloads manifest names the record in force the same way, as its `environment` (sections 14, 18; research R19; REP-082) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (on Windows the `python.exe` of the Store distribution's versioned prefix, `sys.executable` with the alias resolved; in WSL `~/.venvs/phycoweb/bin/python`; research R1), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
@@ -104,7 +111,7 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants and constructed states with their generator runs and checks, projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| No finding: vectors, constants and constructed states with their generator runs and checks, the environment, downloads, freeze and review-package records (REP-085), projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
 | A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
 | A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
 | A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
@@ -117,8 +124,10 @@ the class.
 | A finding of a tool not yet validated | `unverified hypothesis`, with `status` `blocked` |
 | The demonstration record (section 4) | `confirmed vulnerability` of `phyco-v2`'s seed bound once every target is recovered; a disagreement in its match counts is an `unverified hypothesis` until the FUT-SEC-8 result review |
 
-- **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or
-  `lf-normalized` (research R16).
+- **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or `lf-normalized`
+  over a file's bytes (research R16), or `canonical` over a record's canonical JSON (introduction):
+  an environment record's or an `owner-provided` entry's approval hash and the freeze record's
+  `draft_sha256` (REP-083).
 - **Record files.** Every record file is `<directory>/<record_id>.json`, the directory being its
   kind's place: `fut-sec-8/` for a `demonstration`; `candidates/<id>/` for the kinds of sections 5
   and 6 but `control`, and for a `cross-check` and a `cost` record; `controls/` for a `control`;
@@ -149,6 +158,16 @@ the class.
   R7), so a probe at a larger size runs before the run it projects.
 - **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its
   path and SHA-256, and the re-check resolves either from `<dir>/versions/`.
+- **Kinds kept under a name of their own.** The environment records (`environment`, research R1),
+  the downloads manifest (`downloads`, R19), the freeze record (`freeze`, section 13) and the review
+  package's manifest (`review-package`, section 16) hold the common fields of this section, `none`
+  where a field concerns a run, and the fields of their own sections. Each is written through
+  `protocol/evidence.py`, the freeze record's changes through `protocol/design_freeze.py`, and
+  `scripts/review_package.py` assembles the review package through `protocol/review_package.py` and
+  writes its manifest, its `--check` rebuilding the manifest from the files it lists and comparing
+  it (cli contract). `downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`,
+  each recording an owner's act or an outside fact that a later run cannot regenerate (research R16;
+  REP-085).
 - **Re-check records.** `recheck_004.py` writes a `recheck` record, `rechecks/<record_id>.json`,
   which names, per record, the commits whose verdict functions it ran, that
   record's `git_head`, from a worktree of it, for the rules in force at its
@@ -228,12 +247,15 @@ design document, which the table names; for every other kind it is reported, and
 | Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15); for a candidate's tables (`--candidate`) and an exploration table (`--exploration`), each check's verdict as well | the measured speed and the generation time |
 | Generator run, vectors and constructed states (`gen_vectors_v3.py`, `gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
 | Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s | `design_sha256` for the other generators' |
+| Review package (`review-package`; section 16) | every field of section 16, and `design_sha256`, since its code reads the design document | none of its own (REP-085) |
 | Re-check (`recheck`; above) | per record, each recomputed verdict, its agreement with the recorded one and the commit whose functions computed it; the counts of agreements and disagreements | the interpreter, the platform and the `pip freeze` it ran with |
 | Projection (above) | nothing beyond the common fields | the measured speed and the projected hours |
 
 No row is needed for a `lock-cleared` record, which records an event, a `reproduction` record, which
-is not reproduced, or a tie choice (`d4-tie-choice`, `selection-tie-choice`), an owner's own act
-that no script repeats; the claim test writes no record (spec FR-061).
+is not reproduced, a tie choice (`d4-tie-choice`, `selection-tie-choice`), an owner's own act that
+no script repeats, or an `environment`, `downloads` or `freeze` record, whose writers have no
+`--reproduce` (Kinds kept under a name of their own, above; REP-085); the claim test writes no
+record (spec FR-061).
 
 ## 2. Development inputs (`protocol/devinputs_v3.py`; FR-040, R3)
 
@@ -779,7 +801,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
 | `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k, with the structure that set it, which a test computes again (spec FR-059; HW-084), and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 with its length word, held among the self-test's constants and fed as the host would (HW-082), and the second request of k whole blocks, written by `gen_vectors_v3.py` from the same `ResearchDuplex` run as the vectors; `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
-| `constructed_<variant>.json` | per edge state: name, construction, whether the normal calls reach it from a development key within the number of calls of Π the design document's list states or it is covered only from a chosen state, set by `ResearchDuplex.from_state` (REP-078), inputs, outputs |
+| `constructed_<variant>.json` | per edge state: name, `construction`, an object, written by the format rules, that holds the list of calls for a state the normal calls reach or, for a state set by `ResearchDuplex.from_state`, its `lanes` and `counters` as that call takes them (model contract, Research duplex), so that `gen_constructed_v3.py --check` regenerates each vector byte for byte and FR-054's testbench loads the same lanes and counters (REP-087), whether the normal calls reach it from a development key within the number of calls of Π the design document's list states or it is covered only from a chosen state, set by `ResearchDuplex.from_state` (REP-078), inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
 
@@ -824,7 +846,11 @@ order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3
 vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes, from the same
 `ResearchDuplex` run, each claimable size's `selftest_<variant>.json`, the self-test's inputs and
 every expected block, whole, and `phycoweb/selftest_v3.py`, copied from those files (spec FR-059;
-HW-077). (3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it. The model
+HW-077). (3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it, in
+`tests/test_model_v3.py`'s named test `test_generator_selftest`, which builds a `Generator` and runs
+that self-test; `gen_constructed_v3.py` and its `--check` run it first, on the platform where they
+run, exiting 2 unless it passes and recording its result in the record each writes, so that SC-009's
+pair of check records for step (4) shows that step (3) passed on each platform (REP-086). The model
 imports that module inside `Generator`'s constructor only, so `pi`, `pi_inv`, `pi_trace` and
 `ResearchDuplex` import without it and step (2) runs before it exists; a `Generator` built before
 then fails its self-test and leaves no object (model contract, Module rules).
@@ -859,8 +885,13 @@ copy against its manifest hash and its live source (SC-012).
   operation list; `research/004/ir.py` with its tools; and the scripts that compute verdicts:
   `evidence_v3.py`, `round_rule.py`, `d4_choice.py`, `mode_limits_v3.py`,
   `validate_tool.py`, `fut_sec8.py`, `recheck_004.py`, `protocol/devinputs_v3.py` and
-  `protocol/evidence.py`; the freeze's code, `protocol/design_freeze.py`, and
-  its command, `scripts/design_freeze.py`; and the security target's files
+  `protocol/evidence.py`; the freeze's code, `protocol/design_freeze.py`, and its command,
+  `scripts/design_freeze.py`; every module of the repository that a frozen script imports, directly
+  or through another module, `protocol/candidates.py` among them and, where a frozen script imports
+  them, the log writers `protocol/changelog.py` and `protocol/provenance.py`, which `create` lists
+  from the scripts' imports, so that the re-check runs only code whose hashes
+  match the freeze and a change after the freeze to a module on the path of a
+  verdict makes `validate` exit 1 (REP-091); and the security target's files
   `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
   every one of which must be `verified`, with each precondition marked met, marks that count only
   under an Approved security-target review row naming the set the record freezes, the SHA-256 of the
@@ -881,9 +912,12 @@ copy against its manifest hash and its live source (SC-012).
 - Tool versions; `git_head`; `owner_commit`, the hash of the freeze's step (1), the owner's commit
   of the feature files, which follows the commit that records the owner design review's approval in
   its row with the highest k, `create` exiting 2 unless it is HEAD (spec FR-043; PRO-070);
-  `git_dirty`, which must be false; `draft_sha256`, written by `create`:
-  the SHA-256 of the record's canonical JSON without that field and the approval fields; and
-  `status`, `draft` until the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
+  `git_dirty`, which must be false; `draft_sha256`, written by `create`: the SHA-256 of the record's
+  canonical JSON without that field and the approval fields, kind `canonical` (introduction;
+  REP-083), the approval fields being `status`, `approved_by`, `approved_utc`, `approval_wording`
+  and `approval_confirmed`, so that `validate` recomputes the same hash over the approved record and
+  exits 1 only if anything else changed (REP-084); and `status`, `draft` until
+  the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
   run by the owner, prints `draft_sha256` and refuses unless standard input is an interactive
   terminal and the owner types its first 16 hex digits; it then changes `status` to `approved`, adds
   `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed` (the digits typed), and
@@ -905,7 +939,11 @@ produced the verdicts. `protocol/evidence.py` refuses, exit 2, to write over a f
 record pins, `parameters.json`, `limits.json` and the selected candidate's `round-rule.json` among
 them, and after the freeze `mode_limits_v3.py` runs only with `--reproduce`, whose record goes under
 `$REP/reproductions/`. The approval status of the design document and the rationale stays outside
-the frozen files (FR-034).
+the frozen files (FR-034). The record is of kind `freeze` (section 1), with the common fields,
+`none` where a field concerns a run: `create` writes it through `protocol/evidence.py`, its one
+change, the approval, goes through `protocol/design_freeze.py`, and `design_freeze.py` has no
+`--reproduce`, since the record holds the owner's commit and approval, which a later run cannot
+regenerate (research R16; REP-085).
 
 ## 14. Provenance record (`provenance.jsonl`; FR-067)
 
@@ -920,7 +958,12 @@ bytes, LF-normalized for an existing `text=auto` file such as security.md or REA
 otherwise, as research R16 hashes, with `sha256_kind` (`raw` or `lf-normalized`) beside it; a
 section's text runs from its heading line, included, to the line before the next heading of the same
 or a higher level, or to the file's end, each line with its final LF, taken from those bytes, and
-`section` names its heading as it stands (REP-079). A review is a new entry for the same `path` and
+`section` names its heading as it stands (REP-079); a heading is an ATX heading outside fenced code
+blocks, as CommonMark reads it, that is, one to six `#` at the line's start, after at most three
+spaces, followed by a space, a tab or the line's end, and a heading text that occurs more than once
+in one file is named in `section` by the texts of the headings that enclose it,
+from the highest level down, and its own, joined by " > ", so that `section`
+names one section (REP-088). A review is a new entry for the same `path` and
 `section`, with `follows`, the `seq` of the entry it follows, and `sha256`,
 the SHA-256 of the section text reviewed, computed the same way, with its kind, and with `reviewer`,
 the role and name of who reviewed, the owner for the security-target review and the owner design
@@ -940,8 +983,9 @@ and SHA-256, the record's `reviewer` staying as written (section 1). Every appen
 `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
 section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenance.py add` for an
 entry and `review` for a review entry (cli contract), which refuses, exit 2, appending
-nothing, an entry with a field of its kind missing or a `sha256` or `sha256_kind` that is not that
-of the named file, the named section's text or the named record, each computed by the writer as
+nothing, an entry with a field of its kind missing, a `section` that names no section or more than
+one (REP-088) or a `sha256` or `sha256_kind` that is not that of the named file, the
+named section's text or the named record, each computed by the writer as
 above (REP-079), or a review entry whose `row` does not read at HEAD, with its `reviewed_sha256`,
 the decision the entry records, Approved for `accepted` and Declined for
 `changes-requested`, or whose `reviewer` names an AI tool or session (RAT-077). The
@@ -956,11 +1000,19 @@ review adds a review entry for each, so that the frozen text carries no status (
 
 Files drafted or repaired before the log exists are in FR-067's scope: the spec, the plan, research,
 this data model, the contracts, the quickstart, the checklists and checklist-choices.md, drafted and
-repaired with an AI tool over several sessions before any task existed, and the files of plan
-phase 1 written before the log. Right after the log's creation, before any other entry,
-`provenance.py add` writes one entry per such file, holding `sha256` and its kind (REP-079) of the
-file as committed then, `date_utc` as the writer adds it, `drafted_from` and `drafted_to`, the dates
-of the first and last commits that changed the file, `session` "several, not recorded" unless one is
+repaired with an AI tool over several sessions before any task existed, and the files of plan phase
+1 written before the log, and every file outside the feature directory that this feature's sessions
+changed, as `git log` from the spec's first commit, 801c6d7, shows, the log read on 2026-11-02
+listing `research/004/place_check.py` and `.gitattributes`, entered whole, and
+security.md, the constitution, `.specify/memory/constitution.md`, whose amendment to
+1.3.0 an AI session drafted for the owner's approval, and the strategy note
+`research/security/crypto-redesign-strategy.md`, entered per section changed, as a file drafted in
+parts is (REP-089). Right after the log's creation, before any other entry,
+`provenance.py add` writes one entry per such file, or per section changed of a file entered per
+section, holding `sha256` and its kind (REP-079) of the file or section as committed then,
+`date_utc` as the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and
+last commits from 801c6d7 on that changed the file or the section, never an
+earlier feature's (REP-089), `session` "several, not recorded" unless one is
 known, `tool` and `model` as known and otherwise "not recorded", `task_id` `none` for a file drafted
 before tasks.md existed and the task's ID for a file of plan phase 1, and `review_status` `pending`
 until the owner reviews it, a review entry following then. The entries, not the history, state that
@@ -1068,7 +1120,11 @@ checkout, and no existing file's pin changes (R18). The manifest is a fixed-name
 owner's action. Once the external design review is done, its Review & Approval row names the
 manifest it read by SHA-256, with the design-document version and the selection record it carried,
 and `design_freeze.py create` exits 2 while that manifest is neither `review-package/MANIFEST.json`
-nor kept under `versions/` (spec FR-043).
+nor kept under `versions/` (spec FR-043). The manifest is a record of kind `review-package`
+(section 1), with the common fields, `none` where a field concerns a run, written through
+`protocol/evidence.py` by `scripts/review_package.py`, which assembles the package through
+`protocol/review_package.py`; its `--check` rebuilds the manifest from the files it lists and
+compares it (cli contract; REP-085).
 
 ## 17. State transitions
 

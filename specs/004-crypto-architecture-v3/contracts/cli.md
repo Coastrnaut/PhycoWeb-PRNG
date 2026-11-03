@@ -39,6 +39,9 @@ until it is resolved, and, since it ran in the environment that made the origina
 defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
 p-values, which decide no verdict, makes the outcome `differs` and blocks nothing (data model §1).
 `fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
+`downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`, each recording an
+owner's act or an outside fact that a later run cannot regenerate, as their sections state (research
+R16; REP-085).
 
 ## Guards shared by every script
 
@@ -58,8 +61,10 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   and the pins of `requirements.txt` for that platform, exit 2 on any difference, its `environment`
   field `none`, with the interpreter's version and each pinned package's version that the check
   compared. Every other write, a `lock-cleared` record included, also exits 2 unless the record in
-  force has its Review & Approval row, "Environment record <n>", Approved at HEAD with its SHA-256
-  (Approvals, below), an approval that needs no lock, so that a stale lock found after an update is
+  force has its Review & Approval row, "Environment record <n>", Approved at HEAD with
+  its approval hash, kind `canonical`, the SHA-256 of its canonical JSON
+  without the approval fields (data model introduction, §1; REP-083), an
+  approval that needs no lock, so that a stale lock found after an update is
   cleared once the new record is approved; before the first record no lock can be held, since no
   log writer or heavy run starts before it (PRO-068). Each platform's first
   record comes before every other write, in plan phase 1's order (REP-082).
@@ -524,7 +529,11 @@ files, so its `--check` covers them too (HW-077); (3) `Generator` imports
 step (2) imports the model before that module exists (model contract, Module rules);
 (4) `gen_constructed_v3.py`, run once step (3)'s self-test has passed, which writes the
 constructed-state vectors through `pi`, `pi_inv` and `ResearchDuplex` only, its research path to
-chosen states included (model contract, Research duplex; REP-077, REP-078). Tests check that
+chosen states included (model contract, Research duplex; REP-077, REP-078). `gen_constructed_v3.py`
+and its `--check` run first `tests/test_model_v3.py`'s named test `test_generator_selftest`, which
+builds a `Generator` and runs its self-test, on the platform where they run, exiting 2 unless it
+passes and recording its result in the record each writes, so that step (4)'s pair of check records
+shows that step (3) passed on each platform (SC-009; REP-086). Tests check that
 `Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
 `selftest_v3.py` with the vectors and the three generators, `gen_constants_v3.py`,
 `gen_vectors_v3.py` and `gen_constructed_v3.py` (data model §13; REP-077).
@@ -545,8 +554,9 @@ writes the approval into it; (4) the owner commits the record; (5) `validate` ex
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others
 `rationale.md`, the selected operation list, `research/004/ir.py` with its tools, the
-verdict scripts, `validate_tool.py` and `fut_sec8.py` among them, both freeze
-files, every evidence record behind R by ID and by SHA-256, and the last `seq`
+verdict scripts, `validate_tool.py` and `fut_sec8.py` among them, both freeze files, every module of
+the repository that a frozen script imports, directly or through another module, listed from the
+scripts' imports (REP-091), every evidence record behind R by ID and by SHA-256, and the last `seq`
 and line SHA-256 of the candidate log, the provenance log and the protocol change log. The freeze's
 code is `protocol/design_freeze.py`, with create, approve and validate as functions, and this script
 is the command that calls it, as the other scripts call `protocol/evidence.py`; the record hashes
@@ -576,15 +586,35 @@ at a supported (n, w) and its final R (research R15), if the design document's h
 other than its title, the disclaimer and its line "Version: …" (spec FR-034), if the commit that
 follows the one recording the owner design review's approval, in its row with the highest k, the
 owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), or if `git_dirty` is true. `create`
-stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the record's
-canonical JSON without that field and the approval fields. `approve`, run by
+stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the
+record's canonical JSON without that field and the approval fields, `status`,
+`approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, kind
+`canonical` (data model introduction, §13; REP-083, REP-084). `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
 the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
 `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
 else. Steps (1), (3) and (4) are the owner's own acts, which the agent never performs (FR-043).
 `validate` recomputes `draft_sha256` and every hash
 and checks the format rules; it exits 1 if anything but the approval fields changed or a hash does
-not match, and 2 while `status` is `draft` (data model §13).
+not match, and 2 while `status` is `draft` (data model §13). It has no `--reproduce`: the record
+holds the owner's commit and approval, acts that a later run cannot regenerate, and `validate`
+recomputes every hash the record holds (introduction; research R16; REP-085).
+
+## `scripts/review_package.py`
+
+```text
+review_package.py [--check]               # writes $REP/review-package/ and its MANIFEST.json
+review_package.py --reproduce RECORD      # a review-package record (introduction)
+```
+
+Run by the agent. It assembles the review package of spec FR-063 through
+`protocol/review_package.py` and writes its manifest, `$REP/review-package/MANIFEST.json`, a record
+of kind `review-package` with the fields of data model §16, through `protocol/evidence.py`, keeping
+the earlier manifest under `versions/` first (data model introduction). `--check` rebuilds the
+manifest from the files it lists, each hashed as data model §16 states, and compares it with the
+committed one, exit 1 on any difference. Since the script writes a record, it also runs as
+`--reproduce RECORD` (introduction). Sending the package is the owner's outward action (spec FR-063;
+REP-085).
 
 ## `scripts/recheck_004.py`
 
@@ -664,13 +694,18 @@ the check compared (PRO-068); each platform's first record comes before every ot
 `protocol/evidence.py` or a log writer, and a new one follows the wheels' install, in plan phase 1's
 order (REP-082); `owner-provided` adds an entry to `$REP/downloads.json` with
 the owner's words, the source the owner names, the date and the value's SHA-256 (research R19). Each
-mode prints the SHA-256 of what it writes, taken over its canonical JSON without the approval
-fields, and exits 2, writing nothing, unless standard input is an interactive terminal and the owner
+mode prints the approval hash of what it writes, kind `canonical`, the SHA-256 of its
+canonical JSON without the approval fields, `approved_by`, `approved_utc`
+and `approval_confirmed` (data model introduction; REP-083), and exits 2,
+writing nothing, unless standard input is an interactive terminal and the owner
 types its first 16 hex digits; it then writes the record or entry with `approved_by`, `approved_utc`
 and `approval_confirmed`, keeping the fixed-name file's current content under `versions/` first
 (data model introduction). The owner then adds and commits its Review & Approval row, "Environment
-record <n>" or "Owner-provided value <n>", with that SHA-256, which the Environment guard and
-`validate_tool.py`'s source guard read at HEAD (Approvals, above).
+record <n>" or "Owner-provided value <n>", with that hash, which the Environment guard and
+`validate_tool.py`'s source guard read at HEAD (Approvals, above); every `environment` field names
+an environment record by that hash and by the raw SHA-256 of its file as committed, which names it
+under `versions/` and in `previous_sha256` (data model §1; REP-083). It has no `--reproduce`: each
+mode records an owner's act, which a later run cannot regenerate (introduction; REP-085).
 
 ## `scripts/downloads.py`
 
@@ -691,7 +726,9 @@ local path. `not-obtained` writes `not obtained` with the reason. Each mode refu
 nothing, a name that no `approved` entry holds, and keeps the manifest's earlier content under
 `versions/` first (data model introduction). An `owner-provided` entry stays the owner's own act,
 written by `owner_record.py owner-provided` (above). `tests/test_protocol_004.py` covers each
-refusal (REP-076).
+refusal (REP-076). It has no `--reproduce`: its entries record outside facts, the files as fetched
+and the reasons a file was not obtained, which a later run cannot regenerate (introduction;
+REP-085).
 
 ## `scripts/protocol_change.py`
 
@@ -758,17 +795,23 @@ tool's second known result; `review` appends a review entry, with `follows`, the
 it follows, and the status the review gives, or the review of an evidence record, naming the
 record's ID and SHA-256. Each computes the `sha256` and `sha256_kind` of the named file, section or
 record as data model §14 states, over the file's bytes, LF-normalized for an existing `text=auto`
-file and raw otherwise, a section from its heading line to the line before the next heading of the
-same or a higher level, or to the file's end, and refuses, exit 2, appending nothing, an entry with
-a field of its kind missing or a `sha256` or kind that differs (REP-079), or a review entry whose
+file and raw otherwise, a section from its heading line, an ATX heading outside fenced code blocks
+as CommonMark reads it, to the line before the next heading of the same or a higher level, or to the
+file's end, `section` naming it by its heading's text, preceded, where that text occurs more than
+once in the file, by the texts of the headings that enclose it, from the highest level down, joined
+by " > " (data model §14; REP-088), and refuses, exit 2, appending nothing, an entry with a
+field of its kind missing, a `section` that names no section or more than one
+(REP-088) or a `sha256` or kind that differs (REP-079), or a review entry whose
 `row` does not read at HEAD, with its `reviewed_sha256`, the decision the entry records, Approved
 for `accepted` and Declined for `changes-requested`, or whose `reviewer` names an AI tool or
 session; a review entry holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
 runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
 row's approval (spec FR-064, FR-067; data model §14; RAT-077). Right after
-the log's creation, before any other entry, `add` writes one entry per file
-drafted before the log, with `drafted_from`, `drafted_to` and the other fields
-data model §14 lists for such an entry (spec FR-067; REP-080). Every append
+the log's creation, before any other entry, `add` writes one entry per file drafted before the log,
+the files outside the feature directory that this feature's sessions changed among
+them, whole or per section changed, with `drafted_from` and `drafted_to`
+from the spec's first commit, 801c6d7, on, and the other fields data model
+§14 lists for such an entry (spec FR-067; REP-080, REP-089). Every append
 takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
 above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
 `tests/test_protocol_004.py` covers each refusal.

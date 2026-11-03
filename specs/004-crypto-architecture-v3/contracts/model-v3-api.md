@@ -157,7 +157,12 @@ not the production interface: it is named in the model's docstring as research o
 
 `ResearchDuplex.from_state(variant_id, key, lanes, counters)`, a call `Generator` lacks and
 research-only, starts the mode from a chosen state and chosen counter values, each within its range,
-and refuses any other with `ValueError`. `Generator` has no such path: a test checks that it has
+and refuses any other with `ValueError`. `lanes` gives the lanes' values, one word each, in the
+design document's order, and `counters` maps each counter, by the name the design document gives it,
+to its value, an integer within its range, the 32-bit-word form and its carry rule staying inside
+the model; the object starts as after `instantiate`, accepting `generate` and `reseed`, and an
+`instantiate` sets the lanes again from the key and a new nonce, as always (data
+model §11; REP-087). `Generator` has no such path: a test checks that it has
 none and that `Generator` and `ResearchDuplex` enforce every limit through one shared function, so
 that a refusal reached through `from_state` tests the rule `Generator` applies. The refusals at a
 per-key or per-instantiation limit (spec FR-058) and quickstart M5's refusals beyond every limit are

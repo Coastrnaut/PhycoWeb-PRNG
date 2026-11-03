@@ -258,6 +258,8 @@ protocol/
 ├── changelog.py              # new: the one writer of the protocol change log (FR-044)
 ├── provenance.py             # new: the one writer of the provenance log (FR-067)
 ├── design_freeze.py          # new: the freeze's code, create, approve and validate (FR-043)
+│                             # and hashes every module a frozen script imports (REP-091)
+├── review_package.py         # new: the review package and its manifest (FR-063; REP-085)
 ├── claims.json               # new: claim and evidence register (FR-069)
 └── disclaimer.py             # gains DESIGN_DISCLAIMER; DISCLAIMER unchanged (FR-068)
 
@@ -289,6 +291,7 @@ scripts/
 ├── gen_vectors_v3.py         # vectors and known-answer tests (R8)
 ├── gen_constructed_v3.py     # constructed-state vectors (FR-054)
 ├── design_freeze.py          # the freeze command, calling protocol/design_freeze.py
+├── review_package.py         # the review package's assembly and --check (FR-063; REP-085)
 ├── recheck_004.py            # recomputes every verdict (FR-065)
 ├── repair_log.py             # a chain repair, only with the owner's go-ahead (R16)
 ├── owner_record.py           # the owner's environment records and owner-provided values (R1, R19)
@@ -307,6 +310,7 @@ tests/
 │                             # critical_counts.json only appended to (data-model §5)
 ├── test_seed_search.py       # WSL; skips on Windows
 ├── test_model_v3.py          # FR-058's list, refusals, call sequences
+│                             # test_generator_selftest, Generator's self-test (REP-086)
 ├── test_vectors_v3.py
 ├── test_v3_transcription.py  # model against tests/v3_reference.py, step by step;
 │                             # the second transcription's provenance (FR-057)
@@ -336,6 +340,7 @@ reports/004-crypto-architecture-v3/
 ├── downloads.json            # the downloads manifest (R19)
 ├── spec-versions/            # every spec version a record cites, by SHA-256 (R16)
 ├── research-versions/        # every research.md version a record cites, by SHA-256 (R16)
+├── design-versions/          # every design-document version a record cites, by SHA-256 (REP-090)
 ├── fut-sec-8/                # demonstration records (<record_id>.json), tool check, review
 ├── validation/               # tool validation records
 ├── controls/                 # uniform controls, one record per test and size,
@@ -383,9 +388,11 @@ takes each from there.
    the packages that file pins, the one write the guard "Environment" admits while no record is in
    force (PRO-068), and its row "Environment record <n>" reads Approved before the next step, so
    that (3) to (6) run under those records, every entry and record naming the record in
-   force as its `environment` (REP-082); (3) the provenance log, its first
-   entries those of the files drafted before it (FR-067; data-model §14;
-   REP-080); (4) the protocol change log, after the owner's confirmation of every list at the tasks
+   force as its `environment` (REP-082); (3) the provenance log, its first entries those of the
+   files drafted before it, the files outside the feature directory that this feature's
+   sessions changed among them, as `git log` from 801c6d7 shows, whole or per
+   section changed (FR-067; data-model §14; REP-080, REP-089); (4) the protocol
+   change log, after the owner's confirmation of every list at the tasks
    approval and before every file written through `protocol/evidence.py` but a `lock-cleared` record
    (PRO-065), its first entries the answered rows of every checklist round answered before it is
    created, by the per-round lists of checklist-choices.md, in round order, approved by the owner at
@@ -440,7 +447,8 @@ takes each from there.
    created at L0 in phase 1, and its §15 line in a commit of its own right after the owner's
    commit (FR-012; SEC-081); then the rationale; the security.md version of
    FR-051 (2.11 already records the §20.1
-   decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design review**,
+   decision, from the checklist answers of 2026-11-01); review package, assembled by
+   `scripts/review_package.py` (FR-063; REP-085); ⛔ **owner design review**,
    from whose approval commit on the agent commits no file of this feature; external review recorded
    as done or not arranged, after that approval only in the owner's commit of the feature files; the
    owner commits the feature files (Principle IX), the commit `design_freeze.py create` records as

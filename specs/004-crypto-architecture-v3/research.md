@@ -117,13 +117,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     owner runs, an owner's own act (spec FR-044): the Windows build, the
     WSL distribution, its version and the kernel, Python, gcc, make and the
     full `pip freeze`, with `approved_by`, `approved_utc` and `approval_confirmed`. The script
-    prints the record's SHA-256, taken without those fields, and writes nothing unless standard
-    input is an interactive terminal and the owner types its first 16 hex digits; the owner then
-    sets the record's Review & Approval row, "Environment record <n>", to Approved with that SHA-256
-    and commits it. A record is written only when its Python and pinned packages
+    prints the record's approval hash, kind `canonical`, the SHA-256 of its canonical JSON without
+    those fields (data-model introduction), and writes nothing unless standard input is an
+    interactive terminal and the owner types its first 16 hex digits; the owner then sets the
+    record's Review & Approval row, "Environment record <n>", to Approved with that hash and commits
+    it (REP-083). A record is written only when its Python and pinned packages
     match this section and the pins of `requirements.txt` for that platform (R18), the check the
     guard "Environment" makes of that one write in place of the comparison below (cli contract;
-    PRO-068). Each evidence record cites its environment record's SHA-256 (data-model §1). Both
+    PRO-068). Each evidence record names its environment record by path and by both of its hashes,
+    the raw SHA-256 of the file as committed, which `versions/` and `previous_sha256`
+    hold, and the approval hash, so that the guard, the re-check and a later
+    reader resolve the same record from either (data-model §1; REP-083). Both
     keep fixed names: before one changes, its current content is kept as `versions/<sha256>.json`
     beside it, and the new record holds `previous_sha256` (R16).
   - Every write through `protocol/evidence.py` or through the log writers `protocol/changelog.py`
@@ -140,7 +144,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `environment` field `none`, with the interpreter's version and each pinned package's version
     that the check compared. Every other write, a `lock-cleared` record included, also exits 2
     unless the record in force has its row "Environment record <n>" Approved at HEAD with its
-    SHA-256 (cli contract, "Environment"), an approval that needs no lock, so that
+    approval hash (cli contract, "Environment"; REP-083), an approval that needs no lock, so that
     a stale lock found after an update is cleared once the new record is
     approved; before the first record no lock can be held, since no log writer or
     heavy run starts before it (PRO-068). `scripts/recheck_004.py` alone is
@@ -1671,14 +1675,24 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `research/004/`, `vectors/phyco-v3/` and `baseline/phyco-v2/`; feature 003's 1,000 tracked `.gz`
     files, listed with their hashes in its `SHA256SUMS`, hold a file name and a nonzero time, are
     outside its scope and stay unchanged.
-  - **Hashes.** Each hash is recorded beside its kind, `raw` or `lf-normalized`. Every new file
+  - **Hashes.** Each hash is recorded beside its kind: `raw` or `lf-normalized` over a file's bytes,
+    or `canonical` over a record's canonical JSON, as data-model's format rules
+    define it, for an approval hash, which `owner_record.py` prints and a row
+    names, and the freeze record's `draft_sha256` (REP-083). Every new file
     is hashed over its raw bytes and is pinned to LF or `binary` (R18), so its raw and
     normalized content agree on every checkout. An existing `text=auto` file is hashed over its
     LF-normalized content. The CRLF-pinned freeze records of features 002 and 003 keep their
     recorded hashes over CRLF bytes.
     Every digest is written as 64 lower-case hex digits. `lf-normalized` means each CR LF pair
     replaced by LF on the file's bytes, as Git normalizes, with a lone CR kept; it is never computed
-    from a file read in text mode, whose universal newlines also turn a lone CR into LF.
+    from a file read in text mode, whose universal newlines also turn a lone CR into LF. A section
+    of a file that a provenance entry names (data-model §14) runs from its heading, an ATX heading
+    outside fenced code blocks, as CommonMark reads it, that is, one to six `#` at the line's start,
+    after at most three spaces, followed by a space, a tab or the line's end, to the line before the
+    next such heading of the same or a higher level, or to the file's end, its lines taken from the
+    bytes hashed as above, and a heading text that occurs more than once in one file is named by the
+    texts of the headings that enclose it, from the highest level down, and its own, joined by " > "
+    (REP-088).
   - **Spec and research versions.** The first time a record cites a spec hash,
     `protocol/evidence.py` stores a copy of that spec as
     `reports/004-crypto-architecture-v3/spec-versions/<sha256>.md`,
@@ -1707,7 +1721,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to
     "never overwritten" (data-model introduction): before one changes, `protocol/evidence.py` keeps
     its current content as `<dir>/versions/<sha256>.json` beside it, and the new content holds
-    `previous_sha256`. A record that cites one gives its path and SHA-256, and the re-check resolves
+    `previous_sha256`, both the raw SHA-256 of that content as committed (REP-083). A record
+    that cites one gives its path and SHA-256, and the re-check resolves
     either from the versions. After the freeze, `protocol/evidence.py` refuses, exit 2, to write
     over one that the freeze record pins, `parameters.json`, `limits.json` and the selected
     candidate's `round-rule.json` among them, as the generators refuse (cli contract).
@@ -1752,7 +1767,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     test reproduces, per kind, its latest light run and, where one exists, a light run made before
     the last change to its code (R7), and leaves out, each with its reason, the claim test, which
     writes no record and runs as a test, a `lock-cleared` record, which records an event, a tie
-    choice, an owner's own act, and the reproduction records, which are not reproduced.
+    choice, an owner's own act, the reproduction records, which are not reproduced, and the
+    `environment`, `downloads` and `freeze` records, whose writers `owner_record.py`, `downloads.py`
+    and `design_freeze.py` have no `--reproduce`, each recording an owner's act or an outside fact
+    that a later run cannot regenerate, as each one's section of the cli contract states;
+    `review_package.py`, which writes the `review-package` record, has it (data-model §1; REP-085).
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs, of every
     kind FR-065 lists, the tool validations, the cross-checks between kinds
     and the D4 choice among them, and compares it with the recorded verdict
@@ -1843,11 +1862,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (3) the owner runs `design_freeze.py approve`, which prints `draft_sha256`, refuses unless
     standard input is an interactive terminal and the owner types its first 16 hex digits, writes
     the approval with that confirmation into it and changes nothing else (data-model §13); (4) the
-    owner commits the record; (5) `validate`, which
-    recomputes `draft_sha256` and every hash, exits 0. Dirty means a tracked file modified or an
+    owner commits the record; (5) `validate`, which recomputes `draft_sha256`, taken
+    without that field and the approval fields, `status`, `approved_by`,
+    `approved_utc`, `approval_wording` and `approval_confirmed` (data-model §13;
+    REP-084), and every hash, exits 0. Dirty means a tracked file modified or an
     untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
     and local-only outputs are in the record by SHA-256 anyway. Steps (1), (3) and (4) are the
-    owner's own acts, which the agent never performs (spec FR-043).
+    owner's own acts, which the agent never performs (spec FR-043). The record hashes every module
+    of the repository that a frozen script imports, directly or through another module,
+    `protocol/candidates.py` among them and, where a frozen script imports them, the log writers
+    `protocol/changelog.py` and `protocol/provenance.py`, which `create` lists from the scripts'
+    imports, so that the re-check runs only code whose hashes match the freeze (data-model §13;
+    REP-091).
 - **Stricter means**: what a record holds, which files are hashed and kept, and the writers' and
   guards' checks and refusals may only be added, and no file's hash kind changes once a record holds
   it (spec FR-044; PRO-066).
@@ -2070,11 +2096,13 @@ writing nothing, a name that no `approved` entry holds, and keeps the manifest's
 content under `versions/` first (REP-076). A value the owner provides gets an
 entry of its own, `owner-provided`, with the owner's words, the source the owner names, the date and
 the value's SHA-256, written by `scripts/owner_record.py owner-provided`, which the owner runs, an
-owner's own act (spec FR-044): the script prints the entry's SHA-256 and writes nothing unless
-standard input is an interactive terminal and the owner types its first 16 hex digits, and the entry
+owner's own act (spec FR-044): the script prints the entry's approval hash, kind
+`canonical`, the SHA-256 of its canonical JSON without the approval fields
+(data-model introduction; REP-083), and writes nothing unless standard input is an
+interactive terminal and the owner types its first 16 hex digits, and the entry
 keeps `approved_by`, `approved_utc` and `approval_confirmed`. The owner then sets its Review &
-Approval row, "Owner-provided value <n>", to Approved and commits it, and `validate_tool.py`'s
-source guard accepts the entry only while that row reads Approved at HEAD. The
+Approval row, "Owner-provided value <n>", to Approved with that hash and commits it, and
+`validate_tool.py`'s source guard accepts the entry only while that row reads Approved at HEAD. The
 manifest keeps its fixed name: before it changes, its current content is
 kept as `versions/<sha256>.json` beside it (R16). A validation record's `source` cites the manifest
 entry: a `fetched` file's, with the paper's table and value, or an `owner-provided` one (data-model
