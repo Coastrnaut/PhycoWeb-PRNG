@@ -791,3 +791,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   2026-11-02 set, so the checklist is run again only on the owner's word, and `/speckit-tasks`
   waits for it (spec, Clarifications and the Review & Approval row "Checklist choices, tenth
   re-run").
+- CHK085's text gives data-model §15 as the place of the sentence "L2 is never `claim_level` in this
+  feature"; the sentence stands in data-model §17, "State transitions", which §15 cites as
+  section 17's sentence, and SEC-085's row in checklist-choices.md names §17. The item's question,
+  its answer and its tick do not depend on the section's number, and its text stays as written, this
+  checklist being appended to only; this note records the correction, on the owner's answer of
+  2026-11-03 to the agent's items after the loop ("all recommended").
