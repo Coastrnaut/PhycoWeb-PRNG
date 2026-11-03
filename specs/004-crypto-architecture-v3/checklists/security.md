@@ -638,6 +638,56 @@ They start open, and an item is ticked only under the rule in the Notes below.
   named? [Coverage, Measurability, Spec §FR-008, §FR-025 "Call sequence", §FR-034 "Components",
   §FR-059]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK089 Are the values of `phyco-v3`'s `bound` and `evidence` in the claim register stated,
+  given that FR-069 asks the register to list every model ID with its claim level, its claim or "no
+  claim", its bound and its evidence records, that plan phase 1 creates the entry at L0 with "no
+  claim" and `in_progress` `none` and names neither field, that data-model §15 gives a `bound` only
+  for `phyco-v2` ("at most 64 bits"), and that FR-009 states a bound per supported size while the
+  register holds one `bound` per model ID? Is it stated what the entry's `bound` reads before any
+  size profile exists, whether and in which commit it follows the size profiles' `bound_bits` once
+  `parameters.json` exists, which records `evidence` lists at L0 and at L1, and whether the claim
+  test checks either field against the files at HEAD, as it checks `claim_level`, `history` and
+  `in_progress`? [Gap, Spec §FR-009, §FR-012, §FR-069; data-model §10, §15; plan phase 1; cli
+  contract `check_claims.py`]
+- [ ] CHK090 Is the derivation of `bound_bits` in `parameters.json` stated, given that FR-009 asks
+  each supported size to state "the bound these place on any security level", that SC-003 counts
+  that bound for every supported size, and that FR-010 lists the generic checks of security.md §12.2
+  (the key entropy, a reachable secret state of at least 2s, multi-target search, k − log₂ u, within
+  the stated u, key plus nonce, capacity c ≥ 2s and single-target quantum search, k/2), while
+  data-model §10 names `bound_bits` once, beside `status`, with no rule saying which of these values
+  it takes, for example the least of k, half the reachable secret state, c/2 and k/2, nor how a
+  keyed reduced variant such as `n2-w16-R8-c64` gets its value? Can the value that
+  `mode_limits_v3.py` writes then be checked by a test? [Clarity, Measurability, Spec §FR-009,
+  §FR-010, §SC-003; data-model §10; security.md §12.2]
+- [ ] CHK091 Is it defined how the claim test compares a bound or a claim stated in a disclaimer
+  with the register's, given that each disclaimer must "state no level, claim or bound beyond the
+  register's", that the level rule gives each line its own `claim_level`, from the models the line
+  names by ID and L0 where it names none, while no such rule is stated for a bound or a claim, and
+  that README's status block states a bound for PhycoWeb-PRNG as a whole in a line that names no
+  model ID, "Its 64-bit seed also caps any security level at 64 bits", beside which FR-051's update
+  adds a sentence on `phyco-v3`? Is it stated which register entry a bound or a claim in such a line
+  is checked against, and what "beyond" means for a bound, for example a larger value than the
+  entry's `bound` or a bound the register does not hold? [Clarity, Measurability, Spec §FR-051,
+  §FR-069; data-model §15; cli contract `check_claims.py`; README status block]
+- [ ] CHK092 Is it stated how the claim test finds each of the three disclaimer blocks, README's
+  status block and security.md's blocks, the one that opens it and the one that closes it, and by
+  what criterion it decides that a block says "that PhycoWeb-PRNG, every model included, must not be
+  used to generate secrets" (a fixed text, required phrases or a reading), given that none of the
+  three says "every model" as it stands, that security.md's closing block names neither
+  PhycoWeb-PRNG nor a model ("This generator must not be used to generate secrets"), and that plan
+  phase 1 starts the test "with FR-069's wording rules and its disclaimer check" while FR-051's
+  updates of security.md and README come in plan phases 8 and 9, phase 1's security.md version
+  adding only `phyco-v3`'s line in §15? Is it stated whether the blocks are reworded when the test
+  is written, or which wording of each the test accepts as it stands? [Measurability, Spec §FR-051,
+  §FR-068, §FR-069; data-model §15; plan phase 1; cli contract `check_claims.py`; README;
+  security.md]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the security focus prompt of the strategy
