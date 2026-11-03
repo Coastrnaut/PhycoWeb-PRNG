@@ -465,8 +465,14 @@ mode_limits_v3.py --out $REP/security-target/limits.json
 mode_limits_v3.py --reproduce RECORD
 ```
 
-Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴ and
-N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
+Reads three tables of the design document, each a Markdown table with fixed columns in a section of
+its own, which the chapters' test checks: the chapter "Permutation"'s section "Variant table", one
+row per variant with its ID, n, w, b, c, r, R and status, and the chapter "Mode"'s sections
+"Layout", which lanes form the rate part and which the capacity part at each size, and "Limits",
+each limit in calls of Π and in bits at every claimable size, with u and the two ways of choosing
+nonces; exit 2 if a table is missing, appears twice or holds a row it cannot read (spec FR-034;
+RAT-085). Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴
+and N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
 `theorem` is `unverified` until its paper has been read: each theorem's entry cites the paper's
 `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page, and the
 script refuses `verified`, exit 2, without such an entry or when the file on
@@ -481,7 +487,10 @@ SEC-090). Both files keep their fixed names: before one changes, its current
 content is kept as `security-target/versions/<sha256>.json`, and the new content holds
 `previous_sha256` (data model introduction). After the freeze it runs only with `--reproduce`, whose
 record goes under `$REP/reproductions/`, and `protocol/evidence.py` refuses, exit 2, to write over
-either file, which the freeze record pins (data model §13).
+either file, which the freeze record pins (data model §13). Its runs compare `design_sha256`, since
+its code reads the design document (data model §1), and a test compares the chapter "Security
+target"'s parameter table and output limits with the two files row by row and value by value,
+failing on any difference (RAT-085).
 
 ## Generators of constants and vectors
 
@@ -601,8 +610,11 @@ record freezes, by path and SHA-256: the chapter's version, compared item by ite
 change to the chapters "Security target" or "Mode" or to `parameters.json` or
 `limits.json` after the review, a `verified` or met mark included, exits 2 until a
 "Security-target review <k>" naming the changed set reads Approved, while a change
-elsewhere in the design document leaves that review standing; and the design
-document's version with the latest selection record; if no row of the external review's family names
+elsewhere in the design document leaves that review standing; and the design document's version with
+the latest selection record and `rationale.md`, so that a change to `rationale.md` after
+the review's approval exits 2 until an "Owner design review <k>" naming the
+changed file reads Approved, as a change to the design document does, which
+`tests/test_protocol_004.py` covers (RAT-083); if no row of the external review's family names
 the latest selection record (each row names the selection record it applies to, a done row through
 its manifest and a "not arranged" row when it is written), or if the highest-k row that does is
 neither done nor "not arranged", or reads done and names no manifest, or one that neither
@@ -861,8 +873,10 @@ session, or a review entry while the named file, or, where the row names a chapt
 SHA-256, the chapter, does not have at that moment the SHA-256 that the row names for it, while its
 `follows` is not the latest entry for that path and section, or while the section's text differs
 from the text whose `sha256` that entry holds, so that the status the latest entry gives is that of
-the text the reviewer read, a section changed after its last entry getting an `add` entry before its
-review, each refusal a case of `tests/test_protocol_004.py` (RAT-081); a review entry
+the text the reviewer read, a section changed after its last entry getting an `add`
+entry before its review, each refusal a case of `tests/test_protocol_004.py`
+(RAT-081), the SHA-256 that a row names for a section of `rationale.md` being the
+file's, which the owner design review's row names (RAT-083); a review entry
 holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
 runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
 row's approval (spec FR-064, FR-067; data model §14; RAT-077). It writes the owner design review's

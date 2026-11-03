@@ -307,7 +307,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
 | Security-target review (the design document's chapters "Security target" and "Mode", with the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
-| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
+| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043). The row, and each "Owner design review <k>", names `rationale.md` by path and SHA-256 beside the design document's version and the selection record, and `design_freeze.py create` compares it with the file at HEAD (RAT-083) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, with every hash those review rows name matching the file at HEAD, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows, and its return to L0 after a change to what those rows reviewed in the commit that makes the change, or right after an owner's commit that makes it (FR-069; SEC-079) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names the latest selection record, by path and SHA-256, when it is written. Each row of this family names the selection record it applies to, a done row through its manifest, which carries that record, and a "not arranged" row by naming the latest selection record when it is written; `design_freeze.py create` reads the highest-k row that names the latest selection record and exits 2 while none does, so that a new selection record needs a row of its own, done or "not arranged", for the candidate it selects, and a review done for another candidate stays done in its row and is cited, in the freeze record's "External review" and in the final report, for the candidate and the version it read only (SC-013; SEC-078). |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | Set by the owner and committed, an owner's own act that no guard reads (the notes under this table). It names the approved freeze record by path and SHA-256 and its `owner_commit`, the owner's commit of the feature files in the freeze's step (1), which follows the commit that records the owner design review's approval in its row with the highest k, the agent committing no file of this feature from that approval on, so that the history shows the owner's act (FR-043; PRO-070) |
@@ -385,7 +385,11 @@ candidate that a later selection record selects, is a row of its own, added when
 "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>", with
 k = 2, 3, … in order, the unnumbered row being the first. It names what it reviews by path and
 SHA-256: the demonstration record, the chapter's version, or the design document's version with the
-selection record. The chapter's version is a set, which the security-target review's row names and
+selection record and `rationale.md`, whose SHA-256 `design_freeze.py create` compares with the file
+at HEAD, exiting 2 while they differ, so that a change to `rationale.md` after the review's
+approval counts only once an "Owner design review <k>" naming the changed
+file reads Approved, as a change to the design document does (RAT-083). The
+chapter's version is a set, which the security-target review's row names and
 `design_freeze.py create` compares item by item: the SHA-256 of the text of each chapter the review
 covers, "Security target" and "Mode" (FR-034), each from its heading line to the next heading of the
 same or a higher level, or to the file's end, over its raw bytes (research R16), and the SHA-256 of
@@ -527,8 +531,10 @@ mode chapter of the design document.
    **Then** each is met by specification, with the section that meets it cited; FUT-SEC-8 points
    to User Story 1, and FUT-SEC-7 points to feature 007 and is open.
 2. **Given** each supported size, **When** the parameter table is read, **Then** it states the
-   key entropy, the secret state reachable from the key, the capacity, the rate, the round count
-   and the resulting bound, and every size that fails a generic bound is a research variant.
+   key entropy, the secret state reachable from the key, the capacity, the rate, the round count and
+   the resulting bound, and every size that fails a generic bound is a research variant; the table
+   and the chapter's output limits restate `parameters.json` and `limits.json`, and a test compares
+   them value by value (FR-034; RAT-085).
 3. **Given** threats T1–T11, **When** the threat model is read, **Then** each is adopted for
    `phyco-v3` or excluded with a reason.
 4. **Given** the mode, **When** the theorem it relies on is checked, **Then** every precondition
@@ -952,7 +958,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   size profile as met with equality; behaviour on nonce reuse stated (edge case "Nonce
   reuse"), with its test. Each is a check in the size profile (`parameters.json`) that can fail,
   computed by code: `mode_limits_v3.py` writes the profile beside `limits.json` and exits 1 on any
-  violation at a claimable size (FR-065). The profile's `bound_bits`, the bound FR-009 states, is
+  violation at a claimable size (FR-065), reading the variant table, the layout and the limits from
+  the design document's tables that FR-034 "Chapters" fixes, and the chapter "Security target"'s
+  parameter table and output limits restate the profile and `limits.json`, which a test compares
+  value by value (RAT-085). The profile's `bound_bits`, the bound FR-009 states, is
   per supported size the least of the figures these checks give, each the cost of a generic attack
   in bits: k, the key entropy; half the reachable secret state at the call boundary where it is
   least; k − log₂ u at the u that `limits.json` states; half of the key and nonce bits together;
@@ -1968,7 +1977,31 @@ freeze hashes and the baseline manifest; run the claim-register test.
     section (RAT-074). The security-target review covers "Security target"
     and "Mode", with the security target's files (the notes under the Review & Approval table), and
     the owner design review every chapter, with the rationale, whose Alternatives chapter is its own
-    (RAT-069).
+    (RAT-069). `mode_limits_v3.py` reads three tables of the design document, each a Markdown table
+    with fixed columns in a section of its own, which the chapters' test checks: the chapter
+    "Permutation"'s section "Variant table", one row per variant with its ID, n, w, b, c, r, R and
+    status, and the chapter "Mode"'s sections "Layout", which lanes form the rate part and which the
+    capacity part at each size, and "Limits", each limit in calls of Π and in bits at every
+    claimable size, with u and the two ways of choosing nonces, and exits 2 if a table is missing,
+    appears twice or holds a row it cannot read, its runs comparing `design_sha256` (data-model §1);
+    and the chapter "Security target"'s parameter table and output limits restate `parameters.json`
+    and `limits.json`, a test comparing each with its file row by row and value by value, the key
+    entropy, the reachable secret state, c, r, R and the bound among them, and failing on any
+    difference, so that the security-target review reads one set of values (FR-010; RAT-085).
+  - **Rationale chapters.** `rationale.md`'s chapters are level-2 headings with fixed names, each
+    once and in this order, which a test checks as it checks the design document's: "Security
+    target", "Mode", "Components", "Nonlinearity", "Diffusion", "Constants", "Margin" and "Attack
+    classes", one for each item of security.md §8's rationale list in its order, then "Network
+    questions" and "Alternatives". "Security target", "Mode", "Nonlinearity" and "Diffusion" each
+    state their item or cite, by chapter and section or by record ID and SHA-256, the design
+    document's chapter or the evidence record that states it: the security target, the threat model
+    and the claim template; the mode, its theorem and how each precondition is met; the sources of
+    nonlinearity with their bound records; and R_f, R_b and FR-029's diffusion through
+    instantiation. "Components" holds the component list below with what the slime-mould mapping
+    does and does not contribute, "Margin" the round-count rule with the margin, and "Attack
+    classes" also the known limitations, the classes left open or deferred among them; the parts
+    below are these chapters, and SC-013 counts the coverage as the eight chapters present, each
+    stating or citing its item (RAT-084).
   - **Components.** The rationale gives the role and the reason of every component: the two
     lanes per node, the coupling function, the vein accumulator, the colour schedule, the local
     linear layer between boxes, the food nodes and their placement, the rotation amounts, the
@@ -2025,7 +2058,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
     the key registers under the row on the key and nonce chains and the output buffer under the row
     on the clock, reset and start signal, and the design document's chapter "Hardware structure" for
-    the rest (RAT-070).
+    the rest (RAT-070). The chapter states once what the slime-mould mapping does and does not
+    contribute, citing the mapping chapter (FR-030; RAT-084).
   - **Constants.** Every constant of Π and the mode has its rule and reason: round constants,
     rotation amounts, padding constants and domain separators, the last two in the mode
     chapter.
@@ -2036,7 +2070,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     names FR-020's fixed operations as the feature that meets its timing part (T4, FR-008) and is
     marked "deferred to feature 008 (FR-008)" for power, electromagnetic and fault-injection attacks
     and the behaviour on reset and clock glitches, with FR-008's stated risk, and "open for feature
-    005" stays for a class whose analysis feature 005 takes up (RAT-075). It
+    005" stays for a class whose analysis feature 005 takes up (RAT-075).
+    The chapter also states the known limitations, the classes left open or
+    deferred among them, as security.md §8's last item asks (RAT-084). It
     names a resisting feature, never "open", for the classes this feature's
     evidence addresses: differential and linear (trail bounds), slide (round constants),
     invariant subspace (invariant checks, constants), rotational and rotational-XOR (symmetry
@@ -2062,7 +2098,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     `d4/tie-choice.json` where they exist, every selection record with its tie choice, each
     decline's log entry and, for each candidate not selected, the entry or record that decided it,
     so that every reason it gives traces to its record.
-  - **Margin.** The margin per claimable size is three numbers, R − R_dist, R − R_bound and
+  - **Margin.** The chapter states the round-count rule, citing the protocol's "Round rule" (FR-032,
+    FR-038), and the margin per claimable size, three numbers, R − R_dist, R − R_bound and
     R / max(R_f, R_b), with the term that set R, and the rationale explains R's growth with n
     (FR-028). It argues Δ = 2 against the single-trail limits of FR-038 as a pre-registered
     allowance, not a proof, and states the gap from clustering and hulls as a residual risk
@@ -2410,9 +2447,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the decline ends in one of the others. Any change after the owner design review (R
   raised, a new finding, a corrected document) makes a new design-document version: the rationale is
   revised, the review is repeated for the changed parts and recorded in a row of its own, "Owner
-  design review <k>" (the notes under the Review & Approval table), and the
-  review package is rebuilt, its earlier manifest kept as `review-package/versions/<sha256>.json`
-  (data-model introduction). A change before the freeze that touches any candidate's eligibility or
+  design review <k>" (the notes under the Review & Approval table), and the review package is
+  rebuilt, its earlier manifest kept as `review-package/versions/<sha256>.json` (data-model
+  introduction). The owner design review's row, and each "Owner design review <k>", names
+  `rationale.md` by path and SHA-256 beside the design document's version and the selection record,
+  and `design_freeze.py create` compares it with the file at HEAD and exits 2 while they differ, so
+  that a change to `rationale.md` after the review's approval counts only once an "Owner design
+  review <k>" naming the changed file reads Approved, as a change to the design document does
+  (RAT-083). A change before the freeze that touches any candidate's eligibility or
   R at 4×4 after a selection record exists makes `round_rule.py --select` run again over the whole
   set and write the next record (section "Pre-registered Design Protocol", "Eligibility and
   selection"): if it selects another candidate, the security-target review and every later review
@@ -3894,8 +3936,10 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   family has more than three candidates in the log.
 - **SC-012**: Every archived `phyco-v2` file matches its manifest hash and its live source, and
   every frozen file of features 002 and 003 still hashes as recorded.
-- **SC-013**: The design rationale covers 100% of the items of security.md §8, and the owner design
-  review, the external review record and the design freeze are recorded; where the design changed
+- **SC-013**: The design rationale covers 100% of the items of security.md §8's rationale list,
+  counted as the eight chapters of `rationale.md` that FR-034 fixes for them, each present and
+  stating or citing its item (RAT-084), and the owner design review, the external
+  review record and the design freeze are recorded; where the design changed
   after the external review, the freeze record and the final report state the version that review
   read and the versions since, and cite it for that version only (FR-043).
 - **SC-014**: 9 of 9 carried-over feature-002 requirements and every item of the §5.3 checklist

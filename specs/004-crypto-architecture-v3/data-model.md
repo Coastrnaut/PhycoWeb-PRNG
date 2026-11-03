@@ -261,7 +261,8 @@ design document, which the table names; for every other kind it is reported, and
 | Trail bound and trail (section 6) | `bound_kind`, `rounds`, `width`, `size`, `bound`, `method`, `tool`, `validation`, `scope`, `cross_check`; of `solver`, the settings, the status and the proven dual bound; of `budget`, the cap; of a `trail` record, `trail_kind`, `characteristic` and `weight` | of `budget`, the hours used; the raw solver log; `design_sha256` |
 | Tool validation (section 7) | `tool`, `version`, `tool_sha256`, `licence`, `source`, `validated_kind`, `known_result`, `second_known_result`, `found`, `outcome` | the projected and used hours; `design_sha256` |
 | Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r and width, the tool's value beside each exhaustive one with its outcome: for an ARX-box, the internal-trail search's value at w = 4 and whether they are equal, and the floor at w = 4 and 8 and whether the value lies at or above it; for the active-S-box counter, the exhaustive minimum and whether they are equal | the projected and used hours; `design_sha256` |
-| D4 choice, round rule, cost records, selection, size profile and limits (sections 8 to 10) | every field of its section | `design_sha256` |
+| D4 choice, round rule, cost records and selection (sections 8 and 9) | every field of its section | `design_sha256` |
+| Size profile and limits (`mode_limits_v3.py`; section 10) | every field of section 10, and `design_sha256`, since its code reads the design document's variant table, layout and limits (RAT-085) | none of its own |
 | Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, and `design_sha256`, since its restatement check reads the design document (research R15); for a candidate's tables (`--candidate`) and an exploration table (`--exploration`), each check's verdict as well | the measured speed and the generation time |
 | Generator run, vectors and constructed states (`gen_vectors_v3.py`, `gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
 | Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s | `design_sha256` for the other generators' |
@@ -766,7 +767,17 @@ each in a row of its own; if it selects the same one, the reviews held stand for
 `parameters.json`, a fixed-name file (introduction) written by `scripts/mode_limits_v3.py` beside
 `limits.json`, one row per supported size, each from the variant table and the design document's
 layout, with FR-010's checks computed by that script, which exits 1 on any violation at a claimable
-size:
+size. The script reads the variant table, the layout and the limits from three tables of the design
+document, each a Markdown table with fixed columns in a section of its own, which the chapters' test
+checks: the chapter "Permutation"'s section "Variant table", one row per variant with its ID, n, w,
+b, c, r, R and status, and the chapter "Mode"'s sections "Layout", which lanes form the rate part
+and which the capacity part at each size, and "Limits", each limit in calls of Π and in bits at
+every claimable size, with u and the two ways of choosing nonces; it exits 2 if a table is missing,
+appears twice or holds a row it cannot read, and its runs compare `design_sha256` (section 1). The
+chapter "Security target"'s parameter table and output limits restate this file and `limits.json`,
+and a test compares each with its file row by row and value by value, the key entropy, the reachable
+secret state, c, r, R and the bound among them, failing on any difference (spec FR-010, FR-034;
+RAT-085). Each row holds:
 
 - `n`, `w`, `lanes_per_node` (2), `b`, `c`, `r`, `variant_id`, and `R`. A research variant's R
   carries its reason: the round rule's value where its inputs exist at that variant, or a
@@ -920,8 +931,12 @@ copy against its manifest hash and its live source (SC-012).
   nothing else, `create` exiting 2 on any other header line, the record naming that version 1.0,
   with `reviewed_version`, the header's 0.<k> that the owner design review read and that
   the record hashes, so that no file changes at or after the freeze and the
-  reviewed text is the frozen text; spec FR-034; RAT-080); `rationale.md`,
-  versioned with it and carrying the same version; `phycoweb/model_v3.py`;
+  reviewed text is the frozen text; spec FR-034; RAT-080); `rationale.md`, versioned with it and
+  carrying the same version, whose SHA-256 the owner design review's row with the highest k names
+  beside the design document's version and the selection record and `create` compares with the file
+  at HEAD, exiting 2 while they differ, so that a change to `rationale.md` after the review's
+  approval counts only once an "Owner design review <k>" naming the changed file reads Approved, as
+  a change to the design document does (spec FR-043; RAT-083); `phycoweb/model_v3.py`;
   `phycoweb/constants_v3.py`, with its table per supported (n, w), which `create`
   checks, exit 2 otherwise, to equal the selected candidate's tables at each
   supported (n, w) and its final R (research R15); `phycoweb/selftest_v3.py`
