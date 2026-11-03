@@ -32,14 +32,14 @@ steps before the tasks approval. Phase 1 holds the setup and the foundational wr
 phase 1's steps (1) to (9) in their order (REP-081). Stories: US1, FUT-SEC-8 (P1, phase 2, the MVP);
 US4's tools, validated in phase 3 before any of their results counts (FR-039); US2, the security
 target (P2, drafted in phase 4 and reviewed in phase 8); US3, the permutation, its inverse and the
-mode, and US4, the evidence (phases 5 to 7); US5, the reviews and the freeze (phase 8). The
-operation-list framework `research/004/ir.py`, which plan phase 5 names first, is written at the
-start of phase 3, because the known results of research R13 for the structural tools are stated
-operation lists that those tools read through it (R11, R13); phase 5 starts with the cost model.
-Phase 4 writes `scripts/mode_limits_v3.py` and its tests, and the script's first run comes in
-phase 8, before the security-target review, since it reads each variant's R from the design
-document's variant table (data-model §10), which holds the selected candidate's R only once phase 5
-has given it.
+mode, and US4, the evidence (phases 5 to 7); US5, the reviews and the freeze (phase 8). As plan
+phases 3 to 5 state, the operation-list framework `research/004/ir.py` is written at the start of
+phase 3, because the known results of research R13 for the structural tools are stated operation
+lists that those tools read through it (R11, R13), and phase 5 starts with the cost model; phase 4
+writes `scripts/mode_limits_v3.py` and its tests, and the script's first run comes in phase 8,
+before the security-target review, since it reads each variant's R from the design document's
+variant table (data-model §10), which holds the selected candidate's R only once phase 5 has given
+it.
 
 ⛔ marks a human review gate (Principle VIII): the agent stops there and waits for the owner.
 **Owner** marks a task only the owner performs: `scripts/owner_record.py` (`environment` and
@@ -65,7 +65,8 @@ from `/mnt/c/GIT/PhycoWeb-PRNG`.
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: can run in parallel (different files, no dependency on an incomplete task)
+- **[P]**: can run in parallel: the task writes no file that another task of its phase writes, and
+  depends on no incomplete task
 - **[Story]**: US1 to US5 (spec.md, "User Scenarios & Testing")
 - Each task ends with the requirements, success criteria and research items it serves.
 
@@ -133,18 +134,23 @@ or key-loading code is written here.
 - [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`;
   check with `git check-ignore` that each is ignored and that `fast/build/` stays ignored through
   `build/`. (FR-045; R16, R18)
-- [ ] T006 [P] Write research R18's line-ending test in `tests/test_records_004.py`: every path
-  whose hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule
-  or `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no
-  hashed file starts with a byte-order mark; while no record exists, it checks every tracked file
-  under the pinned paths. It runs from this phase on. (FR-053; R18)
+- [ ] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
+  hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule or
+  `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no hashed
+  file starts with a byte-order mark; while no record exists, it checks every tracked file under the
+  pinned paths. In the same file, a test checks each `code_sha256` entry of a committed record
+  against the blob at the record's `git_head`, and a second test checks the header of every
+  committed `.gz` file under `reports/004-crypto-architecture-v3/`, `research/004/`,
+  `vectors/phyco-v3/` and `baseline/phyco-v2/`, which must be the header that
+  `gzip.compress(data, compresslevel=9, mtime=0)` writes, feature 003's `.gz` files left out. These
+  tests run from this phase on. (FR-053; R18)
 
 ### Step (2): the writers before what they write
 
 - [ ] T007 Add `DESIGN_DISCLAIMER` to `protocol/disclaimer.py`, holding exactly the design-form
   disclaimer, the block directly under spec.md's title, its lines joined by single spaces;
   `DISCLAIMER` stays byte for byte as it is. (FR-068; R18)
-- [ ] T008 [P] Write the tests of the evidence writer in `tests/test_protocol_004.py` and
+- [ ] T008 Write the tests of the evidence writer in `tests/test_protocol_004.py` and
   `tests/test_records_004.py`, before the writer, on temporary directories: record IDs and file
   names (data-model §1, "Record files"); the common fields of FR-061 with `DESIGN_DISCLAIMER`;
   canonical JSON and its `canonical` hashes; `versions/` for fixed-name files; the suffixes allowed
@@ -158,26 +164,35 @@ or key-loading code is written here.
   digits do not match, a later entry and the last line whose digits do not match, a reading marked
   `set_aside` with no decision and a `repair` entry whose list differs; Order of sizes, a
   `--project` probe never refused; Approvals, the table read at HEAD and a working tree that differs
-  refused; Order of US1; Tool validation; and Budget. (FR-040, FR-044, FR-045, FR-053, FR-061; R16;
-  PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+  refused; Order of US1; Tool validation; Trail tools, once the first trail search has started, a
+  tool outside research R12's fixed set or without an earlier `re-found` record of its exact hash,
+  and a search that reached its cap, save research R7's one re-run after a recorded tool defect; and
+  Budget. In `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the
+  FUT-SEC-8 sweep among them, and every script with a worker option takes the heavy-run lock, each
+  script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065,
+  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
-  canonical JSON, the suffix and 10 MB rules, `versions/` for fixed-name files, the copies under
-  `spec-versions/`, `research-versions/` and `design-versions/` of every version a record cites, the
-  `projection` record, the shared guards of contracts/cli.md ("Guards shared by every script") with
-  exits 0 to 3, each guard that reads the Review & Approval table reading it at HEAD, and the common
-  part of every `--reproduce` mode: a worktree of the original's `git_head`, its `code_sha256`
-  checked against that commit's blobs, output under `$REP/reproductions/<record_id>/<n>/`, the
-  design document read from that worktree and checked against `design-versions/<sha256>.md`, and
-  exit 2 while the environment record the original cites is not in force. (FR-053, FR-061, FR-065,
-  FR-068; R1, R16; REP-099, REP-100)
-- [ ] T010 [P] Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every
-  append takes `data/log-append.lock` by exclusive create, checks the chain to the last line and
-  appends one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its
-  final LF; a lock not free within 10 s exits 2, naming it (quickstart P4); a broken chain exits 2,
-  save for the one `repair` entry while "Log repair <n>" reads Approved at HEAD and names that log
-  and the `seq` of the break; and the refusals of the provenance log's and the protocol change log's
-  writers. (FR-041, FR-044, FR-067; R16; PRO-076)
+  canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
+  `gzip.compress(data, compresslevel=9, mtime=0)` with the SHA-256 of its uncompressed content in
+  its record, `versions/` for fixed-name files, the copies under `spec-versions/`,
+  `research-versions/` and `design-versions/` of every version a record cites, the `projection`
+  record, the shared guards of contracts/cli.md ("Guards shared by every script") with exits 0 to 3,
+  each guard that reads the Review & Approval table reading it at HEAD, and the common part of every
+  `--reproduce` mode: a worktree of the original's `git_head`, its `code_sha256` checked against
+  that commit's blobs, output under `$REP/reproductions/<record_id>/<n>/`, the design document read
+  from that worktree and checked against `design-versions/<sha256>.md`, and exit 2 while the
+  environment record the original cites is not in force. (FR-053, FR-061, FR-065, FR-068; R1, R16;
+  REP-099, REP-100)
+- [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
+  takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
+  one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
+  a lock not free within 10 s exits 2, naming it (quickstart P4); a broken chain exits 2, save for
+  the one `repair` entry while "Log repair <n>" reads Approved at HEAD and names that log and the
+  `seq` of the break; the refusals of the provenance log's and the protocol change log's writers;
+  and `create`'s refused-list step, exit 2 while `research/004/refused-constants.json` is missing or
+  differs from HEAD, its SHA-256 written as `refused_list` in the entry of each row listed under the
+  constant rule. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
 - [ ] T011 Write `protocol/provenance.py`, the one writer of `$REP/provenance.jsonl`, and
   `scripts/provenance.py` with `add FILE` and `review FILE` (contracts/cli.md; data-model §14): one
   entry per file or per section, with the tool and model, the date, the task ID and the review
@@ -188,27 +203,32 @@ or key-loading code is written here.
   data-model §18): `check` makes FR-044's comparison and writes nothing; `create` runs only while
   the log does not exist, reads the lists "Rows that change the protocol" in round order, the row
   "Place check" with the highest k and the row "Readings set aside" at HEAD, exits 2 while a reading
-  marked `set_aside` is not decided, and ends in the approval step, where the owner types the first
-  16 hex digits of the approval hash it prints; `propose` writes one later entry the same way.
-  (FR-044; PRO-063, PRO-077, PRO-079; REP-094)
-- [ ] T013 [P] Write `scripts/repair_log.py --log LOG --approval REF` (contracts/cli.md; R16), which
+  marked `set_aside` is not decided or while `research/004/refused-constants.json` is missing or
+  differs from HEAD, writes that file's SHA-256 as `refused_list` in the entry of each row listed
+  under the constant rule (data-model §18), and ends in the approval step, where the owner types the
+  first 16 hex digits of the approval hash it prints; `propose` writes one later entry the same way,
+  an addition to the refused list with the list's new SHA-256 in its `refused_list`. (FR-023,
+  FR-044; R15; PRO-063, PRO-077, PRO-079; REP-094)
+- [ ] T013 Write `scripts/repair_log.py --log LOG --approval REF` (contracts/cli.md; R16), which
   appends a broken chain's `repair` entry through that log's one writer only while its row "Log
   repair <n>" reads Approved at HEAD and names the same log and position, with its tests in
-  `tests/test_protocol_004.py`. (FR-041, FR-044, FR-067; R16; PRO-076, REP-101)
-- [ ] T014 [P] Write `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request, which
+  `tests/test_protocol_004.py`; for the candidate log it appends through `protocol/candidates.py`,
+  which T076 writes, so that task completes this path and T075 its test. (FR-041, FR-044, FR-067;
+  R16; PRO-076, REP-101)
+- [ ] T014 Write `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request, which
   removes a stale `data/heavy-run.lock` or `data/log-append.lock` only once it shows, in the lock's
   environment, that no process with the lock's PID and start time still runs, and writes a
   `lock-cleared` record, `$REP/locks/<record_id>.json`, with its tests in
   `tests/test_protocol_004.py`. (FR-045; R16; PRO-065, PRO-068)
-- [ ] T015 [P] Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
+- [ ] T015 Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
   which checks the running environment against research R1 and the pins of `requirements.txt` for
   that platform and writes `$REP/environment-<platform>.json`, and `owner-provided --known KNOWN_ID
   --value TEXT --source TEXT --words TEXT --by NAME`, which writes an `owner-provided` entry of
   `$REP/downloads.json`; each prints its approval hash, kind `canonical`, writes nothing unless the
   owner types its first 16 hex digits at an interactive terminal, and is tested in
-  `tests/test_protocol_004.py`. The agent writes and tests this script and never runs it. (R1, R19;
-  PRO-068, PRO-071; REP-082, REP-083)
-- [ ] T016 [P] Write `scripts/downloads.py` with `init`, `fetched NAME PATH [--pypi-sha256 HEX]` and
+  `tests/test_protocol_004.py`. The agent writes and tests this script and never runs it. (FR-039,
+  FR-044, FR-053, FR-058; R1, R19; PRO-068, PRO-071; REP-082, REP-083)
+- [ ] T016 Write `scripts/downloads.py` with `init`, `fetched NAME PATH [--pypi-sha256 HEX]` and
   `not-obtained NAME --reason TEXT`, which keeps `$REP/downloads.json` (contracts/cli.md; R19):
   `init` exits 2 once the manifest exists; `fetched` computes the SHA-256 and size from the file,
   read under `-I` and never run, and refuses a size that differs from one R19 gives in bytes and,
@@ -251,7 +271,7 @@ or key-loading code is written here.
   with its path and text, its reason, its writer and the date, until
   `python scripts/check_claims.py` reports 0 findings; the owner reviews the entries at the next ⛔
   gate, and an entry the owner declines is removed in the next commit. (FR-069; SC-018; SEC-087)
-- [ ] T023 [P] Write the document tests in `tests/test_protocol_004.py`: the spec's Status line, the
+- [ ] T023 Write the document tests in `tests/test_protocol_004.py`: the spec's Status line, the
   Status of `checklist-choices.md` and the Review & Approval table agree; the first list of rows a
   guard reads, its numbered families included, and the contracts' guards agree both ways; no key is
   loaded into a state of `phyco-v3` or of any candidate while the "FUT-SEC-8 result review" row with
@@ -290,12 +310,18 @@ or key-loading code is written here.
 
 - [ ] T027 Write the refused list of research R15 as `research/004/refused-constants.json`, which
   `scripts/gen_constants_v3.py` will read, before the protocol change log, so that its SHA-256
-  stands in the entry that fixes the constant rule (data-model §18): the standard polynomials of
-  degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's and the CRC-64 polynomials of ISO 3309 and ECMA-182)
-  and the polynomials and constant sets of every design that the strategy note, the spec, the plan,
-  research.md and `security.md` name, research R12's reference designs among them, each with its
-  source; a set whose source is a paper of R19 not yet fetched enters before the first candidate is
-  scored, as a `stricter` entry with the list's new SHA-256. (FR-023, FR-044; R15; RAT-038, RAT-043)
+  stands in `refused_list` of each entry that fixes the constant rule (data-model §18), the file
+  committed before T028: the standard polynomials of degree 64 and 128 (CMAC's R₆₄ and R₁₂₈, GCM's
+  and the CRC-64 polynomials of ISO 3309 and ECMA-182) and the polynomials and constant sets of
+  every design that the strategy note, the spec, the plan, research.md and `security.md` name,
+  research R12's reference designs among them, each with its source; each set's source is a file of
+  research R19 recorded `fetched` in `downloads.json`, the design's published derivation computed by
+  committed code with its citation, or a value the owner provides with its source (`owner-provided`,
+  R19), and a set with none of these waits for a download of its own, with the owner's permission
+  for that file (FR-046); a set not on the list when the log is created, a set from a paper of R19
+  not yet fetched among them, enters as a `stricter` entry with the list's new SHA-256, and no
+  candidate is scored before every set this task names is on the list. (FR-023, FR-044, FR-046; R15,
+  R19; RAT-038, RAT-043)
 - [ ] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/004/protocol-changes.jsonl`, one per listed row of every answered
@@ -363,9 +389,10 @@ or key-loading code is written here.
 - [ ] T037 Run the whole suite under `tests/` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and in WSL with `wpy`: every test passes,
   or skips naming its open item, and none fails (quickstart P0); record the commands and results for
-  the phase report. The suite is light until T080 adds FR-053's test with two worker counts, marked
-  heavy; from then on a run of the whole suite is a heavy run and waits for the owner's go-ahead.
-  (FR-053, FR-058; Principle V)
+  the phase report. The suite is light until T081 adds FR-053's test with two worker counts, marked
+  heavy; from then on a run of the whole suite, or of `tests/test_records_004.py`, is a heavy run
+  and waits for the owner's go-ahead, and T125 makes that run before the final report. (FR-053,
+  FR-058; Principle V)
 
 **Checkpoint**: the writers, the three logs, the register and the archive stand; the claim test and
 the line-ending test pass at HEAD; each platform's environment record in force reads Approved. The
@@ -572,7 +599,7 @@ hash, older than its first counted result.
 - [ ] T064 [US4] Run `tests/test_tools_004.py` and `tests/test_ir.py`, `python -W ignore -m unittest
   tests.test_tools_004 tests.test_ir`, on both platforms and list for the owner every tool without a
   `re-found` record, whose results stay `not evaluated`. The trail tools are fixed when the first
-  trail search starts (T087): the rows of research R12's table that then have a `re-found` record,
+  trail search starts (T088): the rows of research R12's table that then have a `re-found` record,
   none added afterwards. (FR-039; SC-007; R12)
 
 **Checkpoint**: every tool of phases 5 and 6 but the cost model has its validation record, or is
@@ -589,7 +616,7 @@ mode theorem at the target advantage ε = 2⁻⁶⁴ (FR-004 to FR-016; R9, R10)
 **Independent Test**: without running code, a reviewer checks FUT-SEC-1 to FUT-SEC-9, threats
 T1 to T11 and the generic bounds of security.md §12.2 against the parameter table and the mode
 chapter; the tests of `scripts/mode_limits_v3.py` pass on stated tables, and quickstart T1 and T2
-run with T106.
+run with T107.
 
 - [ ] T065 [US2] Fetch the theorem papers of research R19 when this task is reached, each into its
   own new directory: `Daemen.pdf`, `SpongePRNG.pdf` and `169.pdf`, the last through the owner's
@@ -597,8 +624,8 @@ run with T106.
   table; record each in `$REP/downloads.json` with `python scripts/downloads.py fetched NAME PATH`
   or `not-obtained NAME --reason TEXT`, and read each with Python under `-I` only. A theorem paper
   not obtained leaves the mode chapter "unverified" (R10). (FR-011, FR-013, FR-046; R10, R19)
-- [ ] T066 [P] [US2] Write the security-target tests in `tests/test_records_004.py`, skipping, with
-  their reason, until the two files exist (T106): `$REP/security-target/parameters.json` and
+- [ ] T066 [US2] Write the security-target tests in `tests/test_records_004.py`, skipping, with
+  their reason, until the two files exist (T107): `$REP/security-target/parameters.json` and
   `limits.json` hold data-model §10's fields; the chapter "Security target"'s parameter table and
   output limits restate them row by row and value by value; each row's `bound_bits` is recomputed
   from its `bound_terms`, and each term from the row's other fields (SEC-090); and `rationale.md`
@@ -606,19 +633,33 @@ run with T106.
   outside a citation of the design document's chapter and section or of a record's ID and SHA-256
   (RAT-090). (FR-010, FR-034, FR-065; SC-003; RAT-085)
 - [ ] T067 [US2] Write `scripts/mode_limits_v3.py` with `--out $REP/security-target/limits.json` and
-  `--reproduce RECORD` (contracts/cli.md; data-model §10), with its tests on stated tables: it reads
-  the design document's three tables, the chapter "Permutation"'s section "Variant table" and the
-  chapter "Mode"'s sections "Layout" and "Limits", exit 2 if one is missing, appears twice or holds
-  a row it cannot read; evaluates the theorem's bound at the limits the "Limits" table states, the
-  per-request cap of 2¹⁹ bits and at most 2³² instantiations per key among them, with ε = 2⁻⁶⁴ and
-  N = 2¹²⁸ (research R9), exit 1 if the bound exceeds ε there, and the doubling check; keeps
-  `theorem` `unverified` until its paper is read, refusing `verified`, exit 2, without the paper's
-  `fetched` entry in `downloads.json`; and writes the size profile `parameters.json` beside
-  `limits.json`, one row per supported size with its key entropy, its reachable secret state, c, r,
-  R, `bound_bits` and `bound_terms`, FR-010's generic-bound checks computed by code, the keyed
-  reduced variants with a c-bit key and a c/2-bit nonce checked at s = c/2. (FR-007, FR-009, FR-010,
-  FR-015; SC-003; R9, R14)
-- [ ] T068 [US2] Draft `specs/004-crypto-architecture-v3/design.md` with its header, which holds
+  `--reproduce RECORD` (contracts/cli.md; data-model §10), with its tests in
+  `tests/test_records_004.py` on stated tables: it reads the design document's three tables, the
+  chapter "Permutation"'s section "Variant table" and the chapter "Mode"'s sections "Layout" and
+  "Limits", exit 2 if one is missing, appears twice or holds a row it cannot read; evaluates the
+  theorem's bound at the limits the "Limits" table states, the per-request cap of 2¹⁹ bits and at
+  most 2³² instantiations per key among them, with ε = 2⁻⁶⁴ and N = 2¹²⁸ (research R9), exit 1 if
+  the bound exceeds ε there, and the doubling check; keeps `theorem` `unverified` until its paper is
+  read, refusing `verified`, exit 2, without the paper's `fetched` entry in `downloads.json`; and
+  writes the size profile `parameters.json` beside `limits.json`, one row per supported size with
+  its key entropy, its reachable secret state, c, r, R, `bound_bits` and `bound_terms`, FR-010's
+  generic-bound checks computed by code, the keyed reduced variants with a c-bit key and a c/2-bit
+  nonce checked at s = c/2. (FR-007, FR-009, FR-010, FR-015; SC-003; R9, R14)
+- [ ] T068 [US2] Write FR-034's chapters' test in `tests/test_records_004.py`, skipping, with its
+  reason, until `specs/004-crypto-architecture-v3/design.md` and `rationale.md` exist: the design
+  document's level-2 chapters "Security target", "Mode", "Permutation", "Hardware structure",
+  "Replaced mechanisms" and "Slime-mould mapping", each once and in this order; each section FR-034
+  names, in its chapter: "Key loading", "Diffusion through instantiation", "Layout" and "Limits" in
+  "Mode", "Variant table", "Inverse" and "Network questions" in "Permutation", and "Self-test" in
+  "Hardware structure"; the four tables that `scripts/mode_limits_v3.py` and
+  `scripts/gen_vectors_v3.py` read, the variant table, with its columns ID, n, w, b, c, r, R and
+  status, the tables of "Layout" and "Limits" and the table of k, each a Markdown table with fixed
+  columns, once in its section, every row readable; `rationale.md`'s chapters "Security target",
+  "Mode", "Components", "Nonlinearity", "Diffusion", "Constants", "Margin", "Attack classes",
+  "Network questions" and "Alternatives", each once and in this order; and each file's header, its
+  title, its disclaimer and one "Version: 0.<k>" line and nothing else, the two version lines equal.
+  (FR-034, FR-059; SC-013; RAT-074, RAT-084, RAT-085, RAT-087)
+- [ ] T069 [US2] Draft `specs/004-crypto-architecture-v3/design.md` with its header, which holds
   only the title, the design-form disclaimer and "Version: 0.<k>", and its chapter "Security
   target", first in FR-034's order: the properties sought as bounds on an adversary's advantage
   (keystream under nonces never repeated, multi-user for u keys, backtracking across each forget
@@ -629,25 +670,26 @@ run with T106.
   claimable sizes and the 2×2 decision; the certification route with "class unconfirmed" beside it
   until the class is confirmed or changed; and the claim template, marked "target, not a claim".
   (FR-004 to FR-012, FR-017, FR-034; R9, R14)
-- [ ] T069 [US2] Draft the design document's chapter "Mode", with its sections "Key loading",
+- [ ] T070 [US2] Draft the design document's chapter "Mode", with its sections "Key loading",
   "Diffusion through instantiation", "Layout" and "Limits": the keyed duplex over Π with
   instantiate, generate, forget and the optional reseed, forget after every request and at the end
   of instantiate in the form the theorem covers; the theorem with every precondition and the design
   feature that meets it; padding and domain separation with their injectivity shown both ways; the
   reseed input taken as chosen by the attacker (T9); the rate, the capacity and the canonical
   serialization; and the limits from `limits.json`. (FR-013 to FR-016, FR-034; R10)
-- [ ] T070 [US2] Draft `specs/004-crypto-architecture-v3/rationale.md` with its header (title,
+- [ ] T071 [US2] Draft `specs/004-crypto-architecture-v3/rationale.md` with its header (title,
   design-form disclaimer, the design document's "Version: 0.<k>") and its chapters "Security target"
   and "Mode", which explain the design document's chapters, each statement carrying one of FR-062's
   seven labels. (FR-034, FR-062; RAT-086, RAT-087)
-- [ ] T071 [US2] Record the four chapters as under review in `$REP/provenance.jsonl`, one entry per
+- [ ] T072 [US2] Record the four chapters as under review in `$REP/provenance.jsonl`, one entry per
   section drafted with the tool and model, the date, the task ID and the status, and no mark in
   either file; the security-target review of phase 8 reads them once the records of phase 5 that it
   cites exist. (FR-034, FR-067; RAT-068, RAT-069, RAT-086)
 
 **Checkpoint**: the security target stands as a draft under review, with `scripts/mode_limits_v3.py`
-and its tests; the script's first run, and the register's `bound` and `evidence` with it, follows
-the variant table (T106). The phase ends with the constitution's phase report to the owner.
+and its tests and the chapters' test (T068); the script's first run, and the register's `bound` and
+`evidence` with it, follows the variant table (T107). The phase ends with the constitution's phase
+report to the owner.
 
 ---
 
@@ -668,23 +710,25 @@ fourth `proposed` entry exiting 2 (SC-011). The production-width analysis covers
 the other family is analysed there only if the chosen one ends with no eligible candidate, and its
 candidates are otherwise `ineligible` (R6, R7).
 
-- [ ] T072 [P] [US4] Write `tests/test_costmodel.py` (R5): research R5's hand-counted examples
+- [ ] T073 [P] [US4] Write `tests/test_costmodel.py` (R5): research R5's hand-counted examples
   reproduced exactly; 0 LUTs for rotations, constant shifts and wiring; w per bitwise word operation
   with fan-in k ≤ 6 and w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no
   fusion. (FR-022, FR-026; R5)
-- [ ] T073 [US4] Write `research/004/tools/costmodel.py` (R5) and validate it with
+- [ ] T074 [US4] Write `research/004/tools/costmodel.py` (R5) and validate it with
   `scripts/validate_tool.py` on R5's hand-counted examples, entered in the provenance log by T048;
   the implied throughput is reported beside the goal of 10⁸ words per second at 200 MHz, never an
   eligibility rule. (FR-022, FR-026, FR-039; SC-007; R5)
-- [ ] T074 [P] [US3] Write the candidate log's tests in `tests/test_protocol_004.py`: each mode of
+- [ ] T075 [US3] Write the candidate log's tests in `tests/test_protocol_004.py`: each mode of
   `scripts/candidate_log.py` and its refusals; a fourth `proposed` entry of one family exits 2
   (quickstart E6); every tool refuses an operation list whose hash has no `proposed` or `correction`
-  entry; no entry is ever deleted; the budget rows, the order of sizes (quickstart E7) and the stop
-  rule. (FR-041; SC-011; R7; ANA-080, ANA-083)
-- [ ] T075 [US3] Write `protocol/candidates.py`, the one writer of `research/004/candidates.jsonl`,
+  entry; no entry is ever deleted; `scripts/repair_log.py`'s `repair` entry on this log (T013); the
+  budget rows, the order of sizes (quickstart E7) and the stop rule. (FR-041; SC-011; R7; ANA-080,
+  ANA-083)
+- [ ] T076 [US3] Write `protocol/candidates.py`, the one writer of `research/004/candidates.jsonl`,
   and `scripts/candidate_log.py` with `propose`, `mapping`, `enter`, `decide`, `correct`, `replace`
-  and `outcome` (contracts/cli.md; data-model §3). (FR-041; SC-011; R16)
-- [ ] T076 [US3] Write `scripts/gen_constants_v3.py` (contracts/cli.md, "Generators of constants and
+  and `outcome` (contracts/cli.md; data-model §3), through which `scripts/repair_log.py` (T013)
+  appends this log's `repair` entry. (FR-041; SC-011; R16)
+- [ ] T077 [US3] Write `scripts/gen_constants_v3.py` (contracts/cli.md, "Generators of constants and
   vectors"; R15): the constant rule as fixed (degree 64, the first primitive polynomial in the
   stated order not on `research/004/refused-constants.json`, Fibonacci form seeded with ASCII
   `PhycoWeb`, each table read w bits per word in the stated order, skipping periodic and related
@@ -694,28 +738,28 @@ candidates are otherwise `ineligible` (R6, R7).
   rules; and the modes `--candidate ID --variant VARIANT`, `--exploration N W` into
   `research/004/exploration/`, `[--check]` for `phycoweb/constants_v3.py` and `--reproduce RECORD`,
   each run writing a `generator-run` record. (FR-023, FR-024, FR-047; SC-006; R13, R15)
-- [ ] T077 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
+- [ ] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
   as `research/004/candidates/cand-A1.py`, an operation list of invertible updates with its
   reference outputs, and append its `proposed` entry with
   `python scripts/candidate_log.py propose FILE` before any tool runs on it; a replaced list stays
   unchanged as `research/004/candidates/cand-A1/superseded/<sha256>.py`, listed in
   `research/004/candidates/superseded.json`. (FR-019, FR-020, FR-021, FR-022, FR-041; R6, R11)
-- [ ] T078 [US3] Write at least one Boolean candidate, `research/004/candidates/cand-B1.py`, the
+- [ ] T079 [US3] Write at least one Boolean candidate, `research/004/candidates/cand-B1.py`, the
   same way, with its `proposed` entry; a further candidate, at most three per family, is entered
   only where the rules can select it. (FR-022, FR-041; SC-011; R6)
-- [ ] T079 [US3] Generate each candidate's constant tables with `python scripts/gen_constants_v3.py
+- [ ] T080 [US3] Generate each candidate's constant tables with `python scripts/gen_constants_v3.py
   --candidate ID --variant VARIANT` into `research/004/candidates/<id>/constants/<variant>.json`
   before its first tool run, and append its `mapping` entry with
   `python scripts/candidate_log.py mapping FILE` before its first score. (FR-023, FR-024, FR-041;
   R15)
-- [ ] T080 [P] [US4] Write the evidence-run tests in `tests/test_protocol_004.py` and
+- [ ] T081 [US4] Write the evidence-run tests in `tests/test_protocol_004.py` and
   `tests/test_records_004.py`: `scripts/evidence_v3.py` refuses a candidate not in the log, a spent
   budget row, a size out of order and a `bound` without a validated tool; an `avalanche` run without
   the candidate's `dependency` record at its size exits 2; every run started writes a record; a
   `control` run exits 2 once its record exists; `--reproduce` of a light run of each kind, its
   latest and one older, matches (R7); and FR-053's test with two worker counts, marked heavy.
   (FR-037, FR-045, FR-053, FR-065; R4, R7, R16)
-- [ ] T081 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
+- [ ] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
   `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
   `invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) and
   `cross-check` (with `--tool NAME`); the counts of research R4 and R13, which no option lowers;
@@ -723,49 +767,49 @@ candidates are otherwise `ineligible` (R6, R7).
   record; a `trail` record beside each bound run of a tool that searches Π; and
   `--reproduce RECORD`. Every finding carries one of the four classes of security.md §9.1, and every
   other record `none`. (FR-037, FR-038, FR-060, FR-061; SC-017; R4, R7, R12, R13)
-- [ ] T082 [P] [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
+- [ ] T083 [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
   `tests/test_protocol_004.py`: a second D4 run exits 2 (quickstart E4); `--tie` only after an exact
   tie, once both values of R at 4×4 exist; `--choose` writes nothing unless the owner types 16 hex
   digits at an interactive terminal; R by the round rule with every input cited, eligibility,
   selection and the stop rule; `--select` exits 2 after a D4 tie until its row reads Approved or
   "Not needed"; `--decide` exits 2 while the latest selection record has a tie and no choice whose
   row reads Approved. (FR-022, FR-028, FR-041; SC-005; R6, R7; PRO-074)
-- [ ] T083 [US4] Write `scripts/d4_choice.py` (contracts/cli.md; data-model §8; R5, R6): the score
+- [ ] T084 [US4] Write `scripts/d4_choice.py` (contracts/cli.md; data-model §8; R5, R6): the score
   (min(W_D, W_L)/r*)/L over the entered set recorded before the first score, at 4×4 and at the
   widest reduced width, 16 or else 8, with a common r* ≥ 2, compared exactly; `--tie`;
   `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`. (FR-022; R5, R6)
-- [ ] T084 [US4] Write `scripts/round_rule.py` (contracts/cli.md; data-model §9): `--candidate ID`,
+- [ ] T085 [US4] Write `scripts/round_rule.py` (contracts/cli.md; data-model §9): `--candidate ID`,
   R per claimable size with every input cited, into `$REP/candidates/<ID>/round-rule.json`;
   `--close`; `--select`, into `$REP/freeze/selection.json` and later `selection-<k>.json`;
   `--decide`; `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`, with
   eligibility, selection and the stop rule as the spec's "Pre-registered Design Protocol" states.
   (FR-028, FR-041, FR-043; SC-005, SC-008; R6, R7)
-- [ ] T085 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
+- [ ] T086 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
   (contracts/cli.md; R16), standard library and `protocol/` only, which recomputes every verdict of
   FR-065 from committed files, the `trail` records' weights and classifications among them, and
   writes a `recheck` record naming the interpreter, the platform and its `pip freeze`; with its
   import test in `tests/test_records_004.py`. (FR-065; SC-017; ANA-086)
-- [ ] T086 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
+- [ ] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
   `entered-d4` entry per candidate of the set, before the first score. (FR-022, FR-041; R6)
-- [ ] T087 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
+- [ ] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
   inputs of the D4 score with `python scripts/evidence_v3.py`: the trail bounds over r* rounds with
   the validated trail tools and the cross-checks between kinds, the first trail search fixing the
   trail tools, and the cost from `research/004/tools/costmodel.py`; each heavy run **heavy**,
   projected first. (FR-022, FR-038, FR-039; R5, R6, R7, R12)
-- [ ] T088 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
+- [ ] T089 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
   $REP/d4/choice.json` once (quickstart E4); after an exact tie, `--tie` writes `$REP/d4/tie.json`
   once both values of R at 4×4 exist. (FR-022; R6)
-- [ ] T089 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
+- [ ] T090 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
   `python scripts/d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json`,
   then set and commit the row "D4 tie" in `specs/004-crypto-architecture-v3/spec.md`; where a
   tie-break decides it, the row reads "Not needed", naming `d4/tie.json` and its tie-break. (FR-022;
   R6; PRO-074)
-- [ ] T090 [US4] Before any candidate's first frequency or avalanche run at a size, run the uniform
+- [ ] T091 [US4] Before any candidate's first frequency or avalanche run at a size, run the uniform
   controls there, `python scripts/evidence_v3.py --kind control --test frequency --size N --project
   --out-dir $REP/controls` and then the run, and the same for `avalanche`, each **heavy**; a control
   that fires makes that size's bias evidence inconclusive for every candidate, and the feature
   recommends stopping. (FR-037; R4, R7; ANA-074)
-- [ ] T091 [US4] For each candidate of the chosen family, at 4×4, then 8×8, then 16×16, with `python
+- [ ] T092 [US4] For each candidate of the chosen family, at 4×4, then 8×8, then 16×16, with `python
   scripts/evidence_v3.py --candidate ID --kind KIND --size N --out-dir $REP/candidates/<ID>`: the
   differential and linear trail bounds at the production width, with the cross-checks between kinds;
   then the structural checks, the inverse on the 16 vector inputs and 2¹⁰ test states at every
@@ -776,19 +820,19 @@ candidates are otherwise `ineligible` (R6, R7).
   related-nonce set and the rotational pairs, N_a = 2¹³, from the R the earlier kinds give and
   extended to every later rise of R; each heavy run **heavy**, projected first (quickstart E1 to
   E3). (FR-019, FR-021, FR-029, FR-037, FR-038; SC-004, SC-005, SC-008; R4, R7, R12, R13)
-- [ ] T092 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
+- [ ] T093 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
   stands at every claimable size; after a rise of R, repeat the inverse tests, the invariant checks
   and the new constant table's checks at the new variant before the bias tests are extended (R7,
   "After a rise of R"); then run `--close`, `--select` (exit 1 for a stop) and `--decide`
   (quickstart E5). (FR-028, FR-041; SC-005, SC-008; R7)
-- [ ] T093 [US4] ⛔ **Selection tie** (**Owner**), only where eligible candidates tie: run `python
+- [ ] T094 [US4] ⛔ **Selection tie** (**Owner**), only where eligible candidates tie: run `python
   scripts/round_rule.py --choose ID --seen SHA256 --by NAME`, which writes
   `$REP/freeze/selection-tie-choice.json`, then set and commit the row "Selection tie" in
   `specs/004-crypto-architecture-v3/spec.md`, or "Selection tie <k>" for a later selection record;
   otherwise the row reads "Not needed". (FR-041; data-model §9; PRO-074)
 
 **Checkpoint**: a selection record with its decision entries in `research/004/candidates.jsonl`, or
-a stop with what was reached, which skips to T124. The phase ends with the constitution's phase
+a stop with what was reached, which skips to T126. The phase ends with the constitution's phase
 report to the owner.
 
 ---
@@ -803,7 +847,7 @@ vectors, each reproduced on Windows and in WSL (FR-018 to FR-036, FR-054 to FR-0
 its `generator-check` record; every reduced variant and every request beyond a limit is refused
 (SC-010).
 
-- [ ] T094 [US3] Complete `specs/004-crypto-architecture-v3/design.md` for the selected candidate,
+- [ ] T095 [US3] Complete `specs/004-crypto-architecture-v3/design.md` for the selected candidate,
   its chapters after "Security target" and "Mode" in FR-034's order: "Permutation", with its
   sections "Variant table", "Inverse" and "Network questions"; "Hardware structure", with its
   section "Self-test" and its table of k; "Replaced mechanisms", which shows how each failed
@@ -815,7 +859,7 @@ its `generator-check` record; every reduced variant and every request beyond a l
   figure, the output bits per call and per round and the throughput implied at 200 MHz; each section
   entered in `$REP/provenance.jsonl` as it is drafted. (FR-017 to FR-032, FR-034, FR-054, FR-055,
   FR-059; R5, R11, R14, R15)
-- [ ] T095 [P] [US3] Write `tests/test_model_v3.py` (contracts/model-v3-api.md, "Tests that hold the
+- [ ] T096 [P] [US3] Write `tests/test_model_v3.py` (contracts/model-v3-api.md, "Tests that hold the
   model to this contract"): FR-058's list, minimum, maximum and boundary values, all-zero and
   all-one keys and nonces, single-bit keys, overflow and truncation, shift and rotation boundaries,
   reset, zeroization and repeated instantiation, long runs with the 2²⁰-word digest and invalid
@@ -826,11 +870,11 @@ its `generator-check` record; every reduced variant and every request beyond a l
   no analysis dependency; `phyco-v3` reproducing the selected candidate's outputs through the
   `selected` entry's variant map; property tests with Hypothesis; and `test_generator_selftest`
   (REP-086). (FR-033, FR-035, FR-058, FR-059; SC-010; R17)
-- [ ] T096 [US3] Run `python scripts/gen_constants_v3.py`, which writes `phycoweb/constants_v3.py`
+- [ ] T097 [US3] Run `python scripts/gen_constants_v3.py`, which writes `phycoweb/constants_v3.py`
   with its GENERATED header for every supported (n, w) at its final R; then `--check` on Windows and
   with `wpy` in WSL, each writing a `generator-check` record with verdict `match` under
   `$REP/generator-checks/` (quickstart M1). (FR-023, FR-024; SC-006, SC-009; R15)
-- [ ] T097 [US3] Write `phycoweb/model_v3.py` from the design document (contracts/model-v3-api.md;
+- [ ] T098 [US3] Write `phycoweb/model_v3.py` from the design document (contracts/model-v3-api.md;
   R17): standard library only, its source parsing under Python 3.8's grammar, integer-only and
   branch-free on data, `MODEL_ID = "phyco-v3"` with `PRODUCTION_VARIANTS`, `parse_variant` and
   `is_production`; `pi`, `pi_inv` and `pi_trace`, research-only; `Generator(variant_id, key)` with
@@ -838,25 +882,35 @@ its `generator-check` record; every reduced variant and every request beyond a l
   self-test imported only in its constructor, every limit with its counter and every refusal of the
   contract; `ResearchDuplex` for the keyed reduced variants; marked model-only, RTL-pending.
   (FR-013, FR-015, FR-020, FR-033, FR-035, FR-055, FR-059; SC-010; R9, R14, R17)
-- [ ] T098 [P] [US3] Write `tests/test_vectors_v3.py` (data-model §11; R8): Π and Π⁻¹ known-answer
+- [ ] T099 [P] [US3] Write `tests/test_vectors_v3.py` (data-model §11; R8): Π and Π⁻¹ known-answer
   tests at every supported size and every reduced variant used as evidence, 16 inputs with 4 traced
   phase by phase; the mode at every claimable size with 2 development keys × 10,000 words in
   requests that cycle through the stated lengths; the SHA-256 digest of 2²⁰ words over their 4·2²⁰
-  raw bytes; the sidecar `vectors/phyco-v3/MANIFEST.json`; and `phycoweb/selftest_v3.py` equal to
-  the vectors it copies. (FR-036, FR-059; SC-009; R8)
-- [ ] T099 [US3] Write `scripts/gen_vectors_v3.py [--check] [--variant ID ...]` with
-  `--reproduce RECORD` (contracts/cli.md; R8) and run it into `vectors/phyco-v3/`, writing
-  `phycoweb/selftest_v3.py` (GENERATED) from the vectors, each vector file in at most an hour and
-  the model's speed measured and recorded; then `--check` on Windows and with `wpy` in WSL, each
-  writing a `generator-check` record (quickstart M2). (FR-036, FR-059; SC-009; R8)
-- [ ] T100 [US3] Write `scripts/gen_constructed_v3.py [--check]` with `--reproduce RECORD`
+  raw bytes; the sidecar `vectors/phyco-v3/MANIFEST.json`; `phycoweb/selftest_v3.py` equal to the
+  vectors it copies; each `selftest_<variant>.json`, one per claimable size and per keyed research
+  variant (HW-095), from the self-test's call sequence alone, each request with its forget call
+  (REP-096); and each file's k against the least k computed again from the model's run and against
+  the design document's table of k, equal unless a named structure with its reason raised it
+  (REP-097). (FR-036, FR-059; SC-009; R8; HW-095, REP-096, REP-097)
+- [ ] T100 [US3] Write `scripts/gen_vectors_v3.py [--check] [--variant ID ...]` with
+  `--reproduce RECORD` (contracts/cli.md; R8) and run it into `vectors/phyco-v3/`, writing in the
+  same run, from a `ResearchDuplex` object of its own run through the self-test's call sequence
+  alone, each request with its forget call (REP-096), each claimable size's and each keyed research
+  variant's `selftest_<variant>.json` (HW-095), with k read from the design document's table of k,
+  exit 2 if that table is missing, appears twice or holds a row it cannot read, exit 1 if its k is
+  below the least k of the run, or above it with no named structure and reason, and k, the structure
+  that set it and the run's least k written into each file (REP-097), and `phycoweb/selftest_v3.py`
+  (GENERATED) copied from those files, each vector file in at most an hour and the model's speed
+  measured and recorded; then `--check` on Windows and with `wpy` in WSL, each writing a
+  `generator-check` record (quickstart M2). (FR-036, FR-059; SC-009; R8; HW-095, REP-096, REP-097)
+- [ ] T101 [US3] Write `scripts/gen_constructed_v3.py [--check]` with `--reproduce RECORD`
   (contracts/cli.md): a constructed-state vector for every edge state the design document lists,
   from chosen states and from development keys, all-zero and all-one lanes, every addition driven to
   a carry out of its top bit and every shift and rotation at its boundary among them, into
   `vectors/phyco-v3/`; run it, then `--check` on Windows and with `wpy` in WSL, the pair of
   `generator-check` records also showing that `Generator`'s self-test passed on each platform
   (quickstart M3). (FR-054, FR-056; SC-009, SC-016; REP-086)
-- [ ] T101 [US3] Run `tests/test_model_v3.py` and `tests/test_vectors_v3.py`, `python -W ignore -m
+- [ ] T102 [US3] Run `tests/test_model_v3.py` and `tests/test_vectors_v3.py`, `python -W ignore -m
   unittest tests.test_model_v3 tests.test_vectors_v3`, on Windows and with `wpy` in WSL
   (quickstart M5), and record the commands and results. No expected value is ever edited to make a
   test pass: a disagreement goes back to the design document or the model as a finding. (FR-035,
@@ -874,20 +928,20 @@ separate session, agreeing with the model step by step (FR-057).
 
 **Independent Test**: quickstart X1 and X2.
 
-- [ ] T102 [US3] ⛔ **Second transcription go-ahead** (**Owner**): the row "Second transcription
+- [ ] T103 [US3] ⛔ **Second transcription go-ahead** (**Owner**): the row "Second transcription
   go-ahead" in `specs/004-crypto-architecture-v3/spec.md` set to Approved and committed before the
   separate session starts; the agent lists the approval commits and the allow-list entries added
   since the last gate. (FR-057; Principle VIII)
-- [ ] T103 [P] [US3] Write `tests/test_v3_transcription.py`: `phycoweb/model_v3.py` and
+- [ ] T104 [P] [US3] Write `tests/test_v3_transcription.py`: `phycoweb/model_v3.py` and
   `tests/v3_reference.py` agree after every phase of every round on the committed vectors, for Π,
   Π⁻¹ and the mode, with the common-mode caveat of security.md §10.2 beside the result
   (quickstart X1); and the provenance test: the go-ahead row reads Approved at HEAD with a date no
   later than the first provenance entry of `tests/v3_reference.py`, and the two files come from
   different sessions (quickstart X2). (FR-057, FR-067; SC-016)
-- [ ] T104 [US3] In a separate session that has not read `phycoweb/model_v3.py` and imports no code
+- [ ] T105 [US3] In a separate session that has not read `phycoweb/model_v3.py` and imports no code
   from it, write `tests/v3_reference.py` from the design document alone, with its entries in
   `$REP/provenance.jsonl` naming that session. (FR-057, FR-064, FR-067; R17)
-- [ ] T105 [US3] Run `tests/test_v3_transcription.py`,
+- [ ] T106 [US3] Run `tests/test_v3_transcription.py`,
   `python -W ignore -m unittest tests.test_v3_transcription`, on both platforms; a disagreement is
   reported against the design document, corrected as a new version of it and compared again, never
   by editing either side to agree. (FR-056, FR-057; SC-016)
@@ -907,14 +961,14 @@ FR-063).
 package against §14; compare the candidate log with the model's variant IDs; recompute the freeze
 hashes and the baseline manifest; run the claim-register test.
 
-- [ ] T106 [US2] Once the design document holds the three tables the script reads, the "Variant
-  table" with every variant's R from T092 (T094) and the mode chapter's "Layout" and "Limits", run
+- [ ] T107 [US2] Once the design document holds the three tables the script reads, the "Variant
+  table" with every variant's R from T093 (T095) and the mode chapter's "Layout" and "Limits", run
   `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json` (quickstart T1 and T2)
   and commit both files; in the same commit, write `phyco-v3`'s `bound` in `protocol/claims.json`
   from the profile, "at most <bound_bits> bits" per claimable size by its variant ID, with the
   profile's path and SHA-256, and its `evidence`, the profile and `limits.json`. (FR-007, FR-010,
   FR-069; SC-003; SEC-089)
-- [ ] T107 [US2] Prepare the security-target review in `specs/004-crypto-architecture-v3/design.md`,
+- [ ] T108 [US2] Prepare the security-target review in `specs/004-crypto-architecture-v3/design.md`,
   `rationale.md` and `$REP/security-target/`: cite the selected candidate's records of FR-029's
   diffusion through instantiation and of research R4's first-order related-key and related-nonce
   differences; confirm or change FR-011's functionality class in the design document once the AIS
@@ -925,33 +979,33 @@ hashes and the baseline manifest; run the claim-register test.
   SHA-256 of each of the four chapters, from its heading line to the next heading of the same or a
   higher level, and of `parameters.json` and `limits.json`, with the design document's "Version:
   0.<k>". (FR-011, FR-012, FR-029; RAT-086; SEC-075)
-- [ ] T108 [US2] ⛔ **Security-target review** (**Owner**), in
+- [ ] T109 [US2] ⛔ **Security-target review** (**Owner**), in
   `specs/004-crypto-architecture-v3/spec.md`'s Review & Approval table: the row names the set by
   SHA-256 with the version read and is committed by the owner; the agent lists the approval commits
   and the allow-list entries added since the last gate. A decline ends in a revised chapter,
   reviewed in "Security-target review <k>", its security-target parameters changing only in their
   stricter direction, or a stop. (FR-012, FR-043, FR-044; SEC-075; Principle VIII)
-- [ ] T109 [US2] **Owner**: set the row "L1 recorded" in `specs/004-crypto-architecture-v3/spec.md`
-  once the FUT-SEC-8 result review and the security-target review both read Approved, naming both
-  rows by family and k with what each reviewed by path and SHA-256, the row reading "blocked" and
-  naming the missing paper while a theorem the mode chapter uses is "unverified"; then the agent, in
-  a commit of its own right after the owner's commit, changes `phyco-v3`'s entry in
-  `protocol/claims.json`, its §15 line and its §1.1 row in `security.md` to the level the rows give,
-  with `python scripts/check_claims.py` reporting 0 findings. (FR-012, FR-069; SEC-076, SEC-079,
-  SEC-081, SEC-095)
-- [ ] T110 [US5] Write the rest of `specs/004-crypto-architecture-v3/rationale.md`, its chapters in
+- [ ] T110 [US2] ⛔ **L1 recorded** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
+  Review & Approval table: set the row "L1 recorded" once the FUT-SEC-8 result review and the
+  security-target review both read Approved, naming both rows by family and k with what each
+  reviewed by path and SHA-256, the row reading "blocked" and naming the missing paper while a
+  theorem the mode chapter uses is "unverified"; then the agent, in a commit of its own right after
+  the owner's commit, changes `phyco-v3`'s entry in `protocol/claims.json`, its §15 line and its
+  §1.1 row in `security.md` to the level the rows give, with `python scripts/check_claims.py`
+  reporting 0 findings. (FR-012, FR-069; SEC-076, SEC-079, SEC-081, SEC-095)
+- [ ] T111 [US5] Write the rest of `specs/004-crypto-architecture-v3/rationale.md`, its chapters in
   FR-034's order, "Components", "Nonlinearity", "Diffusion", "Constants", "Margin" and "Attack
   classes", then "Network questions" and "Alternatives", each statement with one of FR-062's seven
   labels: every rationale item of security.md §8, the hardware structures of plan.md's Complexity
   Tracking with their functional need, and every candidate considered with the reason it was kept or
   dropped. (FR-030, FR-034, FR-062; SC-013; RAT-084)
-- [ ] T111 [US5] Write the version of `security.md` that FR-051 asks for, CRLF kept, with its
+- [ ] T112 [US5] Write the version of `security.md` that FR-051 asks for, CRLF kept, with its
   history entry: `phyco-v3`'s own section, a table of structural facts, the best-attack register
   rows of its first bounds and the lessons table that links S1 to S15 to the rules or parts of the
   design that answer them, each with its evidence; the §1.1 row of phase 1 and the fixed sentence in
   both blocks kept; and what feature 005's cryptanalysis instructions need. (FR-051, FR-066;
   SEC-095)
-- [ ] T112 [P] [US5] Write the freeze tests in `tests/test_protocol_004.py`:
+- [ ] T113 [P] [US5] Write the freeze tests in `tests/test_protocol_004.py`:
   `scripts/design_freeze.py create` exits 2 before the owner design review (quickstart F1), on every
   condition of its section in contracts/cli.md, a change to `rationale.md` or to the reviewed set
   after its review among them (RAT-083), unless HEAD is the owner's commit of step (1), and while
@@ -959,7 +1013,7 @@ hashes and the baseline manifest; run the claim-register test.
   first 16 hex digits of `draft_sha256` at an interactive terminal; `validate` exits 2 while
   `freeze_status` is `draft` and 1 if anything but the approval fields changed. (FR-043; PRO-070,
   PRO-073; REP-092, REP-093)
-- [ ] T113 [US5] Write `protocol/design_freeze.py`, with create, approve and validate as functions,
+- [ ] T114 [US5] Write `protocol/design_freeze.py`, with create, approve and validate as functions,
   and `scripts/design_freeze.py`, the command that calls it (contracts/cli.md; data-model §13): the
   record holds the design document's version 1.0 with `reviewed_version`, `rationale.md`, the
   selected operation list, `research/004/ir.py` with its tools, the verdict scripts,
@@ -967,13 +1021,13 @@ hashes and the baseline manifest; run the claim-register test.
   imports, listed from the scripts' imports with `research/004/` loaded by path, every evidence
   record behind R by ID and SHA-256, and the last `seq` and line SHA-256 of the three logs. (FR-043;
   REP-091, REP-092)
-- [ ] T114 [US5] Write `protocol/review_package.py` and `scripts/review_package.py [--check]` with
+- [ ] T115 [US5] Write `protocol/review_package.py` and `scripts/review_package.py [--check]` with
   `--reproduce RECORD` (contracts/cli.md; data-model §16), and assemble `$REP/review-package/` with
   its `MANIFEST.json`: the spec, the design document and the rationale with exact revisions, the
   model source and vectors, the evidence records, the threat model, the security target marked as
   targets, and the known limitations and open questions, every item of security.md §14 by the files
   of its group; `--check` fails an item with no file. (FR-063; SC-020; RAT-089, REP-085)
-- [ ] T115 [US5] ⛔ **Owner design review** (**Owner**), in
+- [ ] T116 [US5] ⛔ **Owner design review** (**Owner**), in
   `specs/004-crypto-architecture-v3/spec.md`'s Review & Approval table: the design document, the
   rationale, the candidate log and the evidence; "no security statement rests on the mapping"
   recorded among its items; the row naming `rationale.md` by path and SHA-256 beside the design
@@ -983,19 +1037,19 @@ hashes and the baseline manifest; run the claim-register test.
   `python scripts/candidate_log.py outcome FILE` after the row's commit. From the commit that
   records the approval, the agent commits no file of this feature (FR-043). (FR-043, FR-064; SC-013;
   ANA-083, RAT-083; SEC-084)
-- [ ] T116 [US5] Right after the commit that records the owner design review's approval, write its
+- [ ] T117 [US5] Right after the commit that records the owner design review's approval, write its
   review entries in `$REP/provenance.jsonl` with `python scripts/provenance.py review FILE`, one per
   AI-drafted section, `rationale.md`'s chapters "Security target" and "Mode" among them, and the
   `review-outcome` entry with `python scripts/candidate_log.py outcome FILE`, leaving them in the
   working tree for the owner's commit of step (1), before the owner sets any row for that step.
   (FR-043, FR-067; PRO-075; RAT-082, RAT-086)
-- [ ] T117 [US5] **Owner**: the external design review, arranged by the owner where possible, from
-  `$REP/review-package/`; its row "External design review" in
+- [ ] T118 [US5] ⛔ **External design review** (**Owner**), arranged by the owner where possible,
+  from `$REP/review-package/`; its row "External design review" in
   `specs/004-crypto-architecture-v3/spec.md` reads done, naming the package's manifest by SHA-256,
   or "not arranged", naming the latest selection record by path and SHA-256; no AI session is
   recorded as an independent or external reviewer. (FR-043, FR-063, FR-064; SC-013, SC-020; SEC-077,
   SEC-078)
-- [ ] T118 [US5] Run the five freeze steps (contracts/cli.md; quickstart F2): (1) **Owner**: commit
+- [ ] T119 [US5] Run the five freeze steps (contracts/cli.md; quickstart F2): (1) **Owner**: commit
   the feature files, the owner's next commit after the one that records the owner design review's
   approval, with the review entries and step (1)'s rows; (2) the agent runs
   `python scripts/design_freeze.py create` on a clean tree with that commit as HEAD, writing
@@ -1005,7 +1059,7 @@ hashes and the baseline manifest; run the claim-register test.
   "Environment record <n>" or "Log repair <n>" on its own between the approval and step (1), the
   owner design review is held again in "Owner design review <k>" first. (FR-043; SC-013; PRO-070,
   PRO-072, REP-092, REP-093)
-- [ ] T119 [US5] ⛔ **Design freeze** (**Owner**): the row "Design freeze" in
+- [ ] T120 [US5] ⛔ **Design freeze** (**Owner**): the row "Design freeze" in
   `specs/004-crypto-architecture-v3/spec.md` names the approved freeze record by path and SHA-256
   and its `owner_commit`, set and committed by the owner. (FR-043; Principle VIII)
 
@@ -1019,19 +1073,26 @@ phase ends with the constitution's phase report to the owner.
 **Purpose**: inside FR-043's window, so the agent writes each file and the owner commits it
 (SEC-084).
 
-- [ ] T120 Update `README.md`, CRLF kept: the status of `phyco-v3` with FR-051's sentence on it
+- [ ] T121 Update `README.md`, CRLF kept: the status of `phyco-v3` with FR-051's sentence on it
   beside the line on the seed, and the documentation drift of checklist group F corrected. (FR-051,
   FR-069; SC-018; SEC-086)
-- [ ] T121 Append an addendum to `reports/002-core-dynamics-redesign/phase-report.md`, after
+- [ ] T122 Append an addendum to `reports/002-core-dynamics-redesign/phase-report.md`, after
   checking that no freeze record of features 002 and 003 hashes it, stating that S13 contradicts its
   "invertible-looking ARX" and pointing to `phyco-v3`'s evidence. (FR-051; SC-012)
-- [ ] T122 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
+- [ ] T123 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
   over the final documents: 0 findings (quickstart F4). (FR-050, FR-069; SC-015, SC-018; SEC-081)
-- [ ] T123 Run `python scripts/recheck_004.py` in a fresh clone, on a machine of the owner's choice:
+- [ ] T124 Run `python scripts/recheck_004.py` in a fresh clone, on a machine of the owner's choice:
   0 disagreements, its `recheck` record under `$REP/rechecks/` naming the interpreter, the platform
   and its `pip freeze`, and saying when that environment is not one of research R1's
   (quickstart F3). (FR-065; SC-017)
-- [ ] T124 Write the final report `$REP/phase-report.md` with `DESIGN_DISCLAIMER`, as the
+- [ ] T125 **heavy**, on the owner's go-ahead: run the whole suite under `tests/` on Windows,
+  `python -W ignore -m unittest discover -s tests -t .`, and with `wpy` in WSL (quickstart P0),
+  FR-053's two-worker test among it, under the heavy-run lock and projected first against
+  research R7's feature-wide row, charging no candidate: every test passes, or skips naming its open
+  item, and none fails; any record it writes stays in the working tree for the owner's commit
+  (FR-043), and the commands and results go to the final report. (FR-045, FR-053, FR-058;
+  Principle V)
+- [ ] T126 Write the final report `$REP/phase-report.md` with `DESIGN_DISCLAIMER`, as the
   constitution's Phase Completion Reporting asks: every FR and SC with its evidence or listed as
   open; FUT-SEC-1 to FUT-SEC-9 with the statuses of the spec's table, FUT-SEC-7 open for feature
   007, and the FUT-GRID and FUT-HW rows; the evidence of every redesign-checklist item this feature
@@ -1043,7 +1104,7 @@ phase ends with the constitution's phase report to the owner.
   and the RTL; and the recommendation, to go on to feature 005 or to stop, a stop ending FR-043's
   window at the same commit. (FR-041, FR-047, FR-048, FR-049, FR-052, FR-060, FR-062, FR-064,
   FR-066; SC-002, SC-014, SC-019, SC-020)
-- [ ] T125 ⛔ **Final result review** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
+- [ ] T127 ⛔ **Final result review** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
   Review & Approval table: the owner's commit that records the decision, with the spec's Status
   line, ends FR-043's window; the standing authorization covers this feature's files again from the
   next commit, for the features that follow. (FR-043, FR-052; PRO-080; Principle VIII)
@@ -1065,23 +1126,27 @@ phase ends with the constitution's phase report to the owner.
 - **Phase 4 (US2)** needs Phase 1 only and may overlap Phase 3, having no heavy run; its review
   waits for Phase 8.
 - **Phase 5** needs Phases 3 and 4: the security target fixes s, the key, the nonce and c before any
-  score (FR-005, FR-006, FR-015); T086 before T087; T088 before the production-width analysis; T090
+  score (FR-005, FR-006, FR-015); T087 before T088; T089 before the production-width analysis; T091
   before each size's first bias test; sizes in order.
-- **Phase 6** needs the selection of T092; **Phase 7** needs Phase 6; **Phase 8** needs Phases 5 to
-  7, with T106 before T107, T108 before T115 and every freeze step in order; **Phase 9** needs T119,
-  or a stop from Phase 5.
+- **Phase 6** needs the selection of T093; **Phase 7** needs Phase 6; **Phase 8** needs Phases 5 to
+  7, with T107 before T108, T109 before T116 and every freeze step in order; **Phase 9** needs T120,
+  or a stop from Phase 5, and T125 comes before T126.
 
 ### Parallel opportunities
 
-- Phase 1: T006 ∥ T008 ∥ T010 ∥ T020 ∥ T023 (test files); T013 ∥ T014 ∥ T015 ∥ T016 (separate
-  scripts); T033 ∥ T035.
+- Phase 1: T020 beside the other test tasks, which share `tests/test_protocol_004.py` and
+  `tests/test_records_004.py` and run in turn, as the scripts tested in `tests/test_protocol_004.py`
+  (T013, T014, T015, T016) do; T033 ∥ T035.
 - Phase 2: T038 ∥ T039.
 - Phase 3: T046 ∥ T049; once T050 stands, T053 ∥ T054 ∥ T055 ∥ T056 ∥ T057 and T060 ∥ T061 ∥ T062 ∥
   T063 as code; their heavy validations still run one at a time.
-- Phase 4 drafting (T068–T070) beside Phase 3's light tasks.
-- Phase 5: T072 ∥ T074 ∥ T080 ∥ T082; candidates T077 ∥ T078.
-- Phase 6: T095 ∥ T098; Phase 7: T103 beside T104, which runs in its own session.
-- Phase 8: T110 ∥ T111 ∥ T112.
+- Phase 4 drafting (T069–T071) beside Phase 3's light tasks; its tests (T066, T067, T068) share
+  `tests/test_records_004.py` and run in turn.
+- Phase 5: T073 beside T075, T081 and T083, which share `tests/test_protocol_004.py` and run in
+  turn; the candidates' modules (T078, T079) may be drafted side by side, their `proposed` entries
+  appended in turn under the log's lock.
+- Phase 6: T096 ∥ T099; Phase 7: T104 beside T105, which runs in its own session.
+- Phase 8: T113 beside T111 and T112.
 
 ## Implementation Strategy
 
@@ -1101,110 +1166,110 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-001: T023, T038, T039, T040, T041, T043
 - FR-002: T038, T039, T040, T041, T042, T043
 - FR-003: T023, T044, T045, T052
-- FR-004: T068
-- FR-005: T068
-- FR-006: T068
-- FR-007: T067, T068, T106
-- FR-008: T068
-- FR-009: T067, T068
-- FR-010: T066, T067, T068, T106
-- FR-011: T065, T068, T107
-- FR-012: T017, T068, T107, T108, T109
-- FR-013: T065, T069, T097
-- FR-014: T069
-- FR-015: T067, T069, T097
-- FR-016: T069
-- FR-017: T068, T094
-- FR-018: T046, T047, T094
-- FR-019: T046, T047, T057, T077, T091, T094
-- FR-020: T047, T077, T094, T097
-- FR-021: T051, T077, T091, T094
-- FR-022: T072, T073, T077, T078, T082, T083, T086, T087, T088, T089, T094
-- FR-023: T027, T054, T076, T079, T094, T096
-- FR-024: T054, T076, T079, T094, T096
-- FR-025: T094
-- FR-026: T072, T073, T094
-- FR-027: T094
-- FR-028: T082, T084, T092, T094
-- FR-029: T055, T058, T091, T094, T107
-- FR-030: T094, T110
-- FR-031: T094
-- FR-032: T047, T094
-- FR-033: T095, T097
-- FR-034: T066, T068, T069, T070, T071, T094, T110
-- FR-035: T024, T095, T097, T101
-- FR-036: T098, T099, T101
-- FR-037: T051, T053, T055, T056, T057, T058, T080, T081, T090, T091
-- FR-038: T060, T061, T062, T063, T081, T087, T091
-- FR-039: T048, T049, T050, T051, T052, T053, T054, T055, T056, T057, T058, T060, T061, T062, T063,
-  T064, T073, T087
+- FR-004: T069
+- FR-005: T069
+- FR-006: T069
+- FR-007: T067, T069, T107
+- FR-008: T069
+- FR-009: T067, T069
+- FR-010: T066, T067, T069, T107
+- FR-011: T065, T069, T108
+- FR-012: T017, T069, T108, T109, T110
+- FR-013: T065, T070, T098
+- FR-014: T070
+- FR-015: T067, T070, T098
+- FR-016: T070
+- FR-017: T069, T095
+- FR-018: T046, T047, T095
+- FR-019: T046, T047, T057, T078, T092, T095
+- FR-020: T047, T078, T095, T098
+- FR-021: T051, T078, T092, T095
+- FR-022: T073, T074, T078, T079, T083, T084, T087, T088, T089, T090, T095
+- FR-023: T010, T012, T027, T054, T077, T080, T095, T097
+- FR-024: T054, T077, T080, T095, T097
+- FR-025: T095
+- FR-026: T073, T074, T095
+- FR-027: T095
+- FR-028: T083, T085, T093, T095
+- FR-029: T055, T058, T092, T095, T108
+- FR-030: T095, T111
+- FR-031: T095
+- FR-032: T047, T095
+- FR-033: T096, T098
+- FR-034: T066, T068, T069, T070, T071, T072, T095, T111
+- FR-035: T024, T096, T098, T102
+- FR-036: T099, T100, T102
+- FR-037: T051, T053, T055, T056, T057, T058, T081, T082, T091, T092
+- FR-038: T008, T060, T061, T062, T063, T082, T088, T092
+- FR-039: T008, T015, T048, T049, T050, T051, T052, T053, T054, T055, T056, T057, T058, T060, T061,
+  T062, T063, T064, T074, T088
 - FR-040: T008, T023, T033, T034, T039
-- FR-041: T010, T013, T074, T075, T077, T078, T079, T082, T084, T086, T092, T093, T124
+- FR-041: T010, T013, T075, T076, T078, T079, T080, T083, T085, T087, T093, T094, T126
 - FR-042: T035, T036
-- FR-043: T084, T108, T112, T113, T115, T116, T117, T118, T119, T124, T125
-- FR-044: T001, T002, T008, T010, T012, T013, T027, T028, T108
-- FR-045: T005, T008, T014, T042, T043, T080
-- FR-046: T016, T029, T030, T031, T059, T065
-- FR-047: T076, T124
-- FR-048: T124
-- FR-049: T124
-- FR-050: T020, T122
-- FR-051: T018, T111, T120, T121
-- FR-052: T124, T125
-- FR-053: T003, T004, T006, T008, T009, T024, T025, T037, T039, T050, T080
-- FR-054: T094, T100
-- FR-055: T094, T097
-- FR-056: T100, T101, T105
-- FR-057: T102, T103, T104, T105
-- FR-058: T031, T032, T037, T095, T101
-- FR-059: T094, T095, T097, T098, T099
-- FR-060: T041, T043, T081, T124
-- FR-061: T008, T009, T041, T081
-- FR-062: T070, T110, T124
-- FR-063: T114, T117
-- FR-064: T104, T115, T117, T124
-- FR-065: T009, T049, T051, T066, T080, T085, T123
-- FR-066: T111, T124
-- FR-067: T010, T011, T013, T026, T071, T103, T104, T116
+- FR-043: T085, T109, T113, T114, T116, T117, T118, T119, T120, T125, T126, T127
+- FR-044: T001, T002, T008, T010, T012, T013, T015, T027, T028, T109
+- FR-045: T005, T008, T014, T042, T043, T081, T125
+- FR-046: T016, T027, T029, T030, T031, T059, T065
+- FR-047: T077, T126
+- FR-048: T126
+- FR-049: T126
+- FR-050: T020, T123
+- FR-051: T018, T112, T121, T122
+- FR-052: T126, T127
+- FR-053: T003, T004, T006, T008, T009, T015, T024, T025, T037, T039, T050, T081, T125
+- FR-054: T095, T101
+- FR-055: T095, T098
+- FR-056: T101, T102, T106
+- FR-057: T103, T104, T105, T106
+- FR-058: T015, T031, T032, T037, T096, T102, T125
+- FR-059: T068, T095, T096, T098, T099, T100
+- FR-060: T041, T043, T082, T126
+- FR-061: T008, T009, T041, T082
+- FR-062: T071, T111, T126
+- FR-063: T115, T118
+- FR-064: T105, T116, T118, T126
+- FR-065: T009, T049, T051, T066, T081, T086, T124
+- FR-066: T112, T126
+- FR-067: T010, T011, T013, T026, T072, T104, T105, T117
 - FR-068: T007, T009, T020
-- FR-069: T017, T018, T019, T020, T021, T022, T106, T109, T120, T122
+- FR-069: T017, T018, T019, T020, T021, T022, T107, T110, T121, T123
 - SC-001: T041, T043, T045
-- SC-002: T124
-- SC-003: T066, T067, T106
-- SC-004: T057, T091
-- SC-005: T055, T082, T084, T091, T092
-- SC-006: T054, T076, T096
-- SC-007: T049, T051, T052, T053, T054, T055, T056, T057, T058, T060, T061, T062, T063, T064, T073
-- SC-008: T084, T091, T092
-- SC-009: T096, T098, T099, T100, T101
-- SC-010: T095, T097, T101
-- SC-011: T033, T034, T074, T075, T078
-- SC-012: T035, T036, T121
-- SC-013: T110, T115, T117, T118
-- SC-014: T124
-- SC-015: T020, T122
-- SC-016: T100, T103, T105
-- SC-017: T081, T085, T123
-- SC-018: T020, T021, T022, T120, T122
-- SC-019: T124
-- SC-020: T026, T114, T117, T124
+- SC-002: T126
+- SC-003: T066, T067, T107
+- SC-004: T057, T092
+- SC-005: T055, T083, T085, T092, T093
+- SC-006: T054, T077, T097
+- SC-007: T049, T051, T052, T053, T054, T055, T056, T057, T058, T060, T061, T062, T063, T064, T074
+- SC-008: T085, T092, T093
+- SC-009: T097, T099, T100, T101, T102
+- SC-010: T096, T098, T102
+- SC-011: T033, T034, T075, T076, T079
+- SC-012: T035, T036, T122
+- SC-013: T068, T111, T116, T118, T119
+- SC-014: T126
+- SC-015: T020, T123
+- SC-016: T101, T104, T106
+- SC-017: T082, T086, T124
+- SC-018: T020, T021, T022, T121, T123
+- SC-019: T126
+- SC-020: T026, T115, T118, T126
 
 FUT-SEC traceability (spec, "Security Policy traceability"), through the requirements the table
 names:
 
-- FUT-SEC-1, key entropy (FR-005, FR-006, FR-010): T066, T067, T068, T106
-- FUT-SEC-2, reachable secret state (FR-009, FR-010, FR-015, FR-017): T066, T067, T068, T069, T094,
-  T097, T106
-- FUT-SEC-3, stream separation (FR-006, FR-014): T068, T069
-- FUT-SEC-4, reseeding (FR-004, FR-016): T068, T069
-- FUT-SEC-5, initialization analysis (FR-013, FR-014, FR-029, FR-049): T055, T058, T065, T069, T091,
-  T094, T097, T107, T124
-- FUT-SEC-6, output limit (FR-007): T067, T068, T106
-- FUT-SEC-7, re-validation (FR-035, FR-036, FR-043): T024, T084, T095, T097, T098, T099, T101, T108,
-  T112, T113, T115, T116, T117, T118, T119, T124, T125
+- FUT-SEC-1, key entropy (FR-005, FR-006, FR-010): T066, T067, T069, T107
+- FUT-SEC-2, reachable secret state (FR-009, FR-010, FR-015, FR-017): T066, T067, T069, T070, T095,
+  T098, T107
+- FUT-SEC-3, stream separation (FR-006, FR-014): T069, T070
+- FUT-SEC-4, reseeding (FR-004, FR-016): T069, T070
+- FUT-SEC-5, initialization analysis (FR-013, FR-014, FR-029, FR-049): T055, T058, T065, T070, T092,
+  T095, T098, T108, T126
+- FUT-SEC-6, output limit (FR-007): T067, T069, T107
+- FUT-SEC-7, re-validation (FR-035, FR-036, FR-043): T024, T085, T096, T098, T099, T100, T102, T109,
+  T113, T114, T116, T117, T118, T119, T120, T125, T126, T127
 - FUT-SEC-8, demonstration first (FR-001 to FR-003): T023, T038, T039, T040, T041, T042, T043, T044,
   T045, T052
-- FUT-SEC-9, certification route (FR-011): T065, T068, T107
+- FUT-SEC-9, certification route (FR-011): T065, T069, T108
 
 ## Notes
 
@@ -1222,3 +1287,8 @@ names:
 - The protocol only becomes stricter (FR-044): a change is proposed by the agent with
   `scripts/protocol_change.py propose FILE` and made only with the owner's approval, before any
   result it affects.
+- Test runs at a phase's checkpoint are light: until T081 adds FR-053's two-worker test, the whole
+  suite on both platforms, as T037 runs it; from then on, the phase's own test modules by their test
+  classes, FR-053's two-worker test left out. A run that includes that test, the whole suite or
+  `tests/test_records_004.py` among them, is a heavy run that waits for the owner's go-ahead
+  (FR-045), and T125 is that run before the final report.

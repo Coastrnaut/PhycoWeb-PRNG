@@ -874,8 +874,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   suggest a protection that does not exist. A test shows the stated behaviour (FR-058).
 - **Reseed without a validated entropy source**: the interface allows it, but it gives no
   prediction resistance, and its input is treated as chosen by the attacker (T9).
-- **The Python model is slow at large grids**: vectors at large sizes may be shorter than at
-  4×4, with the length and the measured speed stated.
+- **The Python model is slow at large grids**: the vectors keep the same lengths at every size,
+  as the plan fixes them for FR-036, with no shortening at 8×8 or 16×16; the length and the
+  measured speed are stated.
 - **Large evidence records** (for example dependency matrices at 16×16): the plan decides what is
   committed, compressed or regenerated on demand, and every record's hash is kept. An output kept
   only locally must come from a deterministic command, so that its committed SHA-256 can be

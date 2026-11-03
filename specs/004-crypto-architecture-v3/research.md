@@ -1605,9 +1605,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     aperiodic classes, the record of taken classes starts afresh each time every class has been used
     once, and every repeat is recorded. The design document restates these values, and the script
     checks that the two agree.
-  - **Refused constants.** The script holds a committed list of the polynomials and constant
-    sets it refuses, each with its source, frozen with the rule before the first candidate is
-    scored, its SHA-256 in the change-log entry that fixes the rule. It holds the polynomials and
+  - **Refused constants.** The script reads a committed list,
+    `research/004/refused-constants.json`, of the polynomials and constant sets it refuses, each
+    with its source, frozen with the rule before the first candidate is scored, its SHA-256 in
+    `refused_list` of each change-log entry that fixes the rule (data-model §18) and in every
+    record the script writes; the script exits 2 while the list's SHA-256 differs from the latest
+    such entry's. The list holds the polynomials and
     constant sets of R12's reference designs (SPECK32, PRESENT, SPARKLE) and of every design the
     strategy note, the spec, the plan, this document and security.md name, and the standard
     polynomials of degree 64 and 128: CMAC's R₆₄ and R₁₂₈ (SP 800-38B), GCM's (SP 800-38D), and the

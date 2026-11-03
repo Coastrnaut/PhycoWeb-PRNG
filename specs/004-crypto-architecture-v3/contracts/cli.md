@@ -636,7 +636,12 @@ with the fields of data model §1 (FR-061) and each written file's path and SHA-
 sidecar left out, its entry being appended once the record is written, and
 the freeze hashing the sidecar with the vectors (data model §11; REP-092);
 `--check` does not compare the sidecar. `gen_constants_v3.py` also writes each constant table
-as `vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory, compares every
+as `vectors/phyco-v3/constants_n<n>_w<w>.json`. It reads the refused list
+`research/004/refused-constants.json` (research R15), holds the list's SHA-256 in every record it
+writes and exits 2, writing nothing, while that SHA-256 differs from the `refused_list` of the
+protocol change log's latest entry that holds one, or no entry holds one (data model §18); a
+`--reproduce` run instead compares the list at the record's `git_head` with the SHA-256 the
+record holds. `--check` regenerates in memory, compares every
 generated file byte for byte with the committed one and writes a `generator-check` record under
 `$REP/generator-checks/` with the fields of data model §1 (FR-061), each generated file's path and
 SHA-256 and the verdict `match` or `differs`; it exits 1 on any byte difference. SC-009's evidence
@@ -1010,8 +1015,11 @@ and exits 2, writing nothing, while a first entry would hold a reading marked `s
 case under which the old text fails, that the row does not decide, entry by entry, the change kept,
 with the owner's reason, as a change spec FR-044's words do not allow, or the old text restored, and
 it records each decision, with its reason, in that reading (data model §18;
-PRO-079). Otherwise it builds one first entry per listed row, with `rules`,
-`row`, `granularity` and `place_check`, and one per place confirmed as an entry of its own, with
+PRO-079). It exits 2, writing nothing, while `research/004/refused-constants.json` is missing or
+differs from HEAD (research R15). Otherwise it builds one first entry per listed row, with `rules`,
+`row`, `granularity` and `place_check`, and, for a row listed under the constant rule,
+`refused_list`, that file's SHA-256 at HEAD (data model §18), and one per place confirmed as an
+entry of its own, with
 `rules` at the edit's parent and at its commit, `row` none, `granularity` `commit` with `commit`,
 the edit's hash, `reason`, the owner's confirmation naming the commit, and `place_check` for the
 pair or span that holds the commit; an edit inside a round's pair is recorded beside that round's
@@ -1019,7 +1027,9 @@ list, and its entry follows the round's row entries; an edit between two rounds 
 the list of the round before it, as ad2c195's is beside the re-run's, and its entry follows that
 round's entries, so that the log keeps the order of the commits (data model §18; PRO-064).
 `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
-which the agent may write as a proposal. Each refuses, exit 2, appending nothing, an entry, or a
+which the agent may write as a proposal; an entry that adds to the refused list holds the list's
+new SHA-256 in `refused_list`, and `propose` exits 2 while it differs from the file at HEAD.
+Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`; a later entry whose `readings` mark a reading `set_aside` shows
 it at the approval step, which records the owner's decision and reason in it (PRO-079). A `repair`

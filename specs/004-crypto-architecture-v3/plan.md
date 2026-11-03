@@ -178,7 +178,7 @@ No item is left as NEEDS CLARIFICATION: research R1–R19 settle every open choi
 | VIII. Human review gates | Every gate of the spec's Review & Approval table, which is the source: spec approval; plan approval; the checklist choices of each round; tasks approval; tool acquisition (every file of R19 approved on 2026-11-01, any other file separately); FUT-SEC-8 result review; the D4 and selection ties, where a tie reaches the owner; go-ahead for the second transcription; security-target review; owner design review; L1 recorded; external design review, recorded as done or not arranged; design freeze; final result review; and the rows added when needed: each environment record, owner-provided value and log repair, and each review held again | Pass |
 | IX. Outward actions | The agent makes local commits only under the owner's standing authorization and never pushes, tags, releases or publishes; downloads only with per-file permission; sending the review package is the owner's action | Pass |
 | Security Policy | FUT-SEC-1 to FUT-SEC-9 carried and traced (FR-049); key 256 bits and reachable secret state ≥ 256 bits at every claimable size (FR-009, FR-010); no claim, only a target at L1; restriction stated wherever use is described (FR-050) | Pass |
-| Technical constraints | Python 3.8+ for the model (standard library only); numpy with explicit dtypes; scipy for analysis only; a test checks that the model imports no analysis dependency. Adds C tooling for the sweep | Justified (Complexity Tracking) |
+| Technical constraints | Python 3.8+ for the model (standard library only); numpy with explicit dtypes; scipy for analysis only; a test checks that the model imports no analysis dependency. Adds C tooling for the sweep and for research R12's ARX trail search | Justified (Complexity Tracking) |
 | Workflow and phase reporting | This plan has its Constitution Check; the change-completion items still open at the end (statistical evaluation, RTL) are reported (FR-052); every phase ends with the constitution's report | Pass |
 
 **Post-design re-check**: research R1–R19, the data model and the contracts add no new
@@ -267,15 +267,20 @@ protocol/
 
 research/004/
 ├── ir.py                     # operation lists, interpreters, inverse (R11)
-├── candidates/               # A1–A3 and B1–B3 at most, one module each, with reference outputs
+├── candidates/               # A1–A3 and B1–B3 at most, one module each, cand-A1.py to
+│                             # cand-B3.py, with reference outputs
 │   ├── <id>/superseded/      # every replaced operation list, as <sha256>.py, unchanged
 │   ├── <id>/constants/       # GENERATED: each variant's constant table, before the freeze (R15)
 │   └── superseded.json       # committed inventory of every superseded hash and path
-├── tools/                    # bijectivity, dependency, bias, symmetry, invariants, costmodel
+├── tools/                    # bijectivity.py, dependency.py, bias.py, symmetry.py,
+│                             # invariants.py, avalanche.py, degree.py and costmodel.py
 │   ├── critical_counts.json  # integer critical counts per (N, S) and (N_a, S_A) (R4)
-│   └── trails/               # box tables, MILP active-box counting, ARX branch-and-bound
+│   └── trails/               # tables.py (box tables), active_sbox.py and long_trail.py (MILP
+│                             # active-box counting), arx_search.c with arx_search.mk (ARX
+│                             # branch-and-bound, C99 in WSL)
 ├── validation/               # re-finding S12–S15, FUT-SEC-8, published trail values
 ├── exploration/              # constant tables for exploration: never frozen or evidence (R14)
+├── refused-constants.json    # research R15's refused list, read by gen_constants_v3.py (FR-023)
 ├── place_check.py            # the lists' comparison before the tasks approval (FR-044)
 ├── place-check.json          # its result, which the row "Place check" names by SHA-256
 ├── candidates.jsonl          # the candidate log
@@ -328,7 +333,8 @@ tests/
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
 │                             # mark of every hashed path, each code_sha256 entry against its blob
 │                             # and the header of every committed .gz (FR-053); the re-check's
-│                             # imports (FR-065)
+│                             # imports (FR-065); mode_limits_v3.py on stated tables and the
+│                             # security target's files (FR-010); the chapters' test (FR-034)
 ├── test_baseline_v2.py       # archive against manifest and live files
 └── test_claims.py            # FR-069
 
@@ -405,7 +411,9 @@ takes each from there.
    force as its `environment` (REP-082); (3) the provenance log, its first entries those of the
    files drafted before it, the files outside the feature directory that this feature's
    sessions changed among them, as `git log` from 801c6d7 shows, whole or per
-   section changed (FR-067; data-model §14; REP-080, REP-089); (4) the protocol
+   section changed (FR-067; data-model §14; REP-080, REP-089); (4) the refused list
+   `research/004/refused-constants.json` of research R15, committed first, since the constant
+   rule's entries hold its SHA-256 in `refused_list` (data-model §18), then the protocol
    change log, after the owner's confirmation of every list at the tasks
    approval and before every file written through `protocol/evidence.py` but a
    `lock-cleared` record or an environment record (PRO-065, PRO-071), its first
@@ -429,8 +437,10 @@ takes each from there.
 2. **US1 FUT-SEC-8**: `fast/seed_search.c` and its vector check, with progress written by the
    main thread only (R2); the sweep, a heavy run → demonstration record → ⛔ **FUT-SEC-8 result
    review**. No key-loading code before it.
-3. **Tool validation**: re-find S12–S15 and the FUT-SEC-8 recovery on `phyco-v2`; trail tools
-   on published values, from the papers of R19, whose downloads the owner approved on
+3. **Tool validation**: first the operation-list framework `research/004/ir.py`, since the known
+   results of research R13 for the structural tools are stated operation lists that those tools
+   read through it (R11, R13); then re-find S12–S15 and the FUT-SEC-8 recovery on `phyco-v2`;
+   trail tools on published values, from the papers of R19, whose downloads the owner approved on
    2026-11-01 (`47270450.pdf` through the owner's browser), or from values the owner provides.
    The set of trail tools is fixed when the first trail search starts (R12).
 4. **US2 security target**: the design document's chapters "Security target", chapter 1, and "Mode",
@@ -439,9 +449,11 @@ takes each from there.
    review's row, with no mark in the file, until the security-target review of phase 8, which also
    reads the two chapters of `rationale.md`, whose review entries the owner design
    review adds (RAT-086), and cites records that exist only after phase 5
-   (RAT-068, RAT-069); `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and
+   (RAT-068, RAT-069); `mode_limits_v3.py` at ε = 2⁻⁶⁴, written and tested here, its first run
+   in phase 8, before the security-target review, once the design document's variant table
+   holds the selected candidate's R (data-model §10). The theorem papers and
    AIS 20/31 3.0 come from the approved downloads of R19, `169.pdf` through the owner's browser.
-5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
+5. **US3 and US4 candidates**: cost model (`ir.py` from phase 3); A1 (the ARX-box design)
    and at least one Boolean candidate; the entered set recorded; reduced-width bounds; the D4
    choice; production-width bounds, structural checks with the `degree` records, frequency and
    avalanche tests, in that order at each size, the bias tests starting at the R the earlier kinds
@@ -456,7 +468,8 @@ takes each from there.
 7. **Second transcription**: ⛔ **owner go-ahead**, the Review & Approval row "Second transcription
    go-ahead", which the owner sets and commits and the provenance test reads at HEAD; a separate
    session writes `tests/v3_reference.py`; step-by-step agreement with the common-mode caveat.
-8. **US5**: first the ⛔ **security-target review**, with its Review & Approval row, after the
+8. **US5**: first `mode_limits_v3.py`'s first run, with the claim register's `bound` (SEC-089),
+   then the ⛔ **security-target review**, with its Review & Approval row, after the
    selection and before the owner design review: it cites the selected candidate's records of
    FR-029's diffusion through instantiation and of R4's first-order differences, and closes FR-011's
    functionality class; L1 recorded when its gate passes (security.md §15, 2.13: the FUT-SEC-8
@@ -519,7 +532,7 @@ takes each from there.
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| C tooling beyond the Python and numpy stack (Technical Constraints) | The sweep costs about 2³² × 257 steps per target; a C evaluator generated from an operation list is added only if a heavy run's projection does not fit its budget (R7) | The Python model runs at about 2 × 10⁵ steps/s, about 64 days per target; lowering counts to fit a budget is not allowed |
+| C tooling beyond the Python and numpy stack (Technical Constraints) | The sweep costs about 2³² × 257 steps per target; research R12's branch-and-bound ARX trail search, `research/004/tools/trails/arx_search.c` with `arx_search.mk` (C99, WSL), must finish each search within R7's 8 h per instance to give a bound, and an exhaustive table or check too slow in Python may be written in C (Technical Context); a C evaluator generated from an operation list is added only if a heavy run's projection does not fit its budget (R7) | The Python model runs at about 2 × 10⁵ steps/s, about 64 days per target; a slower trail search reaches its 8 h cap sooner, and a search that times out gives no bound (R12); lowering counts to fit a budget is not allowed |
 | A second copy of the design-1.0 step, in `fast/seed_search.c` | `fast/phyco_stream.c` stays unchanged, because the feature-003 freeze hashes its source and binary | Editing or rebuilding it would touch frozen evidence; the copy is checked against both golden vector files before any sweep |
 | Absorption and output trees over the rate lanes, which are not neighbour links (Principle III) | FR-018 requires registered trees for absorption and output | Neighbour-only paths would take about n steps per block. The trees are fully registered, and the design document specifies, per supported size, each tree's fan-in per stage, depth, registered stages and latency in cycles; the latency enters FR-025's instantiate latency and FR-026's throughput. The justification Principle III asks for is an argument in the design document: a register at every stage and a fan-in bounded by a stated number |
 | Clock, reset (which every zeroization trigger also drives), the start signal with the call type, and the round and phase counters reaching every node (Principle III) | Every node needs the clock, a reset, every zeroization, the start of each call with its call type, and the round and phase position that index its constant ROM (R15) | The core takes its clock as an input on the device's clock network; its generation from the 100 MHz oscillator through an MMCM belongs to feature 008's board wrapper, outside the core and the only file with vendor primitives (FR-025). Reset is synchronous and reaches the nodes through a registered fan-out tree whose latency is part of the reset sequence (FR-025); the start signal reaches the nodes and the replicated counters through a registered fan-out tree with one stated latency to every node, as reset does, no greater than the reset tree's, so lockstep holds, and a zeroization clears its registers with the call-type field, so that no call of Π starts after a zeroization's clear (spec FR-025 "Zeroization"; HW-088). The counters are replicated, one copy at each food node or node, all started by that reset and running in lockstep, so no counter value crosses the grid. The core never stalls in mid-call: output leaves through a buffer of one block, and the next call starts only after the consumer has taken it; the buffer's size and the tree's latency enter FR-020's cycle formulas and FR-025. One global counter would be a grid-wide data path, an unregistered reset fan-out would be a long combinational path, and a global combinational enable to stall the core in mid-call, which the buffer makes unnecessary, would be another. Every zeroization trigger drives the reset's registered fan-out tree, so it reaches every register within the reset's latency, which each trigger's figure counts, and the call type travels with the start signal as a field of ⌈log₂ t⌉ bits for t call types, registered beside it at every node, to select the ROM's stream: each a public control signal with one stated latency |
