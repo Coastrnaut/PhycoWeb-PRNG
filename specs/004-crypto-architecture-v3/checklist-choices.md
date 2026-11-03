@@ -1764,26 +1764,41 @@ tasks approval as an entry of its own or as no change of rule, with the reason; 
 reading is that it is stricter under both readings of the old text, and that it sets no reading
 aside.
 
-Over every span from the plan-approval commit, 65bcbf2, to c7dadf5 outside the rounds' pairs, the
+Commit 0b60ab1, the fourteenth report's remediation, on the owner's instruction of 2026-11-03 to
+make and commit the edits for its issues, changed the cli contract, research R16 and
+data-model §1, places that the heading "Records and their hashes" names. A heavy reproduction with
+a differing rebuild makes two runs, and the text left open whether their projections are summed
+and whether the rebuild comes first. Any rebuild now comes first, the projections of all the
+runs it will make must together fit the hours left in research R7's feature-wide row, and the
+hours left are read again before a second run, one that no longer fits not being made, exit 1,
+with `differs` where the first run differs and otherwise a record of `status` `inconclusive`,
+neither `match` nor `differs`. The commit is recorded here for the owner to confirm at the tasks
+approval as an entry of its own or as no change of rule, with the reason; the agent's reading is
+that its refusals contain those of every reading of the old text, that the one new write, the
+first run's record, is what data-model §1 already requires of an aborted run, and that it sets
+no reading aside.
+
+Over every span from the plan-approval commit, 65bcbf2, to 0b60ab1 outside the rounds' pairs, the
 comparison that `research/004/place_check.py` wrote to `research/004/place-check.json`, committed
-in 9a74a9b with `compared_to` c7dadf5, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740
-and e1d7a90 committed in 0a99462, c5a630c, ce902d5, c92383c and 637eb02, found seventeen commits
-that changed places of rules with an edit that no row made: ad2c195's change to research R3,
-recorded beside the re-run's list above; and, in the span from 974ffef to c7dadf5, after this
-round's pair, research R16 and the cli
+in d3cdbf5 with `compared_to` 0b60ab1, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740,
+e1d7a90 and c7dadf5 committed in 0a99462, c5a630c, ce902d5, c92383c, 637eb02 and 9a74a9b, found
+eighteen commits that changed places of rules with an edit that no row made: ad2c195's change to
+research R3, recorded beside the re-run's list above; and, in the span from 974ffef to 0b60ab1,
+after this round's pair, research R16 and the cli
 contract by 1c67100, data-model §18 by 57bd909, the cli contract by b6a93f0, spec FR-039, research
 R4 and the cli contract by 252512a, spec FR-020, FR-025 and FR-026 and research R5 and R8 by
 797c6da, research R15, data-model §1 and §18 and the cli contract by ce3cde1, research R15,
 data-model §1 and the cli contract by ccfd9d1, research R15 by b3eba12, research R15 and R16,
 data-model's introduction and §18, the cli contract and the notes under the Review & Approval
 table by 5f34d5c and again by 7a6d0e8, research R12 by 2e36613, research R16, data-model §1 and the
-cli contract by 7f42e03, b9d9740, 43baec5 and e1d7a90, and the cli contract by c7dadf5, 28 entries
-in all, one per commit and rule, each recorded beside this list above. The span from 832bd4d to
-930494d, between the ninth and tenth
+cli contract by 7f42e03, b9d9740, 43baec5 and e1d7a90, the cli contract by c7dadf5, and research
+R16, data-model §1 and the cli contract by 0b60ab1, 29 entries in all, one per commit and rule,
+each recorded beside this list above. The span from 832bd4d to 930494d, between the ninth and
+tenth
 re-runs' pairs, changed no place, nor did the span's other commits, 744ded0, ccaf8f0, 388551a,
 82bb979, 3c8eccb, 7e61f4f, 40768cd, e560a9c, addc940, 0a99462, d626a13, dc40078, a56d372, d9a17e7,
-99b6422, c5a630c, 280e360, ce902d5, c92383c, 00ee022, 637eb02 and ab10bbb. These results restate
-that file, which the owner confirms in the row "Place check" (PRO-063).
+99b6422, c5a630c, 280e360, ce902d5, c92383c, 00ee022, 637eb02, ab10bbb, 9a74a9b and 35e4ab2. These
+results restate that file, which the owner confirms in the row "Place check" (PRO-063).
 
 ## After the answer
 
