@@ -1570,6 +1570,7 @@ From the tenth re-run, 27 of its 28 rows:
   HW-094, HW-095.
 - **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): ANA-083,
   ANA-087.
+- **Vector lengths** (research R8; FR-036): HW-095.
 - **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
   SEC-096.
 - **Protocol changes and their directions** (FR-044; data-model §18; the cli contract's

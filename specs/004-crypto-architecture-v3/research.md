@@ -933,7 +933,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Π and Π⁻¹ | 16 inputs: all-zero, all-one, alternating `0x55…`, a counting pattern and test states 0…11; the state after every phase of every round for the first 4 inputs, as `pi_trace` returns it; the output for all 16 | — |
   | Mode | — | 2 development keys (key and nonce 0, key and nonce 1) × 10,000 32-bit words, in generate requests of 1, 7, 64 and 1,000 words in that order, cycled, the last request taking what is left (nine cycles, then 1, 7, 64 and 280 words), with forget after each request; the header says `schedule=cyclic-truncated` (data-model §11) |
   | Long run | — | the SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words (FR-058 "long runs"), taken over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines, so that feature 006's C stream and the hardware export can reproduce it from their own output |
-  | Self-test | — | per claimable size: instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document's table of k, in the chapter "Hardware structure"'s section "Self-test", as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part, as spec FR-059 defines taking part from the model's run, or as raised by a structure the design document names with its reason, `gen_vectors_v3.py` reading it from that table, computing the least from its run, exiting 1 if the table's k is below it or above it with no named structure and reason, and writing k with the structure that set it and the run's least k, which a test checks against the model's run and the table (HW-084; REP-097), the `cost` records taking before selection the least k of each candidate's own run (spec FR-026); then, if the design has a reseed, a reseed with reseed input 0 (R3), held with its length word among the self-test's constants and fed as the host would (HW-082), and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
+  | Self-test | — | per claimable size and per keyed research variant (spec FR-018; HW-095): instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document's table of k, in the chapter "Hardware structure"'s section "Self-test", as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part, as spec FR-059 defines taking part from the model's run, or as raised by a structure the design document names with its reason, `gen_vectors_v3.py` reading it from that table, computing the least from its run, exiting 1 if the table's k is below it or above it with no named structure and reason, and writing k with the structure that set it and the run's least k, which a test checks against the model's run and the table (HW-084; REP-097), the `cost` records taking before selection the least k of each candidate's own run (spec FR-026); then, if the design has a reseed, a reseed with reseed input 0 (R3), held with its length word among the self-test's constants and fed as the host would (HW-082), and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
   | Constructed states | the edge states the design document lists (FR-054) | the same |
 
   - Every input comes from R3: keys, nonces and test states by index (keys and nonces 0 and 1,
@@ -1505,7 +1505,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Keyed variants per size.** The list of supported sizes names each size's keyed variants:
     the production variant at every claimable size, and at 2×2 at least one keyed reduced
     variant, such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce (quickstart M6). A
-    supported 3×3 gets one as well. Keyless variants are listed as permutation-only. FUT-GRID-2's
+    supported 3×3 gets one as well, at w = 16 or 32, since a keyed variant's r is a multiple of 32
+    (below; HW-093). Keyless variants are listed as permutation-only, and no core is built at one:
+    the RTL's generics refuse a keyless variant at elaboration, its permutation tested alone in
+    FUT-HW-5's simulation, and each keyed research variant has its own self-test file, from
+    which a core built at it runs its reset sequence and self-test as at
+    a claimable size (spec FR-018, FR-025, FR-059; HW-095). FUT-GRID-2's
     "defined for every supported size" is met through the keyed variant each size has.
   - Supported means the sizes above, as FR-018 lists them: 2×2, 3×3 where specified, 4×4, 8×8 and
     16×16. The research interface also accepts every other n from 2 to 16, for exploration only,
@@ -1535,9 +1540,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     level of those checks, not a field of the row and not its bound (spec
     FR-006, FR-010, FR-032; SEC-096). c is a multiple of 16 as well as of w, so
     both lengths are whole bytes, and a keyed variant's c is a multiple of 64, so the key and the
-    nonce are whole 32-bit words on the hardware's interfaces (FR-025); keyless variants keep
-    the wider rule. `n2-w16-R8-c64` meets it, and a keyed 2×2 variant needs
-    w ≥ 16. A variant whose c is not a multiple of 64, or whose key and nonce leave no room in the
+    nonce are whole 32-bit words on the hardware's interfaces (FR-025), and its r = b − c a multiple
+    of 32, so every absorbed and output block is a whole number of 32-bit words (spec FR-018;
+    HW-093); keyless variants keep the wider rule. Since b = 2w·n², r is then a multiple of 32 at
+    w ≥ 16 and at every even n, so that at an odd n a keyed variant needs w ≥ 16, a supported
+    3×3's keyed variant being at w = 16 or 32, such as one with c = 64 and
+    r = 224 at w = 16. `n2-w16-R8-c64` meets both, with r = 64, and a keyed 2×2
+    variant needs w ≥ 16. A variant whose c is not a multiple of 64, whose r
+    is not a multiple of 32, or whose key and nonce leave no room in the
     state for the padding and domain bits, is keyless: the research duplex refuses it, and only the
     permutation interface applies. The model contract and data-model §10 take these lengths.
     The key-loading interface is generic in c in the same way (FR-025): a c-bit key, with the

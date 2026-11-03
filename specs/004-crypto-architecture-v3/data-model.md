@@ -853,10 +853,11 @@ RAT-085). Each row holds:
   carries its reason: the round rule's value where its inputs exist at that variant, or a
   reduced count chosen for a stated test and marked as reduced; the variant ID carries R.
 - `key_entropy_bits` and `nonce_bits`: c and c/2, so 256 and 128 at every claimable size, and 0
-  for a keyless variant (R14). `keyed_variants` names each size's keyed variants: the
-  production variant at every claimable size, and at 2×2 at least one keyed reduced variant,
-  such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce. Keyless variants are listed as
-  permutation-only.
+  for a keyless variant (R14). `keyed_variants` names each size's keyed variants: the production
+  variant at every claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced
+  variant, such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce, each with c a multiple of
+  64 and r = b − c a multiple of 32, a supported 3×3's at w = 16 or 32 (spec FR-018; R14; HW-093).
+  Keyless variants are listed as permutation-only.
 - `reachable_secret_state_bits`, per call boundary (after instantiate, after each generate with
   its forget call, after each reseed): the bits of the state that no public input sets and no
   output reveals, the capacity part, c bits, for the duplex as designed. It is counted from the
@@ -922,7 +923,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `pi_<variant>.json` | 16 inputs and their Π and Π⁻¹ outputs, as lanes in hex in the design document's order; the state after every phase of every round for the first 4, as `pi_trace` returns it |
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
-| `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k, read from the design document's table of k, in the chapter "Hardware structure"'s section "Self-test", with the structure that set it and the least k that the generator's run gives, which a test computes again and checks the file's k against, with the table's, equal unless a structure the design document names, with its reason, raised it (spec FR-034, FR-059; HW-084; REP-097), and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 with its length word, held among the self-test's constants and fed as the host would (HW-082), and the second request of k whole blocks, written by `gen_vectors_v3.py` in the same generator run as the vectors, from a `ResearchDuplex` object of its own run through the self-test's call sequence alone, each request with its forget call, so that its expected blocks are those that `Generator` and the hardware's self-test compute (spec FR-059; REP-096); `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
+| `selftest_<variant>.json` | per claimable size and per keyed research variant (spec FR-018; HW-095), the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k, read from the design document's table of k, in the chapter "Hardware structure"'s section "Self-test", with the structure that set it and the least k that the generator's run gives, which a test computes again and checks the file's k against, with the table's, equal unless a structure the design document names, with its reason, raised it (spec FR-034, FR-059; HW-084; REP-097), and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 with its length word, held among the self-test's constants and fed as the host would (HW-082), and the second request of k whole blocks, written by `gen_vectors_v3.py` in the same generator run as the vectors, from a `ResearchDuplex` object of its own run through the self-test's call sequence alone, each request with its forget call, so that its expected blocks are those that `Generator` and the hardware's self-test compute (spec FR-059; REP-096); `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
 | `constructed_<variant>.json` | per edge state: name, `construction`, an object, written by the format rules, that holds the list of calls for a state the normal calls reach or, for a state set by `ResearchDuplex.from_state`, its `lanes` and `counters` as that call takes them (model contract, Research duplex), so that `gen_constructed_v3.py --check` regenerates each vector byte for byte and FR-054's testbench loads the same lanes and counters (REP-087), whether the normal calls reach it from a development key within the number of calls of Π the design document's list states or it is covered only from a chosen state, set by `ResearchDuplex.from_state` (REP-078), inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
@@ -970,11 +971,12 @@ order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3
 vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also
 writes, in the same generator run, from a `ResearchDuplex` object of its
 own run through the self-test's call sequence alone (spec FR-059; REP-096),
-each claimable size's `selftest_<variant>.json`, the self-test's inputs and
-every expected block, whole, and `phycoweb/selftest_v3.py`, copied from those files (spec FR-059;
-HW-077); it reads each claimable size's k from the design document's table of k, in the chapter
-"Hardware structure"'s section "Self-test", and computes the least k from its self-test run, exiting
-2 if that table is missing, appears twice or holds a row it cannot read and 1 if the table's k is
+each claimable size's and each keyed research variant's `selftest_<variant>.json` (HW-095), the
+self-test's inputs and every expected block, whole, and `phycoweb/selftest_v3.py`, copied
+from those files (spec FR-059; HW-077); it reads each one's k from the design
+document's table of k, in the chapter "Hardware structure"'s section "Self-test",
+and computes the least k from its self-test run, exiting 2 if that table is
+missing, appears twice or holds a row it cannot read and 1 if the table's k is
 below the least or above it with no named structure and reason, its runs and checks
 comparing `design_sha256` (section 1; spec FR-034, FR-059; REP-097). (3)
 `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it, in

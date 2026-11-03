@@ -654,10 +654,11 @@ They run in four steps, each generator's `--check` passing before the next step 
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
 `ResearchDuplex`, which runs no self-test, and also writes, in the same run, from a
 `ResearchDuplex` object of its own run through the self-test's call sequence alone,
-each request with its forget call (spec FR-059; REP-096), each claimable
-size's `selftest_<variant>.json`, the self-test's inputs and every expected
-block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those files, so its `--check`
-covers them too (HW-077), reading each claimable size's k from the design document's table of k, in
+each request with its forget call (spec FR-059; REP-096), each claimable size's
+and each keyed research variant's `selftest_<variant>.json` (spec FR-018;
+HW-095), the self-test's inputs and every expected block, whole (spec FR-059),
+and `phycoweb/selftest_v3.py`, copied from those files, so its `--check`
+covers them too (HW-077), reading each one's k from the design document's table of k, in
 the chapter "Hardware structure"'s section "Self-test" (spec FR-034 "Chapters"), exiting 2 if that
 table is missing, appears twice or holds a row it cannot read, computing the least k from its
 self-test run as spec FR-059 defines taking part, exiting 1 if the table's k is below it, or above

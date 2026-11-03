@@ -1230,8 +1230,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   list names each size's keyed variants: the production variant at every
   claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced variant, such
   as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce; keyless variants are listed as
-  permutation-only. Per claimable size it gives the start-up self-test's expected output
-  (FR-059). For every supported size the design document states the number of food nodes, their
+  permutation-only. A keyed variant's r MUST be a multiple of 32, as its c is a multiple of 64
+  (research R14), a variant whose r is not a multiple of 32 being keyless: since b = 2w·n² and c is
+  a multiple of 64, r is a multiple of 32 at w ≥ 16 and at every even n, so that at an odd n a keyed
+  variant needs w ≥ 16, as a keyed 2×2 does, and a supported 3×3's keyed variant is at w = 16 or 32,
+  such as one with c = 64 and r = 224 at w = 16; every block of the absorption and output interfaces
+  is then a whole number of 32-bit words (FR-025 "Flow control"; HW-093). Per claimable size and per
+  keyed research variant it gives the start-up self-test's expected output (FR-059), and a
+  core is built only at a keyed variant, its generics refusing a keyless
+  variant at elaboration (FR-025 "Key loading and reset"; HW-095). For every
+  supported size the design document states the number of food nodes, their
   positions by the rule and the reason for them (for example the number of rounds until every
   lane depends on a constant injected in round 1, from the dependency propagation of research
   R13); the ROM depth at each food node (R entries per distinct constant
@@ -1524,8 +1532,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     interface is generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
     absorption interface (research R14), 256 and 128 bits at every claimable
     size, both whole 32-bit words, since a keyed variant's c is a multiple of
-    64; keyless variants have none, and FUT-GRID-2's key loading "for every
-    supported size" is met through the keyed variant each size has (FR-018). The core is
+    64; keyless variants have none, and no core is built at one: the generics refuse a keyless
+    variant at elaboration, its permutation being tested alone in FUT-HW-5's simulation, and a core
+    built at a keyed research variant runs the reset sequence and its self-test as at a claimable
+    size, from that variant's `selftest_<variant>.json` (FR-059; HW-095); FUT-GRID-2's key loading
+    "for every supported size" is met through the keyed variant each size has (FR-018). The core is
     vendor-neutral and takes its clock as an input, on the device's clock network; clock generation
     belongs to the board wrapper: a wrapper of feature 008, outside the core and the only file with
     vendor primitives, derives the clock from the 100 MHz oscillator through an MMCM, and the
@@ -1600,7 +1611,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     self-test's selectors, at the key chain's input, at the nonce chain's input and at the
     absorption interface, select its constants; every other state selects the interfaces (FR-059;
     SEC-082), and FR-008's risk names each of them held on its constants,
-    alone or with the others (SEC-088). `failed`, after a failed self-test,
+    alone or with the others (SEC-088). At a keyed research variant `resetting`
+    is the same, its self-test running from that variant's inputs, k and
+    expected output (FR-059; HW-095). `failed`, after a failed self-test,
     accepts no call until the next reset, with `selftest_fail`, an output of its own, latched until
     a self-test passes: it stays set through `resetting` after that reset,
     and the end of a self-test that passes clears it (FR-059; HW-081). In `not-reset`, `resetting`,
@@ -1691,7 +1704,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     The core never stalls in mid-call: output leaves through a buffer of one block (r bits), and the
     next call starts only after the consumer has taken the block, so a stall, which the consumer
     sets in public, holds only the buffer and delays the next call, and no cycle count depends on
-    secret data. From any call's command word to its end, whether the core waits for the host or
+    secret data. The buffer is read out to the output interface's width i in ⌈r/i⌉ transfers per
+    block, which the read-out's count of transfers within a block counts, and the read-out stops at
+    a request's last word within its last block, which the request's count of remaining words gives,
+    both counters on the list of "Zeroization" (FR-026; HW-094). From any
+    call's command word to its end, whether the core waits for the host or
     runs Π, the command interface accepts zeroize only, save in `zeroizing`, which accepts none
     ("Call sequence"; HW-076, HW-087): while a block waits in the buffer, it accepts zeroize, which
     clears what "Zeroization" lists, the buffer, the trees and the state
@@ -1720,7 +1737,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     one 32-bit word giving its length in bytes, refused above the design's maximum; unused bytes of
     a last partial word that must be zero, a word with a nonzero unused byte being an error path,
     with its error code ("Zeroization"), since it can arrive after earlier blocks of the same input
-    have been absorbed; and the key and the nonce as whole 32-bit words, since a keyed variant's c
+    have been absorbed; each block of the absorption and output interfaces a whole number of 32-bit
+    words, since a keyed variant's r is a multiple of 32 (FR-018; HW-093); and
+    the key and the nonce as whole 32-bit words, since a keyed variant's c
     is a multiple of 64 (research R14), in a stated word and byte order, matching the model's. A
     generate request gives its length in 32-bit words in its command word, so a length that is
     not a whole number of words cannot be expressed, as the model refuses an `nbits` that is not a
@@ -1737,7 +1756,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
     as the tests of each state expect (HW-085; HW-089). The core's counters, listed here once, each
     with the part of FR-026's estimate it falls in, are the replicated round and phase counters, a
     part of their own; the limit counters, one for each limit of FR-007 that the core counts, a part
-    of their own, whose integrity FR-034's paths that carry secret data name; and the controller's
+    of their own, whose integrity FR-034's paths that carry secret data name; the read-out's
+    counters, in the part of the output buffer with its read-out to the interface width: its count
+    of transfers within a block, up to ⌈r/i⌉, and the request's count of remaining words, which
+    stops the read-out at the request's last word ("Flow control"; HW-094); and the controller's
     counters, in the controller's part: the request's block count that FR-059's k counts, the key
     words taken in `loading`, the nonce's words, and the words of a personalization string or
     a reseed input counted against its length word (HW-089). A zeroizing
@@ -1793,8 +1815,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     register holds zeros until an instantiate requested by the host completes after a passed
     self-test, and a generate request before then is refused with an error signal, as the model
     raises `CallSequenceError`. The self-test's blocks go only to its comparator, which takes each
-    whole r-bit block as the output buffer receives it, with no consumer handshake, so they never
-    reach the output port, and the zeroization after the self-test clears what it computed, both
+    whole r-bit block as the output buffer receives it and each of the block's words as the read-out
+    gives it at the interface width, with no consumer handshake, the read-out stepping on
+    its own and the output port's valid held low, so they never reach the
+    output port while the self-test reaches the read-out's counters (HW-094),
+    and the zeroization after the self-test clears what it computed, both
     chains and the rate lanes' nonce registers included (FR-059). In the model, zeroization
     overwrites the object's own `bytearray` copy of the key with zeros in place and drops it, and
     drops the state's integers, which Python cannot overwrite; as with constant time, this is a
@@ -1834,8 +1859,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (strategy note §10), and, from the same model, the estimated LUTs, flip-flops and block RAM per
   claimable size, each part with its own figure: the nodes and stages (LUTs per node and round × n²
   for the stages built), the absorption and output trees, the reset and start fan-out trees with the
-  call-type field at every node, the ROMs, the output buffer (r bits, 16,128 at 16×16) with its
-  read-out to the interface width, the key registers and the key-loading buffer,
+  call-type field at every node, the ROMs, the output buffer (r bits, 16,128 at 16×16)
+  with its read-out to the interface width and the read-out's two counters
+  (FR-025 "Zeroization"; HW-094), the key registers and the key-loading buffer,
   the nonce chain and the rate lanes' nonce registers, the instantiate lane
   selectors (up to 2w·n² bits, estimated per state bit and stated where merged
   with stage logic), the command interface, the controller with the call-state table and its
@@ -2101,8 +2127,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     no field of either file, standing as its bullet states them (RAT-090).
     `gen_vectors_v3.py` reads the design document's table of k, a Markdown table with fixed columns
     in the chapter "Hardware structure"'s section "Self-test", which the chapters' test checks, with
-    one row per claimable size holding k, the structure that set it and, where k exceeds the least
-    that the model's run gives, the structure the design document names with its reason, and it
+    one row per claimable size and per keyed research variant holding k (HW-095), the
+    structure that set it and, where k exceeds the least that the model's run
+    gives, the structure the design document names with its reason, and it
     exits 2 if that table is missing, appears twice or holds a row it cannot read, its runs and
     checks comparing `design_sha256` (FR-059; data-model §1; REP-097).
   - **Rationale chapters.** `rationale.md`'s chapters are level-2 headings with fixed names, each
@@ -3168,8 +3195,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   fails its self-test; FR-036), its expected output, its behaviour on failure, and the zeroization
   of the whole state after it, before the first instantiate. The self-test runs instantiate with key
   and nonce 0 and the empty personalization string, its length word fed through the absorption
-  interface's selector as the host would; then one generate request of k whole blocks, k·r bits, k
-  stated per claimable size in the design document as the least for which every node, every lane,
+  interface's selector as the host would; then one generate request of k whole
+  blocks, k·r bits, k stated per claimable size and per keyed research variant
+  (HW-095) in the design document as the least for which every node, every lane,
   every constant ROM entry of the calls run, both trees and the counters take part; then, if the
   design has a reseed, a reseed with reseed input 0 of research R3 and a second generate request of
   k whole blocks, so that the reseed's effect is compared; the self-test holds that reseed input and
@@ -3185,11 +3213,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the self-test's input words has entered it, the output tree once a whole block has left it, and
   each counter once it has counted, the round and phase counters through a whole call, the request's
   block count, one of the controller's counters (FR-025 "Zeroization"; HW-089), to its last
-  block and each limit counter by one step; k is the least number of whole
+  block, the read-out's count of transfers within a block through a whole
+  block and the request's count of remaining words to the request's last word
+  (HW-094), and each limit counter by one step; k is the least number of whole
   blocks for which the run meets them all, which may be 1, unless the design document names a
   structure that needs more, with its reason, in its table of k (FR-034 "Chapters"), one row per
-  claimable size with k, the structure that set it and, where k exceeds the least that the model's
-  run gives, the structure the design document names with its reason; `gen_vectors_v3.py` reads k
+  claimable size and per keyed research variant with k, the structure that set it
+  and, where k exceeds the least that the model's run gives, the structure
+  the design document names with its reason; `gen_vectors_v3.py` reads k
   from that table, computes the least k from its self-test run, exits 1 if the table's k is below
   the least k of its run, or above it with no named structure and reason, and writes k, the
   structure that set it and the run's least k into the self-test's vector file, and a test computes
@@ -3206,9 +3237,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   call and, where the design has a reseed, the reseed with reseed input 0 of
   research R3 and the second request of k whole blocks with its forget call,
   so that its expected blocks are those that the model's `Generator` and
-  the hardware's self-test compute (REP-096), as a vector file of its own,
-  `selftest_<variant>.json`, frozen with the vectors, from which `phycoweb/selftest_v3.py` is
-  copied, so that the frozen vectors hold every value the comparator compares; FR-020's
+  the hardware's self-test compute (REP-096), as a vector file of its own per claimable
+  size and per keyed research variant (HW-095), `selftest_<variant>.json`,
+  frozen with the vectors, from which `phycoweb/selftest_v3.py` is copied, so
+  that the frozen vectors hold every value the comparator compares; FR-020's
   self-test formula, the reset figure and FR-026's storage count follow from k
   (HW-077). It feeds the key and nonce chains from its constants through a
   selector at each chain's input, word by word as the host would, the nonce's words for rate lanes
@@ -3224,9 +3256,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the design has a reseed, after a reseed with an input other than the self-test's
   and a second request, so that each selector held alone, as well as all of
   them, gives an output that differs from the model's (FR-008; SEC-088). Its
-  comparator, r bits wide, takes each whole r-bit block as the output buffer
-  receives it, compares it with the matching block of the expected output, stated per claimable size
-  from the frozen vectors, and holds the result until the last block; the comparator and the
+  comparator, r bits wide, takes each whole r-bit block as the output buffer receives it and each of
+  the block's words as the read-out gives it at the interface width, the read-out stepping with no
+  consumer handshake and the output port's valid held low (HW-094), compares each with the
+  matching block of the expected output, or that block's matching word, stated
+  per claimable size and per keyed research variant from the frozen vectors
+  (HW-095), and holds the result until the last block; the comparator and the
   expected output's storage are parts of FR-026's estimate. The self-test then zeroizes, both chains
   and the rate lanes' nonce registers included; on failure it zeroizes, blocks every call and
   sets the `selftest_fail` output, an output of its own, latched until a self-test passes (state
@@ -3236,8 +3271,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `selftest_fail` once `call_done` rises after a reset, a second failure included (FR-025 "Registers
   and read-back"; HW-086); every reset runs the self-test again, as a new `Generator` runs it again
   in the model. The design document lists the output in the port list (FR-025
-  "Registers and read-back"), and feature 008 tests it. Its cycle count is
-  stated (FR-020), and the reset latency of FR-025 runs from reset released to the self-test done
+  "Registers and read-back"), and feature 008 tests it. Its cycle count is stated (FR-020), the
+  read-out's ⌈r/i⌉ transfers of each of its blocks among its cycles (HW-094), and the
+  reset latency of FR-025 runs from reset released to the self-test done
   and the state zeroized. Features 006 and 008 implement it in the RTL (strategy note §10; D10). It
   is not a FIPS 140-3 self-test and MUST NOT be described as one (FR-011). Its blocks go only to its
   comparator and never to the output port, with output-valid low throughout (FR-025 "Zeroization"),
