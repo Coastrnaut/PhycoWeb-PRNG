@@ -45,13 +45,17 @@ stands; a difference in a field that enters a verdict blocks the candidate's eli
 until it is resolved, and, since it ran in the environment that made the original, it is a tool
 defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
 p-values, which decide no verdict, makes the outcome `differs` and blocks nothing (data model §1).
-A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction rebuilds
-the binary from that commit's source with its make file, in a second worktree of that commit, and
-reports the rebuild's SHA-256 only; where it differs from the committed binary's, the configuration
-runs again there with the rebuild, Committed code applying to every file but the rebuilt binary,
-whose `--source-sha256` is still checked, its outputs under a further `rebuilt/` directory,
-compared as the first run's are, the outcome `match` only when both runs match, and a rebuild that
-fails counting as a difference in every compared field (research R16).
+A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction removes
+the committed binary from a second worktree of that commit, so that make cannot take it as up to
+date, rebuilds the binary there from that commit's source with its make file and reports the
+rebuild's SHA-256 only; where it differs from the committed binary's, the configuration runs again
+there with the rebuild, Committed code applying to every file but the rebuilt binary, whose
+`--source-sha256` is still checked, its outputs under a further `rebuilt/` directory, compared as
+the first run's are, the outcome `match` only when both runs match, and a rebuild that fails
+counting as a difference in every compared field. That run counts nothing, so Tool validation and
+Trail tools, and the `validation` and `cross_check` it cites, look the tool up by the pair of its
+source's and its committed binary's SHA-256 in the original's `code_sha256`, the rebuild's hash
+entering no guard (research R16).
 `fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
 `downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`, each recording an
 owner's act or an outside fact that a later run cannot regenerate; nor have `clear_lock.py`, whose
@@ -223,7 +227,8 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   written with `status` `not evaluated` and never counts; a trail or distinguisher it finds is
   recorded as an unverified hypothesis, `blocked`, which blocks the candidate's eligibility
   until a validated tool, or direct evaluation with the validated exact models, settles it
-  (data model §5). A tool is validated again after any change to its code (its SHA-256 differs), a
+  (data model §5). A reproduction's run with a rebuild looks the tool up by its committed pair
+  (introduction). A tool is validated again after any change to its code (its SHA-256 differs), a
   dependency upgrade, or a use at a word width, operation set or kind of model outside its validated
   kind; until then its results are `not evaluated`. A use at a word width or kind of model outside
   its validated kind counts only once a further known result covering it, fixed with its source
@@ -254,7 +259,8 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has
-  an earlier `re-found` record. A search that reached its cap is refused, exit 2, with any tool or
+  an earlier `re-found` record, a reproduction's run with a rebuild being looked up by its committed
+  pair (introduction). A search that reached its cap is refused, exit 2, with any tool or
   version, except as research R7's one re-run after a recorded tool defect; a speed-up is not a
   defect (research R12).
 

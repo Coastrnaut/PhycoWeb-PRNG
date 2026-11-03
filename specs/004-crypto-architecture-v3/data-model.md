@@ -223,14 +223,18 @@ the class.
   `.hex` file, its record holding each file's path, SHA-256 and outcome. The record holds the
   original's ID and SHA-256, the commit it ran, each compared field with its outcome, the reported
   fields, and `match` or `differs`. A run that used a C tool is reproduced with a rebuild too:
-  before it runs, the reproduction rebuilds the binary from that commit's source with its make
-  file, in a second worktree of that commit, and the record holds the rebuild's SHA-256, reported
-  only; where it differs from the committed binary's, the recorded configuration runs again there
-  with the rebuild, the committed-code guard applying to every file but the rebuilt binary, whose
+  before it runs, the reproduction removes the committed binary from a second worktree of that
+  commit, so that make cannot take it as up to date, rebuilds the binary there from that commit's
+  source with its make file, and the record holds the rebuild's SHA-256, reported only; where it
+  differs from the committed binary's, the recorded configuration runs again there with the
+  rebuild, the committed-code guard applying to every file but the rebuilt binary, whose
   `--source-sha256` is still checked, its outputs placed as the first run's under a further
   `rebuilt/` directory, and the record also holds that run's compared fields with their outcomes,
-  the outcome being `match` only when both runs match; a rebuild that fails counts as a difference
-  in every compared field (research R16). A reproduction appends nothing to the candidate
+  the outcome being `match` only when both runs match; that run counts nothing, so the guards Tool
+  validation and Trail tools, and the `validation` and `cross_check` it cites, look the tool up by
+  the pair of its source's and its committed binary's SHA-256 in the original's `code_sha256`, the
+  rebuild's hash entering no guard; a rebuild that fails counts as a difference in every compared
+  field (research R16). A reproduction appends nothing to the candidate
   log, charges no candidate's budget row and is not a re-run under research
   R7, so it can neither replace evidence nor add any; a heavy one runs only on the owner's request,
   quoted with its date in the record's `owner_request`, and is charged to research R7's feature-wide
@@ -653,7 +657,8 @@ first and each further one, has its own, R12; ANA-076), `found`, `outcome`
 same kind and of the tool's exact hash exists. For a C tool, `tool_sha256` is the SHA-256 of its
 source and the record's `code_sha256` holds its binary's as well, and its exact hash is the pair
 of the two (research R12), so that a change to either is a new version, which counts only after
-a `re-found` record of its own.
+a `re-found` record of its own. A reproduction's rebuild is no new version: it counts nothing, and
+its run looks the tool up by the committed pair (section 1, Reproduction).
 
 - **What must match.** The exact published value over the stated rounds: for a trail search,
   the weight of the optimal trail, not the trail itself; for the S-box tables, every entry; for

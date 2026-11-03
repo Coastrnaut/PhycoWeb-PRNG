@@ -184,8 +184,11 @@ or key-loading code is written here.
   source's and its binary's SHA-256, and a search that reached its cap, save research R7's one
   re-run after a recorded tool defect; and Budget. They also test the common part of `--reproduce`,
   with a mocked C tool and build on a temporary repository: the worktree of `git_head` checked
-  against its blobs, and the rebuild in a second worktree, one run where the rebuild's SHA-256
-  equals the committed binary's and a second, compared too, where it differs, the outcome `match`
+  against its blobs, and the rebuild in a second worktree, the committed binary removed there first,
+  so that a make file that would find it up to date compiles it all the same, one run where the
+  rebuild's SHA-256 equals the committed binary's and a second, compared too, where it differs, that
+  run's guards and citations looking the tool up by the committed pair, so that a rebuild with no
+  `re-found` record of its own is neither refused nor written `not evaluated`, the outcome `match`
   only when both runs match, and a rebuild that fails counted as a difference in every compared
   field. In `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the
   FUT-SEC-8 sweep among them, and every script with a worker option takes the heavy-run lock, each
@@ -202,9 +205,10 @@ or key-loading code is written here.
   `--reproduce` mode: a worktree of the original's `git_head`, its `code_sha256` checked against
   that commit's blobs, a C tool's committed binary among them, which the reproduction runs from that
   worktree, and its rebuild from that commit's source with its make file in a second worktree, the
-  rebuild's SHA-256 reported only and a second run with it, compared too, where that differs from
-  the committed binary's, output under `$REP/reproductions/<record_id>/<n>/`, the second run's under
-  a further `rebuilt/` directory, the design document read from that worktree and checked against
+  committed binary removed there first, the rebuild's SHA-256 reported only and a second run with
+  it, compared too, where that differs from the committed binary's, that run looking the tool up by
+  the committed pair, output under `$REP/reproductions/<record_id>/<n>/`, the second run's under a
+  further `rebuilt/` directory, the design document read from that worktree and checked against
   `design-versions/<sha256>.md`, and exit 2 while the environment record the original cites is not
   in force. (FR-053, FR-061, FR-065, FR-068; R1, R16, R18; REP-099, REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
