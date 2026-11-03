@@ -631,8 +631,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     exact tie sends both representatives on (below).
   - **Where**: at 4×4, at the widest reduced width, 16 or else 8, at which at least one entered
     candidate of each family has both a differential and a linear trail bound for a common
-    number of rounds of at least 2; r* is the largest such common number. Only candidates with
-    both bounds at r* rounds are scored.
+    number of rounds of at least 2; r* is the largest such common number. Only candidates with both
+    bounds at r* rounds are scored. "Common" means common to the two bounds of each scored candidate
+    and to the scored candidates of both families, so that at a width where both families qualify
+    each has a scored candidate at r*. Where at 16 and at 8 only one family has a candidate with
+    both bounds at the same number of rounds, at least 2, that family is chosen by default ("One
+    family scored", below): the width is the widest at which it has one, r* the largest such number
+    there, and its candidates with both bounds at r* rounds are scored, the highest being its
+    representative, with the other family's outcomes listed. This is the conservative reading, since
+    the other family has no reduced-width evidence that the choice could weigh. Where neither family
+    has one, D4 is not computable ("Neither family scored", below; ANA-082).
   - **Score**: with W_D and W_L the −log₂ of the bounds on the best differential trail
     probability and on the best linear trail's squared correlation over r* rounds, and L the
     LUTs per node and round of R5 at that width:
@@ -659,9 +667,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     family"), and at the set's close it takes `ineligible`, with the reason "D4 chose the other
     family by its tie-breaks", unless the chosen family ends with no eligible candidate, when its
     family is analysed as R7 states (RAT-072).
-  - **One family scored.** That family is chosen by default, and the record says so.
-  - **Neither family scored.** No family is chosen, and the record says that D4 was not
-    computable. Selection then takes the eligible candidate with the smallest R at 4×4 from
+  - **One family scored.** That family is chosen by default, and the record says so: at 16 and at 8,
+    only one family has a candidate with both bounds at the same number of rounds, at least 2, and
+    its candidates are scored at the width and r* that "Where" gives it (ANA-082).
+  - **Neither family scored.** No family is chosen, and the record says that D4 was not computable:
+    neither family has a candidate with both bounds at the same number of rounds, at least 2, at 16
+    or at 8 (ANA-082). Selection then takes the eligible candidate with the smallest R at 4×4 from
     either family, with a tie going to the owner's recorded choice; the stop rule still applies.
   - **Rotation amounts** are chosen at this width (R15), ranked by this score's own measure,
     min(W_D, W_L) at the search width, at one number of rounds for every candidate

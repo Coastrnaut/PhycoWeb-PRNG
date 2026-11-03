@@ -339,12 +339,29 @@ cite them hold on every checkout.
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
 | `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; the uniform controls' hours, logged by no candidate, are added to `statistics` by the Budget guard from the control records (section 5); each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
-| `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) |
-| `variant_map` | on the `selected` entry: the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it |
+| `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below); a `selected` or `not selected` entry cites its selection record by path and SHA-256, with the record's tie choice where there is one (section 9; ANA-081) |
+| `variant_map` | on each `selected` entry, which `round_rule.py --decide` writes after a selection record, the latest being the one in force (section 9; ANA-081): the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it |
 | `date_utc` | ISO 8601 |
 
 An entry is never edited or deleted; a correction is a new entry that cites the `seq` it
 corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
+
+Each kind of entry has one writer, which the agent runs (cli contract): `evidence_v3.py` appends the
+`evidence` entries; `d4_choice.py` one `scored` entry per scored candidate when it writes
+`d4/choice.json`, citing it by path and SHA-256 (section 8); `round_rule.py --decide` the `selected`
+and `not selected` decisions after each selection record and `round_rule.py --close` the
+`set-closed` entry (section 9; Entered set, below); `repair_log.py` the `repair` entry (Repair,
+below); and `candidate_log.py`, through `protocol/candidates.py`, every other entry, its `propose`,
+`mapping`, `enter`, `decide`, `correct` and `replace` appending the `proposed` entry, the `mapping`
+entry, one `entered-d4` entry per candidate of the entered set before any score, a decision other
+than `selected` and `not selected`, a `rejected` or `ineligible` one with the `replacement` entry it
+brings, a `correction`, and a `replacement` entry that closes a pending one with its reason, each
+from a file holding the entry's fields but `seq`, `prev_sha256` and `date_utc`, which the writer
+adds. Every refusal of the log writer that this section states is the command's, exit 2, appending
+nothing, `enter` among them once a `scored` entry exists, and a `proposed` entry that records the
+owner's approval of a replacement, or of a further candidate after a decline, is written only on the
+owner's explicit word, quoted with its date in it, as a provenance review entry's `owner_word` is
+(section 14; spec FR-041; RAT-077; ANA-080, ANA-081).
 
 - **Decisions.** `rejected` and `ineligible` are given only for the rules' reasons: a failed
   inverse or bijectivity test, a failed eligibility item (FR-018 to FR-031, FR-037, R_bound
@@ -684,7 +701,10 @@ reduced-width outcome for each bound kind at 16 and, where R6 needs it, at 8: a 
 `d4_choice.py` exits 2 until each has one), `width` (16 or 8), `r_star`, with the
 statement that r* compares the candidates over the same rounds and is not a rate per round
 (R6); per scored candidate `W_D` and `W_L` as rationals, `luts` (R5) and the score;
-`representatives`; `outcome` (`chosen`, `chosen by default`, `tie` or `not computable`, R6);
+`representatives`; `outcome` (`chosen`, `chosen by default`, `tie` or `not computable`, R6: `chosen
+by default` where at 16 and at 8 only one family has a candidate with both bounds at the same number
+of rounds, at least 2, `width` and `r_star` then being the widest width at which it has one and the
+largest such number there, and `not computable` where neither has one; ANA-082);
 `chosen_family`; `tie_breaks_applied`; `bound_records`, each from a tool that
 has passed its cross-check on that candidate, which its `cross_check` cites
 (section 6): `d4_choice.py` uses no other. Written once by `scripts/d4_choice.py`
@@ -742,7 +762,18 @@ computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule
 reason. Any change before the freeze that touches any candidate's eligibility or R at 4×4 after a
 selection record exists makes `--select` run again over the whole set and write the next record,
 `selection-<k>.json`, k = 2, 3, …, which cites the previous one by path and SHA-256; earlier records
-stay. A decline's re-selection is one such record: after a decline at the owner design review that
+stay. After each selection record, `round_rule.py --decide` appends to the candidate log one
+`decision` entry `selected` for the candidate the record selects, with its `variant_map` and the
+operation list's SHA-256, and one `not selected` entry for each other candidate the record lists as
+eligible, each citing the record by path and SHA-256 and its tie choice where there is one, and
+exits 2, appending nothing, while the record's outcome is a stop, while the record has a tie and no
+choice whose row, "Selection tie" or "Selection tie <k>", reads Approved at HEAD with the choice
+record's SHA-256, or once the record has its entries; a later selection record gets entries of its
+own, whether it selects another candidate or the same one, so that no entry is
+edited, the latest `selected` entry being the one in force and an earlier one
+standing as a decision that a later record superseded, and `design_freeze.py
+create` reads it (section 13; spec FR-041, FR-043; ANA-081). A decline's
+re-selection is one such record: after a decline at the owner design review that
 ends in a further candidate, entered only where the rules can select it (section 3), `--select` runs
 again over the whole set, the declined candidate included, and selecting the
 declined candidate again is a stop, with the review's reasons (section 3).
@@ -963,8 +994,11 @@ copy against its manifest hash and its live source (SC-012).
   record behind R, by ID and by SHA-256.
 - **Logs**: the last `seq` and line SHA-256 of the candidate log, the provenance log and the
   protocol change log.
-- **Selection**: the `variant_map` of the `selected` entry (section 3), with the operation
-  list's SHA-256.
+- **Selection**: the `variant_map` of the candidate log's latest `selected` entry (section 3), with
+  the operation list's SHA-256; `create` exits 2 unless that entry cites the latest selection
+  record, with that record's tie choice where there is one, and names the candidate that record
+  selects, an earlier `selected` entry standing as a decision that a later record superseded
+  (section 9; spec FR-043; ANA-081).
 - **External review**: the row of the external design review's family that `create` reads, the one
   with the highest k among the rows that name the latest selection record, its value, done or not
   arranged, the selection record it names, and for done the review package's manifest SHA-256 and

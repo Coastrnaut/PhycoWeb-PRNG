@@ -327,6 +327,41 @@ one: outside 82 to 97, or with more than 3 sets holding an unplanted firing, the
 tool is unvalidated there, its results `not evaluated`, until a defect is
 found and fixed (research R3, R4).
 
+## `scripts/candidate_log.py`
+
+```text
+candidate_log.py propose FILE             # a proposed entry, before any tool runs on it
+candidate_log.py mapping FILE             # a candidate's mapping entry, before its first score
+candidate_log.py enter                    # one entered-d4 entry per candidate of the entered set
+candidate_log.py decide FILE              # a decision, with the replacement entry it brings
+candidate_log.py correct FILE             # a correction entry, citing the seq it corrects
+candidate_log.py replace FILE             # closes a pending replacement entry, with its reason
+```
+
+Appends the candidate log's entries that no other script writes, through `protocol/candidates.py`
+(spec FR-041; data model §3): `evidence_v3.py` appends the `evidence` entries, `d4_choice.py` the
+`scored` entries, `round_rule.py --decide` the `selected` and `not selected` decisions and `--close`
+the `set-closed` entry, and `repair_log.py` the `repair` entry (below). FILE is a JSON object
+holding the entry's fields but `seq`, `prev_sha256` and `date_utc`, which the writer adds, as
+`provenance.py add` takes its entry. `propose` appends a candidate's `proposed` entry, with its
+operation list's SHA-256 and its `parameters`, before any tool runs on it; `mapping` its `mapping`
+entry, before its first score; `enter` one `entered-d4` entry per candidate of the entered set,
+before any score (research R6); `decide` a decision other than `selected` and `not selected`, which
+`round_rule.py --decide` alone writes, a `rejected` or `ineligible` one with the `replacement` entry
+it brings, logged `pending` or closed at once with the reason "cause shared" (data model §3;
+ANA-073); `correct` a `correction` entry, citing the `seq` it corrects; and `replace` a
+`replacement` entry that closes a pending one with its stated reason, the family full or the budget
+spent. Every refusal that data model §3 and the protocol state for the log writer is the command's,
+exit 2, appending nothing: a fourth `proposed` entry of a family, a decision outside the rules'
+reasons, a `replacement` entry closed for the budget spent unless R7's rows, the record of that need
+and, for a lowered row, the protocol change log's entry that lowered the budget show it, and `enter`
+once a `scored` entry exists. The agent runs the command, and a `proposed` entry that records the
+owner's approval of a replacement, or of a further candidate after a decline, is written only on the
+owner's explicit word, quoted with its date in it, as `provenance.py review` is (below; RAT-077;
+ANA-080). Every append takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
+above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
+`tests/test_protocol_004.py` covers each refusal.
+
 ## `scripts/evidence_v3.py`
 
 ```text
@@ -374,12 +409,19 @@ d4_choice.py --reproduce RECORD
 ```
 
 Computes the D4 choice of research R6 from saved bound records, using only those of a
-tool that has passed its cross-check on that candidate, which each record's
-`cross_check` cites (data model §6, §8). Exits 2 if `choice.json` exists, if
+tool that has passed its cross-check on that candidate, which each record's `cross_check` cites
+(data model §6, §8). When it writes `choice.json`, it appends one `scored` entry per scored
+candidate to the candidate log, through `protocol/candidates.py`, each citing `choice.json` by path
+and SHA-256 (data model §3; ANA-080). Exits 2 if `choice.json` exists, if
 no entered set is recorded, or until every entered candidate has a final reduced-width outcome for
 each bound kind at 16 and, where research R6 needs it, at 8: a bound record, the `inconclusive`
 record of a capped search, or an `ineligible` or `rejected` log decision; the choice record lists
-each outcome, and no search is retried to reach a score. After an exact tie, `--tie` writes
+each outcome, and no search is retried to reach a score. Where at 16 and at 8 only one family has a
+candidate with both bounds at the same number of rounds, at least 2, the outcome is `chosen by
+default`, at the widest width at which that family has one and the largest such number there, its
+candidates with both bounds at r* rounds scored and the other family's outcomes listed, and where
+neither has one, `not computable` (research R6; ANA-082); a test covers the outcomes `chosen`,
+`chosen by default` and `not computable`. After an exact tie, `--tie` writes
 `tie.json` once, when R at 4×4 exists for both representatives or one of them is ineligible, with
 `decided_by` (`R at 4×4`, `carry chains`, `ineligible` or `owner`); before that, or if `tie.json`
 exists, it exits 2. While the tie waits, only the two representatives are analysed at the production
@@ -399,6 +441,7 @@ than `owner`) or if a choice exists; `tie.json` is never rewritten. Running
 round_rule.py --candidate ID           # writes candidates/<ID>/round-rule.json
 round_rule.py --select                 # writes $REP/freeze/selection.json, later selection-<k>.json
 round_rule.py --close                  # writes the candidate log's set-closed entry
+round_rule.py --decide                 # appends the latest selection record's decision entries
 round_rule.py --choose ID --seen SHA256 --by NAME   # writes the latest selection's tie choice
 round_rule.py --reproduce RECORD       # a round-rule or selection record (introduction)
 ```
@@ -456,7 +499,19 @@ a tie in a later record needs a new choice and a row of its own, "Selection tie
 Running `--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
 `round-rule.json` keeps its fixed name: before it changes, `protocol/evidence.py` keeps its current
 content as `versions/<sha256>.json` beside it, and the new content holds `previous_sha256` (data
-model introduction). A selection record is never rewritten.
+model introduction). A selection record is never rewritten. `--decide`, run by the agent after the
+latest selection record, appends to the candidate log, through `protocol/candidates.py`, one
+`decision` entry `selected` for the candidate the record selects, with its `variant_map` and the
+operation list's SHA-256, and one `not selected` entry for each other candidate the record lists as
+eligible, each citing the record by path and SHA-256 and its tie choice where there is one (data
+model §3), and exits 2, appending nothing, while the record's outcome is a stop, while the record
+has a tie and no choice whose row, "Selection tie" or "Selection tie <k>", reads Approved at HEAD
+with the choice record's SHA-256, or once the record has its entries; a later selection record gets
+entries of its own, whether it selects another candidate or the same one, so that no entry is
+edited, the latest `selected` entry being the one in force and an earlier one standing as a decision
+that a later record superseded, which `design_freeze.py create` checks (below; spec FR-041, FR-043;
+ANA-081). `tests/test_protocol_004.py` covers `--decide` and that check with a tie, a later record
+and a superseded entry.
 
 ## `scripts/mode_limits_v3.py`
 
@@ -622,7 +677,10 @@ neither done nor "not arranged", or reads done and names no manifest, or one tha
 of its own and a review done for another candidate is cited for the candidate and the version it
 read only (spec FR-043; SEC-078), if the latest selection record has a tie
 and its row, "Selection tie" or "Selection tie <k>", does not read Approved
-with the SHA-256 of its choice record, if a theorem the mode chapter uses
+with the SHA-256 of its choice record, if the candidate log's latest `selected` entry, whose
+`variant_map` the freeze record holds, does not cite the latest selection record, with that record's
+tie choice where there is one, or does not name the candidate that record
+selects (data model §3, §13; ANA-081), if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
 theorem, those marks being read as `unverified` while the security-target review row does not read
 Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the selected candidate's

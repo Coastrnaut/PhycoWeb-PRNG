@@ -652,8 +652,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
 2. **Given** the candidate log, **When** it is compared with the model's variant IDs and the
    evidence records, **Then** every candidate design is in the log, whether or not it produced
    evidence, with its decision and reason; every record a log entry cites exists with the cited
-   SHA-256; and the `selected` entry maps the selected candidate's variant IDs to those of
-   `phyco-v3`, through which `phyco-v3` reproduces the candidate's outputs.
+   SHA-256; and the latest `selected` entry, which cites the latest selection record with its tie
+   choice where there is one, maps the selected candidate's variant IDs to those of `phyco-v3`,
+   through which `phyco-v3` reproduces the candidate's outputs, an earlier `selected` entry standing
+   as a decision that a later selection record superseded (FR-041, FR-043; ANA-081).
 3. **Given** the archive, **When** its manifest is checked, **Then** every archived `phyco-v2`
    file matches its recorded SHA-256 and the live file it was copied from.
 4. **Given** the owner design review and the external review record (done, or not arranged),
@@ -2408,8 +2410,21 @@ freeze hashes and the baseline manifest; run the claim-register test.
   freeze, with m/128 at a size where it measured m round counts above 128 (FR-028;
   ANA-075, ANA-079), and that every result of the frozen candidate is on
   development inputs chosen among up to six candidates, so that feature 007's held-out
-  evaluation is the unbiased test. The rationale's chapter on alternatives cites the log
-  entries (FR-034).
+  evaluation is the unbiased test. The rationale's chapter on alternatives cites the log entries
+  (FR-034). Each kind of entry has one writer, which the agent runs: `evidence_v3.py` appends the
+  `evidence` entries; `d4_choice.py` one `scored` entry per scored candidate when it writes
+  `choice.json`, citing it by path and SHA-256; `round_rule.py --decide` the `selected` and `not
+  selected` decisions after each selection record, a later record getting entries of its own, so
+  that no entry is edited and the latest `selected` entry is the one in force (FR-043);
+  `round_rule.py --close` the `set-closed` entry; `repair_log.py` the `repair` entry; and
+  `scripts/candidate_log.py`, through `protocol/candidates.py`, every other entry: `proposed`,
+  `mapping`, one `entered-d4` entry per candidate of the entered set before any score, the other
+  decisions, a `rejected` or `ineligible` one with the `replacement` entry it brings, `correction`,
+  and a `replacement` entry that closes a pending one with its reason. Every refusal of the log
+  writer is the command's, exit 2, appending nothing, `candidate_log.py enter` among them once a
+  `scored` entry exists, and a `proposed` entry that records the owner's approval of a replacement,
+  or of a further candidate after a decline, is written only on the owner's explicit word, quoted
+  with its date in it (cli contract; RAT-077; ANA-080, ANA-081).
 - **FR-042**: `phyco-v2` MUST be archived as byte-exact copies in `baseline/phyco-v2/`, with every
   file's SHA-256 and source in a committed manifest (Principle V): at least the model, the C
   stream, `design.md` 1.0 and the golden vectors. The live files MUST stay unchanged.
@@ -2459,8 +2474,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   set and write the next record (section "Pre-registered Design Protocol", "Eligibility and
   selection"): if it selects another candidate, the security-target review and every later review
   are held again for that candidate, each in a numbered row of its own; if it selects the same one,
-  the reviews held stand for what did not change, and the changed parts are reviewed
-  again as above. The freeze runs in this order: (1) the owner commits the feature files (Principle
+  the reviews held stand for what did not change, and the changed parts are reviewed again as above.
+  After each selection record, `round_rule.py --decide` appends the candidate log's `selected`
+  entry, with its `variant_map`, and a `not selected` entry for each other candidate the record
+  lists as eligible, each citing the record with its tie choice where there is one (FR-041); the
+  latest `selected` entry is the one in force, and `design_freeze.py create` exits 2 unless it cites
+  the latest selection record, with that record's tie choice where there is one, and names the
+  candidate that record selects (data-model §3, §9, §13; ANA-081). The freeze
+  runs in this order: (1) the owner commits the feature files (Principle
   IX): from the first commit that records an owner design review's approval to the feature's end,
   plan phase 9 included, the agent commits no file of this feature and leaves its
   changes in the working tree (SEC-084), and step (1) is the owner's next
@@ -3493,7 +3514,17 @@ tested under its new S or S_A in addition, so R can only rise.
 widths. The family chosen is the one with the larger proven weight per round (−log₂ of the
 weaker of the differential and linear bounds, per round, over the rounds computed) per unit of
 estimated hardware cost (LUTs per node and round, from an operation-count model the plan fixes
-before any candidate is scored). The rotation amounts each candidate is scored with are ranked by
+before any candidate is scored). The width and r* are research R6's: the widest of 16 and 8 at which
+at least one entered candidate of each family has both a differential and a linear trail bound for a
+common number of rounds of at least 2, r* being the largest such common number, "common" meaning
+common to the two bounds of each scored candidate and to the scored candidates of both families, so
+that at a width where both families qualify each has a scored candidate at r*. Where at 16 and at 8
+only one family has a candidate with both bounds at the same number of rounds, at least 2, that
+family is chosen by default, at the widest width at which it has one and the largest such number
+there, its candidates with both bounds at r* rounds scored, the highest being its representative,
+with the other family's outcomes listed; this is the conservative reading, since the other family
+has no reduced-width evidence that the choice could weigh; where neither family has one, D4 is not
+computable (research R6; ANA-082). The rotation amounts each candidate is scored with are ranked by
 the score's own measure, the −log₂ of the weaker of the two bounds at the search width, at one
 number of rounds for every candidate, fixed in the protocol change log before the first rotation
 search (FR-024). Only bound records of a tool that has passed its cross-check on
@@ -3557,13 +3588,25 @@ run again over the whole set, writing `selection-<k>.json`, k = 2, 3, …, which
 record; earlier records stay, and a decline's re-selection is one such record. If another candidate
 is selected, the security-target review and every later review are held again for it, each in a row
 of its own; if the same one is, the reviews held stand for what did not change (FR-043). Every
-candidate stays in the log (FR-041). Candidates are entered before any is scored
+candidate stays in the log (FR-041). After each selection record, `round_rule.py --decide` appends
+one `decision` entry `selected` for the candidate the record selects, with its `variant_map` and the
+operation list's SHA-256, and one `not selected` entry for each other candidate the record lists as
+eligible, each citing the record by path and SHA-256 and its tie choice where there is one; it exits
+2, appending nothing, while the record's outcome is a stop, while the record has a tie and no choice
+whose row, "Selection tie" or "Selection tie <k>", reads Approved at HEAD with the choice record's
+SHA-256, or once the record has its entries; and a later selection record gets entries of its own,
+whether it selects another candidate or the same one, so that no entry is edited, the latest
+`selected` entry being the one in force and an earlier one standing as a decision that a later
+record superseded (FR-043; ANA-081). Candidates are entered before any is scored
 (the entered set of research R6), and a further candidate is entered later only in place of one that
 became `rejected` or `ineligible`, never because another's R is high: one is entered for every such
 candidate while its family has fewer than three evaluated candidates and the budget allows, proposed
 by the agent, its entry approved by the owner, and the candidate log's `replacement` entry,
 `pending` from the decision until the replacement's `proposed` entry or a
-stated reason (the family full, the budget spent) closes it, records each case (data-model §3). The
+stated reason (the family full, the budget spent) closes it, records each case (data-model §3),
+`candidate_log.py` appending the decision with its `replacement` entry, the replacement's `proposed`
+entry, written on the owner's explicit word quoted with its date in it, and a
+`replacement` entry that closes a pending one with its reason (FR-041; ANA-080). The
 entry is logged `pending` only with a decision whose cause lies in the candidate itself, its own
 evidence or properties. A decision whose cause its family or the whole set shares calls for no
 replacement, and its `replacement` entry is logged closed at once, with the reason "cause shared":
@@ -3598,8 +3641,9 @@ only added; the selection rule does not change.
 
 **Stop rule.** At most three candidates of each family (D4) are evaluated. A candidate is a
 distinct design of Π with its own entry in the candidate log (FR-041), eligible or not, and it
-counts as evaluated from its first entry, `proposed`, which comes before any tool runs on it; a
-fourth `proposed` entry of a family is refused. A later candidate is entered
+counts as evaluated from its first entry, `proposed`, which comes before any tool runs
+on it; a fourth `proposed` entry of a family is refused, `candidate_log.py
+propose` exiting 2 and appending nothing (ANA-080). A later candidate is entered
 only in place of one `rejected` or `ineligible`, one for each such candidate
 while its family has fewer than three evaluated candidates and the budget
 allows, or once after a decline at the owner design review where the rules can
@@ -3611,9 +3655,10 @@ uniform control's hours, a stricter change's new measurement or a trail search a
 replacement is not entered only to end as the candidate it replaces did (ANA-078); "the budget
 spent", the reason that closes a `replacement` entry otherwise, means that a row of the further
 candidate, at its current value, is at zero after a lowering or below the recorded need of such a
-run, which the log writer accepts only when R7's rows, the record of that need and, for a lowered
-row, the protocol change log's entry that lowered the budget show it, exit 2 otherwise
-(data-model §3; ANA-078). A decision whose cause its family or the whole set shares calls for no
+run, which the log writer, `candidate_log.py replace`, accepts only when R7's
+rows, the record of that need and, for a lowered row, the protocol change
+log's entry that lowered the budget show it, exit 2 otherwise (data-model §3;
+ANA-078). A decision whose cause its family or the whole set shares calls for no
 replacement: its `replacement` entry is logged closed at once, with the reason "cause shared"
 (Eligibility and selection; ANA-073). A change makes a new candidate if it touches the
 operation list's structure: the nonlinear component, the round structure

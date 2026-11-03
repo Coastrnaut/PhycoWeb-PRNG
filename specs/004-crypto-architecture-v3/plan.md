@@ -283,6 +283,7 @@ scripts/
 ├── archive_phyco_v2.py       # baseline/phyco-v2/ and its MANIFEST.json (R18)
 ├── fut_sec8.py               # US1 driver (R2)
 ├── validate_tool.py          # one tool validation record (FR-039)
+├── candidate_log.py          # the candidate log's entries no other script writes (FR-041; ANA-080)
 ├── evidence_v3.py            # one evidence kind for one candidate (R4, R12, R13)
 ├── d4_choice.py              # the D4 score and choice (R5, R6)
 ├── round_rule.py             # R, eligibility, selection, stop rule
