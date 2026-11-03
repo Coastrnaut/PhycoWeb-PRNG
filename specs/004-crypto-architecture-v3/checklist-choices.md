@@ -16,9 +16,10 @@ applied on 2026-11-02, the 22 that the sixth re-run of 2026-11-02 found over the
 advance and applied on 2026-11-02, the 37 that the seventh re-run of 2026-11-02 found over them,
 answered in advance and applied on 2026-11-02, the 25 that the eighth re-run of 2026-11-02 found
 over them, answered in advance and applied on 2026-11-02, the 15 that the ninth re-run of 2026-11-02
-found over them, answered in advance on 2026-11-02 and applied on 2026-11-03, and the 28 that the
-tenth re-run of 2026-11-03 found over them, not yet answered. The 74 items marked `[Conflict]` come
-first, the 6 of the tenth re-run before the 3 of the ninth re-run, the 4 of the eighth re-run, the 4
+found over them, answered in advance on 2026-11-02 and applied on 2026-11-03, and the 28
+that the tenth re-run of 2026-11-03 found over them, answered in advance on
+2026-11-02. The 74 items marked `[Conflict]` come first, the 6 of the tenth
+re-run before the 3 of the ninth re-run, the 4 of the eighth re-run, the 4
 of the seventh re-run, the 2 of the sixth re-run, the 3 of the fifth re-run, the 11 of the fourth
 re-run, the 9 of the third re-run, the 15 of the second re-run, the 4 of the re-run and the 13 of
 the first run: where two texts disagree, every other item would be checked against a moving target
@@ -29,18 +30,21 @@ re-run's 56, then the re-run's 25, then the 193 other items of the first run, ch
 checklist.
 
 No option was written into the spec, the plan, research.md or any other document before the owner
-answered its round, and none of the tenth re-run's options has been written yet. This document ticks
-no checklist item. On 2026-11-01, and again on 2026-11-02 with the instruction to repeat the rounds
-until a re-run finds no new item, the owner asked the agent to verify each item against the text and
+answered its round. This document ticks no checklist item. On 2026-11-01, and again on
+2026-11-02 with the instruction to repeat the rounds until a re-run finds no new
+item, the owner asked the agent to verify each item against the text and
 tick it if it holds; each checklist's Notes record those instructions, their dates and the commits
 that ticked items, and the owner's tasks approval includes the review of those ticks (PRO-045).
 
-**Status: 522 rows answered and applied: the 376 of the first four rounds "all recommended" (owner),
-the 206 of the first run, the 29 of the re-run and the 71 of the second re-run on 2026-11-01 and the
-70 of the third re-run on 2026-11-02, and the 146 of the fourth to ninth re-runs in advance on
-2026-11-02, by the owner's approval of all suggestions, each round to the eighth re-run applied the
-same day and the ninth re-run on 2026-11-03; the 28 rows of the tenth re-run await the owner's
-answer.** Option A of every answered row is applied where its Changes cell names a document: the
+**Status: all 550 rows answered: the 376 of the first four rounds "all recommended" (owner), the 206
+of the first run, the 29 of the re-run and the 71 of the second re-run on 2026-11-01 and the 70 of
+the third re-run on 2026-11-02, and the 174 of the fourth to tenth re-runs in advance on 2026-11-02,
+by the owner's approval of all suggestions; the 131 of the fourth to eighth re-runs were applied the
+same day and the 15 of the ninth re-run on 2026-11-03.** The 28 rows of the tenth re-run, the last
+round of the loop by the owner's instruction of 2026-11-03, are being applied from
+2026-11-03, checklist by checklist, and each checklist's rows are committed once
+they are written into every document they name. Option A of every row of the
+first ten rounds is applied where its Changes cell names a document: the
 spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, the eight checklist
 files (SEC-066), security.md (versions 2.11, 2.12 and 2.13), `.gitattributes` and this document's
 lists "Rows that change the protocol" (PRO-061), with `research/004/place_check.py`, the script spec
@@ -63,8 +67,9 @@ commit as each table row and each answered round, as the spec's Status line is (
   rows were answered in advance by the same approval. The seventh re-run's 37 rows were answered in
   advance by the same approval. The eighth re-run's 25 rows were answered in advance by the same
   approval. The ninth re-run's 15 rows were answered in advance by the same approval. The tenth
-  re-run's 28 rows await an answer: "all recommended", letters by ID, for example "SEC-096 B,
-  REP-100 B, the rest recommended", or an option in the owner's own words.
+  re-run's 28 rows were answered in advance by the same approval. An answer could also have given
+  letters by ID, for example "SEC-096 B, REP-100 B, the rest recommended", or an option in the
+  owner's own words.
 - After each answer, the changes each chosen option names are applied with their reasons. The six
   checklists are then re-read against the changed text, and the reviewer ticks an item once the text
   it asks for is in place.
@@ -203,7 +208,8 @@ commit as each table row and each answered round, as the spec's Status line is (
 
 The 74 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
 
-From the tenth re-run of 2026-11-03, not yet answered, in checklist order:
+From the tenth re-run of 2026-11-03, answered in advance on 2026-11-02 with the recommended options,
+in checklist order:
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -345,8 +351,8 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 
 The 22 items other than conflicts that the tenth re-run of 2026-11-03 found over the complete
 documents and the repository, in checklist order: 3 security, 4 design-rationale, 6 analysis, 4
-protocol, 3 hardware and 2 reproducibility. They await the owner's answer, as do the 6 conflicts
-above.
+protocol, 3 hardware and 2 reproducibility. They were answered in advance on 2026-11-02 with the
+recommended options, as were the 6 conflicts above.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -1096,8 +1102,9 @@ under the same places, and the owner's answer to that round, given in advance on
 approved it as written (FR-044). The tenth list, the ninth re-run's, was written with its rows on
 2026-11-03, under the same places, and the owner's answer to that round, given in advance on
 2026-11-02, approved it as written (FR-044). The eleventh list, the tenth re-run's, was written with
-its rows on 2026-11-03, under the same places, and the owner's answer to that round approves it
-(FR-044). Each listed row enters the log with its rules' texts before and after its round, as
+its rows on 2026-11-03, under the same places, and the owner's answer to that
+round, given in advance on 2026-11-02, approved it as written (FR-044). Each
+listed row enters the log with its rules' texts before and after its round, as
 data-model §18 states (PRO-051). The log is created, and no evidence run starts, only after the
 owner has confirmed every list; a row the owner takes out of a list is recorded here, beside that
 list, with the owner's reason, that it changed no rule.
@@ -1759,7 +1766,7 @@ the comparison now stand. The protocol changes among them enter the protocol cha
 created, before any result exists (FR-044; data-model §18). Each of the 15 items was then verified
 against the complete documents: all 15 hold and are ticked, as each checklist's Notes record, and no
 item of the eight checklists stays open. A tenth re-run of the six checklists over the complete
-documents and the repository then found the 28 items whose rows await an answer.
+documents and the repository then found 28 more items.
 
 Of the 28 rows of the tenth re-run, 6 are conflicts and 22 come from its other items: 3 security, 4
 design-rationale, 6 analysis, 4 protocol, 3 hardware and 2 reproducibility. By kind, their
@@ -1776,9 +1783,11 @@ conservative reading: a research row's bound is the lower of the two its texts g
 `bound_bits`; a pinned version stays pinned; and D4 sends one family on wherever either has
 reduced-width evidence, never both. SEC-093's and SEC-095's recommendations reword README's status
 block and the README lines the claim test flags, and give security.md §1.1 its row for `phyco-v3`,
-in plan phase 1, with SEC-091's change, when the claim test is written, not now. Once the rows are
-answered, the chosen options are written into the documents their Changes cells name, each with its
-reason; the protocol changes among them, listed above under "Rows that change the protocol", are
-recorded as FR-044 requires; the six checklists are re-read; and, as the owner asked on 2026-11-03,
-the loop of re-runs stops after this round, so that `/speckit-tasks` waits for the owner's word, no
-re-run having yet found no new item.
+in plan phase 1, with SEC-091's change, when the claim test is written, not now. The owner's
+approval of all suggestions, given in advance on 2026-11-02, answers these rows with their
+recommended options and approves this round's list above, and the chosen options are being written
+from 2026-11-03 into the documents their Changes cells name, each with its reason; the protocol
+changes among them enter the protocol change log when it is created, before any result exists
+(FR-044; data-model §18); the six checklists are re-read; and, as the owner asked on 2026-11-03
+("after this iteration, stop the speckit-checklists loop"), the loop of re-runs stops after this
+round, so that `/speckit-tasks` waits for the owner's word, no re-run having yet found no new item.
