@@ -319,7 +319,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     of a false firing (below). The threshold stays 0.005/(128·S_A) whatever the number of round
     counts, so the rule never fires less. If more than 128 are measured, which needs R_cur above
     128, the stated chance of a false firing becomes 0.005·m/128 per size for m round counts,
-    reported beside the result. A difference bit that never flips fires, so a dependency that is
+    reported beside the result and entering the family-wise rate as a = m/128 (False firing, below;
+    ANA-079). A difference bit that never flips fires, so a dependency that is
     never observed raises R_dist.
   - **Null models.** Under a random permutation, p = 1/2 for each frequency bit, each avalanche
     difference bit and each rotational difference bit. For an invariant form (R13), the null
@@ -458,11 +459,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     64% (computed on 2026-11-02), and the chance stated beside a firing is the one for the T call
     types tested. The rate counts the pairs of a claimable size and a round count r at which the
     tests ran with 2r above the R then in force, the only round counts at which a firing raises R,
-    N of them: 1 − 0.995^(T·N), or 1 − 0.995^(T·(N + 3)) with the avalanche test, so that with one R
-    at every size and no rise N = 3⌈R/2⌉, as above; beside a firing, N counts the pairs tested up to
-    that firing's record, and the final report and the spec's FR-041 count every pair tested by the
-    freeze, each size's own R and every rise included, as `round_rule.py`
-    computes it from the records (ANA-075). With the avalanche threshold at
+    N of them: 1 − 0.995^(T·N), or 1 − 0.995^(T·N)·∏(1 − 0.005·a)^T with the avalanche
+    test, so that with one R at every size and no rise N = 3⌈R/2⌉, as above;
+    beside a firing, N counts the pairs tested up to that firing's record, and
+    the final report and the spec's FR-041 count every pair tested by the
+    freeze, each size's own R and every rise included, as `round_rule.py` computes it from the
+    records (ANA-075). The avalanche test's term counts its runs up to the same record, size by
+    size, the product taken over the claimable sizes at which it ran by then, a being 1 at a size
+    where it measured at most 128 round counts and m/128 where it measured m above 128 (Avalanche
+    test, above), so that with every size run and none above 128 it is 1 − 0.995^(T·(N + 3)), and
+    the final report's rate takes every avalanche run by the freeze, as `round_rule.py` computes
+    a from the records with N (ANA-079). With the avalanche threshold at
     0.005/S_A per round count, as first drafted, it would be 38% at R = 32. A raised R adds round
     counts, so a raise can repeat, and repeated raises can use up the budget of R7, which ends
     the measurement as inconclusive. The spec's rule cannot be loosened (FR-044), so this cost is
@@ -798,14 +805,26 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     tie-breaks" (RAT-072).
   - **Replacements.** A candidate entered in place of one `rejected` or `ineligible` (spec stop
     rule) has rows of its own, at their current values after any lowering. "The budget allows" its
-    entry while each of those rows holds more than zero hours, and "the budget spent", which closes
-    a `replacement` entry otherwise, means that a lowered budget left one of them at zero, which the
-    log writer checks against these rows and the protocol change log's entry that lowered the budget
-    (data-model §3). A decision whose cause the candidate's family or the whole set shares,
+    entry while each of those rows holds more than zero hours and at least the recorded need of each
+    run that the rules require of every candidate at that size and that would be charged to it, a
+    uniform control's hours, a stricter change's new measurement or a trail search at 16×16, so that
+    a replacement is not entered only to end as the candidate it replaces did (ANA-078), and "the
+    budget spent", which closes a `replacement` entry otherwise, means that one of them is at zero
+    after a lowering or below the recorded need of such a run, which the log writer checks against
+    these rows, the record of that need and, for a lowered row, the protocol
+    change log's entry that lowered the budget (data-model §3; ANA-078). A
+    decision whose cause the candidate's family or the whole set shares,
     `ineligible` because D4 chose the other family (above) or a decision that a fired uniform
     control, the lack of a validated trail route or a match in the shared polynomial brings, takes
     no replacement: its `replacement` entry is logged closed at once, with the reason "cause shared"
-    (spec "Eligibility and selection"; ANA-073).
+    (spec "Eligibility and selection"; ANA-073). An `ineligible` decision for a row that cannot hold
+    a run the rules require of every candidate at that size, a uniform control's hours, a stricter
+    change's new measurement or a trail search at 16×16, is classed by that run's recorded need:
+    shared where the need exceeds the row's value in this section, at its current value after any
+    lowering, which every replacement's row of that value shares, the decision's `replacement` entry
+    then being logged closed at once with the reason "cause shared", and the candidate's own where
+    the candidate's earlier charges to that row left too little (spec "Eligibility and selection";
+    ANA-078).
   - **After a rise of R** (spec round rule). Every record that depends on R is made again at the new
     variant, each a new measurement of its kind, charged to its row where this section budgets the
     kind: first the constant table of the new variant, written by `gen_constants_v3.py --candidate`

@@ -715,7 +715,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   established for that candidate within its analysis budget, and it cannot be frozen. The gap is
   reported, and the candidate is `ineligible`; another candidate is entered in its place, before the
   set closes, while its family has fewer than three evaluated candidates and the budget allows (each
-  of the replacement's rows holding more than zero hours; stop rule), as the candidate log's
+  of the replacement's rows holding more than zero hours and at least the recorded need of each run
+  the rules require of every candidate at that size; stop rule; ANA-078), as the candidate log's
   `replacement` entry records (section "Pre-registered Design Protocol",
   "Eligibility and selection"); if no candidate ends eligible, the feature recommends stopping.
 - **The round rule gives an expensive R**: rounds are never lowered for throughput. The cost is
@@ -1697,14 +1698,20 @@ freeze hashes and the baseline manifest; run the claim-register test.
   distinguisher at its round count that raises R, with the family-wise rate of chance firings on
   uniform outputs for the T call types tested stated beside it, and is never measured again to
   remove it; the final report repeats the rate. The rate is 1 − 0.995^(T·N), or
-  1 − 0.995^(T·(N + 3)) with the avalanche test, where N is the number of pairs of a claimable size
-  and a round count r at which the tests ran with 2r above the R then in force, the only round
-  counts at which a firing raises R: with one R at every size and no rise, N = 3⌈R/2⌉, so that the
+  1 − 0.995^(T·N)·∏(1 − 0.005·a)^T with the avalanche test, where N is the number
+  of pairs of a claimable size and a round count r at which the tests ran
+  with 2r above the R then in force, the only round counts at which a firing
+  raises R: with one R at every size and no rise, N = 3⌈R/2⌉, so that the
   rate is about 21% and 23% at R = 32 with one stream, T = 1, and about 62% and 64% with T = 4
   (research R4); beside a firing, N counts the pairs tested up to that firing's record, and the
   final report and FR-041's statement of the selection bias count every pair tested by the
-  freeze, each size's own R and every rise included, and `round_rule.py`
-  computes N from the records (ANA-075). Before the freeze, a change is a new
+  freeze, each size's own R and every rise included, and `round_rule.py` computes N from the records
+  (ANA-075); the avalanche test's term counts its runs the same way, size by size, the product taken
+  over the claimable sizes at which it ran up to that record, or by the freeze for the final report,
+  a being 1 at a size where it measured at most 128 round counts and m/128 where it measured
+  m above 128, research R4's chance, so that with every size run and none
+  above 128 the rate is 1 − 0.995^(T·(N + 3)), and `round_rule.py` computes a
+  from the records with N (ANA-079). Before the freeze, a change is a new
   design-document version and a log entry. After the freeze, any change to a frozen file, a
   raise of R by feature 005, a new claimable size, or the correction of a disagreement between
   the frozen design document and the frozen model (edge cases), MUST be a new model ID with its
@@ -2272,9 +2279,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   where possible (FR-044). The final report MUST state the selection bias of choosing among
   candidates on development inputs (security.md §11.6): the candidates logged and evaluated per
   family, the evaluations (measurements and searches) behind the frozen one, the bias rule's
-  family-wise chance rates over them, each counting every pair of a claimable size and a
-  round count tested by the freeze, each size's own R and every rise included
-  (FR-028; ANA-075), and that every result of the frozen candidate is on
+  family-wise chance rates over them, each counting every pair of a claimable size and a round count
+  tested by the freeze, each size's own R and every rise included, and every avalanche run by the
+  freeze, with m/128 at a size where it measured m round counts above 128 (FR-028;
+  ANA-075, ANA-079), and that every result of the frozen candidate is on
   development inputs chosen among up to six candidates, so that feature 007's held-out
   evaluation is the unbiased test. The rationale's chapter on alternatives cites the log
   entries (FR-034).
@@ -3279,11 +3287,15 @@ control ran for it or before it (research R7), and the control runs once every r
 hold them, each charged them in full: the 12 h row of every entered candidate, except a candidate
 `withdrawn`, `rejected` or `ineligible`, whose row is charged no control that runs after that
 decision, and a candidate whose row cannot hold the hours, which takes no test of that kind at that
-size, its evidence there inconclusive, and is charged nothing for it (research R4, R7; ANA-074).
+size, its evidence there inconclusive, and is charged nothing for it (research R4,
+R7; ANA-074); a decision that this brings is classed as "Eligibility and
+selection" states, shared where the control's hours exceed the row's value and
+the candidate's own where its earlier charges left too little (ANA-078).
 A firing is reported as a distinguisher at its round count that raises R,
 with the family-wise rate of chance firings for the call types tested stated beside it,
-over the pairs of a size and a round count tested up to that firing's record
-(FR-028; ANA-075), and it is never measured again to remove it. At each size
+over the pairs of a size and a round count tested up to that firing's record and the avalanche runs
+made up to it, size by size, with research R4's m/128 at a size where more than 128 round counts are
+measured (FR-028; ANA-075, ANA-079), and it is never measured again to remove it. At each size
 it runs after the trail bounds and the structural checks, from the R they
 give, and a later rise of R extends it to the new R (round rule). *Stricter means*: only a change
 that can add firings and never remove one. Every
@@ -3371,9 +3383,15 @@ replacement, and its `replacement` entry is logged closed at once, with the reas
 `ineligible` because D4 chose the other family, by its score or its tie-breaks, and the decisions
 that a fired uniform control, the lack of a validated trail route or a match in the shared
 polynomial bring, which end in the stop rule's recommendation for every candidate; a
-candidate of the family D4 did not choose that is analysed after all takes a
-replacement only for a decision of its own (research R7, "The other family";
-ANA-073). The set closes at a `set-closed` entry of the candidate log, written by
+candidate of the family D4 did not choose that is analysed after all takes a replacement only for a
+decision of its own (research R7, "The other family"; ANA-073). An `ineligible` decision for a row
+that cannot hold a run the rules require of every candidate at that size, a uniform control's hours,
+a stricter change's new measurement or a trail search at 16×16, is classed by that run's recorded
+need: shared where the need exceeds the row's value of research R7, at its current value after any
+lowering, which every replacement's row of that value shares, the decision's `replacement` entry
+then being logged closed at once with the reason "cause shared", and the
+candidate's own where the candidate's earlier charges to that row left too little
+(ANA-078). The set closes at a `set-closed` entry of the candidate log, written by
 `round_rule.py --close` once every candidate has a final decision and no replacement is pending, and
 selection runs only after it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for
 an eligible candidate, its round-rule record at every claimable size; a candidate of
@@ -3400,11 +3418,15 @@ while its family has fewer than three evaluated candidates and the budget
 allows, or once after a decline at the owner design review where the rules can
 select it, never because another's R is high, and none after the set closes (Eligibility and
 selection). The budget allows a replacement while each of its own rows of research R7, at its
-current value after any lowering, holds more than zero hours; "the budget spent", the reason that
-closes a `replacement` entry otherwise, means that a lowered budget left a row of the
-further candidate at zero, which the log writer accepts only when R7's rows
-and the protocol change log's entry that lowered the budget show it, exit 2
-otherwise (data-model §3). A decision whose cause its family or the whole set shares calls for no
+current value after any lowering, holds more than zero hours and at least the recorded need of each
+run that the rules require of every candidate at that size and that would be charged to it, a
+uniform control's hours, a stricter change's new measurement or a trail search at 16×16, so that a
+replacement is not entered only to end as the candidate it replaces did (ANA-078); "the budget
+spent", the reason that closes a `replacement` entry otherwise, means that a row of the further
+candidate, at its current value, is at zero after a lowering or below the recorded need of such a
+run, which the log writer accepts only when R7's rows, the record of that need and, for a lowered
+row, the protocol change log's entry that lowered the budget show it, exit 2 otherwise
+(data-model §3; ANA-078). A decision whose cause its family or the whole set shares calls for no
 replacement: its `replacement` entry is logged closed at once, with the reason "cause shared"
 (Eligibility and selection; ANA-073). A change makes a new candidate if it touches the
 operation list's structure: the nonlinear component, the round structure

@@ -395,7 +395,10 @@ R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every inpu
 It computes from the evidence records the N of spec FR-028's family-wise rate, the pairs of a
 claimable size and a round count r at which the bias tests ran with 2r above the R then in force, up
 to each firing's record for the rate stated beside it and by the freeze for the final report's
-(ANA-075). `--close` writes the candidate log's `set-closed` entry once every candidate has a final
+(ANA-075). With N it computes the avalanche test's term, its runs up to the same record, size by
+size, a being 1 at a size where it measured at most 128 round counts and m/128 where it measured m
+above 128, and the rate 1 − 0.995^(T·N)·∏(1 − 0.005·a)^T over the sizes run (spec FR-028; ANA-079).
+`--close` writes the candidate log's `set-closed` entry once every candidate has a final
 decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule
 record at every claimable size) and no `replacement` entry of the log is `pending` (data model §3),
 an entry logged closed at once with the reason "cause shared" reading as closed (ANA-073), and

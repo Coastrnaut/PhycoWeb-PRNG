@@ -344,17 +344,31 @@ corrects. `cand-A1` is the long-trail ARX-box design (FR-022).
   "D4 chose the other family by its tie-breaks", and for the decisions that a fired uniform control,
   the lack of a validated trail route or a match in the shared polynomial bring, the entry is logged
   closed at once, with the reason "cause shared", and no replacement is entered for it (spec
-  "Eligibility and selection"; ANA-073).
+  "Eligibility and selection"; ANA-073). An `ineligible` decision for a row that cannot hold a run
+  the rules require of every candidate at that size, a uniform control's hours, a stricter change's
+  new measurement or a trail search at 16×16, is classed by that run's recorded need: shared where
+  the need exceeds the row's value of research R7, at its current value after any lowering, which
+  every replacement's row of that value shares, the decision's `replacement` entry then being logged
+  closed at once with the reason "cause shared", and the candidate's own where the candidate's
+  earlier charges to that row left too little (ANA-078).
 - **Entered set.** Candidates are entered before any is scored (R6's entered set). A further
   candidate is entered later only in place of one that became `rejected` or `ineligible`, never
-  because another's R is high, and one is entered for every such candidate while its family has
-  fewer than three evaluated candidates and the budget allows: the agent proposes it, and the owner
+  because another's R is high, and one is entered for every candidate that became `rejected` or
+  `ineligible` for a cause of its own, its own evidence or properties, while its family has fewer
+  than three evaluated candidates and the budget allows, and none for a decision whose
+  `replacement` entry was logged closed at once with the reason "cause shared"
+  (Decisions, above; ANA-073, ANA-077): the agent proposes it, and the owner
   approves its entry, quoted with its date in its `proposed` entry, which closes the
   `replacement` entry logged with the decision; a stated reason, the family full or the budget
   spent, closes it otherwise. The budget allows while each of the replacement's own rows of research
-  R7, at its current value after any lowering, holds more than zero hours; it is spent when a
-  lowered budget left one of those rows at zero, and the log writer closes a `replacement` entry for
-  that reason only when R7's rows and the protocol change log's entry that lowered
+  R7, at its current value after any lowering, holds more than zero hours and at least the recorded
+  need of each run that the rules require of every candidate at that size and that would be charged
+  to it, a uniform control's hours, a stricter change's new measurement or a trail search at 16×16,
+  so that a replacement is not entered only to end as the candidate it replaces did (Decisions,
+  above; ANA-078); it is spent when one of those rows, at its current value, is at zero after a
+  lowering or below the recorded need of such a run, and the log writer closes a
+  `replacement` entry for that reason only when R7's rows, the record of that
+  need and, for a lowered row, the protocol change log's entry that lowered
   the budget show it, exit 2 otherwise. The set closes at a `set-closed`
   entry, written by `round_rule.py --close` once every candidate has a final decision and no
   `replacement` entry is `pending`; `--select` exits 2 before it, and no candidate is entered after
