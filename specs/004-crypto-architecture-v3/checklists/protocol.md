@@ -670,6 +670,104 @@ They start open, and an item is ticked only under the rule in the Notes below.
   FR-043's step (2) does? [Consistency, Spec §FR-043; research R16; quickstart F2; data-model §13;
   cli contract `design_freeze.py`]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK074 Do the notes under the Review & Approval table and the cli contract's "Approvals" name
+  every script that reads a row of the table at HEAD, given that `round_rule.py --decide` exits 2,
+  appending nothing, while the latest selection record has a tie and no choice whose row, "Selection
+  tie" or "Selection tie <k>", reads the owner's approval at HEAD with the choice record's SHA-256
+  (ANA-081), and that `provenance.py review` refuses a review entry whose `row` does not read at
+  HEAD, with its `reviewed_sha256`, the decision the entry records (RAT-077, RAT-081), while the
+  notes' first list has the Selection tie rows and the review rows read by `design_freeze.py create`
+  alone, the cli contract's "Approvals" names neither script among the guards that read the table at
+  HEAD and exit 2 while the working tree's table differs from HEAD's, and a test checks that the
+  first list, its numbered families included, and the contracts' guards agree both ways? Is each
+  reading listed with the rows it reads, and is it stated whether each exits 2 while the working
+  tree's table differs from HEAD's? [Consistency, Coverage, Spec §Review & Approval (notes under the
+  table); data-model §3, §14, §17; cli contract "Approvals", `round_rule.py`, `provenance.py`]
+- [ ] CHK075 Can the agent write the owner design review's review entries in FR-043's window while a
+  row that the owner sets for step (1)'s commit stands uncommitted in the working tree, given that
+  `provenance.py` writes through `protocol/provenance.py`, a log writer that the guard "Environment"
+  checks, that this guard, like every guard that reads the Review & Approval table, exits 2 while
+  the working tree's table differs from HEAD's (cli contract, "Approvals"), that the entries are
+  written after the commit that records the review's approval and before step (1), for step (1)'s
+  commit to hold them (RAT-082), and that the external review's row, where it is set after that
+  approval, is set in that same commit (PRO-070)? Is the order stated, the review entries before any
+  row is set in the working tree for step (1), or another reading of the table for that write, so
+  that the entries step (1) must hold cannot be refused by a row the owner has already set? [Edge
+  Case, Gap, Spec §FR-043, §Review & Approval (notes under the table); cli contract "Environment",
+  "Approvals", `provenance.py`]
+- [ ] CHK076 Is the repair of a broken chain stated consistently with the logs' writers and the
+  guard "Hash-chained logs", given that `scripts/repair_log.py` repairs a chain "in one of the three
+  logs" and appends a `repair` entry with the break's position, its cause and what was restored, the
+  broken file kept unchanged with its SHA-256 (research R16; data-model §3; cli contract), while
+  data-model §14 has the provenance log's chain "repaired as in section 3" and names
+  `protocol/provenance.py` its one writer, FR-044 and data-model §18 have the protocol change log
+  written only by `scripts/protocol_change.py`, whose writer refuses an entry without `direction`,
+  `last_record_id` or `results_known`, neither section defines a `repair` entry, every append
+  exits 2 while the chain is broken, and no entry is ever edited? Is it stated which writer appends
+  the repair entry to each log and with which fields, whether the restored log keeps its later lines
+  as stored or chains them anew, how that append takes `data/log-append.lock` and passes the chain
+  check, and whether a `repair` entry of the protocol change log goes through the owner's approval
+  step and becomes the entry that later records cite? [Conflict, Gap, Spec §FR-044, §FR-067;
+  research R16; data-model §3, §14, §18; cli contract "Hash-chained logs", `repair_log.py`,
+  `protocol_change.py`, `provenance.py`]
+- [ ] CHK077 Is the owner's confirmation of a later entry of the protocol change log checked by any
+  reader, given that `protocol_change.py propose` ends in the approval step and records the first 16
+  hex digits the owner typed as `approval_confirmed`, over that entry's own SHA-256 without
+  `approver` and `prev_sha256` (REP-094), while the guard "Protocol log" recomputes the approval
+  hash from the first entries alone and checks only their digits, `recheck_004.py` reads no
+  approval, and the chain does not protect the log's last line, so that a later entry whose digits
+  do not match its hash, a stricter change or an addition to the constant rule's refused list among
+  them, would still be cited by every later record and applied by the re-check as the rules in
+  force? Does the guard also recompute each later entry's hash and check its `approval_confirmed`,
+  exit 2 otherwise, with `tests/test_protocol_004.py` covering a later entry whose digits do not
+  match? [Gap, Measurability, Spec §FR-044; data-model §18 `approver`; cli contract "Protocol log",
+  `protocol_change.py`, `recheck_004.py`]
+- [ ] CHK078 Is a change of the versions that research R1 states recorded as a change of a rule,
+  with a direction, given that after an update the owner writes a new environment record "with R1
+  updated first when a pinned version changes", the record being checked against R1 and the pins of
+  `requirements.txt` (cli contract, "Environment"; PRO-068), while FR-044 makes R1 a place of
+  "Records and their hashes", so that a change made in its text alone is a change of that rule, to
+  be recorded before any result it affects with the owner's approval, and that rule's direction only
+  adds to what a record holds, the files hashed and kept, and the writers' and guards' checks and
+  refusals, which a new version of Python, numpy, scipy, pip or gcc does not do? Since
+  `protocol_change.py propose` writes through `protocol/changelog.py`, which the guard refuses while
+  the running environment differs from the record in force, is it stated whether R1's versions
+  belong to the rule's text, which direction such an entry takes, and in which order R1's change,
+  the new record, its row and the entry come, inside FR-043's window too? [Conflict, Gap, Spec
+  §FR-044; research R1, R18; cli contract "Environment", `owner_record.py`, `protocol_change.py`]
+- [ ] CHK079 Can the change log's first entries record, for every listed row, a direction that
+  FR-044 defines, given that FR-044 allows a change only in a rule's stricter direction or as a
+  settling "never looser than any reading of the existing text", with no qualifier of size, while
+  checklist-choices.md's "How to answer" says that RAT-036 and RAT-052 change a check at the
+  research sizes, "where as written it fails every candidate", and ANA-062 and ANA-068 the round
+  counts and bits of the avalanche test's validation, under which, "read with every round count from
+  1 and no bit exempt, it fails every correct test", that the Settle rows PRO-065, PRO-068 and
+  PRO-071 admit writes that the guards "Protocol log" and "Environment" refused as written, under
+  headings whose directions only add refusals, and that the Clarifications and the Review & Approval
+  rows of the third to ninth re-runs qualify the claim by size, "at every claimable size" and "at a
+  claimable size"? Is it stated how a first entry records a rule changed against a reading under
+  which the rule fails every candidate, every correct tool or a write the protocol needs, with that
+  reading among its `readings`, so that FR-044's definition and the rows' claim agree? [Conflict,
+  Measurability, Spec §FR-044, §Clarifications, §Review & Approval; data-model §18 `direction`,
+  `readings`; checklist-choices.md "How to answer", "Rows that change the protocol"]
+- [ ] CHK080 Is the end of FR-043's window fixed by an event that the agent and a reader of the
+  history can find, given that from the first commit that records an owner design review's approval
+  "to the feature's end, plan phase 9 included" every commit of a file of this feature is the
+  owner's, that those files include security.md, README, `.gitignore`, `.gitattributes`,
+  `requirements.txt` and `protocol/claims.json`, which later features change too, and that no text
+  names the commit, row or step at which the feature ends, while the last row of the Review &
+  Approval table, "Final result review", has no notes and the final report may recommend a stop
+  (FR-052)? Is it stated, for example, that the window ends with the commit that records the final
+  result review's decision, and from when the standing authorization covers those files again? [Gap,
+  Clarity, Spec §FR-043, §FR-052, §Review & Approval "Final result review", §Assumptions; plan
+  phase 9; constitution IX]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
