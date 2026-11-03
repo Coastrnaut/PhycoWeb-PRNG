@@ -167,15 +167,19 @@ the class.
   defect keeps its record, with the defect noted.
   A heavy run that died holding its lock gets that `inconclusive` record when
   `scripts/clear_lock.py` clears the lock, which also writes a `lock-cleared` record under `locks/`
-  with the lock's content (research R16).
+  with the lock's content (research R16); its `hours` used are the hours from the time the lock
+  holds to the clearing, the most it can have used, and for a run on a candidate
+  `evidence_v3.py --aborted` appends that record's `evidence` entry, so that the run is charged
+  and the log cites it (cli contract, `clear_lock.py`).
 - **Projection records.** A `projection` record (research R7) is written for every 60 s
   projection and every timing probe: the run it projects and its budget row, its inputs (the
   first inputs of that run), the measured speed, the projected hours and its own time. Its
   outputs other than timing are discarded unread, and the record says so. Its time counts
   against the row of the run it projects. FR-053's test with two worker counts, which is not
   evidence and writes no other record, writes a further one when it ends, naming research R7's
-  feature-wide row, whose time is the time the test took, so that the row's hours used can be
-  read from the records (cli contract, Budget).
+  feature-wide row, whose time is the time the test took and which says, in place of the sentence
+  above on its outputs, that the test compared the outputs of its stated test operation list and
+  kept none, so that the row's hours used can be read from the records (cli contract, Budget).
   A projection record is not evidence: the order of sizes counts evidence records only (research
   R7), so a probe at a larger size runs before the run it projects.
 - **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its

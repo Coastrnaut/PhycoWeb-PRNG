@@ -1996,7 +1996,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     removes one, and only when no process with that PID and start time runs; it writes a
     `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
     A heavy run that died holding the lock then gets the `inconclusive` record that every started
-    run writes (data-model §1). Before the protocol change log exists a `lock-cleared` record and an
+    run writes, the hours from the time the lock holds to the clearing being its hours used, the
+    most it can have used (data-model §1; cli contract). Before the protocol change log exists a
+    `lock-cleared` record and an
     environment record written by `owner_record.py environment` are the two kinds
     `protocol/evidence.py` writes, each with `protocol_seq` and `protocol_line_sha256` `none`, the
     first since it records an event and clearing a stale lock is what lets the log be created, the

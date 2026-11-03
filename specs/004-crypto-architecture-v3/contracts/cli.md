@@ -267,11 +267,11 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   first against research R7's feature-wide 66 h row and exits 2, writing
   nothing but its `projection` record, unless its projection fits the hours left there, a heavy
   reproduction's being the projections of all the runs it will make, together (introduction). The
-  hours used in that row are the sum, read from the records, of the `hours` used of every record
-  with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's pass excepted, and of the
-  time of every `projection` record that names the row; FR-053's test, which is not evidence and
-  writes no other record, writes a further `projection` record when it ends, naming the row, whose
-  time is the time the test took (data model §1).
+  hours used in that row are the sum, read from the records, of the time of every `projection`
+  record that names the row and of the `hours` used of every other record with `heavy_run` true
+  that charges no candidate, the FUT-SEC-8 row's pass excepted; FR-053's test, which is not
+  evidence and writes no other record, writes a further `projection` record when it ends, naming
+  the row, whose time is the time the test took (data model §1).
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has
@@ -459,6 +459,7 @@ above). It writes log entries and no record, and so has no `--reproduce` mode (s
 evidence_v3.py --candidate ID --kind KIND [--size N] [--width W] [--rounds R] [--project] --out-dir DIR
 evidence_v3.py --kind control --test frequency|avalanche --size N [--project] --out-dir DIR
 evidence_v3.py --reproduce RECORD
+evidence_v3.py --aborted RECORD
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
@@ -476,7 +477,12 @@ both input sets, and an `avalanche` run the flip set and the related-key, relate
 rotational sets. An `avalanche` run needs the candidate's `dependency` record at the same size,
 or exits 2; a disagreement with its matrices writes the record with `status` `inconclusive` and
 a tool-defect entry, and exits 3. Every run started writes a record, even if aborted
-(`inconclusive` or `blocked`, with the reason). `--project` runs the timing probe of research
+(`inconclusive` or `blocked`, with the reason). A run on a candidate that died holding the
+heavy-run lock gets its record from `clear_lock.py` (below), which runs `--aborted RECORD`: that
+mode makes no run, so no budget row refuses it, and appends that record's `evidence` entry, with
+its `hours` in `budget_used_h`, so that the row is charged and the log cites the record (spec
+FR-041), and exits 2 for any other record or one that has its entry.
+`--project` runs the timing probe of research
 R7, writes a `projection` record and prints the projected hours against the budget row; it writes no
 evidence. A `control` run, the second form, belongs to no candidate and takes no `--candidate`: it
 runs once per test and size, before that test's first use at that size by any candidate, projects
@@ -1177,7 +1183,11 @@ Run by the owner or at the owner's request. It removes LOCK only when it can sho
 lock's environment, that no process with the PID and start time the lock holds still runs;
 otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
-`inconclusive` record of the run that died holding it (data model §1; research R16). While the
+`inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
+record (Budget, above), its hours used, or its time, being the hours from the time the lock holds
+to the clearing, the most the run can have used, since nothing else shows when it died; for a run
+on a candidate it runs `evidence_v3.py --aborted RECORD` before it removes the lock
+(`evidence_v3.py`, above; data model §1; research R16). While the
 protocol change log does not exist, a `lock-cleared` record is one of the two kinds that the guard
 "Protocol log" lets `protocol/evidence.py` write, an environment record the other (Protocol
 log, above; PRO-071), each with `protocol_seq` and `protocol_line_sha256`

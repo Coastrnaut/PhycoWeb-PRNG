@@ -186,9 +186,9 @@ or key-loading code is written here.
   record and nothing else, a spent candidate row never refusing a reproduction and a heavy
   reproduction refused once the projections of the runs it will make, after any rebuild, do not
   together fit the hours left in research R7's feature-wide row, its hours used being the sum, read
-  from the records, of the `hours` used of every record with `heavy_run` true that charges no
-  candidate, the FUT-SEC-8 row's pass excepted, and of the time of every `projection` record that
-  names the row. They also test the common part of `--reproduce`, with a mocked C tool and build on
+  from the records, of the time of every `projection` record that names the row and of the `hours`
+  used of every other record with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's
+  pass excepted. They also test the common part of `--reproduce`, with a mocked C tool and build on
   a temporary repository: the worktree of `git_head` checked against its blobs, and the rebuild in a
   second worktree, the committed binary removed there first, so that a make file that would find it
   up to date compiles it all the same, one run where the rebuild's SHA-256 equals the committed
@@ -271,8 +271,12 @@ or key-loading code is written here.
 - [ ] T014 Write `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request, which
   removes a stale `data/heavy-run.lock` or `data/log-append.lock` only once it shows, in the lock's
   environment, that no process with the lock's PID and start time still runs, and writes a
-  `lock-cleared` record, `$REP/locks/<record_id>.json`, with its tests in
-  `tests/test_protocol_004.py`. (FR-045; R16; PRO-065, PRO-068)
+  `lock-cleared` record, `$REP/locks/<record_id>.json`, and, for the heavy-run lock, the
+  `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
+  record, the hours from the time the lock holds to the clearing being its hours used, with its
+  tests in `tests/test_protocol_004.py`; for a run on a candidate it runs
+  `scripts/evidence_v3.py --aborted RECORD` before it removes the lock, which T082 writes, so that
+  task completes this path and T081 its test. (FR-041, FR-045; R7, R16; PRO-065, PRO-068)
 - [ ] T015 Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
   which checks the running environment against research R1 and the pins of `requirements.txt` for
   that platform and writes `$REP/environment-<platform>.json`, and `owner-provided --known KNOWN_ID
@@ -845,19 +849,25 @@ candidates are otherwise `ineligible` (R6, R7).
 - [ ] T081 [US4] Write the evidence-run tests in `tests/test_protocol_004.py` and
   `tests/test_records_004.py`: `scripts/evidence_v3.py` refuses a candidate not in the log, a spent
   budget row, a size out of order and a `bound` without a validated tool; an `avalanche` run without
-  the candidate's `dependency` record at its size exits 2; every run started writes a record; a
-  `control` run exits 2 once its record exists; `--reproduce` of a light run of each kind, its
-  latest and one older, matches (R7); and FR-053's test with two worker counts, marked heavy, which
-  writes, when it ends, a further `projection` record naming research R7's feature-wide row, whose
-  time is the time the test took. (FR-037, FR-045, FR-053, FR-065; R4, R7, R16)
+  the candidate's `dependency` record at its size exits 2; every run started writes a record;
+  `--aborted RECORD` appends the `evidence` entry of a record that `scripts/clear_lock.py` wrote,
+  with its `hours` in `budget_used_h`, whatever the row holds, and exits 2 for any other record or
+  one that has its entry; a `control` run exits 2 once its record exists; `--reproduce` of a light
+  run of each kind, its latest and one older, matches (R7); and FR-053's test with two worker
+  counts, marked heavy, which writes, when it ends, a further `projection` record naming
+  research R7's feature-wide row, whose time is the time the test took and which says that the test
+  compared the outputs of its stated test operation list and kept none. (FR-037, FR-041, FR-045,
+  FR-053, FR-065; R4, R7, R16)
 - [ ] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
   `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
   `invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) and
   `cross-check` (with `--tool NAME`); the counts of research R4 and R13, which no option lowers;
   `--project`, which writes only a `projection` record; an `evidence` entry in the candidate log per
-  record; a `trail` record beside each bound run of a tool that searches Π; and
-  `--reproduce RECORD`. Every finding carries one of the four classes of security.md §9.1, and every
-  other record `none`. (FR-037, FR-038, FR-060, FR-061; SC-017; R4, R7, R12, R13)
+  record; a `trail` record beside each bound run of a tool that searches Π; `--aborted RECORD`,
+  which makes no run and appends the `evidence` entry of a record that `scripts/clear_lock.py` wrote
+  (T014); and `--reproduce RECORD`. Every finding carries one of the four classes of
+  security.md §9.1, and every other record `none`. (FR-037, FR-038, FR-041, FR-060, FR-061; SC-017;
+  R4, R7, R12, R13)
 - [ ] T083 [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
   `tests/test_protocol_004.py`: a second D4 run exits 2 (quickstart E4); `--tie` only after an exact
   tie, once both values of R at 4×4 exist; `--choose` writes nothing unless the owner types 16 hex
@@ -1295,7 +1305,8 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-039: T008, T015, T048, T049, T050, T051, T052, T053, T054, T055, T056, T057, T058, T060, T061,
   T062, T063, T064, T074, T088
 - FR-040: T008, T023, T033, T034, T039
-- FR-041: T010, T013, T075, T076, T078, T079, T080, T083, T085, T087, T093, T094, T126
+- FR-041: T010, T013, T014, T075, T076, T078, T079, T080, T081, T082, T083, T085, T087, T093, T094,
+  T126
 - FR-042: T035, T036
 - FR-043: T085, T109, T113, T114, T116, T117, T118, T119, T120, T125, T126, T127
 - FR-044: T001, T002, T008, T010, T012, T013, T015, T027, T028, T077, T109
@@ -1307,8 +1318,8 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-050: T020, T123
 - FR-051: T018, T112, T121, T122
 - FR-052: T126, T127
-- FR-053: T003, T004, T005, T006, T008, T009, T015, T024, T025, T037, T038, T039, T040, T042, T049,
-  T050, T063, T081, T125
+- FR-053: T003, T004, T005, T006, T008, T009, T014, T015, T024, T025, T037, T038, T039, T040, T042,
+  T049, T050, T063, T081, T125
 - FR-054: T095, T101
 - FR-055: T095, T098
 - FR-056: T101, T102, T106
