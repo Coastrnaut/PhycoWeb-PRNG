@@ -796,6 +796,52 @@ They start open, and an item is ticked only under the rule in the Notes below.
   length words and k·r bits per request, or states a part negligible only with its figure and
   reason? [Consistency, Spec §FR-026, §FR-034, §FR-059; research R5; data-model §9]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK093 Is the transfer of input and output words stated for a keyed variant whose rate r is
+  not a whole number of 32-bit words, given that a keyed variant's c is a multiple of 64, so that
+  the key and the nonce are whole 32-bit words on the hardware's interfaces (research R14; CHK068),
+  while no rule makes r = b − c a multiple of 32 or of the output interface's width i, so that a
+  supported 3×3 at w = 8, with b = 144 and c = 64, has r = 80? The personalization string and a
+  reseed input are absorbed over the rate in r-bit blocks through 32-bit transfers on the absorption
+  interface, a generate request gives its length in 32-bit words, output leaves through a buffer of
+  one block (r bits) whose read-out goes to the interface width, the next call starting only after
+  the consumer has taken the block, FR-026's rate counts ⌈r/i⌉ transfers per block, and the model's
+  `words32` splits a request's bytes into 32-bit words across block boundaries, as the vector files
+  list them. Is it stated whether such a variant is built in hardware, how a word whose bits fall in
+  two blocks crosses either interface, the part held across the call of Π between them with its
+  register in the zeroization list and in FR-026's estimate, or that a keyed variant's r must be a
+  multiple of 32, as its c must be of 64? [Edge Case, Gap, Spec §FR-015, §FR-018, §FR-025 "Flow
+  control", "Zeroization", §FR-026; research R14; model contract "Variant IDs", "Output"]
+- [ ] CHK094 Does the list of the core's counters, "listed here once" with the part of FR-026's
+  estimate each falls in, name every counter the core holds, given that the output buffer's read-out
+  to the interface width takes ⌈r/i⌉ transfers per block (FR-026) and must stop at a request's last
+  word within its last block, which needs a count of the transfers within a block or of the
+  request's words, while the list names the replicated round and phase counters, the limit counters
+  and, in the controller, the request's block count, the key words, the nonce's words and the words
+  of a personalization string or a reseed input (HW-089)? Since FR-059's k is the least for which
+  "the counters take part", each "once it has counted", while the self-test's blocks go to its
+  comparator "as the output buffer receives it", with no read-out, is such a counter listed with its
+  part, the output buffer with its read-out, and is it stated whether the self-test's coverage
+  reaches it, or why it need not? [Completeness, Consistency, Spec §FR-025 "Zeroization", "Flow
+  control", §FR-026, §FR-059]
+- [ ] CHK095 Are the reset sequence and the start-up self-test stated for the core built at a
+  research size, given that the RTL selects one constant table per supported (n, w) by its generics
+  (FR-018), that the key-loading interface is generic in c, FUT-GRID-2's key loading "for every
+  supported size" being met through the keyed variant each size has (FR-025; research R14), while
+  the self-test, a step of every reset sequence, has its k, its constants and its expected output
+  "per claimable size" only (FR-018, FR-059; data-model §11, `selftest_<variant>.json`), `resetting`
+  runs from reset released to the self-test done and the state zeroized, and no call is accepted
+  before then? Is it stated whether a core built at a keyed research variant runs a self-test from
+  vectors of its own, written in the same run as the claimable sizes', or what its reset sequence
+  does instead, with the figures that follow, and what a core built at a keyless variant, which has
+  no key-loading interface, accepts? [Gap, Coverage, Spec §FR-018, §FR-025 "Key loading and reset",
+  "Call sequence", §FR-059; research R14; data-model §11; traceability FUT-GRID-2]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
