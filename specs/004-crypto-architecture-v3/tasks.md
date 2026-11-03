@@ -134,10 +134,10 @@ or key-loading code is written here.
   `fast/Makefile` among them, so that no frozen file's bytes change. (FR-053; R18)
 - [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`, with
   the generic lines `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`, `.vscode/`,
-  `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that a temporary file that a dying
-  `protocol_change.py create` leaves beside the log's path still shows in `git status`; check with
-  `git check-ignore` that each is ignored and that `fast/build/` stays ignored through `build/`.
-  (FR-045; R16, R18)
+  `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that the temporary file beside the
+  log's path, which `protocol_change.py create` writes before its rename, is never hidden from
+  `git status`; check with `git check-ignore` that each is ignored and that `fast/build/` and
+  `research/004/tools/trails/build/` stay ignored through `build/`. (FR-045; R16, R18)
 - [ ] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
   hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule or
   `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no hashed
@@ -614,9 +614,10 @@ hash, older than its first counted result.
 - [ ] T062 [P] [US4] Write `research/004/tools/trails/long_trail.py`, MILP counting of active
   ARX-boxes at the same settings; validate it on `sparkle-box`, SPARKLE's published long-trail bound
   from its box bounds. (FR-038, FR-039; SC-007; R12)
-- [ ] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c` with
-  `research/004/tools/trails/arx_search.mk` (C99, WSL), a branch-and-bound search for ARX
-  differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén);
+- [ ] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c`, a branch-and-bound search for
+  ARX differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén),
+  with `research/004/tools/trails/arx_search.mk` (C99, WSL), which builds
+  `research/004/tools/trails/build/arx_search`, ignored through `build/` as `fast/build/` is;
   validate it on `speck32-diff` and `speck32-lin`, the weights of SPECK32's optimal trails over the
   first rounds, and at w = 32 on its known result from the same papers, each run over 10 minutes
   **heavy**. (FR-038, FR-039; SC-007; R12)

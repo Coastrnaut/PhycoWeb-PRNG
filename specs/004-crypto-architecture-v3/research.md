@@ -2143,7 +2143,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     do not change: Git already holds it with LF line endings (checklist F12).
   - `.gitignore` gains, at setup (plan phase 1), the two locks of R16, `data/heavy-run.lock` and
     `data/log-append.lock`, and `data/local/`, where local-only outputs are written (R16), so that
-    none of them shows in `git status` or counts as dirty.
+    none of them shows in `git status` or counts as dirty. It also gains the generic lines that the
+    owner chose on 2026-11-03, `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`,
+    `.vscode/`, `.idea/` and `*.swp`, and no `*.tmp`, so that the temporary file beside the
+    protocol change log's path, which `protocol_change.py create` writes before its rename (R16),
+    is never hidden from `git status`. Its line `build/` already keeps out of `git status` the
+    binaries that each C tool builds into a `build/` directory beside its source (plan, Technical
+    Context).
   - `requirements.txt` loses its stale header and pins the two tested environments with markers:
     `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"`,
     `numpy==2.5.4; python_version >= "3.14"`, the same for scipy (1.15.3 and 1.18.1), and
