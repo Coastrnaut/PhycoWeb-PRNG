@@ -818,7 +818,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the rules in force at a record's entry, or a re-check's reproduction that differs, wherever it ran
   (FR-065); or a bug in the tool's code, shown by the faulty line and by a test that fails before
   the fix and passes after. It is recorded with that evidence before any
-  re-run. A disliked result is none of these.
+  re-run. A disliked result is none of these, nor is the end of a run by a reboot, a power loss
+  or an update, which no fault of the tool brought: its `inconclusive` record and its hours
+  stand, and it takes no re-run (research R7).
 - **A tool fails its validation**: none of its results count, no bound from it enters the round
   rule, and the failure is recorded. The defect is recorded with its cause and fixed, and the tool
   is validated again on every known result it has, the first and the second at each of

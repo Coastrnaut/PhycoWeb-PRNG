@@ -764,7 +764,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     force at a record's entry, or a `recheck` record's reproduction that differs, wherever it ran
     (R16); or a bug in the tool's code, shown by the faulty line and a test that fails
     before the fix and passes after. It is recorded with that evidence before any re-run
-    (data-model §1, `exclusions_and_reruns`). A disliked result is none of these.
+    (data-model §1, `exclusions_and_reruns`). A disliked result is none of these, nor is the end
+    of a run by a reboot, a power loss or an update, which no fault of the tool brought: its
+    `inconclusive` record and its hours stand, and it takes no re-run.
   - **Re-runs.** A run may be repeated only after a tool defect is found and recorded: one
     re-run per kind of evidence per candidate, across all sizes, and its time counts against the
     same budget. A second recorded defect in that kind leaves the evidence inconclusive, which
