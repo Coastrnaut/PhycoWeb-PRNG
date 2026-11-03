@@ -736,7 +736,7 @@ Items found when the checklist was run an eleventh time, over the complete docum
 repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
 ticked. They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK083 Are an event and a writer stated for the candidate-log entries that the owner design
+- [x] CHK083 Are an event and a writer stated for the candidate-log entries that the owner design
   review's outcomes need, given that FR-043, the Review & Approval row and data-model §3 and §17
   have a decline's reasons "logged under" the declined candidate, its log entry stating "what the
   rules need to select" a further candidate before that one's `proposed` entry, a revision "logged
@@ -750,7 +750,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   and within the one reopening? [Gap, Completeness, Spec §FR-034 "Version", §FR-041, §FR-043,
   §Review & Approval "Owner design review", §Pre-registered Design Protocol "Stop rule"; data-model
   §3, §17; cli contract `candidate_log.py`]
-- [ ] CHK084 Is the D4 outcome stated for every combination of the families' reduced-width results,
+- [x] CHK084 Is the D4 outcome stated for every combination of the families' reduced-width results,
   given that research R6 and the spec's nonlinearity choice rule (ANA-082) take the widest of 16 and
   8 at which each family has a candidate with both bounds at a common number of rounds, at least 2,
   choose a family "by default" "where at 16 and at 8 only one family has" such a candidate, the
@@ -762,7 +762,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   before any result it affects exists (FR-044)? [Edge Case, Ambiguity, Spec §Pre-registered Design
   Protocol "Nonlinearity choice rule", §FR-044; research R6 "Where", "One family scored", "Neither
   family scored"; data-model §8]
-- [ ] CHK085 Does the latest `selected` entry's `variant_map` stay in step with the selected
+- [x] CHK085 Does the latest `selected` entry's `variant_map` stay in step with the selected
   candidate's final R at every claimable size, given that the variant IDs it maps carry R
   (`cand-…/n…-w…-R…-c…`; FR-032), that `round_rule.py --decide` writes it only after a selection
   record, and that a new selection record follows only a change that "touches any candidate's
@@ -775,7 +775,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   compares the map's variant IDs with `round-rule.json`'s final R at every size? [Gap, Consistency,
   Spec §FR-032, §FR-043, §FR-044, §Pre-registered Design Protocol "Eligibility and selection";
   data-model §3 `variant_map`, §9, §13; cli contract `round_rule.py`, `design_freeze.py`]
-- [ ] CHK086 Does the re-check recompute the verdict of every `trail` record, given that a trail
+- [x] CHK086 Does the re-check recompute the verdict of every `trail` record, given that a trail
   found with probability or squared correlation above 2⁻¹²⁸ is a source of R_dist (round rule;
   FR-038) and is classed "confirmed vulnerability" of the rounds it covers (data-model §1), that
   data-model §6 writes one beside the bound record of every optimal characteristic a search of Π
@@ -787,7 +787,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   operation list, by exact integer arithmetic as for the other kinds, and that a disagreement blocks
   the candidate as for any record? [Coverage, Gap, Spec §FR-038, §FR-060, §FR-065, §Pre-registered
   Design Protocol "Round rule"; research R16; data-model §1, §6; cli contract `recheck_004.py`]
-- [ ] CHK087 Is it stated what closes a pending `replacement` entry when the owner does not approve
+- [x] CHK087 Is it stated what closes a pending `replacement` entry when the owner does not approve
   the replacement the agent proposes, given that a further candidate "is entered for every"
   candidate `rejected` or `ineligible` for a cause of its own while its family has fewer than three
   evaluated candidates and the budget allows, proposed by the agent and entered with the owner's
@@ -799,7 +799,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   another design in its place, and does the owner's refusal close the entry with a reason of its own
   or end in a stop? [Edge Case, Gap, Spec §FR-041, §Pre-registered Design Protocol "Eligibility and
   selection", "Stop rule"; data-model §3; cli contract `candidate_log.py`, `round_rule.py`]
-- [ ] CHK088 Is it stated what `candidate_log.py decide` checks before it appends a `rejected` or
+- [x] CHK088 Is it stated what `candidate_log.py decide` checks before it appends a `rejected` or
   `ineligible` decision with its `replacement` entry, given that the cli contract lists among its
   refusals only "a decision outside the rules' reasons", while `replace` closes an entry for the
   budget spent only when R7's rows, the record of that need and, for a lowered row, the protocol
@@ -857,3 +857,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
+- On 2026-11-03 the owner asked that the loop of re-runs stop after the tenth re-run: "after this
+  iteration, stop the speckit-checklists loop". Its items above are the last this loop adds; the
+  loop ends without a re-run that finds no new item, the condition the owner's instruction of
+  2026-11-02 set, so the checklist is run again only on the owner's word, and `/speckit-tasks`
+  waits for it (spec, Clarifications and the Review & Approval row "Checklist choices, tenth
+  re-run").

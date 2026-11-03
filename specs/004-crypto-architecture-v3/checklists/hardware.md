@@ -802,7 +802,7 @@ Items found when the checklist was run an eleventh time, over the complete docum
 repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
 ticked. They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK093 Is the transfer of input and output words stated for a keyed variant whose rate r is
+- [x] CHK093 Is the transfer of input and output words stated for a keyed variant whose rate r is
   not a whole number of 32-bit words, given that a keyed variant's c is a multiple of 64, so that
   the key and the nonce are whole 32-bit words on the hardware's interfaces (research R14; CHK068),
   while no rule makes r = b − c a multiple of 32 or of the output interface's width i, so that a
@@ -817,7 +817,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   register in the zeroization list and in FR-026's estimate, or that a keyed variant's r must be a
   multiple of 32, as its c must be of 64? [Edge Case, Gap, Spec §FR-015, §FR-018, §FR-025 "Flow
   control", "Zeroization", §FR-026; research R14; model contract "Variant IDs", "Output"]
-- [ ] CHK094 Does the list of the core's counters, "listed here once" with the part of FR-026's
+- [x] CHK094 Does the list of the core's counters, "listed here once" with the part of FR-026's
   estimate each falls in, name every counter the core holds, given that the output buffer's read-out
   to the interface width takes ⌈r/i⌉ transfers per block (FR-026) and must stop at a request's last
   word within its last block, which needs a count of the transfers within a block or of the
@@ -829,7 +829,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   part, the output buffer with its read-out, and is it stated whether the self-test's coverage
   reaches it, or why it need not? [Completeness, Consistency, Spec §FR-025 "Zeroization", "Flow
   control", §FR-026, §FR-059]
-- [ ] CHK095 Are the reset sequence and the start-up self-test stated for the core built at a
+- [x] CHK095 Are the reset sequence and the start-up self-test stated for the core built at a
   research size, given that the RTL selects one constant table per supported (n, w) by its generics
   (FR-018), that the key-loading interface is generic in c, FUT-GRID-2's key loading "for every
   supported size" being met through the keyed variant each size has (FR-025; research R14), while
@@ -881,3 +881,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
+- On 2026-11-03 the owner asked that the loop of re-runs stop after the tenth re-run: "after this
+  iteration, stop the speckit-checklists loop". Its items above are the last this loop adds; the
+  loop ends without a re-run that finds no new item, the condition the owner's instruction of
+  2026-11-02 set, so the checklist is run again only on the owner's word, and `/speckit-tasks`
+  waits for it (spec, Clarifications and the Review & Approval row "Checklist choices, tenth
+  re-run").

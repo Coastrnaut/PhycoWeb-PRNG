@@ -694,7 +694,7 @@ Items found when the checklist was run an eleventh time, over the complete docum
 repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
 ticked. They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK093 Is it defined which text in a disclaimer line the claim test reads as a bound and which
+- [x] CHK093 Is it defined which text in a disclaimer line the claim test reads as a bound and which
   as a claim, given that FR-069 compares "a bound or a claim stated in a disclaimer", line by line,
   with the register entries of the models the line names, a bound being beyond the register's when
   an entry holds `none` or a bound below the line's, while README's line on the 64-bit seed holds
@@ -707,7 +707,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   `phyco-v3` or "does not show cryptographic security" in security.md's opening block?
   [Measurability, Ambiguity, Spec §FR-051, §FR-069; data-model §15; cli contract `check_claims.py`;
   README status block; security.md]
-- [ ] CHK094 Is it stated which of the claim test's findings an allow-list entry can pass, given
+- [x] CHK094 Is it stated which of the claim test's findings an allow-list entry can pass, given
   that FR-069 lets "a flagged line, a rule's own text included," pass only through an entry of the
   register, that the agent drafts each entry and the owner reviews it only at the next ⛔ gate, and
   that each disclaimer, which must "state no level, claim or bound beyond the register's", is
@@ -719,7 +719,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   block, or any finding other than a wording rule's flag, so that the three blocks and the
   register's level, `bound`, `evidence` and `in_progress` stand only as the rules give them?
   [Clarity, Consistency, Spec §FR-069; data-model §15; cli contract `check_claims.py`]
-- [ ] CHK095 Is it stated how the claim test compares security.md §1.1 and README with the register,
+- [x] CHK095 Is it stated how the claim test compares security.md §1.1 and README with the register,
   and who keeps §1.1 in step with it, given that FR-069 has the test check that "README, security.md
   §1.1 and §15, and the disclaimers agree with the register", while a comparison is stated only for
   §15's line, which states "the same level", and for the disclaimers; that §1.1 is a table whose
@@ -734,7 +734,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   that §1.1's row changes in the same commit as §15's line, so that §1.1 never states a level the
   register has left? [Gap, Consistency, Spec §FR-012, §FR-051, §FR-069; data-model §15; plan
   phases 1 and 8; cli contract `check_claims.py`; security.md §1.1; README]
-- [ ] CHK096 Is a research variant's bound stated once, given that FR-006 and FR-032 have a keyed
+- [x] CHK096 Is a research variant's bound stated once, given that FR-006 and FR-032 have a keyed
   reduced variant's size-profile row state "s = c/2 as a bound on that variant only", FR-017 has
   each research row state "its key entropy c, its s = c/2", and research R14 and data-model §10
   check FR-010's relations "at s = c/2", while FR-009, as SEC-090 left it, reads "That bound is the
@@ -784,3 +784,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
+- On 2026-11-03 the owner asked that the loop of re-runs stop after the tenth re-run: "after this
+  iteration, stop the speckit-checklists loop". Its items above are the last this loop adds; the
+  loop ends without a re-run that finds no new item, the condition the owner's instruction of
+  2026-11-02 set, so the checklist is run again only on the owner's word, and `/speckit-tasks`
+  waits for it (spec, Clarifications and the Review & Approval row "Checklist choices, tenth
+  re-run").

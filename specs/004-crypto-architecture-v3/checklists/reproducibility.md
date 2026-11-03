@@ -1005,7 +1005,7 @@ Items found when the checklist was run an eleventh time, over the complete docum
 repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
 ticked. They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK099 Is it stated which copy of the design document a reproduction reads for the kinds whose
+- [x] CHK099 Is it stated which copy of the design document a reproduction reads for the kinds whose
   code reads it, given that data-model §1 compares `design_sha256` for the size profile and limits,
   the constant tables, the vectors, those two generators' checks and the review package, "since its
   code reads the design document", that a reproduction runs the recorded configuration in a separate
@@ -1023,7 +1023,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   in a compared field? [Ambiguity, Consistency, Spec §FR-053; data-model §1 `design_version`,
   `dirty_paths`, "Reproduction", "Fields compared"; research R16 "Spec and research versions", "Code
   at HEAD", "Reproduction"; cli contract "Committed code"]
-- [ ] CHK100 Can a record made before an environment change be reproduced, given that a reproduction
+- [x] CHK100 Can a record made before an environment change be reproduced, given that a reproduction
   runs "in the environment that made the original, as its environment record shows, and in no other"
   (research R1; data-model §1; spec FR-053; cli contract introduction), a difference in a field that
   enters a verdict being a tool defect "since it ran in the environment that made the original",
@@ -1042,7 +1042,7 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   being no tool defect; or another stated rule? [Conflict, Gap, Spec §FR-053, §FR-061; research R1,
   R16 "Reproduction"; data-model §1 "Reproduction"; cli contract introduction, "Environment",
   `validate_tool.py`]
-- [ ] CHK101 Is it stated how a reader decides which entries after a repaired break count, given
+- [x] CHK101 Is it stated how a reader decides which entries after a repaired break count, given
   that research R16, data-model §3 and the cli contract's `repair_log.py` have "Entries after the
   break count only where the records they cite corroborate them", while many entries cite no record,
   the candidate log's `proposed`, `mapping`, `entered-d4`, `replacement` and `set-closed` entries
@@ -1109,3 +1109,9 @@ ticked. They start open, and an item is ticked only under the rule in the Notes 
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
+- On 2026-11-03 the owner asked that the loop of re-runs stop after the tenth re-run: "after this
+  iteration, stop the speckit-checklists loop". Its items above are the last this loop adds; the
+  loop ends without a re-run that finds no new item, the condition the owner's instruction of
+  2026-11-02 set, so the checklist is run again only on the owner's word, and `/speckit-tasks`
+  waits for it (spec, Clarifications and the Review & Approval row "Checklist choices, tenth
+  re-run").
