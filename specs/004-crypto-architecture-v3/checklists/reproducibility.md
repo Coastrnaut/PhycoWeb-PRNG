@@ -928,8 +928,16 @@ start open, and an item is ticked only under the rule in the Notes below.
   alone is exempt, exits 2 while no environment record is in force with its row Approved, and that
   order writes the environment records at step (7), after the downloads manifest's
   entries of step (5), so that those entries and the first environment record
-  itself, each written through that module, are refused, and the tasks cannot
-  follow the order as written. The seventh re-run takes it up. A tick here
+  itself, each written through that module, are refused, and the tasks cannot follow the order as
+  written. The seventh re-run takes it up. Of the 10 items of the seventh re-run, CHK082 to CHK091,
+  verified in the same way once their answers were applied, the 9 from CHK083 to CHK091 were ticked
+  in commit e75c8f9. CHK082 stays open, and with it CHK081: REP-082 puts each platform's first
+  environment record before every other write, the one write the guard "Environment" admits while no
+  record is in force, but the guard "Protocol log" lets `protocol/evidence.py` write only a
+  `lock-cleared` record while the protocol change log does not exist, every other kind refused, so
+  that the first environment record, a record of kind `environment` written through that module
+  before the log (data-model introduction), is refused, and the tasks cannot follow plan
+  phase 1's order as written. The eighth re-run takes it up. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
