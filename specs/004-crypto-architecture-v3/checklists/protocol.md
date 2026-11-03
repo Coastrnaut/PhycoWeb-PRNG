@@ -614,6 +614,39 @@ start open, and an item is ticked only under the rule in the Notes below.
   performed and found in the history? [Gap, Clarity, Spec §FR-043, §FR-044, §Review & Approval
   "Design freeze"; cli contract `design_freeze.py`; data-model §13; constitution IX]
 
+## Eighth re-run (2026-11-02)
+
+Items found when the checklist was run a ninth time, over the complete documents and the
+repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK071 Can plan phase 1's step (2a) run, given that the guard "Protocol log" lets
+  `protocol/evidence.py` write only a `lock-cleared` record while the protocol change log does not
+  exist, every other kind refused, that step (2a) writes each platform's first environment record, a
+  record of kind `environment` kept under a name of its own and so written through that module
+  (data-model introduction, §1 `kind`), before step (4) creates the log, and that the log's writer,
+  `protocol/changelog.py`, itself checks the running environment against the platform's record in
+  force, so that neither can come first? Is the environment record exempt from the guard "Protocol
+  log" while the log does not exist, with its `protocol_seq` and `protocol_line_sha256` stated,
+  `none` as in a `lock-cleared` record, and do data-model §1's `protocol_seq` row, which calls
+  `lock-cleared` "the one kind `protocol/evidence.py` writes then", and the guard's test name that
+  exception, so that CHK065 and CHK068 can close? [Conflict, Spec §FR-044; plan phase 1; data-model
+  introduction, §1 `kind`, `protocol_seq`, §18; cli contract "Environment", "Protocol log",
+  `owner_record.py`]
+- [ ] CHK072 Is it stated what follows when the commit after the one that records the owner design
+  review's approval is not the commit of every feature file changed since, for example an owner's
+  commit of a row needed in between, "Environment record <n>" after a Windows or WSL update or "Log
+  repair <n>", given that step (1) "is the owner's next commit", that `design_freeze.py create`
+  records as `owner_commit` "the commit that follows the one recording that approval" and exits 2
+  unless it is HEAD, and while `git_dirty` is true, so that a row committed on its own leaves no
+  commit that `create` accepts for that approval? Is step (1) instead the owner's first commit after
+  the approval that holds every feature file changed since, or is it stated that such rows are set
+  in that commit, and is it stated whether the agent, which commits no file of this feature from
+  that approval on, commits again once a later row "Owner design review <k>", added after a change
+  made then, is the one with the highest k and is not yet Approved? [Gap, Edge Case, Spec §FR-043,
+  §Review & Approval "Design freeze" and the notes under the table; data-model §13; cli contract
+  `design_freeze.py`, "Environment"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the protocol focus prompt of the strategy
