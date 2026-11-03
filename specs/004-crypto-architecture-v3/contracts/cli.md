@@ -138,8 +138,8 @@ R16; REP-085).
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
-  Order of US1, below; `round_rule.py --select`; `design_freeze.py create`;
-  `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`;
+  Order of US1, below; `round_rule.py --select`; `candidate_log.py outcome` (ANA-083);
+  `design_freeze.py create`; `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`;
   `protocol_change.py create`; the test of the second transcription's provenance) reads
   it as committed at HEAD, never the working tree, and exits 2 while the
   working tree's table differs from HEAD's. The rows that open a guard are set
@@ -337,6 +337,7 @@ candidate_log.py enter                    # one entered-d4 entry per candidate o
 candidate_log.py decide FILE              # a decision, with the replacement entry it brings
 candidate_log.py correct FILE             # a correction entry, citing the seq it corrects
 candidate_log.py replace FILE             # closes a pending replacement entry, with its reason
+candidate_log.py outcome FILE             # a review-outcome entry, after the review's row
 ```
 
 Appends the candidate log's entries that no other script writes, through `protocol/candidates.py`
@@ -350,16 +351,32 @@ entry, before its first score; `enter` one `entered-d4` entry per candidate of t
 before any score (research R6); `decide` a decision other than `selected` and `not selected`, which
 `round_rule.py --decide` alone writes, a `rejected` or `ineligible` one with the `replacement` entry
 it brings, logged `pending` or closed at once with the reason "cause shared" (data model §3;
-ANA-073); `correct` a `correction` entry, citing the `seq` it corrects; and `replace` a
-`replacement` entry that closes a pending one with its stated reason, the family full or the budget
-spent. Every refusal that data model §3 and the protocol state for the log writer is the command's,
+ANA-073), each decision citing by ID and SHA-256 the record that shows its reason (data model §3,
+Decisions; ANA-088); `correct` a `correction` entry, citing the `seq` it corrects; `replace` a
+`replacement` entry that closes a pending one with its stated reason, the family full, the budget
+spent or "the owner declined the proposed design", after which the agent proposes no other design
+for that entry (ANA-087); and `outcome` a `review-outcome` entry, holding the owner design review's
+row with its highest k, the outcome, `declined`, `revised`, `fixed` or `stopped`, its reasons, for a
+decline what the rules need to select a further candidate, and for a revision or a fix the
+candidate's old and new versions, after the commit that records the row's decision, which it
+reads at HEAD (Approvals, above; data model §3; ANA-083). Every refusal that
+data model §3 and the protocol state for the log writer is the command's,
 exit 2, appending nothing: a fourth `proposed` entry of a family, a decision outside the rules'
-reasons, a `replacement` entry closed for the budget spent unless R7's rows, the record of that need
-and, for a lowered row, the protocol change log's entry that lowered the budget show it, and `enter`
-once a `scored` entry exists. The agent runs the command, and a `proposed` entry that records the
+reasons, a decision whose cited record does not show its reason, a D4 reason before every candidate
+of the chosen family has its final decision with one of them eligible, a `replacement` state other
+than the one the rules' classification gives, `pending` or closed with the cause shared (ANA-088), a
+`replacement` entry closed for the budget spent unless R7's rows, the record of that need
+and, for a lowered row, the protocol change log's entry that lowered the budget show it, `enter`
+once a `scored` entry exists, a `propose` after a `set-closed` entry unless the latest
+`review-outcome` entry is `declined`, with no later `set-closed` entry, and the candidate is that
+decline's further candidate or one of its replacements, and an `outcome` that
+the owner design review's row with the highest k does not record at HEAD
+(ANA-083). The agent runs the command, and a `proposed` entry that records the
 owner's approval of a replacement, or of a further candidate after a decline, is written only on the
-owner's explicit word, quoted with its date in it, as `provenance.py review` is (below; RAT-077;
-ANA-080). Every append takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
+owner's explicit word, quoted with its date in it, as `provenance.py review` is, and so is a
+`replacement` entry that closes a pending one with the reason "the owner
+declined the proposed design" (below; RAT-077; ANA-080; ANA-087). Every append
+takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
 above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
 `tests/test_protocol_004.py` covers each refusal.
 
@@ -484,7 +501,12 @@ records beside the `reproduction` records and exits 2 while one holds an
 unresolved disagreement for a record it cites. Any change before the freeze that
 touches any candidate's eligibility or R at 4×4 after a selection record exists makes `--select` run
 again over the whole set and write the next record, `selection-<k>.json`, k = 2, 3, …, citing the
-previous one by path and SHA-256; earlier records stay. After a decline at the owner design review
+previous one by path and SHA-256; earlier records stay. A rise of the selected candidate's R at 8×8
+or 16×16 after a selection record exists, one that leaves every candidate's eligibility and R at 4×4
+as they were, also makes `--select` run again over the whole set and write the next record,
+citing the previous one, and `--decide` appends that record's entries, whose
+`selected` entry's `variant_map` carries the final R at every claimable size, no
+entry being edited (ANA-085). After a decline at the owner design review
 that ends in a further candidate, that re-selection includes the declined candidate, and
 if it selects the declined candidate again, the outcome is a stop, exit 1.
 The decline reopens the set once, for one further candidate, replaced the same way if it becomes
@@ -512,7 +534,8 @@ entries of its own, whether it selects another candidate or the same one, so tha
 edited, the latest `selected` entry being the one in force and an earlier one standing as a decision
 that a later record superseded, which `design_freeze.py create` checks (below; spec FR-041, FR-043;
 ANA-081). `tests/test_protocol_004.py` covers `--decide` and that check with a tie, a later record
-and a superseded entry.
+and a superseded entry, and a rise of R at 8×8 or 16×16 after a selection record with the check of
+the final R below (ANA-085).
 
 ## `scripts/mode_limits_v3.py`
 
@@ -693,8 +716,9 @@ read only (spec FR-043; SEC-078), if the latest selection record has a tie
 and its row, "Selection tie" or "Selection tie <k>", does not read Approved
 with the SHA-256 of its choice record, if the candidate log's latest `selected` entry, whose
 `variant_map` the freeze record holds, does not cite the latest selection record, with that record's
-tie choice where there is one, or does not name the candidate that record
-selects (data model §3, §13; ANA-081), if a theorem the mode chapter uses
+tie choice where there is one, or does not name the candidate that record selects (data model §3,
+§13; ANA-081), if a variant ID of that `variant_map` does not carry the final R that the candidate's
+`round-rule.json` gives at its size (ANA-085), if a theorem the mode chapter uses
 is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
 theorem, those marks being read as `unverified` while the security-target review row does not read
 Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the selected candidate's
@@ -757,9 +781,15 @@ recheck_004.py --reproduce RECORD
 Recomputes every verdict of the feature from saved outputs (FR-065) and compares it with the
 recorded one. Its kinds are those of FR-065's list: the demonstration; the tool validations and
 re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
-uniform-control, symmetry, invariant, degree and bound checks; the D4 choice; the check of generated
-files on each platform; the size profile's generic-bound checks and the bound at the limits;
-eligibility and selection, each recomputed from committed counts by exact arithmetic. Exit 1
+uniform-control, symmetry, invariant, degree and bound checks; the `trail`
+records; the D4 choice; the check of generated files on each platform; the size
+profile's generic-bound checks and the bound at the limits; eligibility and selection, with every
+decision and `replacement` state of the candidate log (ANA-088), each recomputed from committed
+counts by exact arithmetic. For a `trail` record it recomputes each trail's exact weight, as a
+rational, from its committed characteristic and the committed operation list that the candidate's
+`oplist_sha256` names, by exact integer arithmetic, and checks that the characteristic holds
+round by round and that the record's classification follows from that weight,
+the 2⁻¹²⁸ threshold included (spec FR-065; data model §6; ANA-086). Exit 1
 on any disagreement, with each listed. Every verdict is recomputable on a
 fresh clone from committed files, so it works from the committed per-round summaries, for
 example R_f from the per-round flag "every output bit depends on every input bit". Where

@@ -335,13 +335,13 @@ cite them hold on every checkout.
 | `prev_sha256` | SHA-256 of the previous line's UTF-8 bytes as stored, its final LF included, as 64 lower-case hex digits; 64 zeros for `seq` 0 |
 | `candidate_id` | `cand-A1` to `cand-A3`, `cand-B1` to `cand-B3`; a candidate counts towards the stop rule from its first entry, `proposed`, whatever happens after, and a fourth `proposed` entry of a family is refused |
 | `family` | `ARX` or `Boolean` (D4) |
-| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`. A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, the colour schedule, the local linear layer between boxes, the round constants, its key path, spec FR-025's key register at each node that holds key bits with the key shift chain through those nodes, from its operation-list declarations, and any other it adds (RAT-078): each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, the rest of spec FR-034's component list (RAT-078), take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision where the decision's cause lies in the candidate itself, its own evidence or properties, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent); where its family or the whole set shares the cause, the entry is logged closed at once, with the reason "cause shared", and no replacement is entered for it (Decisions, below; ANA-073), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
+| `event` | `proposed`, `mapping`, `entered-d4`, `scored`, `evidence`, `decision`, `correction`, `repair`, `replacement`, `set-closed`, `review-outcome`. A `review-outcome` entry, holding the owner design review's row with its highest k, the outcome, `declined`, `revised`, `fixed` or `stopped`, its reasons, for a decline what the rules need to select a further candidate, and for a revision or a fix the candidate's old and new versions, is written by `candidate_log.py outcome` after the commit that records the decision of that row, which it reads at HEAD, exiting 2 on an outcome the row does not record (Decline at the owner design review, below; ANA-083). A `mapping` entry, written before the candidate's first score, holds FR-030's mapping of the candidate's own components, FR-030's five, the colour schedule, the local linear layer between boxes, the round constants, its key path, spec FR-025's key register at each node that holds key bits with the key shift chain through those nodes, from its operation-list declarations, and any other it adds (RAT-078): each one's place in the metaphor and the attack class, bound or need it serves; the mapping chapter restates only the first part, and the rationale's component list states the second, citing this entry; the structures that every candidate shares, those of the mode and the core, the rest of spec FR-034's component list (RAT-078), take their roles from spec FR-025 and FR-059 in place of the entry and have no place in the metaphor (spec FR-030, FR-034; RAT-073). A `replacement` entry names a candidate that became `rejected` or `ineligible` while its family had fewer than three evaluated candidates and the budget allowed: logged `pending` with that decision where the decision's cause lies in the candidate itself, its own evidence or properties, it is closed by the replacement's `proposed` entry, which cites its `seq`, or by a later `replacement` entry that cites it with the stated reason (the family full, the budget spent, or "the owner declined the proposed design", the owner's word quoted with its date; ANA-087); where its family or the whole set shares the cause, the entry is logged closed at once, with the reason "cause shared", and no replacement is entered for it (Decisions, below; ANA-073), and `round_rule.py --close` reads them (Entered set, below). A `set-closed` entry names no candidate: `round_rule.py --close` writes it once every candidate has a final decision and no replacement is pending, and `--select` exits 2 before it (Entered set, below) |
 | `oplist_sha256` | hash of the candidate's operation-list module (R11). The `proposed` entry with this hash comes before any tool run, and every tool refuses an operation list whose hash has no `proposed` or `correction` entry (exit 2); the module is committed before that run, as every source file of a run that writes evidence is (section 1) |
 | `parameters` | round structure, nonlinear component, rotation and constant rules, generics; the instance of the constant rule (polynomial, seed, reading order, distinct streams per call type or not, with the reason; R15); the rotation search's space of amounts, its K ≥ 2 sets and their placement rule from n, and its width (16 first), the ranking measure, rounds and tie order being the protocol change log's one rule for every candidate (R15), and, if R6's rule fixes the D4 width at 8, a new entry before the search at 8 with the same space, K and placement rule; FR-018's folding rule, longest link per size, food nodes with their positions and reason, and each tree's fan-in per stage, depth, registered stages and latency, which eligibility reads (section 9); and the reduced variants used as evidence (widths, sizes, round counts, capacities); and P, the number of phases in one round of the operation list at each size (FR-025). All are logged before the candidate's first tool run; a variant added later is logged with its reason before its first run |
 | `evidence` | the IDs of every record of the candidate, used or not, as security.md §11.3's "report everything" asks |
 | `budget_used_h` | `{trails, structural, statistics}` with the caps of R7, the D4 reduced-width searches and the rotation-amount searches under `trails`; the uniform controls' hours, logged by no candidate, are added to `statistics` by the Budget guard from the control records (section 5); each heavy run's projected and used hours, measured speed and engine code hash. A budget lowered below the hours already used leaves zero hours: the results so far stand, and no further run of that row starts (R7) |
-| `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below); a `selected` or `not selected` entry cites its selection record by path and SHA-256, with the record's tie choice where there is one (section 9; ANA-081) |
-| `variant_map` | on each `selected` entry, which `round_rule.py --decide` writes after a selection record, the latest being the one in force (section 9; ANA-081): the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it |
+| `decision`, `reason` | `eligible`, `ineligible`, `rejected`, `withdrawn`, `selected` or `not selected`, with the reason (below) and, for `rejected` and `ineligible`, the record that shows it by ID and SHA-256 (Decisions, below; ANA-088); a `selected` or `not selected` entry cites its selection record by path and SHA-256, with the record's tie choice where there is one (section 9; ANA-081) |
+| `variant_map` | on each `selected` entry, which `round_rule.py --decide` writes after a selection record, the latest being the one in force (section 9; ANA-081): the map from `cand-…/n…-w…-R…-c…` to `phyco-v3/…`, with the operation list's SHA-256; the model's tests check that `phyco-v3` reproduces the candidate's outputs through it; each variant ID carries the final R that the candidate's `round-rule.json` gives at its size, a rise of R at 8×8 or 16×16 after a selection record bringing the next record and its entries (section 9; ANA-085) |
 | `date_utc` | ISO 8601 |
 
 An entry is never edited or deleted; a correction is a new entry that cites the `seq` it
@@ -352,17 +352,20 @@ Each kind of entry has one writer, which the agent runs (cli contract): `evidenc
 `d4/choice.json`, citing it by path and SHA-256 (section 8); `round_rule.py --decide` the `selected`
 and `not selected` decisions after each selection record and `round_rule.py --close` the
 `set-closed` entry (section 9; Entered set, below); `repair_log.py` the `repair` entry (Repair,
-below); and `candidate_log.py`, through `protocol/candidates.py`, every other entry, its `propose`,
-`mapping`, `enter`, `decide`, `correct` and `replace` appending the `proposed` entry, the `mapping`
-entry, one `entered-d4` entry per candidate of the entered set before any score, a decision other
+below); and `candidate_log.py`, through `protocol/candidates.py`, every other
+entry, its `propose`, `mapping`, `enter`, `decide`, `correct`, `replace` and
+`outcome` appending the `proposed` entry, the `mapping` entry, one `entered-d4`
+entry per candidate of the entered set before any score, a decision other
 than `selected` and `not selected`, a `rejected` or `ineligible` one with the `replacement` entry it
-brings, a `correction`, and a `replacement` entry that closes a pending one with its reason, each
-from a file holding the entry's fields but `seq`, `prev_sha256` and `date_utc`, which the writer
+brings, a `correction`, a `replacement` entry that closes a pending one with its
+reason, and the `review-outcome` entry (ANA-083), each from a file holding the
+entry's fields but `seq`, `prev_sha256` and `date_utc`, which the writer
 adds. Every refusal of the log writer that this section states is the command's, exit 2, appending
 nothing, `enter` among them once a `scored` entry exists, and a `proposed` entry that records the
 owner's approval of a replacement, or of a further candidate after a decline, is written only on the
-owner's explicit word, quoted with its date in it, as a provenance review entry's `owner_word` is
-(section 14; spec FR-041; RAT-077; ANA-080, ANA-081).
+owner's explicit word, quoted with its date in it, as a provenance review entry's `owner_word` is,
+and so is a `replacement` entry that closes a pending one with the reason "the owner declined the
+proposed design" (section 14; spec FR-041; RAT-077; ANA-080, ANA-081; ANA-087).
 
 - **Decisions.** `rejected` and `ineligible` are given only for the rules' reasons: a failed
   inverse or bijectivity test, a failed eligibility item (FR-018 to FR-031, FR-037, R_bound
@@ -372,7 +375,16 @@ owner's explicit word, quoted with its date in it, as a provenance review entry'
   that lost an exact D4 tie, "D4 chose the other family by its tie-breaks"
   (spec "Nonlinearity choice rule"; RAT-072). A candidate may be `withdrawn`
   before its first tool run, for any recorded reason, and it still counts towards the stop
-  rule. The log writer refuses any other decision. A raised R is never by itself a reason for a
+  rule. The log writer refuses any other decision. A decision cites by ID and SHA-256 the record
+  that shows its reason: a failed check's record for `rejected`, the round-rule record's eligibility
+  item for `ineligible`, R7's rows with the record of the need for a spent budget, as `replace`
+  reads them (ANA-078), and the D4 record for the two D4 reasons; `candidate_log.py decide` exits 2
+  on a decision whose cited record does not show its reason, on a D4 reason before every candidate
+  of the chosen family has its final decision with one of them eligible, and on a `replacement`
+  state other than the one the rules' classification gives, `pending` or closed with the
+  cause shared, and the re-check recomputes every decision and `replacement`
+  state with eligibility and selection, a disagreement blocking as for any
+  record (spec FR-065; ANA-088). A raised R is never by itself a reason for a
   decision: the measurements it needs run as new measurements in their budget rows, and a row that
   cannot hold them makes the candidate `ineligible` for a spent budget (spec Edge Cases). A
   decision's `replacement` entry is logged `pending` only where the decision's cause lies in the
@@ -396,8 +408,11 @@ owner's explicit word, quoted with its date in it, as a provenance review entry'
   `replacement` entry was logged closed at once with the reason "cause shared"
   (Decisions, above; ANA-073, ANA-077): the agent proposes it, and the owner
   approves its entry, quoted with its date in its `proposed` entry, which closes the
-  `replacement` entry logged with the decision; a stated reason, the family full or the budget
-  spent, closes it otherwise. The budget allows while each of the replacement's own rows of research
+  `replacement` entry logged with the decision; a stated reason, the family full, the budget spent
+  or "the owner declined the proposed design", closes it otherwise, the last written only on the
+  owner's explicit word quoted with its date, after which the agent proposes no other design for
+  that entry, so that the set closes on the candidates entered (ANA-087).
+  The budget allows while each of the replacement's own rows of research
   R7, at its current value after any lowering, holds more than zero hours and at least the recorded
   need of each run that the rules require of every candidate at that size and that would be charged
   to it, a uniform control's hours, a stricter change's new measurement or a trail search at 16×16,
@@ -409,7 +424,11 @@ owner's explicit word, quoted with its date in it, as a provenance review entry'
   the budget show it, exit 2 otherwise. The set closes at a `set-closed`
   entry, written by `round_rule.py --close` once every candidate has a final decision and no
   `replacement` entry is `pending`; `--select` exits 2 before it, and no candidate is entered after
-  it. A final decision is `withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate,
+  it but as a decline at the owner design review allows: after a `set-closed` entry
+  `candidate_log.py propose` exits 2 unless the latest `review-outcome` entry is `declined`, with no
+  later `set-closed` entry, and the candidate is that decline's further candidate or one of its
+  replacements, so that the set reopens once (Decline at the owner design review, below; ANA-083). A
+  final decision is `withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate,
   its round-rule record at every claimable size (section 9); the other family's candidates, the
   representative that lost an exact D4 tie among them, analysed at the production width, or further,
   only if D4's chosen family ends with no eligible candidate, are otherwise `ineligible` (Decisions,
@@ -425,7 +444,8 @@ owner's explicit word, quoted with its date in it, as a provenance review entry'
   inventory `research/004/candidates/superseded.json` lists every hash and path, so every
   `oplist_sha256` in the log stays checkable. The re-check verifies the inventory.
 - **Decline at the owner design review.** The declined candidate stays eligible and in the set, and
-  the decline's reasons are logged under it. The decline reopens the set once, for one further
+  the decline's reasons are logged under it in a `review-outcome` entry, as is each other outcome of
+  the review (ANA-083). The decline reopens the set once, for one further
   candidate within the stop rule that the rules can select: from the chosen family, or from the
   other family only where the declined candidate was selected by the fallback or D4 was not
   computable, and only while its family has fewer than three evaluated candidates; before its
@@ -703,9 +723,12 @@ reduced-width outcome for each bound kind at 16 and, where R6 needs it, at 8: a 
 statement that r* compares the candidates over the same rounds and is not a rate per round
 (R6); per scored candidate `W_D` and `W_L` as rationals, `luts` (R5) and the score;
 `representatives`; `outcome` (`chosen`, `chosen by default`, `tie` or `not computable`, R6: `chosen
-by default` where at 16 and at 8 only one family has a candidate with both bounds at the same number
-of rounds, at least 2, `width` and `r_star` then being the widest width at which it has one and the
-largest such number there, and `not computable` where neither has one; ANA-082);
+by default` where no width has a number of rounds common to both families, the family being the one
+whose candidate has both bounds at the same number of rounds, at least 2, at the widest width at
+which any candidate has them, 16 before 8, and, where both families have one there, the one whose
+candidate has them at the larger number of rounds, `width` and `r_star` then being that width and
+the largest such number of that family there, and `not computable` only where no candidate of either
+family has both bounds at the same number of rounds, at least 2, at 16 or at 8; ANA-082, ANA-084);
 `chosen_family`; `tie_breaks_applied`; `bound_records`, each from a tool that
 has passed its cross-check on that candidate, which its `cross_check` cites
 (section 6): `d4_choice.py` uses no other. Written once by `scripts/d4_choice.py`
@@ -766,7 +789,12 @@ computable; R at 4×4; any tie and the owner's recorded choice; or the stop-rule
 reason. Any change before the freeze that touches any candidate's eligibility or R at 4×4 after a
 selection record exists makes `--select` run again over the whole set and write the next record,
 `selection-<k>.json`, k = 2, 3, …, which cites the previous one by path and SHA-256; earlier records
-stay. After each selection record, `round_rule.py --decide` appends to the candidate log one
+stay. A rise of the selected candidate's R at 8×8 or 16×16 after a selection record exists, one that
+leaves every candidate's eligibility and R at 4×4 as they were, also makes `--select` run again over
+the whole set and write the next record, citing the previous one, and `--decide` appends
+that record's entries, whose `selected` entry's `variant_map` carries the
+final R at every claimable size, no entry being edited (ANA-085). After each
+selection record, `round_rule.py --decide` appends to the candidate log one
 `decision` entry `selected` for the candidate the record selects, with its `variant_map` and the
 operation list's SHA-256, and one `not selected` entry for each other candidate the record lists as
 eligible, each citing the record by path and SHA-256 and its tie choice where there is one, and
@@ -1012,7 +1040,8 @@ copy against its manifest hash and its live source (SC-012).
   the operation list's SHA-256; `create` exits 2 unless that entry cites the latest selection
   record, with that record's tie choice where there is one, and names the candidate that record
   selects, an earlier `selected` entry standing as a decision that a later record superseded
-  (section 9; spec FR-043; ANA-081).
+  (section 9; spec FR-043; ANA-081), and unless every variant ID of its `variant_map` carries the
+  final R that the candidate's `round-rule.json` gives at its size (ANA-085).
 - **External review**: the row of the external design review's family that `create` reads, the one
   with the highest k among the rows that name the latest selection record, its value, done or not
   arranged, the selection record it names, and for done the review package's manifest SHA-256 and
@@ -1382,9 +1411,9 @@ compares it (cli contract; REP-085).
   `rationale.md` before the freeze, both files' headers holding it from the same commit
   (RAT-087); the version the owner design review approves; frozen as 1.0, the
   name the approved freeze record gives that version, whose header and `rationale.md` keep its
-  0.<k>, which the record holds as `reviewed_version` (section 13; RAT-080). A
-  revision after a decline or after the owner design review is logged under the
-  candidate with its old and new version, and each version a record cites
+  0.<k>, which the record holds as `reviewed_version` (section 13; RAT-080). A revision after a
+  decline or after the owner design review is logged under the candidate, in a `review-outcome`
+  entry, with its old and new version (section 3; ANA-083), and each version a record cites
   is kept as `design-versions/<sha256>.md` (section 1). After the freeze
   any change is a new model ID (FR-028). A record's `design_sha256` names
   the version its run saw, and a reproduction compares it only for the kinds whose code reads the
@@ -1400,7 +1429,8 @@ compares it (cli contract; REP-085).
   selection record, each row naming the selection record it applies to, so that a new selection
   record needs a row of its own (spec FR-043; SEC-078), and `round_rule.py --select` "Not
   needed" on the "D4 tie" row. A Declined gate ends in one of the outcomes the note under the spec's
-  table states for it, logged with its reasons, and a gate held again is a row of its own,
+  table states for it, logged with its reasons, the owner design review's in a `review-outcome`
+  entry of the candidate log (section 3; ANA-083), and a gate held again is a row of its own,
   "FUT-SEC-8 result review <k>", "Security-target review <k>" or "Owner design review <k>" (k = 2,
   3, … in order), naming what it reviews by path and SHA-256, the chapter's version being a set of
   hashes (spec, the notes under the Review & Approval table); each guard reads its family's row with

@@ -332,7 +332,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
 | Security-target review (the design document's chapters "Security target" and "Mode", with `rationale.md`'s chapters of those names and the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068), `rationale.md`'s chapters of those names, which explain them, being drafted with them and read by the review, while their review entries are the owner design review's (RAT-086); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the design document's chapters "Security target" and "Mode", of `rationale.md`'s chapters of those names and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075; RAT-086). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
-| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043). The row, and each "Owner design review <k>", names `rationale.md` by path and SHA-256 beside the design document's version and the selection record, and `design_freeze.py create` compares it with the file at HEAD (RAT-083) |
+| Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons, in a `review-outcome` entry of the candidate log (FR-043; ANA-083). The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043). The row, and each "Owner design review <k>", names `rationale.md` by path and SHA-256 beside the design document's version and the selection record, and `design_freeze.py create` compares it with the file at HEAD (RAT-083) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, with every hash those review rows name matching the file at HEAD, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows, and its return to L0 after a change to what those rows reviewed in the commit that makes the change, or right after an owner's commit that makes it (FR-069; SEC-079) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names the latest selection record, by path and SHA-256, when it is written. Each row of this family names the selection record it applies to, a done row through its manifest, which carries that record, and a "not arranged" row by naming the latest selection record when it is written; `design_freeze.py create` reads the highest-k row that names the latest selection record and exits 2 while none does, so that a new selection record needs a row of its own, done or "not arranged", for the candidate it selects, and a review done for another candidate stays done in its row and is cited, in the freeze record's "External review" and in the final report, for the candidate and the version it read only (SC-013; SEC-078). |
 | Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | Set by the owner and committed, an owner's own act that no guard reads (the notes under this table). It names the approved freeze record by path and SHA-256 and its `owner_commit`, the owner's commit of the feature files in the freeze's step (1), which follows the commit that records the owner design review's approval in its row with the highest k, the agent committing no file of this feature from that approval on, so that the history shows the owner's act (FR-043; PRO-070) |
@@ -363,10 +363,11 @@ SHA-256, where the tie-breaks reached the owner's choice, or "Not needed",
 naming the tie record and its tie-break, where one decided it; the Selection
 tie and each "Selection tie <k>" of a later selection record, read the same way
 by `design_freeze.py create`; the Security-target review and each "Security-target review <k>", the
-Owner design review and each "Owner design review <k>", and the External
-design review and each "External design review <k>", read by `design_freeze.py
-create` in the rows held for the candidate that the latest selection record
-selects; L1 recorded and each "L1 recorded <k>", read by `check_claims.py` in
+Owner design review and each "Owner design review <k>", and the External design review and each
+"External design review <k>", read by `design_freeze.py create` in the rows held for the candidate
+that the latest selection record selects, the Owner design review's rows also read by
+`candidate_log.py outcome` in the row with the highest k, which exits 2 on an outcome that row does
+not record (ANA-083); L1 recorded and each "L1 recorded <k>", read by `check_claims.py` in
 the row with the highest k, which fails, exit 1, while the register's level for `phyco-v3` differs
 from the one those rows give, L1 while that row reads Approved and names the highest-k row of
 each review family, both Approved, with every hash those review rows name
@@ -402,7 +403,9 @@ security-target review: a revised chapter, as a new version reviewed in a row of
 its own, its security-target parameters changing only in their stricter direction (FR-044); or a
 stop; the owner design review does not start, and `design_freeze.py create` exits 2, while the
 security-target review is not Approved. At the owner design review: the outcomes its row and FR-043
-state. At any other gate: a revision of what it reviews, reviewed again in a row of its own, or a
+state, each logged in a `review-outcome` entry of the candidate log, which `candidate_log.py
+outcome` writes after the commit that records the row's decision (data-model §3; ANA-083). At any
+other gate: a revision of what it reviews, reviewed again in a row of its own, or a
 stop.
 
 A review held again, after a decline, for the changed parts after an approval, or for another
@@ -2497,9 +2500,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and a row that cannot hold them makes the candidate `ineligible` for a spent budget (edge cases).
   Candidates are entered before any is scored, and a further one only in place of one `rejected` or
   `ineligible`, within the stop rule, never because another's R is high; the set closes at a
-  `set-closed` log entry before selection, and a decline at the owner design
-  review reopens it once, for one further candidate that the rules can select
-  (section "Pre-registered Design Protocol"). The candidate frozen MUST be
+  `set-closed` log entry before selection, and a decline at the owner design review reopens it once,
+  for one further candidate that the rules can select (section "Pre-registered Design Protocol"):
+  after a `set-closed` entry `candidate_log.py propose` exits 2 unless the
+  latest `review-outcome` entry is `declined`, with no later `set-closed`
+  entry, and the candidate is that decline's further candidate or one of its
+  replacements, so that the set reopens once (ANA-083). The candidate frozen MUST be
   the one the pre-registered rules select; the owner design review cannot
   put another eligible candidate in its place, and throughput is never a reason to decline. After a
   decline that ends in a further candidate, the rules select again over the whole set, the declined
@@ -2524,11 +2530,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `scripts/candidate_log.py`, through `protocol/candidates.py`, every other entry: `proposed`,
   `mapping`, one `entered-d4` entry per candidate of the entered set before any score, the other
   decisions, a `rejected` or `ineligible` one with the `replacement` entry it brings, `correction`,
-  and a `replacement` entry that closes a pending one with its reason. Every refusal of the log
-  writer is the command's, exit 2, appending nothing, `candidate_log.py enter` among them once a
+  a `replacement` entry that closes a pending one with its reason, and the `review-outcome` entry
+  that records each outcome of the owner design review (ANA-083). Every refusal of the log writer is
+  the command's, exit 2, appending nothing, `candidate_log.py enter` among them once a
   `scored` entry exists, and a `proposed` entry that records the owner's approval of a replacement,
   or of a further candidate after a decline, is written only on the owner's explicit word, quoted
-  with its date in it (cli contract; RAT-077; ANA-080, ANA-081).
+  with its date in it, as is a `replacement` entry that closes a pending one with the reason "the
+  owner declined the proposed design", after which the agent proposes no other design for that entry
+  (cli contract; RAT-077; ANA-080, ANA-081; ANA-087).
 - **FR-042**: `phyco-v2` MUST be archived as byte-exact copies in `baseline/phyco-v2/`, with every
   file's SHA-256 and source in a committed manifest (Principle V): at least the model, the C
   stream, `design.md` 1.0 and the golden vectors. The live files MUST stay unchanged.
@@ -2564,8 +2573,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
   select the further candidate it goes to the review, and if they select the declined one again the
   outcome is a stop, logged with the review's reasons, since the declined candidate is never brought
   back to the review unchanged and a revision of its document, the first outcome, stays possible
-  instead; or a stop. Each is logged with its reasons, and where no further candidate can be entered
-  the decline ends in one of the others. Any change after the owner design review (R
+  instead; or a stop. Each is logged with its reasons in a `review-outcome` entry of the candidate
+  log, holding the owner design review's row with its highest k, the outcome, `declined`, `revised`,
+  `fixed` or `stopped`, its reasons, for a decline what the rules need to select a further
+  candidate, and for a revision or a fix the candidate's old and new versions, which
+  `candidate_log.py outcome` writes after the commit that records the row's decision,
+  reading the row at HEAD and exiting 2 on an outcome the row does not record
+  (data-model §3; ANA-083), and where no further candidate can be entered the decline
+  ends in one of the others. Any change after the owner design review (R
   raised, a new finding, a corrected document) makes a new design-document version: the rationale is
   revised, the review is repeated for the changed parts and recorded in a row of its own, "Owner
   design review <k>" (the notes under the Review & Approval table), and the review package is
@@ -2581,12 +2596,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
   selection"): if it selects another candidate, the security-target review and every later review
   are held again for that candidate, each in a numbered row of its own; if it selects the same one,
   the reviews held stand for what did not change, and the changed parts are reviewed again as above.
+  A rise of the selected candidate's R at 8×8 or 16×16 after a selection record exists, one that
+  leaves every candidate's eligibility and R at 4×4 as they were, also makes `round_rule.py
+  --select` run again over the whole set and write the next record, citing the
+  previous one, whose `selected` entry's `variant_map` carries the final R
+  at every claimable size, no entry being edited (data-model §9; ANA-085).
   After each selection record, `round_rule.py --decide` appends the candidate log's `selected`
   entry, with its `variant_map`, and a `not selected` entry for each other candidate the record
   lists as eligible, each citing the record with its tie choice where there is one (FR-041); the
   latest `selected` entry is the one in force, and `design_freeze.py create` exits 2 unless it cites
-  the latest selection record, with that record's tie choice where there is one, and names the
-  candidate that record selects (data-model §3, §9, §13; ANA-081). The freeze
+  the latest selection record, with that record's tie choice where there is one, and
+  names the candidate that record selects (data-model §3, §9, §13; ANA-081),
+  and unless every variant ID of its `variant_map` carries the final R that
+  the candidate's `round-rule.json` gives at its size (ANA-085). The freeze
   runs in this order: (1) the owner commits the feature files (Principle
   IX): from the first commit that records an owner design review's approval to the feature's end,
   plan phase 9 included, the agent commits no file of this feature and leaves its
@@ -3297,12 +3319,20 @@ freeze hashes and the baseline manifest; run the claim-register test.
   carries no status (FR-034, FR-067).
 - **FR-065**: Every verdict of this feature (the demonstration; the tool validations and
   re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
-  uniform-control, symmetry, invariant, degree and bound checks; the D4 choice; the
-  check of generated files on each platform; the size profile's generic-bound
-  checks and the bound at the limits; eligibility and selection) and every record's classification
-  (FR-060) and `status`, the freeze record's included, whose approval state is a field of its own,
+  uniform-control, symmetry, invariant, degree and bound checks; the `trail` records'
+  weights and classifications; the D4 choice; the check of generated files on
+  each platform; the size profile's generic-bound checks and the bound at the limits;
+  eligibility and selection, with every decision and `replacement` state of the
+  candidate log) and every record's classification (FR-060) and `status`,
+  the freeze record's included, whose approval state is a field of its own,
   `freeze_status` (data-model §1, §13; REP-093), MUST be computed by code from saved outputs
-  and be recomputable by a re-check script, never taken from a narrative (security.md §16.1). No
+  and be recomputable by a re-check script, never taken from a narrative (security.md §16.1). For a
+  `trail` record the re-check recomputes each trail's exact weight, as a rational, from its
+  committed characteristic and the committed operation list that the candidate's `oplist_sha256`
+  names, by exact integer arithmetic, and checks that the characteristic holds round by round and
+  that the record's classification follows from that weight, the 2⁻¹²⁸ threshold included (ANA-086),
+  and it recomputes every decision of the candidate log and its `replacement` state with eligibility
+  and selection (ANA-088), a disagreement blocking the candidate as for any record. No
   phase, test or gate MAY be recorded as passed because its documents exist; where evidence is
   missing, the status MUST be "not evaluated", "inconclusive" or "blocked" (security.md §16.3). The
   re-check needs only committed files, so every verdict is recomputable on a fresh clone: the
@@ -3688,13 +3718,20 @@ before any candidate is scored). The width and r* are research R6's: the widest 
 at least one entered candidate of each family has both a differential and a linear trail bound for a
 common number of rounds of at least 2, r* being the largest such common number, "common" meaning
 common to the two bounds of each scored candidate and to the scored candidates of both families, so
-that at a width where both families qualify each has a scored candidate at r*. Where at 16 and at 8
-only one family has a candidate with both bounds at the same number of rounds, at least 2, that
-family is chosen by default, at the widest width at which it has one and the largest such number
-there, its candidates with both bounds at r* rounds scored, the highest being its representative,
-with the other family's outcomes listed; this is the conservative reading, since the other family
-has no reduced-width evidence that the choice could weigh; where neither family has one, D4 is not
-computable (research R6; ANA-082). The rotation amounts each candidate is scored with are ranked by
+that at a width where both families qualify each has a scored candidate at r*. Where no width has a
+number of rounds common to both families, D4 chooses by default the family whose candidate has both
+bounds at the same number of rounds, at least 2, at the widest width at which any candidate has
+them, 16 before 8, and, where both families have such a candidate at that width, the family whose
+candidate has them at the larger number of rounds there, the two numbers never being equal, since an
+equal number would be common; that family is scored at that width and at r*, the largest such number
+of rounds it has there, its candidates with both bounds at r* rounds scored, the highest being its
+representative, with the other family's outcomes listed (research R6, "One family scored"): a family
+that has one only at 16 is chosen over a family that has one only at 8, and where at 16 and at 8
+only one family has one, that family is chosen. This is the conservative reading, as ANA-082's is:
+it sends one family on wherever either has reduced-width evidence, never both. D4 is
+not computable only where no candidate of either family has both bounds at
+the same number of rounds, at least 2, at 16 or at 8 (research R6; ANA-082;
+ANA-084). The rotation amounts each candidate is scored with are ranked by
 the score's own measure, the −log₂ of the weaker of the two bounds at the search width, at one
 number of rounds for every candidate, fixed in the protocol change log before the first rotation
 search (FR-024). Only bound records of a tool that has passed its cross-check on
@@ -3773,10 +3810,16 @@ became `rejected` or `ineligible`, never because another's R is high: one is ent
 candidate while its family has fewer than three evaluated candidates and the budget allows, proposed
 by the agent, its entry approved by the owner, and the candidate log's `replacement` entry,
 `pending` from the decision until the replacement's `proposed` entry or a
-stated reason (the family full, the budget spent) closes it, records each case (data-model §3),
-`candidate_log.py` appending the decision with its `replacement` entry, the replacement's `proposed`
-entry, written on the owner's explicit word quoted with its date in it, and a
-`replacement` entry that closes a pending one with its reason (FR-041; ANA-080). The
+stated reason (the family full, the budget spent, or "the owner declined the proposed
+design") closes it, records each case (data-model §3), `candidate_log.py`
+appending the decision with its `replacement` entry, the replacement's `proposed`
+entry, written on the owner's explicit word quoted with its date in it, and a `replacement` entry
+that closes a pending one with its reason (FR-041; ANA-080). A proposal the owner does not approve
+is recorded, the owner's word quoted with its date, and `candidate_log.py replace` closes the
+pending entry with the reason "the owner declined the proposed design", a reason
+of its own beside the family full and the budget spent; the agent proposes
+no other design for that entry, so that the set closes on the candidates
+entered and `round_rule.py --close` runs as for any closed entry (ANA-087). The
 entry is logged `pending` only with a decision whose cause lies in the candidate itself, its own
 evidence or properties. A decision whose cause its family or the whole set shares calls for no
 replacement, and its `replacement` entry is logged closed at once, with the reason "cause shared":

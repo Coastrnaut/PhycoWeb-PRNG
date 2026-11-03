@@ -639,13 +639,19 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     number of rounds of at least 2; r* is the largest such common number. Only candidates with both
     bounds at r* rounds are scored. "Common" means common to the two bounds of each scored candidate
     and to the scored candidates of both families, so that at a width where both families qualify
-    each has a scored candidate at r*. Where at 16 and at 8 only one family has a candidate with
-    both bounds at the same number of rounds, at least 2, that family is chosen by default ("One
-    family scored", below): the width is the widest at which it has one, r* the largest such number
-    there, and its candidates with both bounds at r* rounds are scored, the highest being its
-    representative, with the other family's outcomes listed. This is the conservative reading, since
-    the other family has no reduced-width evidence that the choice could weigh. Where neither family
-    has one, D4 is not computable ("Neither family scored", below; ANA-082).
+    each has a scored candidate at r*. Where no width has a number of rounds common to both
+    families, D4 chooses by default ("One family scored", below) the family whose candidate has both
+    bounds at the same number of rounds, at least 2, at the widest width at which any candidate has
+    them, 16 before 8, and, where both families have such a candidate at that width, the family
+    whose candidate has them at the larger number of rounds there, the two numbers never being
+    equal, since an equal number would be common: the width is that width, r* the largest such
+    number of that family there, and its candidates with both bounds at r* rounds are scored, the
+    highest being its representative, with the other family's outcomes listed. So a family that has
+    one only at 16 is chosen over a family that has one only at 8, and where at 16 and at 8 only one
+    family has one, that family is chosen. This is the conservative reading, as ANA-082's is: it
+    sends one family on wherever either has reduced-width evidence, never both. D4 is not computable
+    only where no candidate of either family has both bounds at the same number of rounds, at least
+    2, at 16 or at 8 ("Neither family scored", below; ANA-082; ANA-084).
   - **Score**: with W_D and W_L the −log₂ of the bounds on the best differential trail
     probability and on the best linear trail's squared correlation over r* rounds, and L the
     LUTs per node and round of R5 at that width:
@@ -672,12 +678,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     family"), and at the set's close it takes `ineligible`, with the reason "D4 chose the other
     family by its tie-breaks", unless the chosen family ends with no eligible candidate, when its
     family is analysed as R7 states (RAT-072).
-  - **One family scored.** That family is chosen by default, and the record says so: at 16 and at 8,
-    only one family has a candidate with both bounds at the same number of rounds, at least 2, and
-    its candidates are scored at the width and r* that "Where" gives it (ANA-082).
+  - **One family scored.** That family is chosen by default, and the record says so: no width has a
+    number of rounds common to both families, and the family that "Where" names has its candidates
+    scored at the width and r* that "Where" gives it, the case where at 16 and at 8 only one family
+    has a candidate with both bounds at the same number of rounds, at least 2, among them (ANA-082;
+    ANA-084).
   - **Neither family scored.** No family is chosen, and the record says that D4 was not computable:
     neither family has a candidate with both bounds at the same number of rounds, at least 2, at 16
-    or at 8 (ANA-082). Selection then takes the eligible candidate with the smallest R at 4×4 from
+    or at 8, the only case in which D4 is not computable (ANA-082; ANA-084).
+    Selection then takes the eligible candidate with the smallest R at 4×4 from
     either family, with a tie going to the owner's recorded choice; the stop rule still applies.
   - **Rotation amounts** are chosen at this width (R15), ranked by this score's own measure,
     min(W_D, W_L) at the search width, at one number of rounds for every candidate
@@ -1821,9 +1830,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     that a later run cannot regenerate, as each one's section of the cli contract states;
     `review_package.py`, which writes the `review-package` record, has it (data-model §1; REP-085).
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs, of every
-    kind FR-065 lists, the tool validations, the cross-checks between kinds
-    and the D4 choice among them, and compares it with the recorded verdict
-    (FR-065, SC-017). Every verdict is recomputable on a fresh clone from
+    kind FR-065 lists, the tool validations, the cross-checks between kinds, the D4 choice, the
+    `trail` records and the candidate log's decisions and `replacement` states among them, and
+    compares it with the recorded verdict (FR-065, SC-017); for a `trail` record it recomputes each
+    trail's exact weight, as a rational, from its committed characteristic and the committed
+    operation list that the candidate's `oplist_sha256` names, by exact integer arithmetic,
+    and checks that the characteristic holds round by round and that the
+    record's classification follows from that weight, the 2⁻¹²⁸ threshold
+    included (ANA-086). Every verdict is recomputable on a fresh clone from
     committed files, so the committed per-round summaries must suffice, for example R_f from the
     per-round flag "every output bit depends on every input bit". Local-only outputs serve only
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
