@@ -38,10 +38,11 @@ evidence, do not refuse it, and every other guard applies, Committed code with t
 original's commit in HEAD's place, so a search that reached its cap is not
 reproduced (Trail tools). It is a heavy run where research R7 says so: it then runs only
 with `--owner-request "WORDS (DATE)"`, the owner's request quoted with its
-date, which its record keeps, and exits 2 without one; it takes the lock,
-projects first, for each run it makes, is charged to research R7's feature-wide row and exits 2,
-writing nothing but its `projection` record, unless its projection fits the hours left there
-(Budget). A light reproduction needs no request. A difference is a finding, exit 1: the original
+date, which its record keeps, and exits 2 without one; it takes the lock, makes any rebuild (below),
+projects first each run it will make, is charged to research R7's feature-wide row and exits 2,
+writing nothing but its `projection` records, unless those projections together fit the hours
+left there (Budget).
+A light reproduction needs no request. A difference is a finding, exit 1: the original
 stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
 until it is resolved, and, since it ran in the environment that made the original, it is a tool
 defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
@@ -55,7 +56,11 @@ there with the rebuild, Committed code applying to every file but the rebuilt bi
 the first run's are, the outcome `match` only when both runs match. A rebuild that differs is a new
 version of the tool: where Tool validation or Trail tools does not admit it, no second run is made,
 and a rebuild so refused, or one that fails, counts as a difference in every compared field, exit 1
-(research R16).
+(research R16). A heavy reproduction reads the hours left again before a second run, and one whose
+projection no longer fits them, the first run having taken more than its own, is not made, exit 1:
+the outcome is `differs` where the first run differs, and otherwise the record, written as an
+aborted run's is (data model §1), holds `status` `inconclusive`, with the reason, and neither
+`match` nor `differs`.
 `fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
 `downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`, each recording an
 owner's act or an outside fact that a later run cannot regenerate; nor have `clear_lock.py`, whose
@@ -259,7 +264,8 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   value or on any other known result (research R7), a heavy reproduction, a FUT-SEC-8
   repeat after a tool defect or FR-053's test with two worker counts, projects
   first against research R7's feature-wide 66 h row and exits 2, writing
-  nothing but its `projection` record, unless its projection fits the hours left there.
+  nothing but its `projection` record, unless its projection fits the hours left there, a heavy
+  reproduction's being the projections of all the runs it will make, together (introduction).
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has

@@ -1911,9 +1911,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the same way. Where the guards Tool validation and Trail tools do not admit that version, which
     has no `re-found` record of its own, no second run is made, so that those guards apply as
     written and a binary that its committed source does not give is a finding, not only a refusal.
-    A difference in either run counts as one, a rebuild that fails or that those guards do not
-    admit counts as a difference in every compared field, and a heavy reproduction projects, and is
-    charged for, each run it makes (R7).
+    A difference in either run counts as one, and a rebuild that fails or that those guards do not
+    admit counts as a difference in every compared field. A heavy reproduction makes any rebuild
+    first, projects each run it will make and starts only if those projections together fit the
+    hours left in R7's feature-wide row, exit 2 otherwise, writing nothing but its `projection`
+    records, and it is charged for each run it makes (R7). It reads the hours left again before a
+    second run, and one whose projection no longer fits them, the first run having taken more than
+    its own, is not made, exit 1: the outcome is `differs` where the first run differs, and
+    otherwise the record, written as an aborted run's is (data-model §1), holds `status`
+    `inconclusive`, with the reason, and neither `match` nor `differs`.
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
     test reproduces, per kind, its latest light run made under the platform's environment record in
     force and, where one exists under it, a light run made before the last change to its code (R7),

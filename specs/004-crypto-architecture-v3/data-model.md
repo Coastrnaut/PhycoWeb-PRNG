@@ -125,7 +125,7 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants and constructed states with their generator runs and checks, the environment, downloads, freeze and review-package records (REP-085), projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, which keeps `status` `inconclusive` | `none` |
+| No finding: vectors, constants and constructed states with their generator runs and checks, the environment, downloads, freeze and review-package records (REP-085), projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap or a reproduction whose first run matched and whose second no longer fitted the hours left (Reproduction, below), which keep `status` `inconclusive` | `none` |
 | A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
 | A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
 | A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
@@ -236,8 +236,13 @@ the class.
   compared field (research R16). A reproduction appends nothing to the candidate
   log, charges no candidate's budget row and is not a re-run under research
   R7, so it can neither replace evidence nor add any; a heavy one runs only on the owner's request,
-  quoted with its date in the record's `owner_request`, and is charged to research R7's feature-wide
-  row. A difference is a finding: the original stands; a difference in a field that enters a verdict
+  quoted with its date in the record's `owner_request`, makes any rebuild first, starts only if the
+  projections of the runs it will make together fit the hours left in research R7's feature-wide
+  row, and is charged to that row; a second run that no longer fits the hours then left is not
+  made, exit 1, the outcome being `differs` where the first run differs, and otherwise the record,
+  written as an aborted run's is (Every run writes a record, above), holding `status`
+  `inconclusive`, with the reason, and neither `match` nor `differs` (research R16).
+  A difference is a finding: the original stands; a difference in a field that enters a verdict
   (every compared field but the p-values) makes the candidate's eligibility `blocked`, as an
   unverified hypothesis does (FR-060), until it is resolved, and, since it ran in the environment
   that made the original (below), it is a tool defect of research R7, whose one re-run is a new
