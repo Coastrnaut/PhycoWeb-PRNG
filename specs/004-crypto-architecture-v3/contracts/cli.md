@@ -22,9 +22,15 @@ writes a `reproduction` record there: the original's ID and SHA-256, the commit 
 compared field with its outcome, the reported fields, and `match` or `differs`. The outputs that the
 original commits go there, under the same suffix and 10 MB rules, and an output it keeps
 local-only goes to `data/local/004/<record_id>/`, `<record_id>` there being the
-reproduction's own, its SHA-256 compared (data model §1). It runs only in the
-environment that made the original, as recorded, a re-check's reproduction excepted
-(research R1). It appends nothing to the candidate log, charges no candidate's
+reproduction's own, its SHA-256 compared (data model §1). It reads the design document from that
+worktree, where the original's `design_sha256` is not `none`, and exits 2 unless it matches
+`design-versions/<sha256>.md` and that hash, the verdict being recomputed under the design version
+with the spec and research versions (REP-099). It runs only in the environment that made the
+original, the environment record the original cites, a re-check's reproduction excepted (research
+R1): it exits 2, writing nothing, with the reason "environment record <id> is not in
+force", while that record is not the platform's record in force, so that no
+difference is ever charged to a tool that a changed environment could explain
+(REP-100). It appends nothing to the candidate log, charges no candidate's
 budget row and is not a re-run under research R7, so it can neither replace
 evidence nor add any; the Budget and Order of sizes guards, which concern
 evidence, do not refuse it, and every other guard applies, Committed code with the
@@ -79,9 +85,10 @@ R16; REP-085).
   approval and the freeze's step (1), the owner design review is held again in
   "Owner design review <k>", naming the same versions where nothing else
   changed, and step (1) follows that row's approval (spec FR-043; PRO-072).
-  `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed
-  counts by exact integer arithmetic and imports only the standard library and `protocol/` (its
-  section, below).
+  A reproduction exits 2 while the record its original cites is not the record in force
+  (introduction; REP-100). `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from
+  committed counts by exact integer arithmetic and imports only the standard library and `protocol/`
+  (its section, below).
 - **Committed code**: a run that writes evidence exits 2 unless every source file in its
   `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
   authorization to commit makes routine; data and report files may still be dirty, and the record
@@ -89,8 +96,10 @@ R16; REP-085).
   test checks each record's `code_sha256` entries against the blobs at its `git_head` (FR-053;
   research R16). For `--reproduce`, the commit is the original's `git_head`, checked out in a
   separate worktree (introduction). A run that writes evidence also exits 2 while a file a record
-  would cite, such as the sidecar or `research/004/candidates/superseded.json`, is modified in the
-  working tree, so that `dirty_paths` never holds a cited file (data model introduction).
+  would cite, such as the spec, research.md, the design document, the sidecar or
+  `research/004/candidates/superseded.json`, is modified in the working tree, so that the original's
+  `git_head` holds each version its record cites and `dirty_paths` never holds a cited file (data
+  model introduction; REP-099).
 - **Inputs**: only the namespaces `dev` and `control` of `protocol/devinputs_v3.py`, and for
   US1 the feature-002 `dev` set; anything else exits 2 (FR-040). `control` serves only uniform
   controls and `dev` is never a control: each evidence kind's namespace is fixed in code, not
@@ -132,8 +141,10 @@ R16; REP-085).
   computes it (below; REP-094), while any later entry's `approval_confirmed`, the last line's
   included, which the chain does not protect, differs from the first 16 digits of the approval hash
   that the guard recomputes over that entry alone, without `approver` and `prev_sha256` (PRO-077),
-  or while a reading that an entry's `readings` mark `set_aside` holds no owner's decision
-  (data model §18; PRO-079); every record then cites the log's last entry in
+  while a reading that an entry's `readings` mark `set_aside` holds no owner's decision (data model
+  §18; PRO-079), or while a `repair` entry's list of the entries after the break differs from
+  the list the guard recomputes from the repository by data model §3's rule
+  (data model §18; REP-101); every record then cites the log's last entry in
   `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18). A `lock-cleared`
   record (`clear_lock.py`, below) and an environment record written by `owner_record.py environment`
   (below) are the two kinds `protocol/evidence.py` writes while the log does not exist, each with
@@ -145,8 +156,8 @@ R16; REP-085).
   write, waits until the platform's environment record in force reads Approved at HEAD (Environment,
   above; PRO-068). `tests/test_protocol_004.py` covers the refusal of every other kind, both
   exceptions (PRO-071), a first entry whose digits do not match (REP-094), a later entry and the
-  last line whose digits do not match (PRO-077) and a reading marked `set_aside` with no decision
-  (PRO-079).
+  last line whose digits do not match (PRO-077), a reading marked `set_aside` with no decision
+  (PRO-079) and a `repair` entry whose list differs (REP-101).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -338,8 +349,10 @@ The sets are local-only, under `data/local/004/<record_id>/`, and regenerated by
 command; the record commits each set's SHA-256, the numpy version and a per-set summary, the planted
 bit's count and every fired bit, so a fresh clone recomputes both families' verdicts from committed
 files and a regeneration checks every count (data model §7). No set is ever replaced: a later draw,
-`--reproduce` included, must reproduce every hash in an environment with that numpy version, and a
-draw that differs is reported and counts for nothing. After an approved numpy upgrade the old record
+`--reproduce` included, must reproduce every hash in an environment with that
+numpy version, a reproduction running only while the environment record its
+original cites is in force (introduction; REP-100), and a draw that differs is
+reported and counts for nothing. After an approved numpy upgrade the old record
 stays the validation in the old environment, and a new validation, a new record, decides in the new
 one: outside 82 to 97, or with more than 3 sets holding an unplanted firing, the
 tool is unvalidated there, its results `not evaluated`, until a defect is
@@ -482,6 +495,9 @@ round_rule.py --reproduce RECORD       # a round-rule or selection record (intro
 ```
 
 R = max(2·R_dist, R_bound + 2, 2·max(R_f, R_b)) per claimable size, every input cited by record ID.
+Where a log it reads holds a `repair` entry, it reads that entry's list of
+the entries after the break and recomputes it from the repository by data
+model §3's rule, exiting 2 on a difference (`repair_log.py`, below; REP-101).
 It computes from the evidence records the N of spec FR-028's family-wise rate, the pairs of a
 claimable size and a round count r at which the bias tests ran with 2r above the R then in force, up
 to each firing's record for the rate stated beside it and by the freeze for the final report's
@@ -709,7 +725,10 @@ design document's version, named 1.0, with `reviewed_version`, the header's
 verdict scripts, `validate_tool.py` and `fut_sec8.py` among them, both freeze files, every module of
 the repository that a frozen script imports, directly or through another module, listed from the
 scripts' imports (REP-091), every evidence record behind R by ID and by SHA-256, and the last `seq`
-and line SHA-256 of the candidate log, the provenance log and the protocol change log. The freeze's
+and line SHA-256 of the candidate log, the provenance log and the protocol change log. Where a log
+`create` reads holds a `repair` entry, it reads that entry's list of the entries after
+the break and recomputes it from the repository by data model §3's rule,
+exiting 2 on a difference (`repair_log.py`, below; REP-101). The freeze's
 code is `protocol/design_freeze.py`, with create, approve and validate as functions, and this script
 is the command that calls it, as the other scripts call `protocol/evidence.py`; the record hashes
 both files (data model §13).
@@ -805,7 +824,10 @@ uniform-control, symmetry, invariant, degree and bound checks; the `trail`
 records; the D4 choice; the check of generated files on each platform; the size
 profile's generic-bound checks and the bound at the limits; eligibility and selection, with every
 decision and `replacement` state of the candidate log (ANA-088), each recomputed from committed
-counts by exact arithmetic. For a `trail` record it recomputes each trail's exact weight, as a
+counts by exact arithmetic. Where a log it reads holds a `repair` entry, it reads that entry's
+list of the entries after the break and recomputes it from the repository by
+data model §3's rule, exiting 2 on a difference (`repair_log.py`, below;
+REP-101). For a `trail` record it recomputes each trail's exact weight, as a
 rational, from its committed characteristic and the committed operation list that the candidate's
 `oplist_sha256` names, by exact integer arithmetic, and checks that the characteristic holds
 round by round and that the record's classification follows from that weight,
@@ -863,12 +885,21 @@ through the log's one writer, `protocol/candidates.py` for the candidate log,
 `protocol/provenance.py` for the provenance log and `protocol/changelog.py` for the protocol change
 log, which takes `data/log-append.lock` and admits it, while that row reads Approved at HEAD, as the
 one append to a broken chain (Hash-chained logs, above; PRO-076); in each log the entry holds the
-same fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was
-restored (data model §3, §14, §18). The restored log holds the lines before the break as stored and
-the `repair` entry chained to the last of them. Entries after the break count only where the records
-they cite corroborate them, and an entry that counts is appended again after the `repair` entry by
-its writer, as a new entry citing its `seq` and SHA-256 in the broken file, so that no entry is
-edited; in the protocol change log the `repair` entry goes through the owner's approval step, as
+same fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row, what was
+restored and the list of the entries after the break (data model §3, §14, §18; REP-101). The
+restored log holds the lines before the break as stored and the `repair` entry chained to the last
+of them. The list names every entry after the break by its `seq` and SHA-256 in the broken file,
+each marked as counting or not, with its reason, by the rule data model §3, §14 and §18 state per
+log: an entry counts where every record, file section and row it cites exists at HEAD with the
+SHA-256 it names and its own fields agree with them, and an entry that cites no record, such as the
+candidate log's `proposed`, `mapping`, `entered-d4`, `replacement` or `set-closed`, counts only
+where, besides, a later entry that counts, or a record, cites it by `seq` or SHA-256. An entry that
+counts is appended again after the `repair` entry by its writer, as a new entry citing its `seq` and
+SHA-256 in the broken file, so that no entry is edited, and one that does not count is lost to the
+readers, its writer entering its fact again only where its own rules still admit it;
+`round_rule.py`, `recheck_004.py`, `design_freeze.py create` and the guard "Protocol log" read the
+list of each log they read and recompute it from the repository, exiting 2 on a difference
+(REP-101); in the protocol change log the `repair` entry goes through the owner's approval step, as
 every entry does (`protocol_change.py`, below), and later records cite the entries after it
 (PRO-076). The final report states the repair (research R16). Where the owner
 commits a "Log repair <n>" row on its own between the commit that records the owner design review's

@@ -158,8 +158,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     approved; before the first record no lock can be held, since no log writer or
     heavy run starts before it (PRO-068). `scripts/recheck_004.py` alone is
     exempt, since it imports only the standard library and `protocol/` (R16).
-  - A reproduction runs in the environment that made the original, as its environment record shows,
-    and in no other: a run in the other environment is not a reproduction and compares nothing with
+  - A reproduction runs in the environment that made the original, the environment record the
+    original cites, and in no other: `--reproduce` exits 2, writing nothing, with the reason
+    "environment record <id> is not in force", while that record is not the platform's record in
+    force, so that no difference is ever charged to a tool that a changed environment could
+    explain, and a record made under an earlier record stays the evidence of its
+    environment, as `validate_tool.py`'s old validation does (REP-100); a run in
+    the other environment is not a reproduction and compares nothing with
     the original, and the kinds that depend on the environment, the synthetic draws (numpy), the
     MILP bounds (scipy) and the C tools (built in WSL only), need it anyway. The re-check of R16,
     and a reproduction of its `recheck` record, may run anywhere. A reproduction compares the fields
@@ -1773,8 +1778,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `research_sha256` is kept the same way, as `research-versions/<sha256>.md`, since
     the values that decide verdicts live there. Every version of the design
     document that a record cites by `design_version` is kept the same way, as
-    `design-versions/<sha256>.md` (spec FR-034). Every record also holds `protocol_seq` and
-    `protocol_line_sha256`, the protocol change log's last entry when the run started, which exists
+    `design-versions/<sha256>.md` (spec FR-034), and a verdict is recomputed under the
+    design version beside the spec and research versions (Reproduction, below;
+    REP-099). Every record also holds `protocol_seq` and `protocol_line_sha256`,
+    the protocol change log's last entry when the run started, which exists
     for every run, since the shared guard "Protocol log" refuses every run that writes evidence
     while the log does not exist, its chain does not check or its first entries do not all hold the
     owner's `approval_confirmed` (spec FR-044); a `lock-cleared` record and an environment record
@@ -1787,7 +1794,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     record's code is then found at its `git_head`, and a test checks each `code_sha256` entry
     against the blob at that commit. `research/004/tools/critical_counts.json` is code too, one of
     `research/004/ir.py`'s tools (R4). A run also exits 2 while a file a record would cite is
-    modified in the working tree, so that `dirty_paths` never holds a cited file. `--reproduce` runs
+    modified in the working tree, the spec, research.md and the design document among them, so
+    that the original's `git_head` holds each version its record cites and
+    `dirty_paths` never holds a cited file (REP-099). `--reproduce` runs
     the original's code, from a separate worktree of its `git_head` checked against that commit's
     blobs, and the committed-code guard applies to that commit (Reproduction, below).
   - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
@@ -1833,13 +1842,22 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     data-model §1 defines, and decides nothing, a value outside making the outcome
     `differs`, a finding that blocks no candidate; every other `.gz` file is
     compared by its `uncompressed_sha256`. Its verdict is recomputed under the spec version, the
-    research version and the protocol change-log entry the original cites
-    (`spec-versions/<sha256>.md`, `research-versions/<sha256>.md`), so a later change cannot alter
-    it, and it runs in the environment that made the original, as recorded, and in no other, a
-    `recheck` record's reproduction excepted, which runs anywhere, as the re-check does (R1).
+    research version, the design version and the protocol change-log entry the original cites
+    (`spec-versions/<sha256>.md`, `research-versions/<sha256>.md`, `design-versions/<sha256>.md`),
+    so a later change cannot alter it, the design document being read from the worktree of
+    `git_head`, where the record's `design_sha256` is not `none`, and the run exiting 2 unless it
+    matches `design-versions/<sha256>.md` and that hash (REP-099); and it runs in the environment
+    that made the original, the environment record the original cites, and in no other, exiting 2,
+    writing nothing, with the reason "environment record <id> is not in force", while that record is
+    not the platform's record in force (R1; REP-100), a `recheck` record's
+    reproduction excepted, which runs anywhere, as the re-check does (R1).
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
-    test reproduces, per kind, its latest light run and, where one exists, a light run made before
-    the last change to its code (R7), and leaves out, each with its reason, the claim test, which
+    test reproduces, per kind, its latest light run made under the platform's environment record in
+    force and, where one exists under it, a light run made before the last change to its code (R7),
+    listing each kind whose run before that change was made under an earlier record, with that
+    record, the protocol change log's entry marking `set_aside` the reading under which the test
+    reproduces such a run and fails after every environment change until the kind's code next
+    changes (REP-100; PRO-079), and leaves out, each with its reason, the claim test, which
     writes no record and runs as a test, a `lock-cleared` record, which records an event, a tie
     choice, an owner's own act, the reproduction records, which are not reproduced, and the
     `environment`, `downloads` and `freeze` records, whose writers `owner_record.py`, `downloads.py`
@@ -1937,12 +1955,24 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     through the log's one writer, `protocol/candidates.py`, `protocol/provenance.py` or
     `protocol/changelog.py`, which takes `data/log-append.lock` and admits it, while that row reads
     Approved at HEAD, as the one append to a broken chain, the entry holding in each log the same
-    fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was
-    restored (data-model §3, §14, §18; PRO-076). The restored log holds the lines before the break
-    as stored and the `repair` entry chained to the last of them. Entries after the break count only
-    where the records they cite corroborate them, and an entry that counts is appended again after
-    the `repair` entry by its writer, as a new entry citing its `seq` and SHA-256 in the broken
-    file, so that no entry is edited; in the protocol change log the `repair` entry goes through the
+    fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row, what was
+    restored and the list of the entries after the break (data-model §3, §14, §18; PRO-076;
+    REP-101). The restored log holds the lines before the break as stored and the `repair` entry
+    chained to the last of them. The list names every entry after the break by its `seq` and SHA-256
+    in the broken file, each marked as counting or not, with its reason, by the rule data-model §3,
+    §14 and §18 state per log: an entry counts where every record, file section and row it cites
+    exists at HEAD with the SHA-256 it names and its own fields agree with them, and an entry that
+    cites no record, such as the candidate log's `proposed`, `mapping`, `entered-d4`, `replacement`
+    or `set-closed`, counts only where, besides, a later entry that counts, or a record, cites it by
+    `seq` or SHA-256 (REP-101). An entry that counts is appended again after the `repair` entry by
+    its writer, as a new entry citing its `seq` and SHA-256 in the broken file, so that no entry is
+    edited, and one that does not count is lost to the readers, its writer entering its fact again
+    only where its own rules still admit it; `round_rule.py`, `recheck_004.py`,
+    `design_freeze.py create` and the guard "Protocol log" read the list of each log they read and
+    recompute it from the repository, exiting 2 on a difference, and the protocol change log's entry
+    marks `set_aside` the reading under which an entry that cites no record never counts, under
+    which an `entered-d4` entry lost to a break could never be entered again once a score exists
+    (REP-101; PRO-079); in the protocol change log the `repair` entry goes through the
     owner's approval step, as every entry does, and later records cite the entries after it
     (PRO-076). The final report states the repair.
   - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files, the

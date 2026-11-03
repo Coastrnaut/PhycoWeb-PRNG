@@ -31,8 +31,10 @@ written once each and never rewritten: a later selection is a new record,
 entries never changing: `research/004/tools/critical_counts.json`, which is code (section 5), the
 sidecar `vectors/phyco-v3/MANIFEST.json` (section 11) and `research/004/candidates/superseded.json`
 (section 3); a record that cites one gives its SHA-256 and the entry it used, and every evidence
-script exits 2 while a file a record would cite is modified in the working tree, so that
-`dirty_paths` never holds one (section 1). The freeze record changes only by the
+script exits 2 while a file a record would cite is modified in the working
+tree, the spec, research.md and the design document among them, so that the
+original's `git_head` holds each version its record cites and `dirty_paths`
+never holds one (section 1; REP-099). The freeze record changes only by the
 owner's approval, which `scripts/design_freeze.py approve` writes into it
 through the freeze code of `protocol/design_freeze.py`, its draft checked by
 `draft_sha256` (section 13).
@@ -86,7 +88,7 @@ implementation can write byte-identical files:
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
 | `protocol_seq`, `protocol_line_sha256` | int, hex, or `none` | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract); both `none` in a `lock-cleared` record or an environment record written while the log does not exist, the two kinds `protocol/evidence.py` writes then: the first since it records an event and clearing a stale lock is what lets the log be created (PRO-065), the second, written by `owner_record.py environment`, since it records the platform, holds no result and comes before the log, whose writer checks the running environment against it (PRO-071); once the log exists each cites its last entry |
-| `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
+| `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite, the spec, research.md and the design document among them: every evidence script exits 2 while one is modified in the working tree, so that `git_head` holds each version its record cites (introduction; REP-099) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
 | `environment` | object | path of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), and its two hashes, each with its kind: its SHA-256 over its bytes as committed, kind `raw`, which also names it under `versions/` and in `previous_sha256`, and its approval hash, kind `canonical`, over its canonical JSON without the approval fields (introduction, format rules), which `owner_record.py` prints, its row names and the guard compares, so that the guard, the re-check and a later reader resolve the same record from either (REP-083); written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below); the environment record itself, the one write the guard "Environment" admits while no record is in force or the running environment differs from it, holds `none`, with the interpreter's version and each pinned package's version that its check against research R1 and the pins of `requirements.txt` compared (PRO-068); each entry of the provenance log, the protocol change log and the downloads manifest names the record in force the same way, as its `environment` (sections 14, 18; research R19; REP-082) |
@@ -240,11 +242,18 @@ the class.
   subnormal agrees. A value outside makes the outcome `differs`, exit 1, with the values
   listed: a finding about the run's reproducibility that blocks no candidate,
   since no p-value decides a verdict (section 5, "Exact verdicts"). Every
-  other `.gz` file is compared by its `uncompressed_sha256`. The verdict is
-  recomputed under the spec version, the research version and the protocol change-log entry the
-  original cites (`spec-versions/`, `research-versions/`, section 18), so a later change cannot
-  alter it, and it runs in the environment that made the original, as recorded, and in no other, a
-  `recheck` record's reproduction excepted, which runs anywhere, as the re-check does (research R1).
+  other `.gz` file is compared by its `uncompressed_sha256`. The verdict is recomputed under the
+  spec version, the research version, the design version and the protocol change-log entry the
+  original cites (`spec-versions/`, `research-versions/`, `design-versions/`, section 18), so a
+  later change cannot alter it, the design document being read from the worktree of `git_head`,
+  where the record's `design_sha256` is not `none`, and the run exiting 2 unless it matches
+  `design-versions/<sha256>.md` and that hash (REP-099); and it runs in the environment that made
+  the original, the environment record the original cites, and in no other, exiting 2, writing
+  nothing, with the reason "environment record <id> is not in force", while that record is not the
+  platform's record in force, so that no difference is ever charged to a tool that a changed
+  environment could explain, a record made under an earlier record staying the evidence of its
+  environment (research R1; REP-100), a `recheck` record's reproduction excepted, which runs
+  anywhere, as the re-check does (research R1).
 
 **Fields compared, per kind** (FR-053). A reproduction compares the fields of the Reproduction
 bullet above that its original holds, and those this table lists for its kind; it reports the rest.
@@ -466,12 +475,21 @@ proposed design" (section 14; spec FR-041; RAT-077; ANA-080, ANA-081; ANA-087).
   `data/log-append.lock` and admits it, while that row reads Approved at HEAD, as the one append to
   a broken chain; in each log, this one, the provenance log (section 14) and the protocol change log
   (section 18), the entry holds the same fields: the break's `seq`, its cause, the broken file's
-  path and SHA-256, the row "Log repair <n>" and what was restored (PRO-076). The restored log holds
-  the lines before the break as stored and the `repair` entry chained to the last of them. Entries
-  after the break count only where the records they cite corroborate them, and an entry that counts
-  is appended again after the `repair` entry by its writer, as a new entry citing its `seq` and
-  SHA-256 in the broken file, so that no entry is edited (PRO-076); the final report states the
-  repair (R16).
+  path and SHA-256, the row "Log repair <n>", what was restored and the list of the entries after
+  the break (PRO-076; REP-101). The restored log holds the lines before the break as stored and the
+  `repair` entry chained to the last of them. The list names every entry after the break by its
+  `seq` and SHA-256 in the broken file, each marked as counting or not, with its reason, by this
+  rule, which sections 14 and 18 apply to what their entries cite: an entry counts where every
+  record, file section and row it cites exists at HEAD with the SHA-256 it names and its own fields
+  agree with them, and an entry that cites no record, in this log `proposed`, `mapping`,
+  `entered-d4`, `replacement` and `set-closed` among them, counts only where, besides, a later entry
+  that counts, or a record, cites it by `seq` or SHA-256 (REP-101). An entry that counts is appended
+  again after the `repair` entry by its writer, as a new entry citing its `seq` and SHA-256 in the
+  broken file, so that no entry is edited (PRO-076), and one that does not count is lost to the
+  readers, its writer entering its fact again only where its own rules still admit it;
+  `round_rule.py`, `recheck_004.py` and `design_freeze.py create` read the list and recompute it
+  from the repository, exiting 2 on a difference (REP-101). The final report states the repair
+  (R16).
 
 ```text
 proposed ─► entered-d4 ─► scored ─┐       (only candidates entered before the D4 choice)
@@ -1153,7 +1171,10 @@ read is the file `design_freeze.py create` compares (spec FR-012, FR-034;
 RAT-068). The review of an evidence record is an entry that names the record's ID
 and SHA-256, the record's `reviewer` staying as written (section 1). Every append takes
 `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
-section 3, its `repair` entry holding the fields that section gives it. Its one writer is
+section 3, its `repair` entry holding the fields that section gives it, the list of the entries
+after the break among them, each entry of this log counting by section 3's rule over what it
+cites: the file section it names by its SHA-256 and, for a review entry, the
+review's row or the evidence record it names (REP-101). Its one writer is
 `protocol/provenance.py`, run as `scripts/provenance.py add` for an entry and `review` for a review
 entry (cli contract), and as `scripts/repair_log.py` for the `repair` entry, which it admits
 while the spec's row "Log repair <n>" reads Approved at HEAD, as the one
@@ -1478,7 +1499,7 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `environment` | the platform's environment record in force when the entry was written, named as in section 1 (REP-082) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
-| `repair` | for a `repair` entry only, the one append to a broken chain, which `scripts/repair_log.py` writes through this log's writer while the spec's row "Log repair <n>" reads Approved at HEAD: the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was restored, the same fields as in sections 3 and 14; it changes no rule and holds no `rule`, `rules`, `old_text`, `new_text`, `direction` or `readings`, and it goes through the approval step as every entry does, later records citing the entries after it (PRO-076) |
+| `repair` | for a `repair` entry only, the one append to a broken chain, which `scripts/repair_log.py` writes through this log's writer while the spec's row "Log repair <n>" reads Approved at HEAD: the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was restored, the same fields as in sections 3 and 14, the list of the entries after the break among them, each entry of this log counting by section 3's rule over what it cites, its `last_record_id`, the records of its `results_known` and, for a first entry, the commits its `rules` name with the rule's texts at them; the guard "Protocol log" reads that list and recomputes it from the repository, exiting 2 on a difference (REP-101); it changes no rule and holds no `rule`, `rules`, `old_text`, `new_text`, `direction` or `readings`, and it goes through the approval step as every entry does, later records citing the entries after it (PRO-076) |
 
 A change applies to every candidate, those already evaluated included. Every record cites the log's
 last entry when its run started (`protocol_seq`, `protocol_line_sha256`; section 1), and

@@ -3053,15 +3053,24 @@ freeze hashes and the baseline manifest; run the claim-register test.
     them; a different source hash makes it a new run, not a reproduction. A `p_values` output is
     marked not deterministic and compared by its values, within the tolerance data-model §1 defines;
     a value outside makes the outcome `differs`, a finding about the run's
-    reproducibility that blocks no candidate, since a p-value decides nothing. The
-    verdict is recomputed under the spec version, the research version and the protocol change-log
-    entry the original cites, and a reproduction runs in the environment that made the original, as
-    recorded, a `recheck` record's reproduction excepted, which runs anywhere, as the re-check does
-    (research R1).
+    reproducibility that blocks no candidate, since a p-value decides nothing. The verdict is
+    recomputed under the spec version, the research version, the design version and the protocol
+    change-log entry the original cites, the design document being read from the worktree of
+    `git_head`, where the record's `design_sha256` is not `none`, and the run exiting 2 unless it
+    matches `design-versions/<sha256>.md` and that hash (REP-099), and a reproduction runs in the
+    environment that made the original, the environment record the original cites, a `recheck`
+    record's reproduction excepted, which runs anywhere, as the re-check does (research R1):
+    `--reproduce` exits 2, writing nothing, with the reason "environment record <id> is not in
+    force", while that record is not the platform's record in force, so that no difference is ever
+    charged to a tool that a changed environment could explain, and a record made under an earlier
+    record stays the evidence of its environment (REP-100).
   - **Code by hash.** Every record holds the SHA-256 of every code file the run used (FR-061).
     The model hash is that of the candidate's operation list before selection and that of
-    `model_v3.py` after it. Code is committed before every evidence run; `git_dirty` may be true for
-    data and reports only, never for a file a record cites (data-model §1), and
+    `model_v3.py` after it. Code is committed before every evidence run; `git_dirty` may be true
+    for data and reports only, never for a file a record cites, the spec,
+    research.md and the design document among them, every run that writes evidence
+    exiting 2 while one is modified in the working tree, so that the original's
+    `git_head` holds each version its record cites (data-model §1; REP-099), and
     the record lists the dirty paths: a run that writes evidence exits 2
     unless every source file in its `code_sha256` matches HEAD, committed and unmodified, which
     constitution 1.3.0's standing authorization to commit makes routine, and a binary is rebuilt
@@ -3314,8 +3323,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   states; the working directory, which is the repository root; paths relative
   to it), with a test that reproduces exactly as recorded, through the script's `--reproduce` mode
   (FR-053), per kind, a run that was light by research R7's test, light being a property of each
-  run: the kind's latest such run and, where one exists, one made before the last change to its
-  code; the test leaves out, each with its reason, the claim test, which writes no record and runs
+  run: the kind's latest such run made under the platform's environment record in force and, where
+  one exists under it, one made before the last change to its code, the test listing each kind whose
+  run before that change was made under an earlier record, with that record (REP-100); the test
+  leaves out, each with its reason, the claim test, which writes no record and runs
   as a test, a `lock-cleared` record, which records an event, a tie choice, an owner's own act, the
   reproduction records, which are not reproduced, and the `environment`, `downloads` and `freeze`
   records, whose writers have no `--reproduce`, each recording an owner's act or an outside fact
