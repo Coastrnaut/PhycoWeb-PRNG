@@ -547,8 +547,10 @@ design_freeze.py validate               # recomputes draft_sha256 and every hash
 ```
 
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the owner's next
-commit after the one that records the owner design review's approval, from which the agent commits
-no file of this feature (PRO-070); (2) `create` runs with `git_dirty` false, records that commit as
+commit after the one that records the owner design review's approval, the agent
+committing no file of this feature from the first commit that records an owner
+design review's approval to the feature's end, plan phase 9 included (PRO-070;
+SEC-084); (2) `create` runs with `git_dirty` false, records that commit as
 `owner_commit` and writes the record as `draft`; (3) the owner runs `approve`, which
 writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
@@ -585,7 +587,8 @@ Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the 
 at a supported (n, w) and its final R (research R15), if the design document's header holds a line
 other than its title, the disclaimer and its line "Version: …" (spec FR-034), if the commit that
 follows the one recording the owner design review's approval, in its row with the highest k, the
-owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), or if `git_dirty` is true. `create`
+owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), if `check_claims.py`
+reports a finding at HEAD (SEC-084), or if `git_dirty` is true. `create`
 stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the
 record's canonical JSON without that field and the approval fields, `status`,
 `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, kind
@@ -847,13 +850,25 @@ check_claims.py
 ```
 
 Runs FR-069's test as written, with its scope, rules, strength rule and allow-list: it checks
-README, security.md §1.1 and §15 and the disclaimers against `protocol/claims.json` and that every
-hand-written document of this feature carries the design-form disclaimer, the eight checklists,
-checklist-choices.md and, once written, tasks.md among them, and it scans every
+README, security.md §1.1 and §15 and the disclaimers, README's status block and security.md's own
+blocks, the one that opens it and the one that closes it, each of which must say that PhycoWeb-PRNG,
+every model included, must not be used to generate secrets and state no level, claim or bound beyond
+the register's (SEC-086), against `protocol/claims.json` and that every hand-written document of
+this feature carries the design-form disclaimer, the eight checklists, checklist-choices.md and,
+once written, tasks.md among them, README and security.md keeping their own
+blocks and carrying no copy of it (spec FR-068; SEC-086), and it scans every
 Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`,
 the checklists and checklist-choices.md included, README, security.md, and the comments and
 docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
-of the register, with its reason (data model §15). It reads the spec's Review & Approval rows "L1
+of the register, with its path and text, its reason, its writer and its date, counted from the
+commit that adds it, and every run prints each entry added since the last ⛔ gate's approval commit,
+which the owner's review at that gate lists (data model §15; SEC-087). Its level rule flags every
+name of a level above `claim_level` in every scanned line as a whole word, `claim_level` being, for
+each line, the lowest level the register gives the models the line names by ID, and L0 where it
+names none, the lines that name a level without stating one for a model standing through the entries
+data model §15 lists, and its sample sentences "phyco-v3 is at L2" and "the
+design reaches L3" must be flagged and security.md §15's ladder rows must
+pass (spec FR-069; SEC-085). It reads the spec's Review & Approval rows "L1
 recorded" and "L1 recorded <k>" and those of the FUT-SEC-8 result review and the security-target
 review as committed at HEAD (Approvals, above), and a register whose level for `phyco-v3` differs
 from the one those rows give is a finding: L1 while the "L1 recorded" row with the highest k reads
@@ -868,8 +883,14 @@ too (SEC-080). The agent writes the register's change in a commit of its
 own right after the owner's commit that changes those rows, so that at the owner's commit the check
 reports the register behind the rows (data model §15); it writes the return to L0 that a
 change to a reviewed file brings in the commit that makes the change, or
-right after an owner's commit that makes it, and `in_progress` in the commit
-that writes the first counted trail-bound record (SEC-079, SEC-080). Exit 1
+right after an owner's commit that makes it, and `in_progress` in the commit that writes the first
+counted trail-bound record (SEC-079, SEC-080). Inside the window in which the agent commits no file
+of this feature, from the first commit that records an owner design review's approval to the
+feature's end (spec FR-043), `protocol/claims.json` and security.md among those files, the agent
+writes each of these changes in the working tree, once the owner has set the row or
+made the change there, and the owner's commit holds it, so that at every
+commit of the window the register gives the rows' level, and `design_freeze.py
+create` exits 2 while this check reports a finding at HEAD (SEC-084). Exit 1
 on any finding (SC-018). `tests/test_claims.py` runs it, with a register above, below and at the
 rows' level, a `history` missing a lapsed L1, a reviewed file changed at HEAD with the register at
 L1 and at L0, and an `in_progress` naming L2 with no counted trail-bound record, naming

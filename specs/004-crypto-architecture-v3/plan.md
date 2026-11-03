@@ -448,12 +448,15 @@ takes each from there.
    commit (FR-012; SEC-081); then the rationale; the security.md version of
    FR-051 (2.11 already records the §20.1
    decision, from the checklist answers of 2026-11-01); review package, assembled by
-   `scripts/review_package.py` (FR-063; REP-085); ⛔ **owner design review**,
-   from whose approval commit on the agent commits no file of this feature; external review recorded
+   `scripts/review_package.py` (FR-063; REP-085); ⛔ **owner design review**, from whose first
+   approval commit to the feature's end, phase 9 included, the agent commits no file of this
+   feature, each later commit of such a file, the claim register's changes among them,
+   being the owner's (FR-012, FR-043; SEC-084); external review recorded
    as done or not arranged, after that approval only in the owner's commit of the feature files; the
    owner commits the feature files (Principle IX), the commit `design_freeze.py create` records as
    `owner_commit` (FR-043; PRO-070); ⛔ **design freeze**.
-9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
+9. **Polish**, inside FR-043's window, its files committed by the owner (SEC-084):
+   README stating the status of `phyco-v3`, with the documentation drift of
    checklist group F corrected, and an addendum to the feature-002 phase report, whose
    "invertible-looking ARX" S13 contradicts (FR-051); the claim-register test, run since phase 1,
    again over the final documents (SEC-081); re-check of every verdict; final

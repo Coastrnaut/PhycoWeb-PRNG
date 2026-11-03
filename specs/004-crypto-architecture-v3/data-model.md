@@ -911,7 +911,8 @@ copy against its manifest hash and its live source (SC-012).
   the version it read only, as the final report states them (spec FR-043, SC-013; SEC-078).
 - Tool versions; `git_head`; `owner_commit`, the hash of the freeze's step (1), the owner's commit
   of the feature files, which follows the commit that records the owner design review's approval in
-  its row with the highest k, `create` exiting 2 unless it is HEAD (spec FR-043; PRO-070);
+  its row with the highest k, `create` exiting 2 unless it is HEAD (spec FR-043;
+  PRO-070), and also while `check_claims.py` reports a finding at HEAD (SEC-084);
   `git_dirty`, which must be false; `draft_sha256`, written by `create`: the SHA-256 of the record's
   canonical JSON without that field and the approval fields, kind `canonical` (introduction;
   REP-083), the approval fields being `status`, `approved_by`, `approved_utc`, `approval_wording`
@@ -923,9 +924,11 @@ copy against its manifest hash and its live source (SC-012).
   `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed` (the digits typed), and
   changes nothing else.
 
-The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the owner's next
-commit after the one that records the owner design review's approval, from which the agent commits
-no file of this feature (PRO-070); (2) `design_freeze.py create` runs with `git_dirty`
+The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the
+owner's next commit after the one that records the owner design review's
+approval, the agent committing no file of this feature from the first commit that
+records an owner design review's approval to the feature's end, plan phase 9
+included (PRO-070; SEC-084); (2) `design_freeze.py create` runs with `git_dirty`
 false, records that commit as `owner_commit` and writes the record as `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
@@ -1038,14 +1041,27 @@ that a register below the rows' level, or one missing a lapsed L1, fails
 as one above it does; `tests/test_claims.py` covers each case. The agent writes `phyco-v3`'s
 `claim_level`, `updated` and `history`, and its line in security.md §15, in a commit of its own
 right after the owner's commit that sets "L1 recorded" or "L1 recorded <k>" to Approved, or that
-adds a later row of either review family, which makes L1 lapse, and never before that commit
-(SEC-076). It writes the return to L0 that a change to the reviewed set brings in the commit that
+adds a later row of either review family, which makes L1 lapse, and never before that commit, save
+inside spec FR-043's window, where the owner's commit holds it (SEC-076; SEC-084). It writes the
+return to L0 that a change to the reviewed set brings in the commit that
 makes the change, or, where an owner's commit makes it, in a commit of its own right after it
 (SEC-079), and `in_progress` in the commit that writes the first counted trail-bound record
-(SEC-080). Plan phase 1 creates the register, with an entry for each model ID and `phyco-v3` at L0
+(SEC-080). Inside the window in which the agent commits no file of this feature, from the first
+commit that records an owner design review's approval to the feature's end (spec FR-043),
+`protocol/claims.json` and security.md among those files, it writes each of these changes in the
+working tree, once the owner has set the row or made the change there, and the owner's commit holds
+it, so that at every commit of the window the register gives the rows' level (SEC-084). Plan phase 1
+creates the register, with an entry for each model ID and `phyco-v3` at L0
 with "no claim" and `in_progress` `none`, with `scripts/check_claims.py` and `tests/test_claims.py`,
 and adds `phyco-v3`'s line at L0 to security.md §15 in the same phase, in a security.md version of
-its own (spec FR-051; SEC-081). The spec approval recorded no level.
+its own (spec FR-051; SEC-081). The spec approval recorded no level. The claim test checks README's
+status block and security.md's own blocks, the one that opens it and the one that closes it, each of
+which must say that PhycoWeb-PRNG, every model included, must not be used to generate secrets and
+state no level, claim or bound beyond the register's, against the register; README's block, written
+for the models with a 64-bit seed, gains with spec FR-051's update a sentence on `phyco-v3` that the
+test checks against its `claim_level` and `claim`, and the two documents keep their own blocks and
+carry no copy of the design-form disclaimer, which every hand-written document of this feature
+carries (spec FR-068; SEC-086).
 
 - `claim_level` holds the level whose gate holds at HEAD (L0 or L1 in this feature): a
   later row of either review family, or a change to what those rows reviewed (SEC-079), makes L1
@@ -1053,8 +1069,11 @@ its own (spec FR-051; SEC-081). The spec approval recorded no level.
   each earlier level with its dates, the rows it rested on and the version
   reviewed. `in_progress` is `none` until the first counted trail-bound record,
   and then names a level started and not reached, L2, with that record's
-  date as its start date and "not reached" (SEC-080). The claim test checks
-  that no document states a level above `claim_level`, and refuses a value outside L0…L6.
+  date as its start date and "not reached" (SEC-080). The claim test checks that no document states
+  a level above `claim_level`, flagging every name of a level above it in every scanned line as a
+  whole word, `claim_level` being, for each line, the lowest level the register gives the models the
+  line names by ID, and L0 where it names none (spec FR-069; SEC-085), and refuses a value outside
+  L0…L6.
 - `fut_sec`, for `phyco-v3`: each FUT-SEC requirement's status in the terms of the spec's
   traceability table. FUT-SEC-4 is met by statement (D7); FUT-SEC-5 is met by specification for
   key loading, and by evidence for diffusion through instantiation (FR-029) and research R4's
@@ -1064,8 +1083,13 @@ its own (spec FR-051; SEC-081). The spec approval recorded no level.
   the design document's chapter "Mode" (spec FR-034) and cites the selected
   candidate's evidence records of the measured part, which exist by then, since
   the review is the first step of plan phase 8, after the selection, so nothing remains to measure.
-- `allow_list`: the lines the claim test would flag that may stand, each with its path, its
-  text and its reason. The test flags any strength (a number of bits beside "security",
+- `allow_list`: the lines the claim test would flag that may stand, each with its path, its text,
+  its reason, its writer and the date it was written. The agent drafts each entry, standing phrase
+  or line entry; the test counts an entry from the commit that adds it; `check_claims.py` prints on
+  every run each entry added since the last ⛔ gate's approval commit, and the owner's review at each
+  ⛔ gate lists those entries with their reasons; an entry the owner declines is removed in the next
+  commit, the line it passed then failing the test until its text changes (spec FR-069;
+  SEC-087). The test flags any strength (a number of bits beside "security",
   "strength" or "secure", or a cost such as 2¹²⁸ beside "security") unless the same sentence or row
   carries "target" or quotes a rule. It also flags "random" with its inflections and "high-entropy"
   in every line it scans, since Principle IV forbids describing the generator so beyond what
@@ -1089,7 +1113,12 @@ its own (spec FR-051; SEC-081). The spec approval recorded no level.
   in the disclaimer; "hash randomization" in the rule that nothing depends on it; and every other
   form the test finds gets a phrase of its own, listed here with its reason, or a line entry. The
   project's name holds no flagged word and needs no entry. Standing entries also let these lines
-  stand: security.md §6's rows, which state a standard's own status; the spec's rule lines of FR-050
+  stand: security.md §6's rows, which state a standard's own status; security.md §15's ladder and
+  gate rows, which state each level's requirements, the rows' names "L1 recorded" and "L1 recorded
+  <k>", `in_progress`'s "not reached" and section 17's sentence that L2 is never `claim_level` in
+  this feature, each of which names a level without stating one for a model, the rule lines that
+  move a model between levels, in spec FR-012 and FR-069 and sections 15 and 17, passing
+  through one entry per rule line (SEC-085); the spec's rule lines of FR-050
   and SC-015, which name the words they forbid, and the negative statements on "secure"
   and "unbreakable", such as README's "**not** cryptographically secure",
   each through a fixed phrase with its reason; the spec's FR-025 sentence on
@@ -1100,9 +1129,10 @@ its own (spec FR-051; SEC-081). The spec approval recorded no level.
   the checklists and checklist-choices.md, which quote the documents they review, a flagged word
   inside a quotation, in quotation marks or backticks, any other flagged line there needing an entry
   of its own (FR-069). A test runs every rule and every standing phrase on
-  sample sentences that must and must not be flagged, with one that must be
-  flagged for each form FR-069 lists and "phyco-v3 is unbreakable" among
-  them. Inside the mapping chapter, the design document's section headed
+  sample sentences that must and must not be flagged, with one that must be flagged for each form
+  FR-069 lists and "phyco-v3 is unbreakable" among them, "phyco-v3 is at L2" and "the design reaches
+  L3" among those that must be flagged and security.md §15's ladder rows among those that must pass
+  (SEC-085). Inside the mapping chapter, the design document's section headed
   "Slime-mould mapping" up to the next heading of the same level, the rule matches
   FR-030's list, the words for the arguments it forbids among them, as whole
   words, ignoring case, with their inflections, and the test exits 1 if the
@@ -1142,7 +1172,10 @@ compares it (cli contract; REP-085).
   that row reads "blocked" and names the missing paper. L0 needs no row. L2 is never
   `claim_level` in this feature: `in_progress` is `none` before the first counted trail-bound record
   and names it from that record, with its date as the start date and "not reached", written in the
-  commit that writes the record (section 15; SEC-080). Every level carries "no claim".
+  commit that writes the record (section 15; SEC-080). Every level carries "no claim". The lines of
+  this bullet that move the model between levels pass the claim test's level rule through one entry
+  per line, and its sentence that L2 is never `claim_level` through a standing entry (section 15;
+  SEC-085).
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
 - **Design document**: draft versions 0.<k>, the next with each committed change before the freeze,

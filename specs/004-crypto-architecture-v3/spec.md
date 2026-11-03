@@ -343,7 +343,11 @@ committed at HEAD and exits 2 while the working tree's table differs from HEAD's
 "Approvals"). The agent commits under the owner's standing authorization (constitution 1.3.0,
 Principle IX), and its commits carry no AI co-author line, so the history cannot show who wrote or
 committed a row; the owner's review at each ⛔ gate therefore lists the approval commits since the
-last gate.
+last gate, and the `allow_list` entries of the claim register added since, each with its reason,
+which `check_claims.py` prints, an entry the owner declines being removed in the next commit
+(FR-069; SEC-087). From the first commit that records an owner design review's approval to the
+feature's end, plan phase 9 included, every commit of a file of this feature is the owner's (FR-043;
+SEC-084).
 
 A decline is logged with its reasons and ends, at each gate, in one of these outcomes. At the
 FUT-SEC-8 result review: a corrected demonstration report, as a new version reviewed in a row of its
@@ -382,16 +386,22 @@ later rows read Approved, naming them; until then the register keeps `phyco-v3` 
 FR-069). The agent writes the register's change, `phyco-v3`'s entry in `protocol/claims.json` and
 its line in security.md §15, in a commit of its own right after the owner's commit that sets "L1
 recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family, which
-makes L1 lapse, and never before that commit, and `check_claims.py` fails while the register's level
-differs from the one the rows give, in either direction (SEC-076). L1 holds at HEAD only while what
+makes L1 lapse, and never before that commit, save inside FR-043's window, where the owner's commit
+holds it (SEC-084), and `check_claims.py` fails while the register's level differs from the one the
+rows give, in either direction (SEC-076). L1 holds at HEAD only while what
 its rows name holds there: `check_claims.py` compares with the files at HEAD each hash named by the
 review rows that the "L1 recorded" row with the highest k names, the chapter's version item by item
 and the demonstration record with its report, and gives L0 while any differs, so that a change to
 the reviewed set makes L1 lapse from the commit that makes it, as a later row does; the agent
 writes the register's return to L0 in that commit, or, where an owner's commit
 makes the change, in a commit of its own right after it, `history` keeping
-the earlier L1 with its dates, its rows and the version reviewed, until "L1
-recorded <k>" records L1 again (SEC-079). Once the external design review
+the earlier L1 with its dates, its rows and the version reviewed, until "L1 recorded <k>" records L1
+again (SEC-079). FR-043's window, in which the agent commits no file of this feature,
+`protocol/claims.json` and security.md among them, runs from the first commit that records an owner
+design review's approval to the feature's end; inside it the agent writes each of these changes in
+the working tree, once the owner has set the row or made the change there,
+and the owner's commit holds it, so that at every commit of the window the
+register gives the rows' level (SEC-084). Once the external design review
 is done, its row names the review package's manifest it read by SHA-256, and the owner may have
 later changes reviewed in a row of its own, "External design review <k>", which names its manifest
 the same way (FR-043, FR-063; SEC-077). Each row of the external review's family names the selection
@@ -884,12 +894,17 @@ freeze hashes and the baseline manifest; run the claim-register test.
   position of every output block it observes. T4 is adopted as constant time by construction
   (FR-020); power, electromagnetic and fault-injection attacks and the behaviour on reset and
   clock glitches are deferred to feature 008, with the risk stated: a state read by a probe, or
-  changed by a fault, in mid-request exposes that request back to its last forget call, and a
-  self-test selector held on its constants by a design error or a fault would run every instantiate
-  on the self-test's key, a public development input, in place of the host's, or on
-  nonce 0, with no sign at the ports, a risk that feature 008's tests cover
-  with a key load and an instantiate after a passed self-test, the output
-  differing from the self-test's expected output (FR-059; SEC-082). The 128-bit
+  changed by a fault, in mid-request exposes that request back to its last forget call, and any of
+  the self-test's selectors, the one at the key chain's input, the one at the nonce chain's input or
+  the one at the absorption interface, held on its constants by a design error or a fault, alone or
+  with the others, would run every instantiate on the self-test's key, a public development input,
+  in place of the host's, on nonce 0, or on the self-test's input words in place of the host's at
+  the absorption interface, with no sign at the ports, a risk that feature 008's tests cover by
+  matching the output, block by block, with the model's after a passed self-test, a key load and an
+  instantiate with the host's key, nonce and personalization string, each other than the
+  self-test's, and, where the design has a reseed, after a reseed with an input other than the
+  self-test's and a second request, so that each selector held alone, as well as all of them, gives
+  an output that differs from the model's (FR-059; SEC-082, SEC-088). The 128-bit
   target is a classical one, so against T11 this feature covers only single-target key search, k/2 ≥
   s, which k = 256 meets with equality and no margin at s = 128 (FR-010). Multi-target quantum key
   search, which in some cost models costs about 2^((k − log₂ u)/2) and so falls below 2^s for every
@@ -978,22 +993,31 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `history`, and a separate `in_progress` field, `none` before the first counted trail-bound record,
   names L2 with its start date, that record's date, and "not reached", written by
   the agent in the commit that writes that record and checked by the claim
-  test against the records at HEAD (SEC-080); the claim-register test checks
-  that no document states a level above `claim_level`. Plan phase 1 creates `phyco-v3`'s entry in
+  test against the records at HEAD (SEC-080); the claim-register test checks that no document states
+  a level above `claim_level`, flagging every name of a level above it in every scanned line as a
+  whole word, as FR-069's rule states (SEC-085). Plan phase 1 creates `phyco-v3`'s entry in
   `protocol/claims.json` at L0, with "no claim" and `in_progress` `none`, and its line at L0 in
   security.md §15's register (SEC-081). The agent writes each change that the rows
   bring to the entry's `claim_level`, `updated` and `history`, and to that
   line, in a commit of its own right after the owner's commit that sets "L1
   recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family,
-  which makes L1 lapse, and never before that commit; the claim test checks the register against
-  those rows both ways (FR-069; SEC-076). L1 holds at HEAD only while what its rows name holds
+  which makes L1 lapse, and never before that commit, save inside FR-043's window, where the owner's
+  commit holds it (SEC-084); the claim test checks the register against those rows both ways
+  (FR-069; SEC-076). L1 holds at HEAD only while what its rows name holds
   there: `check_claims.py` compares with the files at HEAD each hash named by the review rows that
   the "L1 recorded" row with the highest k names, the chapter's version item by item and the
   demonstration record with its report, and gives L0 while any differs, so that a change to the
   reviewed set makes L1 lapse from the commit that makes it, as a later row does; the agent writes
   the register's return to L0 in that commit, or, where an owner's commit makes the change, in a
   commit of its own right after it, `history` keeping the earlier L1 with its dates, its rows and
-  the version reviewed, until "L1 recorded <k>" records L1 again (SEC-079).
+  the version reviewed, until "L1 recorded <k>" records L1 again (SEC-079). FR-043's window, in
+  which the agent commits no file of this feature, `protocol/claims.json` and security.md among
+  them, runs from the first commit that records an owner design review's approval to the feature's
+  end, plan phase 9 included; inside it the agent writes each change of `phyco-v3`'s entry and of
+  its line in security.md §15 that SEC-076 and SEC-079 name in the working tree, once the owner has
+  set the row or made the change there and before the owner's commit, which holds it, so that at
+  every commit of the window the register gives the rows' level, and `design_freeze.py create` exits
+  2 while `check_claims.py` reports a finding at HEAD (SEC-084).
 
 **Mode (D1)**
 
@@ -1444,8 +1468,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
     (FR-059); feature 008's board wrapper also holds reset after configuration, until the MMCM locks
     and for a stated number of cycles after lock ("Key loading and reset"). `resetting` runs from
     reset released to the self-test done and the state zeroized, and is the only state in which the
-    self-test's selectors select its constants; every other state selects
-    the interfaces (FR-059; SEC-082). `failed`, after a failed self-test,
+    self-test's selectors, at the key chain's input, at the nonce chain's input and at the
+    absorption interface, select its constants; every other state selects the interfaces (FR-059;
+    SEC-082), and FR-008's risk names each of them held on its constants,
+    alone or with the others (SEC-088). `failed`, after a failed self-test,
     accepts no call until the next reset, with `selftest_fail`, an output of its own, latched until
     a self-test passes: it stays set through `resetting` after that reset,
     and the end of a self-test that passes clears it (FR-059; HW-081). In
@@ -1842,8 +1868,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     with the constant ROMs they index, the key register at each node that holds key bits, apart from
     the key shift chain, the one-block output buffer, the controller of the call-state table with
     its error-code register and the latched `selftest_fail` output, the self-test's
-    parts (the selector at each chain's input, its r-bit comparator and the
-    storage of its key, nonce, reseed input and expected output; HW-082), and every component the
+    parts (the selector at each chain's input and the one at the absorption
+    interface, its r-bit comparator and the storage of its key, nonce, reseed
+    input and expected output; HW-082; SEC-088), and every component the
     chosen candidate adds (RAT-070). Each names what it is for: the attack
     class it resists, the bound it supports or the functional need it serves, as the candidate's
     `mapping` log entry records it for the candidate's own components, which the list cites, and as
@@ -1861,8 +1888,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
     one-block output buffer (the state within a request and each output block before the caller
     takes it); and the limit counters (their integrity); each meets no read-back and zeroization
     (FR-025), the counters' integrity resting on FR-025's refusals at each limit, fault attacks on
-    any of them staying with feature 008, and the selectors also name the risk FR-008 states of one
-    held on its constants (SEC-082; RAT-076), while the self-test's stored key, nonce, reseed input
+    any of them staying with feature 008, and the selectors also name the risk
+    FR-008 states of each held on its constants, alone or with the others, the
+    key chain's, the nonce chain's and the absorption interface's (SEC-082,
+    SEC-088; RAT-076), while the self-test's stored key, nonce, reseed input
     and expected output are development inputs of the frozen vectors and carry no secret;
     the rationale cites the plan's Complexity Tracking for each structure one of its rows covers,
     the key registers under the row on the key and nonce chains and the output buffer under the row
@@ -2259,20 +2288,33 @@ freeze hashes and the baseline manifest; run the claim-register test.
   selection"): if it selects another candidate, the security-target review and every later review
   are held again for that candidate, each in a numbered row of its own; if it selects the same one,
   the reviews held stand for what did not change, and the changed parts are reviewed
-  again as above. The freeze runs in this order: (1) the owner commits the feature files
-  (Principle IX): from the commit that records the owner design review's approval, in its row with
-  the highest k, the agent commits no file of this feature and leaves its changes in the working
-  tree, and step (1) is the owner's next commit, of every feature file changed since, or an empty
+  again as above. The freeze runs in this order: (1) the owner commits the feature files (Principle
+  IX): from the first commit that records an owner design review's approval to the feature's end,
+  plan phase 9 included, the agent commits no file of this feature and leaves its
+  changes in the working tree (SEC-084), and step (1) is the owner's next
+  commit after the one that records the owner design review's approval, in its
+  row with the highest k, of every feature file changed since, or an empty
   commit of the owner's where none changed, so that the external review's row, where it is set after
   that approval, is set in that commit (PRO-070); (2) `design_freeze.py create` runs with
   `git_dirty` false, records as `owner_commit` the commit that follows the one recording that
-  approval, step (1)'s, exiting 2 unless it is HEAD, and writes the record as
-  `draft`; (3) the owner's approval is written into it by `design_freeze.py
-  approve`, run by the owner, which changes the status and adds who, when and the wording, and
+  approval, step (1)'s, exiting 2 unless it is HEAD, and also while `check_claims.py` reports
+  a finding at HEAD (SEC-084), and writes the record as `draft`; (3) the
+  owner's approval is written into it by `design_freeze.py approve`, run by the
+  owner, which changes the status and adds who, when and the wording, and
   nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
   having checked against the draft's SHA-256, `draft_sha256`, taken without that field and the
   approval fields, `status`, `approved_by`, `approved_utc`, `approval_wording` and
-  `approval_confirmed` (data-model §13; REP-084), that nothing but the approval changed.
+  `approval_confirmed` (data-model §13; REP-084), that nothing but the approval changed. The window
+  of step (1) runs to the feature's end, plan phase 9 included, as the Assumptions' "from the owner
+  design review's approval on" reads, and each later commit of a file of this feature is the
+  owner's: a file of this feature is every file under the paths that the plan's project structure
+  lists and every other file that this feature's requirements change, security.md, README,
+  `.gitignore`, `.gitattributes` and `requirements.txt` among them, so that `protocol/claims.json`
+  and security.md are files of this feature; inside the window the agent writes each change of
+  `phyco-v3`'s entry and of its line in security.md §15 that SEC-076 and
+  SEC-079 name in the working tree, once the owner has set the row or made the
+  change there and before the owner's commit, which holds it, so that at every
+  commit of the window the register gives the rows' level (FR-012; SEC-084).
   `design_freeze.py create` exits 2 unless every theorem the mode chapter uses is `verified` in
   `limits.json`, with each precondition marked met, naming the theorem otherwise, and reads those
   marks as `unverified` while the security-target review row does not read Approved (FR-012;
@@ -2534,7 +2576,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   README update (strategy note §7.1, rule 5), as MUST a match of FR-023's refused list found after
   the freeze, with `phyco-v3` staying as frozen, and the standards rows of security.md §6 MUST be
   re-checked and dated (rule 8). README MUST state the status of `phyco-v3`, and the documentation
-  drift listed in checklist group F MUST be corrected. The new security.md version keeps the
+  drift listed in checklist group F MUST be corrected; README's status block, written for the models
+  with a 64-bit seed, gains in that update a sentence on `phyco-v3`, a design at the register's
+  level, with no claim and not for secrets, which the claim test checks against its
+  `claim_level` and `claim` (FR-069; SEC-086). The new security.md version keeps the
   constitution version that 2.13 names, 1.3.0, in its header, §4, §18's tree and §22's stage 1.
 - **FR-052**: The final phase report MUST follow the constitution's Phase Completion Reporting,
   MUST state which items of the constitution's change-completion list remain open (the
@@ -2753,8 +2798,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   through the absorption tree's input in the same way, with their cycles in the reset figure
   (FR-025) and no parallel load path; afterwards the selectors return to the interfaces. The
   selectors' control is a function of FR-025's call states: the constants are selected in
-  `resetting` only, and every other state selects the interfaces, so that no call
-  accepted from the host runs on the self-test's constants (SEC-082). Its
+  `resetting` only, and every other state selects the interfaces, so that no call accepted from the
+  host runs on the self-test's constants (SEC-082). These are three selectors, at the key chain's
+  input, at the nonce chain's input and at the absorption interface, and FR-008's risk and feature
+  008's test cover each held on its constants, alone or with the others, the test matching the
+  output, block by block, with the model's after a passed self-test, a key load and an instantiate
+  with the host's key, nonce and personalization string, each other than the self-test's, and, where
+  the design has a reseed, after a reseed with an input other than the self-test's
+  and a second request, so that each selector held alone, as well as all of
+  them, gives an output that differs from the model's (FR-008; SEC-088). Its
   comparator, r bits wide, takes each whole r-bit block as the output buffer
   receives it, compares it with the matching block of the expected output, stated per claimable size
   from the frozen vectors, and holds the result until the last block; the comparator and the
@@ -2945,15 +2997,21 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-068**: The design-form disclaimer, the block directly under this spec's title, MUST be
   defined once in code as `DESIGN_DISCLAIMER`, holding exactly that text, beside the existing
   disclaimer constant, which stays unchanged. Every generated report and record of this feature
-  MUST take it from there, every hand-written document MUST carry the same text (strategy note
-  §3.1), the eight checklists under `checklists/` and checklist-choices.md under their titles and
-  tasks.md from its first version, and the claim-register test compares every document's copy with
-  the constant.
+  MUST take it from there, every hand-written document of this feature, each Markdown file under
+  `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, MUST carry the same
+  text (strategy note §3.1), the eight checklists under `checklists/` and checklist-choices.md under
+  their titles and tasks.md from its first version among them, and the claim-register test compares
+  every document's copy with the constant. README and security.md, in the claim test's scope because
+  FR-051 changes them, keep their own blocks and carry no copy of it (FR-069; SEC-086).
 - **FR-069**: A machine-readable claim and evidence register MUST list every model ID with its
   claim level, its claim or "no claim", its bound and its evidence records (D10). An automated test
-  MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the register,
-  that hand-written documents carry the disclaimer of FR-068, the checklists and tasks.md among
-  them, and that the register gives `phyco-v3` the level the Review & Approval rows give at HEAD, L1
+  MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the register, the
+  disclaimers being README's status block and security.md's own blocks, the one that opens it and
+  the one that closes it, each of which must say that PhycoWeb-PRNG, every model included, must not
+  be used to generate secrets and state no level, claim or bound beyond the register's, README's
+  gaining FR-051's sentence on `phyco-v3` (SEC-086), that the hand-written documents of FR-068 carry
+  its disclaimer, the checklists and tasks.md among them, and that the register
+  gives `phyco-v3` the level the Review & Approval rows give at HEAD, L1
   while the "L1 recorded" row with the highest k reads Approved and names the highest-k row of each
   review family, both Approved, with every hash those review rows name matching the file at HEAD,
   the chapter's version item by item and the demonstration record (SEC-079), and L0 otherwise, with
@@ -2971,7 +3029,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `research/004/`, `tests/` and `fast/seed_search.c`). The test runs from plan phase 1 on, as
   research R18's line-ending test does, so that every document that the security-target review, the
   owner design review and the review package (FR-063) read has been checked first, and phase 9 runs
-  it again over the final documents (SEC-081). In its rules "near" and "beside" mean the
+  it again over the final documents (SEC-081). Inside FR-043's window, from the first commit that
+  records an owner design review's approval to the feature's end, plan phase 9 included, the owner's
+  commit holds each change of the register that FR-012 names, so that the test reports no finding on
+  the level at any commit of the window, and `design_freeze.py create` exits 2 while it reports
+  any finding at HEAD (SEC-084). In its rules "near" and "beside" mean the
   same sentence or table row, as they do for "target", and every rule matches whole words, ignoring
   case, with these inflections, each root's forms in full: prove, proves, proved, proving, proven
   and provably; comply, complies, complied, complying, compliant and compliance; conform, conforms,
@@ -2988,10 +3050,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   promise, the negative statements of FR-011, FR-049, FR-059 and the section "Context", which say
   what no artifact may call a model, a test or a review, and, in the checklists and
   checklist-choices.md, which quote the documents they review, a flagged word inside a quotation, in
-  quotation marks or backticks; any other flagged line there needs an entry of its own. A test runs
-  every rule and every standing phrase on sample sentences that must and must not be flagged, with
-  one that must be flagged for each form listed above and "phyco-v3 is unbreakable" among them, as
-  research R18's test does for the mapping chapter's rule. The rules flag:
+  quotation marks or backticks; any other flagged line there needs an entry of its own. The agent
+  drafts each entry, standing phrase or line entry, with its path and text, its reason, its writer
+  and the date; the test counts an entry from the commit that adds it, so that it runs from plan
+  phase 1 on, and prints on every run each entry added since the last ⛔ gate's approval commit, and
+  the owner's review at each ⛔ gate lists those entries with their reasons, as it lists the approval
+  commits; an entry the owner declines is removed in the next commit, the line it passed then
+  failing the test until its text changes (SEC-087). A test runs every rule and every
+  standing phrase on sample sentences that must and must not be flagged, with
+  one that must be flagged for each form listed above and "phyco-v3 is unbreakable" among them,
+  "phyco-v3 is at L2" and "the design reaches L3" among those that must be flagged and
+  security.md §15's ladder rows among those that must pass (SEC-085), as research R18's test does
+  for the mapping chapter's rule. The rules flag:
   - a strength not labelled as a target: a number of bits beside "security", "strength" or
     "secure", or a cost such as 2¹²⁸ beside "security", unless the same sentence or row carries
     "target" or quotes a rule;
@@ -3002,7 +3072,21 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - "compliant", "conforms" and "approved", with their inflections, near a standard's name, outside
     the design document's one statement that `phyco-v3` conforms to no standard (FR-011);
   - "DRBG" beside a model ID, "the model", "the generator" or "the design" (FR-011);
-  - a claim level above the register's `claim_level` in any document (FR-012);
+  - a claim level above the register's `claim_level` in any document: every name of a level above
+    it, matched as a whole word in every scanned line, as "random" is, `claim_level` being, for each
+    line, the lowest level the register gives the models the line names by ID, and L0 where it names
+    none, every other model staying at L0 in this feature, so that L1 to L6 are flagged in every
+    line while `phyco-v3` is at L0, and, while it is at L1, L2 to L6 in a line that names it alone
+    and L1 to L6 in every other line, and a level stated for a model in any words is caught;
+    standing entries, each with its reason (data-model §15), let stand the lines that name a level
+    without stating one for a model, as security.md §6's rows stand: security.md §15's ladder and
+    gate rows, which state each level's requirements, the rows' names "L1 recorded" and "L1 recorded
+    <k>", `in_progress`'s "not reached" and data-model §17's sentence that L2 is never `claim_level`
+    in this feature; the rule lines that move a model between levels, in FR-012, FR-069 and
+    data-model §15 and §17, pass through one entry per rule line, as every rule's own text does; in
+    the checklists and checklist-choices.md a level name inside a quotation passes as the other
+    flagged words do, and any other flagged line needs a line entry with its reason (FR-012;
+    SEC-085);
   - security wording and the arguments FR-030 forbids, whole words from FR-030's list with their
     inflections, ignoring case, inside the mapping chapter, the design document's section headed
     "Slime-mould mapping" up to the next heading of the same level, where only FR-030's one fixed
@@ -3640,8 +3724,10 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Square grids only**; rectangular grids are out of scope.
 - **No git branch** is created; the feature directory names the feature. The agent commits locally
   under the owner's standing authorization (Principle IX, constitution 1.3.0), at consistent
-  checkpoints and with no AI co-author line, and no file of this feature from the owner design
-  review's approval on (FR-043); only the owner pushes, tags, releases or publishes.
+  checkpoints and with no AI co-author line, and no file of this feature from the first commit that
+  records an owner design review's approval to the feature's end, plan phase 9 included, each later
+  commit of such a file being the owner's (FR-043; SEC-084); only the owner pushes, tags, releases
+  or publishes.
 - **External review**: constitution 1.3.0 does not require an external design review, and
   security.md §7 recommends one. Arranging it is the owner's outward action (Principle IX).
 - **Constitution**: 1.3.0 applies. The optional amendment of strategy note §9.1 and the
