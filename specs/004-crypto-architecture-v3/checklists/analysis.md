@@ -649,6 +649,43 @@ start open, and an item is ticked only under the rule in the Notes below.
   research R12 "Validated widths", "A failed validation", "Second known results"; data-model §7; cli
   contract `validate_tool.py`]
 
+## Eighth re-run (2026-11-02)
+
+Items found when the checklist was run a ninth time, over the complete documents and the
+repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK077 Does data-model §3's "Entered set" state the replacement rule as the Decisions bullet
+  above it and the spec's "Eligibility and selection" do, given that it says that a further
+  candidate "is entered for every such candidate while its family has fewer than three evaluated
+  candidates and the budget allows", for every candidate that became `rejected` or `ineligible`,
+  with no exception, while the Decisions bullet logs the `replacement` entry closed at once, with
+  the reason "cause shared", for a decision whose cause the family or the whole set shares, so that
+  "no replacement is entered for it"? [Consistency, Spec §Pre-registered Design Protocol
+  "Eligibility and selection", "Stop rule"; data-model §3 "Decisions", "Entered set"]
+- [ ] CHK078 Is the cause of an `ineligible` decision classified, the candidate's own or shared,
+  where the candidate's row cannot hold a run that the rules require of every candidate at that
+  size: a uniform control's hours, after which the candidate "takes no test of that kind at that
+  size", a stricter change's new measurement, or a 16×16 search, "as for any spent row", given that
+  the decisions logged "cause shared" are listed as D4's choice, a fired uniform control, the lack
+  of a validated trail route and a match in the shared polynomial, and that a replacement's row of
+  the same value, charged the same control's hours "whether the control ran for it or before it",
+  may be unable to hold that run too? Is it stated whether "the budget allows" a replacement whose
+  rows each hold more than zero hours but less than that run needs, so that a replacement is not
+  entered only to end as the candidate it replaces did? [Gap, Consistency, Spec §FR-038,
+  §Pre-registered Design Protocol "Bias rule", "Eligibility and selection", "Stop rule";
+  research R4, R7; data-model §3]
+- [ ] CHK079 Is the avalanche test's term in the family-wise rate counted as N is, given that the
+  rate is 1 − 0.995^(T·(N + 3)) "with the avalanche test", its 3 being the avalanche test's 0.005 at
+  each of the three claimable sizes, while beside a firing N counts only the pairs tested "up to
+  that firing's record", a frequency firing at 4×4 may come before any avalanche run, since at each
+  size the avalanche test runs after the frequency test, and research R4 states the avalanche test's
+  chance as "0.005·m/128 per size" once more than 128 round counts are measured? Is the term stated
+  as the avalanche runs up to that record, size by size, with m/128 where m exceeds 128, so that
+  `round_rule.py` can compute the rate stated beside each firing and the one in the final report?
+  [Measurability, Consistency, Spec §FR-028, §FR-041, §Pre-registered Design Protocol "Bias rule";
+  research R4 "False firing"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
