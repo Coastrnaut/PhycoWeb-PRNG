@@ -869,7 +869,8 @@ section that meets it, marked met or not), which `design_freeze.py create` reads
 another SHA-256, and the marks count only once the security-target review row, which reviews the
 chapter by its version, reads Approved, `create` reading them as `unverified` until then: that
 version is the set the spec's notes under the Review & Approval table define, the SHA-256 of the
-chapters "Security target" and "Mode" and of this file and `parameters.json`, with the design
+design document's chapters "Security target" and "Mode", of `rationale.md`'s chapters of
+those names (RAT-086) and of this file and `parameters.json`, with the design
 document's version read, so that a mark set after the review counts only once
 a "Security-target review <k>" naming the changed set reads Approved; the
 limits per instantiation, per request and per key, each in calls of Π, the theorem's unit, which is
@@ -971,8 +972,11 @@ copy against its manifest hash and its live source (SC-012).
   nothing else, `create` exiting 2 on any other header line, the record naming that version 1.0,
   with `reviewed_version`, the header's 0.<k> that the owner design review read and that
   the record hashes, so that no file changes at or after the freeze and the
-  reviewed text is the frozen text; spec FR-034; RAT-080); `rationale.md`, versioned with it and
-  carrying the same version, whose SHA-256 the owner design review's row with the highest k names
+  reviewed text is the frozen text; spec FR-034; RAT-080); `rationale.md`, versioned with it, its
+  header holding its title, the design-form disclaimer and the same version line and nothing else,
+  `create` exiting 2 on any other header line there or while its version line differs from the
+  design document's, a committed change to either file making the next 0.<k> in both headers (spec
+  FR-034; RAT-087), whose SHA-256 the owner design review's row with the highest k names
   beside the design document's version and the selection record and `create` compares with the file
   at HEAD, exiting 2 while they differ, so that a change to `rationale.md` after the review's
   approval counts only once an "Owner design review <k>" naming the changed file reads Approved, as
@@ -997,7 +1001,8 @@ copy against its manifest hash and its live source (SC-012).
   `parameters.json` and `limits.json`, with each theorem's status from `limits.json`,
   every one of which must be `verified`, with each precondition marked met, marks that count only
   under an Approved security-target review row naming the set the record freezes, the SHA-256 of the
-  chapters "Security target" and "Mode" and of these two files, which `create` compares item by item
+  design document's chapters "Security target" and "Mode", of `rationale.md`'s chapters of those
+  names (RAT-086) and of these two files, which `create` compares item by item
   (section 10; research R10).
 - **Round count**: per claimable size, R with every input of the round rule, and every evidence
   record behind R, by ID and by SHA-256.
@@ -1011,8 +1016,9 @@ copy against its manifest hash and its live source (SC-012).
 - **External review**: the row of the external design review's family that `create` reads, the one
   with the highest k among the rows that name the latest selection record, its value, done or not
   arranged, the selection record it names, and for done the review package's manifest SHA-256 and
-  the design-document version it names, with the design-document versions since where the design
-  changed after that review, and each review done for another candidate, cited for the candidate and
+  the design-document version it names, with each version 0.<k> since, and the files each changed,
+  where the design document or `rationale.md` changed after that review (RAT-087),
+  and each review done for another candidate, cited for the candidate and
   the version it read only, as the final report states them (spec FR-043, SC-013; SEC-078).
 - Tool versions; `git_head`; `owner_commit`, the hash of the freeze's step (1), the owner's commit
   of the feature files, which follows the commit that records the owner design review's approval in
@@ -1052,9 +1058,10 @@ review's approval, leaving them in the working tree, so that the owner's commit 
 them and the frozen provenance log carries the status FR-034 keeps there, and `create` reads the
 provenance log at HEAD and exits 2 while an AI-drafted section of the design document or of
 `rationale.md` has a latest entry that is not a review entry reading `accepted`, or one that names a
-row other than its review's with the highest k, the security-target review's for the chapters
-"Security target" and "Mode" and the owner design review's for every other section (spec FR-034,
-FR-043; RAT-082). Dirty means a tracked file modified or an untracked file not
+row other than its review's with the highest k, the security-target review's for the design
+document's chapters "Security target" and "Mode" and the owner design review's for every other
+section, `rationale.md`'s chapters of those names among them (spec FR-034, FR-043;
+RAT-082; RAT-086). Dirty means a tracked file modified or an untracked file not
 ignored; ignored files (the locks, the local-only outputs under `data/local/`) do not count, and
 local-only outputs are in the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and
 every hash and checks the format rules; it exits 1 if anything but the approval fields changed or a
@@ -1130,8 +1137,11 @@ self-written result with its SHA-256, entered before the tool's first entry. `se
 of a file: each AI-drafted section of the rationale has its own entries, to which the owner design
 review adds a review entry for each, so that the frozen text carries no status (FR-034). The owner
 design review's review entries, for every AI-drafted section of the design document and of
-`rationale.md` but the chapters "Security target" and "Mode", whose entries the security-target
-review adds, are written by the agent on the owner's word after the commit that records that
+`rationale.md` but the design document's chapters "Security target" and "Mode", whose
+entries the security-target review adds, `rationale.md`'s chapters of those
+names taking the owner design review's entries as every other section of
+`rationale.md` does, though the security-target review also reads them (RAT-086), are
+written by the agent on the owner's word after the commit that records that
 review's approval and before the freeze's step (1), which holds them, and `design_freeze.py create`
 exits 2 while the latest entry of such a section is not a review entry reading `accepted` that names
 its review's row with the highest k (section 13; RAT-082).
@@ -1324,8 +1334,14 @@ claim of a disclaimer's line (spec FR-069; SEC-095).
 
 ## 16. Review package (`review-package/MANIFEST.json`; FR-063)
 
-Every item of security.md §14, each with its path, `git_head` and SHA-256 with its kind, plus
-the known limitations and the unresolved findings. An existing `text=auto` file is hashed over
+Every item of security.md §14, each with its path, `git_head` and SHA-256 with its kind, plus the
+known limitations and the unresolved findings, the entries grouped by §14's six items, each group
+listing the files that stand for its item as spec FR-063 states them, and the field `unresolved`
+listing every finding that no later record, decision or entry closes, a `confirmed vulnerability` or
+`unverified hypothesis`, a re-check disagreement, a claim-test finding and an item the final report
+leaves open, each with the record, decision or entry it comes from by ID or by path and SHA-256;
+`--check` rebuilds that list from the records, and the test of the spec's User Story 5, scenario 6,
+fails a §14 item with no file (spec FR-063; RAT-089). An existing `text=auto` file is hashed over
 its LF-normalized content and marked `lf-normalized`, so the hash is the same on every
 checkout, and no existing file's pin changes (R18). The manifest is a fixed-name file
 (introduction): a rebuilt package keeps the earlier manifest as
@@ -1362,8 +1378,9 @@ compares it (cli contract; REP-085).
   SEC-085).
 - **Protocol rules**: as pre-registered; a change is an entry of section 18, only in its stated
   stricter direction (FR-044).
-- **Design document**: draft versions 0.<k>, the next with each committed change before the freeze,
-  `rationale.md` carrying the same; the version the owner design review approves; frozen as 1.0, the
+- **Design document**: draft versions 0.<k>, the next with each committed change to it or to
+  `rationale.md` before the freeze, both files' headers holding it from the same commit
+  (RAT-087); the version the owner design review approves; frozen as 1.0, the
   name the approved freeze record gives that version, whose header and `rationale.md` keep its
   0.<k>, which the record holds as `reviewed_version` (section 13; RAT-080). A
   revision after a decline or after the owner design review is logged under the

@@ -331,7 +331,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | D4 tie (only if the tie-breaks of the nonlinearity choice rule reach the owner's choice) | _pending_ | _pending_ | _pending_ | The owner's choice, written by `d4_choice.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the tie record's SHA-256 (`choice_confirmed`), into `d4/tie-choice.json` beside the tie record, with the SHA-256 of the record the owner saw (`d4/tie.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `round_rule.py --select` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). "Not needed" if the rule decides without a tie, or if a tie-break decides it: the owner then sets this row to "Not needed", naming `d4/tie.json` and its tie-break (`decided_by`), and `round_rule.py --select` opens on that value at HEAD and takes the family from `d4/tie.json` |
 | Selection tie (only if eligible candidates tie under "Eligibility and selection") | _pending_ | _pending_ | _pending_ | The owner's choice, written by `round_rule.py --choose ID --seen SHA256 --by NAME`, which the owner runs, typing the first 16 hex digits of the selection record's SHA-256 (`choice_confirmed`), into `freeze/selection-tie-choice.json` beside the selection record, with the SHA-256 of the record the owner saw (`selection.json`) and of the choice record. Made only after that record exists, and never changed. The owner sets this row and commits it, and `design_freeze.py create` reads it at HEAD; the agent never runs `--choose` or sets the row (FR-043). A tie in a later selection record, `selection-<k>.json` (section "Pre-registered Design Protocol", "Eligibility and selection"), needs a new choice, in `freeze/selection-<k>-tie-choice.json`, and a row of its own, "Selection tie <k>". "Not needed" if the rule decides without a tie |
 | Second transcription go-ahead (FR-057; plan phase 7: the separate session that writes `tests/v3_reference.py`) | _pending_ | _pending_ | _pending_ | The owner's go-ahead, set by the owner and committed before that session starts. The test of the transcription's provenance reads it at HEAD and fails unless it reads Approved, with a date no later than the first provenance entry of `tests/v3_reference.py` |
-| Security-target review (the design document's chapters "Security target" and "Mode", with the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
+| Security-target review (the design document's chapters "Security target" and "Mode", with `rationale.md`'s chapters of those names and the security target's files; FR-011, FR-012; the first step of plan phase 8) | _pending_ | _pending_ | _pending_ | Held after the selection and before the owner design review. Both chapters are drafted in phase 4 and recorded as under review, in the provenance log and in this row, until the review, with no mark in `design.md` (FR-034; RAT-068), `rationale.md`'s chapters of those names, which explain them, being drafted with them and read by the review, while their review entries are the owner design review's (RAT-086); the review cites the selected candidate's records of FR-029's diffusion through instantiation and of research R4's first-order related-key and related-nonce differences, which exist only after phase 5, and closes FR-011's functionality class, confirmed or changed in the design document. The row names the chapter's version it reviews, the set the notes under this table define: the SHA-256 of the design document's chapters "Security target" and "Mode", of `rationale.md`'s chapters of those names and of `parameters.json` and `limits.json`, with the design document's version read (SEC-075; RAT-086). "L1 recorded" follows when its gate passes. If a later selection record selects another candidate, this review and every later one are held again for it, each in a numbered row of its own (the notes under this table; FR-043) |
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043). The row, and each "Owner design review <k>", names `rationale.md` by path and SHA-256 beside the design document's version and the selection record, and `design_freeze.py create` compares it with the file at HEAD (RAT-083) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, with every hash those review rows name matching the file at HEAD, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows, and its return to L0 after a change to what those rows reviewed in the commit that makes the change, or right after an owner's commit that makes it (FR-069; SEC-079) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names the latest selection record, by path and SHA-256, when it is written. Each row of this family names the selection record it applies to, a done row through its manifest, which carries that record, and a "not arranged" row by naming the latest selection record when it is written; `design_freeze.py create` reads the highest-k row that names the latest selection record and exits 2 while none does, so that a new selection record needs a row of its own, done or "not arranged", for the candidate it selects, and a review done for another candidate stays done in its row and is cited, in the freeze record's "External review" and in the final report, for the candidate and the version it read only (SC-013; SEC-078). |
@@ -416,14 +416,16 @@ approval counts only once an "Owner design review <k>" naming the changed
 file reads Approved, as a change to the design document does (RAT-083). The
 chapter's version is a set, which the security-target review's row names and
 `design_freeze.py create` compares item by item: the SHA-256 of the text of each chapter the review
-covers, "Security target" and "Mode" (FR-034), each from its heading line to the next heading of the
+covers, the design document's chapters "Security target" and "Mode" (FR-034) and `rationale.md`'s
+chapters of those names, which the review also reads, though their review entries are the owner
+design review's (RAT-086), each from its heading line to the next heading of the
 same or a higher level, or to the file's end, over its raw bytes (research R16), and the SHA-256 of
 `security-target/parameters.json` and `limits.json`, the `verified` and met marks among them, with
 the design document's version the review read, from its line "Version: 0.<k>". A change to any of
 these hashes after the review, a mark included, counts only once a "Security-target review <k>"
 naming the changed set reads Approved: until then `create` exits 2, since the row no longer names
-what the record freezes, while a change elsewhere in the design document leaves that review
-standing. "L1 recorded" and "L1 recorded <k>" name the same set (SEC-075). Each
+what the record freezes, while a change elsewhere in the design document or in `rationale.md` leaves
+that review standing. "L1 recorded" and "L1 recorded <k>" name the same set (SEC-075). Each
 guard reads the row of its family with the highest k at HEAD, which must
 review what the guard's run cites (cli contract, "Approvals"). A row's Decision holds one of the
 values data-model §17 lists for it, and each guard opens only on the values that section names for
@@ -690,7 +692,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
 5. **Given** the final report, **When** it is read, **Then** each of FUT-SEC-1 to FUT-SEC-9 maps
    to evidence or is listed as open, FUT-SEC-7 is open for feature 007, and no claim is made.
 6. **Given** the review package, **When** it is checked against security.md §14, **Then** it
-   holds every item listed there with exact revisions, whether or not a reviewer was arranged.
+   holds every item listed there with exact revisions, whether or not a reviewer was arranged, each
+   item by the files that stand for it in the manifest's group for it, and the check fails an item
+   with no file (FR-063; RAT-089).
 7. **Given** the claim and evidence register, **When** its test runs, **Then** README,
    security.md and the disclaimers agree with it, and no forbidden wording is found outside the
    rules that forbid it.
@@ -1019,7 +1023,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   at L0, then at L1 once its gate has passed and FUT-SEC-8 and the design document's chapters
   "Security target" and "Mode" (FR-034) have been reviewed, and with "no claim" at every level. Both
   chapters are drafted in plan phase 4 and recorded as under review, in the provenance log and in
-  the security-target review's Review & Approval row, until that review in phase 8; neither carries
+  the security-target review's Review & Approval row, until that review in
+  phase 8, and `rationale.md`'s chapters of those names, which explain them,
+  are drafted with them, the security-target review reading them and the
+  owner design review adding their review entries (RAT-086); neither carries
   a mark in `design.md`, whose approval status stays outside the file (FR-034), so
   that the text the review approves is the text `design_freeze.py create`
   compares (RAT-068, RAT-069). Their review, the security-target review, has a
@@ -1037,8 +1044,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and the agent's `verified` and met marks count only once the security-target review row, which
   reviews the chapter by its version, reads Approved: until then `design_freeze.py create` reads
   them as `unverified`. The chapter's version is the set the notes under the Review & Approval table
-  define, the SHA-256 of the chapters "Security target" and "Mode" and of `parameters.json` and
-  `limits.json`, with the design document's version read, so that a mark set after the review
+  define, the SHA-256 of the design document's chapters "Security target" and "Mode", of
+  `rationale.md`'s chapters of those names (RAT-086) and of `parameters.json` and `limits.json`,
+  with the design document's version read, so that a mark set after the review
   counts only once a "Security-target review <k>" naming the changed set reads
   Approved (SEC-075). A paper that cannot be obtained or read ends as the
   edge case on it states: another theorem of research R10's list, in a new
@@ -2004,25 +2012,31 @@ freeze hashes and the baseline manifest; run the claim-register test.
   provenance log, where each review is a new entry (FR-064), and `design_freeze.py create` reads
   that status at HEAD and exits 2 while an AI-drafted section of the design document or of
   `rationale.md` has a latest entry that is not a review entry reading `accepted`, or one that names
-  a row other than its review's with the highest k, the security-target review's for the
-  chapters "Security target" and "Mode" and the owner design review's for every
-  other section (FR-043; RAT-082). The two documents MUST also meet these
+  a row other than its review's with the highest k, the security-target review's for the design
+  document's chapters "Security target" and "Mode" and the owner design review's for every other
+  section, of the design document or of `rationale.md`, `rationale.md`'s chapters
+  "Security target" and "Mode" among them, which the security-target review also
+  reads (FR-043; RAT-082; RAT-086). The two documents MUST also meet these
   rules:
   - **Version.** The design document's header holds its title, the disclaimer and "Version: 0.<k>",
-    1.0 once frozen, and nothing else, and `rationale.md` carries the same version; "1.0 once
+    1.0 once frozen, and nothing else, and `rationale.md`'s header holds its title, the design-form
+    disclaimer and the same "Version: 0.<k>", and nothing else (RAT-087); "1.0 once
     frozen" is the name the freeze record gives the reviewed version, not a change of the line: the
     header keeps the 0.<k> that the owner design review read, and the approved freeze record names
     the design document's version 1.0, with `reviewed_version`, the header's 0.<k> that it hashes,
     so that no file changes at or after the freeze and the reviewed text is the frozen text,
     `rationale.md` keeping its 0.<k> the same way, and `protocol/evidence.py` gives a later record
     `design_version` 1.0 while the design document has the SHA-256 that the approved freeze
-    record names, and the header's 0.<k> otherwise (RAT-080). Each committed
-    change before the freeze makes the next 0.<k>, and a revision after a decline or after the owner
+    record names, and the header's 0.<k> otherwise (RAT-080). Each committed change to either file
+    before the freeze makes the next 0.<k> in both files' headers, in the same commit, so that a
+    change to `rationale.md` alone also gives the design document its next version, which later
+    records cite (RAT-087), and a revision after a decline or after the owner
     design review is logged under the candidate with its old and new version. `protocol/evidence.py`
     reads each record's `design_version` from that line, and the first record that cites a version
     stores the document as `design-versions/<sha256>.md`, as `spec-versions/` holds the spec
-    (data-model §1); `design_freeze.py create` exits 2 on any other header line, which a test
-    checks.
+    (data-model §1); `design_freeze.py create` exits 2 on any other header line of either file, or
+    while `rationale.md`'s version line differs from the design document's, which a test checks
+    (RAT-087).
   - **Chapters.** The design document's chapters are level-2 headings with fixed names, each once
     and in this order, which a test checks: "Security target" (the properties sought, the threats,
     the parameter table, the generic bounds per size and the output limits, FR-004 to FR-012);
@@ -2041,10 +2055,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     "Self-test"); "Replaced mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each
     edge state of FR-054, and every other Phase 0 item of security.md §8, stands in the
     chapter of what it concerns, and the chapters' test checks each named
-    section (RAT-074). The security-target review covers "Security target"
-    and "Mode", with the security target's files (the notes under the Review & Approval table), and
-    the owner design review every chapter, with the rationale, whose Alternatives chapter is its own
-    (RAT-069). `mode_limits_v3.py` reads three tables of the design document, each a Markdown table
+    section (RAT-074). The security-target review covers "Security target" and "Mode", with
+    `rationale.md`'s chapters of those names and the security target's files (the notes under the
+    Review & Approval table), and the owner design review every chapter, with the rationale, whose
+    Alternatives chapter is its own (RAT-069), and adds the review entries of every section of
+    `rationale.md`, its chapters "Security target" and "Mode" among them (RAT-086).
+    `mode_limits_v3.py` reads three tables of the design document, each a Markdown table
     with fixed columns in a section of its own, which the chapters' test checks: the chapter
     "Permutation"'s section "Variant table", one row per variant with its ID, n, w, b, c, r, R and
     status, and the chapter "Mode"'s sections "Layout", which lanes form the rate part and which the
@@ -2054,7 +2070,14 @@ freeze hashes and the baseline manifest; run the claim-register test.
     and the chapter "Security target"'s parameter table and output limits restate `parameters.json`
     and `limits.json`, a test comparing each with its file row by row and value by value, the key
     entropy, the reachable secret state, c, r, R and the bound among them, and failing on any
-    difference, so that the security-target review reads one set of values (FR-010; RAT-085).
+    difference, so that the security-target review reads one set of values (FR-010; RAT-085);
+    `rationale.md` restates no value of either file, citing each by the design document's chapter
+    and section or by the record's ID and SHA-256, and the same test reads it, failing on a line
+    that writes a field of either file, or a symbol FR-010 gives one, k, s, c, r, R, u, ε or N, with
+    a value outside such a citation, so that the frozen rationale states no value that its
+    files do not hold and both reviews read one set of values, the three
+    margins of the chapter "Margin", values of the round rule's records and of
+    no field of either file, standing as its bullet states them (RAT-090).
     `gen_vectors_v3.py` reads the design document's table of k, a Markdown table with fixed columns
     in the chapter "Hardware structure"'s section "Self-test", which the chapters' test checks, with
     one row per claimable size holding k, the structure that set it and, where k exceeds the least
@@ -2067,7 +2090,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     classes", one for each item of security.md §8's rationale list in its order, then "Network
     questions" and "Alternatives". "Security target", "Mode", "Nonlinearity" and "Diffusion" each
     state their item or cite, by chapter and section or by record ID and SHA-256, the design
-    document's chapter or the evidence record that states it: the security target, the threat model
+    document's chapter or the evidence record that states it, a value of `parameters.json` or
+    `limits.json` only by such a citation (RAT-090): the security target, the threat model
     and the claim template; the mode, its theorem and how each precondition is met; the sources of
     nonlinearity with their bound records; and R_f, R_b and FR-029's diffusion through
     instantiation. "Components" holds the component list below with what the slime-mould mapping
@@ -2102,9 +2126,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     FR-025's, the key register at each node that holds key bits and the key shift chain through
     those nodes, which come from the candidate's operation-list declarations; the shared structures,
     with their roles from FR-025 and FR-059 and no place in the metaphor, are the padding rule, the
-    domain separators and forget, which the mode chapter states, the absorption and output trees,
-    the start tree with its call-type field, whose registers a zeroization
-    clears and whose latency is no greater than the reset tree's (FR-025
+    domain separators and forget, which the design document's chapter "Mode" states (RAT-086), the
+    absorption and output trees, the start tree with its call-type field, whose registers a
+    zeroization clears and whose latency is no greater than the reset tree's (FR-025
     "Zeroization"; HW-088), the reset tree, the replicated round and phase counters
     with the constant ROMs they index, whose contents are the candidate's
     round constants, the limit counters, the controller's counters (HW-089),
@@ -2134,8 +2158,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     the rest (RAT-070). The chapter states once what the slime-mould mapping does and does not
     contribute, citing the mapping chapter (FR-030; RAT-084).
   - **Constants.** Every constant of Π and the mode has its rule and reason: round constants,
-    rotation amounts, padding constants and domain separators, the last two in the mode
-    chapter.
+    rotation amounts, padding constants and domain separators, the last two in the design document's
+    chapter "Mode" (RAT-086).
   - **Attack classes.** The rationale takes each attack class of security.md §12.1 in turn and
     names the design feature meant to resist it, or marks the class open for feature 005 with its
     reason, or, for a class or the part of one that another feature takes up, "deferred to feature
@@ -2143,7 +2167,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
     names FR-020's fixed operations as the feature that meets its timing part (T4, FR-008) and is
     marked "deferred to feature 008 (FR-008)" for power, electromagnetic and fault-injection attacks
     and the behaviour on reset and clock glitches, with FR-008's stated risk, and "open for feature
-    005" stays for a class whose analysis feature 005 takes up (RAT-075).
+    005" stays for a class whose analysis feature 005 takes up (RAT-075). The chapter follows
+    security.md §12.1 row by row, a row that joins classes being taken part by part, each part with
+    an outcome and a mark as a class has (RAT-088): cube and zero-sum, which R_dist counts through
+    every candidate's `degree` records (round rule), cite those records and are not marked open,
+    while algebraic and integral attacks beyond them stay "open for feature 005"; the related-seed
+    part of "Differential and related-seed" cites research R4's first-order related-key and
+    related-nonce differences, its attacks beyond first order marked "deferred to feature
+    005 (FR-049)", the requirement that defers them and keeps that analysis
+    open in the final report; and "Linear and correlation" and "Invariant
+    subspace and nonlinear invariant" state an outcome and a mark for each part.
     The chapter also states the known limitations, the classes left open or
     deferred among them, as security.md §8's last item asks (RAT-084). It
     names a resisting feature, never "open", for the classes this feature's
@@ -2505,10 +2538,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (section "Context"). A row reading done names the review package's manifest by SHA-256, with the
   design-document version and the selection record it carried, and `design_freeze.py create` exits 2
   while a done row names no manifest, or one that neither `review-package/MANIFEST.json` nor its
-  `versions/` holds; where the design changed after that review, the row stays done for the version
-  it names, the freeze record and the final report state that the external review read that earlier
-  version, list the design-document versions since and cite the review for that version only
-  (SC-013), and the owner may have the changes reviewed in a row of its own, "External design review
+  `versions/` holds; where the design document or `rationale.md` changed after that review, the row
+  stays done for the version it names, the freeze record and the final report state that the
+  external review read that earlier version, list each version 0.<k> since, with the files each
+  changed, the design document, `rationale.md` or both, so that a change to `rationale.md` after
+  that review is shown (RAT-087), and cite the review for that version only (SC-013), and the owner
+  may have the changes reviewed in a row of its own, "External design review
   <k>" (SEC-077). Each row of the external review's family names the selection record it applies to,
   a done row through its manifest, which carries that record, and a "not arranged" row by naming the
   latest selection record when it is written; `create` reads the highest-k row that names the latest
@@ -2590,8 +2625,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and `design_freeze.py create` reads the provenance log at HEAD and exits 2 while an AI-drafted
   section of the design document or of `rationale.md` has a latest entry that is not a review entry
   reading `accepted`, or one that names a row other than its review's with the highest k, the
-  security-target review's for the chapters "Security target" and "Mode" and the owner design
-  review's for every other section (FR-034, FR-064; RAT-082); inside the window the agent writes
+  security-target review's for the design document's chapters "Security target" and "Mode" and the
+  owner design review's for every other section, `rationale.md`'s chapters of those names among them
+  (FR-034, FR-064; RAT-082; RAT-086); inside the window the agent writes
   each change of `phyco-v3`'s entry and of its line in security.md §15 that SEC-076 and
   SEC-079 name in the working tree, once the owner has set the row or made the
   change there and before the owner's commit, which holds it, so that at every
@@ -2829,8 +2865,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (FR-029) and measures the first-order related-key and related-nonce differences of research
   R4, reported as "a single-difference avalanche measurement, not a related-key analysis";
   feature 005 analyses related-key and related-IV differential and linear attacks beyond first
-  order, weak-key classes and key-dependent effects, and that analysis MUST stay open in the
-  final report. The boundary keys of FR-058 are tests of the model, not a weak-key analysis. No
+  order, weak-key classes and key-dependent effects, and that analysis MUST stay open in the final
+  report, the rationale's chapter "Attack classes" marking those attacks, the related-seed part of
+  security.md §12.1's row "Differential and related-seed" beyond first order, "deferred to feature
+  005 (FR-049)" and citing research R4's first-order differences for the rest (FR-034; RAT-088). The
+  boundary keys of FR-058 are tests of the model, not a weak-key analysis. No
   claim, evaluation or certification may follow from this feature alone (FR-052).
 - **FR-050**: Every report and document of this feature, each checklist and tasks.md
   included, MUST carry the design-form disclaimer, the block directly under this
@@ -3214,18 +3253,35 @@ freeze hashes and the baseline manifest; run the claim-register test.
   evaluation intended to support one (section "Context"). Where its manifest hashes an existing
   `text=auto` file, such as security.md or README.md, the hash is over LF-normalized content
   and marked so (FR-053). Once the external design review is done, its Review & Approval row names
-  the manifest it read by SHA-256, with the design-document version and the selection record it
-  carried, so that a package rebuilt later leaves that review tied to the version it read (FR-043;
+  the manifest it read by SHA-256, with the design-document version, which `rationale.md`'s header
+  holds too (FR-034; RAT-087), and the selection record it carried, so that a
+  package rebuilt later leaves that review tied to the version it read (FR-043;
   SEC-077). `scripts/review_package.py` assembles the package and writes its manifest, a record of
   kind `review-package` (data-model §1, §16), whose `--check` rebuilds the manifest from the files
-  it lists and compares it (REP-085).
+  it lists and compares it (REP-085). The manifest groups its entries by security.md §14's six
+  items, each listing by path and SHA-256 the files that stand for it: the specification, the spec,
+  the design document and `rationale.md`, each at its revision; the source code and test vectors,
+  the model source and the vectors; the statistical, attack and hardware reports, the evidence
+  records and reports that exist, with the code of every tool that wrote an attack or search record,
+  and for a kind of report this feature makes none of, the feature that does, feature 007 for the
+  statistical programme and feature 006 for the hardware; the threat model, the design document's
+  chapter "Security target"; the claims and assumptions, the register `protocol/claims.json`,
+  `parameters.json` and `limits.json` with each theorem's preconditions, and the security target
+  marked as targets; and the known limitations and unresolved findings, from the rationale's chapter
+  "Attack classes", every record's `limitations` and the manifest's field `unresolved`, a list that
+  `review_package.py` writes of every finding that no later record, decision or entry closes, a
+  `confirmed vulnerability` or `unverified hypothesis`, a re-check disagreement, a claim-test
+  finding and an item the final report leaves open. `--check` rebuilds that list from the records,
+  and the test of User Story 5's scenario 6 fails a §14 item with no file (data-model §16; RAT-089).
 - **FR-064**: No AI session MAY be recorded as an independent or external reviewer: a second AI
   review is not independent cryptanalysis (security.md §14), and a security argument drafted by
   an AI tool is a draft for review, not evidence (security.md §2.1 and §16.3; vhdl-genai.md
   §2.5). The final report MUST record who took each role of security.md §16.2 in this feature,
   and mark every role that was not staffed, computed from the provenance log's review entries, whose
   `reviewer` names who reviewed (RAT-077). Each AI-drafted section of the rationale is recorded in
-  the provenance log with its review status; the agent writes the owner design review's review
+  the provenance log with its review status, the owner design review adding its review entry, the
+  chapters "Security target" and "Mode" included, which the security-target review also
+  reads (FR-034; RAT-086); the agent writes the owner design review's review
   entries after the commit that records its approval and before the freeze's step (1), in the
   working tree, which that step's commit holds, and `design_freeze.py create` exits 2 while an
   AI-drafted section of the design document or of `rationale.md` lacks, as its latest entry, an
@@ -3329,7 +3385,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   disclaimer constant, which stays unchanged. Every generated report and record of this feature
   MUST take it from there, every hand-written document of this feature, each Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, MUST carry the same
-  text (strategy note §3.1), the eight checklists under `checklists/` and checklist-choices.md under
+  text (strategy note §3.1), the design document and `rationale.md` in their headers (FR-034;
+  RAT-087), the eight checklists under `checklists/` and checklist-choices.md under
   their titles and tasks.md from its first version among them, and the claim-register test compares
   every document's copy with the constant. README and security.md, in the claim test's scope because
   FR-051 changes them, keep their own blocks and carry no copy of it (FR-069; SEC-086).

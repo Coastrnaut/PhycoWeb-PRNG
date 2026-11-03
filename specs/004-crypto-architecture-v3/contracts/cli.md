@@ -150,8 +150,9 @@ R16; REP-085).
   with the highest k, which must name by path and SHA-256 what the run cites: the latest
   demonstration record (Order of US1), or the chapter's version and the design document's version
   with the latest selection record (`design_freeze.py create`), the chapter's version being a set
-  that `create` compares item by item, the SHA-256 of the chapters "Security target" and "Mode" and
-  of `parameters.json` and `limits.json`, with the design document's version
+  that `create` compares item by item, the SHA-256 of the design document's chapters "Security
+  target" and "Mode", of `rationale.md`'s chapters of those names and of
+  `parameters.json` and `limits.json`, with the design document's version
   read (spec, the notes under the Review & Approval table). L1 is recorded
   again after a later row of either review family in "L1 recorded <k>", which
   names the highest-k row of each family, and `check_claims.py` reads the "L1 recorded" row with the
@@ -545,7 +546,10 @@ record goes under `$REP/reproductions/`, and `protocol/evidence.py` refuses, exi
 either file, which the freeze record pins (data model §13). Its runs compare `design_sha256`, since
 its code reads the design document (data model §1), and a test compares the chapter "Security
 target"'s parameter table and output limits with the two files row by row and value by value,
-failing on any difference (RAT-085).
+failing on any difference (RAT-085), and reads `rationale.md`, failing on a line that writes a field
+of either file, or a symbol spec FR-010 gives one, k, s, c, r, R, u, ε or N, with a value outside a
+citation of the design document's chapter and section or of a record's ID and SHA-256 (spec FR-034;
+RAT-090).
 
 ## Generators of constants and vectors
 
@@ -671,11 +675,12 @@ both files (data model §13).
 security-target review's or the owner design review's row, the one with the highest k where
 the review has been held again, is not Approved or does not review what the
 record freezes, by path and SHA-256: the chapter's version, compared item by item, so that a
-change to the chapters "Security target" or "Mode" or to `parameters.json` or
+change to the design document's chapters "Security target" or "Mode", to
+`rationale.md`'s chapters of those names (RAT-086) or to `parameters.json` or
 `limits.json` after the review, a `verified` or met mark included, exits 2 until a
-"Security-target review <k>" naming the changed set reads Approved, while a change
-elsewhere in the design document leaves that review standing; and the design document's version with
-the latest selection record and `rationale.md`, so that a change to `rationale.md` after
+"Security-target review <k>" naming the changed set reads Approved, while a change elsewhere in the
+design document or in `rationale.md` leaves that review standing; and the design document's version
+with the latest selection record and `rationale.md`, so that a change to `rationale.md` after
 the review's approval exits 2 until an "Owner design review <k>" naming the
 changed file reads Approved, as a change to the design document does, which
 `tests/test_protocol_004.py` covers (RAT-083); if no row of the external review's family names
@@ -694,13 +699,16 @@ is not `verified` in `limits.json` or a precondition of it is not marked met the
 theorem, those marks being read as `unverified` while the security-target review row does not read
 Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the selected candidate's
 at a supported (n, w) and its final R (research R15), if the design document's header holds a line
-other than its title, the disclaimer and its line "Version: …" (spec FR-034), if the commit that
+other than its title, the disclaimer and its line "Version: …" (spec FR-034), if `rationale.md`'s
+header holds a line other than its title, the design-form disclaimer and its line "Version: …", or
+its version line differs from the design document's (RAT-087), if the commit that
 follows the one recording the owner design review's approval, in its row with the highest k, the
 owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), if, in the provenance log at HEAD,
 an AI-drafted section of the design document or of `rationale.md` has a latest entry that is not a
 review entry reading `accepted`, or one that names a row other than its review's with the highest k,
-the security-target review's for the chapters "Security target" and "Mode" and the owner design
-review's for every other section (spec FR-034; RAT-082), if `check_claims.py`
+the security-target review's for the design document's chapters "Security target" and "Mode" and the
+owner design review's for every other section, `rationale.md`'s chapters of
+those names among them (spec FR-034; RAT-082; RAT-086), if `check_claims.py`
 reports a finding at HEAD (SEC-084), or if `git_dirty` is true. `create`
 stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the record's
 canonical JSON without that field and the approval fields, `freeze_status`, `approved_by`,
@@ -732,7 +740,10 @@ Run by the agent. It assembles the review package of spec FR-063 through
 of kind `review-package` with the fields of data model §16, through `protocol/evidence.py`, keeping
 the earlier manifest under `versions/` first (data model introduction). `--check` rebuilds the
 manifest from the files it lists, each hashed as data model §16 states, and compares it with the
-committed one, exit 1 on any difference. Since the script writes a record, it also runs as
+committed one, exit 1 on any difference. The manifest groups its entries by security.md §14's six
+items, each with the files that stand for it, and its field `unresolved` lists every finding that no
+later record, decision or entry closes, which `--check` rebuilds from the records (spec FR-063;
+data model §16; RAT-089). Since the script writes a record, it also runs as
 `--reproduce RECORD` (introduction). Sending the package is the owner's outward action (spec FR-063;
 REP-085).
 
@@ -942,8 +953,11 @@ SHA-256, the chapter, does not have at that moment the SHA-256 that the row name
 from the text whose `sha256` that entry holds, so that the status the latest entry gives is that of
 the text the reviewer read, a section changed after its last entry getting an `add`
 entry before its review, each refusal a case of `tests/test_protocol_004.py`
-(RAT-081), the SHA-256 that a row names for a section of `rationale.md` being the
-file's, which the owner design review's row names (RAT-083); a review entry
+(RAT-081), the SHA-256 that a row names for a section of `rationale.md` being the file's, which the
+owner design review's row names (RAT-083), and a review entry for a section of
+`rationale.md` that names a row of another family, such as the security-target
+review's, whose set names `rationale.md`'s chapters "Security target" and "Mode"
+without giving them entries, being refused too (RAT-086); a review entry
 holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
 runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
 row's approval (spec FR-064, FR-067; data model §14; RAT-077). It writes the owner design review's

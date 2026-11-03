@@ -432,9 +432,11 @@ takes each from there.
    2026-11-01 (`47270450.pdf` through the owner's browser), or from values the owner provides.
    The set of trail tools is fixed when the first trail search starts (R12).
 4. **US2 security target**: the design document's chapters "Security target", chapter 1, and "Mode",
-   with every precondition, drafted here and recorded as under review, in the provenance log and in
-   the security-target review's row, with no mark in the file, until the
-   security-target review of phase 8, which cites records that exist only after phase 5
+   with every precondition, drafted here with `rationale.md`'s chapters of those names, which
+   explain them, and recorded as under review, in the provenance log and in the security-target
+   review's row, with no mark in the file, until the security-target review of phase 8, which also
+   reads the two chapters of `rationale.md`, whose review entries the owner design
+   review adds (RAT-086), and cites records that exist only after phase 5
    (RAT-068, RAT-069); `mode_limits_v3.py` at ε = 2⁻⁶⁴. The theorem papers and
    AIS 20/31 3.0 come from the approved downloads of R19, `169.pdf` through the owner's browser.
 5. **US3 and US4 candidates**: operation-list framework and cost model; A1 (the ARX-box design)
@@ -458,7 +460,9 @@ takes each from there.
    functionality class; L1 recorded when its gate passes (security.md §15, 2.13: the FUT-SEC-8
    result review and the security-target review), the agent then changing `phyco-v3`'s entry,
    created at L0 in phase 1, its §15 line and its §1.1 row in a commit of its own right after the
-   owner's commit (FR-012; SEC-081; SEC-095); then the rationale; the security.md version of FR-051,
+   owner's commit (FR-012; SEC-081; SEC-095); then the rest of the rationale, its chapters
+   "Security target" and "Mode" having been drafted in phase 4 and read by
+   the security-target review (RAT-086); the security.md version of FR-051,
    which keeps the §1.1 row that phase 1 adds (SEC-095) (2.11 already records the §20.1 decision,
    from the checklist answers of 2026-11-01); review package, assembled by
    `scripts/review_package.py` (FR-063; REP-085); ⛔ **owner design review**, from whose first
