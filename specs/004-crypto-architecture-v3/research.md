@@ -2141,6 +2141,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - `.gitattributes` also gains `*.mk text eol=lf` and `Makefile text eol=lf`, which cover the new
     `fast/seed_search.mk` and keep feature 003's `fast/Makefile` LF on a fresh checkout. Its bytes
     do not change: Git already holds it with LF line endings (checklist F12).
+  - `.gitattributes` also gains, as its last line, `**/build/** binary`, so that the binaries that
+    each C tool builds into a `build/` directory beside its source (plan, Technical Context),
+    whose hashes the records hold (R16; data-model §1, §4), read `binary`, as R16 asks of every
+    new file whose hash is recorded; the later line takes precedence over
+    `research/004/** text eol=lf`, as `*.gz binary` does. No tracked file lies under a `build/`
+    directory, so no committed byte changes, and the line-ending test finds each binary's path
+    marked `binary`.
   - `.gitignore` gains, at setup (plan phase 1), the two locks of R16, `data/heavy-run.lock` and
     `data/log-append.lock`, and `data/local/`, where local-only outputs are written (R16), so that
     none of them shows in `git status` or counts as dirty. It also gains the generic lines that the

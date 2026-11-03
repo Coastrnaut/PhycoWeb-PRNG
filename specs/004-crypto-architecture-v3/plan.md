@@ -392,7 +392,8 @@ takes each from there.
    `.gitattributes` pins and the `.gitignore` entries for both locks and for `data/local/`, where
    local-only outputs go, with the generic lines that the owner chose on 2026-11-03 and no `*.tmp`
    (R16, R18; the pins for `reports/004-crypto-architecture-v3/**`,
-   `research/004/**`, `protocol/*.json` and `*.gz` were added on 2026-11-01), with R18's line-ending
+   `research/004/**`, `protocol/*.json` and `*.gz` were added on 2026-11-01, and the line
+   `**/build/** binary` follows them for the C tools' binaries), with R18's line-ending
    test, which runs from this phase on (FR-053); (2) the writers before what they write:
    `DESIGN_DISCLAIMER`, `protocol/evidence.py`, `protocol/provenance.py` with
    `scripts/provenance.py`, `protocol/changelog.py` with `scripts/protocol_change.py`,

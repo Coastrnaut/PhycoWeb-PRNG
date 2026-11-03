@@ -3166,7 +3166,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     is recorded is hashed over its raw bytes and MUST have a pinned line ending in
     `.gitattributes` (LF, or `binary`), so that its raw and normalized content agree on every
     checkout: `reports/004-crypto-architecture-v3/**`, `research/004/**` and `protocol/*.json` are
-    pinned to LF, and `*.gz` to `binary`. Files committed under
+    pinned to LF, and `*.gz` and every file under a `build/` directory, where each C tool's
+    binary is built (research R18), to `binary`. Files committed under
     `reports/004-crypto-architecture-v3/` are limited to `.json`, `.jsonl`, `.md`, `.csv`, `.txt`
     and `.gz`, and `protocol/evidence.py` refuses any other suffix there, as research R16 and the
     data-model introduction state; `research/004/**` holds the plan's Python code beside files of

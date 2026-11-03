@@ -128,10 +128,14 @@ or key-loading code is written here.
 - [ ] T004 Add to `.gitattributes`, after the line `protocol/*.json text eol=lf` and before the
   `*.hex`, `*.bin` and `*.gz` lines, so that those keep precedence:
   `specs/004-crypto-architecture-v3/**/*.md text eol=lf`, `vectors/phyco-v3/** text eol=lf`,
-  `*.mk text eol=lf` and `Makefile text eol=lf`; keep the pins already there for
-  `reports/004-crypto-architecture-v3/**`, `research/004/**`, `protocol/*.json` and `*.gz`. Check
-  with `git ls-files --eol` that every tracked file the new lines cover is already stored with LF,
-  `fast/Makefile` among them, so that no frozen file's bytes change. (FR-053; R18)
+  `*.mk text eol=lf` and `Makefile text eol=lf`; and, as the last line, `**/build/** binary`, so
+  that the C tools' binaries, whose hashes the records hold, read `binary`, under `research/004/**`
+  too; keep the pins already there for `reports/004-crypto-architecture-v3/**`, `research/004/**`,
+  `protocol/*.json` and `*.gz`. Check with `git ls-files --eol` that every tracked file the new
+  lines cover is already stored with LF, `fast/Makefile` among them, so that no frozen file's bytes
+  change, with `git ls-files` that no tracked file lies under a `build/` directory, and with
+  `git check-attr` that `fast/build/seed_search` and `research/004/tools/trails/build/arx_search`
+  read `binary`. (FR-053; R16, R18)
 - [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`, with
   the generic lines `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`, `.vscode/`,
   `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that the temporary file beside the
