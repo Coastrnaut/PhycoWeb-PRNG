@@ -385,6 +385,14 @@ force only while its row reads Approved at HEAD with that hash, and `validate_to
 guard accepts an `owner-provided` entry only while its row does, as `repair_log.py` reads "Log
 repair <n>" (cli contract, "Environment", `validate_tool.py`).
 
+A file that the row "Tool acquisition" does not cover (research R19), the source of a refused set
+that no listed file gives (research R15) or another copy of a paper among them, needs a row of its
+own too, "Download <n>", added when the owner gives the permission for that file: it names the
+file, its source, its size and its licence and the date, and the owner sets it to Approved and
+commits it. `scripts/downloads.py approve` reads that row at HEAD and writes the file's `approved`
+entry in the downloads manifest only while the row reads Approved and names the file with those
+four values, as `repair_log.py` reads "Log repair <n>" (FR-046; cli contract, `downloads.py`).
+
 Two lists of rows are set by the owner and committed, as "Log repair <n>" is. The first holds the
 rows a guard reads at HEAD, each with its guard: the FUT-SEC-8 result review and
 each "FUT-SEC-8 result review <k>", read by the evidence scripts' guard (cli
@@ -410,8 +418,9 @@ each review family, both Approved, with every hash those review rows name
 matching the file at HEAD (SEC-079), and L0 otherwise; each "Log repair <n>",
 read by `repair_log.py`; each "Environment record <n>", read by the evidence scripts' environment
 guard (cli contract, "Environment"); each "Owner-provided value <n>", read by `validate_tool.py`'s
-source guard; the Place check and each "Place check <k>", read by `protocol_change.py
-create` in the row with the highest k (FR-044); the Readings set aside, read by
+source guard; each "Download <n>", read by `downloads.py approve`; the Place check and each
+"Place check <k>", read by `protocol_change.py create` in the row with the highest k (FR-044); the
+Readings set aside, read by
 `protocol_change.py create`, which exits 2 while a first entry of the protocol change log
 holds a reading marked `set_aside` that the row does not decide (FR-044;
 PRO-079); and the Second transcription go-ahead, read by the test of the

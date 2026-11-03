@@ -170,8 +170,8 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   Order of US1, below; `round_rule.py --select` and `round_rule.py --decide` (PRO-074);
   `candidate_log.py outcome` (ANA-083); `provenance.py review` (PRO-074);
   `design_freeze.py create`; `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`;
-  `protocol_change.py create`; the test of the second transcription's provenance) reads
-  it as committed at HEAD, never the working tree, and exits 2 while the
+  `protocol_change.py create`; `downloads.py approve`; the test of the second transcription's
+  provenance) reads it as committed at HEAD, never the working tree, and exits 2 while the
   working tree's table differs from HEAD's. The rows that open a guard are set
   to Approved and committed by the owner (the note under that table), so an uncommitted row opens
   none, and the owner's review at each ⛔ gate lists the approval commits since the last gate. A
@@ -963,6 +963,7 @@ mode records an owner's act, which a later run cannot regenerate (introduction; 
 
 ```text
 downloads.py init                                    # the approved entries, from research R19
+downloads.py approve NAME                            # one later file, from its row "Download <n>"
 downloads.py fetched NAME PATH [--pypi-sha256 HEX]   # --pypi-sha256 required for a wheel
 downloads.py not-obtained NAME --reason TEXT
 ```
@@ -970,17 +971,22 @@ downloads.py not-obtained NAME --reason TEXT
 Run by the agent. It writes the downloads manifest, `$REP/downloads.json`, through
 `protocol/evidence.py` (research R19; data model introduction). `init` writes one `approved` entry
 per file of research R19's two tables, as research.md holds them at HEAD, with its name, source,
-size and licence, and exits 2 once the manifest exists. `fetched` computes the SHA-256 and the size
-from the downloaded file itself, read under `-I` from its own directory and never run, refuses a
-size that differs from a size R19 gives in bytes and, for a wheel, a SHA-256 that differs from
-PyPI's for that file, and writes the entry `fetched` with its SHA-256, the download date and the
-local path. `not-obtained` writes `not obtained` with the reason. Each mode refuses, exit 2, writing
-nothing, a name that no `approved` entry holds, and keeps the manifest's earlier content under
-`versions/` first (data model introduction). An `owner-provided` entry stays the owner's own act,
-written by `owner_record.py owner-provided` (above). `tests/test_protocol_004.py` covers each
-refusal (REP-076). It has no `--reproduce`: its entries record outside facts, the files as fetched
-and the reasons a file was not obtained, which a later run cannot regenerate (introduction;
-REP-085).
+size and licence, and exits 2 once the manifest exists. `approve` writes one `approved` entry for a
+file that those tables do not list, the source of a refused set (research R15) or another copy of a
+paper among them, with the name, source, size and licence that its row "Download <n>" of the spec's
+Review & Approval table gives and the row's name, only while that row reads Approved at HEAD
+(Approvals, above), and exits 2, writing nothing, while no such row names the file or while an
+entry holds the name. `fetched` computes the SHA-256 and the size from the downloaded file itself,
+read under `-I` from its own directory and never run, refuses a size that differs from a size R19
+or the file's row gives in bytes and, for a wheel, a SHA-256 that differs from PyPI's for that
+file, and writes the entry `fetched` with its SHA-256, the download date and the local path.
+`not-obtained` writes `not obtained` with the reason. `fetched` and `not-obtained` refuse, exit 2,
+writing nothing, a name that no `approved` entry holds, and each write keeps the manifest's earlier
+content under `versions/` first (data model introduction). An `owner-provided` entry stays the
+owner's own act, written by `owner_record.py owner-provided` (above). `tests/test_protocol_004.py`
+covers each refusal (REP-076). It has no `--reproduce`: its entries record outside facts, the
+files as fetched and the reasons a file was not obtained, which a later run cannot regenerate
+(introduction; REP-085).
 
 ## `scripts/protocol_change.py`
 
@@ -1029,7 +1035,10 @@ the list of the round before it, as ad2c195's is beside the re-run's, and its en
 round's entries, so that the log keeps the order of the commits (data model §18; PRO-064).
 `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
 which the agent may write as a proposal; an entry that adds to the refused list holds the list's
-new SHA-256 in `refused_list`, and `propose` exits 2 while it differs from the file at HEAD.
+new SHA-256 in `refused_list`, and `propose` exits 2 while it differs from the file at HEAD, or
+while the list at HEAD drops or changes an entry of the version that the latest `refused_list`
+names, which it finds by that SHA-256 in the file's git history, so that the list only grows
+(research R15); its approval step prints the entries added.
 Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`; a later entry whose `readings` mark a reading `set_aside` shows

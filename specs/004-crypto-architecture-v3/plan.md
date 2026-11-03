@@ -330,7 +330,8 @@ tests/
 │                             # the two log writers' refusals (FR-044, FR-067); the first list
 │                             # of approvals and the guards agree both ways; the three status
 │                             # lines agree; the heavy-run lock's coverage (FR-045); the constants
-│                             # generator's refused-list guard and match check (FR-023)
+│                             # generator's refused-list guard and match check (FR-023); the
+│                             # refused list's growth against its history (FR-044)
 ├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
 │                             # mark of every hashed path, each code_sha256 entry against its blob
@@ -423,7 +424,8 @@ takes each from there.
    created, by the per-round lists of checklist-choices.md, in round order, approved by the owner at
    the log's approval step (FR-044; data-model §18); (5) the downloads manifest `downloads.json`,
    its `approved` entries, one per file of R19's tables, written by `scripts/downloads.py init`
-   before any download, each later `fetched` or `not obtained`, and an `owner-provided` entry for
+   before any download, and one per later file that its row "Download <n>" permits, written by
+   `downloads.py approve`, each later `fetched` or `not obtained`, and an `owner-provided` entry for
    each value the owner provides, written by the owner with `scripts/owner_record.py` (R19); (6) the
    Hypothesis wheels of R19, each downloaded into its own new directory, checked against PyPI's
    SHA-256 and recorded `fetched`, every one before any is installed, since an install changes the

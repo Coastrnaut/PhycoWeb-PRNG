@@ -1636,7 +1636,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so a
     failure shows reuse rather than chance. An addition to the list is proposed by the agent and
     approved by the owner as a stricter change in the protocol change log, since the list only
-    grows, with the list's new SHA-256. Designs that the spec, the plan, this document or
+    grows, with the list's new SHA-256; `scripts/protocol_change.py propose` exits 2, appending
+    nothing, while the list at HEAD drops or changes an entry of the version that the latest
+    `refused_list` names (data-model §18). A set whose only source is a file waits for it: a file
+    that R19 does not list needs its own row "Download <n>", which `scripts/downloads.py approve`
+    reads (R19), and a file recorded `not obtained` needs another copy, permitted the same way;
+    where none can be had, no candidate is scored, and the feature recommends stopping
+    (spec stop rule). Designs that the spec, the plan, this document or
     security.md name later are added when named, as the rationale's citations are, and the check
     runs again. A match makes each candidate whose polynomial or table it touches fail FR-023, an
     eligibility item, so that candidate is `ineligible` and the rules select among the others; a
@@ -1832,7 +1838,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     append-only instead, their earlier entries never changing:
     `research/004/tools/critical_counts.json` (R4), the sidecar `vectors/phyco-v3/MANIFEST.json` and
     `research/004/candidates/superseded.json`; a record that cites one gives its SHA-256 and the
-    entry it used (data-model introduction).
+    entry it used (data-model introduction). The refused list,
+    `research/004/refused-constants.json`, only grows (R15): each committed version keeps every
+    entry of the one before it unchanged (data-model introduction, §18).
   - **Reproduction.** Every script that writes evidence or generated files, those that this
     bullet's end names as having none excepted, has a mode `--reproduce RECORD`,
     which runs the recorded command's configuration in a separate worktree of
@@ -2173,11 +2181,15 @@ On 2026-11-01 the owner approved every file in the two tables below, each as lis
 source, size and licence ("Tool acquisition" in the spec's Review & Approval table). Nothing
 else is covered: a file not listed here, the tools under "Not requested", or a file whose source
 or licence differs from its row, or whose size differs from a size given in bytes, needs its
-own permission. A tool's second known result (R12), and the ARX search's known result at 32-bit
-words, come from these papers where one of its kind is there, fixed before the tool's first
+own permission, given in a row of its own, "Download <n>", which names the file with its source,
+size and licence and which `scripts/downloads.py approve` reads (below). A tool's second known
+result (R12), and the ARX search's known result at 32-bit words, come from these papers where one
+of its kind is there, fixed before the tool's first
 validation, so that no paper is requested after a failed validation to supply one. Each
 file is fetched when the task that uses it is reached. Nothing in this plan
-depends on any of them; without them the work uses the tools of R12 and records each gap as an
+depends on any of them but the refused list, which waits, before the first candidate is scored,
+for each set whose only source is a file (R15); without them the work uses the tools of R12 and
+records each gap as an
 open item. The requests below were prepared on 2026-11-01 from the hosts' pages and from header
 requests, with no file body downloaded. A size comes from the server's header where it gave one,
 and otherwise as the host lists it. The IACR ePrint archive, the IACR conference archive and the
@@ -2238,20 +2250,25 @@ run from inside that directory, Python reading it runs with `-I`, and its SHA-25
 recorded against its row.
 
 A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds from
-setup on one entry per file of these tables, each with its name, source, size and licence, the
-environment record in force when it was written, as `environment` (data-model §1; REP-082), and a
+setup on one entry per file of these tables, and one per later file that its row "Download <n>"
+permits, each with its name, source, size and licence, the environment record in force when it
+was written, as `environment` (data-model §1; REP-082), and a
 `status`: `approved`, not yet fetched, with no SHA-256, date or path; `fetched`, with its SHA-256,
 download date and local path; or `not obtained`, with the reason. Those entries are written by a
 script of its own, `scripts/downloads.py`, through `protocol/evidence.py`, run by the agent: `init`
 writes one `approved` entry per file of the two tables, as research.md holds them at HEAD, with its
-name, source, size and licence, and exits 2 once the manifest exists; `fetched NAME PATH` computes
-the SHA-256 and the size from the downloaded file itself, read under `-I` from its own directory and
-never run, refuses a size that differs from a size this section gives in bytes and, for a wheel, a
-SHA-256 that differs from PyPI's for that file, given as `--pypi-sha256 HEX`, and writes the
-entry `fetched` with its SHA-256, the download date and the local path; and
-`not-obtained NAME --reason TEXT` writes `not obtained` with the reason. Each mode refuses, exit 2,
-writing nothing, a name that no `approved` entry holds, and keeps the manifest's earlier
-content under `versions/` first (REP-076). A value the owner provides gets an
+name, source, size and licence, and exits 2 once the manifest exists; `approve NAME` writes one
+`approved` entry for a file that the tables do not list, with the name, source, size and licence
+that its row "Download <n>" gives and the row's name, only while that row reads Approved at HEAD,
+and exits 2, writing nothing, while no such row names the file or while an entry holds the name;
+`fetched NAME PATH` computes the SHA-256 and the size from the downloaded file itself, read under
+`-I` from its own directory and never run, refuses a size that differs from a size this section or
+the file's row gives in bytes and, for a wheel, a SHA-256 that differs from PyPI's for that file,
+given as `--pypi-sha256 HEX`, and writes the entry `fetched` with its SHA-256, the download date
+and the local path; and `not-obtained NAME --reason TEXT` writes `not obtained` with the reason.
+`fetched` and `not-obtained` refuse, exit 2, writing nothing, a name that no `approved` entry
+holds, and each write keeps the manifest's earlier content under `versions/` first (REP-076).
+A value the owner provides gets an
 entry of its own, `owner-provided`, with the owner's words, the source the owner names, the date and
 the value's SHA-256, written by `scripts/owner_record.py owner-provided`, which the owner runs, an
 owner's own act (spec FR-044): the script prints the entry's approval hash, kind
