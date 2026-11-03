@@ -918,7 +918,9 @@ RAT-085). Each row holds:
 `limits.json`, a fixed-name file too: `epsilon` (2⁻⁶⁴), `N` (2¹²⁸), each theorem the mode chapter
 uses (the paper, cited by its `fetched` entry in `downloads.json` with that entry's SHA-256, the
 theorem's number and page, `verified` or `unverified`, and each precondition with the mode-chapter
-section that meets it, marked met or not), which `design_freeze.py create` reads (section 13):
+section that meets it, marked met or not), which `design_freeze.py create`
+reads (section 13), refusing, exit 2, a section so named that is not one of
+the mode chapter's sections in the version of the design document it reads:
 `mode_limits_v3.py` refuses `verified`, exit 2, without such an entry or when the file on disk has
 another SHA-256, and the marks count only once the security-target review row, which reviews the
 chapter by its version, reads Approved, `create` reading them as `unverified` until then: that

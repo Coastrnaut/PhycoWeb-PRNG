@@ -1072,7 +1072,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   a row of its own, or a stop (the note under the Review & Approval table). The security-target
   review may read Approved while a theorem the mode chapter uses is "unverified"; the owner design
   review and the freeze need every such theorem `verified` in `limits.json`, with each precondition
-  marked met in the mode chapter (FR-043; research R10). Each theorem's entry there cites the
+  marked met there, beside the section of the mode chapter that meets it, which must be one of that
+  chapter's sections in the version of the design document read, `design_freeze.py create` exiting 2
+  otherwise (FR-043; research R10). Each theorem's entry in `limits.json` cites the
   paper's `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page;
   `mode_limits_v3.py` refuses `verified` without one, or when the file on disk has another SHA-256,
   and the agent's `verified` and met marks count only once the security-target review row, which
@@ -2718,8 +2720,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   SEC-079 name in the working tree, once the owner has set the row or made the
   change there and before the owner's commit, which holds it, so that at every
   commit of the window the register gives the rows' level (FR-012; SEC-084).
-  `design_freeze.py create` exits 2 unless every theorem the mode chapter uses is `verified` in
-  `limits.json`, with each precondition marked met, naming the theorem otherwise, and reads those
+  `design_freeze.py create` exits 2 unless every theorem the mode chapter uses is `verified`
+  in `limits.json`, with each precondition marked met beside the section
+  that meets it, one of the mode chapter's sections in the version of the
+  design document it reads, naming the theorem otherwise, and reads those
   marks as `unverified` while the security-target review row does not read Approved (FR-012;
   research R10); a theorem whose paper cannot be obtained or read is replaced by another of research
   R10's list, in a new version reviewed again, or the feature stops (Edge Cases).

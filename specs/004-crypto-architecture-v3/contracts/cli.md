@@ -761,8 +761,10 @@ with the SHA-256 of its choice record, if the candidate log's latest `selected` 
 tie choice where there is one, or does not name the candidate that record selects (data model §3,
 §13; ANA-081), if a variant ID of that `variant_map` does not carry the final R that the candidate's
 `round-rule.json` gives at its size (ANA-085), if a theorem the mode chapter uses
-is not `verified` in `limits.json` or a precondition of it is not marked met there, naming the
-theorem, those marks being read as `unverified` while the security-target review row does not read
+is not `verified` in `limits.json` or a precondition of it is not marked met there or names,
+as the section that meets it, none of the mode chapter's sections in the
+version of the design document it reads, naming the theorem, those marks
+being read as `unverified` while the security-target review row does not read
 Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the selected candidate's
 at a supported (n, w) and its final R (research R15), if the design document's header holds a line
 other than its title, the disclaimer and its line "Version: …" (spec FR-034), if `rationale.md`'s

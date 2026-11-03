@@ -1059,8 +1059,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   "unverified", and L1 is not recorded while it is (FR-012): the security-target review may read
   Approved, and the "L1 recorded" row then reads "blocked", naming the missing paper. The owner
   design review and the freeze need every theorem the mode chapter uses `verified` in `limits.json`,
-  with each precondition marked met in the mode chapter: `design_freeze.py create` exits 2
-  otherwise, naming the theorem, and the freeze record holds `limits.json`'s SHA-256 and each
+  with each precondition marked met there, beside the section of the mode chapter that meets it:
+  `design_freeze.py create` exits 2 otherwise, naming the theorem, as it does when such a section is
+  not one of that chapter's sections in the version of the design document
+  it reads, and the freeze record holds `limits.json`'s SHA-256 and each
   theorem's status (data-model §13). Each theorem's entry in `limits.json` cites the paper's
   `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page;
   `mode_limits_v3.py` refuses `verified`, exit 2, without one or when the file on disk has another
