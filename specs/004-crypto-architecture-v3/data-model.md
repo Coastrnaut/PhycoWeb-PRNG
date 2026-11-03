@@ -109,7 +109,7 @@ implementation can write byte-identical files:
 | `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
 | `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` and `review_status` stay as written, `pending` where no review preceded the record, which is never overwritten: its review is a provenance entry that names the record's ID and SHA-256 (section 14) |
 | `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
-| `heavy_run` | bool | true if the run held the heavy-run lock (FR-045) |
+| `heavy_run`, `hours` | bool, object | `heavy_run` true if the run held the heavy-run lock (FR-045); `hours`, for a heavy run, the hours projected and the hours used (research R7), per run where a reproduction made two, which the Budget guard reads for research R7's feature-wide row (cli contract) and a reproduction reports only, and `none` for every other run |
 | `disclaimer` | str | `protocol.disclaimer.DESIGN_DISCLAIMER`, verbatim (FR-068) |
 
 Statistical records (section 5, `frequency`, `avalanche` and `control`) also hold the items of
@@ -170,9 +170,12 @@ the class.
   with the lock's content (research R16).
 - **Projection records.** A `projection` record (research R7) is written for every 60 s
   projection and every timing probe: the run it projects and its budget row, its inputs (the
-  first inputs of that run), the measured speed and the projected hours. Its outputs other than
-  timing are discarded unread, and the record says so. Its time counts against the row of the
-  run it projects.
+  first inputs of that run), the measured speed, the projected hours and its own time. Its
+  outputs other than timing are discarded unread, and the record says so. Its time counts
+  against the row of the run it projects. FR-053's test with two worker counts, which is not
+  evidence and writes no other record, writes a further one when it ends, naming research R7's
+  feature-wide row, whose time is the time the test took, so that the row's hours used can be
+  read from the records (cli contract, Budget).
   A projection record is not evidence: the order of sizes counts evidence records only (research
   R7), so a probe at a larger size runs before the run it projects.
 - **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its

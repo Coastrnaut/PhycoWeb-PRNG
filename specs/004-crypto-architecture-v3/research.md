@@ -1916,8 +1916,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     first, projects each run it will make and starts only if those projections together fit the
     hours left in R7's feature-wide row, exit 2 otherwise, writing nothing but its `projection`
     records, and it is charged for each run it makes (R7). It reads the hours left again before a
-    second run, and one whose projection no longer fits them, the first run having taken more than
-    its own, is not made, exit 1: the outcome is `differs` where the first run differs, and
+    second run, its first run's hours counted, and one whose projection no longer fits them, the
+    first run having taken more than its own, is not made, exit 1: the outcome is `differs` where
+    the first run differs, and
     otherwise the record, written as an aborted run's is (data-model §1), holds `status`
     `inconclusive`, with the reason, and neither `match` nor `differs`.
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's

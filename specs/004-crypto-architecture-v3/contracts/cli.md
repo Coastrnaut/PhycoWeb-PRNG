@@ -56,8 +56,9 @@ there with the rebuild, Committed code applying to every file but the rebuilt bi
 the first run's are, the outcome `match` only when both runs match. A rebuild that differs is a new
 version of the tool: where Tool validation or Trail tools does not admit it, no second run is made,
 and a rebuild so refused, or one that fails, counts as a difference in every compared field, exit 1
-(research R16). A heavy reproduction reads the hours left again before a second run, and one whose
-projection no longer fits them, the first run having taken more than its own, is not made, exit 1:
+(research R16). A heavy reproduction reads the hours left again before a second run, its first
+run's hours counted, and one whose projection no longer fits them, the first run having taken more
+than its own, is not made, exit 1:
 the outcome is `differs` where the first run differs, and otherwise the record, written as an
 aborted run's is (data model §1), holds `status` `inconclusive`, with the reason, and neither
 `match` nor `differs`.
@@ -265,7 +266,12 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   repeat after a tool defect or FR-053's test with two worker counts, projects
   first against research R7's feature-wide 66 h row and exits 2, writing
   nothing but its `projection` record, unless its projection fits the hours left there, a heavy
-  reproduction's being the projections of all the runs it will make, together (introduction).
+  reproduction's being the projections of all the runs it will make, together (introduction). The
+  hours used in that row are the sum, read from the records, of the `hours` used of every record
+  with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's pass excepted, and of the
+  time of every `projection` record that names the row; FR-053's test, which is not evidence and
+  writes no other record, writes a further `projection` record when it ends, naming the row, whose
+  time is the time the test took (data model §1).
 - **Trail tools**: once the feature's first trail search has started, a trail tool is refused,
   exit 2, unless its name is in the fixed set (the rows of research R12's table: ARX search,
   active-S-box counting, long-trail active-box counting, exhaustive tables) and its exact hash has

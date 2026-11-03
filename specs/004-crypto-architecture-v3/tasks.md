@@ -185,24 +185,26 @@ or key-loading code is written here.
   re-run after a recorded tool defect; and Budget, a refusal after a probe writing its `projection`
   record and nothing else, a spent candidate row never refusing a reproduction and a heavy
   reproduction refused once the projections of the runs it will make, after any rebuild, do not
-  together fit the hours left in research R7's feature-wide row. They also test the common part of
-  `--reproduce`, with a mocked C tool and build on a temporary repository: the worktree of
-  `git_head` checked against its blobs, and the rebuild in a second worktree, the committed binary
-  removed there first, so that a make file that would find it up to date compiles it all the same,
-  one run where the rebuild's SHA-256 equals the committed binary's, a second, compared too, where
-  it differs and has a `re-found` record of its own, the outcome `match` only when both runs match,
-  and no second run and a difference in every compared field, exit 1 with the record written, where
-  the guards Tool validation and Trail tools do not admit the rebuild, whatever the kind of the
-  record reproduced, a demonstration, a validation and a cross-check among them, as where it fails;
-  a heavy reproduction's exit 2 without `--owner-request`, the request quoted with its date in its
-  record's `owner_request`, a light one needing none; and a second run that no longer fits the hours
-  left, the first having taken more than its projection, not made, exit 1, the outcome `differs`
-  where the first run differs and otherwise the record holding `status` `inconclusive`, with the
-  reason, and neither `match` nor `differs`. In `tests/test_protocol_004.py`, FR-045's test also
-  checks that every budgeted kind, the FUT-SEC-8 sweep among them, and every script with a worker
-  option takes the heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040, FR-044,
-  FR-045, FR-053, FR-061; R7, R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094,
-  REP-101)
+  together fit the hours left in research R7's feature-wide row, its hours used being the sum, read
+  from the records, of the `hours` used of every record with `heavy_run` true that charges no
+  candidate, the FUT-SEC-8 row's pass excepted, and of the time of every `projection` record that
+  names the row. They also test the common part of `--reproduce`, with a mocked C tool and build on
+  a temporary repository: the worktree of `git_head` checked against its blobs, and the rebuild in a
+  second worktree, the committed binary removed there first, so that a make file that would find it
+  up to date compiles it all the same, one run where the rebuild's SHA-256 equals the committed
+  binary's, a second, compared too, where it differs and has a `re-found` record of its own, the
+  outcome `match` only when both runs match, and no second run and a difference in every compared
+  field, exit 1 with the record written, where the guards Tool validation and Trail tools do not
+  admit the rebuild, whatever the kind of the record reproduced, a demonstration, a validation and a
+  cross-check among them, as where it fails; a heavy reproduction's exit 2 without
+  `--owner-request`, the request quoted with its date in its record's `owner_request`, a light one
+  needing none; and a second run that no longer fits the hours left, the first run's hours counted
+  and the first having taken more than its projection, not made, exit 1, the outcome `differs` where
+  the first run differs and otherwise the record holding `status` `inconclusive`, with the reason,
+  and neither `match` nor `differs`. In `tests/test_protocol_004.py`, FR-045's test also checks that
+  every budgeted kind, the FUT-SEC-8 sweep among them, and every script with a worker option takes
+  the heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053,
+  FR-061; R7, R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -222,11 +224,11 @@ or key-loading code is written here.
   `design-versions/<sha256>.md`, `--owner-request` for a heavy reproduction, kept in its record as
   `owner_request`, with exit 2 without one, any rebuild made before its projections, which must
   together fit the hours left in research R7's feature-wide row, with exit 2 otherwise, the hours
-  left read again before a second run, which is not made where it no longer fits, exit 1, with
-  `differs` where the first run differs and otherwise a record of `status` `inconclusive`, with the
-  reason, and neither `match` nor `differs`, and exit 2 while the environment record the original
-  cites is not in force. (FR-045, FR-053, FR-061, FR-065, FR-068; R1, R7, R16, R18; REP-099,
-  REP-100)
+  left read again before a second run, the first run's hours counted, which is not made where it no
+  longer fits, exit 1, with `differs` where the first run differs and otherwise a record of `status`
+  `inconclusive`, with the reason, and neither `match` nor `differs`, and exit 2 while the
+  environment record the original cites is not in force. (FR-045, FR-053, FR-061, FR-065, FR-068;
+  R1, R7, R16, R18; REP-099, REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
@@ -845,8 +847,9 @@ candidates are otherwise `ineligible` (R6, R7).
   budget row, a size out of order and a `bound` without a validated tool; an `avalanche` run without
   the candidate's `dependency` record at its size exits 2; every run started writes a record; a
   `control` run exits 2 once its record exists; `--reproduce` of a light run of each kind, its
-  latest and one older, matches (R7); and FR-053's test with two worker counts, marked heavy.
-  (FR-037, FR-045, FR-053, FR-065; R4, R7, R16)
+  latest and one older, matches (R7); and FR-053's test with two worker counts, marked heavy, which
+  writes, when it ends, a further `projection` record naming research R7's feature-wide row, whose
+  time is the time the test took. (FR-037, FR-045, FR-053, FR-065; R4, R7, R16)
 - [ ] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
   `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
   `invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) and
