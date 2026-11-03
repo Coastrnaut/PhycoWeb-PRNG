@@ -281,6 +281,7 @@ research/004/
 ├── validation/               # re-finding S12–S15, FUT-SEC-8, published trail values
 ├── exploration/              # constant tables for exploration: never frozen or evidence (R14)
 ├── refused-constants.json    # research R15's refused list, read by gen_constants_v3.py (FR-023)
+├── refused_sources.py        # computes the refused sets that have a published derivation (R15)
 ├── place_check.py            # the lists' comparison before the tasks approval (FR-044)
 ├── place-check.json          # its result, which the row "Place check" names by SHA-256
 ├── candidates.jsonl          # the candidate log
@@ -328,7 +329,8 @@ tests/
 │                             # every seed-set load is dev-only (FR-040);
 │                             # the two log writers' refusals (FR-044, FR-067); the first list
 │                             # of approvals and the guards agree both ways; the three status
-│                             # lines agree; the heavy-run lock's coverage (FR-045)
+│                             # lines agree; the heavy-run lock's coverage (FR-045); the constants
+│                             # generator's refused-list guard (FR-023)
 ├── test_records_004.py       # --reproduce of a light run per kind, its latest and one older (R7);
 │                             # the two-worker test, marked heavy; the attribute pin and byte-order
 │                             # mark of every hashed path, each code_sha256 entry against its blob

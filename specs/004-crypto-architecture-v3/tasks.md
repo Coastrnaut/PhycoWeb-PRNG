@@ -315,13 +315,13 @@ or key-loading code is written here.
   and the CRC-64 polynomials of ISO 3309 and ECMA-182) and the polynomials and constant sets of
   every design that the strategy note, the spec, the plan, research.md and `security.md` name,
   research R12's reference designs among them, each with its source; each set's source is a file of
-  research R19 recorded `fetched` in `downloads.json`, the design's published derivation computed by
-  committed code with its citation, or a value the owner provides with its source (`owner-provided`,
-  R19), and a set with none of these waits for a download of its own, with the owner's permission
-  for that file (FR-046); a set not on the list when the log is created, a set from a paper of R19
-  not yet fetched among them, enters as a `stricter` entry with the list's new SHA-256, and no
-  candidate is scored before every set this task names is on the list. (FR-023, FR-044, FR-046; R15,
-  R19; RAT-038, RAT-043)
+  research R19 recorded `fetched` in `downloads.json` or the design's published derivation, computed
+  by `research/004/refused_sources.py`, committed code that cites the derivation of each set it
+  computes, and a set with neither waits for a download of its own, with the owner's permission for
+  that file (FR-046); a set not on the list when the log is created, a set from a paper of R19 not
+  yet fetched among them, enters as a `stricter` entry with the list's new SHA-256, and no candidate
+  is scored before every set this task names is on the list. (FR-023, FR-044, FR-046; R15, R19;
+  RAT-038, RAT-043)
 - [ ] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/004/protocol-changes.jsonl`, one per listed row of every answered
@@ -734,10 +734,19 @@ candidates are otherwise `ineligible` (R6, R7).
   `PhycoWeb`, each table read w bits per word in the stated order, skipping periodic and related
   words, every repeat recorded where a call needs more constants than there are aperiodic classes);
   the refused list's check under its 2w transforms over every table and each call type's stream; the
-  checks within a call; the rotation amounts and every other per-node constant by their stated
+  refused list's guard, which writes the list's path and SHA-256 as `refused_list` in every record
+  the script writes, exits 2, writing nothing, while that SHA-256 differs from the `refused_list` of
+  the protocol change log's latest entry that holds one, or no entry holds one, and has a
+  `--reproduce` run compare the list at the record's `git_head` with the record's `refused_list`;
+  the checks within a call; the rotation amounts and every other per-node constant by their stated
   rules; and the modes `--candidate ID --variant VARIANT`, `--exploration N W` into
   `research/004/exploration/`, `[--check]` for `phycoweb/constants_v3.py` and `--reproduce RECORD`,
-  each run writing a `generator-run` record. (FR-023, FR-024, FR-047; SC-006; R13, R15)
+  each run writing its record, a `generator-run` record, a `generator-check` record for `--check` or
+  a `reproduction` record for `--reproduce`. Its tests, in `tests/test_protocol_004.py`, cover that
+  guard: exit 2 with nothing written for a list that differs from the latest `refused_list` and for
+  a log in which no entry holds one, `refused_list` in the record of each mode, and a `--reproduce`
+  run reading the list at the record's `git_head`. (FR-023, FR-024, FR-044, FR-047; SC-006; R13,
+  R15)
 - [ ] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
   as `research/004/candidates/cand-A1.py`, an operation list of invertible updates with its
   reference outputs, and append its `proposed` entry with
@@ -1142,9 +1151,9 @@ phase ends with the constitution's phase report to the owner.
   T063 as code; their heavy validations still run one at a time.
 - Phase 4 drafting (T069–T071) beside Phase 3's light tasks; its tests (T066, T067, T068) share
   `tests/test_records_004.py` and run in turn.
-- Phase 5: T073 beside T075, T081 and T083, which share `tests/test_protocol_004.py` and run in
-  turn; the candidates' modules (T078, T079) may be drafted side by side, their `proposed` entries
-  appended in turn under the log's lock.
+- Phase 5: T073 beside T075, T077, T081 and T083, which share `tests/test_protocol_004.py` and run
+  in turn; the candidates' modules (T078, T079) may be drafted side by side, their `proposed`
+  entries appended in turn under the log's lock.
 - Phase 6: T096 ∥ T099; Phase 7: T104 beside T105, which runs in its own session.
 - Phase 8: T113 beside T111 and T112.
 
@@ -1207,7 +1216,7 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-041: T010, T013, T075, T076, T078, T079, T080, T083, T085, T087, T093, T094, T126
 - FR-042: T035, T036
 - FR-043: T085, T109, T113, T114, T116, T117, T118, T119, T120, T125, T126, T127
-- FR-044: T001, T002, T008, T010, T012, T013, T015, T027, T028, T109
+- FR-044: T001, T002, T008, T010, T012, T013, T015, T027, T028, T077, T109
 - FR-045: T005, T008, T014, T042, T043, T081, T125
 - FR-046: T016, T027, T029, T030, T031, T059, T065
 - FR-047: T077, T126

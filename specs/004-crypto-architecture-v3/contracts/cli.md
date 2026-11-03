@@ -637,11 +637,12 @@ sidecar left out, its entry being appended once the record is written, and
 the freeze hashing the sidecar with the vectors (data model §11; REP-092);
 `--check` does not compare the sidecar. `gen_constants_v3.py` also writes each constant table
 as `vectors/phyco-v3/constants_n<n>_w<w>.json`. It reads the refused list
-`research/004/refused-constants.json` (research R15), holds the list's SHA-256 in every record it
-writes and exits 2, writing nothing, while that SHA-256 differs from the `refused_list` of the
-protocol change log's latest entry that holds one, or no entry holds one (data model §18); a
-`--reproduce` run instead compares the list at the record's `git_head` with the SHA-256 the
-record holds. `--check` regenerates in memory, compares every
+`research/004/refused-constants.json` (research R15), holds the list's path and SHA-256 as
+`refused_list` in every record it writes (data model §11) and exits 2, writing nothing, while that
+SHA-256 differs from the `refused_list` of the protocol change log's latest entry that holds one,
+or no entry holds one (data model §18); a `--reproduce` run instead compares the list at the
+record's `git_head` with the record's `refused_list`.
+`--check` regenerates in memory, compares every
 generated file byte for byte with the committed one and writes a `generator-check` record under
 `$REP/generator-checks/` with the fields of data model §1 (FR-061), each generated file's path and
 SHA-256 and the verdict `match` or `differs`; it exits 1 on any byte difference. SC-009's evidence

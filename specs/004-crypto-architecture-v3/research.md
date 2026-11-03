@@ -1608,9 +1608,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Refused constants.** The script reads a committed list,
     `research/004/refused-constants.json`, of the polynomials and constant sets it refuses, each
     with its source, frozen with the rule before the first candidate is scored, its SHA-256 in
-    `refused_list` of each change-log entry that fixes the rule (data-model §18) and in every
-    record the script writes; the script exits 2 while the list's SHA-256 differs from the latest
-    such entry's. The list holds the polynomials and
+    `refused_list` of each change-log entry that fixes the rule and of each later entry that adds
+    to the list (data-model §18), and in `refused_list` of every record the script writes
+    (data-model §11); the script exits 2 while the list's SHA-256 differs from the `refused_list`
+    of the change log's latest entry that holds one, an addition's included, or while no entry
+    holds one. The list holds the polynomials and
     constant sets of R12's reference designs (SPECK32, PRESENT, SPARKLE) and of every design the
     strategy note, the spec, the plan, this document and security.md name, and the standard
     polynomials of degree 64 and 128: CMAC's R₆₄ and R₁₂₈ (SP 800-38B), GCM's (SP 800-38D), and the

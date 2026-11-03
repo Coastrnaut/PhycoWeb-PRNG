@@ -272,10 +272,10 @@ design document, which the table names; for every other kind it is reported, and
 | Cross-check between kinds (`cross-check`; section 7) | `tool` and its version, and, per r and width, the tool's value beside each exhaustive one with its outcome: for an ARX-box, the internal-trail search's value at w = 4 and whether they are equal, and the floor at w = 4 and 8 and whether the value lies at or above it; for the active-S-box counter, the exhaustive minimum and whether they are equal | the projected and used hours; `design_sha256` |
 | D4 choice, round rule, cost records and selection (sections 8 and 9) | every field of its section | `design_sha256` |
 | Size profile and limits (`mode_limits_v3.py`; section 10) | every field of section 10, and `design_sha256`, since its code reads the design document's variant table, layout and limits (RAT-085) | none of its own |
-| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, `design_sha256`, since its restatement check reads the design document, and the SHA-256 of the refused list it reads (research R15); for a candidate's tables (`--candidate`) and an exploration table (`--exploration`), each check's verdict as well | the measured speed and the generation time |
+| Generator run, constant tables (`generator-run` of `gen_constants_v3.py`; section 11) | each written file's path and SHA-256, computed in memory and compared with the record's, `design_sha256`, since its restatement check reads the design document, and `refused_list`, the path and SHA-256 of the refused list it reads (research R15); for a candidate's tables (`--candidate`) and an exploration table (`--exploration`), each check's verdict as well | the measured speed and the generation time |
 | Generator run, vectors (`gen_vectors_v3.py`) | each written file's path and SHA-256, as for the constant tables, and `design_sha256`, since its code reads the design document's table of k (section 11; REP-097) | as for the constant tables |
 | Generator run, constructed states (`gen_constructed_v3.py`) | each written file's path and SHA-256, as for the constant tables | as for the constant tables, and `design_sha256` |
-| Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, and `design_sha256` for `gen_constants_v3.py`'s and `gen_vectors_v3.py`'s (REP-097) | `design_sha256` for `gen_constructed_v3.py`'s |
+| Generator check (`generator-check`; section 11) | each generated file's path and SHA-256 and the verdict, `design_sha256` for `gen_constants_v3.py`'s and `gen_vectors_v3.py`'s (REP-097), and `refused_list` for `gen_constants_v3.py`'s (research R15) | `design_sha256` for `gen_constructed_v3.py`'s |
 | Review package (`review-package`; section 16) | every field of section 16, and `design_sha256`, since its code reads the design document | none of its own (REP-085) |
 | Re-check (`recheck`; above) | per record, each recomputed verdict, its agreement with the recorded one and the commit whose functions computed it; the counts of agreements and disagreements | the interpreter, the platform and the `pip freeze` it ran with |
 | Projection (above) | nothing beyond the common fields | the measured speed and the projected hours |
@@ -981,12 +981,15 @@ writes the table of an (n, w) outside the supported sizes as
 `research/004/exploration/constants_n<n>_w<w>.json` and, beside it, its check record, a
 `generator-run` record with `exploration` true and each check's verdict, adds no sidecar entry,
 writes no frozen file and no evidence, and refuses a supported (n, w), exit 2 (research R15).
+Every record that `gen_constants_v3.py` writes, in each of its modes, also holds `refused_list`,
+the path `research/004/refused-constants.json` and the SHA-256 (`raw`) of the list the run read
+(research R15).
 
 **Generator checks** (SC-009). `--check` writes a `generator-check` record,
 `generator-checks/<record_id>.json`, with the common fields of section 1 (FR-061), each generated
-file's path and SHA-256 and the verdict `match` or `differs`, computed by code (FR-065). SC-009's
-evidence is each generator's pair of such records, one per platform, which quickstart M1 to M3 and
-the final report cite.
+file's path and SHA-256, `refused_list` for `gen_constants_v3.py`'s (above) and the verdict `match`
+or `differs`, computed by code (FR-065). SC-009's evidence is each generator's pair of such
+records, one per platform, which quickstart M1 to M3 and the final report cite.
 
 **Order of generation** (FR-036, FR-059): four steps, each generator's `--check` passing in this
 order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
