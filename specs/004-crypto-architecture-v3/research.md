@@ -1885,14 +1885,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     owner's next commit after the one that records the owner design review's approval, from which
     the agent commits no file of this feature; (2) `design_freeze.py create` runs with
     `git_dirty` false, records that commit as `owner_commit`, exiting 2 unless
-    it is HEAD (spec FR-043; PRO-070), and writes the record as `draft`;
-    (3) the owner runs `design_freeze.py approve`, which prints `draft_sha256`, refuses unless
-    standard input is an interactive terminal and the owner types its first 16 hex digits, writes
+    it is HEAD (spec FR-043; PRO-070), and writes the record with `freeze_status`
+    `draft` (data-model §13; REP-093); (3) the owner runs `design_freeze.py
+    approve`, which prints `draft_sha256`, refuses unless standard input is an
+    interactive terminal and the owner types its first 16 hex digits, writes
     the approval with that confirmation into it and changes nothing else (data-model §13); (4) the
     owner commits the record; (5) `validate`, which recomputes `draft_sha256`, taken
-    without that field and the approval fields, `status`, `approved_by`,
-    `approved_utc`, `approval_wording` and `approval_confirmed` (data-model §13;
-    REP-084), and every hash, exits 0. Dirty means a tracked file modified or an
+    without that field and the approval fields, `freeze_status`, `approved_by`, `approved_utc`,
+    `approval_wording` and `approval_confirmed` (data-model §13; REP-084,
+    REP-093), and every hash, exits 0. Dirty means a tracked file modified or an
     untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
     and local-only outputs are in the record by SHA-256 anyway. Steps (1), (3) and (4) are the
     owner's own acts, which the agent never performs (spec FR-043). The record hashes every module

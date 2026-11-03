@@ -118,7 +118,9 @@ R16; REP-085).
   `protocol/evidence.py`, while `research/004/protocol-changes.jsonl` does not exist, its chain does
   not check, or its first entries, one per listed row of every round answered before it was created
   and one per place the owner confirmed as an entry of its own (`protocol_change.py`, below), do not
-  all hold the owner's `approval_confirmed`; every record then cites the log's last entry in
+  all hold the owner's `approval_confirmed`, each checked against the first 16 digits of the
+  approval hash that the guard recomputes from the first entries as `protocol_change.py`
+  computes it (below; REP-094); every record then cites the log's last entry in
   `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18). A `lock-cleared`
   record (`clear_lock.py`, below) and an environment record written by `owner_record.py environment`
   (below) are the two kinds `protocol/evidence.py` writes while the log does not exist, each with
@@ -128,8 +130,8 @@ R16; REP-085).
   (PRO-071); once the log exists each cites the last entry as every record does, an environment
   record written after a Windows or WSL update included. A `lock-cleared` record, like every other
   write, waits until the platform's environment record in force reads Approved at HEAD (Environment,
-  above; PRO-068). `tests/test_protocol_004.py` covers the refusal of every other kind and both
-  exceptions (PRO-071).
+  above; PRO-068). `tests/test_protocol_004.py` covers the refusal of every other kind, both
+  exceptions (PRO-071) and a first entry whose digits do not match (REP-094).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -495,7 +497,9 @@ introduction. The command (script and arguments, relative to the repository root
 interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to the
 sidecar `vectors/phyco-v3/MANIFEST.json`, append-only, one entry per generator run citing the
 `record_id` of that run's `generator-run` record, which each run writes under `$REP/generator-runs/`
-with the fields of data model §1 (FR-061) and each written file's path and SHA-256 (data model §11);
+with the fields of data model §1 (FR-061) and each written file's path and SHA-256, the
+sidecar left out, its entry being appended once the record is written, and
+the freeze hashing the sidecar with the vectors (data model §11; REP-092);
 `--check` does not compare the sidecar. `gen_constants_v3.py` also writes each constant table
 as `vectors/phyco-v3/constants_n<n>_w<w>.json`. `--check` regenerates in memory, compares every
 generated file byte for byte with the committed one and writes a `generator-check` record under
@@ -534,8 +538,10 @@ FR-051), as a match found after the freeze is; `phyco-v3` stays as frozen.
 
 They run in four steps, each generator's `--check` passing before the next step (data model §11):
 (1) `gen_constants_v3.py`; (2) `gen_vectors_v3.py`, which writes the vectors through `pi` and
-`ResearchDuplex`, which runs no self-test, and also writes, from the same `ResearchDuplex` run, each
-claimable size's `selftest_<variant>.json`, the self-test's inputs and every expected
+`ResearchDuplex`, which runs no self-test, and also writes, in the same run, from a
+`ResearchDuplex` object of its own run through the self-test's call sequence alone,
+each request with its forget call (spec FR-059; REP-096), each claimable
+size's `selftest_<variant>.json`, the self-test's inputs and every expected
 block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those
 files, so its `--check` covers them too (HW-077); (3) `Generator` imports
 `phycoweb.selftest_v3` inside its constructor only and runs its self-test from it, so
@@ -554,7 +560,7 @@ shows that step (3) passed on each platform (SC-009; REP-086). Tests check that
 ## `scripts/design_freeze.py`
 
 ```text
-design_freeze.py create                 # writes $REP/freeze/freeze.json with status draft
+design_freeze.py create                 # writes $REP/freeze/freeze.json with freeze_status draft
 design_freeze.py approve --by NAME --wording TEXT   # the owner's approval; changes nothing else
 design_freeze.py validate               # recomputes draft_sha256 and every hash
 ```
@@ -569,9 +575,9 @@ record <n>" after a Windows or WSL update or "Log repair <n>", the owner design 
 in "Owner design review <k>", naming the same versions where nothing else changed, and step (1) is
 then the owner's next commit after the commit that records that row's approval
 (PRO-072); (2) `create` runs with `git_dirty` false, records that commit as
-`owner_commit` and writes the record as `draft`; (3) the owner runs `approve`, which
-writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
-tracked file modified or an untracked file not ignored; ignored files, the locks and the
+`owner_commit` and writes the record with `freeze_status` `draft`; (3) the owner runs `approve`,
+which writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty
+means a tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others the
 design document's version, named 1.0, with `reviewed_version`, the header's
 0.<k> that it hashes, the files keeping that line (spec FR-034; RAT-080),
@@ -613,19 +619,23 @@ review entry reading `accepted`, or one that names a row other than its review's
 the security-target review's for the chapters "Security target" and "Mode" and the owner design
 review's for every other section (spec FR-034; RAT-082), if `check_claims.py`
 reports a finding at HEAD (SEC-084), or if `git_dirty` is true. `create`
-stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the
-record's canonical JSON without that field and the approval fields, `status`,
-`approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, kind
-`canonical` (data model introduction, §13; REP-083, REP-084). `approve`, run by
+stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the record's
+canonical JSON without that field and the approval fields, `freeze_status`, `approved_by`,
+`approved_utc`, `approval_wording` and `approval_confirmed`, `record_id` included, which `create`
+computes first, kind `canonical` (data model introduction, §13; REP-083, REP-084, REP-092). The
+record's common `status` is computed by code as every record's is, `pass` once each of `create`'s
+checks holds, as it must for `create` to write the record, and its fields of a run hold `create`'s,
+`inputs` and `outputs` `none` (data model §1, §13; REP-093). `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
-the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
-`approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
-else. Steps (1), (3) and (4) are the owner's own acts, which the agent never performs (FR-043).
+the owner types its first 16 hex digits; it then changes `freeze_status` from `draft` to `approved`,
+adds `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
+else, the record keeping the `record_id` that `create` gave it (REP-092). Steps (1), (3)
+and (4) are the owner's own acts, which the agent never performs (FR-043).
 `validate` recomputes `draft_sha256` and every hash
 and checks the format rules; it exits 1 if anything but the approval fields changed or a hash does
-not match, and 2 while `status` is `draft` (data model §13). It has no `--reproduce`: the record
-holds the owner's commit and approval, acts that a later run cannot regenerate, and `validate`
-recomputes every hash the record holds (introduction; research R16; REP-085).
+not match, and 2 while `freeze_status` is `draft` (data model §13). It has no `--reproduce`: the
+record holds the owner's commit and approval, acts that a later run cannot regenerate, and
+`validate` recomputes every hash the record holds (introduction; research R16; REP-085).
 
 ## `scripts/review_package.py`
 
@@ -730,8 +740,9 @@ after a Windows or WSL update included, cites its last entry as every record
 does (PRO-071); `owner-provided` adds an entry to `$REP/downloads.json` with
 the owner's words, the source the owner names, the date and the value's SHA-256 (research R19). Each
 mode prints the approval hash of what it writes, kind `canonical`, the SHA-256 of its
-canonical JSON without the approval fields, `approved_by`, `approved_utc`
-and `approval_confirmed` (data model introduction; REP-083), and exits 2,
+canonical JSON without the approval fields, `approved_by`, `approved_utc` and
+`approval_confirmed`, an environment record's `record_id` included, which is computed
+first, without them (data model introduction; REP-083, REP-092), and exits 2,
 writing nothing, unless standard input is an interactive terminal and the owner
 types its first 16 hex digits; it then writes the record or entry with `approved_by`, `approved_utc`
 and `approval_confirmed`, keeping the fixed-name file's current content under `versions/` first
@@ -805,7 +816,10 @@ which the agent may write as a proposal. Each refuses, exit 2, appending nothing
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`. Each then ends in the approval step, an owner's own act that
 the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
-together, taken over their canonical JSON without the approval fields, `create` printing also
+together, taken over one canonical JSON array of the first entries in log order, or over the later
+entry alone, each entry without its approval field, `approver` whole, and
+without `prev_sha256`, both filled once the owner has typed the digits, a hash
+of kind `canonical` (data model §1, §18; REP-094), `create` printing also
 their number, counted from the lists (PRO-069), and appends nothing unless
 standard input is an interactive terminal and the owner types its first 16 hex digits, which
 `approver` records as `approval_confirmed`. After the approval step `create` writes the first
@@ -854,8 +868,12 @@ create` finds them in the provenance log at HEAD (spec FR-043; RAT-082). Right a
 the log's creation, before any other entry, `add` writes one entry per file drafted before the log,
 the files outside the feature directory that this feature's sessions changed among
 them, whole or per section changed, with `drafted_from` and `drafted_to`
-from the spec's first commit, 801c6d7, on, and the other fields data model
-§14 lists for such an entry (spec FR-067; REP-080, REP-089). Every append
+from the spec's first commit, 801c6d7, on, and the other fields data model §14 lists for such an
+entry (spec FR-067; REP-080, REP-089); a file entered per section changed gets one entry per section
+of the deepest heading that holds a changed line, none for a section only because a subsection of it
+changed, a section whose heading's text changed keeps one series of entries under its heading as it
+stands, and a removed section is entered under the section that held it, with `removed` naming the
+removed heading and the commit that removed it (data model §14; REP-095). Every append
 takes `data/log-append.lock` and checks the chain first (Hash-chained logs,
 above). It writes log entries and no record, and so has no `--reproduce` mode (spec FR-061).
 `tests/test_protocol_004.py` covers each refusal.

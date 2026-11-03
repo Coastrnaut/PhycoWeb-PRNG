@@ -2404,15 +2404,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   check stands as written (PRO-072); (2) `design_freeze.py create` runs with
   `git_dirty` false, records as `owner_commit` the commit that follows the one recording that
   approval, step (1)'s, exiting 2 unless it is HEAD, and also while `check_claims.py` reports
-  a finding at HEAD (SEC-084), and writes the record as `draft`; (3) the
-  owner's approval is written into it by `design_freeze.py approve`, run by the
-  owner, which changes the status and adds who, when and the wording, and
-  nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
+  a finding at HEAD (SEC-084), and writes the record with `freeze_status` `draft`, its common
+  `status` computed by code as every record's is, `pass` once each of `create`'s checks holds
+  (data-model §1, §13; REP-093); (3) the owner's approval is written into it by `design_freeze.py
+  approve`, run by the owner, which changes `freeze_status` to `approved` and adds who, when and the
+  wording, and nothing else, the record keeping the `record_id` that `create` gave it (⛔ gate;
+  REP-092); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
   having checked against the draft's SHA-256, `draft_sha256`, taken without that field and the
-  approval fields, `status`, `approved_by`, `approved_utc`, `approval_wording` and
-  `approval_confirmed` (data-model §13; REP-084), that nothing but the approval changed. The window
-  of step (1) runs to the feature's end, plan phase 9 included, as the Assumptions' "from the owner
-  design review's approval on" reads, and each later commit of a file of this feature is the
+  approval fields, `freeze_status`, `approved_by`, `approved_utc`, `approval_wording` and
+  `approval_confirmed` (data-model §13; REP-084, REP-093), that nothing but
+  the approval changed. The window of step (1) runs to the feature's end,
+  plan phase 9 included, as the Assumptions' "from the owner design review's
+  approval on" reads, and each later commit of a file of this feature is the
   owner's, a later row "Owner design review <k>" and the change it reviews included (PRO-072): a
   file of this feature is every file under the paths that the plan's project structure
   lists and every other file that this feature's requirements change, security.md, README,
@@ -2916,7 +2919,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   structure that needs more, with its reason, and the self-test's vector
   file holds k with the structure that set it, which a test computes again
   from the model's run (HW-084). `gen_vectors_v3.py` writes these inputs
-  and every expected block, whole, from the same `ResearchDuplex` run, as a vector file of its own,
+  and every expected block, whole, in the same generator run as the vectors, from a `ResearchDuplex`
+  object of its own run through the self-test's call sequence alone, instantiate with key and nonce
+  0 and the empty personalization string, one generate request of k whole blocks with its forget
+  call and, where the design has a reseed, the reseed with reseed input 0 of
+  research R3 and the second request of k whole blocks with its forget call,
+  so that its expected blocks are those that the model's `Generator` and
+  the hardware's self-test compute (REP-096), as a vector file of its own,
   `selftest_<variant>.json`, frozen with the vectors, from which `phycoweb/selftest_v3.py` is
   copied, so that the frozen vectors hold every value the comparator compares; FR-020's
   self-test formula, the reset figure and FR-026's storage count follow from k
@@ -3005,7 +3014,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   provenance records lacked (feature-003 phase report, open issue 3). A statistical measurement,
   such as the bias rule's, MUST also record the items of security.md §11.6. Raw tool output MUST be
   kept, not only summaries. A generator run writes a `generator-run` record with these fields and
-  each written file's path and SHA-256 (data-model §11).
+  each written file's path and SHA-256, the sidecar left out, its entry citing the record
+  (data-model §11; REP-092). The four kinds kept under a name of their own, the environment records,
+  the downloads manifest, the freeze record and the review package's manifest, hold these fields for
+  the run of the script that wrote each or its latest change, `heavy_run` false and `inputs` and
+  `outputs` `none`, the files each names being held in its own fields (data-model §1; REP-093).
 - **FR-062**: The final report and the design rationale MUST keep apart demonstrated facts,
   mathematical arguments, experimental observations, unverified hypotheses, unsuccessful
   attacks, untested areas and residual risks (security.md §17.3). In the rationale each
@@ -3053,8 +3066,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   re-validations and the cross-checks between kinds; the inverse, bijectivity, dependency, bias,
   uniform-control, symmetry, invariant, degree and bound checks; the D4 choice; the
   check of generated files on each platform; the size profile's generic-bound
-  checks and the bound at the limits; eligibility and selection) and every
-  record's classification (FR-060) MUST be computed by code from saved outputs
+  checks and the bound at the limits; eligibility and selection) and every record's classification
+  (FR-060) and `status`, the freeze record's included, whose approval state is a field of its own,
+  `freeze_status` (data-model §1, §13; REP-093), MUST be computed by code from saved outputs
   and be recomputable by a re-check script, never taken from a narrative (security.md §16.1). No
   phase, test or gate MAY be recorded as passed because its documents exist; where evidence is
   missing, the status MUST be "not evaluated", "inconclusive" or "blocked" (security.md §16.3). The
@@ -3119,7 +3133,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   for the owner's approval, and the strategy note `research/security/crypto-redesign-strategy.md`,
   entered per section changed, as a file drafted in parts is (REP-089): right after the log's
   creation, before any other entry, `provenance.py add` writes one entry per such file, or per
-  section changed of a file entered per section, holding `sha256` and its
+  section changed of a file entered per section, the sections and the commits that
+  changed them as data-model §14 states (REP-095), holding `sha256` and its
   kind (REP-079) of the file or section as committed then, `date_utc` as
   the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and last commits from
   801c6d7 on that changed the file or the section, never an earlier feature's (REP-089),
@@ -3753,8 +3768,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
   (constructed-state vectors included) with the self-test data copied from them, the constant and
   vector scripts, the selected operation list, `research/004/ir.py` and the verdict scripts; R and
   its inputs; the last `seq` and line hash of each log; tool versions; `git_head`, `git_dirty`; the
-  draft's SHA-256; status (`draft`, then approved) and the owner's approval, written by
-  `design_freeze.py approve` (FR-043).
+  draft's SHA-256; `freeze_status` (`draft`, then `approved`) and the owner's approval, written by
+  `design_freeze.py approve`, and the common `status`, computed by code (FR-043; REP-093).
 - **Baseline archive**: the `phyco-v2` files, with SHA-256 and source, in a manifest.
 - **Constructed-state vector**: the edge state, how it was constructed, whether any key reaches
   it, inputs, outputs, SHA-256.

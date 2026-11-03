@@ -49,7 +49,12 @@ implementation can write byte-identical files:
 - Canonical JSON, over which an approval hash, `draft_sha256` and the eight hex digits of a
   `record_id` are taken, is the object's UTF-8 JSON with keys sorted, the separators `,` and `:`
   with no spaces, no final newline and non-ASCII characters written as they are; a hash over it is
-  of kind `canonical` (section 1; REP-083).
+  of kind `canonical` (section 1; REP-083). The eight hex digits of a `record_id` are computed
+  first, over the record's canonical JSON without `record_id`, without the approval fields and
+  without any hash taken over the record itself, an approval hash or `draft_sha256`, so that
+  approving a record leaves its ID derived from its content; an approval hash and `draft_sha256` are
+  then computed over the canonical JSON without the approval fields and without that hash,
+  `record_id` included (section 1, Record files; REP-092).
 - Hex words of vectors and states are upper case and zero-padded to the word's width, with lanes in
   the design document's order. Every digest is written as 64 lower-case hex digits, as the existing
   records already are. A vector file's header is `# key=value` fields in a fixed order, separated by
@@ -73,10 +78,10 @@ implementation can write byte-identical files:
 
 | Field | Type | Rule |
 |-------|------|------|
-| `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, the eight hex digits derived from the record's content; unique; the record's file is `<record_id>.json` unless this data model states its name (Record files, below) |
+| `record_id` | str | `<kind>-<UTC yyyymmddThhmmssZ>-<8 hex>`, the eight hex digits derived from the record's content, computed first, without the approval fields and without any hash over the record itself (introduction, format rules; REP-092); unique; the record's file is `<record_id>.json` unless this data model states its name (Record files, below) |
 | `kind` | str | one of: `demonstration` (section 4); `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`, `invariant` and `degree` (section 5); `bound` and `trail` (section 6); `validation` and `cross-check` (section 7); `d4-choice`, `d4-tie` and `d4-tie-choice` (section 8); `round-rule`, `cost`, `selection` and `selection-tie-choice` (section 9); `size-profile` and `limits` (section 10); `generator-run` and `generator-check` (section 11); `projection`, `lock-cleared`, `reproduction` and `recheck` (below); and `environment`, `downloads`, `freeze` and `review-package`, the records kept under a name of their own (research R1, R19; sections 13, 16; below; REP-085) |
 | `created_utc` | str | ISO 8601, seconds |
-| `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); otherwise a candidate or `phyco-v3` variant ID (research R14) |
+| `model_id`, `variant_id` | str or null | `phyco-v2` for US1 and for tool validation on it; null for a `control` record, which belongs to no model (section 5); in the four kinds kept under a name of their own, `model_id` `phyco-v3` in the freeze record and the review package's manifest and null in the other two, and `variant_id` null in all four (Kinds kept under a name of their own, below; REP-093); otherwise a candidate or `phyco-v3` variant ID (research R14) |
 | `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>", and 1.0 while the design document has the SHA-256 that the approved freeze record names, the header keeping the 0.<k> that the owner design review read, which the record holds as `reviewed_version` (spec FR-034; RAT-080), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
@@ -91,7 +96,7 @@ implementation can write byte-identical files:
 | `inputs` | object | namespace (`dev` or `control`; for US1 the feature-002 `dev` set), kind, index range, fingerprint (R3) |
 | `outputs` | list | `{path, sha256, bytes, committed, deterministic}`, `uncompressed_sha256` for a `.gz` file, and `compared` for an output compared otherwise than by its hash; `committed` false for local-only files, written under `data/local/004/<record_id>/`, the ID of the record that lists them, a reproduction's own included, and never under this directory (R16); `deterministic` false for an output that is not, such as a raw solver log with timings, whose `sha256` and `bytes` a reproduction reports only, and for a `p_values` file, with `compared: values`, whose `sha256`, `bytes` and `uncompressed_sha256` a reproduction reports only, comparing its values (Reproduction, below); a committed file has one of the suffixes of the introduction and at most 10 MB, a reproduction's included, and `protocol/evidence.py` refuses a larger one, naming it |
 | `exit_status`, `assertions` | int, list | every assertion with its outcome |
-| `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065) |
+| `status` | str | `pass`, `fail`, `inconclusive`, `not evaluated` or `blocked` (security.md §16.3), computed by code (FR-065); in the freeze record `pass` once each of `create`'s checks holds, as it must for `create` to write the record, its approval state being the field `freeze_status` of its own (section 13; REP-093) |
 | `classification` | str | one of the four classes of security.md §9.1, or `none` for a record without a finding, computed by code (FR-065) from the table below by kind and outcome; a reviewer may add only a note (FR-060) |
 | `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` and `review_status` stay as written, `pending` where no review preceded the record, which is never overwritten: its review is a provenance entry that names the record's ID and SHA-256 (section 14) |
 | `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
@@ -126,8 +131,10 @@ the class.
 
 - **Hashes.** Every SHA-256 a record holds is recorded beside its kind, `raw` or `lf-normalized`
   over a file's bytes (research R16), or `canonical` over a record's canonical JSON (introduction):
-  an environment record's or an `owner-provided` entry's approval hash and the freeze record's
-  `draft_sha256` (REP-083).
+  an environment record's or an `owner-provided` entry's approval hash, the freeze record's
+  `draft_sha256` (REP-083), and the approval hash of the protocol change log's writer, over one
+  canonical JSON array of the first entries in log order or over a later entry alone, each entry
+  without `approver` and `prev_sha256` (section 18; REP-094).
 - **Record files.** Every record file is `<directory>/<record_id>.json`, the directory being its
   kind's place: `fut-sec-8/` for a `demonstration`; `candidates/<id>/` for the kinds of sections 5
   and 6 but `control`, and for a `cross-check` and a `cost` record; `controls/` for a `control`;
@@ -140,8 +147,11 @@ the class.
   and `d4/tie-choice.json` (section 8) and the selection records and their tie choices (section 9);
   and the freeze record, `freeze/freeze.json`, which changes only by the owner's approval
   (introduction, section 13). The eight hex digits of a `record_id` are the first eight of the
-  SHA-256 of the record's canonical JSON without `record_id` and with its own ID written as
-  `<record_id>` wherever a path holds it; until the record is complete, its outputs are written
+  SHA-256 of the record's canonical JSON without `record_id`, without the approval fields and
+  without any hash taken over the record itself, an approval hash or `draft_sha256`,
+  and with its own ID written as `<record_id>` wherever a path holds it,
+  computed before those hashes, which then include it (introduction, format
+  rules; REP-092); until the record is complete, its outputs are written
   under a temporary name, renamed to the ID before the record is written.
 - **Every run writes a record.** A run started on a candidate or a variant writes a record even
   if aborted (`inconclusive` or `blocked`, with the reason). A run later found hit by a tool
@@ -160,8 +170,16 @@ the class.
   path and SHA-256, and the re-check resolves either from `<dir>/versions/`.
 - **Kinds kept under a name of their own.** The environment records (`environment`, research R1),
   the downloads manifest (`downloads`, R19), the freeze record (`freeze`, section 13) and the review
-  package's manifest (`review-package`, section 16) hold the common fields of this section, `none`
-  where a field concerns a run, and the fields of their own sections. Each is written through
+  package's manifest (`review-package`, section 16) hold the common fields of this section and the
+  fields of their own sections: `command`, `config`, `code_sha256`, `versions`, `platform`,
+  `parallelism`, `exit_status`, `assertions`, each of the script's checks with its outcome, and
+  `heavy_run`, false, hold the run of the script that wrote the record or its latest change,
+  `owner_record.py environment`, `downloads.py` or `owner_record.py owner-provided`,
+  `design_freeze.py create` and `review_package.py`, so that each is traced to the command and the
+  code that wrote it, while `inputs` and `outputs` are `none`, the files each names being held in
+  its own fields; `model_id` is `phyco-v3` in the freeze record and the review package's manifest
+  and null in the other two, and `variant_id` is null in all four, the freeze record's
+  variants standing in its `variant_map` (REP-093). Each is written through
   `protocol/evidence.py`, the freeze record's changes through `protocol/design_freeze.py`, and
   `scripts/review_package.py` assembles the review package through `protocol/review_package.py` and
   writes its manifest, its `--check` rebuilding the manifest from the files it lists and comparing
@@ -814,7 +832,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 | `pi_<variant>.json` | 16 inputs and their Π and Π⁻¹ outputs, as lanes in hex in the design document's order; the state after every phase of every round for the first 4, as `pi_trace` returns it |
 | `mode_<variant>_dev<i>.hex` | header line, then 10,000 lines of `%08X`, as the `phyco-v2` vector files |
 | `digest_<variant>.json` | SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words, over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines |
-| `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k, with the structure that set it, which a test computes again (spec FR-059; HW-084), and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 with its length word, held among the self-test's constants and fed as the host would (HW-082), and the second request of k whole blocks, written by `gen_vectors_v3.py` from the same `ResearchDuplex` run as the vectors; `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
+| `selftest_<variant>.json` | per claimable size, the start-up self-test's inputs and every expected block, whole (spec FR-059): key and nonce 0, the empty personalization string with its length word, k, with the structure that set it, which a test computes again (spec FR-059; HW-084), and the request of k whole blocks (k·r bits), and, where the design has a reseed, reseed input 0 of research R3 with its length word, held among the self-test's constants and fed as the host would (HW-082), and the second request of k whole blocks, written by `gen_vectors_v3.py` in the same generator run as the vectors, from a `ResearchDuplex` object of its own run through the self-test's call sequence alone, each request with its forget call, so that its expected blocks are those that `Generator` and the hardware's self-test compute (spec FR-059; REP-096); `phycoweb/selftest_v3.py` is copied from these files (HW-077) |
 | `constructed_<variant>.json` | per edge state: name, `construction`, an object, written by the format rules, that holds the list of calls for a state the normal calls reach or, for a state set by `ResearchDuplex.from_state`, its `lanes` and `counters` as that call takes them (model contract, Research duplex), so that `gen_constructed_v3.py --check` regenerates each vector byte for byte and FR-054's testbench loads the same lanes and counters (REP-087), whether the normal calls reach it from a development key within the number of calls of Π the design document's list states or it is covered only from a chosen state, set by `ResearchDuplex.from_state` (REP-078), inputs, outputs |
 | `constants_n<n>_w<w>.json` | the constant table of one supported (n, w), as `phycoweb/constants_v3.py` holds it (R15), with the count of words skipped by the reading order and every repeat of a class where one call needs more constants than there are aperiodic classes (FR-023) |
 | `MANIFEST.json` | the sidecar, append-only, its earlier entries never changing: one entry per generator run, citing the `record_id` of that run's `generator-run` record (below), which a generator's `--reproduce` names (cli contract), with the command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed (calls of Π and words per second) and the generation time; `--check` does not compare it, and the freeze hashes it with the vectors, as the record of the runs that produced them (section 13); after the freeze a generator runs only with `--check`, `--reproduce` or, for `gen_constants_v3.py`, `--exploration`, which write their records under `reports/004-crypto-architecture-v3/`, an exploration run's beside its table (below), and never to the sidecar |
@@ -837,7 +855,9 @@ every file sits in the one directory `vectors/phyco-v3/`, with no directory per 
 **Generator runs** (FR-061). Each run of `gen_constants_v3.py`, `gen_vectors_v3.py` or
 `gen_constructed_v3.py` writes, beside its sidecar entry, a `generator-run` record,
 `generator-runs/<record_id>.json`, with the common fields of section 1 and each written file's path
-and SHA-256, which its reproduction compares in memory (section 1, Reproduction). The exception is
+and SHA-256, which its reproduction compares in memory (section 1, Reproduction); the sidecar is not
+among those files: its entry, appended once the record is written, cites the record's ID, and the
+freeze hashes the sidecar with the vectors (section 13; REP-092). The exception is
 `gen_constants_v3.py --candidate ID --variant VARIANT`, run before the freeze: it writes that
 candidate's table for the variant (n, w, R), with each call type's stream where its streams are
 distinct, as `research/004/candidates/<id>/constants/<variant>.json`, `<variant>` being the variant
@@ -857,8 +877,10 @@ the final report cite.
 
 **Order of generation** (FR-036, FR-059): four steps, each generator's `--check` passing in this
 order. (1) `gen_constants_v3.py` writes the constant tables. (2) `gen_vectors_v3.py` writes the
-vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also writes, from the same
-`ResearchDuplex` run, each claimable size's `selftest_<variant>.json`, the self-test's inputs and
+vectors through `pi` and `ResearchDuplex`, which runs no self-test, and also
+writes, in the same generator run, from a `ResearchDuplex` object of its
+own run through the self-test's call sequence alone (spec FR-059; REP-096),
+each claimable size's `selftest_<variant>.json`, the self-test's inputs and
 every expected block, whole, and `phycoweb/selftest_v3.py`, copied from those files (spec FR-059;
 HW-077). (3) `Generator` imports `phycoweb.selftest_v3` and runs the self-test from it, in
 `tests/test_model_v3.py`'s named test `test_generator_selftest`, which builds a `Generator` and runs
@@ -931,15 +953,19 @@ copy against its manifest hash and its live source (SC-012).
   its row with the highest k, `create` exiting 2 unless it is HEAD (spec FR-043;
   PRO-070), and also while `check_claims.py` reports a finding at HEAD (SEC-084);
   `git_dirty`, which must be false; `draft_sha256`, written by `create`: the SHA-256 of the record's
-  canonical JSON without that field and the approval fields, kind `canonical` (introduction;
-  REP-083), the approval fields being `status`, `approved_by`, `approved_utc`, `approval_wording`
-  and `approval_confirmed`, so that `validate` recomputes the same hash over the approved record and
-  exits 1 only if anything else changed (REP-084); and `status`, `draft` until
-  the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
+  canonical JSON without that field and the approval fields, `record_id` included, which `create`
+  computes first and `approve` keeps, kind `canonical` (introduction; REP-083, REP-092), the
+  approval fields being `freeze_status`, `approved_by`, `approved_utc`, `approval_wording` and
+  `approval_confirmed`, so that `validate` recomputes the same hash over the approved record and
+  exits 1 only if anything else changed (REP-084); and `freeze_status`, `draft` until the owner
+  approves and then `approved`, which `approve` sets and `validate` reads, the approval state held
+  apart from the common `status`, which code computes as every record's, `pass` once each
+  of `create`'s checks holds, as it must for `create` to write the record
+  (section 1; REP-093). `design_freeze.py approve --by NAME --wording TEXT`,
   run by the owner, prints `draft_sha256` and refuses unless standard input is an interactive
-  terminal and the owner types its first 16 hex digits; it then changes `status` to `approved`, adds
-  `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed` (the digits typed), and
-  changes nothing else.
+  terminal and the owner types its first 16 hex digits; it then changes `freeze_status` to
+  `approved`, adds `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed` (the
+  digits typed), and changes nothing else.
 
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the
 owner's next commit after the one that records the owner design review's
@@ -951,7 +977,7 @@ SEC-084; PRO-072); where the owner must commit a row on its own between that app
 is held again in "Owner design review <k>", naming the same versions where nothing else changed, and
 step (1) is then the owner's next commit after the commit that records that
 row's approval (PRO-072); (2) `design_freeze.py create` runs with `git_dirty`
-false, records that commit as `owner_commit` and writes the record as `draft`;
+false, records that commit as `owner_commit` and writes the record with `freeze_status` `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
 never performs (spec FR-043). Before step (1), the agent writes the owner design review's review
@@ -966,14 +992,16 @@ FR-043; RAT-082). Dirty means a tracked file modified or an untracked file not
 ignored; ignored files (the locks, the local-only outputs under `data/local/`) do not count, and
 local-only outputs are in the record by SHA-256 anyway. `validate` recomputes `draft_sha256` and
 every hash and checks the format rules; it exits 1 if anything but the approval fields changed or a
-hash does not match, and 2 while `status` is `draft`. After approval the frozen files must not
-change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code that
-produced the verdicts. `protocol/evidence.py` refuses, exit 2, to write over a fixed-name file the
-record pins, `parameters.json`, `limits.json` and the selected candidate's `round-rule.json` among
-them, and after the freeze `mode_limits_v3.py` runs only with `--reproduce`, whose record goes under
+hash does not match, and 2 while `freeze_status` is `draft`. After approval the frozen files must
+not change: a fix to a verdict script is a new file, so that the re-check (FR-065) runs the code
+that produced the verdicts. `protocol/evidence.py` refuses, exit 2, to write
+over a fixed-name file the record pins, `parameters.json`, `limits.json` and
+the selected candidate's `round-rule.json` among them, and after the freeze
+`mode_limits_v3.py` runs only with `--reproduce`, whose record goes under
 `$REP/reproductions/`. The approval status of the design document and the rationale stays outside
-the frozen files (FR-034). The record is of kind `freeze` (section 1), with the common fields,
-`none` where a field concerns a run: `create` writes it through `protocol/evidence.py`, its one
+the frozen files (FR-034). The record is of kind `freeze` (section 1), with the common fields, those
+of a run holding `design_freeze.py create`'s and `inputs` and `outputs` `none` (section 1, Kinds
+kept under a name of their own; REP-093): `create` writes it through `protocol/evidence.py`, its one
 change, the approval, goes through `protocol/design_freeze.py`, and `design_freeze.py` has no
 `--reproduce`, since the record holds the owner's commit and approval, which a later run cannot
 regenerate (research R16; REP-085).
@@ -1051,7 +1079,16 @@ listing `research/004/place_check.py` and `.gitattributes`, entered whole, and
 security.md, the constitution, `.specify/memory/constitution.md`, whose amendment to
 1.3.0 an AI session drafted for the owner's approval, and the strategy note
 `research/security/crypto-redesign-strategy.md`, entered per section changed, as a file drafted in
-parts is (REP-089). Right after the log's creation, before any other entry,
+parts is (REP-089). A file entered per section changed gets one entry per section of the deepest
+heading that holds a changed line, its text as above (REP-079), and none for a section only because
+a subsection of it changed, so that the level-1 section, whose text is the whole file, gets an entry
+only for a changed line outside every subsection, security.md's version line among them; a commit
+changed a section when its diff adds, removes or changes a line of that section outside its
+subsections, its heading line included; a section whose heading's text changed keeps one series of
+entries, named by its heading as it stands, `drafted_from` and `drafted_to` counting the commits
+under its earlier texts; and a section that this feature's sessions removed is entered under the
+section that held it, with a field `removed` naming the removed heading and the commit that
+removed it (REP-095). Right after the log's creation, before any other entry,
 `provenance.py add` writes one entry per such file, or per section changed of a file entered per
 section, holding `sha256` and its kind (REP-079) of the file or section as committed then,
 `date_utc` as the writer adds it, `drafted_from` and `drafted_to`, the dates of the first and
@@ -1192,7 +1229,8 @@ owner's action. Once the external design review is done, its Review & Approval r
 manifest it read by SHA-256, with the design-document version and the selection record it carried,
 and `design_freeze.py create` exits 2 while that manifest is neither `review-package/MANIFEST.json`
 nor kept under `versions/` (spec FR-043). The manifest is a record of kind `review-package`
-(section 1), with the common fields, `none` where a field concerns a run, written through
+(section 1), with the common fields, those of a run holding `review_package.py`'s and `inputs` and
+`outputs` `none` (section 1, Kinds kept under a name of their own; REP-093), written through
 `protocol/evidence.py` by `scripts/review_package.py`, which assembles the package through
 `protocol/review_package.py`; its `--check` rebuilds the manifest from the files it lists and
 compares it (cli contract; REP-085).
@@ -1269,7 +1307,7 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md; for an entry made from a place the owner confirmed, the owner's confirmation with its reason, naming the commit (PRO-064) |
 | `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
 | `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
-| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below) |
+| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below), `approver` and `prev_sha256` being left out of the hash it confirms (REP-094) |
 | `environment` | the platform's environment record in force when the entry was written, named as in section 1 (REP-082) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
@@ -1354,10 +1392,17 @@ above, and `propose FILE` a later entry, each ending in the approval step below,
 exit 2, appending nothing, an entry, or a rule of a first entry, without `direction`, a `settled`
 one without `readings`, and an entry without `last_record_id` or `results_known`.
 Approving an entry is the owner's own act, which the agent never performs (spec
-FR-044): the writer's approval step prints the SHA-256 of the entry, or of the
-first entries together when the log is created, and appends nothing unless standard input is an
-interactive terminal and the owner types its first 16 hex digits; each entry records that
-confirmation in `approver`. After the approval step `create` writes the first entries to a temporary
+FR-044): the writer's approval step prints the SHA-256 of the entry, or of the first entries
+together when the log is created, taken over one canonical JSON array of the first entries in log
+order, or over the later entry alone, each entry without its approval field, `approver` whole, and
+without `prev_sha256`, both filled once the owner has typed the digits, `approver` with the owner,
+the date and `approval_confirmed`, and `prev_sha256` chaining each line to the one before as stored,
+a hash of kind `canonical` (section 1, Hashes; REP-094), and appends nothing unless standard input
+is an interactive terminal and the owner types its first 16 hex digits; each entry records that
+confirmation in `approver`, and the guard "Protocol log" recomputes that hash from the first entries
+and checks each one's `approval_confirmed` against its first 16 digits, exit 2 otherwise, as a later
+reader can, `tests/test_protocol_004.py` covering a first entry whose digits do not match (REP-094).
+After the approval step `create` writes the first entries to a temporary
 file beside the log's path and renames it to that path once all are written, so that a writer that
 dies leaves no partial log, only the lock, which `scripts/clear_lock.py` removes
 (PRO-065). The history cannot show who acted, so the owner's review at each ⛔ gate
