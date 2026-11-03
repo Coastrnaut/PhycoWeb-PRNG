@@ -34,7 +34,7 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 
 | Step | Command | Expected |
 |------|---------|----------|
-| U1 | `make -C fast -f seed_search.mk` (WSL) | builds `fast/build/seed_search` with `-Werror`; `fast/build/phyco_stream` untouched |
+| U1 | `make -C fast -f seed_search.mk` (WSL) | builds `fast/build/seed_search` with `-Werror`, committed before U3 (research R18); `fast/build/phyco_stream` untouched and ignored |
 | U2 | `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` | exit 0: 2 × 10,000 words match |
 | U3 | **heavy**: `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8` | all 3 targets recovered; matches after one, two and three words beside about 1, 2⁻³² and 2⁻⁶⁴; under an hour (SC-001); progress lines from the main thread only (R2) |
 | U4 | run U3 again | exit 2 (one pass per target) |

@@ -642,7 +642,10 @@ with its source and its provenance-log entry, section 14, or `none`, which the f
 of that known result states; every known result at a validated width, the
 first and each further one, has its own, R12; ANA-076), `found`, `outcome`
 (`re-found` or `not re-found`). A tool's results count only after a `re-found` record of the
-same kind and of the tool's exact hash exists.
+same kind and of the tool's exact hash exists. For a C tool, `tool_sha256` is the SHA-256 of its
+source and the record's `code_sha256` holds its binary's as well, and its exact hash is the pair
+of the two (research R12), so that a change to either is a new version, which counts only after
+a `re-found` record of its own.
 
 - **What must match.** The exact published value over the stated rounds: for a trail search,
   the weight of the optimal trail, not the trail itself; for the S-box tables, every entry; for

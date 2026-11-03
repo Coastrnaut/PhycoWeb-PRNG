@@ -140,16 +140,21 @@ or key-loading code is written here.
   the generic lines `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`, `.vscode/`,
   `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that the temporary file beside the
   log's path, which `protocol_change.py create` writes before its rename, is never hidden from
-  `git status`; check with `git check-ignore` that each is ignored and that `fast/build/` and
-  `research/004/tools/trails/build/` stay ignored through `build/`. (FR-045; R16, R18)
+  `git status`; and replace the line `build/` with `**/build/**`, followed by
+  `!fast/build/seed_search` and `!research/004/tools/trails/build/arx_search`, so that each C tool's
+  binary can be committed (research R18). Check with `git check-ignore` that the locks,
+  `data/local/` and a file of each generic line are ignored, that every other file under
+  `fast/build/` and `research/004/tools/trails/build/`, `fast/build/phyco_stream` among them, stays
+  ignored, and that the two binaries are not. (FR-045, FR-053; R16, R18)
 - [ ] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
   hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule or
   `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no hashed
   file starts with a byte-order mark; while no record exists, it checks every tracked file under the
-  pinned paths. In the same file, a test checks each `code_sha256` entry of a committed record
-  against the blob at the record's `git_head`, and a second test checks the header of every
-  committed `.gz` file under `reports/004-crypto-architecture-v3/`, `research/004/`,
-  `vectors/phyco-v3/` and `baseline/phyco-v2/`, which must be the header that
+  pinned paths. In the same file, a test checks each `code_sha256` entry of a committed record, a C
+  tool's committed binary among them (research R18), against the blob at the record's `git_head`,
+  and a second test checks the header of every committed `.gz` file under
+  `reports/004-crypto-architecture-v3/`, `research/004/`, `vectors/phyco-v3/` and
+  `baseline/phyco-v2/`, which must be the header that
   `gzip.compress(data, compresslevel=9, mtime=0)` writes, feature 003's `.gz` files left out. These
   tests run from this phase on. (FR-053; R18)
 
@@ -174,11 +179,12 @@ or key-loading code is written here.
   `--project` probe never refused; Approvals, the table read at HEAD and a working tree that differs
   refused; Order of US1; Tool validation; Trail tools, once the first trail search has started, a
   tool outside research R12's fixed set or without an earlier `re-found` record of its exact hash,
-  and a search that reached its cap, save research R7's one re-run after a recorded tool defect; and
-  Budget. In `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the
-  FUT-SEC-8 sweep among them, and every script with a worker option takes the heavy-run lock, each
-  script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065,
-  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+  for a C tool the pair of its source's and its binary's SHA-256, and a search that reached its cap,
+  save research R7's one re-run after a recorded tool defect; and Budget. In
+  `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the FUT-SEC-8
+  sweep among them, and every script with a worker option takes the heavy-run lock, each script as
+  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065, PRO-068,
+  PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -188,10 +194,11 @@ or key-loading code is written here.
   record, the shared guards of contracts/cli.md ("Guards shared by every script") with exits 0 to 3,
   each guard that reads the Review & Approval table reading it at HEAD, and the common part of every
   `--reproduce` mode: a worktree of the original's `git_head`, its `code_sha256` checked against
-  that commit's blobs, output under `$REP/reproductions/<record_id>/<n>/`, the design document read
-  from that worktree and checked against `design-versions/<sha256>.md`, and exit 2 while the
-  environment record the original cites is not in force. (FR-053, FR-061, FR-065, FR-068; R1, R16;
-  REP-099, REP-100)
+  that commit's blobs, a C tool's committed binary among them, which the reproduction runs from that
+  worktree, output under `$REP/reproductions/<record_id>/<n>/`, the design document read from that
+  worktree and checked against `design-versions/<sha256>.md`, and exit 2 while the environment
+  record the original cites is not in force. (FR-053, FR-061, FR-065, FR-068; R1, R16, R18; REP-099,
+  REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
@@ -480,9 +487,11 @@ hashes.
   (FR-001, FR-002, FR-060, FR-061; SC-001; R2)
 - [ ] T042 [US1] In WSL, build with `make -C fast -f seed_search.mk` and run `fast/build/seed_search
   --check-vectors vectors/phyco-v2_*.hex`, exit 0; run
-  `python -W ignore -m unittest tests.test_seed_search` with `wpy`; then ask the owner's go-ahead
-  for the sweep, with its expected cost, about 2³² × 257 steps per target and under an hour of wall
-  time on 32 threads. (FR-002, FR-045; R2)
+  `python -W ignore -m unittest tests.test_seed_search` with `wpy`; commit `fast/build/seed_search`,
+  so that the demonstration record's `code_sha256` entry for it has a blob at its `git_head`
+  (research R18); then ask the owner's go-ahead for the sweep, with its expected cost, about
+  2³² × 257 steps per target and under an hour of wall time on 32 threads. (FR-002, FR-045, FR-053;
+  R2, R18)
 - [ ] T043 [US1] **heavy**: run `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir
   $REP/fut-sec-8` once, under the heavy-run lock: all three targets recovered, the matches after
   one, two and three words beside about 1, 2⁻³² and 2⁻⁶⁴, in under an hour (quickstart U3); then
@@ -539,12 +548,13 @@ hash, older than its first counted result.
   §14; R5, R12, R13)
 - [ ] T049 [P] [US4] Write `tests/test_tools_004.py` (data-model §5, §7): the validation record's
   fields; a counted record cites a validation of the tool's exact hash with an earlier
-  `created_utc`; a result without one is written `not evaluated` and counts for nothing; the known
-  results' provenance entries come before the tool's first entry and their hashes still match;
-  `research/004/tools/critical_counts.json` is only appended to, its entries never changed, and its
-  counts are recomputed exactly; and `scripts/validate_tool.py` exits 2 without a recorded source
-  for a published value, or with an `owner-provided` entry whose row does not read Approved at HEAD.
-  (FR-039, FR-065; SC-007; R4, R12)
+  `created_utc`, a C tool's hash being the pair of its source's and its binary's SHA-256, so that a
+  change to either counts only after a validation of its own; a result without one is written
+  `not evaluated` and counts for nothing; the known results' provenance entries come before the
+  tool's first entry and their hashes still match; `research/004/tools/critical_counts.json` is only
+  appended to, its entries never changed, and its counts are recomputed exactly; and
+  `scripts/validate_tool.py` exits 2 without a recorded source for a published value, or with an
+  `owner-provided` entry whose row does not read Approved at HEAD. (FR-039, FR-065; SC-007; R4, R12)
 - [ ] T050 [US4] Write `scripts/validate_tool.py` (contracts/cli.md; data-model §7) with
   `--tool NAME --known KNOWN_ID --out-dir $REP/validation` and `--reproduce RECORD`: the source
   guard for published values and `owner-provided` entries; the second known result cited; after a
@@ -621,10 +631,11 @@ hash, older than its first counted result.
 - [ ] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c`, a branch-and-bound search for
   ARX differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén),
   with `research/004/tools/trails/arx_search.mk` (C99, WSL), which builds
-  `research/004/tools/trails/build/arx_search`, ignored through `build/` as `fast/build/` is;
-  validate it on `speck32-diff` and `speck32-lin`, the weights of SPECK32's optimal trails over the
-  first rounds, and at w = 32 on its known result from the same papers, each run over 10 minutes
-  **heavy**. (FR-038, FR-039; SC-007; R12)
+  `research/004/tools/trails/build/arx_search`, committed after each build and before the run that
+  uses it, as `fast/build/seed_search` is (research R18); validate it on `speck32-diff` and
+  `speck32-lin`, the weights of SPECK32's optimal trails over the first rounds, and at w = 32 on its
+  known result from the same papers, each run over 10 minutes **heavy**. (FR-038, FR-039, FR-053;
+  SC-007; R12, R18)
 - [ ] T064 [US4] Run `tests/test_tools_004.py` and `tests/test_ir.py`, `python -W ignore -m unittest
   tests.test_tools_004 tests.test_ir`, on both platforms and list for the owner every tool without a
   `re-found` record, whose results stay `not evaluated`. The trail tools are fixed when the first
@@ -1258,7 +1269,8 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-050: T020, T123
 - FR-051: T018, T112, T121, T122
 - FR-052: T126, T127
-- FR-053: T003, T004, T006, T008, T009, T015, T024, T025, T037, T039, T050, T081, T125
+- FR-053: T003, T004, T005, T006, T008, T009, T015, T024, T025, T037, T039, T042, T050, T063, T081,
+  T125
 - FR-054: T095, T101
 - FR-055: T095, T098
 - FR-056: T101, T102, T106

@@ -1208,13 +1208,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Fixed tool set** (**protocol**): the trail tools are those with a `re-found` validation record
     when the feature's first trail search starts, named by their rows in the table below (ARX
     search, active-S-box counting, long-trail active-box counting, exhaustive tables). Each version
-    is identified by its exact hash and counts only with a `re-found` record of that hash, so a
-    fixed or faster version of a named tool is the same tool and may serve searches not yet run,
-    after its re-validation. None is added afterwards. A search that reached its cap is never run
-    again, with another tool or another version of the same one, except as R7's one re-run after a
-    recorded tool defect, and a speed-up is not a defect. This plan requests no solver
-    download (R19), so the set is HiGHS and the self-written searches unless the owner approves
-    one before that moment.
+    is identified by its exact hash, for a C tool such as the ARX search the pair of its source's
+    and its binary's SHA-256, both held in `code_sha256` (data-model §1, §7), and counts only with
+    a `re-found` record of that hash, so a fixed or faster version of a named tool is the same tool
+    and may serve searches not yet run, after its re-validation. None is added afterwards. A search
+    that reached its cap is never run again, with another tool or another version of the same one,
+    except as R7's one re-run after a recorded tool defect, and a speed-up is not a defect. This
+    plan requests no solver download (R19), so the set is HiGHS and the self-written searches
+    unless the owner approves one before that moment.
   - Each tool re-finds a published result of its kind before any of its results counts, and its
     validation record cites the paper, table and value, taken from a copy the owner provides or
     from the paper's download, approved on 2026-11-01 (R19). Every counted tool has one known
@@ -2146,17 +2147,21 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     whose hashes the records hold (R16; data-model §1, §4), read `binary`, as R16 asks of every
     new file whose hash is recorded; the later line takes precedence over
     `research/004/** text eol=lf`, as `*.gz binary` does. No tracked file lies under a `build/`
-    directory, so no committed byte changes, and the line-ending test finds each binary's path
-    marked `binary`.
+    directory when the line is added, so no committed byte changes; each binary committed after
+    it (below) is stored byte for byte, and the line-ending test finds each binary's path marked
+    `binary`.
   - `.gitignore` gains, at setup (plan phase 1), the two locks of R16, `data/heavy-run.lock` and
     `data/log-append.lock`, and `data/local/`, where local-only outputs are written (R16), so that
     none of them shows in `git status` or counts as dirty. It also gains the generic lines that the
     owner chose on 2026-11-03, `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`,
     `.vscode/`, `.idea/` and `*.swp`, and no `*.tmp`, so that the temporary file beside the
     protocol change log's path, which `protocol_change.py create` writes before its rename (R16),
-    is never hidden from `git status`. Its line `build/` already keeps out of `git status` the
-    binaries that each C tool builds into a `build/` directory beside its source (plan, Technical
-    Context).
+    is never hidden from `git status`. Its line `build/` becomes `**/build/**`, followed by
+    `!fast/build/seed_search` and `!research/004/tools/trails/build/arx_search`, so that the binary
+    that each C tool builds into a `build/` directory beside its source (plan, Technical Context) is
+    committed after each build and before the run that uses it, its `code_sha256` entry then having
+    a blob at the record's `git_head` (R16), while every other build output, feature 003's
+    `fast/build/phyco_stream` among them, stays out of `git status`.
   - `requirements.txt` loses its stale header and pins the two tested environments with markers:
     `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"`,
     `numpy==2.5.4; python_version >= "3.14"`, the same for scipy (1.15.3 and 1.18.1), and

@@ -117,8 +117,12 @@ committed, larger outputs stay local with their SHA-256 and the regenerating com
 model `phycoweb/model_v3.py` and `protocol/devinputs_v3.py` use the standard library only and
 keep to Python 3.8 grammar. C99 for `fast/seed_search.c` and any exhaustive check too slow in
 Python (gcc 15.2.0 in WSL). Each C tool builds into a `build/` directory beside its source, as
-`fast/seed_search.mk` builds `fast/build/seed_search`, so that the `.gitignore` line `build/`
-keeps every binary out of `git status` and none counts as dirty.
+`fast/seed_search.mk` builds `fast/build/seed_search`. Its binary is committed after each build
+and before the run that uses it, so that the binary's `code_sha256` entry has a blob at the
+record's `git_head` and a reproduction runs it from its worktree (research R16, R18);
+`.gitignore`'s `**/build/**`, with a `!` line for each such binary, keeps every other build
+output, feature 003's `fast/build/phyco_stream` among them, out of `git status`, so that none
+counts as dirty.
 
 **Primary Dependencies**: no new ones. numpy 2.2.6 / 2.5.4 for batch evaluation and dependency
 matrices (explicit `uint64` dtypes); scipy 1.15.3 / 1.18.1 for the p-values reported and
@@ -251,6 +255,7 @@ specs/004-crypto-architecture-v3/
 
 ```text
 fast/
+├── build/seed_search         # new: the sweep's binary, committed after each build (R18)
 ├── seed_search.c             # new: FUT-SEC-8 sweep with its own design-1.0 step (R2)
 └── seed_search.mk            # new: builds fast/build/seed_search; fast/Makefile unchanged
 
@@ -284,7 +289,8 @@ research/004/
 │   └── trails/               # tables.py (box tables), active_sbox.py and long_trail.py (MILP
 │                             # active-box counting), arx_search.c with arx_search.mk (ARX
 │                             # branch-and-bound, C99 in WSL; it builds
-│                             # research/004/tools/trails/build/arx_search)
+│                             # research/004/tools/trails/build/arx_search, committed
+│                             # after each build, R18)
 ├── validation/               # re-finding S12–S15, FUT-SEC-8, published trail values
 ├── exploration/              # constant tables for exploration: never frozen or evidence (R14)
 ├── refused-constants.json    # research R15's refused list, read by gen_constants_v3.py (FR-023)
@@ -390,8 +396,9 @@ takes each from there.
 
 1. **Setup**, in this order, each step after the steps it needs (REP-081): (1) directories, the
    `.gitattributes` pins and the `.gitignore` entries for both locks and for `data/local/`, where
-   local-only outputs go, with the generic lines that the owner chose on 2026-11-03 and no `*.tmp`
-   (R16, R18; the pins for `reports/004-crypto-architecture-v3/**`,
+   local-only outputs go, with the generic lines that the owner chose on 2026-11-03 and no
+   `*.tmp`, and `**/build/**` in place of `build/`, with a `!` line for each C tool's binary,
+   which is committed (R16, R18; the pins for `reports/004-crypto-architecture-v3/**`,
    `research/004/**`, `protocol/*.json` and `*.gz` were added on 2026-11-01, and the line
    `**/build/** binary` follows them for the C tools' binaries), with R18's line-ending
    test, which runs from this phase on (FR-053); (2) the writers before what they write:

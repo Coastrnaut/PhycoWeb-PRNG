@@ -3152,9 +3152,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
     the record lists the dirty paths: a run that writes evidence exits 2
     unless every source file in its `code_sha256` matches HEAD, committed and unmodified, which
     constitution 1.3.0's standing authorization to commit makes routine, and a binary is rebuilt
-    from committed source, its hash reported only. Each record's code is then found at its
-    `git_head`, and a test checks each `code_sha256` entry against the blob at that commit. A
-    reproduction runs the original's code at its `git_head`, and the guard applies to that commit.
+    from committed source, its hash reported only by a reproduction. Each C tool's binary is
+    committed after it is built and before the run that uses it (research R18), so that each
+    record's code, its binaries among it, is then found at its `git_head`, and a test checks each
+    `code_sha256` entry against the blob at that commit. A reproduction runs the original's code
+    at its `git_head`, its binaries included, and the guard applies to that commit.
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
     count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs
