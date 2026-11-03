@@ -142,7 +142,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     record itself, written by `owner_record.py environment` and checked instead against this section
     and the pins of `requirements.txt` for that platform, exit 2 on any difference, its
     `environment` field `none`, with the interpreter's version and each pinned package's version
-    that the check compared. Every other write, a `lock-cleared` record included, also exits 2
+    that the check compared, and, while the protocol change log does not exist, `protocol_seq` and
+    `protocol_line_sha256` `none`, the guard "Protocol log" admitting it then (R16, "Stale locks";
+    PRO-071). Every other write, a `lock-cleared` record included, also exits 2
     unless the record in force has its row "Environment record <n>" Approved at HEAD with its
     approval hash (cli contract, "Environment"; REP-083), an approval that needs no lock, so that
     a stale lock found after an update is cleared once the new record is
@@ -1724,7 +1726,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `protocol_line_sha256`, the protocol change log's last entry when the run started, which exists
     for every run, since the shared guard "Protocol log" refuses every run that writes evidence
     while the log does not exist, its chain does not check or its first entries do not all hold the
-    owner's `approval_confirmed` (spec FR-044).
+    owner's `approval_confirmed` (spec FR-044); a `lock-cleared` record and an environment record
+    written while the log does not exist are the two exceptions, each with both fields `none` (Stale
+    locks, below; PRO-065, PRO-071).
   - **Code at HEAD.** A run that writes evidence exits 2 unless every source file in its
     `code_sha256` matches HEAD, committed and unmodified, which constitution 1.3.0's standing
     authorization to commit makes routine. Data and report files may still be dirty, and the record
@@ -1845,11 +1849,14 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     removes one, and only when no process with that PID and start time runs; it writes a
     `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
     A heavy run that died holding the lock then gets the `inconclusive` record that every started
-    run writes (data-model §1). Before the protocol change log exists a `lock-cleared` record is the
-    one kind `protocol/evidence.py` writes, with `protocol_seq` and `protocol_line_sha256` `none`,
-    since it records an event and clearing a stale lock is what lets the log be created; every other
-    kind stays refused by the guard "Protocol log", and once the log exists a `lock-cleared` record
-    cites its last entry as every record does. Before the log exists only `data/log-append.lock` can
+    run writes (data-model §1). Before the protocol change log exists a `lock-cleared` record and an
+    environment record written by `owner_record.py environment` are the two kinds
+    `protocol/evidence.py` writes, each with `protocol_seq` and `protocol_line_sha256` `none`, the
+    first since it records an event and clearing a stale lock is what lets the log be created, the
+    second since it records the platform, holds no result and comes before the log, whose writer
+    runs under it (PRO-071); every other kind stays refused by the guard
+    "Protocol log", and once the log exists each cites its last entry as
+    every record does. Before the log exists only `data/log-append.lock` can
     be held, since every run that takes the heavy-run lock writes evidence (PRO-065). Like every
     other write, a `lock-cleared` record waits until the platform's environment record in force
     reads Approved at HEAD (R1): after a Windows or WSL update the owner writes and approves the new

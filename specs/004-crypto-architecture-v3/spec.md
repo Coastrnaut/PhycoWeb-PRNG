@@ -346,8 +346,11 @@ committed a row; the owner's review at each ⛔ gate therefore lists the approva
 last gate, and the `allow_list` entries of the claim register added since, each with its reason,
 which `check_claims.py` prints, an entry the owner declines being removed in the next commit
 (FR-069; SEC-087). From the first commit that records an owner design review's approval to the
-feature's end, plan phase 9 included, every commit of a file of this feature is the owner's (FR-043;
-SEC-084).
+feature's end, plan phase 9 included, every commit of a file of this feature is the owner's, a later
+row "Owner design review <k>" and the change it reviews included; where the owner commits a row on
+its own between that approval and the freeze's step (1), "Environment record <n>" or "Log repair
+<n>", the owner design review is held again in "Owner design review <k>", naming the same versions
+where nothing else changed, and step (1) follows that row's approval (FR-043; SEC-084; PRO-072).
 
 A decline is logged with its reasons and ends, at each gate, in one of these outcomes. At the
 FUT-SEC-8 result review: a corrected demonstration report, as a new version reviewed in a row of its
@@ -2338,7 +2341,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   commit after the one that records the owner design review's approval, in its
   row with the highest k, of every feature file changed since, or an empty
   commit of the owner's where none changed, so that the external review's row, where it is set after
-  that approval, is set in that commit (PRO-070); (2) `design_freeze.py create` runs with
+  that approval, is set in that commit (PRO-070); where the owner must commit a row on its own
+  between that approval and step (1), "Environment record <n>" after a Windows or WSL update or "Log
+  repair <n>", the owner design review is held again in "Owner design review <k>", naming the
+  same versions where nothing else changed, and step (1) is the owner's next
+  commit after the commit that records that row's approval, so that `create`'s
+  check stands as written (PRO-072); (2) `design_freeze.py create` runs with
   `git_dirty` false, records as `owner_commit` the commit that follows the one recording that
   approval, step (1)'s, exiting 2 unless it is HEAD, and also while `check_claims.py` reports
   a finding at HEAD (SEC-084), and writes the record as `draft`; (3) the
@@ -2350,7 +2358,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `approval_confirmed` (data-model §13; REP-084), that nothing but the approval changed. The window
   of step (1) runs to the feature's end, plan phase 9 included, as the Assumptions' "from the owner
   design review's approval on" reads, and each later commit of a file of this feature is the
-  owner's: a file of this feature is every file under the paths that the plan's project structure
+  owner's, a later row "Owner design review <k>" and the change it reviews included (PRO-072): a
+  file of this feature is every file under the paths that the plan's project structure
   lists and every other file that this feature's requirements change, security.md, README,
   `.gitignore`, `.gitattributes` and `requirements.txt` among them, so that `protocol/claims.json`
   and security.md are files of this feature; the agent writes the owner design review's review
@@ -2488,11 +2497,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   per listed row of every round answered before it was created and one per place
   the owner confirmed as an entry of its own, do not all hold the owner's
   `approval_confirmed`, so that every record cites the log's last entry (cli contract;
-  data-model §1), with one exception: a `lock-cleared` record is the one kind that
-  `protocol/evidence.py` writes while the log does not exist, with `protocol_seq` and
-  `protocol_line_sha256` `none`, since it records an event and clearing a stale lock is what lets
-  the log be created; every other kind stays refused, and once the log exists a `lock-cleared`
-  record cites its last entry as every record does. Before the log exists only
+  data-model §1), with two exceptions, the two kinds that `protocol/evidence.py` writes while the
+  log does not exist, each with `protocol_seq` and `protocol_line_sha256` `none`: a `lock-cleared`
+  record, since it records an event and clearing a stale lock is what lets the log be created, and
+  an environment record written by `owner_record.py environment`, which records the platform and
+  holds no result, so that each platform's first record comes before the log, in plan phase 1's
+  order, and the log's writer runs under it; every other kind stays refused, and once the log exists
+  every `lock-cleared` record and every environment record, after a Windows or WSL update among
+  others, cites its last entry as every record does, `tests/test_protocol_004.py` covering both
+  kinds and the refusal of every other (PRO-071). Before the log exists only
   `data/log-append.lock` can be held, since every run that takes the heavy-run lock writes evidence,
   and after the approval step `create` writes the first entries to a temporary file beside the log's
   path and renames it to that path once all are written, so that a writer that

@@ -386,15 +386,18 @@ takes each from there.
    writer: once `requirements.txt` is corrected as R18 states, its Hypothesis pins commented out,
    the owner writes with `scripts/owner_record.py environment` the record of R1's interpreter and
    the packages that file pins, the one write the guard "Environment" admits while no record is in
-   force (PRO-068), and its row "Environment record <n>" reads Approved before the next step, so
+   force (PRO-068) and one of the two kinds the guard "Protocol log" admits before the protocol
+   change log exists, with `protocol_seq` and `protocol_line_sha256` `none` (PRO-071), and
+   its row "Environment record <n>" reads Approved before the next step, so
    that (3) to (6) run under those records, every entry and record naming the record in
    force as its `environment` (REP-082); (3) the provenance log, its first entries those of the
    files drafted before it, the files outside the feature directory that this feature's
    sessions changed among them, as `git log` from 801c6d7 shows, whole or per
    section changed (FR-067; data-model §14; REP-080, REP-089); (4) the protocol
    change log, after the owner's confirmation of every list at the tasks
-   approval and before every file written through `protocol/evidence.py` but a `lock-cleared` record
-   (PRO-065), its first entries the answered rows of every checklist round answered before it is
+   approval and before every file written through `protocol/evidence.py` but a
+   `lock-cleared` record or an environment record (PRO-065, PRO-071), its first
+   entries the answered rows of every checklist round answered before it is
    created, by the per-round lists of checklist-choices.md, in round order, approved by the owner at
    the log's approval step (FR-044; data-model §18); (5) the downloads manifest `downloads.json`,
    its `approved` entries, one per file of R19's tables, written by `scripts/downloads.py init`

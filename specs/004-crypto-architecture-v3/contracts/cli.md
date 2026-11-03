@@ -60,14 +60,20 @@ R16; REP-085).
   environment record itself, written by `owner_record.py environment` and checked instead against R1
   and the pins of `requirements.txt` for that platform, exit 2 on any difference, its `environment`
   field `none`, with the interpreter's version and each pinned package's version that the check
-  compared. Every other write, a `lock-cleared` record included, also exits 2 unless the record in
+  compared, and, while the protocol change log does not exist, `protocol_seq` and
+  `protocol_line_sha256` `none`, the guard "Protocol log" admitting it then (below; PRO-071). Every
+  other write, a `lock-cleared` record included, also exits 2 unless the record in
   force has its Review & Approval row, "Environment record <n>", Approved at HEAD with
   its approval hash, kind `canonical`, the SHA-256 of its canonical JSON
   without the approval fields (data model introduction, §1; REP-083), an
   approval that needs no lock, so that a stale lock found after an update is
   cleared once the new record is approved; before the first record no lock can be held, since no
-  log writer or heavy run starts before it (PRO-068). Each platform's first
-  record comes before every other write, in plan phase 1's order (REP-082).
+  log writer or heavy run starts before it (PRO-068). Each platform's first record comes before
+  every other write, in plan phase 1's order (REP-082). Where the owner commits a new environment
+  record's row on its own between the commit that records the owner design review's
+  approval and the freeze's step (1), the owner design review is held again in
+  "Owner design review <k>", naming the same versions where nothing else
+  changed, and step (1) follows that row's approval (spec FR-043; PRO-072).
   `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed
   counts by exact integer arithmetic and imports only the standard library and `protocol/` (its
   section, below).
@@ -114,12 +120,16 @@ R16; REP-085).
   and one per place the owner confirmed as an entry of its own (`protocol_change.py`, below), do not
   all hold the owner's `approval_confirmed`; every record then cites the log's last entry in
   `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18). A `lock-cleared`
-  record (`clear_lock.py`, below) is the one kind `protocol/evidence.py` writes while the log does
-  not exist, with both fields `none`, since it records an event and clearing a stale lock is what
-  lets the log be created, and once the log exists it cites the last entry as every record does
-  (PRO-065); like every other write, it waits until the platform's environment record in force reads
-  Approved at HEAD (Environment, above; PRO-068). `tests/test_protocol_004.py` covers the refusal
-  and that exception.
+  record (`clear_lock.py`, below) and an environment record written by `owner_record.py environment`
+  (below) are the two kinds `protocol/evidence.py` writes while the log does not exist, each with
+  both fields `none`: the first since it records an event and clearing a stale lock is what lets the
+  log be created (PRO-065), the second since it records the platform, holds no result and comes
+  before the log, whose writer, `protocol/changelog.py`, checks the running environment against it
+  (PRO-071); once the log exists each cites the last entry as every record does, an environment
+  record written after a Windows or WSL update included. A `lock-cleared` record, like every other
+  write, waits until the platform's environment record in force reads Approved at HEAD (Environment,
+  above; PRO-068). `tests/test_protocol_004.py` covers the refusal of every other kind and both
+  exceptions (PRO-071).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -552,8 +562,13 @@ design_freeze.py validate               # recomputes draft_sha256 and every hash
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the owner's next
 commit after the one that records the owner design review's approval, the agent
 committing no file of this feature from the first commit that records an owner
-design review's approval to the feature's end, plan phase 9 included (PRO-070;
-SEC-084); (2) `create` runs with `git_dirty` false, records that commit as
+design review's approval to the feature's end, plan phase 9 included, a later row "Owner design
+review <k>" and the change it reviews included, which the owner commits (PRO-070; SEC-084; PRO-072);
+where the owner must commit a row on its own between that approval and this step, "Environment
+record <n>" after a Windows or WSL update or "Log repair <n>", the owner design review is held again
+in "Owner design review <k>", naming the same versions where nothing else changed, and step (1) is
+then the owner's next commit after the commit that records that row's approval
+(PRO-072); (2) `create` runs with `git_dirty` false, records that commit as
 `owner_commit` and writes the record as `draft`; (3) the owner runs `approve`, which
 writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
@@ -687,7 +702,11 @@ names the row "Log repair <n>" of the spec's Review & Approval table, and the sc
 at HEAD and exits 2 unless that row reads Approved and names the same log and the `seq` of the
 break. The broken file is kept unchanged with its SHA-256, and a `repair` entry records the break's
 position, its cause and what was restored. Entries after the break count only where the records they
-cite corroborate them, and the final report states the repair (research R16).
+cite corroborate them, and the final report states the repair (research R16). Where the owner
+commits a "Log repair <n>" row on its own between the commit that records the owner design review's
+approval and the freeze's step (1), the owner design review is held again in "Owner design review
+<k>", naming the same versions where nothing else changed, and step (1) follows that row's approval
+(spec FR-043; PRO-072).
 
 ## `scripts/owner_record.py`
 
@@ -704,7 +723,11 @@ differs from the platform's record in force or none is in force, checked against
 `environment` field `none`, with the interpreter's version and each pinned package's version that
 the check compared (PRO-068); each platform's first record comes before every other write through
 `protocol/evidence.py` or a log writer, and a new one follows the wheels' install, in plan phase 1's
-order (REP-082); `owner-provided` adds an entry to `$REP/downloads.json` with
+order (REP-082); while the protocol change log does not exist, the guard "Protocol log" admits an
+environment record with `protocol_seq` and `protocol_line_sha256` `none`, as it admits a
+`lock-cleared` record, and once it exists each environment record, one written
+after a Windows or WSL update included, cites its last entry as every record
+does (PRO-071); `owner-provided` adds an entry to `$REP/downloads.json` with
 the owner's words, the source the owner names, the date and the value's SHA-256 (research R19). Each
 mode prints the approval hash of what it writes, kind `canonical`, the SHA-256 of its
 canonical JSON without the approval fields, `approved_by`, `approved_utc`
@@ -848,8 +871,9 @@ lock's environment, that no process with the PID and start time the lock holds s
 otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
 `inconclusive` record of the run that died holding it (data model §1; research R16). While the
-protocol change log does not exist, a `lock-cleared` record is the one kind that the guard "Protocol
-log" lets `protocol/evidence.py` write, with `protocol_seq` and `protocol_line_sha256`
+protocol change log does not exist, a `lock-cleared` record is one of the two kinds that the guard
+"Protocol log" lets `protocol/evidence.py` write, an environment record the other (Protocol
+log, above; PRO-071), each with `protocol_seq` and `protocol_line_sha256`
 `none`; before the log exists only `data/log-append.lock` can be held, since
 every run that takes the heavy-run lock writes evidence, so that a writer of
 the logs that died holding it never blocks the log's creation (PRO-065). Like every other write, its

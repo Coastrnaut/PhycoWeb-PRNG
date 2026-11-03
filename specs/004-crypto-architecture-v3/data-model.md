@@ -80,7 +80,7 @@ implementation can write byte-identical files:
 | `design_version`, `design_sha256` | str | the design document's version, read by `protocol/evidence.py` from its header's line "Version: 0.<k>", and 1.0 while the design document has the SHA-256 that the approved freeze record names, the header keeping the 0.<k> that the owner design review read, which the record holds as `reviewed_version` (spec FR-034; RAT-080), and its hash; `none` before it exists; the first record that cites a version stores that document as `design-versions/<sha256>.md`, committed with the records, as spec versions are (research R16) |
 | `spec_sha256` | hex | SHA-256 of `spec.md` at run time; the first record that cites a hash stores a copy of that spec as `spec-versions/<sha256>.md`, committed with the records (research R16) |
 | `research_sha256` | hex | SHA-256 of `research.md` at run time, which holds the values that decide verdicts; kept as `research-versions/<sha256>.md`, as spec versions are (research R16) |
-| `protocol_seq`, `protocol_line_sha256` | int, hex, or `none` | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract); both `none` in a `lock-cleared` record written while the log does not exist, the one kind `protocol/evidence.py` writes then, since it records an event and clearing a stale lock is what lets the log be created (PRO-065) |
+| `protocol_seq`, `protocol_line_sha256` | int, hex, or `none` | the protocol change log's last entry when the run started (section 18), by `seq` and line SHA-256, which every record holds, since the shared guard "Protocol log" refuses every run that writes evidence before the log exists with its first entries approved (section 18; cli contract); both `none` in a `lock-cleared` record or an environment record written while the log does not exist, the two kinds `protocol/evidence.py` writes then: the first since it records an event and clearing a stale lock is what lets the log be created (PRO-065), the second, written by `owner_record.py environment`, since it records the platform, holds no result and comes before the log, whose writer checks the running environment against it (PRO-071); once the log exists each cites its last entry |
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
@@ -944,8 +944,13 @@ copy against its manifest hash and its live source (SC-012).
 The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the
 owner's next commit after the one that records the owner design review's
 approval, the agent committing no file of this feature from the first commit that
-records an owner design review's approval to the feature's end, plan phase 9
-included (PRO-070; SEC-084); (2) `design_freeze.py create` runs with `git_dirty`
+records an owner design review's approval to the feature's end, plan phase 9 included, a later row
+"Owner design review <k>" and the change it reviews included, which the owner commits (PRO-070;
+SEC-084; PRO-072); where the owner must commit a row on its own between that approval and this step,
+"Environment record <n>" after a Windows or WSL update or "Log repair <n>", the owner design review
+is held again in "Owner design review <k>", naming the same versions where nothing else changed, and
+step (1) is then the owner's next commit after the commit that records that
+row's approval (PRO-072); (2) `design_freeze.py create` runs with `git_dirty`
 false, records that commit as `owner_commit` and writes the record as `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
@@ -1332,9 +1337,10 @@ the owner's reason, that it changed no rule; the shared guard "Protocol log" enf
 not check, or its first entries, one per listed row of every round answered
 before it was created and one per place the owner confirmed as an entry of
 its own, do not all hold the owner's `approval_confirmed`, so that every record cites the log's last
-entry (section 1), with one exception: a `lock-cleared` record is the one kind it writes while the
-log does not exist, with `protocol_seq` and `protocol_line_sha256` `none`, and once the log exists
-it cites the last entry as every record does (PRO-065). The owner's answer to a round
+entry (section 1), with two exceptions: a `lock-cleared` record and an environment record written by
+`owner_record.py environment` are the two kinds it writes while the log does not exist, each with
+`protocol_seq` and `protocol_line_sha256` `none`, and once the log exists each cites the last
+entry as every record does (PRO-065, PRO-071). The owner's answer to a round
 approves its list; a round answered after the log exists adds entries the usual way, proposed by the
 agent and approved by the owner (spec FR-044). The entry for the re-run's REP-029, which added the
 synthetic counts as class 5, records the protocol's "Development inputs" paragraph before and after,
