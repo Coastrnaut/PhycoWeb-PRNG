@@ -388,8 +388,10 @@ repair <n>" (cli contract, "Environment", `validate_tool.py`).
 A file that the row "Tool acquisition" does not cover (research R19), the source of a refused set
 that no listed file gives (research R15) or another copy of a paper among them, needs a row of its
 own too, "Download <n>", added when the owner gives the permission for that file: it names the
-file, its source, its size and its licence and the date, and the owner sets it to Approved and
-commits it. `scripts/downloads.py approve` reads that row at HEAD and writes the file's `approved`
+file, under a name that no entry of the downloads manifest holds (research R19), its source, its
+size and its licence, the listed file it stands in for, if any, and the date, and the owner sets
+it to Approved and commits it. `scripts/downloads.py approve` reads that row at HEAD and writes
+the file's `approved`
 entry in the downloads manifest only while the row reads Approved and names the file with those
 four values, as `repair_log.py` reads "Log repair <n>" (FR-046; cli contract, `downloads.py`).
 
@@ -827,6 +829,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   does, no published theorem's preconditions can be shown met, and the feature recommends stopping
   (stop rule). Another copy of the paper, from any source, is a new download that needs the owner's
   permission for that file (FR-046; research R19).
+- **A refused set's only source file cannot be had**: the refused list waits for the set's file,
+  permitted in a row "Download <n>" (research R15, R19), and a file recorded `not obtained` waits
+  for another copy, permitted the same way under a name of its own. Where none can be had, the
+  list stays incomplete, no candidate can be scored, none can be eligible (FR-023), and the
+  feature recommends stopping (stop rule).
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
   established for that candidate within its analysis budget, and it cannot be frozen. The gap is
   reported, and the candidate is `ineligible`; another candidate is entered in its place, before the

@@ -1636,13 +1636,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     chance of an accidental match, at most T·L·2w·2⁻⁶⁴ for T table words and L listed words, so a
     failure shows reuse rather than chance. An addition to the list is proposed by the agent and
     approved by the owner as a stricter change in the protocol change log, since the list only
-    grows, with the list's new SHA-256; `scripts/protocol_change.py propose` exits 2, appending
-    nothing, while the list at HEAD drops or changes an entry of the version that the latest
-    `refused_list` names (data-model §18). A set whose only source is a file waits for it: a file
-    that R19 does not list needs its own row "Download <n>", which `scripts/downloads.py approve`
-    reads (R19), and a file recorded `not obtained` needs another copy, permitted the same way;
-    where none can be had, no candidate is scored, and the feature recommends stopping
-    (spec stop rule). Designs that the spec, the plan, this document or
+    grows, with the list's new SHA-256; `scripts/protocol_change.py create` and `propose` exit 2,
+    writing nothing, while the list at HEAD does not parse in the entry format above, and
+    `propose` also while it drops or changes an entry of the version that the latest
+    `refused_list` names (data-model §18); a version of the list that no entry names is a draft,
+    which `scripts/gen_constants_v3.py` refuses and the next named version may correct. A set
+    whose only source is a file waits for it: a file that R19 does not list needs its own row
+    "Download <n>", which `scripts/downloads.py approve` reads (R19), and a file recorded
+    `not obtained` needs another copy, permitted the same way under a name of its own (R19);
+    where none can be had, no candidate can be scored, so none can be eligible (FR-023), and the
+    feature recommends stopping (spec stop rule). Designs that the spec, the plan, this document or
     security.md name later are added when named, as the rationale's citations are, and the check
     runs again. A match makes each candidate whose polynomial or table it touches fail FR-023, an
     eligibility item, so that candidate is `ineligible` and the rules select among the others; a
@@ -1839,8 +1842,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `research/004/tools/critical_counts.json` (R4), the sidecar `vectors/phyco-v3/MANIFEST.json` and
     `research/004/candidates/superseded.json`; a record that cites one gives its SHA-256 and the
     entry it used (data-model introduction). The refused list,
-    `research/004/refused-constants.json`, only grows (R15): each committed version keeps every
-    entry of the one before it unchanged (data-model introduction, §18).
+    `research/004/refused-constants.json`, only grows (R15): each version that a `refused_list`
+    of the protocol change log names keeps every entry of each earlier named version unchanged,
+    and a version that none names is a draft (data-model introduction, §18).
   - **Reproduction.** Every script that writes evidence or generated files, those that this
     bullet's end names as having none excepted, has a mode `--reproduce RECORD`,
     which runs the recorded command's configuration in a separate worktree of
@@ -2182,7 +2186,10 @@ source, size and licence ("Tool acquisition" in the spec's Review & Approval tab
 else is covered: a file not listed here, the tools under "Not requested", or a file whose source
 or licence differs from its row, or whose size differs from a size given in bytes, needs its
 own permission, given in a row of its own, "Download <n>", which names the file with its source,
-size and licence and which `scripts/downloads.py approve` reads (below). A tool's second known
+size and licence and which `scripts/downloads.py approve` reads (below). Such a file takes a name
+that no entry of the downloads manifest holds: one that stands in for a listed file, another copy
+of a paper among them, takes that file's name with a suffix, such as `main-2.pdf`, and its row
+names the file it stands in for. A tool's second known
 result (R12), and the ARX search's known result at 32-bit words, come from these papers where one
 of its kind is there, fixed before the tool's first
 validation, so that no paper is requested after a failed validation to supply one. Each

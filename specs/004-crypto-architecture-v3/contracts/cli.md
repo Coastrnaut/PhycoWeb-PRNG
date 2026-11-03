@@ -976,7 +976,9 @@ file that those tables do not list, the source of a refused set (research R15) o
 paper among them, with the name, source, size and licence that its row "Download <n>" of the spec's
 Review & Approval table gives and the row's name, only while that row reads Approved at HEAD
 (Approvals, above), and exits 2, writing nothing, while no such row names the file or while an
-entry holds the name. `fetched` computes the SHA-256 and the size from the downloaded file itself,
+entry holds the name; a file that stands in for a listed one, another copy of a paper among them,
+takes that file's name with a suffix, which its row gives beside the name of the file it stands in
+for (research R19). `fetched` computes the SHA-256 and the size from the downloaded file itself,
 read under `-I` from its own directory and never run, refuses a size that differs from a size R19
 or the file's row gives in bytes and, for a wheel, a SHA-256 that differs from PyPI's for that
 file, and writes the entry `fetched` with its SHA-256, the download date and the local path.
@@ -1022,8 +1024,9 @@ and exits 2, writing nothing, while a first entry would hold a reading marked `s
 case under which the old text fails, that the row does not decide, entry by entry, the change kept,
 with the owner's reason, as a change spec FR-044's words do not allow, or the old text restored, and
 it records each decision, with its reason, in that reading (data model §18;
-PRO-079). It exits 2, writing nothing, while `research/004/refused-constants.json` is missing or
-differs from HEAD (research R15). Otherwise it builds one first entry per listed row, with `rules`,
+PRO-079). It exits 2, writing nothing, while `research/004/refused-constants.json` is missing,
+differs from HEAD or does not parse in the entry format of research R15. Otherwise it builds one
+first entry per listed row, with `rules`,
 `row`, `granularity` and `place_check`, and, for a row listed under the constant rule,
 `refused_list`, that file's SHA-256 at HEAD (data model §18), and one per place confirmed as an
 entry of its own, with
@@ -1035,10 +1038,11 @@ the list of the round before it, as ad2c195's is beside the re-run's, and its en
 round's entries, so that the log keeps the order of the commits (data model §18; PRO-064).
 `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
 which the agent may write as a proposal; an entry that adds to the refused list holds the list's
-new SHA-256 in `refused_list`, and `propose` exits 2 while it differs from the file at HEAD, or
-while the list at HEAD drops or changes an entry of the version that the latest `refused_list`
-names, which it finds by that SHA-256 in the file's git history, so that the list only grows
-(research R15); its approval step prints the entries added.
+new SHA-256 in `refused_list`, and `propose` exits 2 while it differs from the file at HEAD, while
+the list at HEAD does not parse in the entry format of research R15, or while it drops or changes
+an entry of the version that the latest `refused_list` names, which it finds by that SHA-256 in
+the file's git history, so that the list only grows; a version that no entry names is a draft,
+which the next named version may correct. Its approval step prints the entries added.
 Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`; a later entry whose `readings` mark a reading `set_aside` shows

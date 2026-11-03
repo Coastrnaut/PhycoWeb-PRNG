@@ -190,12 +190,14 @@ or key-loading code is written here.
   a lock not free within 10 s exits 2, naming it (quickstart P4); a broken chain exits 2, save for
   the one `repair` entry while "Log repair <n>" reads Approved at HEAD and names that log and the
   `seq` of the break; the refusals of the provenance log's and the protocol change log's writers;
-  and `create`'s refused-list step, exit 2 while `research/004/refused-constants.json` is missing or
-  differs from HEAD, its SHA-256 written as `refused_list` in the entry of each row listed under the
-  constant rule, and `propose`'s, exit 2 with nothing appended while an addition's `refused_list`
-  differs from the file at HEAD or the list at HEAD drops or changes an entry of the version that
-  the latest `refused_list` names, on a stated history in which an entry is dropped and one in which
-  a word changes. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
+  and `create`'s refused-list step, exit 2 while `research/004/refused-constants.json` is missing,
+  differs from HEAD or does not parse in R15's entry format, its SHA-256 written as `refused_list`
+  in the entry of each row listed under the constant rule, and `propose`'s, exit 2 with nothing
+  appended while an addition's `refused_list` differs from the file at HEAD, the list at HEAD does
+  not parse in that format, or it drops or changes an entry of the version that the latest
+  `refused_list` names, on a stated history in which an entry is dropped and one in which a word
+  changes, and an entry appended on one in which a draft that no entry names changes a word before
+  the next named version. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
 - [ ] T011 Write `protocol/provenance.py`, the one writer of `$REP/provenance.jsonl`, and
   `scripts/provenance.py` with `add FILE` and `review FILE` (contracts/cli.md; data-model §14): one
   entry per file or per section, with the tool and model, the date, the task ID and the review
@@ -206,12 +208,13 @@ or key-loading code is written here.
   data-model §18): `check` makes FR-044's comparison and writes nothing; `create` runs only while
   the log does not exist, reads the lists "Rows that change the protocol" in round order, the row
   "Place check" with the highest k and the row "Readings set aside" at HEAD, exits 2 while a reading
-  marked `set_aside` is not decided or while `research/004/refused-constants.json` is missing or
-  differs from HEAD, writes that file's SHA-256 as `refused_list` in the entry of each row listed
-  under the constant rule (data-model §18), and ends in the approval step, where the owner types the
-  first 16 hex digits of the approval hash it prints; `propose` writes one later entry the same way,
-  an addition to the refused list with the list's new SHA-256 in its `refused_list`, and exits 2,
-  appending nothing, while the list at HEAD drops or changes an entry of the version that the latest
+  marked `set_aside` is not decided or while `research/004/refused-constants.json` is missing,
+  differs from HEAD or does not parse in R15's entry format, writes that file's SHA-256 as
+  `refused_list` in the entry of each row listed under the constant rule (data-model §18), and ends
+  in the approval step, where the owner types the first 16 hex digits of the approval hash it
+  prints; `propose` writes one later entry the same way, an addition to the refused list with the
+  list's new SHA-256 in its `refused_list`, and exits 2, appending nothing, while the list at HEAD
+  does not parse in that format or drops or changes an entry of the version that the latest
   `refused_list` names, which it finds by that SHA-256 in the file's git history, its approval step
   printing the entries added. (FR-023, FR-044; R15; PRO-063, PRO-077, PRO-079; REP-094)
 - [ ] T013 Write `scripts/repair_log.py --log LOG --approval REF` (contracts/cli.md; R16), which
@@ -242,7 +245,8 @@ or key-loading code is written here.
   `fetched` computes the SHA-256 and size from the file, read under `-I` and never run, and refuses
   a size that differs from one R19 or the file's row gives in bytes and, for a wheel, a SHA-256 that
   differs from PyPI's; `fetched` and `not-obtained` refuse a name with no `approved` entry; with its
-  tests in `tests/test_protocol_004.py`, each refusal among them. (FR-046; R19; REP-076)
+  tests in `tests/test_protocol_004.py`, each refusal among them, a later copy of a listed file
+  refused under the listed name and entered under a name of its own. (FR-046; R19; REP-076)
 - [ ] T017 Write the claim and evidence register `protocol/claims.json` (data-model §15): one entry
   per model ID, `float-v0`, `lut-v1`, `phyco-v2` and `phyco-v3`, each with its level, its claim or
   "no claim", its `bound` and its `evidence`; `phyco-v3` at L0 with "no claim", `in_progress`
@@ -327,16 +331,17 @@ or key-loading code is written here.
   source; each set's source is a file recorded `fetched` in `downloads.json` or the design's
   published derivation, computed by `research/004/refused_sources.py`, committed code that cites the
   derivation of each set it computes. A set with neither waits for a download of its own: the agent
-  prepares its request, the file's name, source, size and licence, from the host's page and a header
-  request with no file body downloaded, as research R19's were; the owner permits it in a row
-  "Download <n>" of the spec's Review & Approval table; and
-  `python scripts/downloads.py approve NAME` enters it in `downloads.json` before the file is
-  fetched into its own new directory and recorded with `fetched` (FR-046; R19). A set whose file is
-  recorded `not obtained` waits for another copy, requested the same way, and where none can be had,
-  no candidate is scored and the feature recommends stopping (stop rule; R15). A set not on the list
-  when the log is created, a set from a paper of R19 not yet fetched among them, enters as a
-  `stricter` entry with the list's new SHA-256, and no candidate is scored before every set this
-  task names is on the list. (FR-023, FR-044, FR-046; R15, R19; RAT-038, RAT-043)
+  prepares its request, the file's name, one that no entry of `downloads.json` holds, its source,
+  size and licence, from the host's page and a header request with no file body downloaded, as
+  research R19's were; then **Owner**: permit it in a row "Download <n>" of the spec's Review &
+  Approval table; the agent then runs `python scripts/downloads.py approve NAME`, which enters it in
+  `downloads.json` before the file is fetched into its own new directory and recorded with `fetched`
+  (FR-046; R19). A set whose file is recorded `not obtained` waits for another copy under a name of
+  its own, requested the same way, and where none can be had, no candidate can be scored, so none
+  can be eligible, and the feature recommends stopping (stop rule; R15). A set not on the list when
+  the log is created, a set from a paper of R19 not yet fetched among them, enters as a `stricter`
+  entry with the list's new SHA-256, and no candidate is scored before every set this task names is
+  on the list. (FR-023, FR-044, FR-046; R15, R19; RAT-038, RAT-043)
 - [ ] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/004/protocol-changes.jsonl`, one per listed row of every answered
@@ -591,8 +596,8 @@ hash, older than its first counted result.
   (PRESENT) through the owner's browser into a folder the owner names; record each in
   `$REP/downloads.json` with `python scripts/downloads.py fetched NAME PATH` or
   `not-obtained NAME --reason TEXT`, and read each with Python under `-I` only. In place of a paper,
-  the owner may provide a value with `scripts/owner_record.py owner-provided`, its row
-  "Owner-provided value <n>" Approved; without either, the tool it validates stays unvalidated.
+  the owner may provide a value (**Owner**: run `python scripts/owner_record.py owner-provided`, its
+  row "Owner-provided value <n>" Approved); without either, the tool it validates stays unvalidated.
   (FR-046; R12, R19)
 - [ ] T060 [P] [US4] Write `research/004/tools/trails/tables.py`, exhaustive difference and linear
   tables of every distinct box and S-box of up to 16 bits; validate it on every entry of the PRESENT
@@ -762,10 +767,10 @@ candidates are otherwise `ineligible` (R6, R7).
   a log in which no entry holds one, `refused_list` in the record of each mode, and a `--reproduce`
   run reading the list at the record's `git_head`; and the list and its match: the committed
   `research/004/refused-constants.json` parses in R15's entry format, each word within its
-  `word_bits`, each committed version keeps every entry of the one before it unchanged, checked
-  against the file's history, and a set of a stated list, planted in a stated table, is found under
-  each of the 2w transforms and not found when the planted run is one word short of 64 bits.
-  (FR-023, FR-024, FR-044, FR-047; SC-006; R13, R15)
+  `word_bits`, each version that a `refused_list` of the protocol change log names keeps every entry
+  of each earlier named version unchanged, checked against the file's history, and a set of a stated
+  list, planted in a stated table, is found under each of the 2w transforms and not found when the
+  planted run is one word short of 64 bits. (FR-023, FR-024, FR-044, FR-047; SC-006; R13, R15)
 - [ ] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
   as `research/004/candidates/cand-A1.py`, an operation list of invertible updates with its
   reference outputs, and append its `proposed` entry with
