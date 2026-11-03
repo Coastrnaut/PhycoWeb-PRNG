@@ -77,7 +77,7 @@ from `/mnt/c/GIT/PhycoWeb-PRNG`.
 **Purpose**: the comparison FR-044 asks for before the tasks approval, and the approval itself. No
 task of phases 1 to 9 starts before T002.
 
-- [ ] T001 Once this file and any change the owner chooses from the `/speckit-analyze` report are
+- [X] T001 Once this file and any change the owner chooses from the `/speckit-analyze` report are
   committed, run `python research/004/place_check.py`, with `--to` at HEAD, which writes
   `research/004/place-check.json` over the commits from the plan approval's commit, `65bcbf2`, to
   HEAD; compare its places with the results written beside each list "Rows that change the protocol"
