@@ -1246,22 +1246,48 @@ From the seventh re-run, 31 of its 37 rows:
 
 - **Bias rule**, with the inputs per bias measurement (research R4): ANA-074, ANA-075.
 - **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
-  FR-022): RAT-072.
+  FR-022): RAT-072, HW-079, HW-082.
 - **Tool validation**, with the trail tools and the known results (research R12; FR-039): ANA-076.
 - **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: SEC-082, RAT-072,
   RAT-073, ANA-073, ANA-075, HW-079, HW-080, HW-081, HW-082, HW-083, HW-084, HW-085.
 - **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): RAT-072,
   ANA-073, ANA-074, ANA-075.
-- **Vector lengths** (research R8; FR-036): HW-084, REP-086.
+- **Vector lengths** (research R8; FR-036): HW-082, HW-084, REP-083, REP-086.
 - **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
   SEC-083.
 - **Constant rule** (research R15; FR-023): HW-079.
 - **Protocol changes and their directions** (FR-044; data-model §18; the cli contract's
-  `protocol_change.py`): PRO-067, PRO-069.
+  `protocol_change.py`): PRO-067, PRO-069, REP-082.
 - **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
   the cli contract; the notes under the Review & Approval table): SEC-078, SEC-079, SEC-080,
-  RAT-072, RAT-077, ANA-073, ANA-074, ANA-076, PRO-068, PRO-070, REP-082, REP-083, REP-084, REP-085,
-  REP-086, REP-088, REP-089, REP-091.
+  RAT-072, RAT-077, ANA-073, ANA-074, ANA-075, ANA-076, PRO-068, PRO-069, PRO-070, REP-082, REP-083,
+  REP-084, REP-085, REP-086, REP-088, REP-089, REP-091.
+
+Its round's two commits (PRO-061) are 3d18fed and 6637ce9, which applied its last rows, the commit
+that completes its alignment being named here in 6637ce9's place once it exists: that commit adds to
+this list the six rows named next and writes the comparison's results beside it. By the comparison
+and by PRO-067's rule, which also reads the messages of the round's commits and the rows' tags in
+each place's text, six rows of the round had altered a place of a rule without being listed under
+it, and are added: HW-079 and HW-082 under "Nonlinearity choice rule (D4)", for research R5; HW-082
+and REP-083 under "Vector lengths", for research R8 and FR-036; REP-082 under "Protocol changes and
+their directions", for data-model §18; and ANA-075 and PRO-069 under "Records and their hashes", for
+the cli contract. Each was already listed under another heading, so the list keeps 31 of the round's
+37 rows.
+
+The comparison over 3d18fed and 6637ce9, made with `research/004/place_check.py`, then found a row
+of the round listed under every rule whose place changed, each of the round's six commits changing
+only places under rules that list a row of its own checklist; the check of each row's Changes cell
+found each row listed under every heading whose place it names, and the six rows the list leaves
+out, SEC-081, RAT-074, RAT-075, RAT-076, REP-087 and REP-090, naming none. The alignment edits only
+this file, which holds no such place, so that the comparison over 3d18fed and the alignment's commit
+gives the same result.
+
+Over every span from the plan-approval commit, 65bcbf2, to 3d18fed outside the rounds' pairs, the
+comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
+recorded beside the re-run's list above; the span from 2392150 to 3d18fed, between the sixth and
+seventh re-runs' pairs, changed no place. Before the tasks approval the script compares every pair
+and span again, up to HEAD, and writes `research/004/place-check.json`, which these results then
+restate and which the owner confirms in the row "Place check" (PRO-063).
 
 ## After the answer
 
