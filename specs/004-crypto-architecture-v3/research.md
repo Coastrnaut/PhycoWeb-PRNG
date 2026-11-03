@@ -1893,10 +1893,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     with the break's position, its cause and what was restored. Entries after the break count only
     where the records they cite corroborate them, and the final report states the repair.
   - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files, the
-    owner's next commit after the one that records the owner design review's approval, from which
-    the agent commits no file of this feature; (2) `design_freeze.py create` runs with
-    `git_dirty` false, records that commit as `owner_commit`, exiting 2 unless
-    it is HEAD (spec FR-043; PRO-070), and writes the record with `freeze_status`
+    owner's next commit after the one that records the owner design review's approval in its row
+    with the highest k, of every feature file changed since or an empty commit of the owner's where
+    none changed, and, where the owner commits "Environment record <n>" or "Log repair <n>" on its
+    own between that approval and step (1), the owner's next commit after the one that records the
+    approval of the review held again in "Owner design review <k>", the agent
+    committing no file of this feature from the first commit that records an owner
+    design review's approval to the feature's end, plan phase 9 included (spec
+    FR-043; PRO-070, PRO-072, PRO-073); (2) `design_freeze.py create` runs with
+    `git_dirty` false, records that commit as `owner_commit`, exiting 2 unless it is HEAD (spec
+    FR-043; PRO-070), and also while `check_claims.py` reports a finding
+    at HEAD (SEC-084; PRO-073), and writes the record with `freeze_status`
     `draft` (data-model §13; REP-093); (3) the owner runs `design_freeze.py
     approve`, which prints `draft_sha256`, refuses unless standard input is an
     interactive terminal and the owner types its first 16 hex digits, writes
