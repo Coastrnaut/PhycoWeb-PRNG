@@ -478,7 +478,10 @@ takes each from there.
    "invertible-looking ARX" S13 contradicts (FR-051); the claim-register test, run since phase 1,
    again over the final documents (SEC-081); re-check of every verdict; final
    phase report, citing the evidence for every redesign-checklist item this
-   feature covers (FR-048) → ⛔ **final result review**.
+   feature covers (FR-048) → ⛔ **final result review**, whose decision the owner records in the
+   commit that ends FR-043's window, a stop that the final report recommends ending it at the same
+   commit; from the next commit the standing authorization covers this feature's files again, for
+   the features that follow (FR-043; PRO-080).
 
 ## Risks
 

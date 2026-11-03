@@ -51,11 +51,16 @@ R16; REP-085).
   R1) as a whole: Python, every package and version of `pip freeze` (one
   added, upgraded or removed), gcc and make in WSL, and the Windows build or
   the WSL distribution and kernel. Any difference exits 2, writing nothing and naming it, a Windows
-  or WSL update included, for every write but the environment record itself (below); the
-  owner then writes a new environment record with `scripts/owner_record.py
-  environment` and approves it, with R1 updated first when a pinned version changes, and each later
-  record, and each entry of the provenance log, the protocol change log and the downloads manifest,
-  names the record in force as its `environment` (data model §1; REP-082). While the running
+  or WSL update included, for every write but the environment record itself (below); the owner then
+  writes a new environment record with `scripts/owner_record.py environment` and approves it, and
+  each later record, and each entry of the provenance log, the protocol change log and the downloads
+  manifest, names the record in force as its `environment` (data model §1; REP-082). The versions
+  research R1 pins never change during the feature (spec FR-044; PRO-078): after an update that
+  changes one, the owner first restores the version R1 pins, a package's as `requirements.txt`
+  pins it, so that a new record is written only for what no pin fixes, the
+  Windows build, the WSL distribution and kernel, make or a package that no pin
+  names, and an update whose pinned version cannot be restored stops the
+  platform's runs, with the reason, until the owner decides. While the running
   environment differs from the record in force, or none is in force, the guard admits one write, the
   environment record itself, written by `owner_record.py environment` and checked instead against R1
   and the pins of `requirements.txt` for that platform, exit 2 on any difference, its `environment`
@@ -113,14 +118,22 @@ R16; REP-085).
   stored, its final LF included (data model §3), and releases the lock. The lock holds the same
   fields as the heavy-run lock, and only `scripts/clear_lock.py` removes a stale one. It exits 2,
   appending nothing, if the lock is not free within 10 s, naming the lock and whether its holder
-  still runs, or if the chain is broken (research R16).
+  still runs, or if the chain is broken (research R16), save for the one append to a broken chain,
+  the `repair` entry that `scripts/repair_log.py` appends through the log's one writer,
+  `protocol/candidates.py`, `protocol/changelog.py` or `protocol/provenance.py`, while its row "Log
+  repair <n>" reads Approved at HEAD and names that log and the `seq` of the break (`repair_log.py`,
+  below; PRO-076).
 - **Protocol log**: every script that writes evidence exits 2, writing nothing, through
   `protocol/evidence.py`, while `research/004/protocol-changes.jsonl` does not exist, its chain does
   not check, or its first entries, one per listed row of every round answered before it was created
   and one per place the owner confirmed as an entry of its own (`protocol_change.py`, below), do not
   all hold the owner's `approval_confirmed`, each checked against the first 16 digits of the
   approval hash that the guard recomputes from the first entries as `protocol_change.py`
-  computes it (below; REP-094); every record then cites the log's last entry in
+  computes it (below; REP-094), while any later entry's `approval_confirmed`, the last line's
+  included, which the chain does not protect, differs from the first 16 digits of the approval hash
+  that the guard recomputes over that entry alone, without `approver` and `prev_sha256` (PRO-077),
+  or while a reading that an entry's `readings` mark `set_aside` holds no owner's decision
+  (data model §18; PRO-079); every record then cites the log's last entry in
   `protocol_seq` and `protocol_line_sha256` (spec FR-044; data model §1, §18). A `lock-cleared`
   record (`clear_lock.py`, below) and an environment record written by `owner_record.py environment`
   (below) are the two kinds `protocol/evidence.py` writes while the log does not exist, each with
@@ -131,14 +144,17 @@ R16; REP-085).
   record written after a Windows or WSL update included. A `lock-cleared` record, like every other
   write, waits until the platform's environment record in force reads Approved at HEAD (Environment,
   above; PRO-068). `tests/test_protocol_004.py` covers the refusal of every other kind, both
-  exceptions (PRO-071) and a first entry whose digits do not match (REP-094).
+  exceptions (PRO-071), a first entry whose digits do not match (REP-094), a later entry and the
+  last line whose digits do not match (PRO-077) and a reading marked `set_aside` with no decision
+  (PRO-079).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
-  Order of US1, below; `round_rule.py --select`; `candidate_log.py outcome` (ANA-083);
+  Order of US1, below; `round_rule.py --select` and `round_rule.py --decide` (PRO-074);
+  `candidate_log.py outcome` (ANA-083); `provenance.py review` (PRO-074);
   `design_freeze.py create`; `repair_log.py`; `validate_tool.py`'s source guard; `check_claims.py`;
   `protocol_change.py create`; the test of the second transcription's provenance) reads
   it as committed at HEAD, never the working tree, and exits 2 while the
@@ -158,8 +174,9 @@ R16; REP-085).
   names the highest-k row of each family, and `check_claims.py` reads the "L1 recorded" row with the
   highest k. The comparison of spec FR-044 is confirmed in the row "Place check",
   and one made again over later commits in "Place check <k>", each naming
-  `research/004/place-check.json` by SHA-256, and `protocol_change.py create` reads
-  the one with the highest k (PRO-063). A guard opens on Approved alone,
+  `research/004/place-check.json` by SHA-256, and `protocol_change.py create` reads the one with the
+  highest k (PRO-063); it also reads the row "Readings set aside", which decides each reading that a
+  first entry marks `set_aside` (PRO-079). A guard opens on Approved alone,
   except that `design_freeze.py create` also takes done, naming the manifest the review read by
   SHA-256, or "not arranged" on the external review's row, the one with the highest k among the rows
   of its family, "External design review" and "External design review <k>", that name
@@ -529,7 +546,9 @@ operation list's SHA-256, and one `not selected` entry for each other candidate 
 eligible, each citing the record by path and SHA-256 and its tie choice where there is one (data
 model §3), and exits 2, appending nothing, while the record's outcome is a stop, while the record
 has a tie and no choice whose row, "Selection tie" or "Selection tie <k>", reads Approved at HEAD
-with the choice record's SHA-256, or once the record has its entries; a later selection record gets
+with the choice record's SHA-256, the table read as committed at HEAD and `--decide`
+exiting 2 while the working tree's table differs from HEAD's (Approvals, above;
+PRO-074), or once the record has its entries; a later selection record gets
 entries of its own, whether it selects another candidate or the same one, so that no entry is
 edited, the latest `selected` entry being the one in force and an earlier one standing as a decision
 that a later record superseded, which `design_freeze.py create` checks (below; spec FR-041, FR-043;
@@ -801,7 +820,11 @@ environment.
 
 It recomputes each verdict under the rules in force at the protocol change-log entry its record
 cites and, where a later stricter change applies (FR-044), also under the current rules; both are
-listed. A disagreement under the rules in force at a record's entry is a finding: the record's
+listed. It applies only entries whose `approval_confirmed` matches the first 16 digits of the
+approval hash it recomputes, over the first entries together for theirs and
+over each later entry alone, as the guard "Protocol log" does, and lists
+each entry whose digits do not match, exit 1 (data model §18; PRO-077). A
+disagreement under the rules in force at a record's entry is a finding: the record's
 result becomes an unverified hypothesis, `blocked` (spec FR-060), until it is resolved, and the
 disagreement is a tool defect of research R7, whose one re-run follows the fix; one under a later
 stricter change is that change's recomputed verdict, applied as a stricter change and recorded in
@@ -834,9 +857,19 @@ repair_log.py --log LOG --approval REF
 Repairs a broken hash chain in one of the three logs, only with the owner's go-ahead: `--approval`
 names the row "Log repair <n>" of the spec's Review & Approval table, and the script reads the spec
 at HEAD and exits 2 unless that row reads Approved and names the same log and the `seq` of the
-break. The broken file is kept unchanged with its SHA-256, and a `repair` entry records the break's
-position, its cause and what was restored. Entries after the break count only where the records they
-cite corroborate them, and the final report states the repair (research R16). Where the owner
+break. The broken file is kept unchanged with its SHA-256, and the script appends the `repair` entry
+through the log's one writer, `protocol/candidates.py` for the candidate log,
+`protocol/provenance.py` for the provenance log and `protocol/changelog.py` for the protocol change
+log, which takes `data/log-append.lock` and admits it, while that row reads Approved at HEAD, as the
+one append to a broken chain (Hash-chained logs, above; PRO-076); in each log the entry holds the
+same fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was
+restored (data model §3, §14, §18). The restored log holds the lines before the break as stored and
+the `repair` entry chained to the last of them. Entries after the break count only where the records
+they cite corroborate them, and an entry that counts is appended again after the `repair` entry by
+its writer, as a new entry citing its `seq` and SHA-256 in the broken file, so that no entry is
+edited; in the protocol change log the `repair` entry goes through the owner's approval step, as
+every entry does (`protocol_change.py`, below), and later records cite the entries after it
+(PRO-076). The final report states the repair (research R16). Where the owner
 commits a "Log repair <n>" row on its own between the commit that records the owner design review's
 approval and the freeze's step (1), the owner design review is held again in "Owner design review
 <k>", naming the same versions where nothing else changed, and step (1) follows that row's approval
@@ -855,7 +888,10 @@ as research R1 lists it, the one write the Environment guard admits while the ru
 differs from the platform's record in force or none is in force, checked against R1 and the pins of
 `requirements.txt` for that platform instead, exit 2, writing nothing, on any difference, its
 `environment` field `none`, with the interpreter's version and each pinned package's version that
-the check compared (PRO-068); each platform's first record comes before every other write through
+the check compared (PRO-068); R1's pinned versions never change during the
+feature, so that after an update that changes one the owner restores it before
+writing a new record, which is written only for what no pin fixes (research R1;
+PRO-078); each platform's first record comes before every other write through
 `protocol/evidence.py` or a log writer, and a new one follows the wheels' install, in plan phase 1's
 order (REP-082); while the protocol change log does not exist, the guard "Protocol log" admits an
 environment record with `protocol_seq` and `protocol_line_sha256` `none`, as it admits a
@@ -909,7 +945,9 @@ protocol_change.py propose FILE           # one later entry, its fields in FILE
 ```
 
 The one writer of the protocol change log, `research/004/protocol-changes.jsonl`, through
-`protocol/changelog.py` (spec FR-044; data model §18). `create` runs only while the log does not
+`protocol/changelog.py`, which also admits, for `repair_log.py`, a broken chain's
+`repair` entry while its row "Log repair <n>" reads Approved at HEAD (spec
+FR-044; data model §18; PRO-076). `create` runs only while the log does not
 exist, and exits 2 once it does. `check` reads the lists "Rows that change the protocol" of
 checklist-choices.md, in round order, each naming its round's two commits by hash, and compares each
 rule's text, in each place its heading names, each place's text delimited as spec FR-044 states,
@@ -927,7 +965,12 @@ the same comparison first and exits 2, writing nothing, while a place whose text
 of that round listed under its rule and no such confirmation, while its result up to `compared_to`
 differs from the file the row names, or while a place changed after `compared_to`, until the
 comparison is made again over the later commits and its file confirmed in "Place check <k>", read
-with the highest k (PRO-063). Otherwise it builds one first entry per listed row, with `rules`,
+with the highest k (PRO-063). It also reads the row "Readings set aside" at HEAD (Approvals, above)
+and exits 2, writing nothing, while a first entry would hold a reading marked `set_aside`, with the
+case under which the old text fails, that the row does not decide, entry by entry, the change kept,
+with the owner's reason, as a change spec FR-044's words do not allow, or the old text restored, and
+it records each decision, with its reason, in that reading (data model §18;
+PRO-079). Otherwise it builds one first entry per listed row, with `rules`,
 `row`, `granularity` and `place_check`, and one per place confirmed as an entry of its own, with
 `rules` at the edit's parent and at its commit, `row` none, `granularity` `commit` with `commit`,
 the edit's hash, `reason`, the owner's confirmation naming the commit, and `place_check` for the
@@ -938,7 +981,14 @@ round's entries, so that the log keeps the order of the commits (data model §18
 `propose FILE` builds one later entry from FILE, a JSON object holding its fields,
 which the agent may write as a proposal. Each refuses, exit 2, appending nothing, an entry, or a
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
-`last_record_id` or `results_known`. Each then ends in the approval step, an owner's own act that
+`last_record_id` or `results_known`; a later entry whose `readings` mark a reading `set_aside` shows
+it at the approval step, which records the owner's decision and reason in it (PRO-079). A `repair`
+entry, which `repair_log.py` appends through the same module, changes no rule: it holds the repair's
+fields (data model §18) in place of `rule`, `old_text`, `new_text`, `direction` and `readings`, with
+`last_record_id` and `results_known`, goes through the same approval step and is refused without
+them; the reading under which it too needs a `direction`, under which no chain of this log
+could be repaired, is part of the one that PRO-076's entry marks `set_aside`
+(PRO-076, PRO-079). Each then ends in the approval step, an owner's own act that
 the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
 together, taken over one canonical JSON array of the first entries in log order, or over the later
 entry alone, each entry without its approval field, `approver` whole, and
@@ -946,8 +996,10 @@ without `prev_sha256`, both filled once the owner has typed the digits, a hash
 of kind `canonical` (data model §1, §18; REP-094), `create` printing also
 their number, counted from the lists (PRO-069), and appends nothing unless
 standard input is an interactive terminal and the owner types its first 16 hex digits, which
-`approver` records as `approval_confirmed`. After the approval step `create` writes the first
-entries to a temporary file beside the log's path and renames it to that path once all are written,
+`approver` records as `approval_confirmed`, and which the guard "Protocol log"
+checks for every entry, the last line included (Guards, above; PRO-077).
+After the approval step `create` writes the first entries to a temporary
+file beside the log's path and renames it to that path once all are written,
 so that a writer that dies leaves no partial log, only the lock, which `scripts/clear_lock.py`
 removes (PRO-065). Every append takes `data/log-append.lock` and checks the
 chain first (Hash-chained logs, above). It writes log entries and no record, and so has no
@@ -960,8 +1012,10 @@ provenance.py add FILE                    # one entry, its fields in FILE (data 
 provenance.py review FILE                 # one review entry, with `follows`
 ```
 
-The one writer of the provenance log, `$REP/provenance.jsonl`, through `protocol/provenance.py`
-(spec FR-067; data model §14). FILE is a JSON object holding the entry's fields but `seq`,
+The one writer of the provenance log, `$REP/provenance.jsonl`, through `protocol/provenance.py`,
+which also admits, for `repair_log.py`, a broken chain's `repair` entry while
+its row "Log repair <n>" reads Approved at HEAD (spec FR-067; data model
+§14; PRO-076). FILE is a JSON object holding the entry's fields but `seq`,
 `prev_sha256` and `date_utc`, which the writer adds. `add` appends an entry for a file, or a section
 of one, drafted or repaired with an AI tool, or for a known result this feature writes itself or a
 tool's second known result; `review` appends a review entry, with `follows`, the `seq` of the entry
@@ -990,10 +1044,14 @@ review's, whose set names `rationale.md`'s chapters "Security target" and "Mode"
 without giving them entries, being refused too (RAT-086); a review entry
 holds `reviewer`, `row`, `reviewed_sha256` and `owner_word`, and the agent
 runs `review` only on the owner's explicit word for that entry, quoted with its date in it, as for a
-row's approval (spec FR-064, FR-067; data model §14; RAT-077). It writes the owner design review's
-review entries after the commit that records that review's approval and before the freeze's step
-(1), leaving them in the working tree, which step (1)'s commit holds, so that `design_freeze.py
-create` finds them in the provenance log at HEAD (spec FR-043; RAT-082). Right after
+row's approval (spec FR-064, FR-067; data model §14; RAT-077). `review` reads the Review & Approval
+table as committed at HEAD and exits 2 while the working tree's table differs from HEAD's, as every
+guard that reads it does (Approvals, above; PRO-074). It writes the owner design review's review
+entries right after the commit that records that review's approval, before the owner sets any row in
+the working tree for the freeze's step (1), the external review's row among them, leaving them in
+the working tree; the owner sets step (1)'s rows only once they stand, so
+that step (1)'s commit holds both and `design_freeze.py create` finds them
+in the provenance log at HEAD (spec FR-043; RAT-082; PRO-075). Right after
 the log's creation, before any other entry, `add` writes one entry per file drafted before the log,
 the files outside the feature directory that this feature's sessions changed among
 them, whole or per section changed, with `drafted_from` and `drafted_to`

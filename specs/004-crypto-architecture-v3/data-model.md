@@ -351,11 +351,11 @@ Each kind of entry has one writer, which the agent runs (cli contract): `evidenc
 `evidence` entries; `d4_choice.py` one `scored` entry per scored candidate when it writes
 `d4/choice.json`, citing it by path and SHA-256 (section 8); `round_rule.py --decide` the `selected`
 and `not selected` decisions after each selection record and `round_rule.py --close` the
-`set-closed` entry (section 9; Entered set, below); `repair_log.py` the `repair` entry (Repair,
-below); and `candidate_log.py`, through `protocol/candidates.py`, every other
-entry, its `propose`, `mapping`, `enter`, `decide`, `correct`, `replace` and
-`outcome` appending the `proposed` entry, the `mapping` entry, one `entered-d4`
-entry per candidate of the entered set before any score, a decision other
+`set-closed` entry (section 9; Entered set, below); `repair_log.py`, through
+`protocol/candidates.py`, the `repair` entry (Repair, below; PRO-076); and `candidate_log.py`,
+through `protocol/candidates.py`, every other entry, its `propose`, `mapping`, `enter`, `decide`,
+`correct`, `replace` and `outcome` appending the `proposed` entry, the `mapping` entry, one
+`entered-d4` entry per candidate of the entered set before any score, a decision other
 than `selected` and `not selected`, a `rejected` or `ineligible` one with the `replacement` entry it
 brings, a `correction`, a `replacement` entry that closes a pending one with its
 reason, and the `review-outcome` entry (ANA-083), each from a file holding the
@@ -462,9 +462,16 @@ proposed design" (section 14; spec FR-041; RAT-077; ANA-080, ANA-081; ANA-087).
 - **Repair.** A broken chain is repaired only with the owner's go-ahead, the Approved row "Log
   repair <n>" of the spec's Review & Approval table, which `repair_log.py --approval` names (R16).
   The broken file is kept unchanged with its SHA-256, and `scripts/repair_log.py` appends a `repair`
-  entry with the break's position, its cause and what was restored. Entries after the break count
-  only where the records they cite corroborate them, and the final report states the repair
-  (R16).
+  entry through the log's one writer, `protocol/candidates.py` here, which takes
+  `data/log-append.lock` and admits it, while that row reads Approved at HEAD, as the one append to
+  a broken chain; in each log, this one, the provenance log (section 14) and the protocol change log
+  (section 18), the entry holds the same fields: the break's `seq`, its cause, the broken file's
+  path and SHA-256, the row "Log repair <n>" and what was restored (PRO-076). The restored log holds
+  the lines before the break as stored and the `repair` entry chained to the last of them. Entries
+  after the break count only where the records they cite corroborate them, and an entry that counts
+  is appended again after the `repair` entry by its writer, as a new entry citing its `seq` and
+  SHA-256 in the broken file, so that no entry is edited (PRO-076); the final report states the
+  repair (R16).
 
 ```text
 proposed ─► entered-d4 ─► scored ─┐       (only candidates entered before the D4 choice)
@@ -1144,8 +1151,11 @@ read is the file `design_freeze.py create` compares (spec FR-012, FR-034;
 RAT-068). The review of an evidence record is an entry that names the record's ID
 and SHA-256, the record's `reviewer` staying as written (section 1). Every append takes
 `data/log-append.lock` and checks the chain first (R16), and a broken chain is repaired as in
-section 3. Its one writer is `protocol/provenance.py`, run as `scripts/provenance.py add` for an
-entry and `review` for a review entry (cli contract), which refuses, exit 2, appending
+section 3, its `repair` entry holding the fields that section gives it. Its one writer is
+`protocol/provenance.py`, run as `scripts/provenance.py add` for an entry and `review` for a review
+entry (cli contract), and as `scripts/repair_log.py` for the `repair` entry, which it admits
+while the spec's row "Log repair <n>" reads Approved at HEAD, as the one
+append to a broken chain (section 3; PRO-076); it refuses, exit 2, appending
 nothing, an entry with a field of its kind missing, a `section` that names no section or more than
 one (REP-088) or a `sha256` or `sha256_kind` that is not that of the named file, the
 named section's text or the named record, each computed by the writer as
@@ -1438,7 +1448,10 @@ compares it (cli contract; REP-085).
   read Approved. The comparison of the lists "Rows that change the protocol" is confirmed in the row
   "Place check", and one made again over later commits in "Place check <k>" (k = 2, 3, … in order),
   each naming `research/004/place-check.json` by SHA-256; `protocol_change.py create` reads the one
-  with the highest k and opens on Approved alone (section 18; PRO-063).
+  with the highest k and opens on Approved alone (section 18; PRO-063). The readings that the
+  protocol change log's first entries mark `set_aside` are decided, entry by entry, in the row
+  "Readings set aside", which `create` reads at HEAD, opening on Approved alone once the row decides
+  every such reading (section 18; PRO-079).
 - **Evidence status**: `not evaluated` until a record exists; `inconclusive` for a capped search
   or a fired control; `blocked` while a gate it needs is pending; otherwise the computed verdict.
 
@@ -1457,12 +1470,13 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `place_check` | for a first entry only: the result of the writer's comparison, the one `research/004/place-check.json` holds, for the entry's round, or, for an entry made from a place the owner confirmed, for the pair or span that holds its commit (below; PRO-063, PRO-064): the round's two commits, each place whose text changed between them, and the rows of that round listed under its rule, with each place changed by an edit that no row made, its commit and the owner's confirmation |
 | `old_text`, `new_text` | the rule's text before and after; for a first entry, per rule in `rules` |
 | `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md; for an entry made from a place the owner confirmed, the owner's confirmation with its reason, naming the commit (PRO-064) |
-| `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
-| `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
-| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below), `approver` and `prev_sha256` being left out of the hash it confirms (REP-094) |
+| `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; `settled` too, with its `readings`, for a rule whose change sets aside a reading of the old text (`readings`; PRO-079); for a first entry, per rule in `rules` |
+| `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it, or, for a reading that the new text sets aside, admitting what that reading refuses, the mark `set_aside`, with the case under which the old text fails, every candidate, every correct tool or a write the protocol needs, and the owner's decision on it, the change kept, with the owner's reason, as a change spec FR-044's words do not allow, or the old text restored (PRO-079); empty for a `stricter` entry, which sets aside no reading |
+| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below), `approver` and `prev_sha256` being left out of the hash it confirms (REP-094); checked for every entry, the first entries' together and each later one's alone, the last line included, by the guard "Protocol log", and by `recheck_004.py`, which applies only entries whose digits match (PRO-077) |
 | `environment` | the platform's environment record in force when the entry was written, named as in section 1 (REP-082) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
+| `repair` | for a `repair` entry only, the one append to a broken chain, which `scripts/repair_log.py` writes through this log's writer while the spec's row "Log repair <n>" reads Approved at HEAD: the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was restored, the same fields as in sections 3 and 14; it changes no rule and holds no `rule`, `rules`, `old_text`, `new_text`, `direction` or `readings`, and it goes through the approval step as every entry does, later records citing the entries after it (PRO-076) |
 
 A change applies to every candidate, those already evaluated included. Every record cites the log's
 last entry when its run started (`protocol_seq`, `protocol_line_sha256`; section 1), and
@@ -1540,9 +1554,20 @@ written before the first candidate is scored. Every later addition to the refuse
 `stricter` entry, proposed by the agent and approved by the owner, with the list's new SHA-256. The
 spec's Clarifications point to the log. Its one writer is `protocol/changelog.py`, run as
 `scripts/protocol_change.py` (cli contract): `create` writes the first entries, after the comparison
-above, and `propose FILE` a later entry, each ending in the approval step below, and it refuses,
-exit 2, appending nothing, an entry, or a rule of a first entry, without `direction`, a `settled`
-one without `readings`, and an entry without `last_record_id` or `results_known`.
+above, and `propose FILE` a later entry, and, as `scripts/repair_log.py`, a broken chain's `repair`
+entry (the table above; PRO-076), each ending in the approval step below, and it refuses, exit 2,
+appending nothing, an entry, or a rule of a first entry, without `direction`, a `repair` entry
+excepted, which changes no rule, a `settled` one without `readings`, an entry without
+`last_record_id` or `results_known`, and a `repair` entry without its fields (PRO-076). `create`
+also reads the spec's Review & Approval row "Readings set aside" at HEAD and exits 2, writing
+nothing, while a first entry would hold a reading marked `set_aside` that the row does not decide,
+entry by entry, and records each decision, with its reason, in its reading; `propose` shows each
+such reading of a later entry at the approval step, which records the owner's decision and reason in
+it; and the guard "Protocol log" exits 2 while a reading marked `set_aside` holds no decision
+(PRO-079). The first entries that hold one are those of RAT-036, RAT-052, ANA-062, ANA-068,
+PRO-065, PRO-068 and PRO-071, from earlier rounds, and of SEC-093, RAT-086,
+ANA-087, PRO-076, REP-100 and REP-101, from the tenth re-run, with every other
+entry of that kind that the agent finds before the log is created (PRO-079).
 Approving an entry is the owner's own act, which the agent never performs (spec
 FR-044): the writer's approval step prints the SHA-256 of the entry, or of the first entries
 together when the log is created, taken over one canonical JSON array of the first entries in log
@@ -1551,9 +1576,12 @@ without `prev_sha256`, both filled once the owner has typed the digits, `approve
 the date and `approval_confirmed`, and `prev_sha256` chaining each line to the one before as stored,
 a hash of kind `canonical` (section 1, Hashes; REP-094), and appends nothing unless standard input
 is an interactive terminal and the owner types its first 16 hex digits; each entry records that
-confirmation in `approver`, and the guard "Protocol log" recomputes that hash from the first entries
-and checks each one's `approval_confirmed` against its first 16 digits, exit 2 otherwise, as a later
-reader can, `tests/test_protocol_004.py` covering a first entry whose digits do not match (REP-094).
+confirmation in `approver`, and the guard "Protocol log" recomputes that hash for every entry, from
+the first entries together for theirs and from each later entry alone for its own, and checks each
+one's `approval_confirmed` against its first 16 digits, exit 2 otherwise, the last line included,
+which the chain does not protect, as a later reader can; `recheck_004.py` applies only entries
+whose digits match, and `tests/test_protocol_004.py` covers a first entry, a
+later entry and the last line whose digits do not match (REP-094; PRO-077).
 After the approval step `create` writes the first entries to a temporary
 file beside the log's path and renames it to that path once all are written, so that a writer that
 dies leaves no partial log, only the lock, which `scripts/clear_lock.py` removes

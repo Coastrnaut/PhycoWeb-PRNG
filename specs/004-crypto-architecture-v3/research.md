@@ -136,8 +136,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     added, upgraded or removed), gcc and make in WSL, and the Windows build or the WSL distribution
     and kernel. Any difference exits 2, writing nothing and naming it, a Windows or WSL update
     included, for every write but the environment record itself (below); the owner then writes and
-    approves a new environment record, with this section updated first when a pinned version
-    changes, and each later record cites the record in force. While the running environment differs
+    approves a new environment record, and each later record cites the record in force. This
+    section's pinned versions belong to the text of the protocol's "Records and their hashes" and
+    never change during the feature (spec FR-044; PRO-078): after an update that changes one, the
+    owner restores the version this section pins, a package's as `requirements.txt` pins it, and a
+    new environment record, checked against this section as it stands, is written only for what no
+    pin fixes, such as the Windows build, the WSL distribution and kernel, make or a package that no
+    pin names; an update whose pinned version cannot be restored stops the platform's
+    runs, with the reason, until the owner decides, an owner's own change
+    that no checklist answer covers. While the running environment differs
     from the record in force, or none is in force, the guard admits one write, the environment
     record itself, written by `owner_record.py environment` and checked instead against this section
     and the pins of `requirements.txt` for that platform, exit 2 on any difference, its
@@ -1916,9 +1923,18 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     repair <n>" of the spec's Review & Approval table that names the log, the `seq` of the break and
     the date, reads Approved and is committed; `repair_log.py --approval` names that row, and the
     script exits 2 unless the row reads Approved at HEAD and names the same log and position. The
-    broken file is kept unchanged with its SHA-256; `scripts/repair_log.py` writes a `repair` entry
-    with the break's position, its cause and what was restored. Entries after the break count only
-    where the records they cite corroborate them, and the final report states the repair.
+    broken file is kept unchanged with its SHA-256; `scripts/repair_log.py` appends a `repair` entry
+    through the log's one writer, `protocol/candidates.py`, `protocol/provenance.py` or
+    `protocol/changelog.py`, which takes `data/log-append.lock` and admits it, while that row reads
+    Approved at HEAD, as the one append to a broken chain, the entry holding in each log the same
+    fields, the break's `seq`, its cause, the broken file's path and SHA-256, the row and what was
+    restored (data-model §3, §14, §18; PRO-076). The restored log holds the lines before the break
+    as stored and the `repair` entry chained to the last of them. Entries after the break count only
+    where the records they cite corroborate them, and an entry that counts is appended again after
+    the `repair` entry by its writer, as a new entry citing its `seq` and SHA-256 in the broken
+    file, so that no entry is edited; in the protocol change log the `repair` entry goes through the
+    owner's approval step, as every entry does, and later records cite the entries after it
+    (PRO-076). The final report states the repair.
   - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files, the
     owner's next commit after the one that records the owner design review's approval in its row
     with the highest k, of every feature file changed since or an empty commit of the owner's where
@@ -1926,8 +1942,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     own between that approval and step (1), the owner's next commit after the one that records the
     approval of the review held again in "Owner design review <k>", the agent
     committing no file of this feature from the first commit that records an owner
-    design review's approval to the feature's end, plan phase 9 included (spec
-    FR-043; PRO-070, PRO-072, PRO-073); (2) `design_freeze.py create` runs with
+    design review's approval to the feature's end, plan phase 9 included (spec FR-043; PRO-070,
+    PRO-072, PRO-073), the agent writing the owner design review's review entries right after the
+    commit that records that approval, before the owner sets any row in the working tree for step
+    (1), the external review's row among them, since `provenance.py review` exits 2
+    while the working tree's table differs from HEAD's, and the owner setting
+    step (1)'s rows only once those entries stand, so that its commit holds
+    both (spec FR-043; PRO-075); (2) `design_freeze.py create` runs with
     `git_dirty` false, records that commit as `owner_commit`, exiting 2 unless it is HEAD (spec
     FR-043; PRO-070), and also while `check_claims.py` reports a finding
     at HEAD (SEC-084; PRO-073), and writes the record with `freeze_status`
@@ -2058,7 +2079,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the standard library (R17), so FR-035's "expected, not tested" on older versions concerns the
     model only, and that its markers admit Python 3.11 to 3.13 untested. A new environment record is
     written only when the environment matches these pins, and `protocol/evidence.py` checks at start
-    against that record as a whole (R1).
+    against that record as a whole (R1); no pinned version changes during the feature, so that after
+    an update that changes one the owner restores it before the next record, the Hypothesis pins
+    entering as this list states (R1; spec FR-044; PRO-078).
   - `protocol/disclaimer.py` gains `DESIGN_DISCLAIMER`, holding exactly the design-form
     disclaimer, the block directly under the spec's title, as at the top of this document;
     `DISCLAIMER` stays unchanged. The claim test compares every document's copy with the

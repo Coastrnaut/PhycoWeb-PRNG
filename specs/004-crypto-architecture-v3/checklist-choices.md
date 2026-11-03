@@ -90,13 +90,22 @@ commit as each table row and each answered round, as the spec's Status line is (
   | Stricter | Tightens a rule of the pre-registered protocol in the direction FR-044 allows; the row names the direction |
   | Settle | Fixes a case the protocol leaves open, by its most conservative reading, before any result it affects (PRO-027) |
 
-- From plan approval the protocol may only become stricter (FR-044), and no result exists yet. No
-  recommended option loosens it at a claimable size; RAT-036 and RAT-052 change a check only at the
-  research sizes, where as written it fails every candidate, and ANA-062 and ANA-068 state the round
-  counts at which the avalanche test's validation is checked and the bits that must fire at each,
-  where, read with every round count from 1 and no bit exempt, it fails every correct test; ANA-068
-  asks for the exact set at the variant's R and, below it, for the expected set's firing, any other
-  firing reported. An alternative that would loosen it is marked "looser", so the choice is visible
+- From plan approval the protocol may only become stricter (FR-044), and no result exists yet.
+  Thirteen recommended options set aside one reading each of the old text, under which it fails
+  every candidate or every correct tool or refuses a write the protocol needs: RAT-036 and RAT-052
+  change a check only at the research sizes, where as written it fails every candidate; ANA-062 and
+  ANA-068 state the round counts at which the avalanche test's validation is checked and the bits
+  that must fire at each, where, read with every round count from 1 and no bit exempt, it fails
+  every correct test, ANA-068 asking for the exact set at the variant's R and, below it, for the
+  expected set's firing, any other firing reported; PRO-065, PRO-068 and PRO-071 admit writes that
+  the guards "Protocol log" and "Environment" refused as written; and SEC-093, RAT-086, ANA-087,
+  PRO-076, REP-100 and REP-101 do so in the tenth re-run, as their rows state. The protocol change
+  log's first entry for each marks that reading `set_aside`, with its case, for the owner's
+  decision, entry by entry, in the spec's Review & Approval row "Readings set aside" at the tasks
+  approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Every
+  other recommended option is, under every reading of the old text, in its rule's stricter
+  direction or settles an open case by its most conservative reading. An
+  alternative that would loosen it is marked "looser", so the choice is visible
   but cannot be taken without breaking FR-044.
 - The "Changes" column names where the recommended option would be written. "spec FR-006" is a
   requirement of [spec.md](./spec.md), "research R14" a section of [research.md](./research.md),
