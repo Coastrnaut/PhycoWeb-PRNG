@@ -182,18 +182,23 @@ or key-loading code is written here.
   validation; Trail tools, once the first trail search has started, a tool outside research R12's
   fixed set or without an earlier `re-found` record of its exact hash, for a C tool the pair of its
   source's and its binary's SHA-256, and a search that reached its cap, save research R7's one
-  re-run after a recorded tool defect; and Budget. They also test the common part of `--reproduce`,
-  with a mocked C tool and build on a temporary repository: the worktree of `git_head` checked
-  against its blobs, and the rebuild in a second worktree, the committed binary removed there first,
-  so that a make file that would find it up to date compiles it all the same, one run where the
-  rebuild's SHA-256 equals the committed binary's, a second, compared too, where it differs and has
-  a `re-found` record of its own, the outcome `match` only when both runs match, and no second run
-  and a difference in every compared field, exit 1 with the record written, where the guards Tool
-  validation and Trail tools do not admit the rebuild, as where it fails. In
+  re-run after a recorded tool defect; and Budget, a spent candidate row never refusing a
+  reproduction and a heavy reproduction refused, its `projection` record written, once its
+  projection does not fit the hours left in research R7's feature-wide row. They also test the
+  common part of `--reproduce`, with a mocked C tool and build on a temporary repository: the
+  worktree of `git_head` checked against its blobs, and the rebuild in a second worktree, the
+  committed binary removed there first, so that a make file that would find it up to date compiles
+  it all the same, one run where the rebuild's SHA-256 equals the committed binary's, a second,
+  compared too, where it differs and has a `re-found` record of its own, the outcome `match` only
+  when both runs match, and no second run and a difference in every compared field, exit 1 with the
+  record written, where the guards Tool validation and Trail tools do not admit the rebuild,
+  whatever the kind of the record reproduced, a demonstration, a validation and a cross-check among
+  them, as where it fails; and a heavy reproduction's exit 2 without `--owner-request`, the request
+  quoted with its date in its record's `owner_request`, a light one needing none. In
   `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the FUT-SEC-8
   sweep among them, and every script with a worker option takes the heavy-run lock, each script as
-  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065, PRO-068,
-  PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R7, R12, R16; PRO-065,
+  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -207,11 +212,13 @@ or key-loading code is written here.
   worktree, and its rebuild from that commit's source with its make file in a second worktree, the
   committed binary removed there first, the rebuild's SHA-256 reported only and a second run with
   it, compared too, where that differs from the committed binary's and the guards Tool validation
-  and Trail tools admit it, and otherwise a difference in every compared field, output under
-  `$REP/reproductions/<record_id>/<n>/`, the second run's under a further `rebuilt/` directory, the
-  design document read from that worktree and checked against `design-versions/<sha256>.md`, and
-  exit 2 while the environment record the original cites is not in force. (FR-053, FR-061, FR-065,
-  FR-068; R1, R16, R18; REP-099, REP-100)
+  and Trail tools admit it, and a difference in every compared field where they do not admit it or
+  it fails, output under `$REP/reproductions/<record_id>/<n>/`, the second run's under a further
+  `rebuilt/` directory, the design document read from that worktree and checked against
+  `design-versions/<sha256>.md`, `--owner-request` for a heavy reproduction, kept in its record as
+  `owner_request`, with exit 2 without one, and exit 2 while the environment record the original
+  cites is not in force. (FR-045, FR-053, FR-061, FR-065, FR-068; R1, R7, R16, R18; REP-099,
+  REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
@@ -468,10 +475,10 @@ hashes.
 - [ ] T038 [P] [US1] Write `tests/test_seed_search.py`, WSL only, skipping on Windows with its
   reason: `make -C fast -f seed_search.mk` builds `fast/build/seed_search` with `-Werror`, and its
   `--source-sha256` prints the SHA-256 of `fast/seed_search.c` (quickstart U1); a build of the same
-  source in a second directory gives the same SHA-256 (research R16); `fast/build/seed_search
-  --check-vectors vectors/phyco-v2_*.hex` compares 2 × 10,000 words and exits 0 (quickstart U2);
-  `fast/build/phyco_stream` and `fast/Makefile` hash the same before and after the build; only the
-  main thread writes progress lines. (FR-001, FR-002, FR-053; R2, R16)
+  source in a second directory gives a binary of the same SHA-256 (research R16);
+  `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` compares 2 × 10,000 words and
+  exits 0 (quickstart U2); `fast/build/phyco_stream` and `fast/Makefile` hash the same before and
+  after the build; only the main thread writes progress lines. (FR-001, FR-002, FR-053; R2, R16)
 - [ ] T039 [P] [US1] Write the tests of `scripts/fut_sec8.py` in `tests/test_protocol_004.py`, on a
   mocked tool and a temporary reports directory: the targets are
   `protocol.seedsets.load("dev", allow=("dev",))[:3]`, and a held-out set exits 2; a second run
@@ -571,8 +578,8 @@ hash, older than its first counted result.
   appended to, its entries never changed, and its counts are recomputed exactly; and
   `scripts/validate_tool.py` exits 2 without a recorded source for a published value, or with an
   `owner-provided` entry whose row does not read Approved at HEAD; and, in WSL, skipping on Windows
-  and until the file exists, `research/004/tools/trails/arx_search.mk` gives the same SHA-256 in a
-  second directory. (FR-039, FR-053, FR-065; SC-007; R4, R12, R16)
+  and until the file exists, `research/004/tools/trails/arx_search.mk` builds a binary of the same
+  SHA-256 in a second directory. (FR-039, FR-053, FR-065; SC-007; R4, R12, R16)
 - [ ] T050 [US4] Write `scripts/validate_tool.py` (contracts/cli.md; data-model §7) with
   `--tool NAME --known KNOWN_ID --out-dir $REP/validation` and `--reproduce RECORD`: the source
   guard for published values and `owner-provided` entries; the second known result cited; after a
@@ -1281,7 +1288,7 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-042: T035, T036
 - FR-043: T085, T109, T113, T114, T116, T117, T118, T119, T120, T125, T126, T127
 - FR-044: T001, T002, T008, T010, T012, T013, T015, T027, T028, T077, T109
-- FR-045: T005, T008, T014, T042, T043, T081, T125
+- FR-045: T005, T008, T009, T014, T042, T043, T081, T125
 - FR-046: T016, T027, T029, T030, T031, T059, T065
 - FR-047: T077, T126
 - FR-048: T126

@@ -33,14 +33,15 @@ force", while that record is not the platform's record in force, so that no
 difference is ever charged to a tool that a changed environment could explain
 (REP-100). It appends nothing to the candidate log, charges no candidate's
 budget row and is not a re-run under research R7, so it can neither replace
-evidence nor add any; the Budget and Order of sizes guards, which concern
+evidence nor add any; the Order of sizes guard and the Budget guard's candidate rows, which concern
 evidence, do not refuse it, and every other guard applies, Committed code with the
 original's commit in HEAD's place, so a search that reached its cap is not
 reproduced (Trail tools). It is a heavy run where research R7 says so: it then runs only
 with `--owner-request "WORDS (DATE)"`, the owner's request quoted with its
 date, which its record keeps, and exits 2 without one; it takes the lock,
-projects first, for each run it makes, and is charged to research R7's feature-wide row. A light
-reproduction needs no request. A difference is a finding, exit 1: the original
+projects first, for each run it makes, is charged to research R7's feature-wide row and exits 2,
+writing nothing but its `projection` record, unless its projection fits the hours left there
+(Budget). A light reproduction needs no request. A difference is a finding, exit 1: the original
 stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
 until it is resolved, and, since it ran in the environment that made the original, it is a tool
 defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
@@ -227,8 +228,10 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   written with `status` `not evaluated` and never counts; a trail or distinguisher it finds is
   recorded as an unverified hypothesis, `blocked`, which blocks the candidate's eligibility
   until a validated tool, or direct evaluation with the validated exact models, settles it
-  (data model §5). A reproduction makes no run with a rebuild that this rule would write
-  `not evaluated`, and counts a difference instead (introduction). A tool is validated again after
+  (data model §5). A reproduction makes no run with a rebuild that differs from the committed binary
+  and has no `re-found` record of its own, of its kind and of its exact hash, whatever the kind of
+  the record it reproduces, a demonstration, a validation and a cross-check among them, and counts
+  a difference instead (introduction). A tool is validated again after
   any change to its code (its SHA-256 differs), a
   dependency upgrade, or a use at a word width, operation set or kind of model outside its validated
   kind; until then its results are `not evaluated`. A use at a word width or kind of model outside
