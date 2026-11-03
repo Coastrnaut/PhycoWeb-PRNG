@@ -968,6 +968,37 @@ They start open, and an item is ticked only under the rule in the Notes below.
   self-test compute? [Clarity, Spec §FR-036, §FR-059; data-model §11; research R8; cli contract
   "Generators of constants and vectors"]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK097 Where does `gen_vectors_v3.py` take each claimable size's k from, given that FR-059 has
+  k "stated per claimable size in the design document" as the least number of whole blocks for which
+  the model's run meets each structure's taking part, "unless the design document names a structure
+  that needs more, with its reason", that the self-test's vector file "holds k with the structure
+  that set it, which a test computes again from the model's run", that FR-020's self-test formula
+  takes k "computed from the model's run" and FR-026's storage k "computed as FR-059 states", and
+  that data-model §1's table compares `design_sha256` for `gen_constants_v3.py`, "since its
+  restatement check reads the design document", and reports it only for `gen_vectors_v3.py`, whose
+  synopsis takes no k, while any other script that reads the design document joins that table before
+  its first run? Where the design document names a structure that needs more, can the generator
+  write that k, and can the test's k, computed from the model's run, equal it? Is it stated how the
+  design document's k is checked against the file's, and which k each candidate's `cost` record
+  takes for FR-020's self-test formula before selection, when neither exists yet? [Gap, Conflict,
+  Spec §FR-020, §FR-026, §FR-059; research R8; data-model §1 "Fields compared", §11; cli contract
+  "Generators of constants and vectors"]
+- [ ] CHK098 Does research R16's rule on hashes name every hash of kind `canonical`, given that it
+  records `canonical` "for an approval hash, which `owner_record.py` prints and a row names, and the
+  freeze record's `draft_sha256`", while data-model §1's "Hashes" adds the approval hash of the
+  protocol change log's writer, taken "over one canonical JSON array of the first entries in log
+  order or over a later entry alone, each entry without `approver` and `prev_sha256`" (REP-094),
+  which `protocol_change.py` prints, no row names and the guard "Protocol log" recomputes? Is R16, a
+  section that the lists' heading "Records and their hashes" names, brought into line, so that the
+  two statements of the hash kinds agree? [Consistency, Spec §FR-044; research R16; data-model §1
+  "Hashes", §18; cli contract `protocol_change.py`, "Protocol log"]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
