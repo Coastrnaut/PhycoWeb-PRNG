@@ -1009,8 +1009,13 @@ They start open, and an item is ticked only under the rule in the Notes below.
   record is in force, but the guard "Protocol log" lets `protocol/evidence.py` write only a
   `lock-cleared` record while the protocol change log does not exist, every other kind refused, so
   that the first environment record, a record of kind `environment` written through that module
-  before the log (data-model introduction), is refused, and the tasks cannot follow plan
-  phase 1's order as written. The eighth re-run takes it up. A tick here
+  before the log (data-model introduction), is refused, and the tasks cannot follow plan phase 1's
+  order as written. The eighth re-run takes it up. The 5 items of the eighth re-run, CHK092 to
+  CHK096, verified in the same way once their answers were applied, were ticked in commit fe2f6cb,
+  and with them CHK081 and CHK082, which PRO-071 settles: while the protocol change log does not
+  exist, the guard "Protocol log" admits an environment record written by
+  `owner_record.py environment`, so that each platform's first record comes before every other
+  write, in plan phase 1's order, and the tasks can follow that order as written. A tick here
   therefore records a determination the owner delegated, and the owner's
   tasks approval includes the review of those ticks: an item the owner does not accept is unticked.
   Items of later runs follow the same rule, and each commit that ticks items is named here.
