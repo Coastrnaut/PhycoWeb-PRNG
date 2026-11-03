@@ -1598,10 +1598,37 @@ out, RAT-088, naming none: its changes are to spec FR-034 "Attack classes" and F
 place of a rule. The alignment edited only this file, which holds no such place, so that the
 comparison over 930494d and 974ffef gives the same result.
 
+After this round's commits, commit 1c67100 of 2026-11-03 changed research R16 and the cli contract,
+places that the heading "Records and their hashes" names, with an edit that no row made, on the
+owner's word of that day, given after the loop stopped ("consider and fix these two items after the
+loop stops"), that `scripts/downloads.py` has no `--reproduce` while neither the cli contract's rule
+nor FR-061's list of exclusions exempts it. Both already exempted it, REP-085 having written the
+exception at the end of R16's bullet "Reproduction", of the cli contract's paragraph of that name
+and of FR-061's list, but each of the two rules opened with a universal, every script that writes
+evidence or generated files having `--reproduce`. The commit qualified each opening by the scripts
+its end names as having none, and named at each end, beside the three writers, `clear_lock.py`
+(REP-063) and the scripts that write no record: `candidate_log.py`, `protocol_change.py` and
+`provenance.py` (ANA-080, PRO-060) and `check_claims.py` (REP-063), as their sections state, and
+`repair_log.py`, whose section, the one that stated nothing, it gave the statement its siblings
+make. It also qualified spec FR-053, which holds no place of a rule, by the kinds FR-061 leaves out.
+It is recorded here for the owner to confirm at the tasks approval as an entry of its own or as no
+change of rule, with the reason; the agent's reading is that it changed no rule beyond what REP-063,
+PRO-060, ANA-080 and REP-085 changed, since the openings then stated what their ends and those
+sections already said, and `repair_log.py`, like its siblings, writes log entries and no record. The
+agent also raises, for the owner's decision at the same approval, whether REP-063 and REP-085, which
+stated those exceptions against the universal that the second re-run had written, set aside a
+reading of the old text in PRO-079's sense, so that their first entries would carry the mark
+`set_aside` beside the thirteen: under that reading `clear_lock.py` needs a `--reproduce` that finds
+no lock to clear, and each of the three writers one that regenerates an owner's act or an outside
+fact.
+
 Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
 recorded beside the re-run's list above; the span from 832bd4d to 930494d, between the ninth and
-tenth re-runs' pairs, changed no place. Before the tasks approval the script compares every pair and
+tenth re-runs' pairs, changed no place; and after this round's pair, the span from 974ffef to
+1c67100 changed two places, research R16 and the cli contract, both by 1c67100, recorded beside this
+list above, the commits before it, 744ded0 and ccaf8f0, changing none, nor the commit that recorded
+it, which edited only this file. Before the tasks approval the script compares every pair and
 span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
 and which the owner confirms in the row "Place check" (PRO-063).
 
