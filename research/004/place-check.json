@@ -1,7 +1,7 @@
 {
  "lists": "specs/004-crypto-architecture-v3/checklist-choices.md",
  "plan_approval": "65bcbf2b05cc32ba3970220d25d7ea802ef89deb",
- "compared_to": "b9d97405ed779cf496d8d0e174177781216f8487",
+ "compared_to": "e1d7a90b70c37a1680e3d07bc0b8869145d4814a",
  "rules": {
   "Development inputs": [
    "protocol: Development inputs",
@@ -2172,7 +2172,7 @@
   },
   {
    "from": "974ffef9720c698ac3083bfdc0f136edd0f25938",
-   "to": "b9d97405ed779cf496d8d0e174177781216f8487",
+   "to": "e1d7a90b70c37a1680e3d07bc0b8869145d4814a",
    "after": "From the tenth re-run, 27 of its 28 rows:",
    "changes": [
     {
@@ -2360,6 +2360,24 @@
       "data-model §1",
       "cli contract"
      ]
+    },
+    {
+     "commit": "43baec5b9114600c786f9837537cc3c7d62ec915",
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model §1",
+      "cli contract"
+     ]
+    },
+    {
+     "commit": "e1d7a90b70c37a1680e3d07bc0b8869145d4814a",
+     "rule": "Records and their hashes",
+     "places": [
+      "R16",
+      "data-model §1",
+      "cli contract"
+     ]
     }
    ]
   }
@@ -2386,7 +2404,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2398,7 +2416,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2410,7 +2428,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2422,7 +2440,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2434,7 +2452,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2446,7 +2464,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2458,7 +2476,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2472,7 +2490,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2484,7 +2502,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2496,7 +2514,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2509,7 +2527,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2522,7 +2540,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2534,7 +2552,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2547,7 +2565,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2559,7 +2577,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2571,7 +2589,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2584,7 +2602,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2599,7 +2617,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2611,7 +2629,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2624,7 +2642,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2639,7 +2657,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2651,7 +2669,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2665,7 +2683,7 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   },
@@ -2679,7 +2697,35 @@
    ],
    "in": [
     "974ffef9720c698ac3083bfdc0f136edd0f25938",
-    "b9d97405ed779cf496d8d0e174177781216f8487"
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "43baec5b9114600c786f9837537cc3c7d62ec915",
+   "rule": "Records and their hashes",
+   "places": [
+    "R16",
+    "data-model §1",
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
+   ],
+   "beside": "From the tenth re-run, 27 of its 28 rows:"
+  },
+  {
+   "commit": "e1d7a90b70c37a1680e3d07bc0b8869145d4814a",
+   "rule": "Records and their hashes",
+   "places": [
+    "R16",
+    "data-model §1",
+    "cli contract"
+   ],
+   "in": [
+    "974ffef9720c698ac3083bfdc0f136edd0f25938",
+    "e1d7a90b70c37a1680e3d07bc0b8869145d4814a"
    ],
    "beside": "From the tenth re-run, 27 of its 28 rows:"
   }
