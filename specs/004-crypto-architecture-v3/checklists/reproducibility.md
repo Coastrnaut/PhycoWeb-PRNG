@@ -999,6 +999,63 @@ They start open, and an item is ticked only under the rule in the Notes below.
   two statements of the hash kinds agree? [Consistency, Spec §FR-044; research R16; data-model §1
   "Hashes", §18; cli contract `protocol_change.py`, "Protocol log"]
 
+## Tenth re-run (2026-11-03)
+
+Items found when the checklist was run an eleventh time, over the complete documents and the
+repository, after the ninth re-run's answers of 2026-11-02 were applied on 2026-11-03 and its items
+ticked. They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK099 Is it stated which copy of the design document a reproduction reads for the kinds whose
+  code reads it, given that data-model §1 compares `design_sha256` for the size profile and limits,
+  the constant tables, the vectors, those two generators' checks and the review package, "since its
+  code reads the design document", that a reproduction runs the recorded configuration in a separate
+  worktree of the original's `git_head`, its verdict "recomputed under the spec version, the
+  research version and the protocol change-log entry the original cites", `spec-versions/` and
+  `research-versions/` named and no design version (spec FR-053; data-model §1; research R16), and
+  that research R16 keeps every cited spec "whether or not a commit holds it" and every cited
+  design-document version as `design-versions/<sha256>.md`, while the guard on cited files names
+  files cited by path and SHA-256, such as the sidecar and
+  `research/004/candidates/superseded.json`, and `dirty_paths` "may be data and report files only"?
+  Is it stated whether every evidence run exits 2 while the spec, research.md or the design document
+  is modified in the working tree, so that the original's `git_head` holds each version its record
+  cites, or that a reproduction reads the design document from `design-versions/<sha256>.md`, so
+  that a design document left uncommitted at the original's run cannot make its reproduction differ
+  in a compared field? [Ambiguity, Consistency, Spec §FR-053; data-model §1 `design_version`,
+  `dirty_paths`, "Reproduction", "Fields compared"; research R16 "Spec and research versions", "Code
+  at HEAD", "Reproduction"; cli contract "Committed code"]
+- [ ] CHK100 Can a record made before an environment change be reproduced, given that a reproduction
+  runs "in the environment that made the original, as its environment record shows, and in no other"
+  (research R1; data-model §1; spec FR-053; cli contract introduction), a difference in a field that
+  enters a verdict being a tool defect "since it ran in the environment that made the original",
+  while every write through `protocol/evidence.py`, a `reproduction` record's included, exits 2
+  unless the running environment equals the platform's environment record in force as a whole, every
+  package of `pip freeze`, the Windows build or the WSL distribution and kernel among them, so that
+  after any update, a Windows update included, the record that made an earlier original is no longer
+  in force, FR-061's test reproduces per kind its latest light run and one made before the last
+  change to its code, either of which may come before that update, and `validate_tool.py`'s section
+  has a later draw, `--reproduce` included, "reproduce every hash in an environment with that numpy
+  version", a draw that differs being "reported" and counting "for nothing"? Is "the environment
+  that made the original" the platform or the environment record the original cites, and is it
+  stated what a reproduction of a record made before the latest change does: refused with its
+  reason, FR-061's test then taking runs made under the record in force; run under the record in
+  force, the fields that depend on a changed version reported, not compared, a difference there
+  being no tool defect; or another stated rule? [Conflict, Gap, Spec §FR-053, §FR-061; research R1,
+  R16 "Reproduction"; data-model §1 "Reproduction"; cli contract introduction, "Environment",
+  `validate_tool.py`]
+- [ ] CHK101 Is it stated how a reader decides which entries after a repaired break count, given
+  that research R16, data-model §3 and the cli contract's `repair_log.py` have "Entries after the
+  break count only where the records they cite corroborate them", while many entries cite no record,
+  the candidate log's `proposed`, `mapping`, `entered-d4`, `replacement` and `set-closed` entries
+  among them, the provenance log's entries cite a file's section by its SHA-256 and a review's row,
+  the protocol change log's a rule's texts, `last_record_id` and `results_known`, and
+  `round_rule.py`, `recheck_004.py`, `design_freeze.py create` and the guard "Protocol log" read
+  these logs for the entered set, eligibility, selection, the frozen logs' last entries and the
+  rules in force? Is "corroborate" defined per log and kind of entry, with the reader that applies
+  it, the place where it records which entries count, and what becomes of an entry that cites
+  nothing, so that a later reader and the re-check reach the same result from the repository alone?
+  [Measurability, Gap, research R16 "A broken chain"; data-model §3 "Repair", §14, §18; cli contract
+  `repair_log.py`, `round_rule.py`, `recheck_004.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the reproducibility focus prompt of the
