@@ -195,9 +195,9 @@ or key-loading code is written here.
   in the entry of each row listed under the constant rule, and `propose`'s, exit 2 with nothing
   appended while an addition's `refused_list` differs from the file at HEAD, the list at HEAD does
   not parse in that format, or it drops or changes an entry of the version that the latest
-  `refused_list` names, on a stated history in which an entry is dropped and one in which a word
-  changes, and an entry appended on one in which a draft that no entry names changes a word before
-  the next named version. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
+  `refused_list` names, on a stated history in which an entry of that version is dropped and one in
+  which a word of one changes, and an entry appended on one in which a word of an entry added since
+  that version changes before `propose` runs. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
 - [ ] T011 Write `protocol/provenance.py`, the one writer of `$REP/provenance.jsonl`, and
   `scripts/provenance.py` with `add FILE` and `review FILE` (contracts/cli.md; data-model §14): one
   entry per file or per section, with the tool and model, the date, the task ID and the review

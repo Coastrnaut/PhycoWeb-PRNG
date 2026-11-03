@@ -830,10 +830,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (stop rule). Another copy of the paper, from any source, is a new download that needs the owner's
   permission for that file (FR-046; research R19).
 - **A refused set's only source file cannot be had**: the refused list waits for the set's file,
-  permitted in a row "Download <n>" (research R15, R19), and a file recorded `not obtained` waits
-  for another copy, permitted the same way under a name of its own. Where none can be had, the
-  list stays incomplete, no candidate can be scored, none can be eligible (FR-023), and the
-  feature recommends stopping (stop rule).
+  permitted in research R19's tables or, for a file they do not list, in a row "Download <n>"
+  (research R15, R19), and a file recorded `not obtained` waits for another copy, permitted in a
+  row "Download <n>" under a name of its own. Where none can be had, the list stays incomplete,
+  no candidate can be scored, none can be eligible (FR-023), and the feature recommends stopping
+  (stop rule).
 - **No proven or validated trail bound reaches 2⁻¹²⁸ at a claimable size**: R_bound is not
   established for that candidate within its analysis budget, and it cannot be frozen. The gap is
   reported, and the candidate is `ineligible`; another candidate is entered in its place, before the
