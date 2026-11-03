@@ -686,6 +686,50 @@ They start open, and an item is ticked only under the rule in the Notes below.
   [Measurability, Consistency, Spec §FR-028, §FR-041, §Pre-registered Design Protocol "Bias rule";
   research R4 "False firing"]
 
+## Ninth re-run (2026-11-02)
+
+Items found when the checklist was run a tenth time, over the complete documents and the
+repository, after the eighth re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK080 Is a command named that appends the candidate log's entries other than `evidence`,
+  `set-closed` and `repair`, that is `proposed` (with the owner's approval of a replacement "quoted
+  with its date in its `proposed` entry"), `mapping`, `entered-d4`, `scored`, `decision`,
+  `replacement` and `correction`, given that the cli contract has `evidence_v3.py` append `evidence`
+  entries, `round_rule.py --close` write `set-closed` and `repair_log.py` append `repair`, while the
+  plan lists `protocol/candidates.py` as a module with no command, and the log writer's refusals, a
+  fourth `proposed` entry of a family, a decision outside the rules' reasons and a `replacement`
+  entry closed for "the budget spent" unless R7's rows, the record of the need and the protocol
+  change log's entry show it, are stated for that module alone? Is it stated who runs that command
+  for each kind of entry, the agent or, for an owner's approval, the owner's word quoted, as
+  `provenance.py` and `protocol_change.py` state theirs? [Gap, Spec §FR-041, §Eligibility and
+  selection, §Stop rule; data-model §3; plan "Project Structure"; cli contract `evidence_v3.py`,
+  `round_rule.py`, `repair_log.py`]
+- [ ] CHK081 Is it stated who writes the candidate log's `selected` entry, with its `variant_map`,
+  and the `not selected` entries, and when, after the selection record and, where it holds a tie,
+  after the owner's choice, and what a later selection record (`selection-<k>.json`) adds to the log
+  when it selects another candidate or the same one, given that entries are never edited, that the
+  cli contract has `round_rule.py --select` write only the selection record, that
+  `design_freeze.py create` records "the `variant_map` of the `selected` entry" and the model's
+  tests check that `phyco-v3` reproduces the candidate's outputs through it, and that a decline's
+  re-selection may select a further candidate? Is the entry that `create` reads the latest
+  `selected` entry, and must it name the candidate that the latest selection record selects, with
+  that record's tie choice where there is one? [Gap, Clarity, Spec §FR-041, §FR-043, §Eligibility
+  and selection, §User Story 5 scenario 2; data-model §3, §9, §13; cli contract `round_rule.py`,
+  `design_freeze.py`]
+- [ ] CHK082 Can the D4 record's outcome `chosen by default` arise, given that research R6 fixes the
+  width as the widest of 16 and 8 "at which at least one entered candidate of each family has both a
+  differential and a linear trail bound for a common number of rounds of at least 2", r* as "the
+  largest such common number" and scores only "candidates with both bounds at r* rounds", so that at
+  a width that qualifies each family has a scored candidate, while R6 also has "One family scored.
+  That family is chosen by default" and data-model §8 lists that outcome? Is it stated which outcome
+  the record takes, `chosen by default` or `not computable`, when at both widths only one family has
+  a candidate with both bounds at a common round count of at least 2, at which width and r* that
+  family's candidates are then scored, and whether "common" means common to one candidate's two
+  bounds or to the candidates of both families, so that r* cannot be read as exceeding every round
+  count that the other family reaches? [Ambiguity, Conflict, Spec §Nonlinearity choice rule (D4);
+  research R6; data-model §8 `outcome`; cli contract `d4_choice.py`]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the analysis focus prompt of the strategy
