@@ -1714,22 +1714,42 @@ rule, with the reason; the agent's reading is that it is stricter under both rea
 text, the source's hash alone and the binary's alone, as spec FR-039's re-validation after any
 change to a tool's code asks, and that it sets no reading aside.
 
-Over every span from the plan-approval commit, 65bcbf2, to 2e36613 outside the rounds' pairs, the
+Commits 7f42e03 and b9d9740, the eleventh report's remediation and a follow-up to it, on the
+owner's instruction of 2026-11-03 to make and commit the edits for its issues, changed research
+R16, data-model §1 and the cli contract, the places that the heading "Records and their hashes"
+names. Commit 7f42e03 extended the committed-code guard to every file of `code_sha256`, each C
+tool's binary among them, and made each run exit 2 unless the SHA-256 that the binary prints with
+`--source-sha256` equals its source's entry. It also settled the old words "a binary is rebuilt
+from committed source, its hash reported only" as a reproduction that runs the committed binary
+and rebuilds none, which was looser than their other reading, a reproduction that rebuilds the
+binary and runs the rebuild, for a binary stale against its make file or a repository header, so
+the last sentence of that commit's message, that each change is stricter under every reading, did
+not hold for it. Commit b9d9740 keeps both readings: a reproduction runs the committed binary,
+rebuilds each C tool's binary from that commit's source in a second worktree, reports the
+rebuild's SHA-256 only and, where that differs from the committed binary's, runs the rebuild too,
+the outcome `match` only when both runs match. Each commit is recorded here for the owner to
+confirm at the tasks approval as an entry of its own or as no change of rule, with the reason; the
+agent's reading is that the two together are stricter under both readings of the old text, and
+that they set no reading aside.
+
+Over every span from the plan-approval commit, 65bcbf2, to b9d9740 outside the rounds' pairs, the
 comparison that `research/004/place_check.py` wrote to `research/004/place-check.json`, committed
-in c5a630c with `compared_to` 2e36613, after a first comparison up to addc940 committed in
-0a99462, found twelve commits that changed places of rules with an edit that no row made: ad2c195's
-change to research R3, recorded beside the re-run's list above; and, in the span from 974ffef to
-2e36613, after this round's pair, research R16 and the cli contract by 1c67100, data-model §18 by
-57bd909, the cli contract by b6a93f0, spec FR-039, research R4 and the cli contract by 252512a,
-spec FR-020, FR-025 and FR-026 and research R5 and R8 by 797c6da, research R15, data-model §1 and
-§18 and the cli contract by ce3cde1, research R15, data-model §1 and the cli contract by ccfd9d1,
-research R15 by b3eba12, research R15 and R16, data-model's introduction and §18, the cli contract
-and the notes under the Review & Approval table by 5f34d5c and again by 7a6d0e8, and research R12
-by 2e36613, 23 entries in all, one per commit and rule, each recorded beside this list above. The
-span from 832bd4d to 930494d, between the ninth and tenth re-runs' pairs, changed no place, nor did
-the span's other commits, 744ded0, ccaf8f0, 388551a, 82bb979, 3c8eccb, 7e61f4f, 40768cd, e560a9c,
-addc940, 0a99462, d626a13, dc40078, a56d372, d9a17e7 and 99b6422. These results restate that file,
-which the owner confirms in the row "Place check" (PRO-063).
+in c92383c with `compared_to` b9d9740, after comparisons up to addc940, 2e36613 and 7f42e03
+committed in 0a99462, c5a630c and ce902d5, found fourteen commits that changed places of rules
+with an edit that no row made: ad2c195's change to research R3, recorded beside the re-run's list
+above; and, in the span from 974ffef to b9d9740, after this round's pair, research R16 and the cli
+contract by 1c67100, data-model §18 by 57bd909, the cli contract by b6a93f0, spec FR-039, research
+R4 and the cli contract by 252512a, spec FR-020, FR-025 and FR-026 and research R5 and R8 by
+797c6da, research R15, data-model §1 and §18 and the cli contract by ce3cde1, research R15,
+data-model §1 and the cli contract by ccfd9d1, research R15 by b3eba12, research R15 and R16,
+data-model's introduction and §18, the cli contract and the notes under the Review & Approval
+table by 5f34d5c and again by 7a6d0e8, research R12 by 2e36613, and research R16, data-model §1 and
+the cli contract by 7f42e03 and again by b9d9740, 25 entries in all, one per commit and rule, each
+recorded beside this list above. The span from 832bd4d to 930494d, between the ninth and tenth
+re-runs' pairs, changed no place, nor did the span's other commits, 744ded0, ccaf8f0, 388551a,
+82bb979, 3c8eccb, 7e61f4f, 40768cd, e560a9c, addc940, 0a99462, d626a13, dc40078, a56d372, d9a17e7,
+99b6422, c5a630c, 280e360 and ce902d5. These results restate that file, which the owner confirms
+in the row "Place check" (PRO-063).
 
 ## After the answer
 
