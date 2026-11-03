@@ -687,6 +687,80 @@ start open, and an item is ticked only under the rule in the Notes below.
   tests of each state expect? [Consistency, Spec §FR-025 "Zeroization", "Call sequence", "Flow
   control"]
 
+## Eighth re-run (2026-11-02)
+
+Items found when the checklist was run a ninth time, over the complete documents and the
+repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
+They start open, and an item is ticked only under the rule in the Notes below.
+
+- [ ] CHK086 Can the end of a call be read at the ports, given that FR-020 has each call end "when
+  the core is ready for the next command" and "Feature 008 measures the counts at the ports and
+  compares them with the formulas", while, from any call's command word to its end, "the command
+  interface accepts zeroize only", so that its ready is high before a call's end and after it alike,
+  and no port of the port list marks the end: an instantiate ends with "its forget call complete and
+  the core `instantiated` and ready for a command", a generate request with its forget call, after
+  its last block has been taken, and a self-test that fails ends in `failed`, which "accepts no call
+  until the next reset", with `selftest_fail` already set where it is "a second failure leaving it
+  set"? Is a port stated that marks each call's end, for example a registered output that is high
+  while the core takes every command its state accepts, with its value after configuration and after
+  reset in the port list, or a stated event for each call, so that a measured count "matches its
+  formula at any pace the host keeps"? Is it stated how the host learns when it may send its next
+  command, given that a command word taken before a call's end is "refused with the code of a call
+  out of sequence", while one offered on an interface whose ready is low would wait? [Measurability,
+  Gap, Spec §FR-020, §FR-025 "Call sequence", "Flow control", "Registers and read-back", §FR-059;
+  FUT-HW-5]
+- [ ] CHK087 Does the call-state table give a state to every stretch of a call, given that a key
+  load has `loading`, an instantiate `instantiating`, "from its command word to instantiate done",
+  and a reseed `reseeding`, while a generate request has none, so that from its command word to its
+  forget call's end it can only be in `instantiated`, which "accepts the calls the model's call
+  sequence allows, and zeroize", although from any call's command word to its end the command
+  interface accepts zeroize only; that "`loading` runs from that command word to the last key word",
+  while the key-loading figure runs "from the last key word accepted to the key held"; and that a
+  zeroization, "each with its latency in cycles and output-valid low throughout", runs from a
+  zeroize's command word or a zeroizing refusal to `no-key` in no state of the table? Is each such
+  stretch a state, or a stated part of one, with the calls it accepts and each interface's ready, so
+  that "The tests cover a call in each state of the table" cover a call in each stretch, a command
+  word offered during a zeroization included, and "FR-020's zeroization formula covers each state
+  that accepts a zeroize" covers a zeroize during a generate request? [Completeness, Consistency,
+  Spec §FR-025 "Call sequence", "Key loading and reset", "Zeroization", §FR-020]
+- [ ] CHK088 Which trees does "the registers of both trees" in "Zeroization" name, given that
+  FR-034's components name four, the absorption and output trees, "the start tree with its call-type
+  field" and "the reset tree that every zeroization trigger drives", and that FR-026 counts "the
+  reset and start fan-out trees with the call-type field at every node"? Is it stated what a
+  zeroization does to a start signal still on its way to the nodes, sent for a call of Π before the
+  zeroize was taken, given that the start tree and the reset tree each have "one stated latency to
+  every node, as reset does", with no order stated between the two, so that where the start tree's
+  is the longer, a start that reaches the nodes after the clear would run a call of Π on the cleared
+  lanes, the round and phase counters counting again from their reset values, and pass a block to
+  the buffer, against "After reset or zeroization, output-valid stays low and the output register
+  holds zeros until an instantiate requested by the host completes"? Is the start tree, with the
+  call-type field at every node, among what a zeroization clears, or the order of the two latencies
+  stated, so that no call of Π starts after a zeroization's clear? [Ambiguity, Edge Case, Spec
+  §FR-025 "Zeroization", "Flow control", §FR-026, §FR-034 "Components"; plan "Complexity Tracking"]
+- [ ] CHK089 Are the core's counters named once, with their values after a zeroization or a reset,
+  given that "Zeroization" returns "the round, phase and limit counters" to their reset values,
+  FR-026 counts "the replicated round and phase counters, the limit counters" and "the controller
+  with the call-state table", and FR-034's components name the round and phase counters and not the
+  limit counters, which its paths that carry secret data name "(their integrity)", while FR-059's k
+  counts "the request's block count to its last block", a counter that none of these names, and the
+  controller needs others that none names either: the key words taken in `loading`, the nonce's
+  words, and the words of a personalization string or a reseed input against its length word? Is
+  each such counter listed with the part of FR-026's estimate it falls in and its value after a
+  zeroization or a reset, so that a call that follows a zeroize made in mid-call, "where a new load
+  starts afresh", counts from zero, as the tests of each state expect? [Completeness, Consistency,
+  Spec §FR-025 "Call sequence", "Zeroization", §FR-026, §FR-034 "Components", §FR-059]
+- [ ] CHK090 Is a command word that names no command stated, given that the command interface takes
+  "one 32-bit word per call, with the command (key load, instantiate, generate, reseed, zeroize) in
+  stated bits" and, "for generate, the length in 32-bit words in the rest", so that a field of at
+  least three bits holds values that name no command, and the other bits of a key load, instantiate,
+  reseed or zeroize word carry nothing? Is such a word, and one whose unused bits are not zero,
+  refused before anything changes, and with which code, given that the list holds "one code for each
+  refusal that changes nothing (a length, a call out of sequence, any other limit)" and names
+  neither, while on the absorption interface the "unused bytes of a last partial word that must be
+  zero" are checked, a nonzero one being an error path? Is it stated whether a zeroize word whose
+  other bits are not zero still zeroizes, so that a malformed zeroize does not leave the key and the
+  state in place? [Gap, Edge Case, Spec §FR-025 "Flow control", "Zeroization"; FUT-HW-5]
+
 ## Notes
 
 - Generated on 2026-11-01, after plan approval, from the hardware-readiness focus prompt of the
