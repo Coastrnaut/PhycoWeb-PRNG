@@ -1628,13 +1628,25 @@ the three writers one that regenerates an owner's act or an outside fact. The ow
 same day, "yes, add REP-063 and REP-085 to the set-aside readings", so that their first entries
 carry the mark `set_aside` beside the thirteen, by the commit recorded next.
 
+That commit, 57bd909 of 2026-11-03, changed data-model §18, a place that the heading "Protocol
+changes and their directions" names, with an edit that no row made: §18's list of the first entries
+whose `readings` hold a reading marked `set_aside` names REP-063 and REP-085 beside the thirteen,
+as, in the same commit, "How to answer", the spec's Review & Approval rows of the third and seventh
+re-runs and "Readings set aside", a Clarification of that day, research.md's introduction and the
+plan's post-design re-check do, none of them a place of a rule. It is recorded here for the owner to
+confirm at the tasks approval as an entry of its own or as no change of rule, with the reason; the
+agent's reading is that it changed no rule, since §18 already gave the mark to every other entry of
+that kind that the agent finds before the log is created (PRO-079), and that, read as a change, it
+is stricter: `protocol_change.py create` refuses until the owner decides two more readings.
+
 Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
 recorded beside the re-run's list above; the span from 832bd4d to 930494d, between the ninth and
 tenth re-runs' pairs, changed no place; and after this round's pair, the span from 974ffef to
-1c67100 changed two places, research R16 and the cli contract, both by 1c67100, recorded beside this
-list above, the commits before it, 744ded0 and ccaf8f0, changing none, nor the commit that recorded
-it, which edited only this file. Before the tasks approval the script compares every pair and
+57bd909 changed three places, research R16 and the cli contract by 1c67100 and data-model §18 by
+57bd909, each recorded beside this list above, the other commits, 744ded0, ccaf8f0, 388551a
+and the commit that recorded 57bd909, changing none, the last two editing
+only this file. Before the tasks approval the script compares every pair and
 span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
 and which the owner confirms in the row "Place check" (PRO-063).
 
