@@ -995,9 +995,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the absorption interface, with no sign at the ports, a risk that feature 008's tests cover by
   matching the output, block by block, with the model's after a passed self-test, a key load and an
   instantiate with the host's key, nonce and personalization string, each other than the
-  self-test's, and, where the design has a reseed, after a reseed with an input other than the
-  self-test's and a second request, so that each selector held alone, as well as all of them, gives
-  an output that differs from the model's (FR-059; SEC-082, SEC-088; RAT-079). The 128-bit
+  self-test's, and after a reseed with an input other than the self-test's and a second request, so
+  that each selector held alone, as well as all of them, gives an output that
+  differs from the model's (FR-059; SEC-082, SEC-088; RAT-079). The 128-bit
   target is a classical one, so against T11 this feature covers only single-target key search, k/2 ≥
   s, which k = 256 meets with equality and no margin at s = 128 (FR-010). Multi-target quantum key
   search, which in some cost models costs about 2^((k − log₂ u)/2) and so falls below 2^s for every
@@ -1140,7 +1140,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-013**: The generator MUST be a keyed duplex over Π with the calls instantiate (key, nonce,
   personalization string), generate (n bits), forget and an optional reseed (input), and forget
   MUST follow every generate request and end every instantiate, in the form the theorem covers
-  (research R10), so that no state compromise reaches the key (FR-004). Its security bound MUST
+  (research R10), so that no state compromise reaches the key (FR-004). The reseed call is part of
+  the design, of the model and of the core, D1's "optional reseed" meaning only that a host
+  need not call it, so that the start-up self-test and feature 008's tests
+  always run a reseed (FR-008, FR-059; SEC-088). Its security bound MUST
   come from a named, published theorem for exactly this mode (for example the keyed-duplex
   bounds of Daemen, Mennink and Van Assche, 2017, or the sponge-based generator of Bertoni et
   al., 2010). Every precondition of the theorem, including how the key enters the state, MUST be
@@ -1339,9 +1342,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   gives or one that a structure the design document names, with its reason,
   raised, as the design document's table of k states it (HW-084; REP-097), and
   counts every word it feeds, those of its key and nonce, the empty personalization string's length
-  word and, where the design has a reseed, the reseed input's length word and words
-  (FR-059; HW-082). A call made in `not-reset`, `resetting` or `failed` is never
-  accepted and has no count (FR-025 "Call sequence"). Feature 008 measures the counts at the
+  word and the reseed input's length word and words (FR-059; HW-082). A call
+  made in `not-reset`, `resetting` or `failed` is never accepted and has no
+  count (FR-025 "Call sequence"). Feature 008 measures the counts at the
   ports, from a call's start to the cycle in which `call_done` rises, and
   compares them with the formulas (FUT-HW-5; HW-086). For eligibility, decided
   for every candidate before selection, these cycles per call come, with
@@ -1569,8 +1572,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
     cycles, fixed by public values: from reset released to the self-test done and the state
     zeroized (ready for a key), the self-test's key and nonce words fed through the chains and, for
     rate lanes, through the absorption tree into the nonce registers, and its words fed through the
-    absorption interface's selector, the personalization string's length word and, where the design
-    has a reseed, the reseed input's length word and words, included (FR-059;
+    absorption interface's selector, the personalization string's length
+    word and the reseed input's length word and words, included (FR-059;
     HW-082); key loading, from the last key word accepted to the key held,
     the end of `loading` ("Call sequence"; HW-087), for a finished load, a
     call of its own whose cycle count joins FR-020's list; and instantiate, as two figures: from the
@@ -1884,9 +1887,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   each counter in the part FR-025 "Zeroization" gives it (HW-089), the self-test's sequencer,
   its comparator of r bits, its input selectors, the one at each chain's input and the one at the
   absorption interface, and its key, nonce, the empty personalization string's
-  length word (RAT-079), reseed input with its length word where the design
-  has a reseed (HW-082) and expected output, k·r bits per generate request
-  with k computed as FR-059 states (HW-084), held as constants, and the 2w·n²
+  length word (RAT-079), reseed input with its length word (HW-082) and expected output, k·r bits
+  per generate request with k computed as FR-059 states (HW-084), held as constants, and the 2w·n²
   state flip-flops with the pipeline registers; block RAM is expected to be
   0 unless a ROM is mapped to it. A part is stated negligible only with its figure
   and the reason. The total is compared with the XC7A100T's 63,400 LUTs and
@@ -3234,8 +3236,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   interface's selector as the host would; then one generate request of k whole
   blocks, k·r bits, k stated per claimable size and per keyed research variant
   (HW-095) in the design document as the least for which every node, every lane,
-  every constant ROM entry of the calls run, both trees and the counters take part; then, if the
-  design has a reseed, a reseed with reseed input 0 of research R3 and a second generate request of
+  every constant ROM entry of the calls run, both trees and the counters take part; then a
+  reseed with reseed input 0 of research R3 and a second generate request of
   k whole blocks, so that the reseed's effect is compared; the self-test holds that reseed input and
   its length word among its constants and feeds them through the absorption interface's selector,
   word by word as the host would, their storage in FR-026's estimate and their cycles in FR-020's
@@ -3270,9 +3272,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and every expected block, whole, in the same generator run as the vectors, from a `ResearchDuplex`
   object of its own run through the self-test's call sequence alone, instantiate with key and nonce
   0 and the empty personalization string, one generate request of k whole blocks with its forget
-  call and, where the design has a reseed, the reseed with reseed input 0 of
-  research R3 and the second request of k whole blocks with its forget call,
-  so that its expected blocks are those that the model's `Generator` and
+  call and the reseed with reseed input 0 of research R3 and the second request of k whole blocks
+  with its forget call, so that its expected blocks are those that the model's `Generator` and
   the hardware's self-test compute (REP-096), as a vector file of its own per claimable
   size and per keyed research variant (HW-095), `selftest_<variant>.json`,
   frozen with the vectors, from which `phycoweb/selftest_v3.py` is copied, so
@@ -3288,8 +3289,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   input, at the nonce chain's input and at the absorption interface, and FR-008's risk and feature
   008's test cover each held on its constants, alone or with the others, the test matching the
   output, block by block, with the model's after a passed self-test, a key load and an instantiate
-  with the host's key, nonce and personalization string, each other than the self-test's, and, where
-  the design has a reseed, after a reseed with an input other than the self-test's
+  with the host's key, nonce and personalization string, each other than the
+  self-test's, and after a reseed with an input other than the self-test's
   and a second request, so that each selector held alone, as well as all of
   them, gives an output that differs from the model's (FR-008; SEC-088). Its
   comparator, r bits wide, takes each whole r-bit block as the output buffer receives it and each of
