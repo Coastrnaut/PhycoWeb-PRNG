@@ -5,7 +5,7 @@
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
 Feature `004-crypto-architecture-v3`. Date: 2026-11-01. Each row below gives the choices for one of
-the 507 items in the six checklists that `/speckit-checklist` generated after plan approval, with
+the 522 items in the six checklists that `/speckit-checklist` generated after plan approval, with
 the recommended option first: the 206 items of the first run, the 29 that the re-run of 2026-11-01
 found in the text those answers changed, the 71 that the second re-run of 2026-11-01 found over the
 complete documents and the repository and the 70 that the third re-run of 2026-11-01 found over
@@ -14,31 +14,31 @@ them, all answered and applied, the third re-run's on 2026-11-02, the 36 that th
 2026-11-02, the 11 that the fifth re-run of 2026-11-02 found over them, answered in advance and
 applied on 2026-11-02, the 22 that the sixth re-run of 2026-11-02 found over them, answered in
 advance and applied on 2026-11-02, the 37 that the seventh re-run of 2026-11-02 found over them,
-answered in advance and applied on 2026-11-02, and the 25 that the eighth re-run of 2026-11-02
-found over them, answered in advance and applied on 2026-11-02. The 65 items
-marked `[Conflict]` come first, the 4 of the eighth re-run before the 4 of the
-seventh re-run, the 2 of the sixth re-run, the 3 of the fifth re-run, the 11 of
-the fourth re-run, the 9 of the third re-run, the 15 of the second re-run, the 4 of the re-run and
-the 13 of the first run: where two texts disagree, every other item would be checked against a
-moving target until they agree. The eighth re-run's 21 other items follow in a section of their own,
-then the seventh re-run's 33, then the sixth re-run's 20, then the fifth re-run's 8, then the fourth
-re-run's 25, then the third re-run's 61, then the second re-run's 56, then the re-run's 25, then the
-193 other items of the first run, checklist by checklist.
+answered in advance and applied on 2026-11-02, the 25 that the eighth re-run of 2026-11-02 found
+over them, answered in advance and applied on 2026-11-02, and the 15 that the ninth re-run of
+2026-11-02 found over them, not yet answered. The 68 items marked `[Conflict]` come first, the 3 of
+the ninth re-run before the 4 of the eighth re-run, the 4 of the seventh re-run, the 2 of the sixth
+re-run, the 3 of the fifth re-run, the 11 of the fourth re-run, the 9 of the third re-run, the 15 of
+the second re-run, the 4 of the re-run and the 13 of the first run: where two texts disagree, every
+other item would be checked against a moving target until they agree. The ninth re-run's 12 other
+items follow in a section of their own, then the eighth re-run's 21, then the seventh re-run's 33,
+then the sixth re-run's 20, then the fifth re-run's 8, then the fourth re-run's 25, then the third
+re-run's 61, then the second re-run's 56, then the re-run's 25, then the 193 other items of the
+first run, checklist by checklist.
 
 No option was written into the spec, the plan, research.md or any other document before the owner
-answered its round. This document ticks no checklist item. On 2026-11-01, and
-again on 2026-11-02 with the instruction to repeat the rounds until a re-run
-finds no new item, the owner asked the agent to verify each item against the
-text and tick it if it holds; each checklist's Notes record those instructions, their dates and the
-commits that ticked items, and the owner's tasks approval includes the review of those ticks
-(PRO-045).
+answered its round, and none of the ninth re-run's options has been written yet. This document ticks
+no checklist item. On 2026-11-01, and again on 2026-11-02 with the instruction to repeat the rounds
+until a re-run finds no new item, the owner asked the agent to verify each item against the text and
+tick it if it holds; each checklist's Notes record those instructions, their dates and the commits
+that ticked items, and the owner's tasks approval includes the review of those ticks (PRO-045).
 
-**Status: all 507 rows answered and applied: the 376 of the first four rounds "all recommended"
-(owner), the 206 of the first run, the 29 of the re-run and the 71 of the second re-run on
-2026-11-01 and the 70 of the third re-run on 2026-11-02, and the 131 of the fourth to eighth re-runs
-in advance on 2026-11-02, by the owner's approval of all suggestions, each round applied the
-same day.** Option A of every row is applied where its Changes cell names a
-document: the spec, plan.md, research.md, data-model.md, the two contracts,
+**Status: 507 rows answered and applied: the 376 of the first four rounds "all recommended" (owner),
+the 206 of the first run, the 29 of the re-run and the 71 of the second re-run on 2026-11-01 and the
+70 of the third re-run on 2026-11-02, and the 131 of the fourth to eighth re-runs in advance on
+2026-11-02, by the owner's approval of all suggestions, each round applied the same day; the 15 rows
+of the ninth re-run await the owner's answer.** Option A of every answered row is applied where its
+Changes cell names a document: the spec, plan.md, research.md, data-model.md, the two contracts,
 quickstart.md, the eight checklist files (SEC-066), security.md (versions 2.11, 2.12 and 2.13),
 `.gitattributes` and this document's lists "Rows that change the protocol" (PRO-061), with
 `research/004/place_check.py`, the script spec FR-044 names for their comparison (PRO-063); the
@@ -60,8 +60,8 @@ the spec's Status line is (PRO-057).
   which takes the recommended option of every row of every round of the loop. The sixth re-run's 22
   rows were answered in advance by the same approval. The seventh re-run's 37 rows were answered in
   advance by the same approval. The eighth re-run's 25 rows were answered in advance by the same
-  approval. An answer could also have given letters by ID, for example "PRO-072 B, REP-095 B, the
-  rest recommended", or an option in the owner's own words.
+  approval. The ninth re-run's 15 rows await an answer: "all recommended", letters by ID, for
+  example "SEC-090 B, REP-097 B, the rest recommended", or an option in the owner's own words.
 - After each answer, the changes each chosen option names are applied with their reasons. The six
   checklists are then re-read against the changed text, and the reviewer ticks an item once the text
   it asks for is in place.
@@ -164,11 +164,30 @@ the spec's Status line is (PRO-057).
   call's end, give every stretch of a call a state, add the start tree to what a zeroization clears,
   list the counters and settle a malformed command word; and REP-092 to REP-096 order a record's ID
   and its hashes, give the freeze record's approval a field of its own, and state the bytes of the
-  log's approval hash, the unit of a section entry and the self-test's call sequence.
+  log's approval hash, the unit of a section entry and the self-test's call sequence. Among the
+  ninth re-run's rows, SEC-089 and SEC-090 fill `phyco-v3`'s `bound` and `evidence` in the register
+  and derive `bound_bits`, on which SEC-091's comparison of a disclaimer's bound rests, and SEC-092
+  fixes how the claim test finds and decides the disclaimers; RAT-083 ties the owner design review
+  to `rationale.md`, RAT-084 gives `rationale.md` fixed chapters and RAT-085 states what
+  `mode_limits_v3.py` reads and checks the chapter "Security target" against its files; ANA-080 and
+  ANA-081 name the writers of the candidate log's entries, the `selected` entry among them, and
+  ANA-082 settles D4's outcome where one family is scored; PRO-073 aligns research R16 and
+  quickstart F2 with the freeze's steps as PRO-072 left them; HW-091 defines a command word refused
+  while a call runs, and HW-092 aligns R5's size estimate with FR-026, building on HW-082 and
+  HW-084; and REP-097 states where the self-test's k comes from, building on HW-084, and REP-098
+  names every hash of kind `canonical` in R16.
 
 ## Conflicts
 
-The 65 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
+The 68 items marked `[Conflict]`. Each one names two texts that cannot both stand as written.
+
+From the ninth re-run of 2026-11-02, not yet answered, in checklist order:
+
+| ID | Question | Recommended (A) | Other options | Changes |
+|----|----------|-----------------|---------------|---------|
+| RAT-085 | The cli contract has `mode_limits_v3.py` evaluate the theorem's bound "at the limits stated in the design document" and write each row of `parameters.json` "from the variant table and the design document's layout", which the chapters "Mode" and "Permutation" hold as written text, while data-model §1's table reports `design_sha256` only for the size profile and limits, a field "compared only for a kind whose code reads the design document", and the chapter "Security target" holds per size a parameter table and the output limits (User Story 2, scenario 2) that one security-target review reads beside `parameters.json` and `limits.json`. In what form does the script read the limits, the variant table and the layout, is its `design_sha256` compared, and is the chapter's table taken from the files or checked against them? | Align: `mode_limits_v3.py` reads three tables of the design document, each a Markdown table with fixed columns in a section of its own, which the chapters' test checks: the chapter "Permutation"'s section "Variant table", one row per variant with its ID, n, w, b, c, r, R and status, and the chapter "Mode"'s sections "Layout", which lanes form the rate part and which the capacity part at each size, and "Limits", each limit in calls of Π and in bits at every claimable size, with u and the two ways of choosing nonces; it exits 2 if a table is missing, appears twice or holds a row it cannot read; data-model §1's table gives the size profile and limits a row of their own that compares `design_sha256`, since their code reads the design document, as the constant tables' row does; and the chapter "Security target"'s parameter table and output limits restate `parameters.json` and `limits.json`, a test comparing each with its file row by row and value by value, the key entropy, the reachable secret state, c, r, R and the bound among them, and failing on any difference, so that the security-target review reads one set of values; FR-010, FR-034 "Chapters", User Story 2, data-model §1 and §10 and the cli contract's `mode_limits_v3.py` say so | B: `mode_limits_v3.py` reads the limits, the layout and the variant table from arguments of its command, each a JSON file written by hand under `research/004/` and held by path and SHA-256 in the run's `config`, the design document restating them and a test comparing the two, `design_sha256` staying reported only. C: unchanged: the table reports `design_sha256` for a kind whose code reads the design document, the form of what the script reads is unstated, and the chapter's table and the files can differ | spec FR-010, FR-034 "Chapters", User Story 2; data-model §1, §10; cli contract `mode_limits_v3.py` |
+| ANA-082 | Research R6 fixes the D4 width as the widest of 16 and 8 "at which at least one entered candidate of each family has both a differential and a linear trail bound for a common number of rounds of at least 2", r* as "the largest such common number", and scores "Only candidates with both bounds at r* rounds", so that at a width that qualifies each family has a scored candidate, while R6 also has, under "One family scored", "That family is chosen by default", and data-model §8 lists `chosen by default` among the outcomes. Can that outcome arise, which outcome does the record take when at 16 and at 8 only one family has a candidate with both bounds at a common round count of at least 2, at which width and r* are that family's candidates then scored, and does "common" mean common to one candidate's two bounds or to the candidates of both families? | Settle: "common" means common to the two bounds of each scored candidate and to the scored candidates of both families: r* is the largest number of rounds, at least 2, at which at least one entered candidate of each family has both bounds, so that at a width where both families qualify each has a scored candidate and r* never exceeds every round count the other family reaches; where at 16 and at 8 only one family has a candidate with both bounds at some number of rounds of at least 2, that family is chosen by default, as research R6's "One family scored" and data-model §8's `chosen by default` state, the width being the widest at which it has one, r* the largest such number there and its candidates with both bounds at r* scored, the highest being its representative, with the other family's outcomes listed; this reading is the conservative one, since the other family has no reduced-width evidence the choice could weigh; where neither family has one, D4 is not computable, as now; the protocol's "Nonlinearity choice rule" states the two cases, research R6, data-model §8 and the cli contract's `d4_choice.py` say so, and its tests cover the outcomes `chosen`, `chosen by default` and `not computable` | B: where only one family has such a candidate, D4 is not computable, as the width rule read alone gives, both families going on to the production-width analysis and selection taking the eligible candidate with the smallest R at 4×4, and R6's "One family scored" and data-model §8's `chosen by default` are removed (looser). C: unchanged: the width rule leaves `chosen by default` unreachable while R6 and data-model §8 list it, and "common" has two readings | spec "Nonlinearity choice rule"; research R6; data-model §8; cli contract `d4_choice.py` |
+| REP-097 | FR-059 has k "stated per claimable size in the design document" as the least number of whole blocks for which the model's run meets each structure's taking part, "unless the design document names a structure that needs more, with its reason", and the self-test's vector file "holds k with the structure that set it, which a test computes again from the model's run", while `gen_vectors_v3.py`'s synopsis takes no k, data-model §1's table reports `design_sha256` for it only, comparing it for `gen_constants_v3.py` "since its restatement check reads the design document", and each candidate's `cost` record takes FR-020's self-test formula and FR-026's storage before selection, when neither the design document's k nor the vector file exists. Where does the generator take each claimable size's k from, can the test's k, computed from the model's run, equal a k that a named structure raised, and which k does a `cost` record take? | Align: `gen_vectors_v3.py` reads each claimable size's k from a table of the design document's chapter "Hardware structure", in its section "Self-test", which the chapters' test checks: one row per claimable size with k, the structure that set it and, where k exceeds the least that the model's run gives, the structure the design document names with its reason; it computes that least k from a `ResearchDuplex` run through the self-test's call sequence, as FR-059 defines taking part, exits 1 if the table's k is below it, or above it with no named structure and reason, and writes k, the structure that set it and the run's least k into `selftest_<variant>.json`; the test computes the least k again from the model's run and checks the file's k against it and against the table, equal unless a named structure with its reason raised it; data-model §1's table compares `design_sha256` for `gen_vectors_v3.py`'s runs and checks, since its code reads the design document; and before selection each candidate's `cost` record computes the least k from a run of the candidate through the self-test's call sequence, its operation list interpreted by `research/004/ir.py` in the shared mode, and records it with the structure that set it, for FR-020's self-test formula and FR-026's storage, the design document stating the selected candidate's k equal to it or raised by a named structure with its reason; FR-020, FR-026, FR-034 "Chapters", FR-059, research R8, data-model §1 and §11 and the cli contract's generators say so | B: `gen_vectors_v3.py` computes k from the model's run alone and reads no design document, and the clause "unless the design document names a structure that needs more" is removed from FR-059, research R8 and data-model §11, so that k is always the least the run gives, the design document restating it and a test comparing the two, and a `cost` record takes that least k from the candidate's run (looser). C: unchanged: the generator has no source for a k that a named structure raised, the test's k cannot equal it, and a `cost` record has no k | spec FR-020, FR-026, FR-034 "Chapters", FR-059; research R8; data-model §1, §11; cli contract "Generators of constants and vectors" |
 
 From the eighth re-run of 2026-11-02, answered in advance on 2026-11-02 with the recommended
 options, and applied, in checklist order:
@@ -287,6 +306,28 @@ From the first run, answered on 2026-11-01, "all recommended", and applied, in c
 | HW-033 | FUT-GRID-1's expected status is "Met by specification and model", yet R14 leaves n = 5, 6, 7 and 9…15 without vectors, R_f, R_b or bounds, as open items against FUT-GRID-1. Which holds? | Align: the row reads "Partly met: the generics cover n = 2…16 in the model, the supported sizes are listed, and n = 5, 6, 7 and 9…15 are open items with their reason (FR-018)". FR-018 already foresees such open items, so the table follows it | B: commit Π vectors, R_f and R_b and the symmetry checks at every n from 2 to 16, with bounds still only at claimable sizes, so the status holds as written. The cost is eleven more sizes inside the 6 h structural row, which may only fall. C: leave both as they are: the table and R14 keep disagreeing | spec Security Policy traceability (FUT-GRID-1); final report open items |
 | REP-003 | `fut_sec8.py` exits 2 on a second run unless `--repeat-after-defect` names a defect, yet FR-053 wants every record reproducible. How does a reviewer reproduce the sweep without a repeat? | Add: two modes, neither a demonstration attempt. `--verify RECORD` re-checks every listed three-word match and every recovered seed with `model_v2` in seconds, with no sweep. `--reproduce RECORD`, allowed only after the FUT-SEC-8 result review, re-runs the sweep as a heavy run and writes a `fut-sec-8-reproduction` record compared field by field with the original; it can neither replace the demonstration record nor change the review, and a difference is a finding. A plain second run still exits 2 (quickstart U4) | B: `--verify` only: the counts after one and two words could then be re-checked only by a new attempt. C: allow a plain second run (looser: it gives up "one pass per target") | cli contract `scripts/fut_sec8.py`; data-model §4 (a reproduction kind); spec Pre-registered Design Protocol "FUT-SEC-8 demonstration" (Budget row, a sentence that a reproduction after the review is not a repeat) |
 | REP-015 | Generated files record their command, measured speed and generation time, yet `--check` fails on any byte difference, and those fields differ between runs and between Windows and Linux. Where do they go? | Add: generated files hold only deterministic content, as data-model §11's header example already does. The command (script and arguments, relative to the repository root), the interpreter, the model's SHA-256, the platform, the measured speed and the generation time go to a sidecar record per generator run, `vectors/phyco-v3/MANIFEST.json` or an evidence record under `$REP/vectors/`, which `--check` does not compare. FR-036's "measured speed stated" is met by the sidecar | B: keep the fields in the files and mask them in `--check`: the frozen hashes then cover bytes that change on every run. C: keep the script, its arguments and the model's SHA-256 in each header, all deterministic, and put speed, time and platform in the sidecar: self-describing files, but every model edit, even to a comment, rewrites every vector file | cli contract "Generators of constants and vectors"; data-model §11; research R8; spec FR-036 |
+
+## Ninth re-run of 2026-11-02
+
+The 12 items other than conflicts that the ninth re-run of 2026-11-02 found over the complete
+documents and the repository, in checklist order: 4 security, 2 design-rationale, 2 analysis, 1
+protocol, 2 hardware and 1 reproducibility. They await the owner's answer, as do the 3 conflicts
+above.
+
+| ID | Question | Recommended (A) | Other options | Changes |
+|----|----------|-----------------|---------------|---------|
+| SEC-089 | FR-069 asks the register to list every model ID with its claim level, its claim or "no claim", "its bound and its evidence records", while plan phase 1 creates `phyco-v3`'s entry at L0 with "no claim" and `in_progress` `none` and names neither `bound` nor `evidence`, data-model §15 gives a `bound` only for `phyco-v2`, and FR-009 states a bound per supported size while the register holds one `bound` per model ID. What does `phyco-v3`'s `bound` read before any size profile exists, does it follow the profile's `bound_bits` once `parameters.json` exists and in which commit, which records does `evidence` list at L0 and at L1, and does the claim test check either field at HEAD, as it checks `claim_level`, `history` and `in_progress`? | Add: `phyco-v3`'s `bound` reads `none` until `security-target/parameters.json` exists, and from then on holds, for each claimable size by its variant ID, that size's `bound_bits` from the profile, as "at most <bound_bits> bits", with the profile's path and SHA-256, written by the agent in the commit that commits the profile or its change, and inside FR-043's window in the working tree, for the owner's commit to hold (SEC-084); `evidence` lists, by path and SHA-256, the records the entry's level and bound rest on: none at L0 before the profile, the profile and `limits.json` once they exist, and at L1 also the demonstration record and the files that the two review rows named by "L1 recorded" name; the claim test checks both at HEAD, a `bound` that differs from the profile's `bound_bits` at a claimable size, or an `evidence` entry missing at its level or whose file has another SHA-256, being a finding; plan phase 1 creates the entry with `bound` `none` and `evidence` empty; FR-069, data-model §15, plan phase 1 and the cli contract's `check_claims.py` say so, and `tests/test_claims.py` covers each case | B: `phyco-v3`'s `bound` holds one value, the least `bound_bits` over its claimable sizes, as the register's one field per model ID reads, with the same writer, commit, `evidence` and check. C: unchanged: `bound` and `evidence` have no stated value for `phyco-v3`, and the claim test checks neither | spec FR-069; plan "Phases and gates"; data-model §15; cli contract `check_claims.py` |
+| SEC-090 | FR-009 asks each supported size to state "the bound these place on any security level", SC-003 counts that bound for every supported size, and FR-010 lists the generic checks of security.md §12.2 (the key entropy, a reachable secret state of at least 2s, multi-target search with k − log₂ u within the stated u, key plus nonce, capacity c ≥ 2s, single-target quantum search at k/2), while data-model §10 names `bound_bits` once, beside `status`, with no rule saying which of these values it takes, nor how a keyed reduced variant such as `n2-w16-R8-c64` gets its value. How is `bound_bits` derived, and can a test check the value that `mode_limits_v3.py` writes? | Settle: `bound_bits` is, per supported size, the least of the figures FR-010's checks give, each the cost of a generic attack in bits: k, the key entropy; half the reachable secret state at the boundary where it is least; k − log₂ u at the u that `limits.json` states; half of the key and nonce bits together; c/2; and, T11 being single-target key search only (FR-008), k/2; a term below zero counts as zero; `mode_limits_v3.py` writes beside it each term and the term that sets it, as `bound_terms`, computed by code, and a test recomputes the least from the terms and the terms from the row's other fields; a keyed reduced variant, such as `n2-w16-R8-c64`, takes the same rule at its own k, nonce bits and c, its value labelled "research variant, no claim" and never compared with s, and a keyless variant, with k = 0, takes `none`; the least is the most conservative reading, since each check caps every level; FR-009, FR-010, data-model §10 and the cli contract's `mode_limits_v3.py` say so | B: `bound_bits` is the least of k and half the reachable secret state, FR-009's two figures, the other checks staying pass or fail without a figure of their own (looser). C: unchanged: `bound_bits` has no stated derivation, and no test can check it | spec FR-009, FR-010; data-model §10; cli contract `mode_limits_v3.py` |
+| SEC-091 | Each disclaimer must "state no level, claim or bound beyond the register's", and the level rule gives each line its own `claim_level`, from the models the line names by ID and L0 where it names none, while no such rule is stated for a bound or a claim, and README's status block states a bound for PhycoWeb-PRNG as a whole in a line that names no model ID, "Its 64-bit seed also caps any security level at 64 bits", beside which FR-051's update adds a sentence on `phyco-v3`. Which register entry is a bound or a claim in such a line checked against, and what does "beyond" mean for a bound? | Add: a bound or a claim stated in a disclaimer is compared, line by line, with the register entries of the models the line names by ID, as the level rule reads a line's `claim_level`, and a disclaimer line that states a bound or a claim names its models by ID, one that names none being a finding; a bound is beyond the register's when an entry it names holds `none` or a bound below the line's, and a claim when an entry it names holds "no claim"; README's line names, in plan phase 1, when the test is written, the models whose 64-bit seed it describes, `float-v0`, `lut-v1` and `phyco-v2`, so that FR-051's sentence on `phyco-v3` stands beside it and each is checked against its own entries; FR-069, data-model §15, plan phase 1 and the cli contract's `check_claims.py` say so, and `tests/test_claims.py` covers a bound above an entry's, a bound for an entry that holds `none`, a claim beside "no claim" and a line that states a bound and names no model | B: the test checks a disclaimer's level only, and its bound and claim are read by the reviewer at each ⛔ gate, beside the allow-list entries, README's line staying as it stands (looser). C: unchanged: a bound or a claim in a line that names no model has no entry to be checked against, and "beyond" is undefined for a bound | spec FR-069; plan "Phases and gates"; data-model §15; cli contract `check_claims.py` |
+| SEC-092 | FR-069's test must decide that README's status block and security.md's two blocks each "say that PhycoWeb-PRNG, every model included, must not be used to generate secrets", while none of the three says "every model" as it stands, security.md's closing block names neither PhycoWeb-PRNG nor a model, its subject being "This generator", no text says how the test finds each block or by what criterion it decides, a fixed text, required phrases or a reading, and plan phase 1 starts the test "with FR-069's wording rules and its disclaimer check" while FR-051's updates of security.md and README come in plan phases 8 and 9. How does the test find each block and decide it, and are the blocks reworded when the test is written? | Add: the test finds each block by its place, README's status block and security.md's opening block as the first block quote of each file and security.md's closing block as its last, a block quote being a run of lines that start with ">", and exits 1 if one is missing; it decides each by one fixed sentence, "PhycoWeb-PRNG, every model included, must not be used to generate secrets.", which each block holds word for word beside its own text, and by FR-069's rule on a level, claim or bound beyond the register's; the three blocks gain that sentence in plan phase 1, before the test's first run, security.md's two in the version of its own that adds `phyco-v3`'s line to §15 and README's in the same phase, so that the test passes from phase 1, and FR-051's later updates keep it; FR-051, FR-069, data-model §15, plan phase 1 and the cli contract's `check_claims.py` say so, and `tests/test_claims.py` covers a block missing, a block without the sentence and the sentence changed by one word | B: the test accepts each block as it stands, by required phrases matched as whole words, "generate" with "secret" or "secrets", and "PhycoWeb-PRNG" or "This generator", read as every model, the blocks being reworded only by FR-051's updates (looser). C: unchanged: the test has no stated way to find a block or to decide it, and as they stand the blocks say "every model" nowhere | spec FR-051, FR-069; plan "Phases and gates"; data-model §15; cli contract `check_claims.py` |
+| RAT-083 | The owner design review's row reviews the "design document, design rationale, candidate log, evidence", and the freeze record hashes `rationale.md`, while the notes under the Review & Approval table have a review row name "the design document's version with the selection record", `design_freeze.py create` compares only those for that review, and `provenance.py review` refuses a review entry while the named file "does not have at that moment the SHA-256 that the row names for it" (RAT-081), which for `rationale.md` the row does not name. Must the row name `rationale.md` by path and SHA-256, and does `create` compare it, or can a change to `rationale.md` after the review's approval and before step (1) be frozen with no review row naming the text frozen? | Add: the owner design review's row, and each "Owner design review <k>", names `rationale.md` by path and SHA-256 beside the design document's version and the selection record, and `design_freeze.py create` compares it with the file at HEAD and exits 2 while they differ, so that a change to `rationale.md` after the review's approval counts only once an "Owner design review <k>" naming the changed file reads Approved, as a change to the design document does, and `provenance.py review` checks each review entry for a section of `rationale.md` against that hash (RAT-081); the row's notes, the notes under the Review & Approval table, FR-043, data-model §13 and the cli contract's `design_freeze.py` and `provenance.py` say so, and the freeze's tests cover a `rationale.md` changed after the review | B: the row names the design document's version and the selection record only, and `create` reads `rationale.md`'s status from its provenance review entries alone, each entry's `reviewed_sha256` checked against its section's text, so that a section written without an AI tool, which has no entry, is frozen with no hash that a review named (looser). C: unchanged: the row names no hash of `rationale.md`, and a change to it after the review can be frozen | spec FR-043, Review & Approval "Owner design review" and the notes under the table; data-model §13; cli contract `design_freeze.py`, `provenance.py` |
+| RAT-084 | SC-013 asks that the design rationale "covers 100% of the items of security.md §8", eight items it lists (the security target, the threat model and the claim template; the mode, its theorem and how each precondition is met; the role of every component, with what the mapping does and does not contribute; the sources of nonlinearity and their bounds; diffusion in both directions; every constant with its rule; the round-count rule and the margin; the known limitations and the attacks the design was built to resist), while FR-034 names a part of the rationale for some of them ("Components", "Constants", "Attack classes" and "Margin", beside "Network questions" and "Alternatives", which answer other needs) and none for the others, and `rationale.md`'s sections, unlike the design document's chapters, have no fixed headings that a test checks. Which part of `rationale.md` covers each item, or which chapter or record does it cite for it, so that a reviewer can count the coverage? | Add: `rationale.md`'s chapters are level-2 headings with fixed names, each once and in this order, which a test checks as it checks the design document's: "Security target", "Mode", "Components", "Nonlinearity", "Diffusion", "Constants", "Margin" and "Attack classes", one for each item of security.md §8's list in its order, then "Network questions" and "Alternatives"; "Security target", "Mode", "Nonlinearity" and "Diffusion" each state their item or cite, by chapter and section or by record ID and SHA-256, the design document's chapter or the evidence record that states it: the security target, the threat model and the claim template; the mode, its theorem and how each precondition is met; the sources of nonlinearity with their bound records; and R_f, R_b and FR-029's diffusion through instantiation; "Components" holds FR-034's component list with what the mapping does and does not contribute, "Margin" the round-count rule with the margin, and "Attack classes" also the known limitations, the classes left open or deferred among them; FR-034's parts take these names, and SC-013 counts the coverage as the eight chapters present, each stating or citing its item; FR-034 and SC-013 say so | B: `rationale.md` keeps free headings and opens with a coverage table, one row per item of security.md §8 naming the section, chapter or record that covers it, which a test checks against the file's headings and the records, SC-013 counting the rows. C: unchanged: the coverage of security.md §8's eight items cannot be counted | spec FR-034, SC-013 |
+| ANA-080 | The cli contract has `evidence_v3.py` append `evidence` entries, `round_rule.py --close` write `set-closed` and `repair_log.py` append `repair`, while the candidate log's other entries, `proposed`, with a replacement's approval "quoted with its date in its `proposed` entry", `mapping`, `entered-d4`, `scored`, `decision`, `replacement` and `correction`, have no command, the plan lists `protocol/candidates.py` as a module, and the log writer's refusals, a fourth `proposed` entry of a family, a decision outside the rules' reasons and a `replacement` entry closed for "the budget spent" without R7's rows, the record of the need and the protocol change log's entry, are stated for that module alone. Which command appends each of those entries, and who runs it for each kind, the agent or, for an owner's approval, the agent on the owner's word quoted, as `provenance.py` and `protocol_change.py` state theirs? | Add: `scripts/candidate_log.py`, through `protocol/candidates.py`, appends the candidate log's entries that no other script writes: `propose FILE`, `mapping FILE`, `enter`, `decide FILE`, `correct FILE` and `replace FILE` append the `proposed` entry, the `mapping` entry, one `entered-d4` entry per candidate of the entered set before any score, a `decision` entry with the `replacement` entry it brings, a `correction` and a `replacement` entry that closes a pending one with its reason, each FILE holding the entry's fields but `seq`, `prev_sha256` and `date_utc`, which the writer adds, as `provenance.py add` takes its entry; every refusal the module states is the command's, exit 2, appending nothing, `enter` among them once a `scored` entry exists; `d4_choice.py` appends one `scored` entry per scored candidate when it writes `choice.json`, citing it by path and SHA-256; the agent runs the command, and a `proposed` entry that records the owner's approval of a replacement, or of a further candidate after a decline, is written only on the owner's explicit word, quoted with its date in it, as `provenance.py review` is (RAT-077); FR-041, the protocol's "Eligibility and selection" and "Stop rule", plan "Project Structure", data-model §3 and the cli contract say so, and `tests/test_protocol_004.py` covers each refusal | B: each kind is appended by the script whose step it records, `proposed`, `mapping` and `correction` by a new `scripts/oplist_v3.py`, `entered-d4` and `scored` by `d4_choice.py`, and `decision` and `replacement` entries by `round_rule.py --candidate`, with the same refusals and the owner's word quoted as in A. C: unchanged: most entries of the candidate log have no command, and who writes them is unstated | spec FR-041, "Eligibility and selection", "Stop rule"; plan "Project Structure"; data-model §3; cli contract `candidate_log.py`, `d4_choice.py` |
+| ANA-081 | Entries are never edited, the cli contract has `round_rule.py --select` write only the selection record, and a tie in it waits for the owner's choice, while the freeze record holds "the `variant_map` of the `selected` entry", the model's tests check that `phyco-v3` reproduces the candidate's outputs through it, and a later selection record, `selection-<k>.json`, may select another candidate or the same one, a decline's re-selection among them. Who writes the candidate log's `selected` entry, with its `variant_map`, and the `not selected` entries, and when, what does a later selection record add to the log, and is the entry that `design_freeze.py create` reads the latest `selected` entry, which must name the candidate that the latest selection record selects, with that record's tie choice where there is one? | Add: `round_rule.py --decide`, run by the agent after the latest selection record, appends one `decision` entry `selected`, with its `variant_map` and the operation list's SHA-256, and one `not selected` entry for each other candidate the record lists as eligible, each citing the record by path and SHA-256 and its tie choice where there is one, and exits 2, appending nothing, while the record's tie has no choice whose row, "Selection tie" or "Selection tie <k>", reads Approved at HEAD with its SHA-256, while the record's outcome is a stop, or once the record has its entries; a later selection record gets entries of its own, whether it selects another candidate or the same one, so that no entry is edited, the latest `selected` entry being the one in force and an earlier one standing as a decision that a later record superseded; `design_freeze.py create` reads the latest `selected` entry and exits 2 unless it cites the latest selection record, with that record's tie choice where there is one, and names the candidate that record selects; FR-041, FR-043, the protocol's "Eligibility and selection", User Story 5, data-model §3, §9 and §13 and the cli contract's `round_rule.py` and `design_freeze.py` say so, and their tests cover a tie, a later record and a superseded entry | B: `design_freeze.py create` writes the `selected` entry, with its `variant_map`, from the latest selection record and its tie choice, and no `not selected` entry is written, the selection records holding the other candidates (looser). C: unchanged: no command writes the `selected` or `not selected` entries, and the entry `create` reads can name a superseded selection | spec FR-041, FR-043, "Eligibility and selection", User Story 5; data-model §3, §9, §13; cli contract `round_rule.py`, `design_freeze.py` |
+| PRO-073 | Research R16 has the freeze's step (1) be "the owner's next commit after the one that records the owner design review's approval, from which the agent commits no file of this feature", and quickstart F2 has `create` exit 2 "unless HEAD is the commit right after the owner design review's approval", while FR-043, data-model §13 and the cli contract, as PRO-072 left them, make step (1) the owner's next commit after the one that records that approval "in its row with the highest k", of every feature file changed since or an empty commit of the owner's, and, where the owner commits "Environment record <n>" or "Log repair <n>" on its own in between, the owner's next commit after the one that records the approval of the review held again in "Owner design review <k>", and run the agent's window from the first commit that records such an approval to the feature's end. Do R16 and quickstart F2 agree with FR-043, and does R16's step (2) state the exit while `check_claims.py` reports a finding at HEAD (SEC-084)? | Align: research R16's statement of the freeze's steps and quickstart F2 restate FR-043 as PRO-072 left it: step (1) is the owner's next commit after the one that records the owner design review's approval in its row with the highest k, of every feature file changed since or an empty commit of the owner's where none changed, and, where the owner commits "Environment record <n>" or "Log repair <n>" on its own between that approval and step (1), the owner's next commit after the one that records the approval of the review held again in "Owner design review <k>"; the agent commits no file of this feature from the first commit that records an owner design review's approval to the feature's end, plan phase 9 included; R16's step (2) also exits 2 while `check_claims.py` reports a finding at HEAD (SEC-084); and F2's expected result reads that `create` exits 2 unless HEAD is that commit of step (1) and while `check_claims.py` reports a finding, so that neither text names a commit other than the one `create` records as `owner_commit` | B: R16 and quickstart F2 cite FR-043 for the freeze's steps and restate none of them, so that one text states them. C: unchanged: R16 and F2 name the commit after the first approval, which differs from `owner_commit` where a review was held again or a row was committed on its own | research R16; quickstart F2 |
+| HW-091 | FR-020 counts "a refused request that changes nothing" among its calls, each starting "when its command is accepted on the command interface" and ending in the cycle in which `call_done` rises, while `call_done` is low "from each call's start, its command word's acceptance" to that call's end, and from any call's command word to its end the command interface "accepts zeroize only", "every other command word is refused with the code of a call out of sequence" and changes nothing, so that "accepted" reads both as taken and as acted on. Does a command word that the core takes and refuses while a call runs start a call of its own, what does `call_done` do then, which refusals does FR-020's count cover, one made between calls, an instantiate refused at its length word and one made while a call runs, in which cycle does each end, and does a refusal made while a call runs leave the running call's count and `call_done` as they would be without it? | Add: the core takes a command word in the cycle in which the command interface's valid and ready are both high, and a word taken while `call_done` is high starts a call: one the state accepts, or a refused request, which FR-020 counts from that word to the cycle in which its error code is raised, when `call_done` rises, so that a refusal between calls has a call and a count of its own; a word taken while a call runs, `call_done` low, starts no call: a zeroize ends the running call and starts its zeroization, as now, and any other word is refused with its code, changes nothing and leaves the running call's count, outputs and `call_done` as they would be without it, its error signal and code held until the next call starts or a reset, as FR-025's "until the next command word is accepted" then reads, unless the running call raises a code of its own, which replaces it; an instantiate or a reseed refused at its length word ends its own call, counted from its command word to the cycle in which the refusal's code is raised, when `call_done` rises, by a formula of FR-020's list; FR-020's "a refused request that changes nothing" names these cases and their cycles, FR-025's "Call sequence", "Flow control" and "Registers and read-back" say so, and FUT-HW-5's tests of a call in each state measure each count at the ports, a word refused while a call runs among them | B: a word taken and refused while a call runs starts a call nested in the running one, with a count of its own from its word to the cycle in which its code is raised, `call_done` staying low until the running call ends, so that the nested call's end has no port of its own and FUT-HW-5 measures it from the error signal. C: unchanged: "accepted" reads both as taken and as acted on, and the count of a refusal made while a call runs cannot be measured at the ports | spec FR-020, FR-025 "Call sequence", "Flow control", "Registers and read-back", Security Policy traceability (FUT-HW-5) |
+| HW-092 | Research R5's size estimate lists the self-test's "stored key, nonce, reseed input and expected output (spec FR-059; HW-082)", while FR-026 counts its key, its nonce, the empty personalization string's length word (RAT-079), the reseed input "with its length word where the design has a reseed" (HW-082) and the expected output, "k·r bits per generate request with k computed as FR-059 states (HW-084)", as FR-059's list of stored constants and FR-034's components name them, and every candidate's FR-026 figures come before selection from its `cost` records, written by `research/004/tools/costmodel.py`, which R5 describes. Does R5's size estimate count the self-test's stored constants as FR-026 does? | Align: research R5's size estimate lists the self-test's stored constants as FR-026, FR-059's list and FR-034's components name them, its key, its nonce, the empty personalization string's length word, its reseed input with that input's length word where the design has a reseed, and its expected output, k·r bits per generate request with k computed as FR-059 states, so that `costmodel.py` counts both length words and k·r bits per request, or states a part negligible only with its figure and reason, as R5 asks of every part; research R5 says so | B: R5 cites FR-026's list for the self-test's parts and restates none of them, so that one text states them. C: unchanged: R5's size estimate leaves out the length words and the size of the expected output | research R5 |
+| REP-098 | Research R16's rule on hashes records `canonical` "for an approval hash, which `owner_record.py` prints and a row names, and the freeze record's `draft_sha256`", while data-model §1's "Hashes" adds the approval hash of the protocol change log's writer, taken "over one canonical JSON array of the first entries in log order or over a later entry alone, each entry without `approver` and `prev_sha256`" (REP-094), which `protocol_change.py` prints, no row names and the guard "Protocol log" recomputes. Does R16's rule name every hash of kind `canonical`, so that the two statements of the hash kinds agree? | Align: research R16's rule on hashes names every hash of kind `canonical` that data-model §1's "Hashes" names: the approval hash that `owner_record.py` prints and a row names, of an environment record or an `owner-provided` entry; the freeze record's `draft_sha256` (REP-083); and the approval hash that `protocol_change.py` prints, over one canonical JSON array of the first entries in log order or over a later entry alone, each entry without `approver` and `prev_sha256`, which no row names and the guard "Protocol log" recomputes from the first entries (REP-094), so that the two statements of the hash kinds agree; research R16 says so | B: R16's rule cites data-model §1's "Hashes" for the hashes of kind `canonical` and restates none, so that one text lists them. C: unchanged: R16 leaves out the change log's approval hash | research R16 |
 
 ## Eighth re-run of 2026-11-02
 
@@ -619,13 +660,14 @@ four conflicts above.
 
 ## Security
 
-[checklists/security.md](./checklists/security.md): 88 items. SEC-010, SEC-020, SEC-048, SEC-052,
+[checklists/security.md](./checklists/security.md): 92 items. SEC-010, SEC-020, SEC-048, SEC-052,
 SEC-061, SEC-066 and SEC-084 are under Conflicts, SEC-041 to SEC-044 under "Re-run of 2026-11-01",
 SEC-045 to SEC-047 and SEC-049 to SEC-051 under "Second re-run of 2026-11-01", SEC-053 to SEC-060,
 SEC-062 and SEC-063 under "Third re-run of 2026-11-01", SEC-064, SEC-065 and SEC-067 to SEC-073
 under "Fourth re-run of 2026-11-02", SEC-074 under "Fifth re-run of 2026-11-02", SEC-075 to SEC-077
-under "Sixth re-run of 2026-11-02", SEC-078 to SEC-083 under "Seventh re-run of 2026-11-02" and
-SEC-085 to SEC-088 under "Eighth re-run of 2026-11-02"; the other 38 follow.
+under "Sixth re-run of 2026-11-02", SEC-078 to SEC-083 under "Seventh re-run of 2026-11-02", SEC-085
+to SEC-088 under "Eighth re-run of 2026-11-02" and SEC-089 to SEC-092 under "Ninth re-run of
+2026-11-02"; the other 38 follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -670,14 +712,15 @@ SEC-085 to SEC-088 under "Eighth re-run of 2026-11-02"; the other 38 follow.
 
 ## Design rationale
 
-[checklists/design-rationale.md](./checklists/design-rationale.md): 82 items. RAT-033, RAT-036,
+[checklists/design-rationale.md](./checklists/design-rationale.md): 85 items. RAT-033, RAT-036,
 RAT-038, RAT-040, RAT-044, RAT-045, RAT-048, RAT-050 to RAT-052, RAT-054, RAT-062, RAT-063, RAT-068,
-RAT-071 and RAT-080 are under Conflicts, RAT-037 and RAT-039 under "Re-run of 2026-11-01", RAT-041
-to RAT-043, RAT-046 and RAT-047 under "Second re-run of 2026-11-01", RAT-049, RAT-053 and RAT-055 to
-RAT-059 under "Third re-run of 2026-11-01", RAT-060, RAT-061 and RAT-064 to RAT-066 under "Fourth
-re-run of 2026-11-02", RAT-067 under "Fifth re-run of 2026-11-02", RAT-069 and RAT-070 under "Sixth
-re-run of 2026-11-02", RAT-072 to RAT-077 under "Seventh re-run of 2026-11-02" and RAT-078, RAT-079,
-RAT-081 and RAT-082 under "Eighth re-run of 2026-11-02"; the other 34 follow.
+RAT-071, RAT-080 and RAT-085 are under Conflicts, RAT-037 and RAT-039 under "Re-run of 2026-11-01",
+RAT-041 to RAT-043, RAT-046 and RAT-047 under "Second re-run of 2026-11-01", RAT-049, RAT-053 and
+RAT-055 to RAT-059 under "Third re-run of 2026-11-01", RAT-060, RAT-061 and RAT-064 to RAT-066 under
+"Fourth re-run of 2026-11-02", RAT-067 under "Fifth re-run of 2026-11-02", RAT-069 and RAT-070 under
+"Sixth re-run of 2026-11-02", RAT-072 to RAT-077 under "Seventh re-run of 2026-11-02", RAT-078,
+RAT-079, RAT-081 and RAT-082 under "Eighth re-run of 2026-11-02" and RAT-083 and RAT-084 under
+"Ninth re-run of 2026-11-02"; the other 34 follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -718,13 +761,14 @@ RAT-081 and RAT-082 under "Eighth re-run of 2026-11-02"; the other 34 follow.
 
 ## Analysis
 
-[checklists/analysis.md](./checklists/analysis.md): 79 items. ANA-001, ANA-036, ANA-048, ANA-054,
-ANA-059, ANA-060, ANA-062, ANA-068, ANA-069 and ANA-073 are under Conflicts, ANA-033 to ANA-035
-under "Re-run of 2026-11-01", ANA-037 to ANA-045 under "Second re-run of 2026-11-01", ANA-046,
-ANA-047, ANA-049 to ANA-053 and ANA-055 to ANA-058 under "Third re-run of 2026-11-01", ANA-061 and
-ANA-063 to ANA-067 under "Fourth re-run of 2026-11-02", ANA-070 and ANA-071 under "Fifth re-run of
-2026-11-02", ANA-072 under "Sixth re-run of 2026-11-02", ANA-074 to ANA-076 under "Seventh re-run of
-2026-11-02" and ANA-077 to ANA-079 under "Eighth re-run of 2026-11-02"; the other 31 follow.
+[checklists/analysis.md](./checklists/analysis.md): 82 items. ANA-001, ANA-036, ANA-048, ANA-054,
+ANA-059, ANA-060, ANA-062, ANA-068, ANA-069, ANA-073 and ANA-082 are under Conflicts, ANA-033 to
+ANA-035 under "Re-run of 2026-11-01", ANA-037 to ANA-045 under "Second re-run of 2026-11-01",
+ANA-046, ANA-047, ANA-049 to ANA-053 and ANA-055 to ANA-058 under "Third re-run of 2026-11-01",
+ANA-061 and ANA-063 to ANA-067 under "Fourth re-run of 2026-11-02", ANA-070 and ANA-071 under "Fifth
+re-run of 2026-11-02", ANA-072 under "Sixth re-run of 2026-11-02", ANA-074 to ANA-076 under "Seventh
+re-run of 2026-11-02", ANA-077 to ANA-079 under "Eighth re-run of 2026-11-02" and ANA-080 and
+ANA-081 under "Ninth re-run of 2026-11-02"; the other 31 follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -762,13 +806,14 @@ ANA-063 to ANA-067 under "Fourth re-run of 2026-11-02", ANA-070 and ANA-071 unde
 
 ## Protocol
 
-[checklists/protocol.md](./checklists/protocol.md): 72 items. PRO-001, PRO-026, PRO-041, PRO-044,
+[checklists/protocol.md](./checklists/protocol.md): 73 items. PRO-001, PRO-026, PRO-041, PRO-044,
 PRO-046, PRO-058, PRO-059, PRO-068 and PRO-071 are under Conflicts, PRO-036 to PRO-040 under "Re-run
 of 2026-11-01", PRO-042, PRO-043, PRO-045 and PRO-047 to PRO-049 under "Second re-run of
 2026-11-01", PRO-050 to PRO-057 under "Third re-run of 2026-11-01", PRO-060 under "Fourth re-run of
 2026-11-02", PRO-061 and PRO-062 under "Fifth re-run of 2026-11-02", PRO-063 to PRO-066 under "Sixth
-re-run of 2026-11-02", PRO-067, PRO-069 and PRO-070 under "Seventh re-run of 2026-11-02" and PRO-072
-under "Eighth re-run of 2026-11-02"; the other 33 follow.
+re-run of 2026-11-02", PRO-067, PRO-069 and PRO-070 under "Seventh re-run of 2026-11-02", PRO-072
+under "Eighth re-run of 2026-11-02" and PRO-073 under "Ninth re-run of 2026-11-02"; the other 33
+follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -808,13 +853,13 @@ under "Eighth re-run of 2026-11-02"; the other 33 follow.
 
 ## Hardware readiness
 
-[checklists/hardware.md](./checklists/hardware.md): 90 items. HW-003, HW-009, HW-010, HW-018,
+[checklists/hardware.md](./checklists/hardware.md): 92 items. HW-003, HW-009, HW-010, HW-018,
 HW-033, HW-043, HW-044, HW-071, HW-073 and HW-083 are under Conflicts, HW-038 to HW-042 under
 "Re-run of 2026-11-01", HW-045 to HW-057 under "Second re-run of 2026-11-01", HW-058 to HW-070 under
 "Third re-run of 2026-11-01", HW-072 under "Fourth re-run of 2026-11-02", HW-074 under "Fifth re-run
 of 2026-11-02", HW-075 to HW-078 under "Sixth re-run of 2026-11-02", HW-079 to HW-082, HW-084 and
-HW-085 under "Seventh re-run of 2026-11-02" and HW-086 to HW-090 under "Eighth re-run of
-2026-11-02"; the other 32 follow.
+HW-085 under "Seventh re-run of 2026-11-02", HW-086 to HW-090 under "Eighth re-run of 2026-11-02"
+and HW-091 and HW-092 under "Ninth re-run of 2026-11-02"; the other 32 follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -853,14 +898,14 @@ HW-085 under "Seventh re-run of 2026-11-02" and HW-086 to HW-090 under "Eighth r
 
 ## Reproducibility
 
-[checklists/reproducibility.md](./checklists/reproducibility.md): 96 items. REP-003, REP-015,
-REP-029, REP-035 to REP-037, REP-049, REP-056, REP-058, REP-070, REP-074, REP-082 and REP-093 are
-under Conflicts, REP-028 and REP-030 to REP-034 under "Re-run of 2026-11-01", REP-038 to REP-048 and
-REP-050 to REP-055 under "Second re-run of 2026-11-01", REP-057 and REP-059 to REP-069 under "Third
-re-run of 2026-11-01", REP-071 to REP-073 under "Fourth re-run of 2026-11-02", REP-075 under "Fifth
-re-run of 2026-11-02", REP-076 to REP-081 under "Sixth re-run of 2026-11-02", REP-083 to REP-091
-under "Seventh re-run of 2026-11-02" and REP-092 and REP-094 to REP-096 under "Eighth re-run of
-2026-11-02"; the other 25 follow.
+[checklists/reproducibility.md](./checklists/reproducibility.md): 98 items. REP-003, REP-015,
+REP-029, REP-035 to REP-037, REP-049, REP-056, REP-058, REP-070, REP-074, REP-082, REP-093 and
+REP-097 are under Conflicts, REP-028 and REP-030 to REP-034 under "Re-run of 2026-11-01", REP-038 to
+REP-048 and REP-050 to REP-055 under "Second re-run of 2026-11-01", REP-057 and REP-059 to REP-069
+under "Third re-run of 2026-11-01", REP-071 to REP-073 under "Fourth re-run of 2026-11-02", REP-075
+under "Fifth re-run of 2026-11-02", REP-076 to REP-081 under "Sixth re-run of 2026-11-02", REP-083
+to REP-091 under "Seventh re-run of 2026-11-02", REP-092 and REP-094 to REP-096 under "Eighth re-run
+of 2026-11-02" and REP-098 under "Ninth re-run of 2026-11-02"; the other 25 follow.
 
 | ID | Question | Recommended (A) | Other options | Changes |
 |----|----------|-----------------|---------------|---------|
@@ -976,13 +1021,14 @@ sixth re-run's, was written with its rows on 2026-11-02, and the owner's answer 
 in advance on 2026-11-02, approved it as written (FR-044). The eighth list, the seventh re-run's,
 was written with its rows on 2026-11-02, under the places that PRO-067's recommendation gives two of
 its headings, and the owner's answer to that round, given in advance on 2026-11-02, approved it as
-written (FR-044). The ninth list, the eighth re-run's, was written with its rows on
-2026-11-02, under the same places, and the owner's answer to that round, given
-in advance on 2026-11-02, approved it as written (FR-044). Each listed row
-enters the log with its rules' texts before and after its round, as data-model §18 states (PRO-051).
-The log is created, and no evidence run starts, only after the owner has confirmed every list; a row
-the owner takes out of a list is recorded here, beside that list, with the owner's reason, that it
-changed no rule.
+written (FR-044). The ninth list, the eighth re-run's, was written with its rows on 2026-11-02,
+under the same places, and the owner's answer to that round, given in advance on 2026-11-02,
+approved it as written (FR-044). The tenth list, the ninth re-run's, was written with its rows on
+2026-11-03, under the same places, and the owner's answer to that round approves it (FR-044). Each
+listed row enters the log with its rules' texts before and after its round, as data-model §18 states
+(PRO-051). The log is created, and no evidence run starts, only after the owner has confirmed every
+list; a row the owner takes out of a list is recorded here, beside that list, with the owner's
+reason, that it changed no rule.
 
 From the first run, 147 of its 206 rows:
 
@@ -1389,6 +1435,21 @@ eighth re-runs' pairs, changed no place. Before the tasks approval the script co
 and span again, up to HEAD, and writes `research/004/place-check.json`, which these results then
 restate and which the owner confirms in the row "Place check" (PRO-063).
 
+From the ninth re-run, 14 of its 15 rows:
+
+- **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
+  FR-022): ANA-082, HW-092.
+- **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: ANA-080, ANA-081,
+  HW-091, REP-097.
+- **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): ANA-080,
+  ANA-081.
+- **Vector lengths** (research R8; FR-036): REP-097.
+- **Security-target parameters and output limits** (research R9; FR-005 to FR-007, FR-010, FR-015):
+  SEC-090, RAT-085.
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-089, SEC-090, SEC-091,
+  SEC-092, RAT-083, RAT-085, ANA-080, ANA-081, ANA-082, PRO-073, REP-097, REP-098.
+
 ## After the answer
 
 The options chosen for the 29 rows of the re-run were written into the documents their Changes cells
@@ -1562,5 +1623,21 @@ any result exists (FR-044; data-model §18). Each of the 25 items was then verif
 complete documents, and with them protocol CHK065 and CHK068 and reproducibility CHK081 and CHK082,
 which PRO-071 answers: all 29 hold and are ticked, as each checklist's Notes record, and no item of
 the eight checklists stays open. A ninth re-run of the six checklists over the complete documents
-and the repository follows, and `/speckit-tasks` once a re-run finds no new item, up to the ⛔ tasks
-approval.
+and the repository then found the 15 items whose rows await an answer.
+
+Of the 15 rows of the ninth re-run, 3 are conflicts and 12 come from its other items: 4 security, 2
+design-rationale, 2 analysis, 1 protocol, 2 hardware and 1 reproducibility. By kind, their
+recommendations are 8 Add, 5 Align and 2 Settle; none is Clarify or Stricter. No recommended option
+loosens the protocol; seven alternatives are marked "looser": SEC-090 B, SEC-091 B, SEC-092 B,
+RAT-083 B, ANA-081 B, ANA-082 B and REP-097 B. SEC-090's and ANA-082's recommendations settle their
+cases by the most conservative reading: `bound_bits` is the least of the figures FR-010's checks
+give, since each check caps every level, and where only one family has a candidate with both bounds
+at a common round count of at least 2, D4 chooses that family by default, as research R6's "One
+family scored" states, since the other family has no reduced-width evidence the choice could weigh;
+ANA-082's alternative, which leaves D4 not computable there and analyses both families, admits
+candidates that this reading excludes, and is the looser one. SEC-091's and SEC-092's
+recommendations reword README's status block and security.md's two blocks in plan phase 1, when the
+claim test is written, not now. Once the rows are answered, the chosen options are written into the
+documents their Changes cells name, each with its reason; the protocol changes among them, listed
+above under "Rows that change the protocol", are recorded as FR-044 requires; the six checklists are
+re-read; and `/speckit-tasks` follows once a re-run finds no new item, up to the ⛔ tasks approval.
