@@ -1352,6 +1352,8 @@ restate and which the owner confirms in the row "Place check" (PRO-063).
 From the eighth re-run, 24 of its 25 rows:
 
 - **Bias rule**, with the inputs per bias measurement (research R4): ANA-078, ANA-079.
+- **Nonlinearity choice rule (D4)**, with the cost model and the D4 choice (research R5, R6;
+  FR-022): HW-089.
 - **Eligibility and selection**, with its items FR-018 to FR-031 and FR-037: SEC-088, RAT-078,
   RAT-079, ANA-078, ANA-079, HW-086, HW-087, HW-088, HW-089, HW-090.
 - **Stop rule**, with the analysis budget and the candidate log (research R7; FR-041): ANA-078,
@@ -1362,6 +1364,31 @@ From the eighth re-run, 24 of its 25 rows:
   the cli contract; the notes under the Review & Approval table): SEC-084, SEC-085, SEC-086,
   SEC-087, RAT-080, RAT-081, RAT-082, ANA-079, PRO-071, PRO-072, REP-092, REP-093, REP-094, REP-095,
   REP-096.
+
+Its round's two commits (PRO-061) are aad3f94 and 074fd32, which applied its last rows, the commit
+that completes its alignment being named here in 074fd32's place once it exists: that commit adds to
+this list the row named next and writes the comparison's results beside it. By the comparison and by
+PRO-067's rule, which also reads the messages of the round's commits and the rows' tags in each
+place's text, one row of the round had altered a place of a rule without being listed under it, and
+is added: HW-089 under "Nonlinearity choice rule (D4)", for research R5, whose size estimate names
+the controller's counters. It was already listed under "Eligibility and selection", so the list
+keeps 24 of the round's 25 rows.
+
+The comparison over aad3f94 and 074fd32, made with `research/004/place_check.py`, then found a row
+of the round listed under every rule whose place changed, each of the round's six commits changing
+only places under rules that list a row of its own checklist; the check of each row's Changes cell
+found each row listed under every heading whose place it names, and the row the list leaves out,
+ANA-077, naming none: its change is to data-model §3, which holds no place of a rule, and its
+commit's message names the spec's "Eligibility and selection" only as the text that change restates.
+The alignment edits only this file, which holds no such place, so that the comparison over aad3f94
+and the alignment's commit gives the same result.
+
+Over every span from the plan-approval commit, 65bcbf2, to aad3f94 outside the rounds' pairs, the
+comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
+recorded beside the re-run's list above; the span from 08184f1 to aad3f94, between the seventh and
+eighth re-runs' pairs, changed no place. Before the tasks approval the script compares every pair
+and span again, up to HEAD, and writes `research/004/place-check.json`, which these results then
+restate and which the owner confirms in the row "Place check" (PRO-063).
 
 ## After the answer
 
