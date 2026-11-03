@@ -119,7 +119,8 @@ keep to Python 3.8 grammar. C99 for `fast/seed_search.c` and any exhaustive chec
 Python (gcc 15.2.0 in WSL). Each C tool builds into a `build/` directory beside its source, as
 `fast/seed_search.mk` builds `fast/build/seed_search`. Its binary is committed after each build
 and before the run that uses it, so that the binary's `code_sha256` entry has a blob at the
-record's `git_head` and a reproduction runs it from its worktree (research R16, R18). It prints
+record's `git_head` and a reproduction runs it from its worktree, rebuilding it as well and
+running the rebuild too where it differs (research R16, R18). It prints
 with `--source-sha256` the SHA-256 of the source it was built from, which its make file builds
 into it, and an evidence run that uses it exits 2 unless that hash is its committed source's and
 the binary is itself committed and unmodified (R16). `.gitignore`'s `**/build/**`, with a `!`

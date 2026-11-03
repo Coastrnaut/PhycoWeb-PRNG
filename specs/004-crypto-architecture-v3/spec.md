@@ -3159,8 +3159,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     source, which the binary prints with `--source-sha256`, and the guard also exits 2 unless
     the printed hash equals the source's entry in `code_sha256`, so that the binary that runs
     was built from its committed source (research R16). A reproduction runs the original's code
-    at its `git_head`, its binaries included and none rebuilt, the guard applying to that commit,
-    and reports a binary's hash only.
+    at its `git_head`, its committed binaries included, the guard applying to that commit. It also
+    rebuilds each C tool's binary from that commit's source with its make file, in a second
+    worktree of that commit, and reports the rebuild's hash only; where the rebuild's SHA-256
+    differs from the committed binary's, it runs the recorded configuration again there with the
+    rebuild and compares that run with the original too, so that both the binary that ran and one
+    built from its committed source reproduce the result (research R16).
   - **Canonical order.** Every list in a record or vector file is sorted by a stated key, so
     that nothing depends on set iteration, hash randomization, thread completion or worker
     count. Records hold `PYTHONHASHSEED` if it is set, and the worker and thread counts; a test runs

@@ -182,11 +182,15 @@ or key-loading code is written here.
   validation; Trail tools, once the first trail search has started, a tool outside research R12's
   fixed set or without an earlier `re-found` record of its exact hash, for a C tool the pair of its
   source's and its binary's SHA-256, and a search that reached its cap, save research R7's one
-  re-run after a recorded tool defect; and Budget. In `tests/test_protocol_004.py`, FR-045's test
-  also checks that every budgeted kind, the FUT-SEC-8 sweep among them, and every script with a
-  worker option takes the heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040,
-  FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094,
-  REP-101)
+  re-run after a recorded tool defect; and Budget. They also test the common part of `--reproduce`,
+  with a mocked C tool and build on a temporary repository: the worktree of `git_head` checked
+  against its blobs, and the rebuild in a second worktree, one run where the rebuild's SHA-256
+  equals the committed binary's and a second, compared too, where it differs, the outcome `match`
+  only when both runs match, and a rebuild that fails counted as a difference in every compared
+  field. In `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the
+  FUT-SEC-8 sweep among them, and every script with a worker option takes the heavy-run lock, each
+  script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R12, R16; PRO-065,
+  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -197,10 +201,12 @@ or key-loading code is written here.
   each guard that reads the Review & Approval table reading it at HEAD, and the common part of every
   `--reproduce` mode: a worktree of the original's `git_head`, its `code_sha256` checked against
   that commit's blobs, a C tool's committed binary among them, which the reproduction runs from that
-  worktree, output under `$REP/reproductions/<record_id>/<n>/`, the design document read from that
-  worktree and checked against `design-versions/<sha256>.md`, and exit 2 while the environment
-  record the original cites is not in force. (FR-053, FR-061, FR-065, FR-068; R1, R16, R18; REP-099,
-  REP-100)
+  worktree, and its rebuild from that commit's source with its make file in a second worktree, the
+  rebuild's SHA-256 reported only and a second run with it, compared too, where that differs from
+  the committed binary's, output under `$REP/reproductions/<record_id>/<n>/`, the second run's under
+  a further `rebuilt/` directory, the design document read from that worktree and checked against
+  `design-versions/<sha256>.md`, and exit 2 while the environment record the original cites is not
+  in force. (FR-053, FR-061, FR-065, FR-068; R1, R16, R18; REP-099, REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;

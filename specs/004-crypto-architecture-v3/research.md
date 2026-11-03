@@ -1836,9 +1836,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     modified in the working tree, the spec, research.md and the design document among them, so
     that the original's `git_head` holds each version its record cites and
     `dirty_paths` never holds a cited file (REP-099). `--reproduce` runs
-    the original's code, its binaries included and none rebuilt, from a separate worktree of its
-    `git_head` checked against that commit's blobs, a binary's hash reported only, and the
-    committed-code guard applies to that commit (Reproduction, below).
+    the original's code, its committed binaries included, from a separate worktree of its
+    `git_head` checked against that commit's blobs, and the committed-code guard applies to that
+    commit; it also rebuilds each C tool's binary from that commit's source, the rebuild's hash
+    reported only, and runs the rebuild as well where it differs (Reproduction, below).
   - **Fixed-name files.** The files kept under a fixed name, `candidates/<id>/round-rule.json`,
     `security-target/parameters.json` and `limits.json`, the environment
     records, `downloads.json` and `review-package/MANIFEST.json`, are the stated exceptions to
@@ -1895,6 +1896,16 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     writing nothing, with the reason "environment record <id> is not in force", while that record is
     not the platform's record in force (R1; REP-100), a `recheck` record's
     reproduction excepted, which runs anywhere, as the re-check does (R1).
+    A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction
+    rebuilds the tool's binary from that commit's source with that commit's make file, in a second
+    worktree of the commit, and reports the rebuild's SHA-256 only. Where that equals the committed
+    binary's, the two binaries are identical and one run serves for both; otherwise the recorded
+    configuration runs a second time, with the rebuild, in the second worktree, the committed-code
+    guard applying there to every file but the rebuilt binary, whose `--source-sha256` it still
+    checks, and that run's outputs, placed as the first run's under a further `rebuilt/` directory,
+    are compared with the original's in the same way. A difference in either run counts as one, a
+    rebuild that fails counts as a difference in every compared field, and a heavy reproduction
+    projects, and is charged for, each run it makes (R7).
     The tests of User Story 4 and FR-061, and the full re-runs below, call `--reproduce`: FR-061's
     test reproduces, per kind, its latest light run made under the platform's environment record in
     force and, where one exists under it, a light run made before the last change to its code (R7),

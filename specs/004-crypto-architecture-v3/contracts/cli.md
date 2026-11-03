@@ -39,12 +39,19 @@ original's commit in HEAD's place, so a search that reached its cap is not
 reproduced (Trail tools). It is a heavy run where research R7 says so: it then runs only
 with `--owner-request "WORDS (DATE)"`, the owner's request quoted with its
 date, which its record keeps, and exits 2 without one; it takes the lock,
-projects first and is charged to research R7's feature-wide row. A light
+projects first, for each run it makes, and is charged to research R7's feature-wide row. A light
 reproduction needs no request. A difference is a finding, exit 1: the original
 stands; a difference in a field that enters a verdict blocks the candidate's eligibility, `blocked`,
 until it is resolved, and, since it ran in the environment that made the original, it is a tool
 defect of research R7, whose one re-run is new evidence in the original's row; a difference in the
 p-values, which decide no verdict, makes the outcome `differs` and blocks nothing (data model §1).
+A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction rebuilds
+the binary from that commit's source with its make file, in a second worktree of that commit, and
+reports the rebuild's SHA-256 only; where it differs from the committed binary's, the configuration
+runs again there with the rebuild, Committed code applying to every file but the rebuilt binary,
+whose `--source-sha256` is still checked, its outputs under a further `rebuilt/` directory,
+compared as the first run's are, the outcome `match` only when both runs match, and a rebuild that
+fails counting as a difference in every compared field (research R16).
 `fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
 `downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`, each recording an
 owner's act or an outside fact that a later run cannot regenerate; nor have `clear_lock.py`, whose
@@ -99,10 +106,11 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   built from its source, the `.c` file of its name beside that directory, and committed before the
   run that uses it (research R18); the run also exits 2 unless the SHA-256 that the binary prints
   with `--source-sha256`, which its make file builds into it, equals the source's entry in
-  `code_sha256`. A reproduction runs the committed binary, rebuilding none, its hash reported only,
-  and a test checks each record's `code_sha256` entries against the blobs at its `git_head`
-  (FR-053; research R16). For `--reproduce`, the commit is the original's `git_head`, checked out
-  in a separate worktree (introduction). A run that writes evidence also exits 2 while a file a
+  `code_sha256`. A reproduction runs the committed binary and also rebuilds it, the rebuild's hash
+  reported only, running the rebuild as well where it differs (introduction), and a test checks
+  each record's `code_sha256` entries against the blobs at its `git_head` (FR-053; research R16).
+  For `--reproduce`, the commit is the original's `git_head`, checked out in a separate worktree
+  (introduction). A run that writes evidence also exits 2 while a file a
   record would cite, such as the spec, research.md, the design document, the sidecar or
   `research/004/candidates/superseded.json`, is modified in the working tree, so that the original's
   `git_head` holds each version its record cites and `dirty_paths` never holds a cited file (data
