@@ -13,8 +13,9 @@ included. `REP=reports/004-crypto-architecture-v3`. Every record is written thro
 `protocol/evidence.py` ([data-model.md](../data-model.md) §1), as `<record_id>.json` in its kind's
 directory, unless the data model states its name (data model §1, Record files).
 
-**Reproduction.** Every script that writes evidence or generated files also runs as
-`--reproduce RECORD` (data model §1): it runs the recorded command's configuration in a separate
+**Reproduction.** Every script that writes evidence or generated files, those
+that this paragraph's end names excepted, also runs as `--reproduce RECORD`
+(data model §1): it runs the recorded command's configuration in a separate
 worktree of the original's `git_head`, the code files of its `code_sha256` checked against
 that commit's blobs, with its output directory replaced by the main tree's
 `$REP/reproductions/<record_id>/<n>/`, n = 1, 2, … for successive reproductions of that record, and
@@ -46,8 +47,10 @@ defect of research R7, whose one re-run is new evidence in the original's row; a
 p-values, which decide no verdict, makes the outcome `differs` and blocks nothing (data model §1).
 `fut_sec8.py --reproduce` is this mode for the demonstration, under the conditions of its section.
 `downloads.py`, `owner_record.py` and `design_freeze.py` have no `--reproduce`, each recording an
-owner's act or an outside fact that a later run cannot regenerate, as their sections state (research
-R16; REP-085).
+owner's act or an outside fact that a later run cannot regenerate; nor have `clear_lock.py`, whose
+`lock-cleared` record records an event, `candidate_log.py`, `protocol_change.py`, `provenance.py`
+and `repair_log.py`, which write log entries and no record, and `check_claims.py`, which writes no
+record and runs as a test, as their sections state (spec FR-061; research R16; REP-085).
 
 ## Guards shared by every script
 
@@ -905,7 +908,8 @@ every entry does (`protocol_change.py`, below), and later records cite the entri
 commits a "Log repair <n>" row on its own between the commit that records the owner design review's
 approval and the freeze's step (1), the owner design review is held again in "Owner design review
 <k>", naming the same versions where nothing else changed, and step (1) follows that row's approval
-(spec FR-043; PRO-072).
+(spec FR-043; PRO-072). The script writes log entries and no record, and so has no `--reproduce`
+mode (spec FR-061).
 
 ## `scripts/owner_record.py`
 

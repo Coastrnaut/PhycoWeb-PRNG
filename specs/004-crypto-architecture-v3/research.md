@@ -1816,8 +1816,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `research/004/tools/critical_counts.json` (R4), the sidecar `vectors/phyco-v3/MANIFEST.json` and
     `research/004/candidates/superseded.json`; a record that cites one gives its SHA-256 and the
     entry it used (data-model introduction).
-  - **Reproduction.** Every script that writes evidence or generated files has a mode
-    `--reproduce RECORD`, which runs the recorded command's configuration in a separate worktree of
+  - **Reproduction.** Every script that writes evidence or generated files, those that this
+    bullet's end names as having none excepted, has a mode `--reproduce RECORD`,
+    which runs the recorded command's configuration in a separate worktree of
     the original's `git_head`, the code files of its `code_sha256` checked against that commit's
     blobs, with its output directory replaced by the main tree's `reproductions/<record_id>/<n>/`,
     and writes a `reproduction` record there, naming that commit: the original's ID and
@@ -1863,8 +1864,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     choice, an owner's own act, the reproduction records, which are not reproduced, and the
     `environment`, `downloads` and `freeze` records, whose writers `owner_record.py`, `downloads.py`
     and `design_freeze.py` have no `--reproduce`, each recording an owner's act or an outside fact
-    that a later run cannot regenerate, as each one's section of the cli contract states;
-    `review_package.py`, which writes the `review-package` record, has it (data-model §1; REP-085).
+    that a later run cannot regenerate, as each one's section of the cli contract states; nor have
+    `clear_lock.py`, the `lock-cleared` record's writer, the scripts that write log entries and no
+    record, `candidate_log.py`, `protocol_change.py`, `provenance.py` and `repair_log.py`, and the
+    claim test, `check_claims.py`; `review_package.py`, which writes the `review-package` record,
+    has it (data-model §1; REP-085).
   - `scripts/recheck_004.py` recomputes every verdict from the saved outputs, of every
     kind FR-065 lists, the tool validations, the cross-checks between kinds, the D4 choice, the
     `trail` records and the candidate log's decisions and `replacement` states among them, and

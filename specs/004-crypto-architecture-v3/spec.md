@@ -3025,8 +3025,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
 
 **Reproducibility**
 
-- **FR-053**: Every evidence record MUST be reproducible from a committed script with fixed
-  inputs and the recorded command, with the model hash and tool versions recorded (Principle V).
+- **FR-053**: Every evidence record MUST be reproducible from a committed script with fixed inputs
+  and the recorded command, with the model hash and tool versions recorded (Principle V), the kinds
+  that FR-061 leaves out excepted, each with its reason: the records of an owner's act, an
+  outside fact or an event, which a later run cannot regenerate, and the
+  reproduction records, which are not reproduced (data-model §1; REP-085).
   `requirements.txt` MUST be corrected and its versions pinned (checklist group F), the Hypothesis
   pins entering it once their wheels are installed and checked (research R18). These rules
   make that checkable:
