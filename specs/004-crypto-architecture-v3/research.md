@@ -509,8 +509,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 
   - The round constants, held in a small ROM at each food node (R15), are not counted. Per
     supported size, the design document reports the number of food nodes, the ROM depth at each
-    (R entries per call type, times the number of distinct constant streams), the word width and
-    the total bits.
+    (R entries per distinct constant stream, t·R for spec FR-023's t call types; HW-079), the word
+    width and the total bits.
   - An operation shared by two nodes counts once, at the node that computes it.
   - **Stages.** One pipeline stage is one colour phase and takes one clock cycle, so a round of P
     phases takes P cycles, P being the number of phases in one round of the candidate's operation
@@ -541,9 +541,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     bits, estimated per state bit and stated where merged with stage logic;
     the command interface; the controller with the call-state table; the error-code register; the
     replicated counters; the limit counters; the self-test's sequencer, r-bit comparator, input
-    selectors and stored key, nonce and expected output; 2w·n² state flip-flops plus
-    pipeline registers; block RAM, expected to be 0 unless a ROM is mapped to it) against the
-    device's 63,400 LUTs and 126,800 flip-flops, and names the largest size expected to fit, as an
+    selectors and stored key, nonce, reseed input and expected output (spec FR-059; HW-082);
+    2w·n² state flip-flops plus pipeline registers; block RAM, expected to be
+    0 unless a ROM is mapped to it) against the device's 63,400 LUTs and
+    126,800 flip-flops, and names the largest size expected to fit, as an
     estimate that feature 008 checks part by part against Vivado's hierarchical utilization report
     (FR-026). A part is stated negligible only with its figure and reason.
   - **Throughput goal** (checklist C3): 10⁸ 32-bit words per second at the 200 MHz target, at
@@ -874,7 +875,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Π and Π⁻¹ | 16 inputs: all-zero, all-one, alternating `0x55…`, a counting pattern and test states 0…11; the state after every phase of every round for the first 4 inputs, as `pi_trace` returns it; the output for all 16 | — |
   | Mode | — | 2 development keys (key and nonce 0, key and nonce 1) × 10,000 32-bit words, in generate requests of 1, 7, 64 and 1,000 words in that order, cycled, the last request taking what is left (nine cycles, then 1, 7, 64 and 280 words), with forget after each request; the header says `schedule=cyclic-truncated` (data-model §11) |
   | Long run | — | the SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words (FR-058 "long runs"), taken over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines, so that feature 006's C stream and the hardware export can reproduce it from their own output |
-  | Self-test | — | per claimable size: instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part; then, if the design has a reseed, a reseed with reseed input 0 (R3) and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
+  | Self-test | — | per claimable size: instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part, as spec FR-059 defines taking part from the model's run, k written with the structure that set it (HW-084); then, if the design has a reseed, a reseed with reseed input 0 (R3), held with its length word among the self-test's constants and fed as the host would (HW-082), and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
   | Constructed states | the edge states the design document lists (FR-054) | the same |
 
   - Every input comes from R3: keys, nonces and test states by index (keys and nonces 0 and 1,
@@ -1608,9 +1609,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     column of the table, in a small ROM indexed by the round counter and, where the call types draw
     on distinct streams, by the call type that travels with the start signal (FR-025), so no data
     signal crosses the grid. Per supported size, the design document reports the number of food
-    nodes, the ROM depth at each (R entries per call type, times the number of distinct constant
-    streams), the word width and the total bits (R5). The core takes its clock as an input, on the
-    device's clock network; clock generation belongs to feature 008's board wrapper (FR-025). Reset
+    nodes, the ROM depth at each (R entries per distinct constant stream, t·R for spec
+    FR-023's t call types; HW-079), the word width and the total bits (R5).
+    The core takes its clock as an input, on the device's clock network;
+    clock generation belongs to feature 008's board wrapper (FR-025). Reset
     is synchronous and reaches the nodes through a registered fan-out tree whose latency is part of
     the reset sequence, and every zeroization trigger drives the same tree (FR-025). The round and
     phase counters are replicated, one copy at

@@ -109,7 +109,7 @@ g.zeroize()                             # clears the whole state and the key; th
 | Per-key limit | a `Generator` holds one key, from construction; output under all its nonces counts against the per-key limit, and its instantiations against the random-nonce limit of research R9, at most 2³², whatever nonces the caller uses, since the object cannot tell a random nonce from a counter value; and a call refused at a per-key limit raises `LimitExceeded`, zeroizes and ends the object, since nothing more may be done with that key; the counters are never reset, since `zeroize` ends the object; the refusals at this limit and at the per-instantiation limit are tested through `ResearchDuplex.from_state`, which applies the same limit function (Research duplex; REP-078) |
 | Keys u, and limits across objects | u is a parameter of the bound, stated in the security target. Across objects, processes and devices, the per-key limits and u are usage rules that the design document states for the caller; the model enforces them only within one object |
 | Nonce reuse | the same key, nonce and personalization string give the same output; more generally, under one key and nonce, two instantiations agree until the first call or input word that differs takes effect (the personalization string, a request's length, a reseed's input or the order of calls), and the output blocks given while they agree repeat, the design document's chapter "Mode" naming which blocks repeat in each case; stated behaviour (T7), not detected, and outside the mode's bound, which covers a repeated nonce only through the collision term of research R9 (spec FR-006; SEC-083); the tests show each case the model can run (spec FR-058) |
-| Lengths | a key other than 32 bytes at construction, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` |
+| Lengths | a key other than 32 bytes at construction, a nonce other than 16 bytes, or a personalization string or reseed input over its maximum raises `ValueError` before anything changes; an `instantiate` so refused keeps the instantiation it would have replaced, if any, and a new `instantiate` may follow, as the RTL refuses a length word over the maximum before its copy (spec FR-025 "Flow control"; HW-083) |
 
 The model never wraps, truncates or carries on past a limit (Edge Cases). Counters wider than
 32 bits are held as 32-bit words with the design document's carry rule (re-decided feature-002
@@ -120,7 +120,7 @@ FR-002).
 | Path | Effect |
 |------|--------|
 | A failed construction: a refused variant, a wrong key length or a failed self-test | no object exists; any state the self-test used is zeroized; no copy of the key was stored |
-| A refused request: a limit other than a per-key one, a length, a call out of sequence | nothing changes, and the object stays usable |
+| A refused request: a limit other than a per-key one, a length, a call out of sequence | nothing changes, and the object stays usable; a refused `instantiate` leaves the instantiation it would have replaced, if any, in place (HW-083) |
 | A failed self-test | a failed construction (above): it zeroizes, and no object exists |
 | An exception after the state has changed | zeroizes the whole state and ends the object, so no half-updated state survives |
 | A call refused at a per-key limit | zeroizes and ends the object |
