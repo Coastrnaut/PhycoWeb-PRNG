@@ -693,7 +693,7 @@ Items found when the checklist was run a ninth time, over the complete documents
 repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK086 Can the end of a call be read at the ports, given that FR-020 has each call end "when
+- [x] CHK086 Can the end of a call be read at the ports, given that FR-020 has each call end "when
   the core is ready for the next command" and "Feature 008 measures the counts at the ports and
   compares them with the formulas", while, from any call's command word to its end, "the command
   interface accepts zeroize only", so that its ready is high before a call's end and after it alike,
@@ -709,7 +709,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   out of sequence", while one offered on an interface whose ready is low would wait? [Measurability,
   Gap, Spec §FR-020, §FR-025 "Call sequence", "Flow control", "Registers and read-back", §FR-059;
   FUT-HW-5]
-- [ ] CHK087 Does the call-state table give a state to every stretch of a call, given that a key
+- [x] CHK087 Does the call-state table give a state to every stretch of a call, given that a key
   load has `loading`, an instantiate `instantiating`, "from its command word to instantiate done",
   and a reseed `reseeding`, while a generate request has none, so that from its command word to its
   forget call's end it can only be in `instantiated`, which "accepts the calls the model's call
@@ -723,7 +723,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   word offered during a zeroization included, and "FR-020's zeroization formula covers each state
   that accepts a zeroize" covers a zeroize during a generate request? [Completeness, Consistency,
   Spec §FR-025 "Call sequence", "Key loading and reset", "Zeroization", §FR-020]
-- [ ] CHK088 Which trees does "the registers of both trees" in "Zeroization" name, given that
+- [x] CHK088 Which trees does "the registers of both trees" in "Zeroization" name, given that
   FR-034's components name four, the absorption and output trees, "the start tree with its call-type
   field" and "the reset tree that every zeroization trigger drives", and that FR-026 counts "the
   reset and start fan-out trees with the call-type field at every node"? Is it stated what a
@@ -737,7 +737,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   call-type field at every node, among what a zeroization clears, or the order of the two latencies
   stated, so that no call of Π starts after a zeroization's clear? [Ambiguity, Edge Case, Spec
   §FR-025 "Zeroization", "Flow control", §FR-026, §FR-034 "Components"; plan "Complexity Tracking"]
-- [ ] CHK089 Are the core's counters named once, with their values after a zeroization or a reset,
+- [x] CHK089 Are the core's counters named once, with their values after a zeroization or a reset,
   given that "Zeroization" returns "the round, phase and limit counters" to their reset values,
   FR-026 counts "the replicated round and phase counters, the limit counters" and "the controller
   with the call-state table", and FR-034's components name the round and phase counters and not the
@@ -749,7 +749,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   zeroization or a reset, so that a call that follows a zeroize made in mid-call, "where a new load
   starts afresh", counts from zero, as the tests of each state expect? [Completeness, Consistency,
   Spec §FR-025 "Call sequence", "Zeroization", §FR-026, §FR-034 "Components", §FR-059]
-- [ ] CHK090 Is a command word that names no command stated, given that the command interface takes
+- [x] CHK090 Is a command word that names no command stated, given that the command interface takes
   "one 32-bit word per call, with the command (key load, instantiate, generate, reseed, zeroize) in
   stated bits" and, "for generate, the length in 32-bit words in the rest", so that a field of at
   least three bits holds values that name no command, and the other bits of a key load, instantiate,

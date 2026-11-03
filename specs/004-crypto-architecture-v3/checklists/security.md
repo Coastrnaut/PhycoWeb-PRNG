@@ -581,7 +581,7 @@ Items found when the checklist was run a ninth time, over the complete documents
 repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK084 Is it stated who commits the claim register's change, and in which commit, when it
+- [x] CHK084 Is it stated who commits the claim register's change, and in which commit, when it
   falls after the commit that records the owner design review's approval, in its row with the
   highest k, from which "the agent commits no file of this feature and leaves its changes in the
   working tree" (FR-043; PRO-070), given that SEC-076 and SEC-079 have the agent write each change
@@ -596,7 +596,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   approval on" names none, so that the register at HEAD cannot read L1 while the rows give L0?
   [Conflict, Ambiguity, Spec §FR-012, §FR-043, §FR-069, §Review & Approval "L1 recorded" and "Design
   freeze", §Assumptions; data-model §13, §15; cli contract `check_claims.py`, `design_freeze.py`]
-- [ ] CHK085 Can the rule that "no document states a level above `claim_level`" be applied by a
+- [x] CHK085 Can the rule that "no document states a level above `claim_level`" be applied by a
   test, given that FR-069's other rules each state their match form, whole words with listed
   inflections and "near" or "beside" meaning the same sentence or table row, and pass a flagged line
   only through an allow-list entry, while this rule, "a claim level above the register's
@@ -607,7 +607,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   example a level beside a model ID in the same sentence or table row outside the ladder and the
   rules, and through which entries the other lines pass? [Measurability, Ambiguity, Spec §FR-012,
   §FR-069; data-model §15; cli contract `check_claims.py`; security.md §15]
-- [ ] CHK086 Is it stated whether README and security.md, which FR-069 brings into the claim test's
+- [x] CHK086 Is it stated whether README and security.md, which FR-069 brings into the claim test's
   scope "since FR-051 changes both", must carry the design-form disclaimer that FR-068 asks of
   "every hand-written document" and that the test compares with `DESIGN_DISCLAIMER`, given that each
   opens with a block of its own that differs from it, README's written for the models with a 64-bit
@@ -617,7 +617,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   what README's block says of `phyco-v3` once FR-051's update states its status, and which texts are
   "the disclaimers" that the test checks against the register? [Ambiguity, Consistency, Spec
   §FR-051, §FR-068, §FR-069; cli contract `check_claims.py`; README; security.md]
-- [ ] CHK087 Is it stated who writes the entries of the claim register's `allow_list`, its standing
+- [x] CHK087 Is it stated who writes the entries of the claim register's `allow_list`, its standing
   phrases and its line entries, and who reviews them, given that a flagged line "passes only through
   this list", that any other flagged line "needs an entry of its own", each with its reason, that
   the agent drafts the documents and their comments, and that no Review & Approval row, gate or
@@ -626,7 +626,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   reviewed it, and whether the owner's review at each gate lists the entries added since the last
   gate, as it lists the approval commits? [Gap, Spec §FR-050, §FR-067, §FR-069, the notes under the
   Review & Approval table; data-model §14, §15 `allow_list`]
-- [ ] CHK088 Does the test criterion that FR-008 states for feature 008 cover each case of the risk
+- [x] CHK088 Does the test criterion that FR-008 states for feature 008 cover each case of the risk
   it names for a self-test selector held on its constants, given that the self-test runs instantiate
   "with key and nonce 0", and that "the output differing from the self-test's expected output" after
   a key load and an instantiate also holds while one selector alone is held, the key selector under

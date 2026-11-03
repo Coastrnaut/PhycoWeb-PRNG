@@ -599,7 +599,7 @@ Items found when the checklist was run a ninth time, over the complete documents
 repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK078 Does the split of FR-034's components between the candidate's `mapping` entry and the
+- [x] CHK078 Does the split of FR-034's components between the candidate's `mapping` entry and the
   structures that every candidate shares cover each component of the list, given that the entry
   holds "the candidate's own components, the five above, its key path and any other it adds" and the
   shared structures are named as the output buffer, the call-state controller with its error-code
@@ -612,7 +612,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   comes from the entry or from FR-025, and whether it has a place in the metaphor that the mapping
   chapter restates? [Completeness, Consistency, Spec §FR-025, §FR-030, §FR-034 "Components";
   data-model §3 `mapping`]
-- [ ] CHK079 Does FR-034's list of the self-test's parts, "the selector at each chain's input, its
+- [x] CHK079 Does FR-034's list of the self-test's parts, "the selector at each chain's input, its
   r-bit comparator and the storage of its key, nonce, reseed input and expected output", name every
   part that FR-059 and FR-026 give the self-test, given that FR-059 also feeds the empty
   personalization string's length word, and the reseed input with its length word, "through the
@@ -623,7 +623,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   at every lane" and the self-test's selectors, and that only the latter carry FR-008's stated risk
   of one held on its constants? [Completeness, Clarity, Spec §FR-008, §FR-025 "Key loading and
   reset", §FR-026, §FR-034 "Components", §FR-059]
-- [ ] CHK080 Is it stated when, by whom and in which commit the version line of the design
+- [x] CHK080 Is it stated when, by whom and in which commit the version line of the design
   document's header, and that of `rationale.md`, comes to read 1.0, given that FR-034 has the header
   hold "Version: 0.<k>", "1.0 once frozen", while "Each committed change before the freeze makes the
   next 0.<k>", that the agent commits no file of this feature from the owner design review's
@@ -634,7 +634,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   files keeping the 0.<k> reviewed, or is the line changed before the owner design review, which
   then reviews 1.0? [Conflict, Spec §FR-034 "Version", §FR-043; data-model §13, §17; cli contract
   `design_freeze.py`]
-- [ ] CHK081 Is a provenance review entry tied to the text that its row reviewed, given that
+- [x] CHK081 Is a provenance review entry tied to the text that its row reviewed, given that
   `provenance.py review` computes the entry's `sha256` from the named section of the file as it
   stands when the entry is written, and checks `reviewed_sha256`, "the SHA-256 that row names", only
   against the row at HEAD, so that a section changed after the review, or one whose text differs
@@ -643,7 +643,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   while the section's text differs from that of the entry it follows, so that the status the latest
   entry gives is that of the text the reviewer read? [Gap, Consistency, Spec §FR-034, §FR-064,
   §FR-067; data-model §14; cli contract `provenance.py`]
-- [ ] CHK082 Does any guard read the approval status that FR-034 keeps "in the provenance log" for
+- [x] CHK082 Does any guard read the approval status that FR-034 keeps "in the provenance log" for
   the design document and `rationale.md`, given that `design_freeze.py create` reads the review rows
   and records only the provenance log's last `seq` and line SHA-256, and that nothing refuses a
   freeze while an AI-drafted section of either file has a latest entry that reads `pending` or

@@ -528,7 +528,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   "round's place" in the log's order its entry takes, given that checklist-choices.md records
   ad2c195 beside the re-run's list? [Gap, Clarity, Spec §FR-044; data-model §18; cli contract
   `protocol_change.py`; checklist-choices.md "Rows that change the protocol"]
-- [ ] CHK065 Can a stale `data/log-append.lock` be cleared before the protocol change log exists,
+- [x] CHK065 Can a stale `data/log-append.lock` be cleared before the protocol change log exists,
   given that `protocol_change.py create` and `provenance.py`, whose entries for drafted files and
   self-written known results precede the log, take that lock, that only `clear_lock.py` removes a
   stale lock, writing a `lock-cleared` record under `locks/`, a record kind of data-model §1, and
@@ -573,7 +573,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   whether the comparison reads them, so that such a change cannot pass outside the log? [Coverage,
   Gap, Spec §FR-044, §Review & Approval; data-model §1, §18; research R1, R16; cli contract "Guards
   shared by every script"; checklist-choices.md "Rows that change the protocol"]
-- [ ] CHK068 Can the owner write an environment record, and a stale lock be cleared, while the guard
+- [x] CHK068 Can the owner write an environment record, and a stale lock be cleared, while the guard
   "Environment" refuses? `protocol/evidence.py` writes every record, the environment records among
   the files it keeps under a fixed name (data-model introduction), and exits 2 at start unless the
   running environment matches "the platform's environment record in force" as a whole and that
@@ -620,7 +620,7 @@ Items found when the checklist was run a ninth time, over the complete documents
 repository, after the seventh re-run's answers of 2026-11-02 were applied and its items ticked.
 They start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK071 Can plan phase 1's step (2a) run, given that the guard "Protocol log" lets
+- [x] CHK071 Can plan phase 1's step (2a) run, given that the guard "Protocol log" lets
   `protocol/evidence.py` write only a `lock-cleared` record while the protocol change log does not
   exist, every other kind refused, that step (2a) writes each platform's first environment record, a
   record of kind `environment` kept under a name of its own and so written through that module
@@ -633,7 +633,7 @@ They start open, and an item is ticked only under the rule in the Notes below.
   exception, so that CHK065 and CHK068 can close? [Conflict, Spec §FR-044; plan phase 1; data-model
   introduction, §1 `kind`, `protocol_seq`, §18; cli contract "Environment", "Protocol log",
   `owner_record.py`]
-- [ ] CHK072 Is it stated what follows when the commit after the one that records the owner design
+- [x] CHK072 Is it stated what follows when the commit after the one that records the owner design
   review's approval is not the commit of every feature file changed since, for example an owner's
   commit of a row needed in between, "Environment record <n>" after a Windows or WSL update or "Log
   repair <n>", given that step (1) "is the owner's next commit", that `design_freeze.py create`
