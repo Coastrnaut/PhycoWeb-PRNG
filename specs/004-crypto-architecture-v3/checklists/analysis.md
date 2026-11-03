@@ -592,7 +592,7 @@ Items found when the checklist was run an eighth time, over the complete documen
 repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK073 Does the replacement rule apply to every `ineligible` decision, given that one is
+- [x] CHK073 Does the replacement rule apply to every `ineligible` decision, given that one is
   entered for every candidate that became `rejected` or `ineligible` "while its family has fewer
   than three evaluated candidates and the budget allows", that the `replacement` entry logged with
   the decision stays `pending` until the replacement's `proposed` entry or a stated reason, "the
@@ -610,7 +610,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   Gap, Spec §Pre-registered Design Protocol "Nonlinearity choice rule", "Eligibility and selection",
   "Stop rule", §Edge Cases; data-model §3 "Decisions", "Entered set"; research R4 "Uniform control",
   R7 "The other family", R12, R15; cli contract `round_rule.py`]
-- [ ] CHK074 Is it stated whose 12 h rows a uniform control's hours must fit, and what follows when
+- [x] CHK074 Is it stated whose 12 h rows a uniform control's hours must fit, and what follows when
   one cannot hold them? The cli contract runs a control once per test and size, "before that test's
   first use at that size by any candidate", and "only if every entered candidate's 12 h row can hold
   its hours", since every candidate's row is charged them "whether the control ran for it or before
@@ -623,7 +623,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   `blocked` or inconclusive for every candidate, waits, or is charged otherwise? [Gap, Consistency,
   Spec §Pre-registered Design Protocol "Bias rule", "Stop rule"; research R4 "Uniform control", R7
   "What else is charged"; data-model §3 `budget_used_h`; cli contract "Budget", `evidence_v3.py`]
-- [ ] CHK075 Is the R in the family-wise rate stated beside a firing defined? FR-028 and research R4
+- [x] CHK075 Is the R in the family-wise rate stated beside a firing defined? FR-028 and research R4
   give the rate as 1 − 0.995^(3⌈R/2⌉·T), or 1 − 0.995^(T·(3⌈R/2⌉ + 3)) with the avalanche test,
   counting the round counts r with 2r > R, "⌈R/2⌉ of them per size", over the three claimable sizes
   as if they shared one R, while FR-028 has R "computed per claimable size", so that it "may differ
@@ -633,7 +633,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   repeated in the final report and in FR-041's statement of the selection bias, can be computed by
   code from the records? [Clarity, Measurability, Spec §FR-028, §FR-041, §Pre-registered Design
   Protocol "Bias rule"; research R4 "False firing"]
-- [ ] CHK076 Is it stated which known results a tool is validated again on after a failed validation
+- [x] CHK076 Is it stated which known results a tool is validated again on after a failed validation
   when it has more than one, given that research R12 and data-model §7 give each counted tool one
   known result and one second known result, fixed before its first validation, and that after a
   failure "the re-validation re-finds the second as well as the first" (cli contract), "so that a

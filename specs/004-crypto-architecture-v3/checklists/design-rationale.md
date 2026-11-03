@@ -519,7 +519,7 @@ Items found when the checklist was run an eighth time, over the complete documen
 repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK072 Is the outcome stated for the representative that loses an exact D4 tie, and for the
+- [x] CHK072 Is the outcome stated for the representative that loses an exact D4 tie, and for the
   other candidates of both families while the tie waits, given that research R6 sends both
   representatives on "to the production-width analysis within their own budgets" until
   `d4_choice.py --tie` applies the tie-breaks once both values of R at 4×4 exist, while the rule
@@ -533,7 +533,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   close and no hours go to a family the tie-breaks did not choose? [Gap, Spec §Pre-registered Design
   Protocol "Nonlinearity choice rule", "Eligibility and selection"; research R6 "Exact tie", R7;
   data-model §8; cli contract `d4_choice.py`, `round_rule.py`]
-- [ ] CHK073 Does the candidate log's `mapping` entry cover the components FR-034's list now names,
+- [x] CHK073 Does the candidate log's `mapping` entry cover the components FR-034's list now names,
   given that the entry, written before the candidate's first score, holds "each component's place in
   the metaphor and the attack class, bound or need it serves", the rationale's list gives each
   component's role "as the candidate's `mapping` log entry records it, which the list cites", and
@@ -548,7 +548,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   cited, and whether a component may have no place in the metaphor, with how the entry and the
   mapping chapter say so under the chapter's word rule? [Consistency, Gap, Spec §FR-030, §FR-034
   "Components"; data-model §3 `mapping`]
-- [ ] CHK074 Does FR-034's list of chapters place everything the design document must hold, given
+- [x] CHK074 Does FR-034's list of chapters place everything the design document must hold, given
   that a test checks the six level-2 headings, each once and in order, and "Permutation" names the
   operation list, the colour schedule, the rotation amounts, the round constants and the variant
   table, while no chapter is named for Π⁻¹, which FR-019 has "written out at the same level of
@@ -560,7 +560,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   stand among the six, so that the second transcription (FR-057), the owner design review and the
   test find each one? [Completeness, Clarity, Spec §FR-019, §FR-027, §FR-029, §FR-034 "Chapters",
   "Network questions", §FR-057; security.md §8]
-- [ ] CHK075 Does FR-034's walk through the attack classes allow the outcome that security.md
+- [x] CHK075 Does FR-034's walk through the attack classes allow the outcome that security.md
   §12.1's class "Side-channel and fault" has in this spec, given that the rationale must name, for
   each class, "the design feature meant to resist it" or mark it "open for feature 005 with its
   reason", while that class is met in part by FR-020's fixed operations, which FR-008 adopts for T4,
@@ -570,7 +570,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   takes up, citing the requirement that defers it and the risk it states, so that such a class is
   neither given a resisting feature it lacks nor marked open for the wrong feature? [Consistency,
   Gap, Spec §FR-008, §FR-020, §FR-034 "Attack classes", "Components"; security.md §12.1, §13]
-- [ ] CHK076 Does FR-034's list of the paths that carry secret data, "the key registers, which hold
+- [x] CHK076 Does FR-034's list of the paths that carry secret data, "the key registers, which hold
   the key between instantiates, the key chain and the selectors", each with "the attack class they
   meet (no read-back, zeroization)", cover every hardware structure that holds one of FR-008's
   assets, given that those assets include "the whole state within a request", "every output block
@@ -580,7 +580,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   output tree's registers and the limit counters are among those paths, each with the attack class
   it meets, or why each is not? [Consistency, Coverage, Spec §FR-008, §FR-025 "Zeroization",
   "Registers and read-back", §FR-034 "Components"]
-- [ ] CHK077 Is it stated who writes the provenance log's review entries, those of the
+- [x] CHK077 Is it stated who writes the provenance log's review entries, those of the
   security-target review for the chapters "Security target" and "Mode" and those of the owner design
   review for each AI-drafted section of the rationale, and on whose word, and is the reviewer named
   in them? Data-model §14 gives each entry the AI tool's `tool`, `model` and `session` and a

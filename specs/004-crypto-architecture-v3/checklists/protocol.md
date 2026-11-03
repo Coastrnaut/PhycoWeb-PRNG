@@ -559,7 +559,7 @@ Items found when the checklist was run an eighth time, over the complete documen
 repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK067 Do the places that the lists' headings name hold the texts that their directions
+- [x] CHK067 Do the places that the lists' headings name hold the texts that their directions
   govern? The direction of "Records and their hashes" covers "what a record holds, which files are
   hashed and kept, and the writers' and guards' checks and refusals", and that of "Protocol changes
   and their directions" "an entry's fields, the comparison and the guard's refusals", while their
@@ -593,7 +593,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   Spec §FR-044, §FR-058, §Review & Approval; data-model introduction, §1 `kind`, `environment`;
   research R1, R16 "Stale locks"; plan phase 1; cli contract "Environment", "Protocol log",
   `owner_record.py`, `clear_lock.py`]
-- [ ] CHK069 Is the number of the log's first entries stated consistently with the lists, given that
+- [x] CHK069 Is the number of the log's first entries stated consistently with the lists, given that
   data-model §18 counts among them "the 70 rows tagged Stricter or Settle (26 and 44)", the count
   after the fourth re-run, while the lists now hold 81 such rows, 27 Stricter and 54 Settle, the
   fifth re-run having added five Settle rows and the sixth five Settle rows and HW-077's Stricter,
@@ -603,7 +603,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   listed, so that no number in the requirements disagrees with the lists when `create` writes the
   entries? [Consistency, Spec §FR-044; data-model §18; checklist-choices.md "Rows that change the
   protocol"]
-- [ ] CHK070 Is the end of the standing authorization stated before the freeze, given that FR-043
+- [x] CHK070 Is the end of the standing authorization stated before the freeze, given that FR-043
   makes step (1), "the owner commits the feature files (Principle IX)", an owner's own act that
   falls "outside the standing authorization for local commits" and that "the agent never performs",
   while under that authorization the agent commits "after each task or Spec Kit command", the

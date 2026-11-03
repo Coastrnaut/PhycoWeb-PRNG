@@ -601,7 +601,7 @@ Items found when the checklist was run an eighth time, over the complete documen
 repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK079 Is "call type" used in one sense, with t stated? FR-023's call types are "(instantiate,
+- [x] CHK079 Is "call type" used in one sense, with t stated? FR-023's call types are "(instantiate,
   generate, forget, reseed)", calls of Π that may "draw on distinct constant streams", of which one
   generate request or instantiate makes several, its forget call among them, and research R4 reckons
   its hours "at four call types"; the command word carries "the call type (key load, instantiate,
@@ -614,7 +614,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   call type", FR-020's public "call type" and FR-026's t_s each read the set they need? [Clarity,
   Consistency, Spec §FR-018, §FR-020, §FR-023, §FR-025 "Flow control", §FR-026; research R4, R15;
   plan "Complexity Tracking"]
-- [ ] CHK080 Is each input interface's ready stated for the states that take no word on it? FR-025
+- [x] CHK080 Is each input interface's ready stated for the states that take no word on it? FR-025
   holds "ready low on the command, key-loading and absorption interfaces" in `not-reset`,
   `resetting` and `failed`, has `loading` accept "the key words and zeroize only" and
   `instantiating` and `reseeding` each accept "its input's words on the absorption interface", and
@@ -626,7 +626,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   that the core neither takes such a word nor raises an error for it, and do the tests that "cover a
   call in each state of the table" cover a word offered on each input interface in each state? [Gap,
   Edge Case, Spec §FR-025 "Call sequence", "Flow control", "Zeroization", §FR-020]
-- [ ] CHK081 Is the moment at which `selftest_fail` clears stated once, with its value after reset?
+- [x] CHK081 Is the moment at which `selftest_fail` clears stated once, with its value after reset?
   FR-059 has the output "latched until the next reset" and then "every reset runs the self-test
   again, and a pass clears the latch", and FR-025 has `failed` accept no call "until the next reset,
   with `selftest_fail`, an output of its own, latched", while the port list gives "every port's
@@ -637,7 +637,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   after a second failure sees no change on the port. Is it stated which, so that feature 008's test
   of the output, and the test of a call made "one while the self-test runs", each have one expected
   value? [Clarity, Consistency, Spec §FR-059, §FR-025 "Call sequence", "Registers and read-back"]
-- [ ] CHK082 Are the self-test's reseed input and its length word among its stored constants, and
+- [x] CHK082 Are the self-test's reseed input and its length word among its stored constants, and
   fed by a stated path? FR-059 runs, "if the design has a reseed, a reseed with reseed input 0 of
   research R3", which R3 gives as "the 32-byte digest" of `phycoweb-004/dev/reseed/0`, and
   `selftest_<variant>.json` holds it, while FR-026's estimate counts the self-test's "key, nonce and
@@ -650,7 +650,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   rationale's list, and their cycles in FR-020's self-test formula and the reset figure? [Gap,
   Consistency, Spec §FR-059, §FR-026, §FR-034 "Components", §FR-020; research R3, R8; data-model
   §11]
-- [ ] CHK083 Is the class of an instantiate's length check stated, given the order of its input? An
+- [x] CHK083 Is the class of an instantiate's length check stated, given the order of its input? An
   instantiate's input is "the nonce's words, in the model's word order, then the personalization
   string's length word, then the string's words", and its first figure runs "from the nonce's last
   word accepted to the copy done", so that the copy sets every lane from the key and the nonce
@@ -664,7 +664,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   refused instantiate in `instantiated` leaves of the state it would have replaced? [Conflict, Gap,
   Spec §FR-025 "Flow control", "Key loading and reset", "Zeroization", §FR-058; model contract
   "Lengths", "Failure paths", "Call sequence"]
-- [ ] CHK084 Is the criterion that fixes k measurable? FR-059 states k per claimable size "as the
+- [x] CHK084 Is the criterion that fixes k measurable? FR-059 states k per claimable size "as the
   least for which every node, every lane, every constant ROM entry of the calls run, both trees and
   the counters take part", and "FR-020's self-test formula, the reset figure and FR-026's storage
   count follow from k", while "take part" is not defined, and one call of Π already runs every node
@@ -675,7 +675,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   a block count within a request), so that k can be computed from the model's run, written to
   `selftest_<variant>.json` and checked by a test? [Measurability, Clarity, Spec §FR-059, §FR-020,
   §FR-026; research R8; data-model §11]
-- [ ] CHK085 Do the three statements of what a zeroize clears agree? "Zeroization" clears the lanes,
+- [x] CHK085 Do the three statements of what a zeroize clears agree? "Zeroization" clears the lanes,
   every pipeline register, both trees' registers, the key chain's and the nonce chain's registers,
   the rate lanes' nonce registers, the held key and its copies and the output register, and "returns
   the round, phase and limit counters to their reset values"; "Call sequence" has a zeroize during a

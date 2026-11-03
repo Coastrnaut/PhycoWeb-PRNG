@@ -784,7 +784,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   so that the tasks can follow the order and every file still names the environment that wrote it?
   [Conflict, Gap, Spec §FR-058; plan "Phases and gates" phase 1; research R1, R19; data-model
   introduction, §1 `environment`; cli contract "Environment", `downloads.py`, `owner_record.py`]
-- [ ] CHK083 Is it stated which SHA-256 names an environment record and an `owner-provided` entry,
+- [x] CHK083 Is it stated which SHA-256 names an environment record and an `owner-provided` entry,
   and over which bytes? `owner_record.py` "prints the SHA-256 of what it writes, taken over its
   canonical JSON without the approval fields", the Review & Approval row names "that SHA-256", and
   the environment guard accepts a record in force "only while its row reads Approved at HEAD with
@@ -800,7 +800,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   re-check and a later reader resolve the same record from either hash? [Clarity, Consistency, Spec
   §Review & Approval notes; data-model introduction "Format rules", §1 `record_id`, `environment`,
   "Hashes", §13; research R1, R16; cli contract "Environment", `owner_record.py`]
-- [ ] CHK084 Is `status` among the approval fields that `draft_sha256` leaves out? `create` stores
+- [x] CHK084 Is `status` among the approval fields that `draft_sha256` leaves out? `create` stores
   `draft_sha256`, "the SHA-256 of the record's canonical JSON without that field and the approval
   fields", with `status` `draft`; `approve` "changes `status` from `draft` to `approved`, adds
   `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
@@ -811,7 +811,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   recompute with `status` set back to `draft`, so that the approved record can be checked again by
   every later run? [Clarity, Measurability, Spec §FR-043; data-model §13; research R16 "The design
   freeze"; cli contract `design_freeze.py`]
-- [ ] CHK085 Is it stated which fields the files without a kind hold, which module and script write
+- [x] CHK085 Is it stated which fields the files without a kind hold, which module and script write
   them, and whether those scripts reproduce them? Data-model §1 gives "every evidence record" the
   common fields and lists the kinds, with no kind for an environment record, `downloads.json`,
   `freeze/freeze.json` or `review-package/MANIFEST.json`, while "Every record is written through
@@ -826,7 +826,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   traced to the command and the code that wrote it? [Gap, Consistency, Spec §FR-061, §FR-063;
   data-model introduction, §1 `kind`, §13, §16; research R1, R16, R19; cli contract introduction,
   `downloads.py`, `owner_record.py`, `design_freeze.py`; plan "Project Structure"]
-- [ ] CHK086 Is it stated what shows that step (3) of the generators' order has passed, on each
+- [x] CHK086 Is it stated what shows that step (3) of the generators' order has passed, on each
   platform? The order runs "four steps, each generator's `--check` passing in this order", step (3)
   being "`Generator` imports `phycoweb.selftest_v3` and runs the self-test from it", which is no
   generator, has no `--check` and writes no record, while step (4) runs "once step (3)'s self-test
@@ -837,7 +837,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   `ResearchDuplex` only", which import without `selftest_v3`? [Gap, Measurability, Spec §FR-036,
   §SC-009; data-model §11 "Order of generation"; cli contract "Generators of constants and vectors";
   model contract "Module rules"]
-- [ ] CHK087 Are `ResearchDuplex.from_state`'s arguments and the state it starts in stated, and does
+- [x] CHK087 Are `ResearchDuplex.from_state`'s arguments and the state it starts in stated, and does
   a constructed-state vector hold them? The model contract has it start "the mode from a chosen
   state and chosen counter values, each within its range", and data-model §11 has
   `constructed_<variant>.json` hold, per edge state, "name, construction", whether the normal calls
@@ -851,7 +851,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   regenerate each vector byte for byte and start from the state it names? [Gap, Clarity, Spec
   §FR-036, §FR-054; model contract "Research duplex", "Other limits"; data-model introduction
   "Format rules", §11]
-- [ ] CHK088 Is a heading defined for the bounds of a provenance entry's section? A section's text
+- [x] CHK088 Is a heading defined for the bounds of a provenance entry's section? A section's text
   "runs from its heading line, included, to the line before the next heading of the same or a higher
   level, or to the file's end", and `section` "names its heading as it stands", while no passage
   says what counts as a heading, and the files the entries cover hold heading-like lines inside
@@ -862,7 +862,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   named so that `section` stays unique, so that the writer, `provenance.py`'s check and a later
   reader take the same bytes? [Clarity, Spec §FR-051, §FR-067; data-model §14; research R16; cli
   contract `provenance.py`]
-- [ ] CHK089 Do the provenance log's first entries cover every file that this feature's AI sessions
+- [x] CHK089 Do the provenance log's first entries cover every file that this feature's AI sessions
   drafted or repaired before the log? FR-067 puts in scope "Files drafted or repaired before the log
   exists, the planning documents, the checklists and checklist-choices.md among them, and the files
   of plan phase 1 written before it", data-model §14 lists the spec, the plan, research, the data
@@ -875,7 +875,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   scope, recorded whole or per section changed, as a file drafted in parts is, and with dates from
   this feature's commits only? [Gap, Coverage, Spec §FR-067, §FR-051; data-model §14; plan "Phases
   and gates" phase 1; cli contract `provenance.py`]
-- [ ] CHK090 Does the plan's tree show every directory the records write? Data-model §1 has the
+- [x] CHK090 Does the plan's tree show every directory the records write? Data-model §1 has the
   first record that cites a design-document version store "that document as
   `design-versions/<sha256>.md`, committed with the records, as spec versions are", while the plan's
   tree under `reports/004-crypto-architecture-v3/` lists `spec-versions/` and `research-versions/`
@@ -883,7 +883,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   there, so that every place a record writes is in the tree the tasks follow? [Consistency,
   data-model §1 `design_version`; research R16 "Spec and research versions"; plan "Project
   Structure"]
-- [ ] CHK091 Does the freeze hash the modules that the frozen scripts import? Data-model §13 hashes
+- [x] CHK091 Does the freeze hash the modules that the frozen scripts import? Data-model §13 hashes
   "the scripts that compute verdicts", `protocol/devinputs_v3.py` and `protocol/evidence.py` among
   them, so that "the re-check (FR-065) runs the code that produced the verdicts", while the plan's
   tree adds `protocol/candidates.py`, the candidate log's module, from whose entries `round_rule.py`

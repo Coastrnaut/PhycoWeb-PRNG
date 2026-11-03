@@ -507,7 +507,7 @@ Items found when the checklist was run an eighth time, over the complete documen
 repository, after the sixth re-run's answers of 2026-11-02 were applied and its items ticked. They
 start open, and an item is ticked only under the rule in the Notes below.
 
-- [ ] CHK078 Is the external design review tied to the candidate that the latest selection record
+- [x] CHK078 Is the external design review tied to the candidate that the latest selection record
   selects, as the other review rows that `design_freeze.py create` reads are, given that FR-043
   holds "the security-target review and every later review" again, "each in a numbered row of its
   own", when a later selection record selects another candidate, and the notes under the Review &
@@ -521,7 +521,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   to which candidate a "not arranged" row applies? [Consistency, Gap, Spec §FR-043, §SC-013, §Review
   & Approval "External design review" and the notes under the table; data-model §13, §17; cli
   contract "Approvals", `design_freeze.py create`]
-- [ ] CHK079 Is it stated what becomes of a recorded L1 when what "L1 recorded" rests on changes
+- [x] CHK079 Is it stated what becomes of a recorded L1 when what "L1 recorded" rests on changes
   before a later review row is added, given that a change to any hash of the chapter's version, a
   `verified` or met mark included, makes `design_freeze.py create` exit 2, and a new demonstration
   record makes key loading exit 2, until a row naming the changed item reads Approved, while L1
@@ -532,7 +532,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   `check_claims.py` compares the named set and demonstration record with the files at HEAD?
   [Consistency, Gap, Spec §FR-012, §FR-069, §Review & Approval "L1 recorded" and the notes under the
   table; data-model §15, §17; cli contract "Approvals", "Order of US1", `check_claims.py`]
-- [ ] CHK080 Is a writer named for `phyco-v3`'s `in_progress` field in `protocol/claims.json`, with
+- [x] CHK080 Is a writer named for `phyco-v3`'s `in_progress` field in `protocol/claims.json`, with
   the commit it is written in, given that FR-012 and data-model §15 have it name L2 "with its start
   date, that of the first counted trail-bound record, and 'not reached'", and the "L1 recorded" row
   says only that "the start of L2 is recorded with the first counted trail-bound record", while
@@ -542,7 +542,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   record exists, with another start date, or missing once one exists, passes? [Gap, Measurability,
   Spec §FR-012, §FR-069, §Review & Approval "L1 recorded"; data-model §15, §17; cli contract
   `check_claims.py`]
-- [ ] CHK081 Is the point stated at which `protocol/claims.json`, with its entry for `phyco-v3` at
+- [x] CHK081 Is the point stated at which `protocol/claims.json`, with its entry for `phyco-v3` at
   L0, the register's line for `phyco-v3` in security.md §15, `scripts/check_claims.py` and
   `tests/test_claims.py` come into being, given that the plan's project structure lists them and no
   phase names them, while plan phase 8 records L1 "when its gate passes", after which the agent
@@ -554,7 +554,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   (FR-063), so that what those reviews read has been checked first? [Gap, Consistency, Spec §FR-012,
   §FR-051, §FR-063, §FR-069; plan Project Structure, phases 8 and 9; data-model §15; security.md
   §15]
-- [ ] CHK082 Is the risk of the self-test's selectors at the key and nonce chains' inputs stated and
+- [x] CHK082 Is the risk of the self-test's selectors at the key and nonce chains' inputs stated and
   carried to feature 008, given that FR-059 has them feed the chains from the self-test's constants
   and says only that "afterwards the selectors return to the interfaces", and FR-034 names the
   selectors among the paths that carry secret data, while FR-008's stated risk covers only a state
@@ -565,7 +565,7 @@ start open, and an item is ticked only under the rule in the Notes below.
   function of FR-025's call states, for example the constants selected only in `resetting`, with
   feature 008's tests covering a key load after a passed self-test? [Gap, Coverage, Spec §FR-008,
   §FR-025 "Call sequence", §FR-034 "Components", §FR-059]
-- [ ] CHK083 Is "the behaviour on a repeated nonce" (FR-006, T7) stated beyond the one case that the
+- [x] CHK083 Is "the behaviour on a repeated nonce" (FR-006, T7) stated beyond the one case that the
   edge case "Nonce reuse" and the model contract give, the same key, nonce and personalization
   string giving the same output? Is it stated what a repeated key and nonce give with another
   personalization string, with other request lengths or another order of calls, or after a reseed
