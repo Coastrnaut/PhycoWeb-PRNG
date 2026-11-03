@@ -473,7 +473,11 @@ script refuses `verified`, exit 2, without such an entry or when the file on
 disk has another SHA-256 (data model §10). It also writes the size profile
 `parameters.json` beside `limits.json` (data model §10), each row from the variant table and the
 design document's layout, with FR-010's generic-bound checks computed by code; exit 1 on any
-violation at a claimable size. Both files keep their fixed names: before one changes, its current
+violation at a claimable size. Each row's `bound_bits` is the least of the figures those checks
+give, with `bound_terms` beside it holding each term and the term that sets it, computed by code, a
+term below zero counting as zero and a keyless variant taking `none`, and a test recomputes the
+least from the terms and each term from the row's other fields (data model §10;
+SEC-090). Both files keep their fixed names: before one changes, its current
 content is kept as `security-target/versions/<sha256>.json`, and the new content holds
 `previous_sha256` (data model introduction). After the freeze it runs only with `--reproduce`, whose
 record goes under `$REP/reproductions/`, and `protocol/evidence.py` refuses, exit 2, to write over
@@ -919,7 +923,19 @@ once written, tasks.md among them, README and security.md keeping their own
 blocks and carrying no copy of it (spec FR-068; SEC-086), and it scans every
 Markdown file under `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`,
 the checklists and checklist-choices.md included, README, security.md, and the comments and
-docstrings of the files FR-069 names. A line its rules flag passes only through an allow-list entry
+docstrings of the files FR-069 names. It finds each disclaimer by its place, README's status block
+and security.md's opening block as the first block quote of each file and security.md's closing
+block as its last, a block quote being a run of lines that start with ">", exit 1 if one is missing,
+and decides each by the fixed sentence "PhycoWeb-PRNG, every model included, must not be used to
+generate secrets.", held word for word beside the block's own text (SEC-092). It compares a bound or
+a claim stated in a disclaimer, line by line, with the register entries of the models the line names
+by ID, a line that states one and names no model being a finding, a bound being beyond the
+register's when an entry it names holds `none` or a bound below the line's, `phyco-v3`'s bound being
+the least of its sizes' bounds unless the line names a size by its variant ID, and a claim when an
+entry it names holds "no claim" (SEC-091). It checks `phyco-v3`'s `bound` against the size profile's
+`bound_bits` at each claimable size and its `evidence` against the records
+its level needs, each file against the SHA-256 the entry names (data model
+§15; SEC-089). A line its rules flag passes only through an allow-list entry
 of the register, with its path and text, its reason, its writer and its date, counted from the
 commit that adds it, and every run prints each entry added since the last ⛔ gate's approval commit,
 which the owner's review at that gate lists (data model §15; SEC-087). Its level rule flags every
@@ -954,6 +970,10 @@ create` exits 2 while this check reports a finding at HEAD (SEC-084). Exit 1
 on any finding (SC-018). `tests/test_claims.py` runs it, with a register above, below and at the
 rows' level, a `history` missing a lapsed L1, a reviewed file changed at HEAD with the register at
 L1 and at L0, and an `in_progress` naming L2 with no counted trail-bound record, naming
-another start date, or reading `none` once one exists among its cases (SEC-079,
-SEC-080). It writes no record and runs as a test, so FR-061's reproduction
+another start date, or reading `none` once one exists among its cases (SEC-079, SEC-080), as are a
+`bound` that differs from the profile's `bound_bits` and an `evidence` entry missing or naming
+another SHA-256 (SEC-089), a bound above an entry's, a bound for an entry that holds `none`, a claim
+beside "no claim" and a line that states a bound and names no model (SEC-091), and a disclaimer
+block missing, one without the fixed sentence and the sentence changed by one word
+(SEC-092). It writes no record and runs as a test, so FR-061's reproduction
 test leaves it out (spec FR-061).

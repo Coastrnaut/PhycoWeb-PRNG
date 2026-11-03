@@ -941,7 +941,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   domain-separation bits, counters, the nonce, the personalization string, reseed inputs and
   every output) MUST NOT be counted as secret; a reseed input is never secret state, even from
   a secret source (FR-016). A research variant's bound is labelled "research variant, no claim"
-  and is never compared with s = 128 or reported as a strength (FR-032).
+  and is never compared with s = 128 or reported as a strength (FR-032). That bound is the size
+  profile's `bound_bits`, the least of the figures FR-010's checks give, as FR-010 states (SEC-090).
 - **FR-010**: Every claimable size MUST be shown to respect every generic bound of security.md
   §12.2: strength at most the key entropy; reachable secret state at least 2s at every call
   boundary (FR-009); output volume stated, with every limit at most what the theorem allows at
@@ -951,7 +952,18 @@ freeze hashes and the baseline manifest; run the claim-register test.
   size profile as met with equality; behaviour on nonce reuse stated (edge case "Nonce
   reuse"), with its test. Each is a check in the size profile (`parameters.json`) that can fail,
   computed by code: `mode_limits_v3.py` writes the profile beside `limits.json` and exits 1 on any
-  violation at a claimable size (FR-065).
+  violation at a claimable size (FR-065). The profile's `bound_bits`, the bound FR-009 states, is
+  per supported size the least of the figures these checks give, each the cost of a generic attack
+  in bits: k, the key entropy; half the reachable secret state at the call boundary where it is
+  least; k − log₂ u at the u that `limits.json` states; half of the key and nonce bits together;
+  c/2; and k/2, T11 being single-target key search only (FR-008); a term below zero counts as zero,
+  and the checks of output volume and of nonce reuse give no figure and stay checks that can fail.
+  `mode_limits_v3.py` writes beside it each term and the term that sets it, as `bound_terms`,
+  computed by code, and a test recomputes the least from the terms and each term from the row's
+  other fields. A keyed reduced variant, such as `n2-w16-R8-c64`, takes the same rule at its own k,
+  nonce bits and c, its value labelled "research variant, no claim" and never compared with s, and a
+  keyless variant, with k = 0, takes `none`. The least is the most conservative reading, since each
+  check caps every level (SEC-090).
 - **FR-011**: The certification route MUST be named (FUT-SEC-9; D8); naming it meets FUT-SEC-9
   by specification. The functionality class within AIS 20/31 version 3.0 stays an open item,
   written "class unconfirmed" beside the route, until the download the owner allowed (research R19)
@@ -1015,9 +1027,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   the agent in the commit that writes that record and checked by the claim
   test against the records at HEAD (SEC-080); the claim-register test checks that no document states
   a level above `claim_level`, flagging every name of a level above it in every scanned line as a
-  whole word, as FR-069's rule states (SEC-085). Plan phase 1 creates `phyco-v3`'s entry in
-  `protocol/claims.json` at L0, with "no claim" and `in_progress` `none`, and its line at L0 in
-  security.md §15's register (SEC-081). The agent writes each change that the rows
+  whole word, as FR-069's rule states (SEC-085). Plan phase 1 creates `phyco-v3`'s entry
+  in `protocol/claims.json` at L0, with "no claim", `in_progress` `none`,
+  `bound` `none` and `evidence` empty, and its line at L0 in security.md §15's
+  register (SEC-081; SEC-089). The agent writes each change that the rows
   bring to the entry's `claim_level`, `updated` and `history`, and to that
   line, in a commit of its own right after the owner's commit that sets "L1
   recorded" or "L1 recorded <k>" to Approved, or that adds a later row of either review family,
@@ -2709,8 +2722,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   document's chapter "Replaced mechanisms" with their records), a row in §1.1, a
   validation-phase table like §1.3, the §20.1 decision (recorded in
   2.11 on 2026-11-01; FR-017), the claim-register entry as it then stands
-  (its line for `phyco-v3` at L0 is added in plan phase 1, in a security.md
-  version of its own; FR-069; SEC-081), the status of roadmap stage 5a.1 and
+  (its line for `phyco-v3` at L0 is added in plan phase 1, in a security.md version of its own,
+  which also gives security.md's opening and closing blocks FR-069's fixed
+  sentence; FR-069; SEC-081, SEC-092), the status of roadmap stage 5a.1 and
   a mention in §23. security.md keeps policy, status and registers, and derivations and other
   per-model detail go to research notes or reports (strategy note G16 and §7.1). A finding that
   breaks the target on the full rounds MUST be recorded at once, with a history entry and a
@@ -2720,7 +2734,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   drift listed in checklist group F MUST be corrected; README's status block, written for the models
   with a 64-bit seed, gains in that update a sentence on `phyco-v3`, a design at the register's
   level, with no claim and not for secrets, which the claim test checks against its
-  `claim_level` and `claim` (FR-069; SEC-086). The new security.md version keeps the
+  `claim_level` and `claim` (FR-069; SEC-086). The new security.md version and
+  README's update keep the fixed sentence that FR-069 has the three blocks
+  hold from plan phase 1 (SEC-092). The new security.md version keeps the
   constitution version that 2.13 names, 1.3.0, in its header, §4, §18's tree and §22's stage 1.
 - **FR-052**: The final phase report MUST follow the constitution's Phase Completion Reporting,
   MUST state which items of the constitution's change-completion list remain open (the
@@ -3172,8 +3188,16 @@ freeze hashes and the baseline manifest; run the claim-register test.
   their titles and tasks.md from its first version among them, and the claim-register test compares
   every document's copy with the constant. README and security.md, in the claim test's scope because
   FR-051 changes them, keep their own blocks and carry no copy of it (FR-069; SEC-086).
-- **FR-069**: A machine-readable claim and evidence register MUST list every model ID with its
-  claim level, its claim or "no claim", its bound and its evidence records (D10). An automated test
+- **FR-069**: A machine-readable claim and evidence register MUST list every model ID with its claim
+  level, its claim or "no claim", its bound and its evidence records (D10): `phyco-v3`'s `bound`
+  reads `none` until the size profile `security-target/parameters.json` exists, and from then on
+  holds, for each claimable size by its variant ID, that size's `bound_bits`, as "at most
+  <bound_bits> bits", with the profile's path and SHA-256, written by the agent in the commit that
+  commits the profile or its change, and inside FR-043's window in the working tree, for the owner's
+  commit to hold (SEC-084); its `evidence` lists, by path and SHA-256, the records its level and
+  bound rest on: none at L0 before the profile, the profile and `limits.json` once
+  they exist, and at L1 also the demonstration record and the files that the
+  two review rows named by "L1 recorded" name (SEC-089). An automated test
   MUST check that README, security.md §1.1 and §15, and the disclaimers agree with the register, the
   disclaimers being README's status block and security.md's own blocks, the one that opens it and
   the one that closes it, each of which must say that PhycoWeb-PRNG, every model included, must not
@@ -3188,10 +3212,30 @@ freeze hashes and the baseline manifest; run the claim-register test.
   change to the reviewed set ended, with its dates, the rows it rested on and the version reviewed,
   so that a register below the rows' level, or one missing a lapsed L1, fails as one above it does
   (FR-012; SEC-076), and that its `in_progress` reads `none` while no counted
-  trail-bound record exists at HEAD and names L2, "not reached", with the
-  first such record's date once one exists (SEC-080), and MUST report any
-  use of the wording FR-050 forbids outside the rules that forbid it (strategy note §10;
-  feature-003 T041). Its scope is every document of this feature, that is every Markdown file under
+  trail-bound record exists at HEAD and names L2, "not reached", with the first such record's date
+  once one exists (SEC-080), that `phyco-v3`'s `bound` and `evidence` hold what the register's rule
+  above gives, a `bound` that differs from the profile's `bound_bits` at a claimable size, or an
+  `evidence` entry missing at its level or whose file has another SHA-256, being a finding
+  (SEC-089), and MUST report any use of the wording FR-050 forbids outside the rules that forbid it
+  (strategy note §10; feature-003 T041). For the disclaimers, the test finds each disclaimer by its
+  place, README's status block and security.md's opening block as the first block quote of each file
+  and security.md's closing block as its last, a block quote being a run of lines that start with
+  ">", and exits 1 if one is missing, and decides each by one fixed sentence, "PhycoWeb-PRNG, every
+  model included, must not be used to generate secrets.", which each block holds word for word
+  beside its own text, and by the rule on a level, claim or bound beyond the register's; the three
+  blocks gain that sentence in plan phase 1, before the test's first run, security.md's two in the
+  version of its own that adds `phyco-v3`'s line to §15 and README's in the same phase, so that the
+  test passes from phase 1, and FR-051's later updates keep it (SEC-092). A bound or a claim stated
+  in a disclaimer is compared, line by line, with the register entries of the models the line names
+  by ID, as the level rule reads a line's `claim_level`, a disclaimer line that states a bound or a
+  claim naming its models by ID and one that names none being a finding; a bound is beyond the
+  register's when an entry it names holds `none` or a bound below the line's, `phyco-v3`'s bound
+  being the least of its sizes' bounds unless the line names a size by its variant ID, and a claim
+  is beyond it when an entry it names holds "no claim"; README's line on the 64-bit seed names, in
+  plan phase 1, when the test is written, the models whose seed it describes, `float-v0`, `lut-v1`
+  and `phyco-v2`, so that FR-051's sentence on `phyco-v3` stands beside it and each is checked
+  against its own entries (SEC-091). `tests/test_claims.py` covers each of these cases. Its
+  scope is every document of this feature, that is every Markdown file under
   `specs/004-crypto-architecture-v3/` and `reports/004-crypto-architecture-v3/`, the checklists and
   checklist-choices.md included, with README and security.md, since FR-051 changes both, and the
   comments and docstrings of every file it adds or changes (`phycoweb/`, `protocol/`, `scripts/`,

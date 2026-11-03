@@ -378,8 +378,12 @@ takes each from there.
    `scripts/provenance.py`, `protocol/changelog.py` with `scripts/protocol_change.py`,
    `scripts/clear_lock.py`, `scripts/owner_record.py` and `scripts/downloads.py` (REP-076), then the
    claim register `protocol/claims.json`, with an entry for each model ID and `phyco-v3` at L0 with
-   "no claim" and `in_progress` `none`, with `phyco-v3`'s line at L0 in security.md §15's register,
-   in a security.md version of its own, and `scripts/check_claims.py` and `tests/test_claims.py`, so
+   "no claim", `in_progress` `none`, `bound` `none` and `evidence` empty (SEC-089), with
+   `phyco-v3`'s line at L0 in security.md §15's register, in a security.md version of its own, which
+   also gives security.md's opening and closing blocks FR-069's fixed sentence, "PhycoWeb-PRNG,
+   every model included, must not be used to generate secrets.", README's status block gaining it in
+   the same phase, with its line on the 64-bit seed naming `float-v0`, `lut-v1` and `phyco-v2`
+   (SEC-091, SEC-092), and `scripts/check_claims.py` and `tests/test_claims.py`, so
    that the claim-register test, with FR-069's wording rules and its disclaimer check, runs from
    this phase on, as R18's line-ending test does (FR-051, FR-069; SEC-081); (2a) each platform's
    first environment record (R1), before every other write through `protocol/evidence.py` or a log
