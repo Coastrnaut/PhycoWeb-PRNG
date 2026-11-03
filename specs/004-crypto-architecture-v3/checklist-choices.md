@@ -876,6 +876,19 @@ result up to `compared_to` differs from the file the row names, or while a place
 "Place check <k>", read with the highest k; the comparison's result is recorded with the first
 entries (data-model §18).
 
+PRO-067 gives two headings the places of the texts their directions govern, each delimited as spec
+FR-044 states: "Records and their hashes" research R1 and R16, data-model's introduction and §1,
+§13, §14, §16 and §17, the cli contract and the notes under the Review & Approval table, and
+"Protocol changes and their directions" spec FR-044, data-model §18 and the cli contract's
+`protocol_change.py`, so that a change made in those texts alone is a change of that rule. The
+comparison reads them over every pair and span, the eighth list is written by them, and beside each
+earlier list stand, added on 2026-11-02, the rows of its round whose Changes cells name one of those
+places or whose applied change altered one and that the list does not yet list under that heading:
+for the first two rounds by the Changes cells alone, since each applied its rows in one commit with
+other edits, whose message names no row; from the second re-run on also by the messages of the
+round's commits, which name, row by row, the places each row's change altered; and from the sixth
+re-run on also by the rows' tags in those places' text.
+
 Each heading takes the stricter direction that spec FR-044's list states for it, and each listed
 row's rules take `stricter` in that direction or `settled`, with its readings, a rule whose
 direction is "no change" taking `settled` whatever the row's kind (data-model §18; PRO-066). The
@@ -965,6 +978,16 @@ heading below names and that this list does not list under that heading; they ar
 - **Records and their hashes** (research R16): PRO-018, PRO-024, PRO-031, REP-002, REP-006, REP-013,
   REP-014.
 
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells, 29 rows of the
+round that name a place of "Records and their hashes", not yet listed under it, 14 of them new to
+the list, so that the round enters the log with 167 of its 206 rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-031, SEC-032, SEC-033,
+  RAT-033, RAT-035, ANA-001, ANA-006, ANA-020, PRO-004, PRO-005, PRO-006, PRO-012, PRO-014, PRO-016,
+  PRO-029, PRO-030, PRO-033, HW-022, REP-001, REP-003, REP-004, REP-005, REP-007, REP-008, REP-015,
+  REP-017, REP-021, REP-025, REP-027.
+
 From the re-run, 20 of its 29 rows:
 
 - **Development inputs** (research R3; FR-040): REP-029.
@@ -994,6 +1017,17 @@ so that the round enters the log with 27 of its 29 rows:
 
 - **Records and their hashes** (research R16): PRO-036, PRO-037, PRO-039, PRO-040, REP-028, REP-030,
   REP-032, REP-034.
+
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells, 6 rows of the
+round that name a place of "Records and their hashes" and 4 that name a place of "Protocol changes
+and their directions", each not yet listed under that heading, none of them new to the list, so that
+the round still enters the log with 27 of its 29 rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): ANA-033, ANA-035, ANA-036,
+  REP-029, REP-031, REP-033.
+- **Protocol changes and their directions** (FR-044; data-model §18; the cli contract's
+  `protocol_change.py`): RAT-037, RAT-038, PRO-038, REP-032.
 
 Between this round's commits and the next round's, commit ad2c195 of 2026-11-01 changed research R3,
 a place that the heading "Development inputs" names, with an edit that no row made: it brought R3's
@@ -1037,6 +1071,19 @@ with 55 of its 71 rows:
 - **Records and their hashes** (research R16): PRO-042, REP-035, REP-036, REP-037, REP-040, REP-041,
   REP-042, REP-043, REP-045, REP-049, REP-052.
 
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells and the messages
+of the round's commits, 18 rows of the round that name or altered a place of "Records and their
+hashes" and one that names a place of "Protocol changes and their directions", each not yet listed
+under that heading, 6 of them new to the list, so that the round enters the log with 61 of its 71
+rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-047, RAT-044, RAT-045,
+  ANA-039, ANA-040, ANA-042, ANA-043, ANA-045, PRO-044, PRO-048, PRO-049, REP-038, REP-039, REP-046,
+  REP-048, REP-050, REP-053, REP-055.
+- **Protocol changes and their directions** (FR-044; data-model §18; the cli contract's
+  `protocol_change.py`): PRO-043.
+
 From the third re-run, 50 of its 70 rows:
 
 - **Development inputs** (research R3; FR-040): PRO-052, REP-064.
@@ -1078,6 +1125,16 @@ three of them new to the list, so that the round enters the log with 53 of its 7
 - **Records and their hashes** (research R16): ANA-048, PRO-056, REP-058, REP-059, REP-061, REP-062,
   REP-063, REP-065.
 
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells and the messages
+of the round's commits, 24 rows of the round that name or altered a place of "Records and their
+hashes", not yet listed under it, 13 of them new to the list, so that the round enters the log with
+66 of its 70 rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-053, SEC-054, SEC-055,
+  SEC-056, SEC-057, SEC-059, SEC-061, SEC-062, RAT-053, ANA-049, ANA-050, ANA-052, ANA-054, ANA-058,
+  PRO-050, PRO-052, PRO-053, PRO-055, REP-056, REP-057, REP-060, REP-066, REP-068, REP-069.
+
 From the fourth re-run, 18 of its 36 rows:
 
 - **FUT-SEC-8 demonstration** (FR-001 to FR-003): PRO-059.
@@ -1105,6 +1162,16 @@ rule.
 
 - **Records and their hashes** (research R16): SEC-073, RAT-061, REP-070, REP-071, REP-073.
 
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells and the messages
+of the round's commits, 15 rows of the round that name or altered a place of "Records and their
+hashes", not yet listed under it, 7 of them new to the list, so that the round enters the log with
+30 of its 36 rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-066, SEC-067, SEC-068,
+  SEC-069, SEC-072, RAT-062, RAT-063, RAT-064, ANA-060, ANA-061, ANA-065, ANA-067, PRO-059, PRO-060,
+  HW-073.
+
 From the fifth re-run, 9 of its 11 rows:
 
 - **Bias rule**, with the inputs per bias measurement (research R4): ANA-068, ANA-071.
@@ -1122,6 +1189,18 @@ Its round's two commits (PRO-061) are c9f5cb1 and 285584c, the commit that compl
 V1, and 285584c dropped a repeated clause from PRO-062's text in research R16. The comparison over
 them found a row of the round listed under every rule whose place changed, and the check of each
 row's Changes cell found each row listed under every heading whose place it names.
+
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells and the messages
+of the round's commits, 5 rows of the round that name or altered a place of "Records and their
+hashes" and one that names a place of "Protocol changes and their directions", each not yet listed
+under that heading, 2 of them new to the list, so that the round enters the log with all 11 of its
+rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-074, ANA-069, ANA-071,
+  PRO-061, REP-075.
+- **Protocol changes and their directions** (FR-044; data-model §18; the cli contract's
+  `protocol_change.py`): REP-074.
 
 Over every span from the plan-approval commit, 65bcbf2, to c9f5cb1 outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
@@ -1146,6 +1225,15 @@ changing only places under rules that list a row of its own checklist, and the s
 commit, 072394a, none; the check of each row's Changes cell found each row listed under every
 heading whose place it names. The alignment added that script and edited only this file, which hold
 no such place, so that the comparison over 2156dd8 and 2392150 gives the same result.
+
+Added beside this list on 2026-11-02 by PRO-067 (above), by the rows' Changes cells, the messages of
+the round's commits and the rows' tags in those places' text, 13 rows of the round that name or
+altered a place of "Records and their hashes", not yet listed under it, 9 of them new to the list,
+so that the round enters the log with 20 of its 22 rows:
+
+- **Records and their hashes** (research R1, R16; data-model introduction, §1, §13, §14, §16, §17;
+  the cli contract; the notes under the Review & Approval table): SEC-075, SEC-076, SEC-077,
+  RAT-068, PRO-063, PRO-064, HW-077, REP-076, REP-077, REP-078, REP-079, REP-080, REP-081.
 
 Over every span from the plan-approval commit, 65bcbf2, to 2156dd8 outside the rounds' pairs, the
 comparison found one place changed by an edit that no row made, ad2c195's change to research R3,

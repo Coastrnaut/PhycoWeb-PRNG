@@ -277,7 +277,7 @@ and the design document leaves an implementer, human or model, nothing to guess.
 | Owner design review (design document, design rationale, candidate log, evidence) | _pending_ | _pending_ | _pending_ | A decline states its reasons and ends in one of: a revision of the design document or rationale (same candidate, new version, review repeated); a fix that leaves the design unchanged, logged under the candidate; a further candidate within the stop rule, entered only where the rules can select it (FR-043), after which the rules select again over the whole set, the declined candidate included: the further one, if selected, goes to the review, and the declined one, if selected again, ends in a stop with the review's reasons; or a stop. Each is logged with its reasons. The review cannot put another eligible candidate in the rules' place (FR-041), and throughput is reported, never a reason to decline. A change after an approval (R raised, a new finding, a corrected document) makes a new design-document version, and the review of the changed parts is recorded in a numbered row of its own, "Owner design review <k>" (the notes under this table; FR-043) |
 | L1 recorded (security.md §15's L1 gate: the FUT-SEC-8 result review and the security-target review, both Approved; FR-012) | _pending_ | _pending_ | _pending_ | Until this row reads Approved, the claim register keeps `phyco-v3` at L0: the spec approval of 2026-11-01 started the design work and recorded no level. L0 needs no row; the start of L2 is recorded with the first counted trail-bound record. While any theorem the mode chapter uses is "unverified" (research R10), this row reads "blocked" and names the missing paper. The row names the two review rows it rests on, by family and k, the FUT-SEC-8 result review's and the security-target review's, each with what it reviewed by path and SHA-256: the demonstration record, the chapter's version, the set the security-target review's row names. Once a later row of either family is added, L1 is recorded again in a row of its own, "L1 recorded <k>" (k = 2, 3, … in order), when the later rows read Approved, naming them (the notes under this table). The owner sets this row and commits it, and `check_claims.py` reads the family's row with the highest k at HEAD and fails, exit 1, while the register's level for `phyco-v3` differs from the one the rows give, L1 while that row reads Approved and names the highest-k row of each review family, both Approved, with every hash those review rows name matching the file at HEAD, and L0 otherwise; the agent writes the register's change in a commit of its own right after the owner's commit that changes these rows, and its return to L0 after a change to what those rows reviewed in the commit that makes the change, or right after an owner's commit that makes it (FR-069; SEC-079) |
 | External design review (security.md §7; recommended, not required) | _pending_ | _pending_ | _pending_ | Recorded as "not arranged" if none can be arranged before the freeze; the review package (FR-063) is prepared either way. Once the review is done, the row names the review package's manifest by SHA-256, with the design-document version and the selection record it carried; where the design changes after the review, the row stays done for that version, and the owner may have the changes reviewed in a row of its own, "External design review <k>" (FR-043; SEC-077). A row reading "not arranged" names the latest selection record, by path and SHA-256, when it is written. Each row of this family names the selection record it applies to, a done row through its manifest, which carries that record, and a "not arranged" row by naming the latest selection record when it is written; `design_freeze.py create` reads the highest-k row that names the latest selection record and exits 2 while none does, so that a new selection record needs a row of its own, done or "not arranged", for the candidate it selects, and a review done for another candidate stays done in its row and is cited, in the freeze record's "External review" and in the final report, for the candidate and the version it read only (SC-013; SEC-078). |
-| Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | |
+| Design freeze (`phyco-v3`) | _pending_ | _pending_ | _pending_ | Set by the owner and committed, an owner's own act that no guard reads (the notes under this table). It names the approved freeze record by path and SHA-256 and its `owner_commit`, the owner's commit of the feature files in the freeze's step (1), which follows the commit that records the owner design review's approval in its row with the highest k, the agent committing no file of this feature from that approval on, so that the history shows the owner's act (FR-043; PRO-070) |
 | Final result review (phase report) | _pending_ | _pending_ | _pending_ | |
 
 A repair of a broken log chain (research R16) needs a row of its own in this table, "Log repair
@@ -2182,9 +2182,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   selection"): if it selects another candidate, the security-target review and every later review
   are held again for that candidate, each in a numbered row of its own; if it selects the same one,
   the reviews held stand for what did not change, and the changed parts are reviewed
-  again as above. The freeze runs in this order: (1) the owner commits the
-  feature files (Principle IX); (2) `design_freeze.py create` runs with `git_dirty` false and
-  writes the record as `draft`; (3) the owner's approval is written into it by `design_freeze.py
+  again as above. The freeze runs in this order: (1) the owner commits the feature files
+  (Principle IX): from the commit that records the owner design review's approval, in its row with
+  the highest k, the agent commits no file of this feature and leaves its changes in the working
+  tree, and step (1) is the owner's next commit, of every feature file changed since, or an empty
+  commit of the owner's where none changed, so that the external review's row, where it is set after
+  that approval, is set in that commit (PRO-070); (2) `design_freeze.py create` runs with
+  `git_dirty` false, records as `owner_commit` the commit that follows the one recording that
+  approval, step (1)'s, exiting 2 unless it is HEAD, and writes the record as
+  `draft`; (3) the owner's approval is written into it by `design_freeze.py
   approve`, run by the owner, which changes the status and adds who, when and the wording, and
   nothing else (⛔ gate); (4) the owner commits the record; (5) `design_freeze.py validate` exits 0,
   having checked against the draft's SHA-256 that nothing but the approval changed.
@@ -2245,7 +2251,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   answered before then, by the per-round lists "Rows that change the protocol" of
   checklist-choices.md, in round order, each holding, per rule its row is listed under, that rule's
   text before and after its round was applied (data-model §18). A row is listed under every rule
-  whose text its Changes cell names or its applied change altered. Each list names its round's two
+  whose text its Changes cell names or its applied change altered. A change made in the texts of a
+  rule's places alone is a change of that rule: the places of "Records and their hashes" are
+  research R1 and R16, data-model's introduction and §1, §13, §14, §16 and §17, the cli contract and
+  the notes under the Review & Approval table, and those of "Protocol changes and their directions"
+  this requirement, data-model §18 and the cli contract's `protocol_change.py`, as the directions
+  below name them; the comparison below reads them over every pair and span, each rule's `old_text`
+  and `new_text` taken from them, and each round's list names under those headings
+  every row of its round whose Changes cell names one of their places or
+  whose applied change altered one (PRO-067). Each list names its round's two
   commits by hash, the commit before the round's first applied row and the commit that completed its
   alignment, so that a round's alignment commits fall inside its pair, the first two rounds' pairs
   being the commits that hold their rows with their other edits, named as such. Before the tasks
@@ -2258,8 +2272,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   commit it compared up to. A place's text, as committed with CR LF read as LF, runs for an FR item
   from its line `- **FR-0xx**` to the next line that starts an FR item, a bold group name or a
   heading; for a research section from its heading `## R<k>.` to the next heading of that level; for
-  a paragraph of the protocol from its bold name to the next bold name or to the section's end; and
-  for the plan's table from its heading to the next heading. A round with no alignment commit takes
+  a paragraph of the protocol from its bold name to the next bold name or to the section's end; for
+  the plan's table from its heading to the next heading; for a numbered section of the data model,
+  or a script's section of the cli contract, from its heading to the next heading of the same or a
+  higher level; for the data model's introduction from the file's start to its first numbered
+  section; for the cli contract, the whole file; and for the notes under the Review & Approval table
+  from the line after the table to the next heading; in the data model, the cli contract and those
+  notes, a line in fenced code is never a heading (PRO-067). A round with no alignment commit takes
   as its second commit the commit of its last applied row, named as such. The results beside each
   list restate that file. A place changed by an edit that no row made, in a round's commits or
   between two rounds, is recorded beside a list with its commit, for the owner to confirm at the
@@ -2349,10 +2368,13 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - the structural checks (research R13): counts only rise, and symmetries, constant relations,
     forms and sources of R_dist are only added;
   - the vector lengths (research R8): lengths only grow;
-  - records and their hashes (research R16): what a record holds, which files are hashed and kept,
+  - records and their hashes (research R1, R16; data-model's introduction and §1,
+    §13, §14, §16 and §17; the cli contract; the notes under the Review &
+    Approval table): what a record holds, which files are hashed and kept,
     and the writers' and guards' checks and refusals are only added, and no file's hash kind changes
     once a record holds it;
-  - protocol changes and their directions (this requirement): an entry's fields, the comparison and
+  - protocol changes and their directions (this requirement; data-model §18; the cli
+    contract's `protocol_change.py`): an entry's fields, the comparison and
     the guard's refusals are only added, and no rule's direction is loosened.
 - **FR-045**: Heavy runs MUST NOT overlap one another or any battery run (security.md §12.5). A
   heavy run is any run that is of a kind research R7 budgets, uses more than one worker process or
@@ -2600,10 +2622,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   Hypothesis) MUST be added if the owner approves the download; otherwise their absence MUST be
   recorded as an open item. Until the approved wheels are installed and checked, the property tests
   skip with a reason naming that open item and none fails, and the final report lists the skipped
-  tests; once the wheels are installed and the pins take effect, the first environment records are
-  written, in plan phase 1's order, and the property tests run before any later record; a wheel
-  installed after a record needs a new environment record, approved before any later record
-  (research R17, R18; REP-081). They run under a settings profile registered by the test package,
+  tests. Each platform's first environment record, of the interpreter and the packages that
+  `requirements.txt` pins before the wheels, comes before every other write through
+  `protocol/evidence.py` or a log writer: it is the one write the guard "Environment" admits while
+  no record is in force, checked against research R1 and those pins instead (cli contract,
+  "Environment"; PRO-068); once the wheels are installed and the pins take effect, each platform's
+  new record is written and approved before any later write, in plan phase 1's order, and the
+  property tests run before any later record; a wheel installed after a record needs a new
+  environment record, approved before any later record (research R1, R17, R18; REP-081,
+  REP-082). They run under a settings profile registered by the test package,
   with `derandomize=True` and `database=None`, so that every run tries the same examples and a
   failure replays by running again.
 - **FR-059**: The design document MUST define a known-answer self-test for start-up as a step of
@@ -3493,7 +3520,8 @@ seed-entropy note's §5.3 checklist is covered by the table above.
 - **Square grids only**; rectangular grids are out of scope.
 - **No git branch** is created; the feature directory names the feature. The agent commits locally
   under the owner's standing authorization (Principle IX, constitution 1.3.0), at consistent
-  checkpoints and with no AI co-author line; only the owner pushes, tags, releases or publishes.
+  checkpoints and with no AI co-author line, and no file of this feature from the owner design
+  review's approval on (FR-043); only the owner pushes, tags, releases or publishes.
 - **External review**: constitution 1.3.0 does not require an external design review, and
   security.md §7 recommends one. Arranging it is the owner's outward action (Principle IX).
 - **Constitution**: 1.3.0 applies. The optional amendment of strategy note §9.1 and the

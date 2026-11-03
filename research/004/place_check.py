@@ -11,8 +11,13 @@ that no row made, with its commit and the list it is recorded beside; and `compa
 A place's text, as committed with CR LF read as LF (spec FR-044), runs for an FR item from its line
 `- **FR-0xx**` to the next line that starts an FR item, a bold group name or a heading; for a
 research section from its heading `## R<k>.` to the next heading of that level; for a paragraph of
-the protocol from its bold name to the next bold name or to the section's end; and for the plan's
-table from its heading to the next heading.
+the protocol from its bold name to the next bold name or to the section's end; for the plan's
+table from its heading to the next heading; for a numbered section of the data model, or a script's
+section of the cli contract, from its heading to the next heading of the same or a higher level; for
+the data model's introduction from the file's start to its first numbered section; for the cli
+contract, the whole file; and for the notes under the spec's Review & Approval table from the line
+after the table to the next heading; in the data model, the cli contract and those notes, a line in
+fenced code is never a heading (PRO-067).
 
 Standard library only. Exit 0 once the file is written; 2, writing nothing, when a list names no
 pair of commits, a heading names no place, or a pair is out of order; 3 when git cannot be run or a
@@ -30,6 +35,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 FEATURE = "specs/004-crypto-architecture-v3/"
 LISTS = FEATURE + "checklist-choices.md"
+DATA_MODEL = FEATURE + "data-model.md"
+CLI = FEATURE + "contracts/cli.md"
 PLAN_APPROVAL = "65bcbf2"
 OUT = ROOT / "research" / "004" / "place-check.json"
 
@@ -37,6 +44,14 @@ LISTS_START = "## Rows that change the protocol"
 LISTS_END = "## After the answer"
 PROTOCOL = "### Pre-registered Design Protocol"
 PLAN_TABLE = "### Values this plan fixes"
+APPROVALS = "## Review & Approval"
+INTRO = "data-model: introduction"
+CONTRACT = "cli contract"
+NOTES = "spec: notes under the Review & Approval table"
+FENCE = re.compile(r"^\s*(?:```|~~~)")
+HEADING = re.compile(r"^(#{1,6}) ")
+NUMBERED = re.compile(r"^#{1,6} (\d+)\. ")
+SCRIPT = re.compile(r"^#{1,6} `(?:scripts/)?([^`/]+)`")
 LIST_HEAD = re.compile(r"^From the (?:.+?), \d+ of its \d+ rows:$", re.M)
 PAIR = re.compile(r"two commits(?: \(PRO-061\))?(?: are|,) ([0-9a-f]{7,40}) and ([0-9a-f]{7,40})")
 BULLET = re.compile(r"^- \*\*(.+?)\*\*([^:\n]*(?:\n  [^:\n]*)*):\s*(.+?)(?=\n- |\n\n|\Z)",
@@ -76,6 +91,30 @@ def until(lines: list[str], start: int, stop) -> int:
     return j
 
 
+def headings(lines: list[str]) -> list[tuple[int, int]]:
+    """(line, level) of every heading outside fenced code."""
+    out, fenced = [], False
+    for i, line in enumerate(lines):
+        if FENCE.match(line):
+            fenced = not fenced
+        elif not fenced and HEADING.match(line):
+            out.append((i, len(HEADING.match(line).group(1))))
+    return out
+
+
+def sections(lines: list[str], pattern: re.Pattern, prefix: str) -> dict[str, str]:
+    """Each heading that the pattern matches, keyed by prefix and its group, from the heading to the
+    next heading of the same or a higher level."""
+    out: dict[str, str] = {}
+    heads = headings(lines)
+    for k, (i, level) in enumerate(heads):
+        m = pattern.match(lines[i])
+        if m:
+            j = next((x for x, lv in heads[k + 1:] if lv <= level), len(lines))
+            out.setdefault(prefix + m.group(1), "\n".join(lines[i:j]))
+    return out
+
+
 def place_texts(commit: str, cache: dict[str, dict[str, str]]) -> dict[str, str]:
     """Every place's text at the commit, keyed as heading_places() names them."""
     if commit in cache:
@@ -105,13 +144,34 @@ def place_texts(commit: str, cache: dict[str, dict[str, str]]) -> dict[str, str]
         if line.startswith(PLAN_TABLE):
             j = until(plan, i, lambda s: s.startswith("#"))
             out.setdefault("plan: Values this plan fixes", []).append("\n".join(plan[i:j]))
+    model = show(commit, DATA_MODEL)
+    numbered = [i for i, _ in headings(model) if NUMBERED.match(model[i])]
+    if numbered:
+        out[INTRO] = ["\n".join(model[:numbered[0]])]
+    for key, text in sections(model, NUMBERED, "data-model §").items():
+        out[key] = [text]
+    cli = show(commit, CLI)
+    if cli:
+        out[CONTRACT] = ["\n".join(cli)]
+    for key, text in sections(cli, SCRIPT, "cli: ").items():
+        out[key] = [text]
+    starts = [i for i, line in enumerate(spec) if line.startswith(APPROVALS)]
+    if starts:
+        i = starts[0] + 1
+        while i < len(spec) and not spec[i].startswith("|"):
+            i += 1
+        while i < len(spec) and spec[i].startswith("|"):
+            i += 1
+        j = next((x for x, _ in headings(spec) if x > i), len(spec))
+        out[NOTES] = ["\n".join(spec[i:j])]
     cache[commit] = {k: "\n".join(v) for k, v in out.items()}
     return cache[commit]
 
 
 def heading_places(name: str, text: str, protocol: set[str]) -> list[str]:
-    """The places a list heading names: its protocol paragraph, research sections, FR items and the
-    plan's table."""
+    """The places a list heading names: its protocol paragraph, research sections, FR items, the
+    plan's table, data-model sections and introduction, the cli contract or a script's section of
+    it, and the notes under the Review & Approval table."""
     places = ["protocol: " + name] if name in protocol else []
     places += [f"R{k}" for k in re.findall(r"\bR(\d+)\b", text)]
     numbers: list[int] = []
@@ -121,6 +181,15 @@ def heading_places(name: str, text: str, protocol: set[str]) -> list[str]:
     places += [f"FR-{k:03d}" for k in dict.fromkeys(numbers)]
     if "the plan's table" in text:
         places.append("plan: Values this plan fixes")
+    for part in re.findall(r"data-model ([^;)]*)", text):
+        if "introduction" in part:
+            places.append(INTRO)
+        places += [f"data-model §{k}" for k in re.findall(r"§(\d+)", part)]
+    places += ["cli: " + k for k in re.findall(r"the cli contract's `(?:scripts/)?([^`]+)`", text)]
+    if re.search(r"the cli contract(?!'s)", text):
+        places.append(CONTRACT)
+    if "the notes under the Review & Approval table" in text:
+        places.append(NOTES)
     return list(dict.fromkeys(places))
 
 

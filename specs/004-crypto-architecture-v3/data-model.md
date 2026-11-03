@@ -77,7 +77,7 @@ implementation can write byte-identical files:
 | `git_head`, `git_dirty`, `dirty_paths` | str, bool, list | as in the feature-002 and feature-003 records; `dirty_paths` lists every modified or untracked path not ignored, which may be data and report files only, since code is committed before every evidence run (`code_sha256`), and never a file a record would cite: every evidence script exits 2 while one is modified in the working tree (introduction) |
 | `code_sha256` | object | path → SHA-256 of every code file the run used: the script, the `protocol/` modules, the candidate's operation list, `research/004/ir.py` and its tools, `research/004/tools/critical_counts.json` among them (section 5), a C source and its binary. A self-written tool's version is its hash (FR-039). Code is committed before every evidence run: a run that writes evidence exits 2 unless every source file here matches HEAD, committed and unmodified, and a binary is rebuilt from committed source, its hash reported only by a reproduction; a test checks each entry against the blob at `git_head`, the commit a reproduction runs (Reproduction, below; research R16) |
 | `versions` | object | Python, numpy, scipy, gcc, and every tool used, with its version and licence |
-| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below) |
+| `environment` | object | path and SHA-256 of the platform's environment record in force, `environment-windows.json` or `environment-wsl.json` (research R1), written by the owner with `scripts/owner_record.py environment`, with `approved_by`, `approved_utc` and `approval_confirmed`, and Approved in its own Review & Approval row, "Environment record <n>", at HEAD, which the start check compared the running environment with as a whole (Python, every package of `pip freeze --all`, taken as research R1 states, gcc and make in WSL, the Windows build or the WSL distribution and kernel); an earlier one resolved from `versions/` (introduction); a `recheck` record holds its own environment instead (below); the environment record itself, the one write the guard "Environment" admits while no record is in force or the running environment differs from it, holds `none`, with the interpreter's version and each pinned package's version that its check against research R1 and the pins of `requirements.txt` compared (PRO-068); each entry of the provenance log, the protocol change log and the downloads manifest names the record in force the same way, as its `environment` (sections 14, 18; research R19; REP-082) |
 | `platform` | object | operating system, CPU, logical CPUs, RAM |
 | `parallelism` | object | worker and thread counts, and `PYTHONHASHSEED` if set |
 | `command`, `config` | str, object | the interpreter by its full path (on Windows the `python.exe` of the Store distribution's versioned prefix, `sys.executable` with the alias resolved; in WSL `~/.venvs/phycoweb/bin/python`; research R1), then the script and its arguments with paths relative to the repository root; the working directory and the repository root; every parameter |
@@ -878,7 +878,10 @@ copy against its manifest hash and its live source (SC-012).
   the design-document version it names, with the design-document versions since where the design
   changed after that review, and each review done for another candidate, cited for the candidate and
   the version it read only, as the final report states them (spec FR-043, SC-013; SEC-078).
-- Tool versions; `git_head`; `git_dirty`, which must be false; `draft_sha256`, written by `create`:
+- Tool versions; `git_head`; `owner_commit`, the hash of the freeze's step (1), the owner's commit
+  of the feature files, which follows the commit that records the owner design review's approval in
+  its row with the highest k, `create` exiting 2 unless it is HEAD (spec FR-043; PRO-070);
+  `git_dirty`, which must be false; `draft_sha256`, written by `create`:
   the SHA-256 of the record's canonical JSON without that field and the approval fields; and
   `status`, `draft` until the owner approves. `design_freeze.py approve --by NAME --wording TEXT`,
   run by the owner, prints `draft_sha256` and refuses unless standard input is an interactive
@@ -886,8 +889,10 @@ copy against its manifest hash and its live source (SC-012).
   `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed` (the digits typed), and
   changes nothing else.
 
-The freeze runs in five steps (FR-043): (1) the owner commits the feature files;
-(2) `design_freeze.py create` runs with `git_dirty` false and writes the record as `draft`;
+The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the owner's next
+commit after the one that records the owner design review's approval, from which the agent commits
+no file of this feature (PRO-070); (2) `design_freeze.py create` runs with `git_dirty`
+false, records that commit as `owner_commit` and writes the record as `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
 never performs (spec FR-043). Dirty means a tracked file modified or an untracked file not
@@ -907,8 +912,10 @@ the frozen files (FR-034).
 One line per file drafted or repaired with an AI tool, and per section where a file is
 drafted in parts: `seq` and `prev_sha256`, chained as the candidate log is
 (section 3: the previous line's UTF-8 bytes as stored, final LF included), `path`, `section`,
-`sha256` and `sha256_kind`, `tool` and `model`, `session`, `date_utc`, `task_id`, `review_status`,
-which is `pending`, `accepted` or `changes-requested`. An entry's `sha256` is over the named file's
+`sha256` and `sha256_kind`, `tool` and `model`, `session`, `date_utc`, `task_id`,
+`environment`, the platform's environment record in force when the entry was
+written, named as in section 1 (REP-082), `review_status`, which is `pending`,
+`accepted` or `changes-requested`. An entry's `sha256` is over the named file's
 bytes, LF-normalized for an existing `text=auto` file such as security.md or README.md and raw
 otherwise, as research R16 hashes, with `sha256_kind` (`raw` or `lf-normalized`) beside it; a
 section's text runs from its heading line, included, to the line before the next heading of the same
@@ -1131,6 +1138,7 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; for a first entry, per rule in `rules` |
 | `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it; empty for a `stricter` entry |
 | `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below) |
+| `environment` | the platform's environment record in force when the entry was written, named as in section 1 (REP-082) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
 
@@ -1142,10 +1150,21 @@ in force at the entry blocks the candidate and is a tool defect, and one under a
 change is that change's recomputed verdict, recorded in `results_known` (section 1, Re-check
 records). The log's first entries, written when it is created, are the answered rows of every
 checklist round answered before the log is created, by the lists "Rows that change the protocol" of
-[checklist-choices.md](./checklist-choices.md), in round order: one entry per listed row, whose
-applied change altered the text of a pre-registered rule, whatever its kind, the 70 rows tagged
-Stricter or Settle (26 and 44) among them. A row is listed under every rule whose text its Changes
-cell names or its applied change altered (PRO-058). Each list names its round's two commits by hash,
+[checklist-choices.md](./checklist-choices.md), in round order: one entry per row listed in a
+round's list, whose applied change altered the text of a pre-registered rule, whatever its kind,
+every Stricter or Settle row among them, and one per place the owner confirms as an entry of
+its own, placed as stated below; `protocol_change.py create` reports their
+number from the lists, so that no count in the requirements can disagree
+with them (PRO-069). A row is listed under every rule whose text its Changes
+cell names or its applied change altered (PRO-058). A change made in the texts of a rule's places
+alone is a change of that rule: "Records and their hashes" has research R1 and R16, this file's
+introduction and sections 1, 13, 14, 16 and 17, the cli contract and the notes under the spec's
+Review & Approval table, and "Protocol changes and their directions" spec FR-044, this section and
+the cli contract's `protocol_change.py`, each place delimited as spec FR-044 states; the comparison
+below reads them over every pair and span, each rule's `old_text` and `new_text`
+taken from them, and each round's list names under those headings every row
+of its round whose Changes cell names one of their places or whose applied
+change altered one (PRO-067). Each list names its round's two commits by hash,
 the commit before the round's first applied row and the commit that completed its alignment, so that
 a round's alignment commits fall inside its pair, the first two rounds' pairs being the commits that
 hold their rows with their other edits, named as such (PRO-061). Before the tasks approval the agent

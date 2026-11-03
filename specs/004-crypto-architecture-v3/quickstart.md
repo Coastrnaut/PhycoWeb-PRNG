@@ -89,6 +89,6 @@ marked **heavy** take the heavy-run lock and never overlap another heavy run.
 | Step | Command | Expected |
 |------|---------|----------|
 | F1 | `python scripts/design_freeze.py create` before the owner design review | exit 2 |
-| F2 | after the reviews, the five steps of [contracts/cli.md](./contracts/cli.md): the owner commits the feature files; `create` on a clean tree (status `draft`); the owner's approval; the owner commits the record; `validate` | exit 0 (FR-043); `validate` exits 2 while the record is `draft` |
+| F2 | after the reviews, the five steps of [contracts/cli.md](./contracts/cli.md): the owner commits the feature files, the owner's next commit after the owner design review's approval; `create` on a clean tree, with that commit as HEAD, recorded as `owner_commit` (status `draft`); the owner's approval; the owner commits the record; `validate` | exit 0 (FR-043); `create` exits 2 unless HEAD is the commit right after the owner design review's approval (PRO-070); `validate` exits 2 while the record is `draft` |
 | F3 | `python scripts/recheck_004.py` in a fresh clone, on any machine | 0 disagreements (SC-017); its `recheck` record names the interpreter, platform and `pip freeze` it ran with, and says when that environment is not one of research R1's |
 | F4 | `python scripts/check_claims.py` | 0 findings (SC-015, SC-018) |

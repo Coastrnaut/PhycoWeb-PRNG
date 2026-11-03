@@ -109,8 +109,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   `-I` would disable. `pip freeze`, for the environment record and for the start check, is that
   interpreter's `-m pip freeze --all`, run without `-I`.
   - One environment record per platform, `environment-windows.json` and `environment-wsl.json`
-    under `reports/004-crypto-architecture-v3/`, is written at setup, once the wheels of R19 are
-    installed and R18's pins are in `requirements.txt`, in plan phase 1's order (REP-081),
+    under `reports/004-crypto-architecture-v3/`, is written at setup, first, of this section's
+    interpreter and the packages that `requirements.txt` pins before the wheels, before every other
+    write through `protocol/evidence.py` or a log writer, and again once the wheels of R19 are
+    installed and R18's pins are in `requirements.txt`, in plan phase 1's order (REP-081, REP-082),
     and on any change by `scripts/owner_record.py environment`, which the
     owner runs, an owner's own act (spec FR-044): the Windows build, the
     WSL distribution, its version and the kernel, Python, gcc, make and the
@@ -119,18 +121,29 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     input is an interactive terminal and the owner types its first 16 hex digits; the owner then
     sets the record's Review & Approval row, "Environment record <n>", to Approved with that SHA-256
     and commits it. A record is written only when its Python and pinned packages
-    match this section and the pins of `requirements.txt` for that platform (R18). Each evidence
-    record cites its environment record's SHA-256 (data-model §1). Both
+    match this section and the pins of `requirements.txt` for that platform (R18), the check the
+    guard "Environment" makes of that one write in place of the comparison below (cli contract;
+    PRO-068). Each evidence record cites its environment record's SHA-256 (data-model §1). Both
     keep fixed names: before one changes, its current content is kept as `versions/<sha256>.json`
     beside it, and the new record holds `previous_sha256` (R16).
-  - `protocol/evidence.py` checks at start the running environment against the platform's
+  - Every write through `protocol/evidence.py` or through the log writers `protocol/changelog.py`
+    and `protocol/provenance.py` checks at start the running environment against the platform's
     environment record in force, as a whole: Python, every package and version of `pip freeze` (one
     added, upgraded or removed), gcc and make in WSL, and the Windows build or the WSL distribution
-    and kernel. Any difference exits 2, naming it, a Windows or WSL update included; the owner then
-    writes and approves a new environment record, with this section updated first when a pinned
-    version changes, and each later record cites the record in force. The check also exits 2 unless
-    the record in force has its row "Environment record <n>" Approved at HEAD with its
-    SHA-256 (cli contract, "Environment"). `scripts/recheck_004.py` alone is
+    and kernel. Any difference exits 2, writing nothing and naming it, a Windows or WSL update
+    included, for every write but the environment record itself (below); the owner then writes and
+    approves a new environment record, with this section updated first when a pinned version
+    changes, and each later record cites the record in force. While the running environment differs
+    from the record in force, or none is in force, the guard admits one write, the environment
+    record itself, written by `owner_record.py environment` and checked instead against this section
+    and the pins of `requirements.txt` for that platform, exit 2 on any difference, its
+    `environment` field `none`, with the interpreter's version and each pinned package's version
+    that the check compared. Every other write, a `lock-cleared` record included, also exits 2
+    unless the record in force has its row "Environment record <n>" Approved at HEAD with its
+    SHA-256 (cli contract, "Environment"), an approval that needs no lock, so that
+    a stale lock found after an update is cleared once the new record is
+    approved; before the first record no lock can be held, since no log writer or
+    heavy run starts before it (PRO-068). `scripts/recheck_004.py` alone is
     exempt, since it imports only the standard library and `protocol/` (R16).
   - A reproduction runs in the environment that made the original, as its environment record shows,
     and in no other: a run in the other environment is not a reproduction and compares nothing with
@@ -1797,7 +1810,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     since it records an event and clearing a stale lock is what lets the log be created; every other
     kind stays refused by the guard "Protocol log", and once the log exists a `lock-cleared` record
     cites its last entry as every record does. Before the log exists only `data/log-append.lock` can
-    be held, since every run that takes the heavy-run lock writes evidence (PRO-065).
+    be held, since every run that takes the heavy-run lock writes evidence (PRO-065). Like every
+    other write, a `lock-cleared` record waits until the platform's environment record in force
+    reads Approved at HEAD (R1): after a Windows or WSL update the owner writes and approves the new
+    record, which needs no lock, and the stale lock is cleared then; before the first environment
+    record no lock can be held, since no log writer or heavy run starts before it (PRO-068).
   - **Protocol change log.** Each change of a pre-registered rule is one entry: the date, the
     rule, the old and new text, the reason, the direction, `stricter` in the rule's stated direction
     or `settled`, which fixes a case the protocol leaves open, only before any result
@@ -1816,8 +1833,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     broken file is kept unchanged with its SHA-256; `scripts/repair_log.py` writes a `repair` entry
     with the break's position, its cause and what was restored. Entries after the break count only
     where the records they cite corroborate them, and the final report states the repair.
-  - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files;
-    (2) `design_freeze.py create` runs with `git_dirty` false and writes the record as `draft`;
+  - **The design freeze** (FR-043) runs in five steps: (1) the owner commits the feature files, the
+    owner's next commit after the one that records the owner design review's approval, from which
+    the agent commits no file of this feature; (2) `design_freeze.py create` runs with
+    `git_dirty` false, records that commit as `owner_commit`, exiting 2 unless
+    it is HEAD (spec FR-043; PRO-070), and writes the record as `draft`;
     (3) the owner runs `design_freeze.py approve`, which prints `draft_sha256`, refuses unless
     standard input is an interactive terminal and the owner types its first 16 hex digits, writes
     the approval with that confirmation into it and changes nothing else (data-model §13); (4) the
@@ -2003,9 +2023,14 @@ nothing runs from the download directory. A check after each install compares
 `pip freeze` with R18's pins, which enter `requirements.txt` only then (R18). The
 licences allow use in a GPL-3.0 project, and nothing here is committed or distributed. Each file's
 SHA-256 is checked against PyPI's after download and recorded. The wheels are fetched, recorded and
-installed in plan phase 1's order: the manifest's `approved` entries first, then each wheel in its
-own new directory, checked by `scripts/downloads.py fetched` and installed, then R18's pins written
-into the corrected `requirements.txt`, and only then the environment records (R1; REP-081).
+installed in plan phase 1's order, under the first environment records, which come before every
+other write through `protocol/evidence.py` or a log writer (R1; REP-082): the manifest's `approved`
+entries first, then each wheel in its own new directory, checked and recorded by
+`scripts/downloads.py fetched`, every wheel recorded before any is installed, since an install
+changes the running environment and the guard "Environment" then admits only a new environment
+record (cli contract; PRO-068), then the wheels installed, then R18's pins written into the
+corrected `requirements.txt`, and only then each platform's new environment record, approved before
+any later write (R1; REP-081, REP-082).
 
 | File | Source | Size | Licence | Use | Without it |
 |------|--------|------|---------|-----|-----------------|
@@ -2027,7 +2052,8 @@ run from inside that directory, Python reading it runs with `-I`, and its SHA-25
 recorded against its row.
 
 A committed downloads manifest, `reports/004-crypto-architecture-v3/downloads.json`, holds from
-setup on one entry per file of these tables, each with its name, source, size and licence and a
+setup on one entry per file of these tables, each with its name, source, size and licence, the
+environment record in force when it was written, as `environment` (data-model §1; REP-082), and a
 `status`: `approved`, not yet fetched, with no SHA-256, date or path; `fetched`, with its SHA-256,
 download date and local path; or `not obtained`, with the reason. Those entries are written by a
 script of its own, `scripts/downloads.py`, through `protocol/evidence.py`, run by the agent: `init`

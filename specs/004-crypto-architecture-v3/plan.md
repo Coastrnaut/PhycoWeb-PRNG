@@ -153,7 +153,8 @@ protocols, their seed sets, or any frozen file, `fast/phyco_stream.c` and `fast/
 included (its LF pin leaves its bytes unchanged, R18); development inputs only; the protocol
 only becomes stricter; no key-loading code before the FUT-SEC-8 review; heavy runs never
 overlap; no download beyond the approved files of R19; the agent commits only locally, under the
-owner's standing authorization, and never pushes.
+owner's standing authorization, no file of this feature from the owner design review's approval on
+(FR-043), and never pushes.
 
 **Scale/Scope**: three claimable sizes (b = 1,024, 4,096 and 16,384 bits at w = 32), research
 size 2×2 (3×3 only with a three-colour schedule); at most six candidates; 3 × 2³² sweep
@@ -375,8 +376,15 @@ takes each from there.
    "no claim" and `in_progress` `none`, with `phyco-v3`'s line at L0 in security.md §15's register,
    in a security.md version of its own, and `scripts/check_claims.py` and `tests/test_claims.py`, so
    that the claim-register test, with FR-069's wording rules and its disclaimer check, runs from
-   this phase on, as R18's line-ending test does (FR-051, FR-069; SEC-081); (3) the
-   provenance log, its first entries those of the files drafted before it (FR-067; data-model §14;
+   this phase on, as R18's line-ending test does (FR-051, FR-069; SEC-081); (2a) each platform's
+   first environment record (R1), before every other write through `protocol/evidence.py` or a log
+   writer: once `requirements.txt` is corrected as R18 states, its Hypothesis pins commented out,
+   the owner writes with `scripts/owner_record.py environment` the record of R1's interpreter and
+   the packages that file pins, the one write the guard "Environment" admits while no record is in
+   force (PRO-068), and its row "Environment record <n>" reads Approved before the next step, so
+   that (3) to (6) run under those records, every entry and record naming the record in
+   force as its `environment` (REP-082); (3) the provenance log, its first
+   entries those of the files drafted before it (FR-067; data-model §14;
    REP-080); (4) the protocol change log, after the owner's confirmation of every list at the tasks
    approval and before every file written through `protocol/evidence.py` but a `lock-cleared` record
    (PRO-065), its first entries the answered rows of every checklist round answered before it is
@@ -386,10 +394,13 @@ takes each from there.
    before any download, each later `fetched` or `not obtained`, and an `owner-provided` entry for
    each value the owner provides, written by the owner with `scripts/owner_record.py` (R19); (6) the
    Hypothesis wheels of R19, each downloaded into its own new directory, checked against PyPI's
-   SHA-256, recorded `fetched` and installed from outside the download directory under `-I`, as R19
-   states, then checked against R18's pins, which are written into the corrected `requirements.txt`
-   only then; (7) the environment records of both platforms (R1), matching those pins, written by
-   the owner with `scripts/owner_record.py`, each with its Review & Approval row;
+   SHA-256 and recorded `fetched`, every one before any is installed, since an install changes the
+   running environment and the guard then admits only a new record, then installed from outside the
+   download directory under `-I`, as R19 states, and checked against R18's pins, which are written
+   into the corrected `requirements.txt` only then; (7) each platform's new environment record (R1),
+   matching those pins, written by the owner with `scripts/owner_record.py
+   environment` once the wheels are installed, the new record FR-058 asks
+   for, its Review & Approval row Approved before any later write (REP-082);
    (8) `protocol/devinputs_v3.py` with the fingerprints of every allowed (n, w), at most 16 pairs,
    and of the synthetic seeds (R3); (9) the `phyco-v2` archive (FR-042). (The status of the strategy
    note and of security.md §22 rows 5a and 5a.1 was updated during planning, in security.md 2.10.)
@@ -429,9 +440,11 @@ takes each from there.
    created at L0 in phase 1, and its §15 line in a commit of its own right after the owner's
    commit (FR-012; SEC-081); then the rationale; the security.md version of
    FR-051 (2.11 already records the §20.1
-   decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design
-   review**; external review recorded as done or not arranged; the owner commits the feature
-   files (Principle IX); ⛔ **design freeze**.
+   decision, from the checklist answers of 2026-11-01); review package; ⛔ **owner design review**,
+   from whose approval commit on the agent commits no file of this feature; external review recorded
+   as done or not arranged, after that approval only in the owner's commit of the feature files; the
+   owner commits the feature files (Principle IX), the commit `design_freeze.py create` records as
+   `owner_commit` (FR-043; PRO-070); ⛔ **design freeze**.
 9. **Polish**: README stating the status of `phyco-v3`, with the documentation drift of
    checklist group F corrected, and an addendum to the feature-002 phase report, whose
    "invertible-looking ARX" S13 contradicts (FR-051); the claim-register test, run since phase 1,

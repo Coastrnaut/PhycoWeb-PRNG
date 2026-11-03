@@ -42,17 +42,28 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
 
 ## Guards shared by every script
 
-- **Environment**: `protocol/evidence.py` checks at start the running environment against the
-  platform's environment record in force (research R1) as a whole: Python, every package and version
-  of `pip freeze` (one added, upgraded or removed), gcc and make in WSL, and the Windows build or
-  the WSL distribution and kernel. Any difference exits 2, naming it, a Windows or WSL update
-  included; the owner then writes a new environment record with `scripts/owner_record.py
+- **Environment**: every write through `protocol/evidence.py` or through the log writers
+  `protocol/changelog.py` and `protocol/provenance.py` checks at start the running
+  environment against the platform's environment record in force (research
+  R1) as a whole: Python, every package and version of `pip freeze` (one
+  added, upgraded or removed), gcc and make in WSL, and the Windows build or
+  the WSL distribution and kernel. Any difference exits 2, writing nothing and naming it, a Windows
+  or WSL update included, for every write but the environment record itself (below); the
+  owner then writes a new environment record with `scripts/owner_record.py
   environment` and approves it, with R1 updated first when a pinned version changes, and each later
-  record cites the record in force (data model §1). It also exits 2 unless
-  the record in force has its Review & Approval row, "Environment record
-  <n>", Approved at HEAD with its SHA-256 (Approvals, below). A new record is
-  written only when its Python and pinned packages match R1 and the pins of `requirements.txt` for
-  that platform. `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed
+  record, and each entry of the provenance log, the protocol change log and the downloads manifest,
+  names the record in force as its `environment` (data model §1; REP-082). While the running
+  environment differs from the record in force, or none is in force, the guard admits one write, the
+  environment record itself, written by `owner_record.py environment` and checked instead against R1
+  and the pins of `requirements.txt` for that platform, exit 2 on any difference, its `environment`
+  field `none`, with the interpreter's version and each pinned package's version that the check
+  compared. Every other write, a `lock-cleared` record included, also exits 2 unless the record in
+  force has its Review & Approval row, "Environment record <n>", Approved at HEAD with its SHA-256
+  (Approvals, below), an approval that needs no lock, so that a stale lock found after an update is
+  cleared once the new record is approved; before the first record no lock can be held, since no
+  log writer or heavy run starts before it (PRO-068). Each platform's first
+  record comes before every other write, in plan phase 1's order (REP-082).
+  `scripts/recheck_004.py` alone is exempt: it recomputes verdicts from committed
   counts by exact integer arithmetic and imports only the standard library and `protocol/` (its
   section, below).
 - **Committed code**: a run that writes evidence exits 2 unless every source file in its
@@ -101,7 +112,9 @@ p-values, which decide no verdict, makes the outcome `differs` and blocks nothin
   record (`clear_lock.py`, below) is the one kind `protocol/evidence.py` writes while the log does
   not exist, with both fields `none`, since it records an event and clearing a stale lock is what
   lets the log be created, and once the log exists it cites the last entry as every record does
-  (PRO-065). `tests/test_protocol_004.py` covers the refusal and that exception.
+  (PRO-065); like every other write, it waits until the platform's environment record in force reads
+  Approved at HEAD (Environment, above; PRO-068). `tests/test_protocol_004.py` covers the refusal
+  and that exception.
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
   (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
@@ -524,8 +537,10 @@ design_freeze.py approve --by NAME --wording TEXT   # the owner's approval; chan
 design_freeze.py validate               # recomputes draft_sha256 and every hash
 ```
 
-The freeze runs in five steps (FR-043): (1) the owner commits the feature files; (2) `create`
-runs with `git_dirty` false and writes the record as `draft`; (3) the owner runs `approve`, which
+The freeze runs in five steps (FR-043): (1) the owner commits the feature files, the owner's next
+commit after the one that records the owner design review's approval, from which the agent commits
+no file of this feature (PRO-070); (2) `create` runs with `git_dirty` false, records that commit as
+`owner_commit` and writes the record as `draft`; (3) the owner runs `approve`, which
 writes the approval into it; (4) the owner commits the record; (5) `validate` exits 0. Dirty means a
 tracked file modified or an untracked file not ignored; ignored files, the locks and the
 local-only outputs, do not count. The record holds what data model §13 lists: among others
@@ -558,8 +573,10 @@ is not `verified` in `limits.json` or a precondition of it is not marked met the
 theorem, those marks being read as `unverified` while the security-target review row does not read
 Approved (research R10), if `phycoweb/constants_v3.py`'s tables differ from the selected candidate's
 at a supported (n, w) and its final R (research R15), if the design document's header holds a line
-other than its title, the disclaimer and its line "Version: …" (spec FR-034), or if
-`git_dirty` is true. `create` stores `draft_sha256`, the SHA-256 of the record's
+other than its title, the disclaimer and its line "Version: …" (spec FR-034), if the commit that
+follows the one recording the owner design review's approval, in its row with the highest k, the
+owner's commit of step (1), is not HEAD (spec FR-043; PRO-070), or if `git_dirty` is true. `create`
+stores that commit's hash as `owner_commit`, and `draft_sha256`, the SHA-256 of the record's
 canonical JSON without that field and the approval fields. `approve`, run by
 the owner, prints `draft_sha256` and exits 2 unless standard input is an interactive terminal and
 the owner types its first 16 hex digits; it then changes `status` from `draft` to `approved`, adds
@@ -639,8 +656,13 @@ owner_record.py owner-provided --known KNOWN_ID --value TEXT --source TEXT --wor
 
 Run by the owner only: each mode is an owner's own act, outside the standing authorization for local
 commits, which the agent never performs (spec FR-044). `environment` records the running environment
-as research R1 lists it, only when its Python and pinned packages match R1 and the pins of
-`requirements.txt` for that platform; `owner-provided` adds an entry to `$REP/downloads.json` with
+as research R1 lists it, the one write the Environment guard admits while the running environment
+differs from the platform's record in force or none is in force, checked against R1 and the pins of
+`requirements.txt` for that platform instead, exit 2, writing nothing, on any difference, its
+`environment` field `none`, with the interpreter's version and each pinned package's version that
+the check compared (PRO-068); each platform's first record comes before every other write through
+`protocol/evidence.py` or a log writer, and a new one follows the wheels' install, in plan phase 1's
+order (REP-082); `owner-provided` adds an entry to `$REP/downloads.json` with
 the owner's words, the source the owner names, the date and the value's SHA-256 (research R19). Each
 mode prints the SHA-256 of what it writes, taken over its canonical JSON without the approval
 fields, and exits 2, writing nothing, unless standard input is an interactive terminal and the owner
@@ -711,7 +733,8 @@ which the agent may write as a proposal. Each refuses, exit 2, appending nothing
 rule of a first entry, without `direction`, a `settled` one without `readings`, and an entry without
 `last_record_id` or `results_known`. Each then ends in the approval step, an owner's own act that
 the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
-together, taken over their canonical JSON without the approval fields, and appends nothing unless
+together, taken over their canonical JSON without the approval fields, `create` printing also
+their number, counted from the lists (PRO-069), and appends nothing unless
 standard input is an interactive terminal and the owner types its first 16 hex digits, which
 `approver` records as `approval_confirmed`. After the approval step `create` writes the first
 entries to a temporary file beside the log's path and renames it to that path once all are written,
@@ -765,8 +788,13 @@ protocol change log does not exist, a `lock-cleared` record is the one kind that
 log" lets `protocol/evidence.py` write, with `protocol_seq` and `protocol_line_sha256`
 `none`; before the log exists only `data/log-append.lock` can be held, since
 every run that takes the heavy-run lock writes evidence, so that a writer of
-the logs that died holding it never blocks the log's creation (PRO-065). A
-`lock-cleared` record records an event and is not reproduced, so this script has no `--reproduce`
+the logs that died holding it never blocks the log's creation (PRO-065). Like every other write, its
+`lock-cleared` record waits until the platform's environment record in force reads Approved at HEAD
+(Environment, above), and it exits 2, removing nothing, while the guard refuses the record: a stale
+lock found after a Windows or WSL update is cleared once the new record, which needs no lock, is
+approved, and before the first environment record no lock can be held, since no
+log writer or heavy run starts before it (PRO-068). A `lock-cleared` record
+records an event and is not reproduced, so this script has no `--reproduce`
 mode (spec FR-061).
 
 ## `scripts/check_claims.py`
