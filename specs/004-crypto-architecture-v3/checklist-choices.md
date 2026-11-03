@@ -1580,6 +1580,32 @@ From the tenth re-run, 27 of its 28 rows:
   RAT-086, RAT-087, RAT-089, RAT-090, ANA-083, ANA-085, ANA-086, ANA-087, ANA-088, PRO-074, PRO-075,
   PRO-076, PRO-077, PRO-078, PRO-079, PRO-080, HW-095, REP-099, REP-100, REP-101.
 
+Its round's two commits (PRO-061) are 930494d and b63b919, which applied its last rows, the commit
+that completes its alignment being named here in b63b919's place once it exists: that commit writes
+the comparison's results beside this list. By the comparison and by PRO-067's rule, which also reads
+the messages of the round's commits and the rows' tags in each place's text, no row of the round had
+altered a place of a rule without being listed under it, HW-095 having been listed under "Vector
+lengths" by 8f59ae4, the commit that applied it and changed research R8's self-test row, so the list
+keeps 27 of the round's 28 rows.
+
+The comparison over 930494d and b63b919, made with `research/004/place_check.py`, found a row of the
+round listed under every rule whose place changed, each of the round's six commits changing only
+places under rules that list a row of its own checklist. The four tags that PRO-067's rule finds
+grown in data-model §18 without their rows listed under its rule, SEC-093, RAT-086, ANA-087 and
+REP-100, are PRO-079's list of the first entries that hold a reading set aside, which acd4671 wrote
+for PRO-079, listed there; none of the four changed that section. The check of each row's Changes
+cell found each row listed under every heading whose place it names, and the row the list leaves
+out, RAT-088, naming none: its changes are to spec FR-034 "Attack classes" and FR-049, which hold no
+place of a rule. The alignment edits only this file, which holds no such place, so that the
+comparison over 930494d and the alignment's commit gives the same result.
+
+Over every span from the plan-approval commit, 65bcbf2, to 930494d outside the rounds' pairs, the
+comparison found one place changed by an edit that no row made, ad2c195's change to research R3,
+recorded beside the re-run's list above; the span from 832bd4d to 930494d, between the ninth and
+tenth re-runs' pairs, changed no place. Before the tasks approval the script compares every pair and
+span again, up to HEAD, and writes `research/004/place-check.json`, which these results then restate
+and which the owner confirms in the row "Place check" (PRO-063).
+
 ## After the answer
 
 The options chosen for the 29 rows of the re-run were written into the documents their Changes cells
