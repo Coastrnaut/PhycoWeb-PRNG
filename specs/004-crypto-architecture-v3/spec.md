@@ -1253,8 +1253,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   own, a zeroize excepted, which ends the running call and starts its zeroization, counted from that
   word as FR-025 "Call sequence" states, and any other word is refused with its code, changes
   nothing and leaves the running call's count, outputs and `call_done` as they
-  would be without it (FR-025 "Call sequence", "Flow control"; HW-091). The
-  start-up self-test's formula follows from FR-059's k, computed from the model's run (HW-084), and
+  would be without it (FR-025 "Call sequence", "Flow control"; HW-091). The start-up
+  self-test's formula follows from FR-059's k, the least that the model's run
+  gives or one that a structure the design document names, with its reason,
+  raised, as the design document's table of k states it (HW-084; REP-097), and
   counts every word it feeds, those of its key and nonce, the empty personalization string's length
   word and, where the design has a reseed, the reseed input's length word and words
   (FR-059; HW-082). A call made in `not-reset`, `resetting` or `failed` is never
@@ -1262,8 +1264,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   ports, from a call's start to the cycle in which `call_done` rises, and
   compares them with the formulas (FUT-HW-5; HW-086). For eligibility, decided
   for every candidate before selection, these cycles per call come, with
-  FR-026's figures, from the candidate's `cost` records (section "Pre-registered Design Protocol").
-  Constant time by construction is a property of the design's sequence of
+  FR-026's figures, from the candidate's `cost` records (section "Pre-registered Design Protocol"),
+  the self-test's formula taking the least k that the `cost` record computes, as FR-026 states
+  (FR-059; REP-097). Constant time by construction is a property of the design's sequence of
   operations and of a hardware implementation of it. For each implementation it means: in
   hardware, a cycle count fixed by public values; in feature 006's C, no branch or memory index
   that depends on secret data; in the Python model, branch-free on data as a discipline only,
@@ -1793,7 +1796,11 @@ freeze hashes and the baseline manifest; run the claim-register test.
   to features 006 and 008 (FUT-HW-3). For eligibility, every candidate's figures are computed before
   selection by the cost model from its operation list, P and R, as a `cost` record per size; the
   design document restates them for the selected candidate (Pre-registered Design Protocol,
-  "Eligibility and selection").
+  "Eligibility and selection"). The self-test's storage and cycles take there the least k that each
+  `cost` record computes from a run of the candidate through the self-test's call sequence, its
+  operation list interpreted by `research/004/ir.py` in the shared mode, recorded with the structure
+  that set it, and the design document states the selected candidate's k equal to it or raised by a
+  named structure with its reason (FR-020, FR-059; REP-097).
 - **FR-027**: The design document MUST state the width, signedness, wrap rule, shift kind and
   comparison semantics of every operation, the update order, the direction of every data flow
   between neighbours, and the edge states of the model (Principle I; security.md §8 and §13), so
@@ -2000,9 +2007,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
     "Inverse", Π⁻¹ written out at Π's level of detail, FR-019, FR-027, and
     "Network questions", the answers to security.md §8's eight questions,
     which concern the grid and its update); "Hardware structure" (the rest of
-    FR-025, FR-020's cycle formulas, FR-026's estimate and FR-059's self-test); "Replaced
-    mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each edge state of
-    FR-054, and every other Phase 0 item of security.md §8, stands in the
+    FR-025, FR-020's cycle formulas, FR-026's estimate and FR-059's self-test, with its section
+    "Self-test"); "Replaced mechanisms" (FR-030's rows); and "Slime-mould mapping" (FR-030). Each
+    edge state of FR-054, and every other Phase 0 item of security.md §8, stands in the
     chapter of what it concerns, and the chapters' test checks each named
     section (RAT-074). The security-target review covers "Security target"
     and "Mode", with the security target's files (the notes under the Review & Approval table), and
@@ -2018,6 +2025,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
     and `limits.json`, a test comparing each with its file row by row and value by value, the key
     entropy, the reachable secret state, c, r, R and the bound among them, and failing on any
     difference, so that the security-target review reads one set of values (FR-010; RAT-085).
+    `gen_vectors_v3.py` reads the design document's table of k, a Markdown table with fixed columns
+    in the chapter "Hardware structure"'s section "Self-test", which the chapters' test checks, with
+    one row per claimable size holding k, the structure that set it and, where k exceeds the least
+    that the model's run gives, the structure the design document names with its reason, and it
+    exits 2 if that table is missing, appears twice or holds a row it cannot read, its runs and
+    checks comparing `design_sha256` (FR-059; data-model §1; REP-097).
   - **Rationale chapters.** `rationale.md`'s chapters are level-2 headings with fixed names, each
     once and in this order, which a test checks as it checks the design document's: "Security
     target", "Mode", "Components", "Nonlinearity", "Diffusion", "Constants", "Margin" and "Attack
@@ -3039,9 +3052,19 @@ freeze hashes and the baseline manifest; run the claim-register test.
   block count, one of the controller's counters (FR-025 "Zeroization"; HW-089), to its last
   block and each limit counter by one step; k is the least number of whole
   blocks for which the run meets them all, which may be 1, unless the design document names a
-  structure that needs more, with its reason, and the self-test's vector
-  file holds k with the structure that set it, which a test computes again
-  from the model's run (HW-084). `gen_vectors_v3.py` writes these inputs
+  structure that needs more, with its reason, in its table of k (FR-034 "Chapters"), one row per
+  claimable size with k, the structure that set it and, where k exceeds the least that the model's
+  run gives, the structure the design document names with its reason; `gen_vectors_v3.py` reads k
+  from that table, computes the least k from its self-test run, exits 1 if the table's k is below
+  the least k of its run, or above it with no named structure and reason, and writes k, the
+  structure that set it and the run's least k into the self-test's vector file, and a test computes
+  the least k again from the model's run and checks the file's k against it and against the table,
+  equal unless a named structure with its reason raised it (HW-084; REP-097). Before selection, the
+  self-test's figures take the least k that each `cost` record computes from a run of the candidate
+  through the self-test's call sequence, its operation list interpreted by `research/004/ir.py` in
+  the shared mode, recorded with the structure that set it, the design document stating the
+  selected candidate's k equal to it or raised by a named structure with its
+  reason (FR-020, FR-026; REP-097). `gen_vectors_v3.py` writes these inputs
   and every expected block, whole, in the same generator run as the vectors, from a `ResearchDuplex`
   object of its own run through the self-test's call sequence alone, instantiate with key and nonce
   0 and the empty personalization string, one generate request of k whole blocks with its forget

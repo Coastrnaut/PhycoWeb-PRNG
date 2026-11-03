@@ -917,7 +917,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   | Π and Π⁻¹ | 16 inputs: all-zero, all-one, alternating `0x55…`, a counting pattern and test states 0…11; the state after every phase of every round for the first 4 inputs, as `pi_trace` returns it; the output for all 16 | — |
   | Mode | — | 2 development keys (key and nonce 0, key and nonce 1) × 10,000 32-bit words, in generate requests of 1, 7, 64 and 1,000 words in that order, cycled, the last request taking what is left (nine cycles, then 1, 7, 64 and 280 words), with forget after each request; the header says `schedule=cyclic-truncated` (data-model §11) |
   | Long run | — | the SHA-256 of the first 2²⁰ output words for key and nonce 0, in requests of 4,096 words (FR-058 "long runs"), taken over FR-015's canonical serialization as 4·2²⁰ raw bytes, not over the `%08X` text lines, so that feature 006's C stream and the hardware export can reproduce it from their own output |
-  | Self-test | — | per claimable size: instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part, as spec FR-059 defines taking part from the model's run, k written with the structure that set it (HW-084); then, if the design has a reseed, a reseed with reseed input 0 (R3), held with its length word among the self-test's constants and fed as the host would (HW-082), and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
+  | Self-test | — | per claimable size: instantiate with key and nonce 0 and the empty personalization string, its length word fed as the host would; one generate request of k whole blocks, k·r bits, k stated in the design document's table of k, in the chapter "Hardware structure"'s section "Self-test", as the least for which every node, lane, constant ROM entry of the calls run, both trees and the counters take part, as spec FR-059 defines taking part from the model's run, or as raised by a structure the design document names with its reason, `gen_vectors_v3.py` reading it from that table, computing the least from its run, exiting 1 if the table's k is below it or above it with no named structure and reason, and writing k with the structure that set it and the run's least k, which a test checks against the model's run and the table (HW-084; REP-097), the `cost` records taking before selection the least k of each candidate's own run (spec FR-026); then, if the design has a reseed, a reseed with reseed input 0 (R3), held with its length word among the self-test's constants and fed as the host would (HW-082), and a second request of k whole blocks; every input and expected block written whole, as `selftest_<variant>.json` (spec FR-059; HW-077) |
   | Constructed states | the edge states the design document lists (FR-054) | the same |
 
   - Every input comes from R3: keys, nonces and test states by index (keys and nonces 0 and 1,
@@ -1714,9 +1714,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     files, listed with their hashes in its `SHA256SUMS`, hold a file name and a nonzero time, are
     outside its scope and stay unchanged.
   - **Hashes.** Each hash is recorded beside its kind: `raw` or `lf-normalized` over a file's bytes,
-    or `canonical` over a record's canonical JSON, as data-model's format rules
-    define it, for an approval hash, which `owner_record.py` prints and a row
-    names, and the freeze record's `draft_sha256` (REP-083). Every new file
+    or `canonical` over a record's canonical JSON, as data-model's format rules define it, for the
+    three hashes of that kind that data-model §1's "Hashes" names: the approval hash that
+    `owner_record.py` prints and a row names, of an environment record or an `owner-provided` entry;
+    the freeze record's `draft_sha256` (REP-083); and the approval hash that `protocol_change.py`
+    prints, over one canonical JSON array of the first entries in log order or over a later entry
+    alone, each entry without `approver` and `prev_sha256`, which no row names and the guard
+    "Protocol log" recomputes from the first entries (REP-094; REP-098). Every new file
     is hashed over its raw bytes and is pinned to LF or `binary` (R18), so its raw and
     normalized content agree on every checkout. An existing `text=auto` file is hashed over its
     LF-normalized content. The CRLF-pinned freeze records of features 002 and 003 keep their

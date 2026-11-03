@@ -610,8 +610,14 @@ They run in four steps, each generator's `--check` passing before the next step 
 `ResearchDuplex` object of its own run through the self-test's call sequence alone,
 each request with its forget call (spec FR-059; REP-096), each claimable
 size's `selftest_<variant>.json`, the self-test's inputs and every expected
-block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those
-files, so its `--check` covers them too (HW-077); (3) `Generator` imports
+block, whole (spec FR-059), and `phycoweb/selftest_v3.py`, copied from those files, so its `--check`
+covers them too (HW-077), reading each claimable size's k from the design document's table of k, in
+the chapter "Hardware structure"'s section "Self-test" (spec FR-034 "Chapters"), exiting 2 if that
+table is missing, appears twice or holds a row it cannot read, computing the least k from its
+self-test run as spec FR-059 defines taking part, exiting 1 if the table's k is below it, or above
+it with no named structure and reason, and writing k, the structure that set it and the run's least
+k into each file, its runs and checks comparing `design_sha256`, since its code reads
+the design document (data model §1, §11; REP-097); (3) `Generator` imports
 `phycoweb.selftest_v3` inside its constructor only and runs its self-test from it, so
 step (2) imports the model before that module exists (model contract, Module rules);
 (4) `gen_constructed_v3.py`, run once step (3)'s self-test has passed, which writes the
@@ -621,7 +627,10 @@ and its `--check` run first `tests/test_model_v3.py`'s named test `test_generato
 builds a `Generator` and runs its self-test, on the platform where they run, exiting 2 unless it
 passes and recording its result in the record each writes, so that step (4)'s pair of check records
 shows that step (3) passed on each platform (SC-009; REP-086). Tests check that
-`Generator` reproduces the vectors and that `selftest_v3` equals them, and the freeze hashes
+`Generator` reproduces the vectors and that `selftest_v3` equals them, a test computing
+the least k again from the model's run and checking each self-test file's k
+against it and against the design document's table, equal unless a named
+structure with its reason raised it (spec FR-059; REP-097), and the freeze hashes
 `selftest_v3.py` with the vectors and the three generators, `gen_constants_v3.py`,
 `gen_vectors_v3.py` and `gen_constructed_v3.py` (data model §13; REP-077).
 
