@@ -1,0 +1,68 @@
+{
+ "description": "integer critical counts of research R4, appended to and never changed",
+ "entries": [
+  {
+   "test": "frequency",
+   "n": 1048576,
+   "s": 4096,
+   "level_numerator": 1,
+   "level_denominator": 819200,
+   "low": 521803,
+   "high": 526773
+  },
+  {
+   "test": "frequency",
+   "n": 1048576,
+   "s": 16384,
+   "level_numerator": 1,
+   "level_denominator": 3276800,
+   "low": 521665,
+   "high": 526911
+  },
+  {
+   "test": "frequency",
+   "n": 1048576,
+   "s": 65536,
+   "level_numerator": 1,
+   "level_denominator": 13107200,
+   "low": 521535,
+   "high": 527041
+  },
+  {
+   "test": "avalanche",
+   "n": 8192,
+   "s": 2553856,
+   "level_numerator": 1,
+   "level_denominator": 65378713600,
+   "low": 3790,
+   "high": 4402
+  },
+  {
+   "test": "avalanche",
+   "n": 8192,
+   "s": 6021120,
+   "level_numerator": 1,
+   "level_denominator": 154140672000,
+   "low": 3784,
+   "high": 4408
+  },
+  {
+   "test": "avalanche",
+   "n": 8192,
+   "s": 40861696,
+   "level_numerator": 1,
+   "level_denominator": 1046059417600,
+   "low": 3772,
+   "high": 4420
+  },
+  {
+   "test": "vein-lanes",
+   "n": 2400000,
+   "s": 32,
+   "level_numerator": 1,
+   "level_denominator": 6400,
+   "low": 1197070,
+   "high": 1202930
+  }
+ ]
+}

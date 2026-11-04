@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from unittest import mock
 
+import numpy as np
+
 from protocol import evidence
 from protocol.evidence import NONE
 from tests.support_004 import CODE_ROOT, TempRepo, Tool, write
@@ -773,17 +775,17 @@ def stated_lists(table, load):
     yield m.KNOWN_ID, [builder(n, w) for _, builder, n, w, _ in m.CASES]
 
 
-def exact_critical(n: int, level: Fraction):
-    """The largest low count and the smallest high count at which a two-sided p-value is at most
-    `level`, by exact integer arithmetic over the binomial distribution with p = 1/2."""
-    total = 2 ** n
-    tail, low = 0, -1
-    for k in range(n // 2 + 1):
-        tail += math.comb(n, k)
-        if min(Fraction(2 * tail, total), Fraction(1)) > level:
-            break
-        low = k
-    return low, n - low
+def two_sided_p_at(n: int, c: int) -> Fraction:
+    """Twice P(X <= c), X binomial(n, 1/2), at most 1, exactly: one minus the middle of the row."""
+    middle = sum(math.comb(n, k) for k in range(c + 1, n - c))
+    return min(Fraction(1), 1 - Fraction(middle, 2 ** n))
+
+
+def bias_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import bias
+    return bias
 
 
 class CriticalCounts(unittest.TestCase):
@@ -795,11 +797,46 @@ class CriticalCounts(unittest.TestCase):
         if not (CODE_ROOT / self.REL).exists():
             self.skipTest("the table does not exist yet (T051)")
         self.table = json.loads((CODE_ROOT / self.REL).read_text(encoding="utf-8"))
+        self.bias = bias_module()
 
-    def test_every_count_is_recomputed_exactly(self):
+    def test_every_count_is_exactly_where_the_level_falls(self):
+        """Recomputed by the definition: the level is met at `low`, and not one step inside it."""
+        for entry in self.table["entries"]:
+            n, low = entry["n"], entry["low"]
+            level = Fraction(entry["level_numerator"], entry["level_denominator"])
+            self.assertEqual(entry["high"], n - low, entry)
+            self.assertFalse(self.above(n, low, level), entry)
+            self.assertTrue(self.above(n, low + 1, level), entry)
+
+    def above(self, n: int, c: int, level: Fraction) -> bool:
+        """Whether the two-sided p-value at c lies above the level: the middle of the row by its own
+        recurrence from the centre, compared by cross-multiplying, so that n = 2^20 is quick."""
+        k = n // 2
+        term = self.bias.central_binomial(n)
+        middle = term
+        while k - 1 > c:
+            term = term * k // (n - k + 1)
+            k -= 1
+            middle += 2 * term
+        return ((1 << n) - middle) * level.denominator > level.numerator << n
+
+    def test_the_tool_derives_the_committed_table(self):
+        self.assertEqual(self.bias.table_entries(), self.table["entries"][:7])
+
+    def test_each_level_is_the_rule_of_r4(self):
         for entry in self.table["entries"]:
             level = Fraction(entry["level_numerator"], entry["level_denominator"])
-            self.assertEqual(exact_critical(entry["n"], level), (entry["low"], entry["high"]), entry)
+            if entry["test"] == "avalanche":
+                self.assertEqual(level, Fraction(5, 1000) / (128 * entry["s"]), entry)
+            else:
+                self.assertEqual(level, Fraction(5, 1000) / entry["s"], entry)
+
+    def test_the_table_holds_every_size_of_r4(self):
+        pairs = {(e["test"], e["n"], e["s"]) for e in self.table["entries"]}
+        for size, flips in ((4, 1024), (8, 512), (16, 1024)):
+            b = 64 * size * size
+            self.assertIn(("frequency", 2 ** 20, 4 * b), pairs)
+            self.assertIn(("avalanche", 2 ** 13, (2 * flips + 384 + 62) * b), pairs)
 
     def test_the_file_is_only_appended_to(self):
         log = evidence.git("log", "--format=%H", "--", self.REL, cwd=CODE_ROOT).decode().split()
@@ -810,6 +847,385 @@ class CriticalCounts(unittest.TestCase):
             if newer is not None:
                 self.assertEqual(newer[:len(older)], older, commit)
             newer = older
+        current = self.table["entries"]
+        if newer is not None:
+            self.assertEqual(current[:len(newer)], newer)
+
+
+class Bias(unittest.TestCase):
+    """research/004/tools/bias.py on stated counts."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.bias = bias_module()
+        import ir
+        cls.ir = ir
+
+    def test_the_central_coefficient_is_math_combs_at_small_n(self):
+        self.bias.central_binomial.cache_clear()
+        for n in (2, 4, 6, 10, 100, 1000, 4096, 8192):
+            self.assertEqual(self.bias.central_binomial(n), math.comb(n, n // 2), n)
+
+    def test_the_central_coefficient_at_the_test_sizes_by_lucas_theorem(self):
+        """C(n, k) modulo a prime p is the product of C(n_i, k_i) over the digits of n and k in base
+        p: a check that shares nothing with how the integer was built."""
+        def lucas(n, k, p):
+            out = 1
+            while n or k:
+                n, n_digit = divmod(n, p)
+                k, k_digit = divmod(k, p)
+                out = out * math.comb(n_digit, k_digit) % p
+            return out
+
+        primes = {2 ** 20: (19, 47, 71, 73, 103, 157, 241, 269, 293, 313),
+                  2400000: (61, 71, 73, 103, 139, 173, 199, 223, 227, 233)}
+        for n, chosen in primes.items():
+            value = self.bias.central_binomial(n)
+            for p in chosen:
+                self.assertEqual(value % p, lucas(n, n // 2, p), (n, p))
+                self.assertNotEqual(value % p, 0, "a residue of 0 would show nothing")
+            self.assertEqual(value.bit_length(), n - int(0.5 * math.log2(math.pi * n / 2)), n)
+
+    def test_critical_counts_meet_the_definition(self):
+        for n, level in ((10, Fraction(1, 10)), (100, Fraction(1, 1000)), (1000, Fraction(1, 10 ** 6))):
+            low, high = self.bias.critical(n, level)
+            self.assertEqual(high, n - low)
+            self.assertLessEqual(two_sided_p_at(n, low), level)
+            self.assertGreater(two_sided_p_at(n, low + 1), level)
+
+    def test_a_stated_critical_count(self):
+        """C(10, 0) + C(10, 1) = 11, so twice the tail at 1 is 22/1024 = 0.0215, and at 2 is 0.109."""
+        self.assertEqual(self.bias.critical(10, Fraction(1, 10)), (1, 9))
+        self.assertEqual(self.bias.critical(10, Fraction(22, 1024)), (1, 9))
+        self.assertEqual(self.bias.critical(10, Fraction(21, 1024)), (0, 10))
+
+    def test_an_odd_n_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.bias.critical(11, Fraction(1, 10))
+
+    def test_a_verdict_compares_integers_at_both_ends(self):
+        entry = {"low": 10, "high": 90}
+        counts = np.array([0, 10, 11, 50, 89, 90, 100])
+        self.assertEqual(self.bias.fires(counts, entry).tolist(),
+                         [True, True, False, False, False, True, True])
+
+    def test_p_values_are_exact_on_a_stated_row(self):
+        self.assertAlmostEqual(float(self.bias.p_values(np.array([1]), 10)[0]), 22 / 1024, places=12)
+        self.assertAlmostEqual(float(self.bias.p_values(np.array([9]), 10)[0]), 22 / 1024, places=12)
+        self.assertEqual(float(self.bias.p_values(np.array([5]), 10)[0]), 1.0)
+
+    def test_ones_counts_each_lane_and_bit(self):
+        states = np.array([[0b101, 0b100], [0b011, 0b000]], dtype=np.uint64)
+        counts = self.bias.ones(states, 4)
+        self.assertEqual(counts.tolist(), [[1, 0, 2, 0], [1, 1, 0, 0]])
+
+    def test_the_test_order_is_lanes_then_bits_from_the_top(self):
+        counts = np.array([[1, 2, 3], [4, 5, 6]])
+        self.assertEqual(self.bias.test_order(counts).tolist(), [3, 2, 1, 6, 5, 4])
+
+    def rotation_list(self):
+        return self.ir.load(self.ir.Program("rot", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),)))
+
+    def test_frequency_counts_follow_each_round_both_ways(self):
+        loaded = self.rotation_list()
+        states = np.zeros((8, 2), dtype=np.uint64)
+        states[0] = [0b1, 0b1]
+        out = self.bias.frequency_counts(loaded, [states], (), 3)
+        for r in range(3):
+            self.assertEqual(out["forward"][r, 0].tolist(), [2 if b == r + 1 else 0 for b in range(8)])
+            self.assertEqual(out["inverse"][r, 0].tolist(), [2 if b == 7 - r else 0 for b in range(8)])
+
+    def test_batches_add_up(self):
+        loaded = self.rotation_list()
+        states = np.ones((8, 4), dtype=np.uint64)
+        whole = self.bias.frequency_counts(loaded, [states], (), 2)
+        parts = self.bias.frequency_counts(loaded, self.bias.batches_of(states, 3), (), 2)
+        self.assertTrue((whole["forward"] == parts["forward"]).all())
+        self.assertTrue((whole["inverse"] == parts["inverse"]).all())
+
+    def test_the_inverse_reads_the_table_from_its_end(self):
+        program = self.ir.Program("c", 2, 8, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),))
+        loaded = self.ir.load(program)
+        states = np.zeros((8, 1), dtype=np.uint64)
+        out = self.bias.frequency_counts(loaded, [states], [(0x01,), (0x02,)], 2)
+        self.assertEqual(out["forward"][0, 0].tolist()[:2], [1, 0])
+        self.assertEqual(out["forward"][1, 0].tolist()[:2], [1, 1])
+        self.assertEqual(out["inverse"][0, 0].tolist()[:2], [0, 1])
+        self.assertEqual(out["inverse"][1, 0].tolist()[:2], [1, 1])
+
+    def test_fired_bits_are_named_in_the_test_order(self):
+        counts = np.array([[0, 5, 5], [5, 5, 10]])
+        self.assertEqual(self.bias.fired_bits(counts, {"low": 1, "high": 9}), [[2, 0], [3, 10]])
+
+    def test_the_control_of_differences_pairs_consecutive_states(self):
+        states = np.array([[1, 3, 4, 4]], dtype=np.uint64)
+        self.assertEqual(self.bias.control_differences(states).tolist(), [[2, 0]])
+
+    def test_control_counts_sum_their_batches(self):
+        batches = [np.array([[1, 1]], dtype=np.uint64), np.array([[1, 0]], dtype=np.uint64)]
+        self.assertEqual(self.bias.control_counts(batches, 2).tolist(), [[3, 0]])
+
+    def test_the_planted_bit_of_each_family(self):
+        self.assertEqual(self.bias.planted_position("class 5", 7, 4096), 7)
+        self.assertEqual(self.bias.planted_position("class 5", 5000, 4096), 904)
+        self.assertEqual(self.bias.planted_position("second", 100, 4096), 0)
+        self.assertEqual(self.bias.planted_position("second", 199, 4096), 4055)
+        self.assertEqual(self.bias.planted_position("second", 150, 65536), 32768)
+
+    def test_a_draw_repeats_and_plants_its_bit(self):
+        one = self.bias.draw_set(12345, 64, 9, 0.2, n=1000)
+        two = self.bias.draw_set(12345, 64, 9, 0.2, n=1000)
+        self.assertTrue((one == two).all())
+        self.assertEqual(len(one), 64)
+        self.assertGreater(int(one[9]), 620)
+        self.assertLess(int(np.abs(np.delete(one, 9) - 500).max()), 120)
+        self.assertFalse((one == self.bias.draw_set(12346, 64, 9, 0.2, n=1000)).all())
+
+    def test_a_sets_text_is_decimal_one_count_per_line(self):
+        self.assertEqual(self.bias.set_text(np.array([12, 7])), b"12\n7\n")
+
+    def test_a_family_holds_only_inside_both_limits(self):
+        holds = self.bias.family_holds
+        self.assertEqual([holds(f, 0) for f in (81, 82, 97, 98)], [False, True, True, False])
+        self.assertEqual([holds(90, u) for u in (3, 4)], [True, False])
+
+    def test_a_family_counts_a_set_only_when_its_planted_bit_fires(self):
+        sets = [{"planted_fires": True, "unplanted": []}, {"planted_fires": False, "unplanted": [[1, 2]]},
+                {"planted_fires": True, "unplanted": [[3, 4]]}]
+        out = self.bias.summarise("class 5", 4, sets)
+        self.assertEqual((out["planted_fired"], out["sets_with_unplanted"]), (2, 2))
+
+    def test_a_family_run_writes_every_set_and_finds_its_plant(self):
+        kept = {}
+        entry = {"low": 1000, "high": 530000}
+        with mock.patch.object(self.bias, "DELTA", {4: 0.49}):
+            out = self.bias.run_family("second", range(100, 103), 4, entry, kept.__setitem__)
+        self.assertEqual(sorted(kept), [f"synthetic/n4/{j}.txt" for j in range(100, 103)])
+        first = out["sets"][0]
+        self.assertEqual(first["sha256"], evidence.sha256(kept["synthetic/n4/100.txt"]))
+        self.assertTrue(first["planted_fires"])
+        self.assertEqual(first["planted"], 0)
+        self.assertEqual(first["unplanted"], [])
+
+    def test_a_firing_elsewhere_is_no_firing_of_the_plant(self):
+        counts = np.full(4096, 524288)
+        counts[5] = 10 ** 6
+        entry = {"low": 1000, "high": 530000}
+        with mock.patch.object(self.bias, "draw_set", return_value=counts):
+            out = self.bias.run_family("class 5", range(0, 1), 4, entry, lambda name, data: None)
+        first = out["sets"][0]
+        self.assertFalse(first["planted_fires"])
+        self.assertEqual(first["unplanted"], [[5, 10 ** 6]])
+        self.assertEqual((out["planted_fired"], out["sets_with_unplanted"]), (0, 1))
+
+    def test_the_interval_at_a_stated_fraction(self):
+        low, high = self.bias.interval(0.25, 100000)
+        self.assertLess(abs(low - 24647), 3)
+        self.assertLess(abs(high - 25353), 3)
+        self.assertEqual(self.bias.interval(0.0, 1000), (0, 0))
+
+
+class BiasSeconds(unittest.TestCase):
+    """The stated maps of the bias test's second known results, run by the tool."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.bias = bias_module()
+        cls.table = validate_tool.known_results()
+
+    def run_known(self, name):
+        return self.bias.validation(name, self.vt.load_known(self.table[name]), None)
+
+    def test_each_is_re_found(self):
+        for name in ("s12-second", "s14-second", "s15-second"):
+            self.assertTrue(self.run_known(name)["re_found"], name)
+
+    def test_a_map_with_another_edge_is_not_s12s(self):
+        known = self.vt.load_known(self.table["s12-second"])
+        with mock.patch.object(known, "EDGE", ((2 ** 32 - 1, 2 ** 31 - 1),)):
+            self.assertFalse(self.bias.validation("s12-second", known, None)["re_found"])
+
+    def test_a_map_with_a_word_off_the_edge_is_not_s12s(self):
+        known = self.vt.load_known(self.table["s12-second"])
+        with mock.patch.object(known, "TOP", 1):
+            self.assertFalse(self.bias.validation("s12-second", known, None)["re_found"])
+
+    def test_another_frequency_is_not_s14s(self):
+        known = self.vt.load_known(self.table["s14-second"])
+        with mock.patch.object(known, "FREQUENCY", {7: 0.3}):
+            self.assertFalse(self.bias.validation("s14-second", known, None)["re_found"])
+
+    def test_a_map_that_sets_bit_31_is_not_s14s(self):
+        known = self.vt.load_known(self.table["s14-second"])
+        with mock.patch.object(known, "step", lambda state: [w | (1 << 31) for w in state]):
+            self.assertFalse(self.bias.validation("s14-second", known, None)["re_found"])
+
+    def test_another_bound_or_step_count_is_not_s15s(self):
+        known = self.vt.load_known(self.table["s15-second"])
+        with mock.patch.object(known, "BOUND", 1):
+            self.assertFalse(self.bias.validation("s15-second", known, None)["re_found"])
+        with mock.patch.object(known, "STEPS", 3):
+            self.assertFalse(self.bias.validation("s15-second", known, None)["re_found"])
+        with mock.patch.object(known, "STEPS", 5):
+            self.assertFalse(self.bias.validation("s15-second", known, None)["re_found"],
+                             "4 is the first step count with the bound, not 5")
+
+    def test_a_word_within_the_bound_one_step_early_is_not_s15s(self):
+        known = self.vt.load_known(self.table["s15-second"])
+        at_once = lambda value, steps: known.LIMIT if value == known.EDGE[0] else 0
+        with mock.patch.object(known, "after", at_once):
+            self.assertFalse(self.bias.validation("s15-second", known, None)["re_found"])
+
+
+class BiasOnTheModel(unittest.TestCase):
+    """What the tool reads of `phyco-v2`, on a short sample, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.bias = bias_module()
+
+    def test_the_sample_is_the_probes(self):
+        self.assertEqual(self.bias.vein_count(), 2400000)
+
+    def test_s15s_bound_follows_from_the_range(self):
+        with mock.patch.object(self.bias, "descent", return_value={
+                "bit31_off_the_edge": 0, "veins_above_2_31": 0}):
+            self.assertTrue(self.bias.re_find_s15(None, None)["re_found"])
+        with mock.patch.object(self.bias, "descent", return_value={
+                "bit31_off_the_edge": 1, "veins_above_2_31": 1}):
+            self.assertFalse(self.bias.re_find_s15(None, None)["re_found"])
+
+    def s12(self, values, wanted_fields=None, **descent):
+        after = dict({"bit31_off_the_edge": 0, "veins_above_2_31": 0}, **descent)
+        wanted = {"totals": dict({"class_counts": [1, 2, 0, 0], "bit31_set": 0, "vein_values": 3},
+                                 **(wanted_fields or {}))}
+        with mock.patch.object(self.bias, "vein_values",
+                               return_value=np.array(values, dtype=np.uint64)), \
+                mock.patch.object(self.bias, "descent", return_value=after), \
+                mock.patch.object(self.bias, "recorded", return_value=wanted):
+            return self.bias.re_find_s12(None, None)["re_found"]
+
+    def test_s12_needs_every_class_count_and_the_edge(self):
+        low, high = 1, 1 << 30
+        self.assertTrue(self.s12([low, high, high]))
+        self.assertFalse(self.s12([low, low, high]))
+        self.assertFalse(self.s12([low, high, 3 << 30]))
+        self.assertFalse(self.s12([low, high, high], bit31_off_the_edge=1))
+        self.assertFalse(self.s12([low, high, high], veins_above_2_31=1))
+        self.assertFalse(self.s12([low, high]))
+
+    def test_s12_reads_each_recorded_total_for_itself(self):
+        low, high = 1, 1 << 30
+        self.assertFalse(self.s12([low, high, 2 << 30], {"class_counts": [1, 1, 1, 0]}))
+        self.assertTrue(self.s12([low, high, 2 << 30], {"class_counts": [1, 1, 1, 0], "bit31_set": 1}))
+        self.assertFalse(self.s12([low, high, high], {"vein_values": 99}))
+
+    def s14(self, values=None, fired=None, families=True, **wanted):
+        """re_find_s14 on a stated sample of 4000 words, every bit at its recorded frequency."""
+        top = 1 << 30
+        if values is None:
+            values = [top + (i & 0xFF) for i in range(4000)]
+        array = np.array(values, dtype=np.uint64)
+        ones = self.bias.ones(array.reshape(1, -1))[0][::-1]
+        probe = {"s14_bit_bias": dict({
+            "d_ones_frequency_bit31_to_bit0": [float(c) / array.size for c in ones],
+            "d_range": [f"0x{int(array.min()):08X}", f"0x{int(array.max()):08X}"]}, **wanted)}
+        entry = {"low": 10 ** 9, "high": 0} if fired else {"low": -1, "high": 10 ** 9}
+        with mock.patch.object(self.bias, "vein_values", return_value=array), \
+                mock.patch.object(self.bias, "recorded", return_value=probe), \
+                mock.patch.object(self.bias, "read_table", return_value={}), \
+                mock.patch.object(self.bias, "entry_for", return_value=entry) as self.asked, \
+                mock.patch.object(self.bias, "run_family", return_value={"holds": families}) as self.ran:
+            return self.bias.re_find_s14(None, None)
+
+    def test_s14_reads_every_deciding_fact(self):
+        fired_all = self.s14(fired=True)
+        self.assertTrue(fired_all["re_found"])
+        self.assertFalse(self.s14()["re_found"], "the five top bits must fire")
+        self.assertFalse(self.s14(fired=True, families=False)["re_found"], "a family must hold")
+        self.assertFalse(self.s14(fired=True, d_range=["0x0", "0x1"])["re_found"], "the range")
+        moved = [0.9] * 32
+        self.assertFalse(self.s14(fired=True, d_ones_frequency_bit31_to_bit0=moved)["re_found"])
+
+    def test_s14_needs_bit_31_never_set_and_bit_29_the_complement_of_bit_30(self):
+        top = 1 << 30
+        self.assertFalse(self.s14([top + i for i in range(3999)] + [3 << 30], fired=True)["re_found"],
+                         "bit 31 set once, with bits 30 and 29 still different")
+        self.assertFalse(self.s14([3 << 29] * 1 + [top + i for i in range(3999)], fired=True)["re_found"],
+                         "bits 30 and 29 equal once, with bit 31 clear")
+
+    def test_s14_runs_both_families_at_each_size_at_that_sizes_counts(self):
+        self.s14(fired=True)
+        asked = [call.args[:3] for call in self.asked.call_args_list]
+        for n in (4, 8, 16):
+            self.assertIn(("frequency", 2 ** 20, 256 * n * n), asked)
+        ran = [(call.args[0], call.args[2]) for call in self.ran.call_args_list]
+        self.assertEqual(sorted(ran), sorted((family, n) for n in (4, 8, 16)
+                                             for family in ("class 5", "second")))
+        self.assertEqual({len(call.args[1]) for call in self.ran.call_args_list}, {100})
+
+    def test_s14_records_what_it_read(self):
+        found = self.s14(fired=True)["found"]
+        self.assertEqual(found["vein_values"], 4000)
+        self.assertEqual(found["bit30_differs_from_bit29"], 4000)
+        self.assertEqual(found["numpy"], np.__version__)
+        self.assertEqual(found["ones_bit31_to_bit0"][1], 4000)
+
+    def test_the_sample_reads_every_vein_after_every_step_in_seed_order(self):
+        from phycoweb.model_v2 import PhycoWebEngineV2
+        from protocol import seedsets
+        with mock.patch.object(self.bias, "STEPS", 2):
+            values = self.bias.vein_values().tolist()
+        wanted = []
+        for seed in [seedsets.load("dev", allow=("dev",))[0], (0, 0, 0, 0), (65535,) * 4]:
+            engine = PhycoWebEngineV2(list(seed))
+            for _ in range(2):
+                engine.compute_block()
+                wanted += engine.D
+        self.assertEqual(values, wanted)
+
+    def test_the_uniform_start_counts_what_it_says(self):
+        tops = [1 << 31, (1 << 31) + 1]
+        with mock.patch.object(self.bias, "STARTS", 1), \
+                mock.patch.object(self.bias.PhycoWebEngineV2, "compute_block", lambda s: setattr(
+                    s, "D", [1, tops[0], tops[1], tops[1]])):
+            after = self.bias.descent()
+        self.assertEqual(after["veins_above_2_31"], 2)
+        self.assertEqual(after["bit31_set"], 3)
+        self.assertEqual(after["bit31_off_the_edge"], 2)
+        self.assertEqual(after["largest"], tops[1])
+
+    def test_the_uniform_start_takes_pressures_and_veins_from_the_state_in_lane_order(self):
+        seen = {}
+        states = [[1, 2, 3, 4, 5, 6, 7, 8]]
+
+        def step(engine):
+            seen["P"], seen["D"] = list(engine.P), list(engine.D)
+
+        with mock.patch.object(self.bias, "STARTS", 1), \
+                mock.patch.object(self.bias.devinputs_v3, "load", return_value=states), \
+                mock.patch.object(self.bias.PhycoWebEngineV2, "compute_block", step):
+            self.bias.descent()
+        self.assertEqual((seen["P"], seen["D"]), ([1, 3, 5, 7], [2, 4, 6, 8]))
+
+    def test_the_inputs_name_what_each_known_result_reads(self):
+        kinds = {name: [item["kind"] for item in self.bias.inputs(name)["sets"]]
+                 for name in ("s12", "s14", "s15", "s15-second")}
+        self.assertEqual(kinds["s12"], ["seed", "state"])
+        self.assertEqual(kinds["s14"], ["seed", "synthetic", "synthetic", "synthetic"])
+        self.assertEqual(kinds["s15"], ["state"])
+        self.assertEqual(kinds["s15-second"], ["state"])
+
+    def test_the_uniform_start_is_read_lane_by_lane(self):
+        with mock.patch.object(self.bias, "STARTS", 8):
+            after = self.bias.descent()
+        self.assertEqual((after["starts"], after["steps"]), (8, 16))
+        self.assertEqual(after["veins_above_2_31"], 0)
+        self.assertEqual(after["bit31_off_the_edge"], 0)
 
 
 @unittest.skipIf(platform.system() == "Windows", "the make file runs in WSL")
