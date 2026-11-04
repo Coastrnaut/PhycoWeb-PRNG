@@ -543,7 +543,7 @@ hashes.
   (research R18); then ask the owner's go-ahead for the sweep, with its expected cost, about
   2³² × 257 steps per target and under an hour of wall time on 32 threads. (FR-002, FR-045, FR-053;
   R2, R18)
-- [ ] T043 [US1] **heavy**: run `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir
+- [X] T043 [US1] **heavy**: run `wpy scripts/fut_sec8.py --binary fast/build/seed_search --out-dir
   $REP/fut-sec-8` once, under the heavy-run lock: all three targets recovered, the matches after
   one, two and three words beside about 1, 2⁻³² and 2⁻⁶⁴, in under an hour (quickstart U3); then
   `wpy scripts/fut_sec8.py --verify RECORD`; commit the record. A disagreement with the expected

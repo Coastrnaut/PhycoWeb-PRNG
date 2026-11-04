@@ -1,0 +1,519 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "check": "target 0 recovered",
+      "outcome": "pass"
+    },
+    {
+      "check": "target 1 recovered",
+      "outcome": "pass"
+    },
+    {
+      "check": "target 2 recovered",
+      "outcome": "pass"
+    },
+    {
+      "check": "false matches agree with the baseline",
+      "outcome": "pass"
+    }
+  ],
+  "assumption": "Each candidate's output words are uniform and independent of the target's. phyco-v2's biases (S12, S14) could make false matches more frequent, so a count above the baseline is an observation about phyco-v2 and does not change the success criterion.",
+  "classification": "confirmed vulnerability",
+  "code_sha256": {
+    "fast/build/seed_search": {
+      "kind": "raw",
+      "sha256": "0f62a0c4ba7e4715bc60b458d123123de344223d8bb4fd7d6530dfea47ee6079"
+    },
+    "fast/lut_table.h": {
+      "kind": "raw",
+      "sha256": "fb1e468bd2834ce96be71b76ad63021fdcc561aa395864b96b9ecfcee1c2dac0"
+    },
+    "fast/seed_search.c": {
+      "kind": "raw",
+      "sha256": "d89134ddd7ee2a9d7cf259d7801a269e2e5ed462bf126261954d5f8b9bb87c17"
+    },
+    "fast/seed_search.mk": {
+      "kind": "raw",
+      "sha256": "b9dee1f2a095ffc38353ec16f3743b58d924a3ba1ff35d37c1ffc000456d6e7a"
+    },
+    "phycoweb/lut.py": {
+      "kind": "raw",
+      "sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3"
+    },
+    "phycoweb/model_v2.py": {
+      "kind": "raw",
+      "sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec"
+    },
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "7e0abd7ff38153c25abd486cd98adebdbf89148d4ebfb2c72316ca755f5ca927"
+    },
+    "protocol/seedsets.py": {
+      "kind": "raw",
+      "sha256": "0471cb7bd009500a885f3a2228dae9b637469ab5b44bc51ae0dee4e1a228c057"
+    },
+    "scripts/fut_sec8.py": {
+      "kind": "raw",
+      "sha256": "e4d02f63bdb3cee047b711d09d497eb7bfc4074f93162d38e6752969c5d04a4a"
+    }
+  },
+  "command": "/home/coast/.venvs/phycoweb/bin/python scripts/fut_sec8.py --binary fast/build/seed_search --out-dir reports/004-crypto-architecture-v3/fut-sec-8",
+  "config": {
+    "cwd": "/mnt/c/GIT/PhycoWeb-PRNG",
+    "repository_root": "/mnt/c/GIT/PhycoWeb-PRNG",
+    "threads": 32,
+    "warmup": 256
+  },
+  "cost": {
+    "extrapolation": {
+      "seconds": 2898280757822.052,
+      "seconds_per_candidate": 1.5711611470518013e-07,
+      "seeds": 18446744073709551616,
+      "steps": 4.740813226954808e+21
+    },
+    "per_target": [
+      {
+        "seconds": 675.555606,
+        "steps_per_second": 1633924115.10925,
+        "total_steps": 1103806595074
+      },
+      {
+        "seconds": 674.613728,
+        "steps_per_second": 1636205356.554343,
+        "total_steps": 1103806595074
+      },
+      {
+        "seconds": 674.256389,
+        "steps_per_second": 1637072504.016123,
+        "total_steps": 1103806595076
+      }
+    ],
+    "seconds": 2024.425723,
+    "steps_per_candidate": 257.0000000006209,
+    "steps_per_second": 1635732913.0933988,
+    "total_steps": 3311419785224
+  },
+  "created_utc": "2026-11-04T16:56:04Z",
+  "defect": "none",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "b62ba9e505df5ce9a10bb084b125386e061231c2e6d85f824b47b77c6d71585c",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-wsl.json",
+    "sha256": "77c5e021619083273826dcd435e9e1227620595ffc0bbc220791cd066251beff",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "git_dirty": false,
+  "git_head": "c846d7e7763a0f119769c1d2cdb1afd871664665",
+  "heavy_run": true,
+  "hours": {
+    "projected": 0.5785310734463277,
+    "used": 0.5623890410722228
+  },
+  "inputs": {
+    "fingerprint": "7e7e33c75e9e58048a26c1926e6addd4dc3514502574ea6687ded889aa47950e",
+    "index_range": [
+      0,
+      2
+    ],
+    "kind": "seed",
+    "namespace": "feature-002/dev"
+  },
+  "kind": "demonstration",
+  "limitations": [],
+  "listed": [
+    [
+      {
+        "fourth_word": "07655EA0",
+        "fourth_word_matches": true,
+        "is_target": true,
+        "s2": 30841,
+        "s3": 11050
+      }
+    ],
+    [
+      {
+        "fourth_word": "477E8109",
+        "fourth_word_matches": true,
+        "is_target": true,
+        "s2": 25293,
+        "s3": 40850
+      }
+    ],
+    [
+      {
+        "fourth_word": "50CBE4C4",
+        "fourth_word_matches": true,
+        "is_target": true,
+        "s2": 41158,
+        "s3": 2166
+      }
+    ]
+  ],
+  "matches": {
+    "agrees": true,
+    "deviations": [],
+    "per_target": [
+      {
+        "after_one": 1,
+        "after_three": 1,
+        "after_two": 1,
+        "expected_false": {
+          "one": 0.9999999997671694,
+          "three": 5.421010861165345e-20,
+          "two": 2.3283064359965952e-10
+        },
+        "false_after_one": 0,
+        "false_after_three": 0,
+        "false_after_two": 0,
+        "poisson": {
+          "agrees": true,
+          "count": 0,
+          "level": 0.01,
+          "mean": 0.9999999997671694,
+          "p": 0.7357588825141919
+        },
+        "target": 0
+      },
+      {
+        "after_one": 1,
+        "after_three": 1,
+        "after_two": 1,
+        "expected_false": {
+          "one": 0.9999999997671694,
+          "three": 5.421010861165345e-20,
+          "two": 2.3283064359965952e-10
+        },
+        "false_after_one": 0,
+        "false_after_three": 0,
+        "false_after_two": 0,
+        "poisson": {
+          "agrees": true,
+          "count": 0,
+          "level": 0.01,
+          "mean": 0.9999999997671694,
+          "p": 0.7357588825141919
+        },
+        "target": 1
+      },
+      {
+        "after_one": 3,
+        "after_three": 1,
+        "after_two": 1,
+        "expected_false": {
+          "one": 0.9999999997671694,
+          "three": 5.421010861165345e-20,
+          "two": 2.3283064359965952e-10
+        },
+        "false_after_one": 2,
+        "false_after_three": 0,
+        "false_after_two": 0,
+        "poisson": {
+          "agrees": true,
+          "count": 2,
+          "level": 0.01,
+          "mean": 0.9999999997671694,
+          "p": 0.5284822351429235
+        },
+        "target": 2
+      }
+    ],
+    "pooled": {
+      "agrees": true,
+      "count": 2,
+      "level": 0.01,
+      "mean": 2.999999999301508,
+      "p": 0.8463801625666698
+    }
+  },
+  "model_id": "phyco-v2",
+  "model_sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+  "observed": [
+    {
+      "positions": [
+        1,
+        2,
+        3
+      ],
+      "words": [
+        "A0347715",
+        "B6C8F1DE",
+        "6283CB85"
+      ]
+    },
+    {
+      "positions": [
+        1,
+        2,
+        3
+      ],
+      "words": [
+        "4C81D0E9",
+        "40EFF50E",
+        "3622A278"
+      ]
+    },
+    {
+      "positions": [
+        1,
+        2,
+        3
+      ],
+      "words": [
+        "A6693D8C",
+        "A2E0BA34",
+        "3D0F8813"
+      ]
+    }
+  ],
+  "outputs": [],
+  "owner_request": "none",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 32,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "none",
+    "logical_cpus": 32,
+    "ram": "33505357824 bytes",
+    "system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 498,
+  "record_id": "demonstration-20261104T165604Z-4406adb9",
+  "recovered": [
+    true,
+    true,
+    true
+  ],
+  "report": {
+    "1_attack_and_target_property": "Exhaustive search of the last two of phyco-v2's four 16-bit seed words. Target property: the 64-bit seed, which bounds security strength against T1 at 64 bits (security.md S3).",
+    "2_attacker": "T1, the known-output attacker of security.md section 5, who knows the design and the position of the observed words, here the first words after the warm-up. An unknown position would add a search over the offset.",
+    "3_observations_and_inputs": {
+      "observed": "the first three output words after the 256-step warm-up",
+      "revealed": "the first two seed words of each target",
+      "targets": 3
+    },
+    "4_analysis": {
+      "assumption": "Each candidate's output words are uniform and independent of the target's. phyco-v2's biases (S12, S14) could make false matches more frequent, so a count above the baseline is an observation about phyco-v2 and does not change the success criterion.",
+      "expected_false_matches": {
+        "one": 0.9999999997671694,
+        "three": 5.421010861165345e-20,
+        "two": 2.3283064359965952e-10
+      },
+      "test": "per target against a Poisson distribution of mean (2^32 - 1)/2^32 and pooled against three times it, two-sided at level 0.01"
+    },
+    "5_implementation": {
+      "binary_sha256": "0f62a0c4ba7e4715bc60b458d123123de344223d8bb4fd7d6530dfea47ee6079",
+      "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+      "driver": "scripts/fut_sec8.py",
+      "flags": "-O2 -std=c99 -Wall -Wextra -Werror -pthread",
+      "source": "fast/seed_search.c",
+      "source_sha256": "d89134ddd7ee2a9d7cf259d7801a269e2e5ed462bf126261954d5f8b9bb87c17",
+      "threads": 32
+    },
+    "6_results": {
+      "matches": {
+        "agrees": true,
+        "deviations": [],
+        "per_target": [
+          {
+            "after_one": 1,
+            "after_three": 1,
+            "after_two": 1,
+            "expected_false": {
+              "one": 0.9999999997671694,
+              "three": 5.421010861165345e-20,
+              "two": 2.3283064359965952e-10
+            },
+            "false_after_one": 0,
+            "false_after_three": 0,
+            "false_after_two": 0,
+            "poisson": {
+              "agrees": true,
+              "count": 0,
+              "level": 0.01,
+              "mean": 0.9999999997671694,
+              "p": 0.7357588825141919
+            },
+            "target": 0
+          },
+          {
+            "after_one": 1,
+            "after_three": 1,
+            "after_two": 1,
+            "expected_false": {
+              "one": 0.9999999997671694,
+              "three": 5.421010861165345e-20,
+              "two": 2.3283064359965952e-10
+            },
+            "false_after_one": 0,
+            "false_after_three": 0,
+            "false_after_two": 0,
+            "poisson": {
+              "agrees": true,
+              "count": 0,
+              "level": 0.01,
+              "mean": 0.9999999997671694,
+              "p": 0.7357588825141919
+            },
+            "target": 1
+          },
+          {
+            "after_one": 3,
+            "after_three": 1,
+            "after_two": 1,
+            "expected_false": {
+              "one": 0.9999999997671694,
+              "three": 5.421010861165345e-20,
+              "two": 2.3283064359965952e-10
+            },
+            "false_after_one": 2,
+            "false_after_three": 0,
+            "false_after_two": 0,
+            "poisson": {
+              "agrees": true,
+              "count": 2,
+              "level": 0.01,
+              "mean": 0.9999999997671694,
+              "p": 0.5284822351429235
+            },
+            "target": 2
+          }
+        ],
+        "pooled": {
+          "agrees": true,
+          "count": 2,
+          "level": 0.01,
+          "mean": 2.999999999301508,
+          "p": 0.8463801625666698
+        }
+      },
+      "recovered": [
+        true,
+        true,
+        true
+      ],
+      "vector_check": [
+        {
+          "file": "vectors/phyco-v2_seed-41278-32039-25293-40850_10000.hex",
+          "mismatches": 0,
+          "words": 10000
+        },
+        {
+          "file": "vectors/phyco-v2_seed-56053-7029-30841-11050_10000.hex",
+          "mismatches": 0,
+          "words": 10000
+        }
+      ]
+    },
+    "7_complexity": {
+      "data": "three 32-bit output words per target",
+      "extrapolation": {
+        "seconds": 2898280757822.052,
+        "seconds_per_candidate": 1.5711611470518013e-07,
+        "seeds": 18446744073709551616,
+        "steps": 4.740813226954808e+21
+      },
+      "memory": "one generator state per thread",
+      "time": {
+        "seconds": 2024.425723,
+        "steps_per_candidate": 257.0000000006209,
+        "steps_per_second": 1635732913.0933988,
+        "total_steps": 3311419785224
+      }
+    },
+    "8_reproduction": {
+      "check": "scripts/fut_sec8.py --verify RECORD",
+      "command": "scripts/fut_sec8.py --reproduce, after the FUT-SEC-8 result review, on the owner's request",
+      "revision": "c846d7e7763a0f119769c1d2cdb1afd871664665"
+    },
+    "9_implications_and_limitations": "The seed bound of phyco-v2 is reproduced on a reduced domain: two seed words are revealed and 2^32 candidates tried per target, and the cost of all 2^64 seeds is extrapolated, not executed. It says nothing about phyco-v3 or any other model, and no result here is a claim about any model's strength.",
+    "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security."
+  },
+  "research_sha256": "b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3",
+  "research_sha256_kind": "raw",
+  "revealed": [
+    [
+      56053,
+      7029
+    ],
+    [
+      41278,
+      32039
+    ],
+    [
+      26646,
+      29351
+    ]
+  ],
+  "review_status": "pending",
+  "reviewer": "pending",
+  "spec_sha256": "e4407f5aff7e30a1f94961e9ab40a33c090c027a0796dcab926d2f915c84e042",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "supersedes": "none",
+  "targets": [
+    [
+      56053,
+      7029,
+      30841,
+      11050
+    ],
+    [
+      41278,
+      32039,
+      25293,
+      40850
+    ],
+    [
+      26646,
+      29351,
+      41158,
+      2166
+    ]
+  ],
+  "tool": {
+    "binary_sha256": "0f62a0c4ba7e4715bc60b458d123123de344223d8bb4fd7d6530dfea47ee6079",
+    "compiler": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "flags": "-O2 -std=c99 -Wall -Wextra -Werror -pthread",
+    "source_sha256": "d89134ddd7ee2a9d7cf259d7801a269e2e5ed462bf126261954d5f8b9bb87c17",
+    "threads": 32
+  },
+  "variant_id": null,
+  "vector_check": [
+    {
+      "file": "vectors/phyco-v2_seed-41278-32039-25293-40850_10000.hex",
+      "mismatches": 0,
+      "words": 10000
+    },
+    {
+      "file": "vectors/phyco-v2_seed-56053-7029-30841-11050_10000.hex",
+      "mismatches": 0,
+      "words": 10000
+    }
+  ],
+  "versions": {
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "numpy": "2.5.4",
+    "python": "3.14.4",
+    "scipy": "1.18.1"
+  }
+}
