@@ -1581,6 +1581,317 @@ class DependencyOnKnown(unittest.TestCase):
         self.assertEqual(self.tool.differences({1: 2}, {1: 2}), 0)
 
 
+def degree_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import degree
+    return degree
+
+
+class Degree(unittest.TestCase):
+    """research/004/tools/degree.py on stated functions (T056)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = degree_module()
+        import ir
+        cls.ir = ir
+        cls.a, cls.b, cls.c = ir.Lane(1), ir.Lane(2), ir.Lane(3)
+
+    def test_a_table_reads_its_normal_form(self):
+        self.assertEqual(self.tool.table_degree(np.array([0, 0, 0, 1], dtype=np.uint8), 2), 2)
+        self.assertEqual(self.tool.table_degree(np.array([0, 1, 1, 0], dtype=np.uint8), 2), 1)
+        self.assertEqual(self.tool.table_degree(np.array([1, 1, 1, 1], dtype=np.uint8), 2), 0)
+        self.assertEqual(self.tool.table_degree(np.array([0, 0, 0, 0], dtype=np.uint8), 2), 0)
+        self.assertEqual(self.tool.table_degree(np.array([0, 1, 1, 1], dtype=np.uint8), 2), 2)
+
+    def test_the_monomials_of_a_stated_table(self):
+        """x or y is x + y + xy, so that the monomials are 1, 2 and 3."""
+        self.assertEqual(self.tool.anf_monomials(np.array([0, 1, 1, 1], dtype=np.uint8), 2).tolist(), [1, 2, 3])
+
+    def test_the_table_is_left_as_it_was(self):
+        """1 + x + y + xy, whose transform is not itself, unlike x or y."""
+        table = np.array([1, 0, 0, 0], dtype=np.uint8)
+        self.assertEqual(self.tool.anf_monomials(table, 2).tolist(), [0, 1, 2, 3])
+        self.assertEqual(table.tolist(), [1, 0, 0, 0])
+
+    def test_the_rule_on_each_operation(self):
+        ir, a, b, c = self.ir, self.a, self.b, self.c
+        degree = self.tool.expression_degree
+        self.assertEqual(degree(a), 1)
+        self.assertEqual(degree(ir.Constant(0)), 0)
+        self.assertEqual(degree(ir.Not(a)), 1)
+        self.assertEqual(degree(ir.Rotl(a, 3)), 1)
+        self.assertEqual(degree(ir.Shl(a, 3)), 1)
+        self.assertEqual(degree(ir.Shr(a, 3)), 1)
+        self.assertEqual(degree(ir.Xor(a, b)), 1)
+        self.assertEqual(degree(ir.And(a, b)), 2)
+        self.assertEqual(degree(ir.Or(a, b)), 2)
+        self.assertEqual(degree(ir.And(ir.Not(a), ir.Rotl(a, 1))), 2)
+        self.assertEqual(degree(ir.And(a, ir.Or(b, c))), 3)
+
+    def test_a_constant_adds_nothing_to_a_monomial(self):
+        ir, a = self.ir, self.a
+        self.assertEqual(self.tool.expression_degree(ir.And(a, ir.Constant(0))), 1)
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Constant(1), ir.Constant(0))), 0)
+        self.assertEqual(self.tool.expression_degree(ir.Xor(ir.Constant(1), ir.Constant(0))), 0)
+
+    def test_the_degree_is_the_normal_forms_not_a_nested_sum(self):
+        """a and (a or b) is a, and (a and b) xor (a and b) is 0."""
+        ir, a, b = self.ir, self.a, self.b
+        self.assertEqual(self.tool.expression_degree(ir.And(a, ir.Or(a, b))), 1)
+        self.assertEqual(self.tool.expression_degree(ir.Xor(ir.And(a, b), ir.And(a, b))), 0)
+
+    def test_not_is_read_in_the_table(self):
+        """not a or a is 1, and not a and a is 0."""
+        ir, a = self.ir, self.a
+        self.assertEqual(self.tool.expression_degree(ir.Or(ir.Not(a), a)), 0)
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Not(a), a)), 0)
+
+    def test_one_bit_read_twice_is_one_variable(self):
+        ir, a, b = self.ir, self.a, self.b
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Rotl(a, 3), ir.Rotl(a, 3))), 1)
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Rotl(ir.Rotl(a, 1), 2), ir.Rotl(a, 3))), 1)
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Rotl(a, 3), ir.Rotl(a, 4))), 2)
+        self.assertEqual(self.tool.expression_degree(ir.And(a, b)), 2)
+
+    def test_a_rotation_above_a_function_goes_down_to_its_leaves(self):
+        ir, a, b = self.ir, self.a, self.b
+        moved = ir.Rotl(ir.And(a, b), 3)
+        self.assertEqual(self.tool.expression_degree(ir.And(moved, ir.Rotl(a, 3))), 2)
+        self.assertEqual(self.tool.expression_degree(ir.And(moved, ir.Rotl(ir.Lane(4), 3))), 3)
+
+    def test_a_shift_is_part_of_a_leafs_name(self):
+        ir, a = self.ir, self.a
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Shl(a, 1), ir.Shr(a, 1))), 2)
+        self.assertEqual(self.tool.expression_degree(ir.And(ir.Shl(a, 1), ir.Shl(a, 1))), 1)
+
+    def test_a_long_xor_needs_no_table(self):
+        ir = self.ir
+        expr = ir.Lane(0)
+        for t in range(1, 32):
+            expr = ir.Xor(expr, ir.Rotl(ir.Lane(0), t))
+        self.assertEqual(self.tool.expression_degree(expr), 1)
+
+    def test_too_many_leaves_for_a_table_is_a_failure(self):
+        ir = self.ir
+        expr = ir.Lane(0)
+        for t in range(1, 20):
+            expr = ir.Xor(expr, ir.Rotl(ir.Lane(0), t))
+        with self.assertRaises(ValueError):
+            self.tool.expression_degree(ir.And(expr, ir.Lane(1)))
+
+    def test_each_update(self):
+        ir, a = self.ir, self.a
+        degree = self.tool.update_degree
+        self.assertEqual(degree(ir.Rot(0, 1), 7), 1)
+        self.assertEqual(degree(ir.Mix(0, "xor", a), 7), 1)
+        self.assertEqual(degree(ir.Mix(0, "xor", ir.Constant(0)), 7), 1)
+        self.assertEqual(degree(ir.Mix(0, "xor", ir.And(a, self.b)), 7), 2)
+        self.assertEqual(degree(ir.Mix(0, "add", a), 7), 7)
+        self.assertEqual(degree(ir.Mix(0, "sub", a), 7), 7)
+        self.assertEqual(degree(ir.Mix(0, "add", ir.Constant(0)), 7), 7)
+        self.assertEqual(degree(ir.Mix(0, "add", ir.And(a, self.b)), 7), 14)
+
+    def program(self, *phases, n=2, w=4):
+        return self.ir.Program("p", n, w, tuple(phases))
+
+    def test_a_phase_takes_its_largest_and_an_empty_phase_counts_one(self):
+        ir, a, b = self.ir, self.a, self.b
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", a), ir.Mix(2, "xor", ir.And(a, b)))),
+                               ir.Phase(0, ()))
+        self.assertEqual(self.tool.phase_degrees(program, 3), [3, 1])
+
+    def test_a_round_is_the_product_of_its_phases(self):
+        ir, a, b = self.ir, self.a, self.b
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", a),)), ir.Phase(0, (ir.Mix(0, "xor", ir.And(a, b)),)))
+        self.assertEqual(self.tool.round_degree(program, 3), 6)
+
+    def test_the_cap_is_b_minus_1(self):
+        self.assertEqual(self.tool.capped(6, 1, 31), 6)
+        self.assertEqual(self.tool.capped(6, 2, 31), 31)
+        self.assertEqual(self.tool.capped(6, 3, 31), 31)
+        self.assertEqual(self.tool.capped(5, 2, 25), 25)
+        self.assertEqual(self.tool.capped(10 ** 6, 10 ** 4, 1023), 1023)
+
+    def test_counts_read_the_size(self):
+        ir, a = self.ir, self.a
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", a),)))
+        self.assertEqual(self.tool.counts(program, 3, (1, 2, 3, 4)), [3, 9, 27, 31])
+
+    def test_rounds_within_a_limit(self):
+        self.assertEqual(self.tool.within([3, 9, 27], (1, 2, 3), 9), [1, 2])
+
+    def test_the_inside_out_count(self):
+        rounds = (1, 2, 3)
+        self.assertEqual(self.tool.inside_out([4, 16, 31], [4, 16, 31], rounds, 20), (4, 17))
+        self.assertEqual(self.tool.inside_out([4, 16, 31], [4, 16, 31], rounds, 3), None)
+        self.assertEqual(self.tool.inside_out([4, 16, 31], [4, 8, 31], rounds, 16), (4, 17))
+        self.assertEqual(self.tool.inside_out([4, 16, 31], [4, 16, 31], rounds, 31), (6, 32))
+
+    def test_the_cost_is_that_of_the_larger_count(self):
+        self.assertEqual(self.tool.inside_out([2, 8], [2, 8], (1, 2), 8), (4, 9))
+        self.assertEqual(self.tool.inside_out([2, 8, 99], [3, 5, 99], (1, 2, 3), 8), (4, 9))
+        self.assertEqual(self.tool.inside_out([2, 3, 99], [3, 8, 99], (1, 2, 3), 8), (4, 9))
+
+    def test_the_pairs_may_come_in_any_order(self):
+        self.assertEqual(self.tool.inside_out([8, 2], [8, 2], (2, 1), 8), (4, 9))
+
+    def test_a_records_fields(self):
+        ir, a = self.ir, self.a
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", a),)))
+        out = self.tool.record_fields(program, (1, 2), 5)
+        self.assertEqual(out["phase_counts"], {"forward": [3], "inverse": [3]})
+        self.assertEqual(out["counts"]["forward"], [3, 9])
+        self.assertEqual(out["upper_bounds"]["forward"], [4, 16])
+        self.assertEqual(out["rounds_within_limit"]["forward"], [1])
+        self.assertEqual(out["rounds_with_bound_within_limit"]["inverse"], [1])
+        self.assertEqual(out["inside_out"], (2, 4))
+        self.assertEqual(out["marked"], "the rule's count, not an upper bound")
+
+    def test_a_record_reads_the_inverse_in_its_own_order(self):
+        ir, a = self.ir, self.a
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", a),)), ir.Phase(0, (ir.Rot(0, 1),)))
+        phases = self.tool.record_fields(program, (1,), 5)["phase_counts"]
+        self.assertEqual(phases, {"forward": [3, 1], "inverse": [1, 3]})
+
+    def test_lanes_group_by_what_they_read(self):
+        ir = self.ir
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", ir.Lane(1)),)),
+                               ir.Phase(1, (ir.Rot(2, 1), ir.Mix(4, "xor", ir.Lane(5)))))
+        self.assertEqual(self.tool.groups_of(program), [[0, 1], [2], [4, 5]])
+
+    def test_the_exact_degree_of_stated_boxes(self):
+        """x + y at w = 4: its top bit is degree 4, x3 + y3 + the carry of degree 3 plus one."""
+        ir = self.ir
+        add = self.program(ir.Phase(0, (ir.Mix(0, "add", ir.Lane(1)),)))
+        self.assertEqual(self.tool.exact_degree(add, 1), 4)
+        turn = self.program(ir.Phase(0, (ir.Rot(0, 1),)))
+        self.assertEqual(self.tool.exact_degree(turn, 1), 1)
+        both = self.program(ir.Phase(0, (ir.Mix(0, "xor", ir.And(ir.Lane(1), ir.Rotl(ir.Lane(1), 1))),)))
+        self.assertEqual(self.tool.exact_degree(both, 1), 2)
+
+    def test_the_exact_degree_runs_its_rounds(self):
+        ir = self.ir
+        program = self.program(ir.Phase(0, (ir.Mix(0, "xor", ir.Lane(1)),)),
+                               ir.Phase(0, (ir.Mix(1, "xor", ir.And(ir.Lane(0), ir.Rotl(ir.Lane(0), 1))),)))
+        self.assertEqual(self.tool.exact_degree(program, 1), 2)
+        self.assertGreater(self.tool.exact_degree(program, 2), 2)
+
+    def test_the_exact_degree_of_too_large_a_group_is_not_computed(self):
+        ir = self.ir
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", ir.Lane(1)),)), n=2, w=16)
+        self.assertIsNone(self.tool.exact_degree(program, 1))
+
+    def test_the_exact_degree_takes_constants_as_0(self):
+        ir = self.ir
+        program = self.program(ir.Phase(0, (ir.Mix(0, "add", ir.Constant(0)),)))
+        self.assertEqual(self.tool.exact_degree(program, 1), 1)
+
+
+class DegreeOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = degree_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def run_known(self, name, known):
+        return self.tool.validation(name, known, None)["re_found"]
+
+    def test_each_is_re_found(self):
+        for name in ("degree-small", "degree-small-second"):
+            self.assertTrue(self.run_known(name, self.known(name)), name)
+
+    def test_the_exact_degree_is_reported_beside_and_under_the_bound(self):
+        out = self.tool.validation("degree-small", self.known("degree-small"), None)
+        rows = {(row["n"], row["w"]): row for row in out["found"]["rows"]}
+        self.assertEqual(len(rows[(2, 4)]["exact_degrees"]), 3)
+        self.assertEqual(len(rows[(2, 8)]["exact_degrees"]), 3)
+        self.assertNotIn("exact_degrees", rows[(4, 32)])
+        for key in ((2, 4), (2, 8)):
+            for degree, bound in zip(rows[key]["exact_degrees"], rows[key]["upper_bounds"]["forward"]):
+                self.assertLessEqual(degree, bound)
+
+    def test_each_table_of_the_first_is_compared(self):
+        for field in ("COUNTS", "BOUNDS"):
+            known = self.known("degree-small")
+            wrong = dict(getattr(known, field))
+            wrong[(2, 4)] = (18, 31, 30)
+            with mock.patch.object(known, field, wrong):
+                self.assertFalse(self.run_known("degree-small", known), field)
+
+    def test_the_inside_out_count_is_compared_both_ways(self):
+        known = self.known("degree-small")
+        for wrong in ({(2, 4): (2, 18), (2, 8): (2, 43), (4, 32): None},
+                      {(2, 4): (1, 19), (2, 8): (2, 43), (4, 32): None},
+                      {(2, 4): None, (2, 8): (2, 43), (4, 32): None},
+                      {(2, 4): (2, 19), (2, 8): (2, 43), (4, 32): (2, 19)}):
+            with mock.patch.object(known, "INSIDE_OUT", wrong):
+                self.assertFalse(self.run_known("degree-small", known), wrong)
+
+    def test_a_bound_under_the_exact_degree_breaks_it(self):
+        known = self.known("degree-small")
+        with mock.patch.object(self.tool, "exact_degree", return_value=10 ** 6):
+            self.assertFalse(self.run_known("degree-small", known))
+
+    def test_each_case_of_the_second_is_compared(self):
+        name = "degree-small-second"
+        for field, value in (("counts", (4, 16, 31, 30)), ("bounds", (4, 16, 31, 30)),
+                             ("inside_out", (4, 16))):
+            known = self.known(name)
+            label, builder, n, w, entry = known.CASES[0]
+            with mock.patch.object(known, "CASES", ((label, builder, n, w, dict(entry, **{field: value})),)):
+                self.assertFalse(self.run_known(name, known), field)
+
+    def test_each_direction_of_the_count_is_compared(self):
+        name = "degree-small"
+        known = self.known(name)
+        real = self.tool.record_fields
+        for direction in ("forward", "inverse"):
+            def changed(program, rounds, limit=126):
+                out = real(program, rounds, limit)
+                out["counts"] = dict(out["counts"], **{direction: [1] * len(rounds)})
+                return out
+
+            with mock.patch.object(self.tool, "record_fields", changed):
+                self.assertFalse(self.run_known(name, known), direction)
+
+    def test_one_wrong_case_of_the_second_is_enough(self):
+        name = "degree-small-second"
+        known = self.known(name)
+        label, builder, n, w, entry = known.CASES[0]
+        cases = ((label, builder, n, w, dict(entry, counts=(1, 1, 1, 1))),) + known.CASES[1:]
+        with mock.patch.object(known, "CASES", cases):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_the_limit_of_the_second_is_read(self):
+        name = "degree-small-second"
+        known = self.known(name)
+        label, builder, n, w, entry = known.CASES[0]
+        with mock.patch.object(known, "CASES", ((label, builder, n, w, dict(entry, limit=3)),)):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_a_bound_under_the_exact_degree_breaks_the_second_only_at_small_widths(self):
+        name = "degree-small-second"
+        known = self.known(name)
+        small = tuple(c for c in known.CASES if c[3] == 4)
+        with mock.patch.object(self.tool, "exact_degree", return_value=10 ** 6), \
+                mock.patch.object(known, "CASES", small):
+            self.assertFalse(self.run_known(name, known))
+        large = tuple(c for c in known.CASES if c[3] == 32)
+        with mock.patch.object(self.tool, "exact_degree", return_value=10 ** 6), \
+                mock.patch.object(known, "CASES", large):
+            self.assertTrue(self.run_known(name, known))
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
