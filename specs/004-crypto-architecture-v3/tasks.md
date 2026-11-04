@@ -231,7 +231,7 @@ or key-loading code is written here.
   `inconclusive`, with the reason, and neither `match` nor `differs`, exit 2 while the environment
   record the original cites is not in force, and exit 2 for a record that holds `ended_outside`.
   (FR-045, FR-053, FR-061, FR-065, FR-068; R1, R7, R16, R18; REP-099, REP-100)
-- [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
+- [X] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
   a lock not free within 10 s exits 2, naming it (quickstart P4); a broken chain exits 2, save for
@@ -245,12 +245,12 @@ or key-loading code is written here.
   `refused_list` names, on a stated history in which an entry of that version is dropped and one in
   which a word of one changes, and an entry appended on one in which a word of an entry added since
   that version changes before `propose` runs. (FR-023, FR-041, FR-044, FR-067; R15, R16; PRO-076)
-- [ ] T011 Write `protocol/provenance.py`, the one writer of `$REP/provenance.jsonl`, and
+- [X] T011 Write `protocol/provenance.py`, the one writer of `$REP/provenance.jsonl`, and
   `scripts/provenance.py` with `add FILE` and `review FILE` (contracts/cli.md; data-model §14): one
   entry per file or per section, with the tool and model, the date, the task ID and the review
   status; `review` refuses an entry whose `row` does not read at HEAD, with its `reviewed_sha256`,
   the decision the entry records. (FR-067; R16; RAT-077, PRO-074)
-- [ ] T012 Write `protocol/changelog.py`, the one writer of `research/004/protocol-changes.jsonl`,
+- [X] T012 Write `protocol/changelog.py`, the one writer of `research/004/protocol-changes.jsonl`,
   and `scripts/protocol_change.py` with `check`, `create` and `propose FILE` (contracts/cli.md;
   data-model §18): `check` makes FR-044's comparison and writes nothing; `create` runs only while
   the log does not exist, reads the lists "Rows that change the protocol" in round order, the row
@@ -264,13 +264,13 @@ or key-loading code is written here.
   does not parse in that format or drops or changes an entry of the version that the latest
   `refused_list` names, which it finds by that SHA-256 in the file's git history, its approval step
   printing the entries added. (FR-023, FR-044; R15; PRO-063, PRO-077, PRO-079; REP-094)
-- [ ] T013 Write `scripts/repair_log.py --log LOG --approval REF` (contracts/cli.md; R16), which
+- [X] T013 Write `scripts/repair_log.py --log LOG --approval REF` (contracts/cli.md; R16), which
   appends a broken chain's `repair` entry through that log's one writer only while its row "Log
   repair <n>" reads Approved at HEAD and names the same log and position, with its tests in
   `tests/test_protocol_004.py`; for the candidate log it appends through `protocol/candidates.py`,
   which T076 writes, so that task completes this path and T075 its test. (FR-041, FR-044, FR-067;
   R16; PRO-076, REP-101)
-- [ ] T014 Write `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request, which
+- [X] T014 Write `scripts/clear_lock.py LOCK`, run by the owner or at the owner's request, which
   removes a stale `data/heavy-run.lock` or `data/log-append.lock` only once it shows, in the lock's
   environment, that no process with the lock's PID and start time still runs, and writes a
   `lock-cleared` record, `$REP/locks/<record_id>.json`, and, for the heavy-run lock, the
@@ -284,7 +284,7 @@ or key-loading code is written here.
   a candidate it runs `scripts/evidence_v3.py --aborted RECORD` before it removes the lock, which
   T082 writes, so that task completes this path and T081 its test. (FR-041, FR-045; R7, R16;
   PRO-065, PRO-068)
-- [ ] T015 Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
+- [X] T015 Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
   which checks the running environment against research R1 and the pins of `requirements.txt` for
   that platform and writes `$REP/environment-<platform>.json`, and `owner-provided --known KNOWN_ID
   --value TEXT --source TEXT --words TEXT --by NAME`, which writes an `owner-provided` entry of
@@ -292,7 +292,7 @@ or key-loading code is written here.
   owner types its first 16 hex digits at an interactive terminal, and is tested in
   `tests/test_protocol_004.py`. The agent writes and tests this script and never runs it. (FR-039,
   FR-044, FR-053, FR-058; R1, R19; PRO-068, PRO-071; REP-082, REP-083)
-- [ ] T016 Write `scripts/downloads.py` with `init`, `approve NAME`,
+- [X] T016 Write `scripts/downloads.py` with `init`, `approve NAME`,
   `fetched NAME PATH [--pypi-sha256 HEX]` and `not-obtained NAME --reason TEXT`, which keeps
   `$REP/downloads.json` (contracts/cli.md; R19): `init` exits 2 once the manifest exists; `approve`
   writes one `approved` entry for a file outside R19's tables, with the name, source, size and

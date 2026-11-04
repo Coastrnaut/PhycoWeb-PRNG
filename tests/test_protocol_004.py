@@ -1,19 +1,21 @@
 """Feature 004: the evidence writer, the guards every script shares and the common part of
 --reproduce (T008; FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; research R7, R12, R16).
 Each guard refuses with exit 2 and writes nothing. No test here makes a heavy run."""
+import datetime
 import gzip
 import json
 import os
 import re
+import subprocess
 import unittest
 from pathlib import Path
 from typing import Dict, List
 from unittest import mock
 
-from protocol import evidence
+from protocol import changelog, evidence, provenance
 from protocol.disclaimer import DESIGN_DISCLAIMER
 from protocol.evidence import NONE, Refused
-from tests.support_004 import SNAPSHOT, TempRepo, Tool, report_files, write
+from tests.support_004 import CODE_ROOT, SNAPSHOT, TempRepo, Tool, report_files, write
 
 ROOT = Path(__file__).resolve().parents[1]
 ARGV = ["scripts/tool.py", "--flag"]
@@ -1443,6 +1445,1122 @@ class HeavyRunCoverage(TempRepo):
             if "protocol.evidence" in text or "import evidence" in text:
                 if re.search(r"--(workers|threads)\b", text):
                     self.assertRegex(text, r"evidence\.Run\(|HeavyRunLock", path.name)
+
+
+class ChainedLogs(TempRepo):
+    """Every append takes data/log-append.lock, checks the chain and chains one line (R16)."""
+
+    LOG = evidence.CANDIDATE_LOG_REL
+
+    def test_each_line_chains_to_the_previous_lines_bytes_with_its_final_lf(self):
+        first = evidence.append_entry(self.LOG, {"event": "proposed"})
+        second = evidence.append_entry(self.LOG, {"event": "mapping"})
+        lines = (self.root / self.LOG).read_bytes().splitlines(keepends=True)
+        self.assertEqual((first["seq"], first["prev_sha256"]), (0, evidence.ZERO_HASH))
+        self.assertEqual((second["seq"], second["prev_sha256"]), (1, evidence.sha256(lines[0])))
+        self.assertTrue(lines[0].endswith(b"\n"))
+        self.assertRegex(first["date_utc"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
+
+    def test_the_append_takes_the_lock_and_leaves_none(self):
+        seen = []
+        real = evidence.check_chain
+
+        def check(rel):
+            seen.append(evidence.REPO.append_lock.exists())
+            return real(rel)
+
+        with mock.patch.object(evidence, "check_chain", side_effect=check):
+            evidence.append_entry(self.LOG, {"event": "proposed"})
+        self.assertEqual(seen, [True])
+        self.assertFalse(evidence.REPO.append_lock.exists())
+
+    def test_a_lock_not_free_within_its_wait_exits_2_naming_it(self):
+        write(self.root, evidence.APPEND_LOCK_REL, evidence.canonical(evidence.lock_content("x")))
+        with mock.patch.object(evidence, "APPEND_LOCK_WAIT_S", 0.0):
+            with self.assertRaisesRegex(Refused, "log-append.lock is held"):
+                evidence.append_entry(self.LOG, {"event": "proposed"})
+        self.assertFalse((self.root / self.LOG).exists())
+
+    def test_the_wait_is_10_s(self):
+        self.assertEqual(evidence.APPEND_LOCK_WAIT_S, 10.0)
+
+    def test_a_broken_chain_exits_2_appending_nothing(self):
+        evidence.append_entry(self.LOG, {"event": "proposed"})
+        evidence.append_entry(self.LOG, {"event": "mapping"})
+        path = self.root / self.LOG
+        path.write_bytes(path.read_bytes().replace(b"proposed", b"Proposed"))
+        before = path.read_bytes()
+        with self.assertRaisesRegex(Refused, "chain breaks"):
+            evidence.append_entry(self.LOG, {"event": "scored"})
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_first_break_names_the_seq_and_the_cause(self):
+        evidence.append_entry(self.LOG, {"event": "proposed"})
+        self.assertIsNone(evidence.first_break(self.LOG))
+        path = self.root / self.LOG
+        path.write_bytes(path.read_bytes() + b"not json\n")
+        self.assertEqual(evidence.first_break(self.LOG), (1, "the line does not parse"))
+        path.write_bytes(path.read_bytes()[:-9] + b'{"seq": 1')
+        self.assertEqual(evidence.first_break(self.LOG)[0], 1)
+
+
+class ApprovalStep(unittest.TestCase):
+    def test_a_redirected_input_is_no_terminal_on_any_platform(self):
+        with open(os.devnull, encoding="utf-8") as handle, mock.patch("sys.stdin", handle):
+            self.assertFalse(evidence.interactive_terminal())
+
+    def test_an_input_that_ends_gives_no_digits(self):
+        with mock.patch.object(evidence, "interactive_terminal", return_value=True), \
+                mock.patch("builtins.input", side_effect=EOFError):
+            with self.assertRaisesRegex(Refused, "no digits"):
+                evidence.confirm_digits("0" * 64)
+
+
+class Sections(unittest.TestCase):
+    TEXT = (b"# Title\n\nintro\n\n## One\n\ntext one\n\n### Same\n\nunder one\n\n"
+            b"## Two\n\n```\n## Not a heading\n```\n\n### Same\n\nunder two\n\n"
+            b"## Three ##\n\nend\n")
+
+    def test_a_section_runs_to_the_next_heading_of_the_same_or_a_higher_level(self):
+        self.assertEqual(evidence.section_bytes(self.TEXT, "One"),
+                         b"## One\n\ntext one\n\n### Same\n\nunder one\n\n")
+
+    def test_a_fenced_line_is_never_a_heading(self):
+        self.assertIn(b"## Not a heading", evidence.section_bytes(self.TEXT, "Two"))
+        with self.assertRaisesRegex(Refused, "names no section"):
+            evidence.section_bytes(self.TEXT, "Not a heading")
+
+    def test_a_closing_sequence_is_not_of_the_text(self):
+        self.assertEqual(evidence.section_bytes(self.TEXT, "Three"), b"## Three ##\n\nend\n")
+
+    def test_a_text_that_occurs_twice_is_named_by_the_headings_that_enclose_it(self):
+        with self.assertRaisesRegex(Refused, "more than one"):
+            evidence.section_bytes(self.TEXT, "Same")
+        self.assertEqual(evidence.section_bytes(self.TEXT, "Title > Two > Same"),
+                         b"### Same\n\nunder two\n\n")
+
+    def test_commonmark_heading_forms(self):
+        lines = ["   ### Three spaces\n", "    #### Four spaces\n", "#No space\n", "#\tTab\n",
+                 "#\n", "####### Seven\n", "~~~\n", "# Fenced\n", "~~~\n", "## After\n"]
+        self.assertEqual([(h.level, h.text) for h in evidence.headings_of(lines)],
+                         [(3, "Three spaces"), (1, "Tab"), (1, ""), (2, "After")])
+
+
+class ProvenanceLog(TempRepo):
+    def setUp(self):
+        super().setUp()
+        write(self.root, "docs/note.md", "# Note\n\n## Part\n\ntext\n\n## Other\n\nmore\n")
+        self.commit("the note")
+
+    def fields(self, **changes) -> Dict:
+        digest, kind = evidence.named_hash("docs/note.md", "Part")
+        fields = {"path": "docs/note.md", "section": "Part", "sha256": digest, "sha256_kind": kind,
+                  "tool": "Claude Code", "model": "claude-opus-5-5", "session": "s1",
+                  "task_id": "T011", "review_status": "pending"}
+        fields.update(changes)
+        return fields
+
+    def review_fields(self, follows: int, row: str = "Security-target review", **changes) -> Dict:
+        digest, kind = evidence.named_hash("docs/note.md", "Part")
+        fields = {"path": "docs/note.md", "section": "Part", "follows": follows, "sha256": digest,
+                  "sha256_kind": kind, "reviewer": "owner, repository owner", "row": row,
+                  "reviewed_sha256": digest, "owner_word": "accepted (2026-11-03)",
+                  "review_status": "accepted"}
+        fields.update(changes)
+        return fields
+
+    def lines(self) -> int:
+        path = self.root / evidence.PROVENANCE_LOG_REL
+        return len(path.read_bytes().splitlines()) if path.exists() else 0
+
+    def test_an_entry_gains_seq_prev_date_and_the_environment(self):
+        entry = provenance.add(self.fields())
+        self.assertEqual((entry["seq"], entry["prev_sha256"]), (0, evidence.ZERO_HASH))
+        self.assertEqual(entry["environment"]["path"], evidence.environment_rel())
+        self.assertEqual(self.lines(), 1)
+
+    def test_a_whole_file_entry(self):
+        digest, kind = evidence.named_hash("docs/note.md")
+        entry = provenance.add(self.fields(section=NONE, sha256=digest, sha256_kind=kind))
+        self.assertEqual(entry["section"], NONE)
+
+    def test_a_known_result_entry_needs_its_source(self):
+        fields = {"known_result": "SPECK32 second", "source": "paper, table 3, value 9",
+                  "tool": "Claude Code", "model": "m", "session": "s", "task_id": "T1",
+                  "review_status": "pending"}
+        self.assertEqual(provenance.add(dict(fields))["known_result"], "SPECK32 second")
+        del fields["source"]
+        with self.assertRaisesRegex(Refused, "source"):
+            provenance.add(fields)
+
+    def test_each_refusal_of_add_appends_nothing(self):
+        for changes, words in (({"tool": None}, "tool"), ({"section": "Absent"}, "no section"),
+                               ({"sha256": "0" * 64}, "differs"),
+                               ({"sha256_kind": "lf-normalized"}, "differs"),
+                               ({"review_status": "maybe"}, "review_status"),
+                               ({"seq": 7}, "the writer adds")):
+            fields = self.fields(**changes)
+            if changes.get("tool", 1) is None:
+                del fields["tool"]
+            with self.assertRaisesRegex(Refused, words):
+                provenance.add(fields)
+        self.assertEqual(self.lines(), 0)
+
+    def test_a_section_that_names_two_is_refused(self):
+        write(self.root, "docs/two.md", "# A\n\n## S\n\n# B\n\n## S\n")
+        with self.assertRaisesRegex(Refused, "more than one"):
+            provenance.add(self.fields(path="docs/two.md", section="S"))
+
+    def test_the_environment_guard_applies(self):
+        with mock.patch.object(evidence, "snapshot", return_value=dict(SNAPSHOT, python="3.10.12")):
+            with self.assertRaisesRegex(Refused, "python"):
+                provenance.add(self.fields())
+
+    def reviewable(self, decision: str = "Approved") -> int:
+        entry = provenance.add(self.fields())
+        digest = entry["sha256"]
+        self.add_row("Security-target review", decision, f"names {digest}")
+        return entry["seq"]
+
+    def test_a_review_entry_stands_on_its_row_at_head(self):
+        seq = self.reviewable()
+        entry = provenance.review(self.review_fields(seq))
+        self.assertEqual((entry["follows"], entry["review_status"]), (seq, "accepted"))
+
+    def test_changes_requested_needs_declined(self):
+        seq = self.reviewable("Declined")
+        with self.assertRaisesRegex(Refused, "does not read"):
+            provenance.review(self.review_fields(seq))
+        provenance.review(self.review_fields(seq, review_status="changes-requested"))
+
+    def test_each_refusal_of_review_appends_nothing(self):
+        seq = self.reviewable()
+        count = self.lines()
+        fake = "1" * 64
+        for changes, words in (({"reviewer": "Claude Code"}, "AI tool"),
+                               ({"reviewer": "the agent's session"}, "AI tool"),
+                               ({"row": "Absent review"}, "does not read"),
+                               ({"reviewed_sha256": fake}, "does not read"),
+                               ({"follows": seq + 1}, "latest entry"),
+                               ({"owner_word": ""}, "owner_word")):
+            with self.assertRaisesRegex(Refused, words):
+                provenance.review(dict(self.review_fields(seq), **changes))
+        fields = self.review_fields(seq)
+        del fields["reviewed_sha256"]
+        with self.assertRaisesRegex(Refused, "reviewed_sha256"):
+            provenance.review(fields)
+        self.assertEqual(self.lines(), count)
+
+    def test_a_working_tree_table_that_differs_refuses(self):
+        seq = self.reviewable()
+        self.add_row("Later", "Approved", "x", commit=False)
+        with self.assertRaisesRegex(Refused, "differs from HEAD"):
+            provenance.review(self.review_fields(seq))
+
+    def test_a_section_changed_after_its_entry_needs_an_add_first(self):
+        seq = self.reviewable()
+        write(self.root, "docs/note.md", "# Note\n\n## Part\n\nchanged\n\n## Other\n\nmore\n")
+        self.commit("changed")
+        digest = evidence.named_hash("docs/note.md", "Part")[0]
+        self.add_row("Security-target review 2", "Approved", f"names {digest}")
+        with self.assertRaisesRegex(Refused, "differs from the text of entry"):
+            provenance.review(self.review_fields(seq, "Security-target review 2"))
+
+    def test_a_chapter_the_row_names_by_its_own_hash(self):
+        seq = self.reviewable()
+        provenance.review(self.review_fields(seq))
+
+    def test_a_section_of_the_rationale_names_only_the_owner_design_review(self):
+        rel = evidence.FEATURE_REL + "/rationale.md"
+        write(self.root, rel, "# Rationale\n\n## Security target\n\ntext\n")
+        self.commit("rationale")
+        file_digest = evidence.named_hash(rel)[0]
+        digest, kind = evidence.named_hash(rel, "Security target")
+        entry = provenance.add(self.fields(path=rel, section="Security target", sha256=digest,
+                                           sha256_kind=kind))
+        self.add_row("Security-target review", "Approved", f"names {file_digest}")
+        self.add_row("Owner design review", "Approved", f"names {file_digest}")
+        fields = self.review_fields(entry["seq"], path=rel, section="Security target",
+                                    sha256=digest, sha256_kind=kind, reviewed_sha256=file_digest)
+        with self.assertRaisesRegex(Refused, "another family"):
+            provenance.review(fields)
+        fields["row"] = "Owner design review"
+        provenance.review(fields)
+
+    def test_the_review_of_an_evidence_record(self):
+        run = evidence.Run("validation", argv=ARGV)
+        with run:
+            path = run.finish("pass")
+        record = json.loads(path.read_bytes())
+        digest = evidence.sha256(path.read_bytes())
+        self.add_row("Record review", "Approved", f"names {digest}")
+        fields = {"record_id": record["record_id"], "sha256": digest, "sha256_kind": "raw",
+                  "reviewer": "owner", "row": "Record review", "reviewed_sha256": digest,
+                  "owner_word": "accepted (2026-11-03)", "review_status": "accepted"}
+        self.assertEqual(provenance.review(dict(fields))["record_id"], record["record_id"])
+        with self.assertRaisesRegex(Refused, "differs"):
+            provenance.review(dict(fields, sha256="0" * 64))
+        with self.assertRaisesRegex(Refused, "no record"):
+            provenance.review(dict(fields, record_id="absent"))
+
+
+def refused_entry(name: str = "CMAC R64", c: str = "0x1b") -> Dict:
+    return {"name": name, "kind": "polynomial", "degree": 64, "c": c,
+            "source": "research/004/refused_sources.py, SP 800-38B"}
+
+
+class ProtocolWriter(TempRepo):
+    """The refusals of the protocol change log's writer, on a stated history of the refused list."""
+
+    def later(self, **changes) -> Dict:
+        fields = {"rule": "Bias rule", "old_text": "a", "new_text": "b", "direction": "stricter",
+                  "readings": [], "reason": "why", "last_record_id": NONE, "results_known": []}
+        fields.update(changes)
+        return fields
+
+    def lines(self) -> int:
+        return len((self.root / evidence.PROTOCOL_LOG_REL).read_bytes().splitlines())
+
+    def owner(self, digits=None):
+        """The owner at an interactive terminal, typing the digits of the hash printed."""
+        typed = {}
+
+        def fake_input(prompt: str) -> str:
+            if prompt.startswith("type"):
+                return digits if digits is not None else typed["digest"][:16]
+            return "kept, for the owner's reason"
+
+        real = evidence.confirm_digits
+
+        def spy(digest: str) -> str:
+            typed["digest"] = digest
+            return real(digest)
+
+        return (mock.patch.object(evidence, "confirm_digits", side_effect=spy),
+                mock.patch.object(evidence, "interactive_terminal", return_value=True),
+                mock.patch("builtins.input", fake_input), mock.patch("builtins.print"))
+
+    def propose(self, fields: Dict, digits=None) -> Dict:
+        patches = self.owner(digits)
+        for patch in patches:
+            patch.start()
+        try:
+            return changelog.propose(fields)
+        finally:
+            for patch in patches:
+                patch.stop()
+
+    def test_a_later_entry_ends_in_the_approval_step(self):
+        entry = self.propose(self.later())
+        self.assertEqual(entry["approver"]["approval_confirmed"],
+                         evidence.later_entry_hash(entry)[:16])
+        self.assertEqual(entry["seq"], 1)
+        self.assertEqual(entry["environment"]["path"], evidence.environment_rel())
+        evidence.guard_protocol_log("inverse")
+
+    def test_no_interactive_terminal_appends_nothing(self):
+        count = self.lines()
+        with mock.patch("builtins.print"):
+            with self.assertRaisesRegex(Refused, "interactive terminal"):
+                changelog.propose(self.later())
+        self.assertEqual(self.lines(), count)
+
+    def test_digits_that_do_not_match_append_nothing(self):
+        count = self.lines()
+        with self.assertRaisesRegex(Refused, "digits"):
+            self.propose(self.later(), digits="0" * 16)
+        self.assertEqual(self.lines(), count)
+
+    def test_each_refusal_of_a_later_entry(self):
+        count = self.lines()
+        for missing in ("direction", "last_record_id", "results_known", "rule"):
+            fields = self.later()
+            del fields[missing]
+            with self.assertRaisesRegex(Refused, missing):
+                self.propose(fields)
+        with self.assertRaisesRegex(Refused, "readings"):
+            self.propose(self.later(direction="settled", readings=[]))
+        with self.assertRaisesRegex(Refused, "direction"):
+            self.propose(self.later(direction="looser"))
+        self.assertEqual(self.lines(), count)
+
+    def test_a_reading_set_aside_is_shown_and_takes_the_owners_decision(self):
+        reading = {"reading": "r", "set_aside": True, "case": "every candidate"}
+        entry = self.propose(self.later(direction="settled", readings=[reading]))
+        self.assertEqual(entry["readings"][0]["decision"], "kept, for the owner's reason")
+        evidence.guard_protocol_log("inverse")
+
+    # the refused list -----------------------------------------------------------------------
+
+    def list_version(self, entries: List[Dict], message: str) -> str:
+        data = evidence.pretty({"entries": entries})
+        write(self.root, changelog.REFUSED_REL, data)
+        self.commit(message)
+        return evidence.sha256(data)
+
+    def name_list(self, entries: List[Dict]) -> str:
+        """A committed version that a `refused_list` of the log names."""
+        digest = self.list_version(entries, "a named version")
+        self.propose(self.later(rule="Constant rule", refused_list={
+            "path": changelog.REFUSED_REL, "sha256": digest, "sha256_kind": "raw"}))
+        self.commit("entry")
+        return digest
+
+    def addition(self, digest: str) -> Dict:
+        return self.later(rule="Constant rule", refused_list={
+            "path": changelog.REFUSED_REL, "sha256": digest, "sha256_kind": "raw"})
+
+    def test_parse_reads_r15s_entry_format(self):
+        good = refused_entry()
+        sets = {"name": "PRESENT", "kind": "constant-set", "source": "main.pdf, table 2",
+                "word_bits": 8, "words": ["0x1", "0xff"]}
+        self.assertEqual(len(changelog.parse_refused_list(
+            evidence.pretty({"entries": [good, sets]}))), 2)
+        bad = [dict(good, kind="set"), dict(good, c="27"), {"name": "x"},
+               dict(sets, words=["0x1ff"]), dict(sets, words="0x1"), dict(good, degree="64"),
+               dict(good, source="")]
+        for entry in bad:
+            with self.assertRaises(ValueError, msg=str(entry)):
+                changelog.parse_refused_list(evidence.pretty({"entries": [entry]}))
+        with self.assertRaises(ValueError):
+            changelog.parse_refused_list(b"not json")
+
+    def test_an_addition_appends_and_its_approval_step_prints_the_entries_added(self):
+        self.name_list([refused_entry()])
+        digest = self.list_version([refused_entry(), refused_entry("GCM", "0x87")], "added")
+        patches = self.owner()
+        for patch in patches:
+            patch.start()
+        try:
+            printed = __import__("builtins").print
+            entry = changelog.propose(self.addition(digest))
+            calls = " ".join(str(c) for c in printed.call_args_list)
+        finally:
+            for patch in patches:
+                patch.stop()
+        self.assertEqual(entry["refused_list"]["sha256"], digest)
+        self.assertIn("GCM", calls)
+
+    def test_an_addition_whose_sha256_differs_from_head_is_refused(self):
+        self.name_list([refused_entry()])
+        count = self.lines()
+        with self.assertRaisesRegex(Refused, "differs from HEAD|at HEAD"):
+            self.propose(self.addition("0" * 64))
+        self.assertEqual(self.lines(), count)
+
+    def test_a_list_that_does_not_parse_at_head_is_refused(self):
+        self.name_list([refused_entry()])
+        data = b'{"entries": [{"name": "x"}]}\n'
+        write(self.root, changelog.REFUSED_REL, data)
+        self.commit("does not parse")
+        with self.assertRaisesRegex(Refused, "does not parse"):
+            self.propose(self.addition(evidence.sha256(data)))
+
+    def test_a_dropped_entry_of_the_latest_named_version_is_refused(self):
+        self.name_list([refused_entry(), refused_entry("GCM", "0x87")])
+        digest = self.list_version([refused_entry()], "dropped")
+        count = self.lines()
+        with self.assertRaisesRegex(Refused, "drops or changes"):
+            self.propose(self.addition(digest))
+        self.assertEqual(self.lines(), count)
+
+    def test_a_changed_word_of_the_latest_named_version_is_refused(self):
+        self.name_list([refused_entry(), refused_entry("GCM", "0x87")])
+        digest = self.list_version([refused_entry(), refused_entry("GCM", "0x89")], "changed")
+        with self.assertRaisesRegex(Refused, "drops or changes"):
+            self.propose(self.addition(digest))
+
+    def test_a_draft_that_no_entry_names_may_be_corrected(self):
+        self.name_list([refused_entry()])
+        self.list_version([refused_entry(), refused_entry("GCM", "0x87")], "a draft")
+        digest = self.list_version([refused_entry(), refused_entry("GCM", "0x88")], "corrected")
+        entry = self.propose(self.addition(digest))
+        self.assertEqual(entry["refused_list"]["sha256"], digest)
+
+    def test_a_list_missing_or_modified_is_refused_at_create(self):
+        with self.assertRaisesRegex(Refused, "refused-constants.json"):
+            changelog.check_refused_list_at_head()
+        self.list_version([refused_entry()], "the list")
+        changelog.check_refused_list_at_head()
+        write(self.root, changelog.REFUSED_REL, b"changed")
+        with self.assertRaisesRegex(Refused, "differs from HEAD"):
+            changelog.check_refused_list_at_head()
+
+    def test_create_runs_only_while_the_log_does_not_exist(self):
+        with self.assertRaisesRegex(Refused, "exists"):
+            changelog.create()
+
+
+    def test_a_create_that_dies_leaves_no_partial_log(self):
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        entries = [self.first_entry(), self.first_entry()]
+        patches = self.owner()
+        for patch in patches:
+            patch.start()
+        real = evidence.log_line
+        calls = []
+
+        def dying(entry: Dict) -> bytes:
+            calls.append(1)
+            if len(calls) == 2:
+                raise OSError("the disk is full")
+            return real(entry)
+
+        try:
+            with mock.patch.object(changelog, "build_first_entries", return_value=entries), \
+                    mock.patch.object(evidence, "log_line", side_effect=dying):
+                with self.assertRaises(OSError):
+                    changelog.create()
+        finally:
+            for patch in patches:
+                patch.stop()
+        self.assertFalse((self.root / evidence.PROTOCOL_LOG_REL).exists())
+        self.assertFalse(evidence.REPO.append_lock.exists())
+
+    def test_create_writes_the_first_entries_after_the_approval_step(self):
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        entries = [self.first_entry(), self.first_entry()]
+        patches = self.owner()
+        for patch in patches:
+            patch.start()
+        try:
+            with mock.patch.object(changelog, "build_first_entries", return_value=entries):
+                self.assertEqual(changelog.create(), 0)
+        finally:
+            for patch in patches:
+                patch.stop()
+        evidence.guard_protocol_log("inverse")
+        stored = [e for e, _ in evidence.log_entries(evidence.PROTOCOL_LOG_REL)]
+        self.assertEqual([e["seq"] for e in stored], [0, 1])
+        self.assertEqual(stored[0]["approver"]["approval_confirmed"],
+                         evidence.first_entries_hash(stored)[:16])
+        self.assertEqual(stored[0]["environment"]["path"], evidence.environment_rel())
+
+    def test_no_interactive_terminal_creates_nothing(self):
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        with mock.patch.object(changelog, "build_first_entries",
+                               return_value=[self.first_entry()]), mock.patch("builtins.print"):
+            with self.assertRaisesRegex(Refused, "interactive terminal"):
+                changelog.create()
+        self.assertFalse((self.root / evidence.PROTOCOL_LOG_REL).exists())
+
+    def test_a_first_entry_without_direction_or_readings_is_refused(self):
+        entry = self.first_entry()
+        del entry["rules"][0]["direction"]
+        with self.assertRaisesRegex(Refused, "direction"):
+            changelog.guard_entry_fields(entry)
+        entry = self.first_entry()
+        entry["rules"][0]["direction"] = "settled"
+        with self.assertRaisesRegex(Refused, "readings"):
+            changelog.guard_entry_fields(entry)
+
+    def test_a_repair_entry_needs_no_direction(self):
+        changelog.guard_entry_fields({"repair": {}, "last_record_id": NONE, "results_known": []})
+        with self.assertRaisesRegex(Refused, "results_known"):
+            changelog.guard_entry_fields({"repair": {}, "last_record_id": NONE})
+
+
+class FirstEntries(unittest.TestCase):
+    """The rows' readings and the confirmations, on stated text."""
+
+    PLACE = ("No change of rule: ad2c195, research R3. An entry of its own: b6a93f0, the cli "
+             "contract (\"Records and their hashes\", `stricter`: a refusal added); 252512a, spec "
+             "FR-039 (\"Tool validation\", `stricter`: words), research R4 (\"Bias rule\", "
+             "`stricter`: more); 7f42e03 and b9d9740, research R16 (\"Records and their hashes\", "
+             "`stricter`, the two together); ccfd9d1, research R15 (\"Constant rule\", `settled`, "
+             "with one reading marked `set_aside`, decided in the row); and 5192c73, research R16 "
+             "(\"Records and their hashes\", `stricter`: the status). The other commits changed "
+             "no place.")
+
+    def test_each_commit_confirmed_as_its_own_entry_with_each_rules_direction(self):
+        own = changelog.own_entries(self.PLACE)
+        self.assertEqual(sorted(own), sorted(["b6a93f0", "252512a", "7f42e03", "b9d9740", "ccfd9d1",
+                                              "5192c73"]))
+        self.assertEqual(own["252512a"], {"Tool validation": "stricter", "Bias rule": "stricter"})
+        self.assertEqual(own["ccfd9d1"], {"Constant rule": "settled"})
+        self.assertNotIn("ad2c195", own)
+
+    def test_the_owners_words_are_those_of_the_entry_of_its_own(self):
+        notes = "compared_to `5192c73aaa`: " + self.PLACE
+        self.assertTrue(changelog.confirmation(notes, "5192c73aaa").startswith("5192c73, research"))
+
+    def test_a_reading_is_read_with_its_case_and_decision(self):
+        notes = ("decided here, entry by entry, each change kept: RAT-036, FR-023's \"differ\", "
+                 "under which no table exists: kept, since the rule holds; the entry for ccfd9d1 "
+                 "(research R15), a reading, under which it refuses: kept, on the owner's word; "
+                 "and RAT-052, the placement, where every placement moves: restored, for a reason. "
+                 "`protocol_change.py create` reads this row")
+        readings = changelog.set_aside_readings(notes)
+        self.assertEqual(sorted(readings), ["RAT-036", "RAT-052", "ccfd9d1"])
+        self.assertEqual(readings["RAT-036"]["case"], "no table exists")
+        self.assertEqual(readings["RAT-036"]["decision"], "kept, since the rule holds")
+        self.assertEqual(readings["RAT-052"]["decision"], "restored, for a reason")
+        self.assertEqual(readings["RAT-052"]["case"], "every placement moves")
+        self.assertIs(readings["ccfd9d1"]["set_aside"], True)
+
+    def test_each_reading_required_is_named(self):
+        model = ("The first entries that hold one are those of RAT-036 and PRO-065, from earlier "
+                 "rounds, and of SEC-093, with every other entry of that kind.")
+        self.assertEqual(changelog.required_readings(model, self.PLACE),
+                         ["RAT-036", "PRO-065", "SEC-093", "ccfd9d1"])
+
+    def test_a_row_decided_that_no_entry_holds_is_refused(self):
+        with self.assertRaisesRegex(Refused, "do not exist"):
+            changelog.attach_readings([], {"RAT-036": {"reading": "r", "case": "c"}})
+
+    def test_a_reading_goes_to_the_rule_whose_place_it_names(self):
+        entry = {"row": {"id": "RAT-036"}, "rules": [
+            {"rule": "Eligibility", "old_text": {"FR-018": ""}, "direction": "stricter",
+             "readings": []},
+            {"rule": "Constant rule", "old_text": {"FR-023": ""}, "direction": "stricter",
+             "readings": []}]}
+        changelog.attach_readings([entry], {"RAT-036": {"reading": "FR-023's word", "case": "c"}})
+        self.assertEqual((entry["rules"][0]["readings"], entry["rules"][1]["direction"]),
+                         ([], "settled"))
+
+    def test_the_direction_of_a_rule(self):
+        self.assertEqual(changelog.direction_of("Bias rule", "Add"), "stricter")
+        self.assertEqual(changelog.direction_of("Bias rule", "Align"), "stricter")
+        self.assertEqual(changelog.direction_of("Bias rule", "Settle"), "settled")
+        self.assertEqual(changelog.direction_of("Bias rule", "Clarify"), "settled")
+        self.assertEqual(changelog.direction_of("Development inputs", "Stricter"), "settled")
+
+
+class FirstEntriesOfThisRepository(unittest.TestCase):
+    """FR-044's comparison on the committed lists, and the first entries `create` would write,
+    built with the refused list that T027 writes standing in; nothing is written."""
+
+    def test_they_agree_with_the_lists_and_the_confirmed_rows(self):
+        stored = json.loads((ROOT / changelog.PLACE_CHECK_REL).read_bytes())
+        self.assertEqual(changelog.check(stored["compared_to"]), stored)
+        fake = {"path": changelog.REFUSED_REL, "sha256": "0" * 64, "sha256_kind": "raw"}
+        with mock.patch.object(changelog, "check_refused_list_at_head", return_value=fake):
+            entries = changelog.build_first_entries()
+        listed: Dict[str, set] = {}
+        for item in stored["rounds"]:
+            listed.setdefault(item["heading"], set()).update(
+                row for change in item["changed"] for row in change["rows"])
+        rows = [e for e in entries if e["granularity"] == "round"]
+        commits = [e for e in entries if e["granularity"] == "commit"]
+        self.assertEqual(len(entries), len(rows) + len(commits))
+        self.assertEqual(sorted({e["commit"] for e in commits}),
+                         sorted({u["commit"] for u in stored["unmade"]
+                                 if u["commit"][:7] in changelog.own_entries(
+                                     evidence.family_row("Place check").notes)}))
+        for entry in entries:
+            changelog.guard_entry_fields(entry)
+            if any(rule["rule"] == changelog.CONSTANT_RULE for rule in entry["rules"]):
+                self.assertEqual(entry["refused_list"], fake)
+            else:
+                self.assertEqual(entry["refused_list"], NONE)
+        marked = [reading for entry in entries for rule in entry["rules"]
+                  for reading in rule["readings"] if reading.get("set_aside")]
+        self.assertTrue(marked)
+        self.assertTrue(all(reading["decision"].startswith("kept") for reading in marked))
+
+
+class RepairedLogs(ProtocolWriter):
+    """scripts/repair_log.py: the one append to a broken chain, by each log's writer."""
+
+    def provenance_log(self) -> str:
+        rel = evidence.PROVENANCE_LOG_REL
+        write(self.root, "docs/note.md", "# Note\n")
+        self.commit("note")
+        digest, kind = evidence.named_hash("docs/note.md")
+        fields = {"path": "docs/note.md", "section": NONE, "sha256": digest, "sha256_kind": kind,
+                  "tool": "t", "model": "m", "session": "s", "task_id": "T",
+                  "review_status": "pending"}
+        provenance.add(dict(fields))
+        provenance.add(dict(fields))
+        path = self.root / rel
+        path.write_bytes(path.read_bytes().replace(b'"seq": 1', b'"seq": 9'))
+        return rel
+
+    def run_repair(self, rel: str, row: str = "Log repair 1") -> int:
+        from scripts import repair_log
+        return repair_log.main(["--log", rel, "--approval", row])
+
+    def test_no_row_refuses_and_changes_nothing(self):
+        rel = self.provenance_log()
+        before = (self.root / rel).read_bytes()
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.run_repair(rel), 2)
+        self.assertEqual((self.root / rel).read_bytes(), before)
+
+    def test_a_row_that_names_another_seq_refuses(self):
+        rel = self.provenance_log()
+        self.add_row("Log repair 1", "Approved", f"{rel}, seq 5, 2026-11-03")
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.run_repair(rel), 2)
+
+    def test_a_row_that_names_another_log_refuses(self):
+        rel = self.provenance_log()
+        self.add_row("Log repair 1", "Approved", f"{evidence.CANDIDATE_LOG_REL}, seq 1, 2026-11-03")
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.run_repair(rel), 2)
+
+    def test_a_row_not_approved_refuses(self):
+        rel = self.provenance_log()
+        self.add_row("Log repair 1", "Declined", f"{rel}, seq 1, 2026-11-03")
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.run_repair(rel), 2)
+
+    def test_the_broken_file_is_kept_and_the_log_restored_with_its_repair_entry(self):
+        rel = self.provenance_log()
+        broken = (self.root / rel).read_bytes()
+        lines = broken.splitlines(keepends=True)
+        self.add_row("Log repair 1", "Approved", f"{rel}, seq 1, 2026-11-03")
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.run_repair(rel), 0)
+        restored = (self.root / rel).read_bytes().splitlines(keepends=True)
+        self.assertEqual(restored[0], lines[0])
+        self.assertEqual(len(restored), 2)
+        entry = json.loads(restored[1])
+        repair = entry["repair"]
+        self.assertEqual((entry["seq"], entry["prev_sha256"]), (1, evidence.sha256(lines[0])))
+        self.assertEqual((repair["break_seq"], repair["row"]), (1, "Log repair 1"))
+        kept = self.root / repair["broken_file"]["path"]
+        self.assertEqual(kept.read_bytes(), broken)
+        self.assertEqual(repair["broken_file"]["sha256"], evidence.sha256(broken))
+        self.assertEqual([e["seq"] for e in repair["entries_after"]], [9])
+        self.assertEqual(repair["entries_after"][0]["sha256"], evidence.sha256(lines[1]))
+        self.assertIsNone(evidence.first_break(rel))
+
+    def test_the_list_counts_an_entry_whose_citations_hold_and_no_other(self):
+        write(self.root, "docs/a.md", "# A\n")
+        self.commit("a")
+        digest = evidence.sha256(b"# A\n")
+        holds = {"seq": 3, "path": "docs/a.md", "section": NONE, "sha256": digest}
+        fails = {"seq": 4, "path": "docs/a.md", "section": NONE, "sha256": "0" * 64}
+        bare = {"seq": 5, "event": "proposed"}
+        cited = {"seq": 6, "event": "proposed"}
+        citing = {"seq": 7, "path": "docs/a.md", "section": NONE, "sha256": digest, "cites_seq": 6}
+        raw = [(e, json.dumps(e).encode() + b"\n") for e in (holds, fails, bare, cited, citing)]
+        rows = evidence.repair_list(raw)
+        self.assertEqual([r["counts"] for r in rows], [True, False, False, True, True])
+
+    def test_an_unparsable_line_never_counts(self):
+        rows = evidence.repair_list([(None, b"garbage\n")])
+        self.assertEqual((rows[0]["counts"], rows[0]["reason"]), (False, "the line does not parse"))
+
+    def test_the_protocol_log_goes_through_the_approval_step(self):
+        rel = evidence.PROTOCOL_LOG_REL
+        self.propose(self.later())
+        path = self.root / rel
+        path.write_bytes(path.read_bytes().replace(b'"seq": 1', b'"seq": 9'))
+        self.add_row("Log repair 1", "Approved", f"{rel}, seq 1, 2026-11-03")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            self.assertEqual(self.run_repair(rel), 2)         # no interactive terminal
+        patches = self.owner()
+        for patch in patches:
+            patch.start()
+        try:
+            self.assertEqual(self.run_repair(rel), 0)
+        finally:
+            for patch in patches:
+                patch.stop()
+        evidence.guard_protocol_log("inverse")
+        entry = evidence.log_entries(rel)[-1][0]
+        self.assertEqual(sorted(k for k in entry if k in ("rule", "direction", "readings")), [])
+        self.assertIn("repair", entry)
+
+
+class ClearLock(TempRepo):
+    def stale(self, descriptor: Dict = None, hours: float = 2.0, boot: str = None):
+        """A heavy-run lock whose holder is gone, taken `hours` before now."""
+        taken = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=hours)
+        content = evidence.lock_content("evidence_v3.py --kind frequency")
+        content["start"] = "gone"
+        content["time"] = taken.strftime("%Y-%m-%dT%H:%M:%SZ")
+        write(self.root, evidence.HEAVY_LOCK_REL, evidence.canonical(content))
+        partial = self.root / evidence.PARTIAL_REL / f"{content['pid']}-1"
+        write(partial, "run.json", evidence.pretty(descriptor or {
+            "kind": "validation", "directory": "validation", "model_id": "phyco-v2",
+            "variant_id": None, "candidate": None, "config": {"a": 1}, "inputs": NONE,
+            "projected_hours": 3.0, "workers": 1, "threads": 1}))
+        write(partial, "partial.json", b"{}")
+        self.boot = boot or "2020-01-01T00:00:00Z"
+        return content
+
+    def clear(self, rel: str = evidence.HEAVY_LOCK_REL) -> int:
+        from scripts import clear_lock
+        with mock.patch.object(evidence, "boot_time", return_value=self.boot), \
+                mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return clear_lock.main([rel])
+
+    def records(self, kind: str) -> List[Dict]:
+        return [r for _, r in evidence.iter_records(kind)]
+
+    def test_a_holder_that_runs_refuses_and_removes_nothing(self):
+        content = evidence.lock_content("cmd")
+        write(self.root, evidence.HEAVY_LOCK_REL, evidence.canonical(content))
+        self.boot = "2020-01-01T00:00:00Z"
+        self.assertEqual(self.clear(), 2)
+        self.assertTrue(evidence.REPO.heavy_lock.exists())
+
+    def test_a_holder_that_cannot_be_asked_refuses(self):
+        self.stale()
+        with mock.patch.object(evidence, "holder_runs", side_effect=evidence.ToolFailure("no")):
+            self.assertEqual(self.clear(), 2)
+        self.assertTrue(evidence.REPO.heavy_lock.exists())
+
+    def test_no_lock_refuses(self):
+        self.boot = "2020-01-01T00:00:00Z"
+        self.assertEqual(self.clear(), 2)
+
+    def test_a_dead_run_gets_its_inconclusive_record_and_the_hours_to_the_clearing(self):
+        content = self.stale()
+        self.assertEqual(self.clear(), 0)
+        self.assertFalse(evidence.REPO.heavy_lock.exists())
+        dead = self.records("validation")[0]
+        self.assertEqual((dead["status"], dead["classification"]), ("inconclusive", NONE))
+        self.assertIs(dead["heavy_run"], True)
+        self.assertEqual(dead["ended_outside"], NONE)
+        self.assertEqual(dead["hours"]["projected"], 3.0)
+        self.assertAlmostEqual(dead["hours"]["used"],
+                               evidence.hours_between(content["time"], dead["created_utc"]))
+        self.assertEqual(dead["command"], content["command"])
+        cleared = self.records("lock-cleared")[0]
+        self.assertEqual(cleared["lock"], content)
+        self.assertEqual(cleared["run_record"]["record_id"], dead["record_id"])
+        self.assertEqual(list((self.root / evidence.PARTIAL_REL).glob(f"{content['pid']}-*")), [])
+
+    def test_a_run_ended_from_outside_stops_at_the_boot_time(self):
+        now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=1)
+        boot = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+        content = self.stale(boot=boot)
+        self.assertEqual(self.clear(), 0)
+        dead = self.records("validation")[0]
+        self.assertEqual(dead["ended_outside"], boot)
+        self.assertAlmostEqual(dead["hours"]["used"], evidence.hours_between(content["time"], boot))
+        self.assertTrue([s for s in dead["limitations"] if "discarded unread" in s])
+
+    def test_fr_053s_test_gets_its_closing_projection(self):
+        self.stale({"kind": "projection", "run": "FR-053's test", "row": evidence.FEATURE_ROW,
+                    "inputs": NONE, "projected_hours": 1.0, "measured_speed": 5.0})
+        self.assertEqual(self.clear(), 0)
+        closing = self.records("projection")[0]
+        self.assertEqual((closing["status"], closing["row"]),
+                         ("inconclusive", evidence.FEATURE_ROW))
+        self.assertIn("ended there", closing["outputs_statement"])
+        self.assertGreater(closing["time_hours"], 1.9)
+        self.assertEqual(self.records("lock-cleared")[0]["run_record"]["record_id"],
+                         closing["record_id"])
+
+    def test_the_append_lock_gets_the_lock_cleared_record_alone(self):
+        content = evidence.lock_content("protocol_change.py create")
+        content["start"] = "gone"
+        write(self.root, evidence.APPEND_LOCK_REL, evidence.canonical(content))
+        self.boot = "2020-01-01T00:00:00Z"
+        self.assertEqual(self.clear(evidence.APPEND_LOCK_REL), 0)
+        self.assertFalse(evidence.REPO.append_lock.exists())
+        record = self.records("lock-cleared")[0]
+        self.assertEqual(record["run_record"], NONE)
+
+    def test_before_the_log_exists_it_cites_none(self):
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        content = evidence.lock_content("protocol_change.py create")
+        content["start"] = "gone"
+        write(self.root, evidence.APPEND_LOCK_REL, evidence.canonical(content))
+        self.boot = "2020-01-01T00:00:00Z"
+        self.assertEqual(self.clear(evidence.APPEND_LOCK_REL), 0)
+        record = self.records("lock-cleared")[0]
+        self.assertEqual((record["protocol_seq"], record["protocol_line_sha256"]), (NONE, NONE))
+
+    def test_the_environment_guard_refuses_and_removes_nothing(self):
+        self.stale()
+        with mock.patch.object(evidence, "snapshot", return_value=dict(SNAPSHOT, python="3.10.12")):
+            self.assertEqual(self.clear(), 2)
+        self.assertTrue(evidence.REPO.heavy_lock.exists())
+        self.assertEqual(self.records("lock-cleared"), [])
+
+    def test_a_run_on_a_candidate_runs_the_aborted_mode_before_the_lock_goes(self):
+        self.stale({"kind": "frequency", "directory": "candidates/cand-A1", "candidate": "cand-A1",
+                    "model_id": "cand-A1", "variant_id": None, "config": {}, "inputs": NONE,
+                    "projected_hours": 1.0, "workers": 1, "threads": 1})
+        seen = []
+
+        def aborted(path: Path) -> None:
+            seen.append((path.name, evidence.REPO.heavy_lock.exists()))
+
+        from scripts import clear_lock
+        with mock.patch.object(clear_lock, "run_aborted", side_effect=aborted):
+            self.assertEqual(self.clear(), 0)
+        self.assertEqual(len(seen), 1)
+        self.assertTrue(seen[0][1])
+
+
+class OwnerRecord(TempRepo):
+    PINS = "numpy==2.2.6\nscipy==1.15.3\n"
+
+    def owner_terminal(self, digits=None):
+        typed = {}
+
+        def fake_input(prompt: str) -> str:
+            return digits if digits is not None else typed["digest"][:16]
+
+        real = evidence.confirm_digits
+
+        def spy(digest: str) -> str:
+            typed["digest"] = digest
+            return real(digest)
+
+        return (mock.patch.object(evidence, "confirm_digits", side_effect=spy),
+                mock.patch.object(evidence, "interactive_terminal", return_value=True),
+                mock.patch("builtins.input", fake_input), mock.patch("builtins.print"),
+                mock.patch("sys.stderr"))
+
+    def run_script(self, *argv, digits=None) -> int:
+        from scripts import owner_record
+        write(self.root, "requirements.txt", self.PINS)
+        patches = self.owner_terminal(digits)
+        for patch in patches:
+            patch.start()
+        try:
+            with mock.patch.object(owner_record, "pinned_python", return_value="3.10.11"):
+                return owner_record.main(list(argv))
+        finally:
+            for patch in patches:
+                patch.stop()
+
+    def environment(self, **kwargs) -> int:
+        return self.run_script("environment", "--platform", evidence.platform_name(),
+                               "--by", "owner", **kwargs)
+
+    def stored(self) -> Dict:
+        return json.loads((self.root / evidence.environment_rel()).read_bytes())
+
+    def test_it_writes_the_record_with_its_approval_and_keeps_the_old_one(self):
+        old = (self.root / evidence.environment_rel()).read_bytes()
+        changed = dict(SNAPSHOT, windows_build="10.0.26400")
+        with mock.patch.object(evidence, "snapshot", return_value=changed):
+            self.assertEqual(self.environment(), 0)
+        record = self.stored()
+        self.assertEqual(record["kind"], "environment")
+        self.assertEqual(record["environment"], NONE)
+        self.assertEqual(record["snapshot"], changed)
+        self.assertEqual(record["approved_by"], "owner")
+        self.assertEqual(record["approval_confirmed"], evidence.approval_hash(record)[:16])
+        self.assertEqual((record["inputs"], record["outputs"], record["heavy_run"]),
+                         (NONE, NONE, False))
+        self.assertIsNone(record["model_id"])
+        digest = evidence.sha256(old)
+        kept = self.root / evidence.REP_REL / "versions" / f"{digest}.json"
+        self.assertEqual(kept.read_bytes(), old)
+        self.assertEqual(record["previous_sha256"], digest)
+        self.assertTrue(evidence.check_record_id(record))
+
+    def test_the_first_record_needs_no_log_and_cites_none(self):
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        (self.root / evidence.environment_rel()).unlink()
+        self.assertEqual(self.environment(), 0)
+        record = self.stored()
+        self.assertEqual((record["protocol_seq"], record["protocol_line_sha256"]), (NONE, NONE))
+
+    def test_a_pinned_version_that_differs_refuses(self):
+        before = (self.root / evidence.environment_rel()).read_bytes()
+        self.PINS = "numpy==2.2.5\n"
+        self.assertEqual(self.environment(), 2)
+        self.assertEqual((self.root / evidence.environment_rel()).read_bytes(), before)
+
+    def test_a_python_that_differs_from_r1_refuses(self):
+        with mock.patch.object(evidence, "snapshot", return_value=dict(SNAPSHOT, python="3.10.12")):
+            self.assertEqual(self.environment(), 2)
+
+    def test_another_platform_refuses(self):
+        other = "wsl" if evidence.platform_name() == "windows" else "windows"
+        self.assertEqual(self.run_script("environment", "--platform", other, "--by", "owner"), 2)
+
+    def test_no_interactive_terminal_writes_nothing(self):
+        from scripts import owner_record
+        write(self.root, "requirements.txt", self.PINS)
+        before = (self.root / evidence.environment_rel()).read_bytes()
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), \
+                mock.patch.object(owner_record, "pinned_python", return_value="3.10.11"):
+            code = owner_record.main(["environment", "--platform", evidence.platform_name(),
+                                      "--by", "owner"])
+        self.assertEqual(code, 2)
+        self.assertEqual((self.root / evidence.environment_rel()).read_bytes(), before)
+
+    def test_digits_that_do_not_match_write_nothing(self):
+        before = (self.root / evidence.environment_rel()).read_bytes()
+        self.assertEqual(self.environment(digits="0" * 16), 2)
+        self.assertEqual((self.root / evidence.environment_rel()).read_bytes(), before)
+
+    def test_markers_choose_the_pins_of_the_running_python(self):
+        from scripts import owner_record
+        text = ('numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"\n'
+                'numpy==2.5.4; python_version >= "3.14"\n# hypothesis==6.168.5\nnistrng==1.2.3\n')
+        self.assertEqual(owner_record.pins_for(text, "3.10.11"),
+                         {"numpy": "2.2.6", "nistrng": "1.2.3"})
+        self.assertEqual(owner_record.pins_for(text, "3.14.4"),
+                         {"numpy": "2.5.4", "nistrng": "1.2.3"})
+
+    def test_owner_provided_adds_an_entry_with_its_approval(self):
+        self.assertEqual(self.run_script(
+            "owner-provided", "--known", "SPECK64-d", "--value", "9", "--source",
+            "a paper, table 2", "--words", "use 9 (2026-11-03)", "--by", "owner"), 0)
+        entry = evidence.read_manifest()[-1]
+        self.assertEqual((entry["status"], entry["known"]), ("owner-provided", "SPECK64-d"))
+        self.assertEqual(entry["value_sha256"], evidence.sha256(b"9"))
+        self.assertEqual(entry["approval_confirmed"],
+                         evidence.approval_hash(entry)[:16])
+        self.assertEqual(entry["environment"]["path"], evidence.environment_rel())
+
+
+class Downloads(TempRepo):
+    R19 = """
+## R19. Downloads
+
+| File | Source | Size | Licence | Use | Without it |
+|------|--------|------|---------|-----|-----------------|
+| `Daemen.pdf`: Daemen et al., a title | https://example.invalid/Daemen.pdf | 604 kB, as CWI lists it | none stated | the theorem | none |
+| `SpongePRNG.pdf`: title | https://example.invalid/SpongePRNG.pdf | 12 bytes | none stated | forget | as above |
+
+Between the tables.
+
+| File | Source | Size | Licence | Use | Without it |
+|------|--------|------|---------|-----|-----------------|
+| `a-1.0-py3-none-any.whl` | PyPI | 5 bytes | MIT | tests | an open item |
+
+## R20. Next
+"""
+
+    def setUp(self):
+        super().setUp()
+        write(self.root, evidence.RESEARCH_REL, "# Research\n" + self.R19)
+        self.commit("R19")
+        self.download = self.root / "dl"
+
+    def script(self, *argv) -> int:
+        from scripts import downloads
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return downloads.main(list(argv))
+
+    def entry(self, name: str) -> Dict:
+        return {e["name"]: e for e in evidence.read_manifest()}[name]
+
+    def file(self, name: str, data: bytes) -> str:
+        return str(write(self.download, name, data))
+
+    def test_init_writes_one_approved_entry_per_file_of_the_tables(self):
+        self.assertEqual(self.script("init"), 0)
+        entries = evidence.read_manifest()
+        self.assertEqual([e["name"] for e in entries],
+                         ["Daemen.pdf", "SpongePRNG.pdf", "a-1.0-py3-none-any.whl"])
+        first = entries[0]
+        self.assertEqual((first["status"], first["size"], first["licence"]),
+                         ("approved", "604 kB, as CWI lists it", "none stated"))
+        self.assertEqual(first["source"], "https://example.invalid/Daemen.pdf")
+        self.assertEqual(first["environment"]["path"], evidence.environment_rel())
+        self.assertNotIn("sha256", first)
+
+    def test_init_exits_2_once_the_manifest_exists(self):
+        self.script("init")
+        self.assertEqual(self.script("init"), 2)
+
+    def test_the_manifest_is_a_record_of_its_own_kind(self):
+        self.script("init")
+        record = json.loads((self.root / evidence.DOWNLOADS_REL).read_bytes())
+        self.assertEqual((record["kind"], record["inputs"], record["outputs"]),
+                         ("downloads", NONE, NONE))
+        self.assertTrue(evidence.check_record_id(record))
+
+    def test_fetched_computes_the_hash_and_size_from_the_file(self):
+        self.script("init")
+        data = b"twelve bytes"
+        path = self.file("SpongePRNG.pdf", data)
+        self.assertEqual(self.script("fetched", "SpongePRNG.pdf", path), 0)
+        entry = self.entry("SpongePRNG.pdf")
+        self.assertEqual((entry["status"], entry["sha256"], entry["bytes"]),
+                         ("fetched", evidence.sha256(data), 12))
+        self.assertEqual(entry["local_path"], path)
+        self.assertRegex(entry["date_utc"], r"^\d{4}-")
+        kept = list((self.root / evidence.REP_REL / "versions").glob("*.json"))
+        self.assertEqual(len(kept), 1)
+
+    def test_a_size_that_differs_from_one_given_in_bytes_is_refused(self):
+        self.script("init")
+        self.assertEqual(self.script("fetched", "SpongePRNG.pdf", self.file("x", b"short")), 2)
+        self.assertEqual(self.entry("SpongePRNG.pdf")["status"], "approved")
+
+    def test_a_size_not_in_bytes_is_not_compared(self):
+        self.script("init")
+        self.assertEqual(self.script("fetched", "Daemen.pdf", self.file("Daemen.pdf", b"any")), 0)
+
+    def test_a_wheel_needs_pypis_hash_and_its_equal(self):
+        self.script("init")
+        data = b"12345"
+        path = self.file("a-1.0-py3-none-any.whl", data)
+        name = "a-1.0-py3-none-any.whl"
+        self.assertEqual(self.script("fetched", name, path), 2)
+        self.assertEqual(self.script("fetched", name, path, "--pypi-sha256", "0" * 64), 2)
+        self.assertEqual(self.script("fetched", name, path, "--pypi-sha256",
+                                     evidence.sha256(data)), 0)
+
+    def test_fetched_and_not_obtained_refuse_a_name_with_no_approved_entry(self):
+        self.script("init")
+        path = self.file("other.pdf", b"x")
+        self.assertEqual(self.script("fetched", "other.pdf", path), 2)
+        self.assertEqual(self.script("not-obtained", "other.pdf", "--reason", "gone"), 2)
+
+    def test_not_obtained_writes_the_reason(self):
+        self.script("init")
+        self.assertEqual(self.script("not-obtained", "Daemen.pdf", "--reason", "gone"), 0)
+        self.assertEqual((self.entry("Daemen.pdf")["status"], self.entry("Daemen.pdf")["reason"]),
+                         ("not obtained", "gone"))
+
+    def row(self, name: str, decision: str = "Approved", n: int = 1) -> None:
+        self.add_row(f"Download {n}", decision,
+                     f"`{name}`; source: https://example.invalid/{name}; size: 7 bytes; "
+                     "licence: none stated; stands in for: `Daemen.pdf`; 2026-11-03")
+
+    def test_approve_reads_its_row_at_head(self):
+        self.script("init")
+        self.assertEqual(self.script("approve", "Daemen-2.pdf"), 2)
+        self.row("Daemen-2.pdf", "Declined")
+        self.assertEqual(self.script("approve", "Daemen-2.pdf"), 2)
+        self.row("Daemen-2.pdf", n=2)
+        self.assertEqual(self.script("approve", "Daemen-2.pdf"), 0)
+        entry = self.entry("Daemen-2.pdf")
+        self.assertEqual((entry["status"], entry["size"], entry["row"]),
+                         ("approved", "7 bytes", "Download 2"))
+        self.assertEqual(entry["source"], "https://example.invalid/Daemen-2.pdf")
+        self.assertEqual(entry["licence"], "none stated")
+
+    def test_approve_refuses_a_name_an_entry_holds(self):
+        self.script("init")
+        self.row("Daemen.pdf")
+        self.assertEqual(self.script("approve", "Daemen.pdf"), 2)
+
+    def test_a_later_copy_is_refused_under_the_listed_name_and_entered_under_its_own(self):
+        self.script("init")
+        self.script("fetched", "SpongePRNG.pdf", self.file("first", b"twelve bytes"))
+        path = self.file("second", b"seven b")
+        self.assertEqual(self.script("fetched", "SpongePRNG.pdf", path), 2)
+        self.row("SpongePRNG-2.pdf")
+        self.assertEqual(self.script("approve", "SpongePRNG-2.pdf"), 0)
+        self.assertEqual(self.script("fetched", "SpongePRNG-2.pdf", path), 0)
+        self.assertEqual(self.entry("SpongePRNG-2.pdf")["status"], "fetched")
+
+    def test_the_real_tables_hold_twelve_files(self):
+        from scripts import downloads
+        previous = evidence.use_repo(CODE_ROOT)
+        self.addCleanup(evidence.use_repo, previous.root)
+        rows = downloads.r19_rows()
+        self.assertEqual(len(rows), 12)
+        self.assertEqual(rows[4]["name"], "2657")
+        self.assertEqual(rows[-1]["size"], "16,740 bytes")
+
+    def test_the_file_is_read_under_isolated_mode_and_never_run(self):
+        from scripts import downloads
+        self.assertEqual(downloads.read_file(Path(self.file("f", b"abc"))),
+                         (evidence.sha256(b"abc"), 3))
+        with mock.patch.object(downloads.subprocess, "run", wraps=subprocess.run) as run:
+            downloads.read_file(Path(self.file("g", b"abc")))
+        command = run.call_args[0][0]
+        self.assertEqual(command[1], "-I")
+        self.assertNotEqual(Path(run.call_args[1]["cwd"]), self.download)
 
 
 if __name__ == "__main__":

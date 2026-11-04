@@ -43,6 +43,7 @@ DESIGN_REL = FEATURE_REL + "/design.md"
 PROTOCOL_LOG_REL = "research/004/protocol-changes.jsonl"
 CANDIDATE_LOG_REL = "research/004/candidates.jsonl"
 PROVENANCE_LOG_REL = REP_REL + "/provenance.jsonl"
+DOWNLOADS_REL = REP_REL + "/downloads.json"
 SIDECAR_REL = "vectors/phyco-v3/MANIFEST.json"
 SUPERSEDED_REL = "research/004/candidates/superseded.json"
 REFUSED_LIST_REL = "research/004/refused-constants.json"
@@ -58,6 +59,7 @@ APPROVAL_FIELDS = ("freeze_status", "approved_by", "approved_utc", "approval_wor
 SELF_HASH_FIELDS = ("draft_sha256",)
 PLACEHOLDER = "<record_id>"
 PARTIAL_REL = LOCAL_REL + "/.partial"
+RUN_FILE = "run.json"
 STATUSES = ("pass", "fail", "inconclusive", "not evaluated", "blocked")
 
 CLAIMABLE_SIZES = (4, 8, 16)
@@ -132,7 +134,8 @@ class Repo:
         return self.path(APPEND_LOCK_REL)
 
 
-REPO = Repo(Path(__file__).resolve().parents[1])
+ROOT_OF_CODE = Path(__file__).resolve().parents[1]
+REPO = Repo(ROOT_OF_CODE)
 
 
 def use_repo(root: Path) -> Repo:
@@ -213,6 +216,78 @@ def hash_entry(rel: str) -> Dict[str, str]:
     kind = hash_kind(rel)
     data = REPO.path(rel).read_bytes()
     return {"sha256": sha256(lf(data) if kind == "lf-normalized" else data), "kind": kind}
+
+
+# ------------------------------------------------------------------------- headings and sections
+
+
+FENCE_LINE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+ATX_HEADING = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*?))?[ \t]*$")
+ATX_CLOSING = re.compile(r"(?:^|[ \t]+)#+$")
+
+
+@dataclass
+class Heading:
+    line: int
+    level: int
+    text: str
+    path: str
+
+
+def headings_of(lines: Sequence[str]) -> List[Heading]:
+    """Each ATX heading outside fenced code blocks, as CommonMark reads them, with the texts of the
+    headings that enclose it, from the highest level down, and its own, joined by " > "."""
+    found: List[Heading] = []
+    fence: Optional[str] = None
+    stack: List[Heading] = []
+    for number, raw in enumerate(lines):
+        line = raw.rstrip("\n")
+        fenced = FENCE_LINE.match(line)
+        if fence is not None:
+            if fenced and fenced.group(1)[0] == fence[0] and len(fenced.group(1)) >= len(fence) \
+                    and not fenced.group(2).strip():
+                fence = None
+            continue
+        if fenced and not (fenced.group(1)[0] == "`" and "`" in fenced.group(2)):
+            fence = fenced.group(1)
+            continue
+        match = ATX_HEADING.match(line)
+        if match:
+            level = len(match.group(1))
+            text = ATX_CLOSING.sub("", match.group(2) or "").strip()
+            while stack and stack[-1].level >= level:
+                stack.pop()
+            heading = Heading(number, level, text, " > ".join([h.text for h in stack] + [text]))
+            stack.append(heading)
+            found.append(heading)
+    return found
+
+
+def section_bytes(data: bytes, section: str) -> bytes:
+    """A section's text, from its heading line to the line before the next heading of the same or a
+    higher level, or to the file's end, each line with its final LF (research R16; REP-088)."""
+    lines = data.decode("utf-8").split("\n")
+    heads = headings_of(lines)
+    matches = [h for h in heads if section in (h.text, h.path)]
+    if not matches:
+        raise Refused(f"{section!r} names no section")
+    if len(matches) > 1:
+        raise Refused(f"{section!r} names more than one section")
+    head = matches[0]
+    later = [h.line for h in heads if h.line > head.line and h.level <= head.level]
+    end = later[0] if later else len(lines)
+    text = "\n".join(lines[head.line:end])
+    return (text + "\n" if later else text).encode("utf-8")
+
+
+def named_hash(rel: str, section: str = NONE) -> Tuple[str, str]:
+    """The SHA-256 and kind of a file, or of a section of it, as data-model section 14 states."""
+    entry = hash_entry(rel)
+    if section == NONE:
+        return entry["sha256"], entry["kind"]
+    data = REPO.path(rel).read_bytes()
+    return sha256(section_bytes(lf(data) if entry["kind"] == "lf-normalized" else data,
+                                section)), entry["kind"]
 
 
 # ---------------------------------------------------------------------------------- record IDs
@@ -588,22 +663,42 @@ def log_entries(rel: str) -> List[Tuple[Dict, bytes]]:
         return []
     out = []
     for raw in path.read_bytes().splitlines(keepends=True):
-        out.append((json.loads(raw.decode("utf-8")), raw))
+        try:
+            out.append((json.loads(raw.decode("utf-8")), raw))
+        except ValueError:
+            raise Refused(f"{rel}: the chain breaks: a line does not parse") from None
     return out
 
 
 ZERO_HASH = "0" * 64
 
 
+def first_break(rel: str) -> Optional[Tuple[int, str]]:
+    """The seq of the first line the chain does not hold, with the cause, or None."""
+    path = REPO.path(rel)
+    previous = ZERO_HASH
+    lines = path.read_bytes().splitlines(keepends=True) if path.exists() else []
+    for seq, raw in enumerate(lines):
+        try:
+            entry = json.loads(raw.decode("utf-8"))
+        except ValueError:
+            return seq, "the line does not parse"
+        if not raw.endswith(b"\n"):
+            return seq, "the line has no final LF"
+        if not isinstance(entry, dict) or entry.get("seq") != seq:
+            return seq, "its seq is not its position"
+        if entry.get("prev_sha256") != previous:
+            return seq, "its prev_sha256 is not the SHA-256 of the line before"
+        previous = sha256(raw)
+    return None
+
+
 def check_chain(rel: str) -> List[Tuple[Dict, bytes]]:
     """Exit 2 if the chain is broken: seq 0, 1, 2, ... and each prev_sha256 over the line before."""
-    entries = log_entries(rel)
-    previous = ZERO_HASH
-    for seq, (entry, raw) in enumerate(entries):
-        if entry.get("seq") != seq or entry.get("prev_sha256") != previous:
-            raise Refused(f"{rel}: the chain breaks at line {seq}")
-        previous = sha256(raw)
-    return entries
+    broken = first_break(rel)
+    if broken is not None:
+        raise Refused(f"{rel}: the chain breaks at line {broken[0]}: {broken[1]}")
+    return log_entries(rel)
 
 
 def guard_oplist(oplist_sha256: str) -> None:
@@ -667,14 +762,14 @@ def guard_protocol_log(kind: str) -> Tuple[Any, Any]:
     return last["seq"], sha256(raw)
 
 
-def entry_citations(entry: Dict) -> List[Tuple[str, str]]:
-    """What an entry cites: each object with `path` and `sha256`, and each record by its ID."""
-    found: List[Tuple[str, str]] = []
+def entry_citations(entry: Dict) -> List[Tuple[str, str, str]]:
+    """What an entry cites: each object with `path` and `sha256`, and any `section` it has."""
+    found: List[Tuple[str, str, str]] = []
 
     def walk(node: Any) -> None:
         if isinstance(node, dict):
             if isinstance(node.get("path"), str) and isinstance(node.get("sha256"), str):
-                found.append((node["path"], node["sha256"]))
+                found.append((node["path"], node["sha256"], node.get("section", NONE)))
             for value in node.values():
                 walk(value)
         elif isinstance(node, list):
@@ -684,36 +779,90 @@ def entry_citations(entry: Dict) -> List[Tuple[str, str]]:
     return found
 
 
-def entry_counts(entry: Dict, later: Sequence[Dict]) -> Tuple[bool, str]:
-    """data-model section 3's rule: an entry counts where everything it cites exists at HEAD with
-    the SHA-256 it names; one that cites nothing counts only where a later entry cites it."""
+def citation_holds(rel: str, digest: str, section: str = NONE) -> bool:
+    """Whether a file, or a section of it, has the SHA-256 at HEAD, on either kind of hash."""
+    blob = show(rel)
+    if blob is None:
+        return False
+    if section == NONE:
+        return digest in (sha256(blob), sha256(lf(blob)))
+    try:
+        return digest == sha256(section_bytes(lf(blob), section))
+    except Refused:
+        return False
+
+
+# The fields by which a log's entry cites an earlier one by its seq.
+SEQ_CITATIONS = ("cites_seq", "follows", "closes", "corrects")
+
+
+def cited_later(entry: Dict, raw: bytes, later: Sequence[Dict]) -> bool:
+    """Whether a later entry that counts, or a record, cites the entry by seq or SHA-256."""
+    digest = sha256(raw)
+    for other in later:
+        if any(other.get(name) == entry.get("seq") for name in SEQ_CITATIONS):
+            return True
+        if digest in canonical(other).decode("utf-8"):
+            return True
+    return any(digest in canonical(record).decode("utf-8") for _, record in iter_records())
+
+
+def entry_counts(entry: Dict, raw: bytes, later: Sequence[Dict]) -> Tuple[bool, str]:
+    """Data-model section 3's rule: an entry counts where everything it cites exists at HEAD with
+    the SHA-256 it names; one that cites nothing counts only where a later entry that counts, or a
+    record, cites it."""
     cited = entry_citations(entry)
-    for rel, digest in cited:
-        blob = show(rel)
-        if blob is None or digest not in (sha256(blob), sha256(lf(blob))):
+    for rel, digest, section in cited:
+        if not citation_holds(rel, digest, section):
             return False, f"{rel} does not hold {digest} at HEAD"
     last_id = entry.get("last_record_id")
     known = [r for r in entry.get("results_known") or [] if isinstance(r, str)]
     for record_id in ([last_id] if last_id and last_id != NONE else []) + known:
         if find_record(record_id) is None:
             return False, f"record {record_id} does not exist at HEAD"
+    reviewed = entry.get("reviewed_sha256")
+    if reviewed and not [r for r in parse_table(table_section(show(SPEC_REL).decode("utf-8")))
+                         if r.name == entry.get("row") and reviewed in r.notes]:
+        return False, f"its row does not name {reviewed} at HEAD"
+    if "rules" in entry:
+        from protocol import changelog
+        if not changelog.rule_texts_hold(entry):
+            return False, "a commit it names does not give its rule's text"
+        return True, "every commit it names gives its rule's text"
     if cited or (last_id and last_id != NONE):
         return True, "every citation holds at HEAD"
-    seq = entry.get("seq")
-    for other in later:
-        if other.get("cites_seq") == seq or other.get("follows") == seq:
-            return True, "a later entry cites it"
+    if cited_later(entry, raw, later):
+        return True, "a later entry or a record cites it"
     return False, "it cites no record, and no later entry cites it"
 
 
-def repair_list(entries_after: Sequence[Tuple[Dict, bytes]]) -> List[Dict]:
-    """Per entry after the break, its seq, its SHA-256 in the broken file and whether it counts."""
-    out = []
-    plain = [e for e, _ in entries_after]
-    for i, (entry, raw) in enumerate(entries_after):
-        counts, reason = entry_counts(entry, plain[i + 1:])
+def repair_list(entries_after: Sequence[Tuple[Optional[Dict], bytes]]) -> List[Dict]:
+    """Per entry after the break, its seq, its SHA-256 in the broken file and whether it counts,
+    the last first, since an entry may count by a later one that counts."""
+    out: List[Dict] = []
+    counting: List[Dict] = []
+    for entry, raw in reversed(entries_after):
+        if entry is None:
+            out.append({"seq": None, "sha256": sha256(raw), "counts": False,
+                        "reason": "the line does not parse"})
+            continue
+        counts, reason = entry_counts(entry, raw, counting)
+        if counts:
+            counting.append(entry)
         out.append({"seq": entry.get("seq"), "sha256": sha256(raw), "counts": counts,
                     "reason": reason})
+    return list(reversed(out))
+
+
+def lines_after(data: bytes, break_seq: int) -> List[Tuple[Optional[Dict], bytes]]:
+    """A broken file's lines from the break on, each parsed if it parses."""
+    out: List[Tuple[Optional[Dict], bytes]] = []
+    for raw in data.splitlines(keepends=True)[break_seq:]:
+        try:
+            parsed = json.loads(raw.decode("utf-8"))
+            out.append((parsed if isinstance(parsed, dict) else None, raw))
+        except ValueError:
+            out.append((None, raw))
     return out
 
 
@@ -724,10 +873,63 @@ def guard_repair_list(entry: Dict) -> None:
     path = REPO.path(broken["path"])
     if not path.exists() or sha256(path.read_bytes()) != broken["sha256"]:
         raise Refused(f"repair entry {entry.get('seq')}: the broken file is not as named")
-    lines = path.read_bytes().splitlines(keepends=True)
-    after = [(json.loads(raw.decode("utf-8")), raw) for raw in lines[repair["break_seq"]:]]
+    after = lines_after(path.read_bytes(), repair["break_seq"])
     if repair_list(after) != repair["entries_after"]:
         raise Refused(f"repair entry {entry.get('seq')}: its list differs from the repository")
+
+
+def guard_repair_row(rel: str, row_name: str, break_seq: int) -> None:
+    """The one append to a broken chain waits for its row "Log repair <n>", Approved at HEAD, which
+    names that log and the seq of the break (cli, Hash-chained logs; PRO-076)."""
+    rows = [r for r in head_table() if r.name == row_name]
+    if not re.fullmatch(r"Log repair \d+", row_name) or not rows:
+        raise Refused(f"no row {row_name!r} at HEAD")
+    row = rows[-1]
+    if row.decision != "Approved":
+        raise Refused(f"the row {row_name!r} does not read Approved at HEAD")
+    if rel not in row.notes or not re.search(rf"seq\W{{0,3}}{break_seq}\b", row.notes):
+        raise Refused(f"the row {row_name!r} does not name {rel} and seq {break_seq}")
+
+
+def repair_fields(rel: str, row_name: str) -> Dict:
+    """A broken log's `repair` fields, the broken file kept unchanged with its SHA-256, through the
+    row's guard; the log itself is restored by restore_chain under the append lock."""
+    broken = first_break(rel)
+    if broken is None:
+        raise Refused(f"{rel}: its chain holds")
+    break_seq, cause = broken
+    guard_repair_row(rel, row_name, break_seq)
+    source = REPO.path(rel)
+    data = source.read_bytes()
+    digest = sha256(data)
+    keep = source.parent / "broken" / f"{source.stem}-{digest}.jsonl"
+    keep.parent.mkdir(parents=True, exist_ok=True)
+    if not keep.exists():
+        keep.write_bytes(data)
+    return {"break_seq": break_seq, "cause": cause, "row": row_name,
+            "broken_file": {"path": rel_to_repo(keep), "sha256": digest, "sha256_kind": "raw"},
+            "restored": f"the {break_seq} lines before the break, as stored",
+            "entries_after": repair_list(lines_after(data, break_seq))}
+
+
+def restore_chain(rel: str, repair: Dict, fields: Optional[Dict] = None,
+                  finish: Optional[Callable[[Dict], Dict]] = None) -> Dict:
+    """The restored log: the lines before the break as stored and the `repair` entry chained to
+    the last of them. `finish` gives a writer's approval step the entry before it is written."""
+    with AppendLock(rel):
+        path = REPO.path(rel)
+        kept = path.read_bytes().splitlines(keepends=True)[:repair["break_seq"]]
+        entry = dict(fields or {})
+        entry.update({"seq": len(kept), "repair": repair,
+                      "prev_sha256": sha256(kept[-1]) if kept else ZERO_HASH,
+                      "date_utc": utc_now()})
+        if finish is not None:
+            entry = finish(entry)
+        data = b"".join(kept) + log_line(entry)
+        temporary = path.with_name(path.name + ".tmp")
+        temporary.write_bytes(data)
+        os.replace(temporary, path)
+    return entry
 
 
 def is_finished(record: Dict) -> bool:
@@ -961,19 +1163,24 @@ def process_start(pid: int) -> Optional[str]:
 
 
 def holder_runs(lock: Dict) -> bool:
-    """Whether a process with the lock's PID and start time runs, in the lock's environment."""
+    """Whether a process with the lock's PID and start time runs, in the lock's environment; a
+    ToolFailure or an OSError where that environment cannot be asked."""
+    pid = int(lock["pid"])
     if lock["environment"] == platform_name():
-        return process_start(int(lock["pid"])) == lock["start"]
+        return process_start(pid) == lock["start"]
     if lock["environment"] == "wsl":
-        cmd = ("wsl.exe", "-e", "cat", f"/proc/{lock['pid']}/stat")
+        cmd = ("wsl.exe", "-e", "sh", "-c", f"cat /proc/{pid}/stat 2>/dev/null; true")
         out = subprocess.run(cmd, capture_output=True, text=True)
         if out.returncode != 0:
-            return False
-        return out.stdout.rsplit(")", 1)[1].split()[19] == lock["start"]
+            raise ToolFailure("wsl.exe cannot be asked whether the lock's holder runs")
+        return bool(out.stdout) and out.stdout.rsplit(")", 1)[1].split()[19] == lock["start"]
     cmd = ("powershell.exe", "-NoProfile", "-Command",
-           f"(Get-Process -Id {lock['pid']}).StartTime.ToFileTimeUtc()")
+           f"$p = Get-Process -Id {pid} -ErrorAction SilentlyContinue; "
+           f"if ($p) {{ $p.StartTime.ToFileTimeUtc() }}")
     out = subprocess.run(cmd, capture_output=True, text=True)
-    return out.returncode == 0 and out.stdout.strip() == lock["start"]
+    if out.returncode != 0:
+        raise ToolFailure("powershell.exe cannot be asked whether the lock's holder runs")
+    return out.stdout.strip() == lock["start"]
 
 
 def boot_time(environment: str) -> str:
@@ -1020,21 +1227,34 @@ def take_lock(path: Path, command: str) -> Dict:
         try:
             state = "its holder still runs" if holder_runs(read_lock(path)) \
                 else "its holder no longer runs; scripts/clear_lock.py removes it"
-        except (ValueError, KeyError, OSError):
+        except (ValueError, KeyError, OSError, ToolFailure):
             state = "its holder cannot be read"
         raise Refused(f"{path.name} is held: {state}") from None
     return content
 
 
 class HeavyRunLock:
-    """data/heavy-run.lock, removed on exit; only scripts/clear_lock.py removes a stale one."""
+    """data/heavy-run.lock, removed on exit; only scripts/clear_lock.py removes a stale one. The
+    run's description goes under its temporary directory first, so that a run that dies holding
+    the lock still gets the record of its kind (data-model section 1)."""
 
-    def __init__(self, command: str):
+    def __init__(self, command: str, description: Optional[Dict] = None,
+                 partial: Optional[Path] = None):
         self.command = command
+        self.description = description
+        self.partial = partial
         self.content: Optional[Dict] = None
 
     def __enter__(self) -> "HeavyRunLock":
-        self.content = take_lock(REPO.heavy_lock, self.command)
+        if self.partial is not None:
+            self.partial.mkdir(parents=True, exist_ok=True)
+            (self.partial / RUN_FILE).write_bytes(pretty(self.description))
+        try:
+            self.content = take_lock(REPO.heavy_lock, self.command)
+        except Refused:
+            if self.partial is not None:
+                shutil.rmtree(self.partial, ignore_errors=True)
+            raise
         return self
 
     def __exit__(self, *exc: Any) -> None:
@@ -1063,24 +1283,66 @@ class AppendLock:
         REPO.append_lock.unlink(missing_ok=True)
 
 
-def append_entry(rel: str, entry: Dict, allow_broken: bool = False) -> Dict:
+def append_entry(rel: str, entry: Dict, finish: Optional[Callable[[Dict], Dict]] = None) -> Dict:
     """One append to a hash-chained log: under the lock, the chain checked up to its last line,
-    `seq`, `prev_sha256` and `date_utc` added by the writer (research R16)."""
+    `seq`, `prev_sha256` and `date_utc` added by the writer (research R16). `finish` gives a
+    writer's approval step the complete entry before it is written."""
     with AppendLock(rel):
         path = REPO.path(rel)
         data = path.read_bytes() if path.exists() else b""
         lines = data.splitlines(keepends=True)
-        if not allow_broken:
-            check_chain(rel)
+        check_chain(rel)
         record = dict(entry)
         record["seq"] = len(lines)
         record["prev_sha256"] = sha256(lines[-1]) if lines else ZERO_HASH
         record.setdefault("date_utc", utc_now())
+        if finish is not None:
+            record = finish(record)
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "ab") as handle:
-            handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False).encode("utf-8")
-                         + b"\n")
+            handle.write(log_line(record))
     return record
+
+
+def log_line(entry: Dict) -> bytes:
+    """One entry of a .jsonl log: sorted keys, characters as they are, one object per line."""
+    return json.dumps(entry, sort_keys=True, ensure_ascii=False).encode("utf-8") + b"\n"
+
+
+def interactive_terminal() -> bool:
+    """Whether standard input is a terminal. On Windows the NUL device passes isatty, so the console
+    is asked as well; a Git Bash window's pipe is no terminal, and PowerShell's console is."""
+    if not sys.stdin.isatty():
+        return False
+    if os.name != "nt":
+        return True
+    import ctypes
+    import msvcrt
+    kernel = ctypes.windll.kernel32
+    kernel.GetConsoleMode.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+    mode = ctypes.c_ulong()
+    handle = ctypes.c_void_p(msvcrt.get_osfhandle(sys.stdin.fileno()))
+    return bool(kernel.GetConsoleMode(handle, ctypes.byref(mode)))
+
+
+def confirm_digits(digest: str) -> str:
+    """The first 16 hex digits of the hash, which the owner types at an interactive terminal."""
+    if not interactive_terminal():
+        raise Refused("the approval step needs an interactive terminal: it is the owner's own act")
+    try:
+        typed = input("type its first 16 hex digits: ").strip()
+    except EOFError:
+        raise Refused("the approval step read no digits") from None
+    if typed != digest[:16]:
+        raise Refused("the digits typed are not the first 16 of the approval hash")
+    return typed
+
+
+def approval_step(digest: str) -> str:
+    """An owner's own act, which the agent never performs: it prints the hash, kind `canonical`,
+    and writes nothing unless the owner types its first 16 digits (spec FR-044; REP-083)."""
+    print(f"approval hash (canonical): {digest}")
+    return confirm_digits(digest)
 
 
 # ------------------------------------------------------------------------------- the design file
@@ -1105,7 +1367,9 @@ def pinned_entries() -> List[Tuple[str, str]]:
     if not path.exists():
         return []
     record = json.loads(path.read_bytes().decode("utf-8"))
-    return entry_citations(record) if record.get("freeze_status") == "approved" else []
+    if record.get("freeze_status") != "approved":
+        return []
+    return [(rel, digest) for rel, digest, _ in entry_citations(record)]
 
 
 def keep_version(subdir: str, data: bytes) -> None:
@@ -1238,10 +1502,17 @@ class Run:
             raise Refused(f"{rel_to_repo(stated)} exists, and it is written once")
         self.read_citations()
         if self.heavy:
-            self.lock = HeavyRunLock(command_line(self.argv))
+            self.lock = HeavyRunLock(command_line(self.argv), self.description(), self.tmp)
             self.lock.__enter__()
         self.clock = time.monotonic()
         return self
+
+    def description(self) -> Dict:
+        """What scripts/clear_lock.py needs for this run's record if it dies holding the lock."""
+        return {"kind": self.kind, "candidate": self.candidate, "model_id": self.model_id,
+                "variant_id": self.variant_id, "directory": self.directory, "config": self.config,
+                "inputs": self.inputs, "projected_hours": self.projected_hours,
+                "workers": self.workers, "threads": self.threads}
 
     def read_citations(self) -> None:
         """What the record cites, as it stands when the run starts; the copies come with the
@@ -1392,14 +1663,35 @@ def write_simple_record(kind: str, directory: str, fields: Dict, status: str = "
 def write_projection(*, run: str, row: str, inputs: Any, measured_speed: Any,
                      projected_hours: float, time_hours: float, statement: Optional[str] = None,
                      status: str = "pass", argv: Sequence[str] = (),
-                     code_files: Iterable[str] = (), writes_evidence: bool = True) -> Path:
+                     code_files: Iterable[str] = (), writes_evidence: bool = True,
+                     extra: Optional[Dict] = None) -> Path:
     """Every 60 s projection and timing probe; not evidence (data-model section 1). FR-053's test
     with two worker counts states what it did in place of the sentence on its outputs."""
     fields = {"run": run, "row": row, "inputs": inputs, "measured_speed": measured_speed,
               "projected_hours": projected_hours, "time_hours": time_hours,
               "outputs_statement": statement or DISCARDED}
+    fields.update(extra or {})
     return write_simple_record("projection", "projections", fields, status=status, argv=argv,
                                code_files=code_files, writes_evidence=writes_evidence)
+
+
+def read_manifest() -> List[Dict]:
+    """The downloads manifest's entries; none before it exists."""
+    path = REPO.path(DOWNLOADS_REL)
+    if not path.exists():
+        return []
+    return json.loads(path.read_bytes().decode("utf-8"))["entries"]
+
+
+def manifest_run(argv: Sequence[str], code_files: Iterable[str]) -> Run:
+    """The run that writes the downloads manifest, a record of a kind of its own (REP-085)."""
+    return Run("downloads", directory="", file_name="downloads.json", fixed=True, argv=argv,
+               code_files=code_files, writes_evidence=False)
+
+
+def write_manifest(run: Run, entries: List[Dict], assertions: Iterable[Any] = ()) -> Path:
+    return run.finish("pass", assertions=assertions,
+                      fields={"entries": entries, "inputs": NONE, "outputs": NONE})
 
 
 # ---------------------------------------------------------------------------------- classification

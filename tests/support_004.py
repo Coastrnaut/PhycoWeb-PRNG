@@ -12,6 +12,10 @@ from unittest import mock
 
 from protocol import evidence
 
+CODE_ROOT = Path(__file__).resolve().parents[1]
+# The code files that the owner's scripts name, committed in every temporary repository.
+CODE_COPIES = ("protocol/evidence.py", "protocol/disclaimer.py", "scripts/clear_lock.py",
+               "scripts/owner_record.py", "scripts/downloads.py")
 GITATTRIBUTES = """* text=auto
 *.py text eol=lf
 *.c text eol=lf
@@ -38,7 +42,8 @@ Notes under the table.
 """
 
 SNAPSHOT = {"platform": evidence.platform_name(), "python": "3.10.11",
-            "packages": ["numpy==2.2.6", "scipy==1.15.3"], "windows_build": "10.0.26300"}
+            "packages": ["numpy==2.2.6", "scipy==1.15.3"], "windows_build": "10.0.26300",
+            "gcc": "gcc (Ubuntu 15.2.0) 15.2.0"}
 
 
 def write(root: Path, rel: str, data) -> Path:
@@ -77,6 +82,8 @@ class TempRepo(unittest.TestCase):
         write(self.root, ".gitignore", "data/local/\ndata/*.lock\n")
         write(self.root, evidence.RESEARCH_REL, "# Research\n")
         write(self.root, "scripts/tool.py", "print('tool')\n")
+        for rel in CODE_COPIES:
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
         self.rows = []
         self.write_spec()
         self.commit("first")
