@@ -8,7 +8,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+**/build/**
+!fast/build/seed_search
+!research/004/tools/trails/build/arx_search
 develop-eggs/
 dist/
 downloads/
@@ -182,3 +184,19 @@ cython_debug/
 # Positive-control bytes stay local; only their SHA-256 is committed (feature 002, Q1)
 data/controls/*
 !data/controls/.gitkeep
+# Feature 004: the two locks and the local-only outputs (research R16), and generic lines
+# (owner, 2026-11-03), with no *.tmp, so that the temporary file beside the protocol change
+# log's path is never hidden from git status.
+data/heavy-run.lock
+data/log-append.lock
+data/local/
+*.o
+*.obj
+*.a
+*.exe
+*.dll
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+*.swp

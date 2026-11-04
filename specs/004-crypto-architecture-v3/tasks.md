@@ -119,13 +119,13 @@ or key-loading code is written here.
 
 ### Step (1): directories, pins, ignores and the line-ending test
 
-- [ ] T003 Create the directories of plan.md's source tree as their first files are written:
+- [X] T003 Create the directories of plan.md's source tree as their first files are written:
   `research/004/tools/trails/`, `research/004/candidates/`, `research/004/validation/`,
   `research/004/exploration/`, `vectors/phyco-v3/`, `baseline/phyco-v2/`, `data/local/004/` and
   `reports/004-crypto-architecture-v3/` with the subdirectories plan.md lists; git records a
   directory with its first file, and no placeholder file such as `.gitkeep` is added under `$REP`.
   (FR-053; R16, R18)
-- [ ] T004 Add to `.gitattributes`, after the line `protocol/*.json text eol=lf` and before the
+- [X] T004 Add to `.gitattributes`, after the line `protocol/*.json text eol=lf` and before the
   `*.hex`, `*.bin` and `*.gz` lines, so that those keep precedence:
   `specs/004-crypto-architecture-v3/**/*.md text eol=lf`, `vectors/phyco-v3/** text eol=lf`,
   `*.mk text eol=lf` and `Makefile text eol=lf`; and, as the last line, `**/build/** binary`, so
@@ -136,7 +136,7 @@ or key-loading code is written here.
   change, with `git ls-files` that no tracked file lies under a `build/` directory, and with
   `git check-attr` that `fast/build/seed_search` and `research/004/tools/trails/build/arx_search`
   read `binary`. (FR-053; R16, R18)
-- [ ] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`, with
+- [X] T005 Add `data/heavy-run.lock`, `data/log-append.lock` and `data/local/` to `.gitignore`, with
   the generic lines `*.o`, `*.obj`, `*.a`, `*.exe`, `*.dll`, `Thumbs.db`, `.DS_Store`, `.vscode/`,
   `.idea/` and `*.swp` (owner, 2026-11-03) and no `*.tmp`, so that the temporary file beside the
   log's path, which `protocol_change.py create` writes before its rename, is never hidden from
@@ -146,7 +146,7 @@ or key-loading code is written here.
   `data/local/` and a file of each generic line are ignored, that every other file under
   `fast/build/` and `research/004/tools/trails/build/`, `fast/build/phyco_stream` among them, stays
   ignored, and that the two binaries are not. (FR-045, FR-053; R16, R18)
-- [ ] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
+- [X] T006 Write research R18's line-ending test in `tests/test_records_004.py`: every path whose
   hash a committed record, manifest or freeze record holds has an explicit `text eol=lf` rule or
   `binary` (`git check-attr text eol`), or its record marks the hash `lf-normalized`, and no hashed
   file starts with a byte-order mark; while no record exists, it checks every tracked file under the

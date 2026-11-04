@@ -25,6 +25,12 @@ baseline/** -text
 reports/004-crypto-architecture-v3/** text eol=lf
 research/004/** text eol=lf
 protocol/*.json text eol=lf
+specs/004-crypto-architecture-v3/**/*.md text eol=lf
+vectors/phyco-v3/** text eol=lf
+*.mk text eol=lf
+Makefile text eol=lf
 *.hex text eol=lf
 *.bin binary
 *.gz binary
+# Feature 004: the binaries each C tool builds beside its source, whose hashes records hold.
+**/build/** binary
