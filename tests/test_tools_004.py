@@ -1892,6 +1892,428 @@ class DegreeOnKnown(unittest.TestCase):
             self.assertTrue(self.run_known(name, known))
 
 
+def bijectivity_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import bijectivity
+    return bijectivity
+
+
+class Bijectivity(unittest.TestCase):
+    """research/004/tools/bijectivity.py at a size a test can sweep (T057). The 2^32 inputs are the
+    validation's own, a heavy run."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = bijectivity_module()
+        import ir
+        cls.ir = ir
+
+    def test_packing_is_lane_by_lane(self):
+        words = np.array([0x87654321], dtype=np.uint64)
+        lanes = self.tool.unpack(words)
+        self.assertEqual(lanes[:, 0].tolist(), [1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(int(self.tool.pack(lanes)[0]), 0x87654321)
+
+    def test_packing_at_another_shape(self):
+        lanes = self.tool.unpack(np.array([0xAB], dtype=np.uint64), lanes=2, w=4)
+        self.assertEqual(lanes[:, 0].tolist(), [0xB, 0xA])
+        self.assertEqual(int(self.tool.pack(lanes, 4)[0]), 0xAB)
+
+    def test_a_permutation_fills_the_bitmap(self):
+        out = self.tool.sweep(lambda s: s[::-1], lanes=2, w=4, batch=7)
+        self.assertEqual((out["inputs"], out["ones"]), (256, 256))
+        self.assertTrue(self.tool.passes(out))
+
+    def test_a_map_with_collisions_leaves_it_short(self):
+        """x and y, with y kept: the sum over y of 2^popcount(y), 3^4 = 81."""
+        def step(states):
+            out = states.copy()
+            out[0] = states[0] & states[1]
+            return out
+
+        out = self.tool.sweep(step, lanes=2, w=4, batch=16)
+        self.assertEqual(out["ones"], 81)
+        self.assertFalse(self.tool.passes(out))
+
+    def test_the_batch_size_changes_nothing(self):
+        def step(states):
+            out = states.copy()
+            out[0] = states[0] | states[1]
+            return out
+
+        results = [self.tool.sweep(step, lanes=2, w=4, batch=b) for b in (1, 7, 16, 255, 256, 1000)]
+        self.assertEqual(len({(r["ones"], r["bitmap_sha256"]) for r in results}), 1)
+
+    def test_the_hash_is_of_the_bitmap(self):
+        """A map to the output 0 alone: one bit set, the lowest of 32 bytes."""
+        out = self.tool.sweep(lambda s: np.zeros_like(s), lanes=2, w=4, batch=16)
+        self.assertEqual(out["ones"], 1)
+        self.assertEqual(out["bitmap_sha256"], evidence.sha256(b"\x01" + bytes(31)))
+
+    def test_a_high_output_lands_in_the_last_byte(self):
+        out = self.tool.sweep(lambda s: np.full_like(s, 15), lanes=2, w=4, batch=16)
+        self.assertEqual(out["bitmap_sha256"], evidence.sha256(bytes(31) + b"\x80"))
+
+    def small_known(self, permutation_ones=256, collision_ones=81):
+        ir = self.ir
+        module = mock.Mock()
+        module.ROUNDS = 2
+        module.PERMUTATION_ONES = permutation_ones
+        module.COLLISION_ONES = collision_ones
+        module.permutation.return_value = ir.Program("r", 2, 4, (ir.Phase(0, (ir.Rot(0, 1),)),))
+
+        def collisions(states):
+            out = states.copy()
+            out[0] = states[0] & states[1]
+            return out
+
+        module.collisions = collisions
+        return module
+
+    def run_small(self, known):
+        real = self.tool.sweep
+        def narrow(step, **_):
+            def widened(states):
+                full = np.zeros((8, states.shape[1]), dtype=np.uint64)
+                full[:2] = states
+                return step(full)[:2]
+            return real(widened, lanes=2, w=4, batch=16)
+        with mock.patch.object(self.tool, "sweep", narrow):
+            return self.tool.validation("bijectivity-maps", known, None)
+
+    def test_each_count_is_compared_exactly(self):
+        self.assertTrue(self.run_small(self.small_known())["re_found"])
+        self.assertFalse(self.run_small(self.small_known(permutation_ones=255))["re_found"])
+        self.assertFalse(self.run_small(self.small_known(collision_ones=82))["re_found"])
+
+    def test_the_list_runs_its_stated_rounds(self):
+        ir = self.ir
+        known = self.small_known()
+        loaded = ir.load(known.permutation())
+        states = np.zeros((8, 1), dtype=np.uint64)
+        states[0, 0] = 1
+        self.assertEqual(int(self.tool.steps_of(known)["permutation"](states)[0, 0]),
+                         int(ir.permute_batch(loaded, states, rounds=2)[0, 0]))
+
+    def test_each_known_result_is_a_heavy_run(self):
+        self.assertEqual(set(self.tool.HEAVY), {"bijectivity-maps", "bijectivity-maps-second"})
+
+    def test_a_probe_times_both_maps_and_reads_the_whole_sweep(self):
+        with mock.patch.object(self.tool, "time_batches", side_effect=[1.0, 3.0]):
+            hours, speed = self.tool.projection("bijectivity-maps")
+        self.assertAlmostEqual(hours, 4.0 * (2 ** 32 / 2 ** 22) / 3600.0)
+        self.assertEqual(speed["seconds_per_batch"], {"permutation": 1.0, "collisions": 3.0})
+
+    def test_a_probe_gives_seconds_per_batch(self):
+        with mock.patch.object(self.tool, "BATCH", 16), \
+                mock.patch.object(self.tool.time, "monotonic", side_effect=[10.0, 18.0]):
+            self.assertEqual(self.tool.time_batches(lambda s: s, 2), 4.0)
+
+    def test_a_probe_batch_is_timed_on_the_real_map(self):
+        calls = []
+
+        def step(states):
+            calls.append(states.shape)
+            return states
+
+        with mock.patch.object(self.tool, "BATCH", 1024):
+            self.assertGreaterEqual(self.tool.time_batches(step, 2), 0.0)
+        self.assertEqual(calls, [(8, 1024), (8, 1024)])
+
+
+def avalanche_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import avalanche
+    return avalanche
+
+
+class Avalanche(unittest.TestCase):
+    """research/004/tools/avalanche.py on stated lists (T058)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = avalanche_module()
+        import dependency
+        import ir
+        cls.ir, cls.dep = ir, dependency
+
+    def test_the_flip_set_of_each_size(self):
+        self.assertEqual(len(self.tool.flip_set(4)), 1024)
+        self.assertEqual(len(self.tool.flip_set(8)), 512)
+        self.assertEqual(len(self.tool.flip_set(16)), 1024)
+        self.assertEqual(self.tool.flip_set(4), list(range(1024)))
+        node = self.ir.lane(8, 3, 3, 1) * 32 + 5
+        self.assertIn(node, self.tool.flip_set(8))
+        self.assertNotIn(self.ir.lane(8, 3, 4, 0) * 32, self.tool.flip_set(8))
+
+    def test_s_a_is_r4s(self):
+        self.assertEqual(self.tool.s_a(4), 2494 * 1024)
+        self.assertEqual(self.tool.s_a(8), 1470 * 4096)
+        self.assertEqual(self.tool.s_a(16), 2494 * 16384)
+
+    def test_a_flip_touches_one_bit(self):
+        states = np.zeros((4, 2), dtype=np.uint64)
+        out = self.tool.flipped(states, 2 * 8 + 3, 8)
+        self.assertEqual(out[2].tolist(), [8, 8])
+        self.assertEqual(int(out.sum()), 16)
+        self.assertEqual(int(states.sum()), 0)
+
+    def test_a_rotation_of_every_word(self):
+        states = np.array([[0x81], [0x01]], dtype=np.uint64)
+        self.assertEqual(self.tool.rotated(states, 1, 8).tolist(), [[0x03], [0x02]])
+
+    def rot_list(self, amount=1):
+        return self.ir.load(self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, amount),)),)))
+
+    def test_difference_counts_follow_each_round(self):
+        loaded = self.rot_list()
+        first = np.zeros((8, 4), dtype=np.uint64)
+        second = self.tool.flipped(first, 0, 8)
+        out = self.tool.difference_counts(loaded, first, second, [None] * 3, 8)
+        for r in range(3):
+            self.assertEqual(out[r, 0].tolist(), [4 if b == r + 1 else 0 for b in range(8)])
+
+    def test_rotational_counts_of_a_lane_that_commutes_are_0(self):
+        states = np.array([[0x1D, 0x2B]] * 8, dtype=np.uint64)
+        out = self.tool.rotational_counts(self.rot_list(3), states, 2, [None] * 2, 8)
+        self.assertEqual(int(out.sum()), 0)
+
+    def test_rotational_counts_of_a_list_that_does_not_commute(self):
+        loaded = self.ir.load(self.ir.Program("a", 2, 8, (self.ir.Phase(0, (
+            self.ir.Mix(0, "add", self.ir.Lane(1)),)),)))
+        states = np.full((8, 1), 0xFF, dtype=np.uint64)
+        states[1, 0] = 1
+        out = self.tool.rotational_counts(loaded, states, 1, [None], 8)
+        self.assertGreater(int(out[0, 0].sum()), 0)
+
+    def test_a_mask_of_lanes(self):
+        mask = self.tool.lanes_mask([1], (3, 2))
+        self.assertEqual(mask.tolist(), [[False, False], [True, True], [False, False]])
+
+    def tally(self):
+        return self.tool.Tally("p", 2, {"low": 1, "high": 9})
+
+    def test_a_tally_counts_a_missed_bit_and_an_other_firing(self):
+        tally = self.tally()
+        counts = np.array([[0, 5, 10], [5, 5, 5]])
+        expected = np.array([[True, True, False], [False, False, False]])
+        tally.add("t", 0, counts, expected)
+        self.assertEqual(tally.missed, 1)
+        self.assertEqual(tally.other_by_round, [1, 0])
+        self.assertEqual(tally.lines, ["p t round 1 lane 0 bit 2 count 10\n"])
+        self.assertFalse(tally.summary()["holds"], "a missed bit")
+
+    def test_another_firing_below_r_decides_nothing(self):
+        tally = self.tally()
+        tally.add("t", 0, np.array([[10]]), np.array([[False]]))
+        tally.add("t", 1, np.array([[5]]), np.array([[False]]))
+        self.assertTrue(tally.summary()["holds"])
+        self.assertEqual(tally.summary()["other_firings_by_round"], [1, 0])
+
+    def test_another_firing_at_r_decides(self):
+        tally = self.tally()
+        tally.add("t", 1, np.array([[10]]), np.array([[False]]))
+        summary = tally.summary()
+        self.assertFalse(summary["holds"])
+        self.assertEqual(summary["other_firings_at_r"], 1)
+
+    def test_a_flip_of_a_bit_the_matrices_show_independent_is_a_tool_defect(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.cross_check(np.array([[0, 1]]), np.array([[True, True]]), "t")
+        self.tool.cross_check(np.array([[0, 1]]), np.array([[True, False]]), "t")
+
+    def run_one(self, program, numbers, planted=()):
+        loaded = self.ir.load(program)
+        rounds = 2
+        states = np.zeros((2 * program.n ** 2, 16), dtype=np.uint64)
+        rows = {"forward": [None] * rounds, "inverse": [None] * rounds}
+        tally = self.tool.Tally("p", rounds, {"low": 0, "high": 16})
+        matrices = self.tool.matrices_of(program, rounds, ("forward", "inverse"))
+        self.tool.run_flips(loaded, states, numbers, rows, matrices, lambda lane: planted, tally,
+                            ("forward", "inverse"))
+        return tally
+
+    def test_a_list_of_one_rotation_fires_exactly_its_expected_set(self):
+        """Each output bit either depends on the flip and always flips, or depends on nothing of it."""
+        program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        tally = self.run_one(program, [3])
+        self.assertEqual(tally.tests, 4)
+        self.assertEqual(tally.missed, 0)
+        self.assertEqual(tally.other_by_round, [2, 2], "the flipped bit itself, once per direction")
+
+    def test_a_flip_where_the_matrices_show_none_stops_the_run(self):
+        """The list rotates, and matrices of a list that does not say the bit moved."""
+        program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        loaded = self.ir.load(program)
+        states = np.zeros((8, 16), dtype=np.uint64)
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16})
+        still = {"forward": [self.dep.identity(2, 8)]}
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.run_flips(loaded, states, [3], {"forward": [None]}, still, lambda lane: (), tally,
+                                ("forward",))
+
+    def test_every_rotation_is_run_both_ways(self):
+        program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        loaded = self.ir.load(program)
+        states = np.zeros((8, 4), dtype=np.uint64)
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 4})
+        self.tool.run_rotations(loaded, states, (0,), tally, {"forward": [None], "inverse": [None]})
+        self.assertEqual(tally.tests, 7 * 2)
+
+    def test_a_planted_lane_that_flips_half_the_time_is_missed(self):
+        program = self.ir.Program("x", 2, 8, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Lane(1)),)),))
+        loaded = self.ir.load(program)
+        states = np.zeros((8, 16), dtype=np.uint64)
+        states[0, ::2] = 0
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16})
+        matrices = self.tool.matrices_of(program, 1, ("forward",))
+        out = self.tool.difference_counts(loaded, states, self.tool.flipped(states, 8, 8), [None], 8)
+        self.assertEqual(int(out[0, 0, 0]), 16)
+        rows = {"forward": [None]}
+        half = {"low": 0, "high": 17}
+        tally = self.tool.Tally("p", 1, half)
+        self.tool.run_flips(loaded, states, [8], rows, matrices, lambda lane: (0,), tally, ("forward",))
+        self.assertGreater(tally.missed, 0, "lane 0 is planted, and bit 0 of it flips every time")
+
+    def test_the_matrices_are_read_per_direction_and_round(self):
+        program = self.ir.Program("x", 2, 8, (
+            self.ir.Phase(0, (self.ir.Rot(1, 1),)),
+            self.ir.Phase(0, (self.ir.Mix(0, "xor", self.ir.Lane(1)),))))
+        out = self.tool.matrices_of(program, 3, ("forward", "inverse"))
+        self.assertEqual(sorted(out), ["forward", "inverse"])
+        self.assertEqual(len(out["forward"]), 3)
+        self.assertFalse((out["forward"][0] == out["inverse"][0]).all())
+
+    def test_a_key_is_read_as_big_endian_words(self):
+        self.assertEqual(self.tool.words_of(bytes([1, 2, 3, 4, 5, 6, 7, 8])), [0x01020304, 0x05060708])
+
+    def test_the_verdict_code_fires_exactly_at_the_critical_values(self):
+        entry = {"n": 100, "low": 30, "high": 70}
+        self.assertTrue(self.tool.verdict_code(entry)["holds"])
+        self.assertEqual(self.tool.verdict_code(entry)["counts"], 101)
+        with mock.patch.object(self.tool.bias, "fires", lambda counts, e: counts <= e["low"]):
+            self.assertFalse(self.tool.verdict_code(entry)["holds"])
+
+    def test_power_is_exact_on_a_stated_row(self):
+        """n = 4, p = 3/4: firing at 0 or 4 is (1/4)^4 + (3/4)^4 = 82/256."""
+        entry = {"n": 4, "low": 0, "high": 4}
+        self.assertEqual(self.tool.power(entry, Fraction(1, 4)), Fraction(82, 256))
+
+    def test_power_at_no_bias_is_the_tails(self):
+        entry = {"n": 10, "low": 1, "high": 9}
+        self.assertEqual(self.tool.power(entry, Fraction(0)), Fraction(22, 1024))
+
+    def test_the_power_at_r4s_stated_biases_exactly(self):
+        """At N_a = 2^13 the stated biases, rounded to four places, give 0.8985, 0.9007 and 0.8987: under
+        0.9 at two sizes. Which of the protocol's numbers moves is the owner's decision (FR-044)."""
+        table = self.tool.bias.read_table()
+        for n, wanted in ((4, 0.898546), (8, 0.900737), (16, 0.898723)):
+            entry = self.tool.bias.entry_for("avalanche", 2 ** 13, self.tool.s_a(n), table)
+            self.assertAlmostEqual(float(self.tool.power(entry, self.tool.DELTA_A[n])), wanted, places=5)
+
+    def test_the_size_of_a_known_result(self):
+        self.assertEqual(self.tool.size_of("avalanche-planted-n16"), 16)
+        self.assertEqual(self.tool.size_of("avalanche-planted-second-n8"), 8)
+
+    def test_each_size_is_a_known_result_of_its_own_with_its_own_second(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        table = validate_tool.known_results()
+        self.assertEqual(table["avalanche-planted-second-n8"].second_of, "avalanche-planted-n8")
+        self.assertEqual(table["avalanche-planted-n8"].second_of, NONE)
+        self.assertEqual(table["avalanche-planted-n8"].path, table["avalanche-planted-n4"].path)
+        self.assertNotIn("avalanche-planted", table)
+        self.assertEqual([k.known_id for k in validate_tool.seconds_of(table, "avalanche-planted-n16")],
+                         ["avalanche-planted-second-n16"])
+
+    def test_the_input_bits_are_found_from_the_loader(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        table = validate_tool.known_results()
+        known = validate_tool.load_known(table["avalanche-planted-n4"])
+        bits = self.tool.input_bits(known, 4)
+        self.assertEqual(len(bits), 384)
+        self.assertEqual(len(set(bits)), 384)
+        self.assertEqual(bits[0], self.ir.lane(4, 0, 0, 0) * 32)
+        self.assertEqual(bits[7 * 32], self.ir.lane(4, 2, 2, 0) * 32)
+        self.assertEqual(bits[8 * 32], self.ir.lane(4, 0, 0, 1) * 32)
+        self.assertEqual(bits[11 * 32 + 31], self.ir.lane(4, 2, 2, 1) * 32 + 31)
+
+
+def ToolFailureClass():
+    return evidence.ToolFailure
+
+
+class AvalancheStem(unittest.TestCase):
+    """A shortened run of each path on the stated stem, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = avalanche_module()
+        cls.table = validate_tool.known_results()
+
+    def setUp(self):
+        self.known = self.vt.load_known(self.table["avalanche-planted-n4"])
+        self.kept = {}
+
+    def run_known(self, least_power=Fraction(1, 2), **changes):
+        tool = self.tool
+        sample = {"flip_set": lambda n, w=32: [0, 511, tool.ir.lane(4, 1, 1, 1) * 32 + 3] if n == 4 else [],
+                  "input_bits": lambda known, n: [0, 7 * 32, 8 * 32, 11 * 32 + 31]}
+        sample.update(changes)
+        with mock.patch.object(tool, "flip_set", sample["flip_set"]), \
+                mock.patch.object(tool, "input_bits", sample["input_bits"]), \
+                mock.patch.object(tool, "s_a", lambda n, w=32: 2494 * 1024), \
+                mock.patch.object(tool, "LEAST_POWER", least_power):
+            return tool.re_find(self.known, 4, self.kept.__setitem__)
+
+    def test_a_sample_of_each_path_holds(self):
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations):
+            out = self.run_known()
+        for path in out["found"]["paths"]:
+            self.assertTrue(path["holds"], path["path"])
+        self.assertTrue(out["re_found"])
+        self.assertIn("other-firings-n4.txt", self.kept)
+        self.assertTrue(self.kept["other-firings-n4.txt"])
+
+    def few_rotations(self, loaded, states, planted, tally, rows):
+        w = 32
+        mask = self.tool.lanes_mask(planted, (states.shape[0], w))
+        for k in (1, 16):
+            counts = self.tool.rotational_counts(loaded, states, k, rows["forward"], w)
+            for r in range(counts.shape[0]):
+                tally.add(f"k {k}", r, counts[r], mask)
+
+    def test_a_lane_said_to_be_planted_that_is_not_breaks_the_flip_path(self):
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
+                mock.patch.object(self.known, "planted_bits", lambda path, n, lane=None: (0,)):
+            self.assertFalse(self.run_known()["re_found"])
+
+    def test_a_failed_verdict_code_or_power_breaks_it(self):
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
+                mock.patch.object(self.tool, "verdict_code", return_value={"holds": False}):
+            self.assertFalse(self.run_known()["re_found"])
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
+                mock.patch.object(self.tool, "LEAST_POWER", Fraction(1, 2)):
+            self.assertFalse(self.run_known(least_power=Fraction(9, 10))["re_found"],
+                             "at N_a = 2^13 the power at 4x4 is 0.8985")
+
+    def test_the_inputs_name_the_three_kinds(self):
+        kinds = [item["kind"] for item in self.tool.inputs("avalanche-planted-n4")["sets"]]
+        self.assertEqual(kinds, ["state", "key", "nonce"])
+
+    def test_the_larger_sizes_are_heavy(self):
+        self.assertNotIn("avalanche-planted-n4", self.tool.HEAVY)
+        self.assertIn("avalanche-planted-n16", self.tool.HEAVY)
+        self.assertIn("avalanche-planted-second-n8", self.tool.HEAVY)
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
@@ -2031,7 +2453,7 @@ def stated_lists(table, load):
     yield m.KNOWN_ID, [m.build(m.N, m.W)]
     for name in ("bijectivity-maps", "bijectivity-maps-second"):
         yield name, [module(name).permutation()]
-    for name in ("avalanche-planted", "avalanche-planted-second"):
+    for name in ("avalanche-planted-n4", "avalanche-planted-second-n4"):
         m = module(name)
         yield name, [build(n) for build in (m.unmixed, m.closed, m.commuting) for n in m.SIZES]
     m = module("costmodel-examples")

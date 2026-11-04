@@ -15,8 +15,9 @@ module of a self-written or published known result, or None for a finding of sec
 results that are heavy runs, with `projection(known_id)`, their hours and measured speed.
 
 Known results are read from research/004/validation/, each module naming its tool, its known result and
-what it is the second of. A published value also names its download, or stands on an `owner-provided`
-entry. After a failed validation a committed note, research/004/validation/defects/<record_id>.json,
+what it is the second of; a tool in PER_SIZE keeps one record per size, its known result's ID ending in
+the size, `avalanche-planted-n4`. A published value also names its download, or stands on an
+`owner-provided` entry. After a failed validation a committed note, research/004/validation/defects/<record_id>.json,
 holds the defect, its cause and the fix; the next attempt reads it and re-finds every known result of
 the tool in one record. This script makes no security claim.
 """
@@ -107,6 +108,7 @@ FINDINGS: Dict[str, Tuple[str, str]] = {
     "s15": ("bias", "security.md S15, its 16 steps and its bound"),
     "fut-sec-8": ("fut_sec8", "the reviewed demonstration record, its three seeds and vector check"),
 }
+PER_SIZE = ("avalanche",)
 PUBLISHED: Dict[str, str] = {
     "speck32-diff": "ARX search",
     "speck32-lin": "ARX search",
@@ -138,8 +140,14 @@ def known_results() -> Dict[str, Known]:
     directory = evidence.REPO.path(VALIDATION_REL)
     for path in sorted(directory.glob("*.py")) if directory.exists() else ():
         module = load_module(path)
-        table[module.KNOWN_ID] = Known(module.KNOWN_ID, module.TOOL, evidence.rel_to_repo(path),
-                                       module.SECOND_OF)
+        rel = evidence.rel_to_repo(path)
+        if module.TOOL in PER_SIZE:
+            for size in module.SIZES:
+                second = NONE if module.SECOND_OF == NONE else f"{module.SECOND_OF}-n{size}"
+                table[f"{module.KNOWN_ID}-n{size}"] = Known(f"{module.KNOWN_ID}-n{size}", module.TOOL,
+                                                            rel, second)
+        else:
+            table[module.KNOWN_ID] = Known(module.KNOWN_ID, module.TOOL, rel, module.SECOND_OF)
     return table
 
 

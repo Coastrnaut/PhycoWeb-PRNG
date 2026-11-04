@@ -9,6 +9,8 @@ As in the first, a plain look with the batch interpreter before this file was fi
 bit that depends on the flip well spread by R = 4n rounds. The expected sets are stated as there.
 
 `unmixed`: no update writes P(1,2). Its 32 bits are the planted bits for every flipped bit, both directions.
+V(1,2), which only that lane's update read, is read by one stated update of P(1,3), so that a flip in it
+spreads as any other.
 
 `closed`: P(3,3) and V(3,3) take only P add rotl(V, 5) and V xor rotl(P, 9), and read no other lane. The
 loader below puts key words 0 to 6 in the veins of KEY_NODES, key word 7 in V(3,3), nonce words 0 to 2 in
@@ -78,7 +80,9 @@ def stem(name, n, w, skip=(), extra=None):
 
 
 def unmixed(n, w=W):
-    return stem("unmixed", n, w, skip={("first", (1, 2))})
+    reader = ir.Mix(ir.lane(n, 1, 3, P), "xor", ir.Rotl(ir.Lane(ir.lane(n, 1, 2, V)), AMOUNTS[0]))
+    return stem("unmixed", n, w, skip={("first", (1, 2))},
+                extra=ir.Phase(ir.colour(n, 1, 3), (reader,)))
 
 
 def closed(n, w=W):

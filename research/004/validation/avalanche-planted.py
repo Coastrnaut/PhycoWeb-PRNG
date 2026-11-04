@@ -17,7 +17,9 @@ must fire. Each list below keeps the three stem updates at every node except whe
 
 `unmixed`, the flip set: no update writes V(1,1), which others read. A flip anywhere else never reaches
 it, and a flip inside it stays at its own bit, so its 32 difference bits are the planted bits, for every
-flipped bit, forward and inverse. Every other output bit depends on every flipped bit at R.
+flipped bit, forward and inverse. In the stem a pressure is read only by its own vein's update, which
+leaves P(1,1) with no reader here, so that one stated update lets V(1,2) read it, and a flip in P(1,1)
+spreads as any other. Every other output bit depends on every flipped bit at R.
 
 `closed`, the related-key and related-nonce set: the two lanes C = P(2,2), V(2,2) form a closed pair: they
 take only V add rotl(P, 7) and P xor rotl(V, 13), and read no other lane, while other lanes read them. The
@@ -92,7 +94,9 @@ def stem(name, n, w, skip=(), extra=None):
 
 
 def unmixed(n, w=W):
-    return stem("unmixed", n, w, skip={("first", (1, 1))})
+    reader = ir.Mix(ir.lane(n, 1, 2, V), "xor", ir.Rotl(ir.Lane(ir.lane(n, 1, 1, P)), AMOUNTS[0]))
+    return stem("unmixed", n, w, skip={("first", (1, 1))},
+                extra=ir.Phase(ir.colour(n, 1, 2), (reader,)))
 
 
 def closed(n, w=W):
