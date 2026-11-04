@@ -106,11 +106,12 @@ commit as each table row and each answered round, as the spec's Status line is (
   REP-101 do so in the tenth re-run, as their rows state. The protocol change
   log's first entry for each marks that reading `set_aside`, with its case, for the owner's
   decision, entry by entry, in the spec's Review & Approval row "Readings set aside" at the tasks
-  approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Three
-  edits that no row made, ccfd9d1, 5f34d5c and 7a6d0e8, among the `/speckit-analyze` remediations
-  recorded beside the tenth re-run's list, set aside one reading each as well, and the first entry
-  made from each one's places marks it the same way, on the owner's answer of 2026-11-03,
-  "all recommended", so that the row decides eighteen such readings. Every
+  approval: the change kept, with the owner's reason, or the old text restored (PRO-079). Four
+  edits that no row made, ccfd9d1, 5f34d5c, 7a6d0e8 and 57763b5, among the `/speckit-analyze`
+  remediations recorded beside the tenth re-run's list, set aside one reading each as well, and
+  the first entry made from each one's places marks it the same way, on the owner's answers of
+  2026-11-03, "all recommended" and, for 57763b5, "Yes, any run (Recommended)", so that the row
+  decides nineteen such readings. Every
   other recommended option is, under every reading of the old text, in its rule's stricter
   direction or settles an open case by its most conservative reading. An
   alternative that would loosen it is marked "looser", so the choice is visible
@@ -1817,14 +1818,39 @@ that size with no conclusive control, which ends in the stop rule for every cand
 alternative, a re-run with its record naming the cause, is looser than that reading, so it is the
 owner's decision alone.
 
-Over every span from the plan-approval commit, 65bcbf2, to ffcee2b outside the rounds' pairs, the
+Commit 57763b5, the eighteenth report's remediation, on the owner's answers of 2026-11-03, "Yes,
+any run (Recommended)" and "At the reboot (Recommended)", changed places of six rules: the
+protocol's row "FUT-SEC-8 demonstration"; the protocol's "Bias rule" and research R4; spec
+FR-039; research R7; the plan's values; and research R16, data-model §1 and the cli contract. That
+report found that ffcee2b's closing words reached further than the paragraph above says: a
+reboot during the FUT-SEC-8 sweep left no way on but a stop, since a second run exits 2 with no
+defect to name, and one during a validation left a correct tool unvalidated. Such a run is still
+no tool defect, and it gives no result. `clear_lock.py` shows which run that is, from the boot
+time of the lock's environment, later than the time the lock holds, which goes into the run's
+`inconclusive` record as `ended_outside`. Its partial outputs are discarded unread, its record
+stands and decides nothing, and its hours stand, counted up to that boot time. It may run again
+by the same command on the same inputs, which spends no re-run, each time projected first and
+charged in full, so that the row's hours bound how often; a uniform control so ended counts as
+none, and a FUT-SEC-8 pass so ended is repeated only on the owner's request, under
+`--repeat-after-end`, charged to the feature-wide row. The commit is recorded here for the owner
+to confirm at the tasks approval as an entry of its own or as no change of rule, with the
+reason. It sets aside one reading, the one under which a run may be repeated only after a tool
+defect, and under which one such end could leave every candidate without a conclusive control
+and the feature with no demonstration: the first entry made from its places marks that reading
+`set_aside`, with that case, on the owner's answer, for the owner's decision in the row
+"Readings set aside" (PRO-079). The hours up to the boot replace 92e91ae's hours up to the
+clearing for such a run; the agent's reading is that the text before 92e91ae stated no hours for
+a dead run and that the new count never falls below the hours used, so that it sets no further
+reading aside.
+
+Over every span from the plan-approval commit, 65bcbf2, to 57763b5 outside the rounds' pairs, the
 comparison that `research/004/place_check.py` wrote to `research/004/place-check.json`, committed
-in b49a4c3 with `compared_to` ffcee2b, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740,
-e1d7a90, c7dadf5, 0b60ab1, d6edec2 and 92e91ae committed in 0a99462, c5a630c, ce902d5, c92383c,
-637eb02, 9a74a9b, d3cdbf5, c9acd78 and 85a5e1c, found twenty-one commits that changed places of
-rules with an edit that no row made: ad2c195's change to research R3, recorded beside the re-run's
-list above; and, in the span from 974ffef to ffcee2b, after this round's pair, research R16 and
-the cli
+in 42e1ba2 with `compared_to` 57763b5, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740,
+e1d7a90, c7dadf5, 0b60ab1, d6edec2, 92e91ae and ffcee2b committed in 0a99462, c5a630c, ce902d5,
+c92383c, 637eb02, 9a74a9b, d3cdbf5, c9acd78, 85a5e1c and b49a4c3, found twenty-two commits that
+changed places of rules with an edit that no row made: ad2c195's change to research R3, recorded
+beside the re-run's list above; and, in the span from 974ffef to 57763b5, after this round's pair,
+research R16 and the cli
 contract by 1c67100, data-model §18 by 57bd909, the cli contract by b6a93f0, spec FR-039, research
 R4 and the cli contract by 252512a, spec FR-020, FR-025 and FR-026 and research R5 and R8 by
 797c6da, research R15, data-model §1 and §18 and the cli contract by ce3cde1, research R15,
@@ -1832,14 +1858,16 @@ data-model §1 and the cli contract by ccfd9d1, research R15 by b3eba12, researc
 data-model's introduction and §18, the cli contract and the notes under the Review & Approval
 table by 5f34d5c and again by 7a6d0e8, research R12 by 2e36613, research R16, data-model §1 and the
 cli contract by 7f42e03, b9d9740, 43baec5 and e1d7a90, the cli contract by c7dadf5, research R16,
-data-model §1 and the cli contract by 0b60ab1, d6edec2 and 92e91ae, and research R7 by ffcee2b, 32
-entries in all, one per commit and rule, each recorded beside this list above. The span from
+data-model §1 and the cli contract by 0b60ab1, d6edec2 and 92e91ae, research R7 by ffcee2b, and
+the protocol's rows "FUT-SEC-8 demonstration" and "Bias rule", research R4, R7 and R16, spec
+FR-039, the plan's values, data-model §1 and the cli contract by 57763b5, 38 entries in all, one
+per commit and rule, each recorded beside this list above. The span from
 832bd4d to 930494d, between the ninth and tenth
 re-runs' pairs, changed no place, nor did the span's other commits, 744ded0, ccaf8f0, 388551a,
 82bb979, 3c8eccb, 7e61f4f, 40768cd, e560a9c, addc940, 0a99462, d626a13, dc40078, a56d372, d9a17e7,
 99b6422, c5a630c, 280e360, ce902d5, c92383c, 00ee022, 637eb02, ab10bbb, 9a74a9b, 35e4ab2, d3cdbf5,
-552fba9, c9acd78, 592cd1d, 85a5e1c and 7814f61. These results restate that file, which the owner
-confirms in the row "Place check" (PRO-063).
+552fba9, c9acd78, 592cd1d, 85a5e1c, 7814f61, b49a4c3 and 9c58b5e. These results restate that file,
+which the owner confirms in the row "Place check" (PRO-063).
 
 ## After the answer
 
