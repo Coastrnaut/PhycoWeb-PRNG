@@ -499,14 +499,14 @@ hashes.
 
 ### Tests for User Story 1
 
-- [ ] T038 [P] [US1] Write `tests/test_seed_search.py`, WSL only, skipping on Windows with its
+- [X] T038 [P] [US1] Write `tests/test_seed_search.py`, WSL only, skipping on Windows with its
   reason: `make -C fast -f seed_search.mk` builds `fast/build/seed_search` with `-Werror`, and its
   `--source-sha256` prints the SHA-256 of `fast/seed_search.c` (quickstart U1); a build of the same
   source in a second directory gives a binary of the same SHA-256 (research R16);
   `fast/build/seed_search --check-vectors vectors/phyco-v2_*.hex` compares 2 × 10,000 words and
   exits 0 (quickstart U2); `fast/build/phyco_stream` and `fast/Makefile` hash the same before and
   after the build; only the main thread writes progress lines. (FR-001, FR-002, FR-053; R2, R16)
-- [ ] T039 [P] [US1] Write the tests of `scripts/fut_sec8.py` in `tests/test_protocol_004.py`, on a
+- [X] T039 [P] [US1] Write the tests of `scripts/fut_sec8.py` in `tests/test_protocol_004.py`, on a
   mocked tool and a temporary reports directory: the targets are
   `protocol.seedsets.load("dev", allow=("dev",))[:3]`, and a held-out set exits 2; a second run
   exits 2 unless `--repeat-after-defect` names a recorded defect, or `--repeat-after-end` the record
@@ -518,7 +518,7 @@ hashes.
 
 ### Implementation for User Story 1
 
-- [ ] T040 [US1] Write `fast/seed_search.c` (C99) and `fast/seed_search.mk` (contracts/cli.md; R2):
+- [X] T040 [US1] Write `fast/seed_search.c` (C99) and `fast/seed_search.mk` (contracts/cli.md; R2):
   its own copy of `phyco-v2`'s design-1.0 step; `--check-vectors FILE ...`, exit 0 only if all
   10,000 words of every file match; `--source-sha256`, which prints the SHA-256 of the
   `fast/seed_search.c` it was built from, which `fast/seed_search.mk` builds into it, compiling with
@@ -529,7 +529,7 @@ hashes.
   threads, the progress going to stderr from the main thread only, from counters that the workers
   update; built in WSL into `fast/build/`, with `fast/phyco_stream.c` and `fast/Makefile` unchanged.
   (FR-001, FR-002, FR-053; R2, R16)
-- [ ] T041 [US1] Write `scripts/fut_sec8.py` (WSL; contracts/cli.md): the observations from
+- [X] T041 [US1] Write `scripts/fut_sec8.py` (WSL; contracts/cli.md): the observations from
   `phycoweb/model_v2.py`, its SHA-256 `1260142d…` checked; the vector check; then one sweep per
   target under the heavy-run lock, any extra three-word match separated by the fourth word; the
   demonstration record `$REP/fut-sec-8/<record_id>.json` with every field of data-model §4, its

@@ -102,6 +102,10 @@ KIND_COMPARED = {
     "trail": ("trail_kind", "characteristic", "weight", "rounds", "size", "width", "tool",
               "validation"),
 }
+# The part of a field that a reproduction compares, the rest of it reported only (data-model
+# section 1, "Fields compared, per kind").
+PARTLY_COMPARED = {"demonstration": {"tool": ("source_sha256",),
+                                     "cost": ("steps_per_candidate", "total_steps")}}
 P_VALUE_TOLERANCE = 1e-6
 P_VALUE_FLOOR = 2.0 ** -1022
 
@@ -1783,6 +1787,11 @@ def compare_records(original: Dict, new: Dict,
         same = original.get(name) == new.get(name)
         outcomes[name] = "match" if same else "differs"
         verdict_differs = verdict_differs or not same
+    for name, keys in PARTLY_COMPARED.get(original.get("kind"), {}).items():
+        ours, theirs = original.get(name) or {}, new.get(name) or {}
+        same = all(ours.get(key) == theirs.get(key) for key in keys)
+        outcomes[name] = "match" if same else "differs"
+        verdict_differs = verdict_differs or not same
     same = source_entries(original.get("code_sha256")) == source_entries(new.get("code_sha256"))
     outcomes["code_sha256"] = "match" if same else "differs"
     verdict_differs = verdict_differs or not same
@@ -1811,7 +1820,8 @@ def compare_records(original: Dict, new: Dict,
 
 def every_field_differs(original: Dict, extra: Sequence[str] = ()) -> Dict:
     """A rebuild refused or failed counts as a difference in every compared field (research R16)."""
-    names = compared_fields(original, extra) + ["code_sha256", "outputs"]
+    names = compared_fields(original, extra) + list(PARTLY_COMPARED.get(original.get("kind"), {}))
+    names += ["code_sha256", "outputs"]
     return {name: "differs" for name in names}
 
 
@@ -1982,9 +1992,11 @@ def adopt_outputs(run: Run, place: Place, result: Dict, prefix: str = "") -> Non
 
 
 def reported_fields(result: Dict, compared: Dict) -> Dict:
-    """Every other field of the run, reported only (data-model section 1, Reproduction)."""
+    """Every other field of the run, reported only (data-model section 1, Reproduction), a field
+    compared in part among them."""
+    partly = PARTLY_COMPARED.get(result.get("kind"), {})
     return {k: v for k, v in result.items()
-            if k not in compared and k not in ("code_sha256", "outputs", "hours_used")}
+            if (k not in compared or k in partly) and k not in ("code_sha256", "outputs", "hours_used")}
 
 
 def run_reproduction(job: Reproduction, run: Run, original: Dict, out: Path,

@@ -2670,5 +2670,587 @@ class Documents(unittest.TestCase):
                     self.assertEqual(allow, ("dev",), path.name)
 
 
+class FutSec8(ReproductionBase):
+    """scripts/fut_sec8.py on a mocked tool and a temporary reports directory (T039)."""
+
+    HEAD = ["--binary", Tool.binary, "--out-dir", evidence.REP_REL + "/fut-sec-8"]
+    REQUEST = "yes, go again (2026-11-04)"
+
+    def setUp(self):
+        super().setUp()
+        from protocol import seedsets
+        from scripts import fut_sec8
+        self.fut = fut_sec8
+        for rel in ("scripts/fut_sec8.py", "protocol/devinputs_v3.py", "protocol/seedsets.py",
+                    "phycoweb/model_v2.py", "phycoweb/lut.py", "fast/lut_table.h"):
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        write(self.root, Tool.make, "CFLAGS := -O2 -std=c99 -Werror -pthread\n")
+        write(self.root, "vectors/phyco-v2_a.hex", "x\n")
+        write(self.root, "vectors/phyco-v2_b.hex", "x\n")
+        self.commit("the demonstration's code")
+        self.seeds = [tuple(s) for s in seedsets.load("dev", allow=("dev",))[:3]]
+        self.vector_exit = 0
+        self.changes: Dict = {}
+        self.calls: List[List[str]] = []
+        self.locks: List[bool] = []
+        self.hours_projected = 0.4
+        self.real_guard = fut_sec8.guard_platform
+        self.real_project = fut_sec8.project
+        for name, side_effect in (("run_tool", self.tool),
+                                  ("project", lambda *a: (self.hours_projected, {"rate": 160.0})),
+                                  ("guard_platform", lambda: None)):
+            patcher = mock.patch.object(fut_sec8, name, side_effect=side_effect)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def tool(self, binary, args, cwd):
+        self.calls.append(list(args))
+        self.locks.append(evidence.REPO.heavy_lock.exists())
+        if args[0] == "--check-vectors":
+            files = [{"file": f, "words": 10000, "mismatches": self.vector_exit} for f in args[1:]]
+            return subprocess.CompletedProcess(args, self.vector_exit, json.dumps({"files": files}))
+        number = [seed[0] for seed in self.seeds].index(int(args[1]))
+        seed = self.seeds[number]
+        out = {"s0": seed[0], "s1": seed[1], "words": args[5:8], "candidates": 2 ** 32,
+               "after_one": 2, "after_two": 1, "after_three": 1,
+               "three_word_matches": [[seed[2], seed[3]]], "total_steps": 257 * 2 ** 32 + 3,
+               "seconds": 400.5, "steps_per_second": 2.7e9, "threads": 32}
+        out.update(self.changes.get(number, {}))
+        return subprocess.CompletedProcess(args, 0, json.dumps(out))
+
+    def script(self, *argv) -> int:
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return self.fut.main(list(argv))
+
+    def run_first(self) -> Dict:
+        self.assertEqual(self.script(*self.HEAD), 0)
+        return self.records()[-1]
+
+    def records(self) -> List[Dict]:
+        """Oldest first; two records of one test can share a second, so a repeat sorts last."""
+        found = [record for _, record in evidence.iter_records("demonstration", "fut-sec-8")]
+        return sorted(found, key=lambda record: (record["created_utc"],
+                                                 record.get("supersedes", NONE) != NONE))
+
+    def record_path(self, record: Dict) -> Path:
+        return self.root / evidence.REP_REL / "fut-sec-8" / f"{record['record_id']}.json"
+
+    def projections(self) -> List[Dict]:
+        return [record for _, record in evidence.iter_records("projection", "projections")]
+
+    # -------------------------------------------------------------------------- the first run
+
+    def test_the_targets_are_the_first_three_dev_seeds(self):
+        record = self.run_first()
+        self.assertEqual(record["targets"], [list(seed) for seed in self.seeds])
+        self.assertEqual(record["revealed"], [list(seed[:2]) for seed in self.seeds])
+
+    def test_a_held_out_set_exits_2_writing_nothing(self):
+        before = report_files(self.root)
+        with mock.patch.object(self.fut, "SEED_SET", "heldout-1"):
+            self.assertEqual(self.script(*self.HEAD), 2)
+        self.assertEqual(report_files(self.root), before)
+        self.assertEqual(self.calls, [])
+
+    def test_the_record_holds_every_field_of_data_model_section_4(self):
+        text = (ROOT / "specs/004-crypto-architecture-v3/data-model.md").read_bytes().decode("utf-8")
+        section = text[text.index("## 4. Demonstration record"):text.index("## 5.")]
+        names = []
+        for line in section.splitlines():
+            if line.startswith("| `"):
+                names += re.findall(r"`(\w+)`", line.split(" | ")[0])
+        self.assertGreater(len(names), 12)
+        record = self.run_first()
+        for name in names:
+            self.assertIn(name, record)
+
+    def test_a_first_record_holds_no_repeat_fields(self):
+        record = self.run_first()
+        self.assertEqual((record["supersedes"], record["defect"], record["owner_request"]),
+                         (NONE, NONE, NONE))
+
+    def test_the_observed_words_come_from_the_python_model_with_their_positions(self):
+        from phycoweb.model_v2 import PhycoWebEngineV2
+        record = self.run_first()
+        for number, seed in enumerate(self.seeds):
+            engine = PhycoWebEngineV2(seed)
+            words = [f"{engine.compute_block():08X}" for _ in range(3)]
+            self.assertEqual(record["observed"][number], {"positions": [1, 2, 3], "words": words})
+
+    def test_the_vector_check_comes_before_every_sweep(self):
+        record = self.run_first()
+        self.assertEqual(self.calls[0][0], "--check-vectors")
+        self.assertEqual(len(self.calls), 4)
+        self.assertEqual([entry["mismatches"] for entry in record["vector_check"]], [0, 0])
+        self.assertEqual([entry["words"] for entry in record["vector_check"]], [10000, 10000])
+
+    def test_a_vector_mismatch_stops_the_run(self):
+        self.vector_exit = 1
+        self.assertEqual(self.script(*self.HEAD), 3)
+        self.assertEqual(len(self.calls), 1)
+        record = self.records()[-1]
+        self.assertEqual((record["status"], record["exit_status"]), ("inconclusive", 3))
+
+    def test_a_failed_sweep_stops_the_run(self):
+        real = self.tool
+
+        def failing(binary, args, cwd):
+            done = real(binary, args, cwd)
+            if args[0] != "--check-vectors":
+                done.returncode = 1
+            return done
+
+        self.fut.run_tool.side_effect = failing
+        self.assertEqual(self.script(*self.HEAD), 3)
+        record = self.records()[-1]
+        self.assertEqual((record["status"], record["exit_status"]), ("inconclusive", 3))
+        self.assertEqual(len(self.calls), 2)
+
+    def test_it_holds_the_lock_through_every_tool_call(self):
+        record = self.run_first()
+        self.assertTrue(all(self.locks))
+        self.assertFalse(evidence.REPO.heavy_lock.exists())
+        self.assertIs(record["heavy_run"], True)
+        self.assertEqual(record["hours"]["projected"], self.hours_projected)
+        self.assertEqual(record["parallelism"]["threads"], 32)
+
+    def test_it_projects_first_under_its_own_row(self):
+        self.run_first()
+        self.assertEqual([p["row"] for p in self.projections()], [evidence.FUT_SEC_8_ROW])
+
+    def test_the_tool_and_model_are_named_by_hash(self):
+        record = self.run_first()
+        self.assertEqual(record["model_sha256"], self.fut.MODEL_SHA256)
+        self.assertEqual(record["tool"]["source_sha256"], self.source_sha256)
+        self.assertEqual(record["tool"]["binary_sha256"],
+                         evidence.sha256((self.root / Tool.binary).read_bytes()))
+        self.assertEqual(record["tool"]["threads"], 32)
+        self.assertIn("-Werror", record["tool"]["flags"])
+        for rel in self.fut.CODE:
+            self.assertIn(rel, record["code_sha256"])
+
+    def test_a_changed_model_exits_2(self):
+        write(self.root, "phycoweb/model_v2.py", b"# another model\n")
+        self.commit("another model")
+        self.assertEqual(self.script(*self.HEAD), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_another_binary_or_directory_exits_2(self):
+        self.assertEqual(self.script("--binary", "fast/build/other", "--out-dir",
+                                     self.HEAD[3]), 2)
+        self.assertEqual(self.script("--binary", Tool.binary, "--out-dir", "elsewhere"), 2)
+        self.assertEqual(self.script("--binary", Tool.binary), 2)
+        self.assertEqual(self.script(), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_the_search_runs_in_wsl_alone(self):
+        with mock.patch.object(evidence, "platform_name", return_value="windows"):
+            with self.assertRaisesRegex(Refused, "WSL"):
+                self.real_guard()
+        with mock.patch.object(evidence, "platform_name", return_value="wsl"):
+            self.real_guard()
+
+    def test_the_cost_and_its_extrapolation(self):
+        cost = self.run_first()["cost"]
+        steps = 3 * (257 * 2 ** 32 + 3)
+        self.assertEqual(cost["total_steps"], steps)
+        self.assertEqual(cost["seconds"], 3 * 400.5)
+        self.assertAlmostEqual(cost["steps_per_candidate"], steps / (3 * 2 ** 32))
+        self.assertAlmostEqual(cost["steps_per_second"], steps / (3 * 400.5))
+        self.assertEqual(cost["extrapolation"]["seeds"], 2 ** 64)
+        self.assertAlmostEqual(cost["extrapolation"]["steps"] / 2 ** 64, steps / (3 * 2 ** 32))
+
+    def test_the_report_holds_the_nine_items_with_t1_and_the_disclaimer(self):
+        record = self.run_first()
+        report = record["report"]
+        for number in range(1, 10):
+            self.assertEqual(len([key for key in report if key.startswith(f"{number}_")]), 1)
+        self.assertIn("T1", report["2_attacker"])
+        self.assertIn("position", report["2_attacker"])
+        self.assertEqual(report["disclaimer"], DESIGN_DISCLAIMER)
+        self.assertEqual(report["6_results"]["matches"], record["matches"])
+        self.assertEqual(report["8_reproduction"]["revision"], record["git_head"])
+
+    def test_every_target_recovered_is_a_confirmed_vulnerability_of_phyco_v2(self):
+        record = self.run_first()
+        self.assertEqual(record["recovered"], [True, True, True])
+        self.assertEqual((record["status"], record["exit_status"]), ("pass", 0))
+        self.assertEqual(record["classification"], "confirmed vulnerability")
+
+    def test_a_target_missed_exits_1(self):
+        self.changes[1] = {"three_word_matches": [], "after_three": 0, "after_two": 0}
+        self.assertEqual(self.script(*self.HEAD), 1)
+        record = self.records()[-1]
+        self.assertEqual(record["recovered"], [True, False, True])
+        self.assertEqual((record["status"], record["exit_status"]), ("fail", 1))
+        self.assertEqual(record["classification"], NONE)
+
+    # -------------------------------------------------------------------------- the baseline
+
+    def test_the_two_sided_poisson_test_on_constructed_counts(self):
+        mean = self.fut.MEAN_AFTER["one"]
+        self.assertAlmostEqual(mean, 1.0, places=9)
+        self.assertAlmostEqual(self.fut.poisson_p(0, 1.0), 2 * 0.36787944, places=6)
+        self.assertEqual(self.fut.poisson_p(1, 1.0), 1.0)
+        self.assertAlmostEqual(self.fut.poisson_p(5, 1.0), 2 * 0.00365985, places=6)
+        for count, agrees in ((0, True), (1, True), (4, True), (5, False), (9, False)):
+            self.assertEqual(self.fut.poisson_test(count, mean)["agrees"], agrees, count)
+
+    def test_the_pooled_test_uses_three_times_the_mean(self):
+        mean = 3 * self.fut.MEAN_AFTER["one"]
+        for count, agrees in ((0, True), (3, True), (8, True), (9, False)):
+            self.assertEqual(self.fut.poisson_test(count, mean)["agrees"], agrees, count)
+
+    def test_the_counts_leave_out_the_target(self):
+        matches = self.run_first()["matches"]
+        for entry in matches["per_target"]:
+            self.assertEqual((entry["after_one"], entry["false_after_one"]), (2, 1))
+            self.assertEqual((entry["after_two"], entry["false_after_two"]), (1, 0))
+            self.assertEqual((entry["after_three"], entry["false_after_three"]), (1, 0))
+            self.assertAlmostEqual(entry["expected_false"]["one"], 1.0, places=9)
+            self.assertAlmostEqual(entry["expected_false"]["two"], 2.0 ** -32, places=15)
+            self.assertAlmostEqual(entry["expected_false"]["three"] * 2.0 ** 64, 1.0, places=9)
+        self.assertEqual(matches["pooled"]["count"], 3)
+        self.assertEqual(matches["pooled"]["mean"], 3 * (2 ** 32 - 1) / 2 ** 32)
+        self.assertIs(matches["agrees"], True)
+        self.assertEqual(matches["deviations"], [])
+
+    def test_a_count_above_the_baseline_is_a_finding_and_no_reason_to_stop(self):
+        self.changes[0] = {"after_one": 9}
+        record = self.run_first()
+        self.assertEqual(record["matches"]["per_target"][0]["poisson"]["agrees"], False)
+        self.assertEqual(record["status"], "pass")
+        self.assertEqual(record["classification"], "unverified hypothesis")
+        self.assertEqual(record["recovered"], [True, True, True])
+
+    def test_a_targets_count_alone_can_disagree(self):
+        self.changes[0] = {"after_one": 6}
+        self.changes[1] = {"after_one": 1}
+        self.changes[2] = {"after_one": 1}
+        record = self.run_first()
+        self.assertFalse(record["matches"]["per_target"][0]["poisson"]["agrees"])
+        self.assertTrue(record["matches"]["pooled"]["agrees"])
+        self.assertIs(record["matches"]["agrees"], False)
+        self.assertEqual(record["classification"], "unverified hypothesis")
+
+    def test_a_pooled_count_alone_can_disagree(self):
+        for number in range(3):
+            self.changes[number] = {"after_one": 4}
+        record = self.run_first()
+        self.assertTrue(all(e["poisson"]["agrees"] for e in record["matches"]["per_target"]))
+        self.assertFalse(record["matches"]["pooled"]["agrees"])
+        self.assertEqual(record["classification"], "unverified hypothesis")
+
+    def test_a_false_match_after_two_words_is_a_deviation(self):
+        self.changes[2] = {"after_two": 2}
+        record = self.run_first()
+        self.assertEqual(record["matches"]["deviations"],
+                         [{"target": 2, "after": "two", "count": 1}])
+        self.assertEqual(record["classification"], "unverified hypothesis")
+
+    def test_an_extra_three_word_match_is_listed_and_separated_by_the_fourth_word(self):
+        seed = self.seeds[0]
+        extra = [(seed[2] + 1) % 65536, seed[3]]
+        self.changes[0] = {"after_two": 2, "after_three": 2,
+                           "three_word_matches": sorted([[seed[2], seed[3]], extra])}
+        record = self.run_first()
+        listed = {(item["s2"], item["s3"]): item for item in record["listed"][0]}
+        self.assertIs(listed[(seed[2], seed[3])]["fourth_word_matches"], True)
+        self.assertIs(listed[(seed[2], seed[3])]["is_target"], True)
+        self.assertIs(listed[tuple(extra)]["fourth_word_matches"], False)
+        self.assertIs(listed[tuple(extra)]["is_target"], False)
+        self.assertEqual(record["matches"]["deviations"],
+                         [{"target": 0, "after": "two", "count": 1},
+                          {"target": 0, "after": "three", "count": 1}])
+
+    def test_the_assumption_is_stated(self):
+        record = self.run_first()
+        self.assertIn("uniform and independent", record["assumption"])
+        self.assertIn("does not change the success criterion", record["assumption"])
+
+    # -------------------------------------------------------------------------- a second run
+
+    def test_quickstart_u4_a_second_run_exits_2(self):
+        self.run_first()
+        before = report_files(self.root)
+        self.calls.clear()
+        self.assertEqual(self.script(*self.HEAD), 2)
+        self.assertEqual(report_files(self.root), before)
+        self.assertEqual(self.calls, [])
+
+    def missed(self) -> Dict:
+        self.changes[0] = {"three_word_matches": [], "after_three": 0, "after_two": 0}
+        self.assertEqual(self.script(*self.HEAD), 1)
+        self.changes.clear()
+        self.commit("the record of the failed pass")
+        return self.records()[-1]
+
+    def test_a_repeat_needs_a_recorded_defect(self):
+        first = self.run_first()
+        self.commit("record")
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", "no-such-record",
+                                     "--owner-request", self.REQUEST), 2)
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", first["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+        self.assertEqual(len(self.records()), 1)
+
+    def test_a_repeat_needs_the_owners_request_with_its_date(self):
+        record = self.missed()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"]), 2)
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", "no date"), 2)
+        self.assertEqual(len(self.records()), 1)
+
+    def test_a_repeat_after_a_defect_writes_beside_the_first(self):
+        record = self.missed()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+        records = self.records()
+        self.assertEqual(len(records), 2)
+        self.assertEqual(records[-1]["supersedes"], record["record_id"])
+        self.assertEqual(records[-1]["defect"], record["record_id"])
+        self.assertEqual(records[-1]["owner_request"], self.REQUEST)
+        self.assertTrue(self.record_path(record).exists())
+
+    def test_a_crash_is_a_recorded_defect_too(self):
+        self.vector_exit = 1
+        self.assertEqual(self.script(*self.HEAD), 3)
+        self.vector_exit = 0
+        crashed = self.records()[-1]
+        self.commit("the record of the crash")
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", crashed["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+
+    def test_a_defect_that_a_record_names_opens_no_second_repeat(self):
+        record = self.missed()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+        self.commit("the repeat")
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+        self.assertEqual(len(self.records()), 2)
+
+    def test_a_repeat_is_charged_to_the_feature_wide_row(self):
+        record = self.missed()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+        rows = [p["row"] for p in self.projections()]
+        self.assertEqual(rows.count(evidence.FEATURE_ROW), 1)
+        self.assertEqual(rows.count(evidence.FUT_SEC_8_ROW), 1)
+
+    def test_a_repeat_that_does_not_fit_the_row_exits_2(self):
+        record = self.missed()
+        self.hours_projected = evidence.FEATURE_ROW_HOURS + 1
+        self.calls.clear()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+        self.assertEqual(self.calls, [])
+        self.assertEqual(len(self.records()), 1)
+
+    def ended(self) -> Dict:
+        record = self.run_first()
+        path = self.record_path(record)
+        data = json.loads(path.read_bytes())
+        data["ended_outside"] = "2026-11-04T00:00:00Z"
+        path.write_bytes(evidence.pretty(data))
+        self.commit("a pass ended from outside")
+        return data
+
+    def test_a_repeat_after_a_pass_ended_from_outside(self):
+        record = self.ended()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-end", record["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+        latest = self.records()[-1]
+        self.assertEqual((latest["supersedes"], latest["defect"]), (record["record_id"], NONE))
+
+    def test_an_ended_pass_opens_one_repeat(self):
+        record = self.ended()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-end", record["record_id"],
+                                     "--owner-request", self.REQUEST), 0)
+        self.commit("the repeat")
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-end", record["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+
+    def test_a_pass_that_finished_is_no_ended_pass(self):
+        first = self.run_first()
+        self.commit("record")
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-end", first["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+
+    def test_an_ended_pass_is_no_defect(self):
+        record = self.ended()
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", record["record_id"],
+                                     "--owner-request", self.REQUEST), 2)
+
+    def test_a_first_run_takes_no_repeat_arguments(self):
+        self.assertEqual(self.script(*self.HEAD, "--owner-request", self.REQUEST), 2)
+        self.assertEqual(self.script(*self.HEAD, "--repeat-after-defect", "x",
+                                     "--owner-request", self.REQUEST), 2)
+        self.assertEqual(self.calls, [])
+
+    # ------------------------------------------------------------------------- --verify
+
+    def test_verify_passes_on_a_true_record(self):
+        record = self.run_first()
+        self.assertEqual(self.script("--verify", record["record_id"]), 0)
+        self.assertEqual(self.script("--verify", str(self.record_path(record))), 0)
+
+    def tampered(self, change) -> int:
+        record = self.run_first()
+        path = self.record_path(record)
+        data = json.loads(path.read_bytes())
+        change(data)
+        path.write_bytes(evidence.pretty(data))
+        return self.script("--verify", str(path))
+
+    def test_verify_exits_1_on_a_listed_match_that_does_not_match(self):
+        def change(data):
+            data["listed"][0][0]["s3"] = (data["listed"][0][0]["s3"] + 1) % 65536
+        self.assertEqual(self.tampered(change), 1)
+
+    def test_verify_exits_1_on_an_entry_true_in_all_but_its_three_words(self):
+        from phycoweb.model_v2 import PhycoWebEngineV2
+        seed = self.seeds[0]
+        s2, s3 = (seed[2] + 1) % 65536, seed[3]
+        engine = PhycoWebEngineV2((seed[0], seed[1], s2, s3))
+        word = [engine.compute_block() for _ in range(4)][3]
+
+        def change(data):
+            data["listed"][0].append({"s2": s2, "s3": s3, "is_target": False,
+                                      "fourth_word": f"{word:08X}", "fourth_word_matches": False})
+        self.assertEqual(self.tampered(change), 1)
+
+    def test_verify_exits_1_on_a_wrong_observed_word(self):
+        def change(data):
+            data["observed"][1]["words"][2] = "00000000"
+        self.assertEqual(self.tampered(change), 1)
+
+    def test_verify_exits_1_on_a_wrong_fourth_word(self):
+        def change(data):
+            data["listed"][2][0]["fourth_word"] = "00000000"
+        self.assertEqual(self.tampered(change), 1)
+
+    def test_verify_exits_1_on_a_recovered_flag_that_disagrees(self):
+        def change(data):
+            data["recovered"][0] = False
+        self.assertEqual(self.tampered(change), 1)
+
+    def test_verify_runs_no_tool_and_writes_nothing(self):
+        record = self.run_first()
+        before = report_files(self.root)
+        self.calls.clear()
+        self.assertEqual(self.script("--verify", record["record_id"]), 0)
+        self.assertEqual(self.calls, [])
+        self.assertEqual(report_files(self.root), before)
+
+    def test_verify_of_no_record_exits_2(self):
+        self.assertEqual(self.script("--verify", "no-such-record"), 2)
+
+    # ---------------------------------------------------------------------- --reproduce
+
+    def reproduce_args(self, record: Dict, request: bool = True) -> List[str]:
+        args = ["--reproduce", record["record_id"], "--binary", Tool.binary]
+        return args + (["--owner-request", self.REQUEST] if request else [])
+
+    def reviewed(self) -> Dict:
+        record = self.run_first()
+        self.commit("the demonstration record")
+        self.add_row("FUT-SEC-8 result review", "Approved", "the row")
+        return record
+
+    def test_reproduce_exits_2_before_the_review(self):
+        record = self.run_first()
+        self.commit("the demonstration record")
+        self.calls.clear()
+        self.assertEqual(self.script(*self.reproduce_args(record)), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_reproduce_exits_2_on_a_review_declined(self):
+        record = self.run_first()
+        self.commit("the demonstration record")
+        self.add_row("FUT-SEC-8 result review", "Declined", "the row")
+        self.calls.clear()
+        self.assertEqual(self.script(*self.reproduce_args(record)), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_reproduce_exits_2_without_the_owners_request(self):
+        record = self.reviewed()
+        self.calls.clear()
+        self.assertEqual(self.script(*self.reproduce_args(record, request=False)), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_a_reproduction_that_agrees_writes_its_record_and_changes_no_demonstration(self):
+        record = self.reviewed()
+        self.assertEqual(self.script(*self.reproduce_args(record)), 0)
+        written = self.reproduction_record(self.record_path(record))
+        self.assertEqual(written["outcome"], "match")
+        self.assertEqual(written["owner_request"], self.REQUEST)
+        self.assertEqual(written["original"]["record_id"], record["record_id"])
+        self.assertEqual(len(self.records()), 1)
+
+    def test_a_reproduction_reports_the_timings_and_compares_the_steps(self):
+        record = self.reviewed()
+        for number in range(3):
+            self.changes[number] = {"seconds": 999.5, "steps_per_second": 1.0e9}
+        self.assertEqual(self.script(*self.reproduce_args(record)), 0)
+        written = self.reproduction_record(self.record_path(record))
+        self.assertEqual(written["compared"]["cost"], "match")
+        self.assertEqual(written["compared"]["tool"], "match")
+        self.assertEqual(written["reported"]["cost"]["seconds"], 3 * 999.5)
+        self.assertEqual(written["reported"]["tool"]["threads"], 32)
+
+    def test_a_reproduction_with_other_steps_differs(self):
+        record = self.reviewed()
+        self.changes[0] = {"total_steps": 257 * 2 ** 32 + 5}
+        self.assertEqual(self.script(*self.reproduce_args(record)), 1)
+        written = self.reproduction_record(self.record_path(record))
+        self.assertEqual(written["compared"]["cost"], "differs")
+        self.assertEqual(written["outcome"], "differs")
+
+    def test_a_reproduction_with_another_count_differs(self):
+        record = self.reviewed()
+        self.changes[1] = {"after_one": 3}
+        self.assertEqual(self.script(*self.reproduce_args(record)), 1)
+        written = self.reproduction_record(self.record_path(record))
+        self.assertEqual(written["compared"]["matches"], "differs")
+
+    # ---------------------------------------------------------------------- the projection
+
+    def test_the_projection_reads_the_tools_progress_lines_alone(self):
+        calls = {}
+
+        class Process:
+            stderr = iter(["progress: 400 of 65536 s2 values in 5 s\n",
+                           "progress: 800 of 65536 s2 values in 10 s\n"])
+
+            def kill(self):
+                calls["killed"] = True
+
+            def wait(self):
+                return 0
+
+        with mock.patch.object(self.fut.subprocess, "Popen", return_value=Process()) as popen, \
+                mock.patch.object(self.fut, "PROBE_SECONDS", 0):
+            hours, speed = self.real_project(Path("tool"), self.root, self.seeds[0])
+        self.assertEqual(calls, {"killed": True})
+        self.assertEqual(speed, {"s2_values_per_second": 80.0})
+        self.assertAlmostEqual(hours, 3 * 65536 / 80.0 / 3600.0)
+        self.assertIn("--progress", popen.call_args[0][0])
+
+    def test_a_projection_that_sees_no_progress_is_a_tool_failure(self):
+        class Process:
+            stderr = iter(["no such line\n"])
+
+            def kill(self):
+                pass
+
+            def wait(self):
+                return 0
+
+        with mock.patch.object(self.fut.subprocess, "Popen", return_value=Process()):
+            with self.assertRaises(evidence.ToolFailure):
+                self.real_project(Path("tool"), self.root, self.seeds[0])
+
+
 if __name__ == "__main__":
     unittest.main()
