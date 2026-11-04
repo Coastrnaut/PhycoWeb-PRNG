@@ -1,0 +1,362 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "degree-small is re-found",
+      "holds": true
+    }
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "5d50fb6c12348aa8f19f2941af6efa459ae4c4735ff282db155763266ade31e4"
+    },
+    "research/004/ir.py": {
+      "kind": "raw",
+      "sha256": "118566f4faf3ad8dd9a00e7e7593ce2087d572a78cf46142beee6631f288a311"
+    },
+    "research/004/tools/degree.py": {
+      "kind": "raw",
+      "sha256": "6d6f21f8378a5a210032e833e01854793bab109247e8d9e0cb05a4ec8640836a"
+    },
+    "research/004/validation/degree-small-second.py": {
+      "kind": "raw",
+      "sha256": "7415596b981767b0a28c2f520d6d9478c8461c1b1ab6625e58a485291c54a4d9"
+    },
+    "research/004/validation/degree-small.py": {
+      "kind": "raw",
+      "sha256": "3bfc15a8e2d23be68a89b2a4461c51b64096e51434d30193a310def532a10bb3"
+    },
+    "scripts/validate_tool.py": {
+      "kind": "raw",
+      "sha256": "ac4415ec3c39fc40baf6693c5ff50402ea0704a9f9a594e046899f8a2662fd71"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/validate_tool.py --tool degree --known degree-small --out-dir reports/004-crypto-architecture-v3/validation",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-04T19:40:49Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "found": {
+    "degree-small": {
+      "rows": [
+        {
+          "counts": {
+            "forward": [
+              18,
+              31,
+              31
+            ],
+            "inverse": [
+              18,
+              31,
+              31
+            ]
+          },
+          "exact_degrees": [
+            5,
+            7,
+            7
+          ],
+          "inside_out": [
+            2,
+            19
+          ],
+          "limit": 20,
+          "list": "small",
+          "marked": "the rule's count, not an upper bound",
+          "n": 2,
+          "phase_counts": {
+            "forward": [
+              3,
+              1,
+              2,
+              3
+            ],
+            "inverse": [
+              3,
+              2,
+              1,
+              3
+            ]
+          },
+          "re_found": true,
+          "rounds": [
+            1,
+            2,
+            3
+          ],
+          "rounds_with_bound_within_limit": {
+            "forward": [],
+            "inverse": []
+          },
+          "rounds_within_limit": {
+            "forward": [
+              1
+            ],
+            "inverse": [
+              1
+            ]
+          },
+          "upper_bounds": {
+            "forward": [
+              24,
+              31,
+              31
+            ],
+            "inverse": [
+              24,
+              31,
+              31
+            ]
+          },
+          "w": 4
+        },
+        {
+          "counts": {
+            "forward": [
+              42,
+              63,
+              63
+            ],
+            "inverse": [
+              42,
+              63,
+              63
+            ]
+          },
+          "exact_degrees": [
+            8,
+            11,
+            15
+          ],
+          "inside_out": [
+            2,
+            43
+          ],
+          "limit": 50,
+          "list": "small",
+          "marked": "the rule's count, not an upper bound",
+          "n": 2,
+          "phase_counts": {
+            "forward": [
+              7,
+              1,
+              2,
+              3
+            ],
+            "inverse": [
+              3,
+              2,
+              1,
+              7
+            ]
+          },
+          "re_found": true,
+          "rounds": [
+            1,
+            2,
+            3
+          ],
+          "rounds_with_bound_within_limit": {
+            "forward": [
+              1
+            ],
+            "inverse": [
+              1
+            ]
+          },
+          "rounds_within_limit": {
+            "forward": [
+              1
+            ],
+            "inverse": [
+              1
+            ]
+          },
+          "upper_bounds": {
+            "forward": [
+              48,
+              63,
+              63
+            ],
+            "inverse": [
+              48,
+              63,
+              63
+            ]
+          },
+          "w": 8
+        },
+        {
+          "counts": {
+            "forward": [
+              186,
+              1023,
+              1023
+            ],
+            "inverse": [
+              186,
+              1023,
+              1023
+            ]
+          },
+          "inside_out": null,
+          "limit": 126,
+          "list": "small",
+          "marked": "the rule's count, not an upper bound",
+          "n": 4,
+          "phase_counts": {
+            "forward": [
+              31,
+              1,
+              2,
+              3
+            ],
+            "inverse": [
+              3,
+              2,
+              1,
+              31
+            ]
+          },
+          "re_found": true,
+          "rounds": [
+            1,
+            2,
+            3
+          ],
+          "rounds_with_bound_within_limit": {
+            "forward": [],
+            "inverse": []
+          },
+          "rounds_within_limit": {
+            "forward": [],
+            "inverse": []
+          },
+          "upper_bounds": {
+            "forward": [
+              192,
+              1023,
+              1023
+            ],
+            "inverse": [
+              192,
+              1023,
+              1023
+            ]
+          },
+          "w": 32
+        }
+      ]
+    }
+  },
+  "git_dirty": false,
+  "git_head": "68e6624ce4e45e2b626d3557a2e61d7503b68454",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "validation",
+  "known_result": {
+    "known_id": "degree-small",
+    "path": "research/004/validation/degree-small.py",
+    "provenance_seq": 103,
+    "sha256": "3bfc15a8e2d23be68a89b2a4461c51b64096e51434d30193a310def532a10bb3",
+    "sha256_kind": "raw"
+  },
+  "licence": "GPL-3.0, this repository",
+  "limitations": [],
+  "model_id": null,
+  "outcome": "re-found",
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 498,
+  "record_id": "validation-20261104T194049Z-1c805114",
+  "research_sha256": "b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "second_known_result": {
+    "known_id": "degree-small-second",
+    "path": "research/004/validation/degree-small-second.py",
+    "provenance_seq": 102,
+    "sha256": "7415596b981767b0a28c2f520d6d9478c8461c1b1ab6625e58a485291c54a4d9",
+    "sha256_kind": "raw"
+  },
+  "source": {
+    "repository": "research/004/validation/degree-small.py"
+  },
+  "spec_sha256": "e9565d1cb0653f977a045c257bcd3eaf5d5134d6f8e4f0739de0f3c892923133",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "tool": "degree",
+  "tool_sha256": "6d6f21f8378a5a210032e833e01854793bab109247e8d9e0cb05a4ec8640836a",
+  "validated_kind": {
+    "degree-small": {
+      "model": "the bottom-up count of research R13, with its bound and its inside-out count",
+      "operations": "XOR, AND, OR, NOT, rotations, shifts, addition and subtraction of words",
+      "uses": [
+        {
+          "covered_by": [
+            "degree-small"
+          ],
+          "use": "the `degree` record at each claimable size, w = 32"
+        },
+        {
+          "covered_by": [
+            "degree-small"
+          ],
+          "use": "the exact degree beside the count, at w = 4 and 8"
+        }
+      ],
+      "widths": [
+        4,
+        8,
+        32
+      ]
+    }
+  },
+  "variant_id": null,
+  "version": "6d6f21f8378a5a210032e833e01854793bab109247e8d9e0cb05a4ec8640836a",
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}

@@ -645,7 +645,7 @@ hash, older than its first counted result.
   them, and bit i of an addition or subtraction depending on bits 0…i of both operands; R_f and R_b
   round by round; and the propagation through instantiate with its margin over R_f; validate it on
   the hand-derived matrices at 3×3 and 4×4. (FR-029, FR-037, FR-039; SC-005, SC-007; R13)
-- [ ] T056 [P] [US4] Write `research/004/tools/degree.py` (R13), the degree derivation: the
+- [X] T056 [P] [US4] Write `research/004/tools/degree.py` (R13), the degree derivation: the
   bottom-up count of research R13 per phase and round, capped at b − 1, beside its upper bound with
   w for each addition and subtraction, and the inside-out count; validate it on its stated list at
   w = 4, an ARX-box spread over two phases and a bitwise S-box, the exact degree from the truth
