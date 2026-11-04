@@ -356,7 +356,7 @@ or key-loading code is written here.
   `nistrng==1.2.3`; the three Hypothesis pins of R19 commented out, naming the open item; and a
   comment that the analysis tools need Python 3.10 or later, that the model needs only the standard
   library, and that the markers admit Python 3.11 to 3.13 untested. (FR-035, FR-053; R17, R18)
-- [ ] T025 **Owner**: run `python scripts/owner_record.py environment --platform windows --by NAME`
+- [X] T025 **Owner**: run `python scripts/owner_record.py environment --platform windows --by NAME`
   on Windows and `wpy scripts/owner_record.py environment --platform wsl --by NAME` in WSL, writing
   `$REP/environment-windows.json` and `$REP/environment-wsl.json`; add a row "Environment record
   <n>" per record to `specs/004-crypto-architecture-v3/spec.md`, naming the platform, the printed
