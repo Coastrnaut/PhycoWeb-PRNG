@@ -443,14 +443,14 @@ or key-loading code is written here.
 
 ### Step (8): development inputs
 
-- [ ] T033 [P] Write `tests/test_devinputs_v3.py` (data-model §2; R3): each input is the SHA-256 of
+- [X] T033 [P] Write `tests/test_devinputs_v3.py` (data-model §2; R3): each input is the SHA-256 of
   `phycoweb-004/dev/<kind>/<i>`, test states of `phycoweb-004/dev/state/n<n>w<w>/<i>/<j>`, and the
   uniform controls come from `phycoweb-004/control/`; the loader refuses every other namespace,
   `control` for any kind but a control, and any index outside the use's declared range; fingerprints
   are checked at load for every allowed (n, w), at most 16 pairs, and for the synthetic seeds; the
   closed class of constructed inputs holds only its listed members; quickstart P2 and P3. (FR-040;
   SC-011; R3)
-- [ ] T034 Write `protocol/devinputs_v3.py`, standard library only, giving every input and the
+- [X] T034 Write `protocol/devinputs_v3.py`, standard library only, giving every input and the
   synthetic seeds through `load`, as quickstart P2 and contracts/cli.md call it, with the
   fingerprints, until `tests/test_devinputs_v3.py` passes. (FR-040; SC-011; R3)
 

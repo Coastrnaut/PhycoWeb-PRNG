@@ -29,6 +29,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
+from protocol.devinputs_v3 import InputRefused, UnknownInput
 from protocol.disclaimer import DESIGN_DISCLAIMER
 
 EXIT_OK, EXIT_VERDICT, EXIT_REFUSED, EXIT_TOOL = 0, 1, 2, 3
@@ -2115,10 +2116,12 @@ def reproduce(job: Reproduction) -> int:
 
 
 def main_guard(fn: Callable[[], int]) -> int:
-    """Run a script's body, turning a refusal into exit 2 and a tool failure into exit 3."""
+    """Run a script's body, turning a refusal into exit 2 and a tool failure into exit 3. The
+    loader's refusals are refusals here, though one of them is a PermissionError (data-model
+    section 2), so they are named before OSError, which stays a tool failure."""
     try:
         return fn()
-    except Refused as exc:
+    except (Refused, InputRefused, UnknownInput) as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return EXIT_REFUSED
     except (ToolFailure, OSError) as exc:
