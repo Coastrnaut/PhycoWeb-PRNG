@@ -426,10 +426,12 @@ or key-loading code is written here.
   `<python> -I -m pip install --user --no-index --no-deps` and the three Windows wheels with
   `typing_extensions-4.16.0-py3-none-any.whl` (row "Download 1"), `<python>` being the full path of
   the app execution alias of research R1's Store Python, and in WSL with
-  `~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` and the two WSL wheels; if
-  pip refuses a user install under `-I`, stop for the owner's decision. Compare `pip freeze` with
-  R18's pins on each platform, then write the Hypothesis pins into `requirements.txt`, each marked
-  for its platform. (FR-046, FR-058; R18, R19)
+  `~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` and the two WSL wheels, each
+  wheel named by its pin with `--find-links` for its directory, since `pip freeze` prints a wheel
+  installed by path as a file URL, which the comparison with the pins cannot read; if pip refuses a
+  user install under `-I`, stop for the owner's decision. Compare `pip freeze` with R18's pins on
+  each platform, then write the Hypothesis pins into `requirements.txt`, each marked for its
+  platform. (FR-046, FR-058; R18, R19)
 
 ### Step (7): the new environment records
 

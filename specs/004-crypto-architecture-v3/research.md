@@ -2312,12 +2312,14 @@ licence does not touch the project's GPL-3.0.
 
 **Software.** Installed from the downloaded files into the two existing environments, from outside
 the download directory: on Windows by `<python> -I -m pip install --user --no-index --no-deps`
-followed by the paths of the three Windows wheels and of
+followed by the three Windows wheels and
 `typing_extensions-4.16.0-py3-none-any.whl` (45,571 bytes, PSF-2.0), which `exceptiongroup` needs
 below Python 3.13 and the row "Download 1" permits, `<python>` being the full path of the app
 execution alias of R1's Store Python, since Windows refuses to run the versioned path itself, so
 that pip reads the downloaded files under `-I`, and in WSL by
-`~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` with the two WSL wheels. If
+`~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` with the two WSL wheels.
+Each wheel is named by its pin, with `--find-links` for its directory, not by its path: `pip freeze`
+prints a wheel installed by path as a file URL, which the comparison with the pins cannot read. If
 pip refuses a user install under `-I`, the install stops for the owner's decision, and
 nothing runs from the download directory. A check after each install compares
 `pip freeze` with R18's pins, which enter `requirements.txt` only then (R18). The
