@@ -3146,6 +3146,16 @@ class FutSec8(ReproductionBase):
     def test_verify_of_no_record_exits_2(self):
         self.assertEqual(self.script("--verify", "no-such-record"), 2)
 
+    def test_verify_of_an_aborted_record_exits_2(self):
+        self.vector_exit = 1
+        self.assertEqual(self.script(*self.HEAD), 3)
+        self.assertEqual(self.script("--verify", self.records()[-1]["record_id"]), 2)
+
+    def test_verify_of_another_kind_of_record_exits_2(self):
+        self.run_first()
+        projection = self.projections()[0]
+        self.assertEqual(self.script("--verify", projection["record_id"]), 2)
+
     # ---------------------------------------------------------------------- --reproduce
 
     def reproduce_args(self, record: Dict, request: bool = True) -> List[str]:
@@ -3169,6 +3179,17 @@ class FutSec8(ReproductionBase):
         record = self.run_first()
         self.commit("the demonstration record")
         self.add_row("FUT-SEC-8 result review", "Declined", "the row")
+        self.calls.clear()
+        self.assertEqual(self.script(*self.reproduce_args(record)), 2)
+        self.assertEqual(self.calls, [])
+
+    def test_reproduce_of_an_aborted_record_exits_2(self):
+        self.vector_exit = 1
+        self.assertEqual(self.script(*self.HEAD), 3)
+        self.vector_exit = 0
+        record = self.records()[-1]
+        self.commit("the aborted record")
+        self.add_row("FUT-SEC-8 result review", "Approved", "the row")
         self.calls.clear()
         self.assertEqual(self.script(*self.reproduce_args(record)), 2)
         self.assertEqual(self.calls, [])

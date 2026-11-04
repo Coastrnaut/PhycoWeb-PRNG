@@ -376,12 +376,18 @@ def demonstrate(args: argparse.Namespace, command: List[str]) -> int:
 
 
 def read_record(reference: str) -> Tuple[Path, Dict]:
+    """A demonstration record that holds a result: an aborted run's holds none to check."""
     path = Path(reference)
     if path.is_file():
-        return path, json.loads(path.read_bytes().decode("utf-8"))
-    found = evidence.find_record(reference)
-    if found is None:
-        raise Refused(f"no record {reference}")
+        found = path, json.loads(path.read_bytes().decode("utf-8"))
+    else:
+        located = evidence.find_record(reference)
+        if located is None:
+            raise Refused(f"no record {reference}")
+        found = located
+    record = found[1]
+    if record.get("kind") != "demonstration" or "targets" not in record:
+        raise Refused(f"{record.get('record_id', reference)} holds no demonstration result")
     return found
 
 
