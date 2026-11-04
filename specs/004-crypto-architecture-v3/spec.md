@@ -3123,7 +3123,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   and the recorded command, with the model hash and tool versions recorded (Principle V), the kinds
   that FR-061 leaves out excepted, each with its reason: the records of an owner's act, an
   outside fact or an event, which a later run cannot regenerate, and the
-  reproduction records, which are not reproduced (data-model §1; REP-085).
+  reproduction records, which are not reproduced, and a record that holds `ended_outside`, whose
+  run gave no result (research R7; data-model §1; REP-085).
   `requirements.txt` MUST be corrected and its versions pinned (checklist group F), the Hypothesis
   pins entering it once their wheels are installed and checked (research R18). These rules
   make that checkable:
@@ -3541,7 +3542,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   committed per-round summaries suffice (for example, R_f from the per-round flag "every output bit
   depends on every input bit", and the bias tool's validation from each synthetic set's committed
   summary), and local-only outputs serve only to re-derive a committed summary, which the re-check
-  also does when they are present; it lists both checks per kind. The re-check is the routine
+  also does when they are present; it lists both checks per kind. A record that `clear_lock.py`
+  wrote for a run that died holding the lock holds no saved output and no verdict: the re-check
+  checks its `status`, its classification and its hours used against it and the `lock-cleared`
+  record that names it (data-model §1). The re-check is the routine
   reproduction test (User Story 4), and it runs the frozen verdict scripts (FR-043): the verdict
   functions it applies are those of `protocol/evidence.py`, which the scripts that wrote the records
   call: for the rules in force at a record's entry, those at that record's `git_head`, from a

@@ -275,7 +275,8 @@ or key-loading code is written here.
   environment, that no process with the lock's PID and start time still runs, and writes a
   `lock-cleared` record, `$REP/locks/<record_id>.json`, and, for the heavy-run lock, the
   `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
-  record, the hours from the time the lock holds to the clearing being its hours used, or, where the
+  record, which says that the test ended there and kept none, the `lock-cleared` record naming
+  either, the hours from the time the lock holds to the clearing being its hours used, or, where the
   boot time of the lock's environment is later than the time the lock holds, a run ended from
   outside, the hours up to that boot time, the record then holding it as `ended_outside` and saying
   that the outputs the run left under a temporary name were discarded unread, with its tests in
@@ -896,8 +897,11 @@ candidates are otherwise `ineligible` (R6, R7).
 - [ ] T086 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
   (contracts/cli.md; R16), standard library and `protocol/` only, which recomputes every verdict of
   FR-065 from committed files, the `trail` records' weights and classifications among them, and
-  writes a `recheck` record naming the interpreter, the platform and its `pip freeze`; with its
-  import test in `tests/test_records_004.py`. (FR-065; SC-017; ANA-086)
+  writes a `recheck` record naming the interpreter, the platform and its `pip freeze`; a record that
+  `scripts/clear_lock.py` wrote for a run that died holding the lock is no disagreement, its
+  `status`, `classification` and hours used checked against it and the `lock-cleared` record that
+  names it, exit 1 on any other; with its tests, this case among them, and its import test in
+  `tests/test_records_004.py`. (FR-065; SC-017; ANA-086)
 - [ ] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
   `entered-d4` entry per candidate of the set, before the first score. (FR-022, FR-041; R6)
 - [ ] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the

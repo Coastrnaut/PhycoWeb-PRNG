@@ -327,7 +327,7 @@ earlier record's ID, `defect`, the defect's, `none` after a pass ended from outs
 `owner_request`. Exit 1 if a target is not recovered.
 
 Neither of the other two modes is a demonstration attempt, and each takes a demonstration record by
-its ID, so that every earlier record stays reproducible:
+its ID, so that every earlier record with a result stays reproducible:
 
 - `--verify RECORD` re-checks every listed three-word match and every recovered seed with
   `model_v2`, in seconds, with no sweep. Exit 1 on any disagreement.
@@ -901,7 +901,11 @@ fresh clone from committed files, so it works from the committed per-round summa
 example R_f from the per-round flag "every output bit depends on every input bit". Where
 local-only outputs are present, it also re-derives each committed summary from them. Its output
 lists both checks per kind, and it verifies the inventory of superseded operation lists
-(data model §3). With `--reproduce RECORD` it runs a recorded re-check again, as the introduction
+(data model §3). A record that `clear_lock.py` wrote for a run that died holding the heavy-run
+lock holds no saved output: it recomputes no verdict from it, and checks, against it and the
+`lock-cleared` record that names it, that its `status` is `inconclusive`, its `classification`
+`none` and its hours used those that `clear_lock.py` states, exit 1 otherwise (data model §1).
+With `--reproduce RECORD` it runs a recorded re-check again, as the introduction
 describes, comparing its verdicts and counts (data model §1); like the re-check, it may run in any
 environment.
 
@@ -1191,8 +1195,9 @@ lock's environment, that no process with the PID and start time the lock holds s
 otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
 `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
-record (Budget, above), its hours used, or its time, being the hours from the time the lock holds
-to the clearing, the most the run can have used, since nothing else shows when it died. Where
+record (Budget, above), which the `lock-cleared` record names, its hours used, or its time, being
+the hours from the time the lock holds to the clearing, the most the run can have used, since
+nothing else shows when it died. Where
 the boot time of the lock's environment is later than the time the lock holds, a reboot, a power
 loss or an update ended the run (research R7): that boot time shows when, so those hours stop
 there, the record holds it as `ended_outside`, and the outputs the run left under a temporary

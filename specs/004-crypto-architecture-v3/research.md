@@ -806,8 +806,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     cap. A uniform control so ended counts as none: no test of its kind starts at that size until
     it has run again, with the same counts and the same inputs, every row it counts charged again
     in full. A FUT-SEC-8 pass so ended is repeated only on the owner's request, charged to the
-    feature-wide row (below). Every other run keeps its own rule, a validation's recorded attempts
-    and a heavy reproduction's owner's request among them.
+    feature-wide row (below). A rule that lets a run be made once counts no run so ended, and every
+    other rule of its kind holds, a validation's recorded attempts and a heavy reproduction's
+    owner's request among them.
   - **Stricter changes during a candidate's runs.** A stricter change of a rule is applied first
     by recomputing the verdicts from saved outputs. New measurements it needs, such as more
     inputs, are a new measurement of the same kind under the changed rule, not a re-run: the
@@ -1920,7 +1921,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     that made the original, the environment record the original cites, and in no other, exiting 2,
     writing nothing, with the reason "environment record <id> is not in force", while that record is
     not the platform's record in force (R1; REP-100), a `recheck` record's
-    reproduction excepted, which runs anywhere, as the re-check does (R1).
+    reproduction excepted, which runs anywhere, as the re-check does (R1). It exits 2 for a record
+    that holds `ended_outside`, whose run gave no result (R7).
     A run that used a C tool is reproduced with a rebuild too: before it runs, the reproduction
     removes the committed binary from a second worktree of the commit, since make would otherwise
     take it as up to date and compile nothing, rebuilds the tool's binary there from that commit's
@@ -1973,7 +1975,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     committed files, so the committed per-round summaries must suffice, for example R_f from the
     per-round flag "every output bit depends on every input bit". Local-only outputs serve only
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
-    it lists both checks per kind. This re-check is the routine test of User Story 4. It recomputes
+    it lists both checks per kind. A record that `clear_lock.py` wrote for a run that died holding
+    the lock holds no saved output: the re-check recomputes no verdict from it, and checks its
+    `status`, its `classification` and its hours used against it and the `lock-cleared` record that
+    names it (data-model §1). This re-check is the routine test of User Story 4. It recomputes
     each verdict under the rules in force at the protocol change-log entry its record cites and,
     where a later stricter change applies (FR-044), also under the current rules, listing both. A
     disagreement under the rules in force at a record's entry blocks the candidate as a differing
@@ -2020,8 +2025,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     removes one, and only when no process with that PID and start time runs; it writes a
     `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
     A heavy run that died holding the lock then gets the `inconclusive` record that every started
-    run writes, the hours from the time the lock holds to the clearing being its hours used, the
-    most it can have used, or, where the boot time of the lock's environment is later than the
+    run writes, which the `lock-cleared` record names, the hours from the time the lock holds to
+    the clearing being its hours used, the most it can have used, or, where the boot time of the
+    lock's environment is later than the
     time the lock holds, a run ended from outside (R7), the hours up to that boot time, after
     which it cannot have run (data-model §1; cli contract). Before the protocol change log exists a
     `lock-cleared` record and an

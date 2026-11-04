@@ -110,7 +110,7 @@ implementation can write byte-identical files:
 | `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` and `review_status` stay as written, `pending` where no review preceded the record, which is never overwritten: its review is a provenance entry that names the record's ID and SHA-256 (section 14) |
 | `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
 | `heavy_run`, `hours` | bool, object | `heavy_run` true if the run held the heavy-run lock (FR-045); `hours`, for a heavy run, the hours projected and the hours used (research R7), per run where a reproduction made two, which the Budget guard reads for research R7's feature-wide row (cli contract) and a reproduction reports only, and `none` for every other run |
-| `ended_outside` | str | in the `inconclusive` record of a run ended from outside (research R7), which `scripts/clear_lock.py` writes, the boot time of the lock's environment, later than the time the lock holds; `none` in every other record. Such a run gave no result: its record decides nothing, its kind's run has not finished, and a reproduction exits 2 for it (cli contract) |
+| `ended_outside` | str | in the record that `scripts/clear_lock.py` writes for a run ended from outside (research R7), the boot time of the lock's environment, later than the time the lock holds; `none` in every other record. Such a run gave no result: its record decides nothing, its kind's run has not finished, and a reproduction exits 2 for it (cli contract) |
 | `disclaimer` | str | `protocol.disclaimer.DESIGN_DISCLAIMER`, verbatim (FR-068) |
 
 Statistical records (section 5, `frequency`, `avalanche` and `control`) also hold the items of
@@ -169,8 +169,9 @@ the class.
   defect keeps its record, with the defect noted.
   A heavy run that died holding its lock gets that `inconclusive` record when
   `scripts/clear_lock.py` clears the lock, which also writes a `lock-cleared` record under `locks/`
-  with the lock's content (research R16); its `hours` used are the hours from the time the lock
-  holds to the clearing, the most it can have used, or, for a run ended from outside, whose
+  with the lock's content, naming that record (research R16); its `hours` used are the hours from
+  the time the lock holds to the clearing, the most it can have used, or, for a run ended from
+  outside, whose
   record holds `ended_outside` and says that its partial outputs were discarded unread (research
   R7), the hours up to that boot time, and for a run on a candidate
   `evidence_v3.py --aborted` appends that record's `evidence` entry, so that the run is charged
@@ -183,7 +184,9 @@ the class.
   evidence and writes no other record, writes a further one when it ends, naming research R7's
   feature-wide row, whose time is the time the test took and which says, in place of the sentence
   above on its outputs, that the test compared the outputs of its stated test operation list and
-  kept none, so that the row's hours used can be read from the records (cli contract, Budget).
+  kept none, or, where `scripts/clear_lock.py` writes it for a test that died holding the lock,
+  that the test ended there and kept none, so that the row's hours used can be read from the
+  records (cli contract, Budget).
   A projection record is not evidence: the order of sizes counts evidence records only (research
   R7), so a probe at a larger size runs before the run it projects.
 - **Fixed-name files.** A record that cites a file kept under a fixed name (introduction) gives its
@@ -219,7 +222,11 @@ the class.
   stricter change is that change's recomputed verdict, applied as research R7's stricter change and
   recorded in `results_known` (section 18), not a defect. A reproduction of a `recheck` record that
   differs is a tool defect of `recheck_004.py` wherever it ran, since its verdicts and counts depend
-  on no environment.
+  on no environment. A record that `clear_lock.py` wrote for a run that died holding the heavy-run
+  lock holds no saved output: the re-check recomputes no verdict from it, which is no disagreement,
+  and checks, against it and the `lock-cleared` record that names it, that its `status` is
+  `inconclusive`, its `classification` `none` and its hours used those that `clear_lock.py`
+  states, any other being a disagreement (cli contract; research R16).
 - **Reproduction.** A reproduction of a record is run by its script's `--reproduce RECORD` mode (cli
   contract), `fut_sec8.py`'s for a demonstration record included, in a separate worktree of the
   original's `git_head`, the code files of its `code_sha256` checked against that commit's blobs, so
@@ -571,7 +578,7 @@ timings of `cost` and the binary's hash only, and does not compare `design_sha25
 FUT-SEC-8 code reads. It is not a demonstration attempt: it can neither replace the demonstration
 record nor change the review, and a difference is a finding. `fut_sec8.py --verify RECORD` re-checks
 every listed match and every recovered seed with `model_v2`, with no sweep. Both take a record by
-its ID, so that every earlier record stays reproducible and every run is reported.
+its ID, so that every earlier record with a result stays reproducible and every run is reported.
 
 ## 5. Structural and statistical evidence (`candidates/<id>/<record_id>.json`)
 
