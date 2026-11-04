@@ -742,6 +742,64 @@ def validation(known_id, known, keep):
         self.assertEqual(self.vt.main(["--reproduce", "nothing.json"]), evidence.EXIT_REFUSED)
 
 
+class FutSec8Known(unittest.TestCase):
+    """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+        import fut_sec8_known
+        cls.known = fut_sec8_known
+        cls.path, cls.record = evidence.latest_demonstration()
+
+    def result(self, **changes):
+        record = json.loads(json.dumps(self.record))
+        record.update(changes)
+        with mock.patch.object(evidence, "latest_demonstration", return_value=(self.path, record)):
+            return self.known.validation("fut-sec-8", None, None)
+
+    def test_the_reviewed_record_is_re_found(self):
+        out = self.result()
+        self.assertTrue(out["re_found"])
+        self.assertEqual(out["found"]["record_id"], self.record["record_id"])
+        self.assertEqual(out["found"]["sha256"], evidence.sha256(self.path.read_bytes()))
+
+    def test_each_seed_must_be_the_first_three_of_dev(self):
+        self.assertFalse(self.result(targets=self.record["targets"][:2])["re_found"])
+        self.assertFalse(self.result(targets=[[1, 2, 3, 4]] + self.record["targets"][1:])["re_found"])
+
+    def test_each_seed_must_be_recovered(self):
+        self.assertFalse(self.result(recovered=[True, True, False])["re_found"])
+        self.assertFalse(self.result(recovered=[True, True])["re_found"])
+
+    def test_every_vector_file_must_match(self):
+        checked = json.loads(json.dumps(self.record["vector_check"]))
+        checked[-1]["mismatches"] = 1
+        self.assertFalse(self.result(vector_check=checked)["re_found"])
+        self.assertFalse(self.result(vector_check=[])["re_found"])
+        empty = json.loads(json.dumps(self.record["vector_check"]))
+        empty[0]["words"] = 0
+        self.assertFalse(self.result(vector_check=empty)["re_found"])
+
+    def test_the_record_must_be_of_the_tool_under_validation(self):
+        for field in ("source_sha256", "binary_sha256"):
+            tool = dict(self.record["tool"], **{field: "0" * 64})
+            self.assertFalse(self.result(tool=tool)["re_found"], field)
+
+    def test_a_record_the_review_does_not_name_is_refused(self):
+        with mock.patch.object(evidence, "family_row", return_value=None):
+            with self.assertRaises(evidence.Refused):
+                self.known.validation("fut-sec-8", None, None)
+
+    def test_it_has_no_second_so_a_failure_leaves_it_unvalidated(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        table = validate_tool.known_results()
+        self.assertEqual(validate_tool.seconds_of(table, "fut-sec-8"), [])
+        with self.assertRaisesRegex(evidence.Refused, "stays unvalidated"):
+            validate_tool.targets_after({"record_id": "x"}, validate_tool.TOOLS["fut_sec8"], table)
+
+
 class TheRepository(unittest.TestCase):
     """The known results as committed, read from the repository itself."""
 
