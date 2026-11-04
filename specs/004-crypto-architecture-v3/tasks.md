@@ -552,7 +552,7 @@ hashes.
 - [X] T044 [US1] Cite the demonstration record by ID and SHA-256 in the best-attack register row for
   exhaustive seed search, in a version of `security.md` of its own with its history entry, CRLF
   kept. (FR-003; data-model §4)
-- [ ] T045 [US1] ⛔ **FUT-SEC-8 result review** (**Owner**), in
+- [X] T045 [US1] ⛔ **FUT-SEC-8 result review** (**Owner**), in
   `specs/004-crypto-architecture-v3/spec.md`'s Review & Approval table: review the demonstration
   record with its report; the row names `fut-sec-8/<record_id>.json` by ID and SHA-256 and is
   committed by the owner. The agent lists the approval commits and the allow-list entries added
