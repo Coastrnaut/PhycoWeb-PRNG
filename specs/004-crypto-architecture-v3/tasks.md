@@ -398,7 +398,7 @@ or key-loading code is written here.
   the log is created, a set from a paper of R19 not yet fetched among them, enters as a `stricter`
   entry with the list's new SHA-256, and no candidate is scored before every set this task names is
   on the list. (FR-023, FR-044, FR-046; R15, R19; RAT-038, RAT-043)
-- [ ] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
+- [X] T028 After T002, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/004/protocol-changes.jsonl`, one per listed row of every answered
   round in round order and one per place confirmed as an entry of its own, each reading marked
