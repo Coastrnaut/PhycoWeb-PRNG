@@ -41,7 +41,8 @@ that ticked items, and the owner's tasks approval includes the review of those t
 2026-11-01 and the 70 of the third re-run on 2026-11-02, and the 174 of the fourth to tenth re-runs
 in advance on 2026-11-02, by the owner's approval of all suggestions, each round to the eighth
 re-run applied the same day and the ninth and tenth re-runs on 2026-11-03, the tenth
-being the last round of the loop by the owner's instruction of 2026-11-03.**
+being the last round of the loop by the owner's instruction of 2026-11-03; the lists "Rows that
+change the protocol" and the ticks confirmed at the tasks approval (2026-11-03).**
 Option A of every row is applied where its Changes cell names a document: the
 spec, plan.md, research.md, data-model.md, the two contracts, quickstart.md, the eight checklist
 files (SEC-066), security.md (versions 2.11, 2.12 and 2.13), `.gitattributes` and this document's
