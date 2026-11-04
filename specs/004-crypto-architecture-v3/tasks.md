@@ -627,7 +627,7 @@ hash, older than its first counted result.
 - [X] T052 [US4] Write the validation record of `fut_sec8.py`'s tools on their known result
   `fut-sec-8` with `scripts/validate_tool.py`, from the reviewed demonstration record: its three
   seeds and its vector check (data-model §7). (FR-003, FR-039; SC-007; R2)
-- [ ] T053 [P] [US4] Write `research/004/tools/invariants.py` (R13): the sums modulo 2^w and the
+- [X] T053 [P] [US4] Write `research/004/tools/invariants.py` (R13): the sums modulo 2^w and the
   XORs of the pressure lanes and of the vein lanes, over the whole state and over each colour class,
   after one round and after a full call, on 2¹⁰ test states, with the binomial test at the bias
   rule's level for probabilistic invariants. Its difference mode takes the S13 transport difference
