@@ -615,7 +615,7 @@ hash, older than its first counted result.
   test, the two synthetic families of 100 sets each, drawn with numpy's `Generator(PCG64(s))` from
   the `synthetic` seeds, kept local-only under `data/local/004/<record_id>/`, each set's SHA-256 and
   summary committed. (FR-039, FR-053; R4, R12, R19)
-- [ ] T051 [US4] Write `research/004/tools/bias.py`, the frequency test and the uniform controls'
+- [X] T051 [US4] Write `research/004/tools/bias.py`, the frequency test and the uniform controls'
   counts (R4): verdicts from integer critical counts, compared exactly, p-values reported only; and
   `research/004/tools/critical_counts.json`, the critical counts per (N, S) and (N_a, S_A), derived
   by exact integer arithmetic and committed. Validate it with `scripts/validate_tool.py` on its
