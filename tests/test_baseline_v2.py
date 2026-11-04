@@ -198,6 +198,14 @@ class ArchiveScript(unittest.TestCase):
 
     def test_a_third_vector_is_refused(self):
         (self.root / "vectors/phyco-v2_c.hex").write_bytes(b"third")
+        git(self.root, "add", "-A")
+        git(self.root, "commit", "-q", "-m", "a third vector")
+        self.assertEqual(self.run_script(), 2)
+        self.assertFalse((self.root / "baseline/phyco-v2").exists())
+
+    def test_a_missing_vector_is_refused(self):
+        git(self.root, "rm", "-q", "vectors/phyco-v2_b.hex")
+        git(self.root, "commit", "-q", "-m", "one vector gone")
         self.assertEqual(self.run_script(), 2)
         self.assertFalse((self.root / "baseline/phyco-v2").exists())
 
