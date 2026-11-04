@@ -640,7 +640,7 @@ hash, older than its first counted result.
   per-node constant, each pattern on its own; validate it on S7's three rotation relations of
   `phyco-v2`'s constants and on its stated lists at n = 3 and 4, the planted symmetries found and
   none on the list without one. (FR-023, FR-024, FR-039; SC-006, SC-007; R13)
-- [ ] T055 [P] [US4] Write `research/004/tools/dependency.py` (R13): exact structural dependency
+- [X] T055 [P] [US4] Write `research/004/tools/dependency.py` (R13): exact structural dependency
   through an operation list, XOR, AND, OR and NOT uniting bit sets, rotations and shifts moving
   them, and bit i of an addition or subtraction depending on bits 0…i of both operands; R_f and R_b
   round by round; and the propagation through instantiate with its margin over R_f; validate it on
