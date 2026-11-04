@@ -160,54 +160,54 @@ or key-loading code is written here.
 
 ### Step (2): the writers before what they write
 
-- [ ] T007 Add `DESIGN_DISCLAIMER` to `protocol/disclaimer.py`, holding exactly the design-form
+- [X] T007 Add `DESIGN_DISCLAIMER` to `protocol/disclaimer.py`, holding exactly the design-form
   disclaimer, the block directly under spec.md's title, its lines joined by single spaces;
   `DISCLAIMER` stays byte for byte as it is. (FR-068; R18)
-- [ ] T008 Write the tests of the evidence writer in `tests/test_protocol_004.py` and
+- [X] T008 Write the tests of the evidence writer in `tests/test_protocol_004.py` and
   `tests/test_records_004.py`, before the writer, on temporary directories: record IDs and file
   names (data-model §1, "Record files"); the common fields of FR-061 with `DESIGN_DISCLAIMER`;
   canonical JSON and its `canonical` hashes; `versions/` for fixed-name files; the suffixes allowed
   under `$REP` (`.json`, `.jsonl`, `.md`, `.csv`, `.txt` and `.gz`, and no placeholder such as
   `.gitkeep`); the 10 MB rule, with local-only outputs under `data/local/004/<record_id>/`; and each
-  shared guard's refusal, exit 2 with nothing written: Environment, with its two exceptions, the
-  environment record itself and the `lock-cleared` record, and its approval hash read at HEAD;
-  Committed code, with a source file or a C tool's binary untracked, staged but not committed, or
-  modified, and a binary whose `--source-sha256` differs from its source's entry in `code_sha256`;
-  Inputs; Operation lists; Heavy runs, with an exclusive create of `data/heavy-run.lock` and a held
-  lock named with whether its holder still runs; Protocol log, with the two kinds admitted before
-  the log exists and every other kind refused, a first entry whose digits do not match, a later
-  entry and the last line whose digits do not match, a reading marked `set_aside` with no decision
-  and a `repair` entry whose list differs; Order of sizes, a `--project` probe never refused and a
-  run ended from outside not finished; Approvals, the table read at HEAD and a working tree that
-  differs refused; Order of US1; Tool validation; Trail tools, once the first trail search has
-  started, a tool outside research R12's fixed set or without an earlier `re-found` record of its
-  exact hash, for a C tool the pair of its source's and its binary's SHA-256, and a search that
-  reached its cap, save research R7's one re-run after a recorded tool defect, one ended from
-  outside not having reached it; and Budget, a refusal after a probe writing its `projection` record
-  and nothing else, a spent candidate row never refusing a reproduction and a heavy reproduction
-  refused once the projections of the runs it will make, after any rebuild, do not together fit the
-  hours left in research R7's feature-wide row, its hours used being the sum, read from the records,
-  of the time of every `projection` record that names the row and of the `hours` used of every other
-  record with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's pass excepted. They
-  also test the common part of `--reproduce`, with a mocked C tool and build on a temporary
-  repository: the worktree of `git_head` checked against its blobs, and the rebuild in a second
-  worktree, the committed binary removed there first, so that a make file that would find it up to
-  date compiles it all the same, one run where the rebuild's SHA-256 equals the committed binary's,
-  a second, compared too, where it differs and has a `re-found` record of its own, the outcome
-  `match` only when both runs match, and no second run and a difference in every compared field,
-  exit 1 with the record written, where the guards Tool validation and Trail tools do not admit the
-  rebuild, whatever the kind of the record reproduced, a demonstration, a validation and a
-  cross-check among them, as where it fails; a heavy reproduction's exit 2 without
-  `--owner-request`, the request quoted with its date in its record's `owner_request`, a light one
-  needing none; exit 2 for a record that holds `ended_outside`; and a second run that no longer fits
-  the hours left, the first run's hours counted and the first having taken more than its projection,
-  not made, exit 1, the outcome `differs` where the first run differs and otherwise the record
-  holding `status` `inconclusive`, with the reason, and neither `match` nor `differs`. In
-  `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the FUT-SEC-8
-  sweep among them, and every script with a worker option takes the heavy-run lock, each script as
-  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R7, R12, R16; PRO-065,
-  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
-- [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
+  shared guard's refusal, exit 2 with nothing written: Environment, with its one exception, the
+  environment record itself, a `lock-cleared` record waiting as every other write does, and its
+  approval hash read at HEAD; Committed code, with a source file or a C tool's binary untracked,
+  staged but not committed, or modified, and a binary whose `--source-sha256` differs from its
+  source's entry in `code_sha256`; Inputs; Operation lists; Heavy runs, with an exclusive create of
+  `data/heavy-run.lock` and a held lock named with whether its holder still runs; Protocol log, with
+  the two kinds admitted before the log exists and every other kind refused, a first entry whose
+  digits do not match, a later entry and the last line whose digits do not match, a reading marked
+  `set_aside` with no decision and a `repair` entry whose list differs; Order of sizes, a
+  `--project` probe never refused and a run ended from outside not finished; Approvals, the table
+  read at HEAD and a working tree that differs refused; Order of US1; Tool validation; Trail tools,
+  once the first trail search has started, a tool outside research R12's fixed set or without an
+  earlier `re-found` record of its exact hash, for a C tool the pair of its source's and its
+  binary's SHA-256, and a search that reached its cap, save research R7's one re-run after a
+  recorded tool defect, one ended from outside not having reached it; and Budget, a refusal after a
+  probe writing its `projection` record and nothing else, a spent candidate row never refusing a
+  reproduction and a heavy reproduction refused once the projections of the runs it will make, after
+  any rebuild, do not together fit the hours left in research R7's feature-wide row, its hours used
+  being the sum, read from the records, of the time of every `projection` record that names the row
+  and of the `hours` used of every other record with `heavy_run` true that charges no candidate, the
+  FUT-SEC-8 row's pass excepted. They also test the common part of `--reproduce`, with a mocked C
+  tool and build on a temporary repository: the worktree of `git_head` checked against its blobs,
+  and the rebuild in a second worktree, the committed binary removed there first, so that a make
+  file that would find it up to date compiles it all the same, one run where the rebuild's SHA-256
+  equals the committed binary's, a second, compared too, where it differs and has a `re-found`
+  record of its own, the outcome `match` only when both runs match, and no second run and a
+  difference in every compared field, exit 1 with the record written, where the guards Tool
+  validation and Trail tools do not admit the rebuild, whatever the kind of the record reproduced, a
+  demonstration, a validation and a cross-check among them, as where it fails; a heavy
+  reproduction's exit 2 without `--owner-request`, the request quoted with its date in its record's
+  `owner_request`, a light one needing none; exit 2 for a record that holds `ended_outside`; and a
+  second run that no longer fits the hours left, the first run's hours counted and the first having
+  taken more than its projection, not made, exit 1, the outcome `differs` where the first run
+  differs and otherwise the record holding `status` `inconclusive`, with the reason, and neither
+  `match` nor `differs`. In `tests/test_protocol_004.py`, FR-045's test also checks that every
+  budgeted kind, the FUT-SEC-8 sweep among them, and every script with a worker option takes the
+  heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053,
+  FR-061; R7, R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+- [X] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
   `gzip.compress(data, compresslevel=9, mtime=0)` with the SHA-256 of its uncompressed content in

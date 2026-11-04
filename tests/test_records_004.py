@@ -9,6 +9,9 @@ import unittest
 from pathlib import Path
 from typing import Dict, Iterator, List, Tuple
 
+from protocol import evidence
+from protocol.disclaimer import DESIGN_DISCLAIMER
+
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = "reports/004-crypto-architecture-v3"
 # Every path this feature pins, read while no record exists (research R18).
@@ -95,7 +98,7 @@ class LineEndings(unittest.TestCase):
 
 
 class CodeHashes(unittest.TestCase):
-    """FR-053: each code_sha256 entry, a C tool's binary among them, matches the blob at git_head."""
+    """FR-053: each code_sha256 entry, a C tool's binary among them, matches its git_head's blob."""
 
     def test_each_entry_matches_the_blob_at_git_head(self):
         for name, record in committed_records():
@@ -117,6 +120,36 @@ class GzipHeaders(unittest.TestCase):
             if path.endswith(".gz"):
                 with (ROOT / path).open("rb") as handle:
                     self.assertEqual(handle.read(10), expected, path)
+
+
+class CommittedFiles(unittest.TestCase):
+    """Research R16: the reports directory's suffixes and its 10 MB, and nothing local tracked."""
+
+    def test_nothing_under_data_local_is_tracked(self):
+        self.assertEqual(tracked("data/local/"), [])
+
+    def test_each_file_under_the_reports_directory_has_an_allowed_suffix_and_size(self):
+        for path in tracked(REPORTS + "/"):
+            self.assertTrue(path.endswith(evidence.SUFFIXES), path)
+            self.assertLessEqual((ROOT / path).stat().st_size, evidence.MAX_COMMITTED_BYTES, path)
+
+
+class RecordIds(unittest.TestCase):
+    """Data model section 1: each record holds the ID that its own content gives."""
+
+    def test_each_committed_record_holds_the_id_of_its_content(self):
+        for path, record in committed_records():
+            if "record_id" in record:
+                self.assertTrue(evidence.check_record_id(record), path)
+
+
+class Disclaimers(unittest.TestCase):
+    """FR-061: each committed record holds the design-form disclaimer verbatim."""
+
+    def test_each_committed_record_holds_it(self):
+        for path, record in committed_records():
+            if "record_id" in record:
+                self.assertEqual(record.get("disclaimer"), DESIGN_DISCLAIMER, path)
 
 
 if __name__ == "__main__":
