@@ -89,7 +89,7 @@ def approved_entry(entries: List[Dict], name: str) -> Dict:
 
 
 def init(run: evidence.Run) -> None:
-    if evidence.read_manifest():
+    if evidence.REPO.path(evidence.DOWNLOADS_REL).exists():
         raise Refused(f"{evidence.DOWNLOADS_REL} exists")
     entries = [dict(row, status="approved", environment=run.environment) for row in r19_rows()]
     evidence.write_manifest(run, entries)

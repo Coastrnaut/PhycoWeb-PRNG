@@ -303,24 +303,24 @@ or key-loading code is written here.
   differs from PyPI's; `fetched` and `not-obtained` refuse a name with no `approved` entry; with its
   tests in `tests/test_protocol_004.py`, each refusal among them, a later copy of a listed file
   refused under the listed name and entered under a name of its own. (FR-046; R19; REP-076)
-- [ ] T017 Write the claim and evidence register `protocol/claims.json` (data-model §15): one entry
+- [X] T017 Write the claim and evidence register `protocol/claims.json` (data-model §15): one entry
   per model ID, `float-v0`, `lut-v1`, `phyco-v2` and `phyco-v3`, each with its level, its claim or
   "no claim", its `bound` and its `evidence`; `phyco-v3` at L0 with "no claim", `in_progress`
   `none`, `bound` `none`, `evidence` empty and `history` empty; and the `allow_list` holding
   data-model §15's standing entries, each with its reason, its writer and the date. (FR-012, FR-069;
   SEC-089)
-- [ ] T018 Write a version of `security.md` of its own, with its history entry and its CRLF line
+- [X] T018 Write a version of `security.md` of its own, with its history entry and its CRLF line
   endings kept: `phyco-v3`'s line at L0 in §15's register and its §1.1 row, "L0; no claim"; the
   opening and the closing block each gaining the fixed sentence "PhycoWeb-PRNG, every model
   included, must not be used to generate secrets." and stating the restriction with "an established
   cryptographic RNG", as README's block does. Edit it with a script that keeps CRLF, never `sed -i`,
   and check the CR count after. (FR-051, FR-069; SEC-092, SEC-094, SEC-095)
-- [ ] T019 Edit `README.md`, CRLF kept: its status block gains the fixed sentence, and its line on
+- [X] T019 Edit `README.md`, CRLF kept: its status block gains the fixed sentence, and its line on
   the seed names `float-v0`, `lut-v1` and `phyco-v2` and states only their cap at 64 bits, in words
   that no rule flags, the seed's size and the 112-bit minimum standing in README's section 5,
   outside the block, whose lines that FR-069's rules flag are reworded. (FR-069; SEC-091, SEC-092,
   SEC-093, SEC-095)
-- [ ] T020 [P] Write `tests/test_claims.py` before the script it runs: every case FR-069 names,
+- [X] T020 [P] Write `tests/test_claims.py` before the script it runs: every case FR-069 names,
   among them the register against README, security.md §1.1 and §15 and the three disclaimer blocks;
   the fixed sentence in each block; a figure that bounds no model; each of the three negated
   phrases, and a negation outside them; a §1.1 row missing, added or differing; the level rule in
@@ -330,17 +330,17 @@ or key-loading code is written here.
   the register's checks, exit 1; the mapping chapter's heading missing or found twice; and every
   hand-written document of FR-068 carrying the design-form disclaimer equal to `DESIGN_DISCLAIMER`.
   (FR-050, FR-068, FR-069; SC-015, SC-018; SEC-085)
-- [ ] T021 Write `scripts/check_claims.py` (contracts/cli.md; data-model §15), FR-069's test as
+- [X] T021 Write `scripts/check_claims.py` (contracts/cli.md; data-model §15), FR-069's test as
   written, run by `tests/test_claims.py` from this phase on, which prints on every run each
   allow-list entry added since the last ⛔ gate's approval commit; exit 0 with no finding, 1 on a
   finding. (FR-069; SC-018; SEC-081, SEC-087)
-- [ ] T022 Draft the `allow_list` line entries in `protocol/claims.json` for the flagged lines of
+- [X] T022 Draft the `allow_list` line entries in `protocol/claims.json` for the flagged lines of
   the documents in the test's scope (the feature's Markdown files, this one included, `README.md`
   and `security.md`, whose §1.1 lines that the level rule flags are reworded or given entries), each
   with its path and text, its reason, its writer and the date, until
   `python scripts/check_claims.py` reports 0 findings; the owner reviews the entries at the next ⛔
   gate, and an entry the owner declines is removed in the next commit. (FR-069; SC-018; SEC-087)
-- [ ] T023 Write the document tests in `tests/test_protocol_004.py`: the spec's Status line, the
+- [X] T023 Write the document tests in `tests/test_protocol_004.py`: the spec's Status line, the
   Status of `checklist-choices.md` and the Review & Approval table agree; the first list of rows a
   guard reads, its numbered families included, and the contracts' guards agree both ways; no key is
   loaded into a state of `phyco-v3` or of any candidate while the "FUT-SEC-8 result review" row with
@@ -350,7 +350,7 @@ or key-loading code is written here.
 
 ### Step (2a): requirements and the first environment records
 
-- [ ] T024 Correct `requirements.txt` as research R18 states: the stale header removed;
+- [X] T024 Correct `requirements.txt` as research R18 states: the stale header removed;
   `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"` and
   `numpy==2.5.4; python_version >= "3.14"`; scipy 1.15.3 and 1.18.1 with the same markers;
   `nistrng==1.2.3`; the three Hypothesis pins of R19 commented out, naming the open item; and a

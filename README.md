@@ -13,13 +13,13 @@ Document Classification: Technical Reference & Implementation Specification
 
 1.1 High-Level Overview
 
-> **Status (2026-10-31): experimental research generator. Not for secrets.** PhycoWeb-PRNG has no
-> cryptographic analysis or review. It must not be used to generate keys, nonces, tokens, salts or
-> any other secret; use an established cryptographic RNG instead (e.g. the operating system's
-> CSPRNG). Statistical-test results, including NIST SP 800-22, do not show cryptographic security.
-> Its 64-bit seed also caps any security level at 64 bits, below the 112-bit minimum for approved
-> cryptographic use. See section 5 for what has and has not been verified, and `security.md` for
-> the security policy.
+> **Status (2026-11-03): experimental research generator. Not for secrets.** PhycoWeb-PRNG, every
+> model included, must not be used to generate secrets. It has no cryptographic analysis or
+> review. It must not be used to generate keys, nonces, tokens, salts or any other secret; use an
+> established cryptographic RNG instead (e.g. the operating system's CSPRNG). Statistical-test
+> results, including NIST SP 800-22, do not show cryptographic security.
+> The seed of `float-v0`, `lut-v1` and `phyco-v2` caps each of them at 64 bits.
+> See section 5 for what has and has not been verified, and `security.md` for the security policy.
 
 PhycoWeb-PRNG is an experimental hardware-oriented generator design that moves away from traditional mathematical abstractions—such as Linear Congruential Generators (LCGs) or standard Artificial Neural Networks (ANNs)—and looks instead to organic systems. It models the decentralized, non-linear foraging behavior of slime molds (Physarum polycephalum) and fungal mycelium networks.
 ```text
@@ -186,7 +186,7 @@ What has been verified, feature 001 (`reports/001-integer-lut-perturbation/`):
 What has not been verified, or is known to be weak:
 • Statistical quality beyond these tests. The two PASS verdicts mean only that SP 800-22, PractRand and TestU01 detected no defect at the depths run. Dieharder has not been run, and the structural tests aimed at the design itself (related seeds, cross-stream correlation, the biased top bits of D) have not started. The feature-001 screening used the defective nistrng 1.2.3; see the erratum and the re-score table in `reports/001-integer-lut-perturbation/summary.md`. lut-v1 fails SP 800-22 under the feature-002 protocol.
 • Cryptographic security: none. No cryptographic analysis or independent review exists. lut-v1's output exposes the low 8 bits of each vein value. phyco-v2 has 272 bits of state, no keying and no cryptanalysis, and its update uses generic add-rotate-XOR operations.
-• Seed size: phyco-v2's seed is four 16-bit words, 64 bits in total. That caps any security level at 64 bits, however large the internal state, which is below the 112-bit minimum for approved cryptographic use. Trying every seed costs about 2⁷² generator steps; the attack has not been run. Any cryptographic claim or certification would need a new key interface, and probably another core redesign. The constitution's Security Policy makes requirements FUT-SEC-1 to FUT-SEC-9 binding before any such claim; see `research/security/seed-entropy-bound.md` and `security.md` §20.1.
+• Seed size: phyco-v2's seed is four 16-bit words, 64 bits in total. That is the cap, however large the internal state, and it is below the 112-bit minimum for cryptographic use. Trying every seed costs about 2⁷² generator steps; the attack has not been run. Any cryptographic use or certification would need a new key interface, and probably another core redesign. The constitution's Security Policy makes requirements FUT-SEC-1 to FUT-SEC-9 binding before any of that; see `research/security/seed-entropy-bound.md` and `security.md` §20.1.
 • Hardware: no VHDL, testbench or synthesis result exists yet. phyco-v2 has open RTL items (a fixed 2×2 ring, a long combinational path per step); see the design review in `specs/002-core-dynamics-redesign/plan.md`.
 
 Do not use PhycoWeb-PRNG for secrets. phyco-v2 passing NIST SP 800-22, PractRand and TestU01 shows only that no statistical defect was detected by those tests. Passing statistical batteries does not show cryptographic security.

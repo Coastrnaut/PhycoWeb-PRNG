@@ -1,6 +1,7 @@
 """Feature 004: the evidence writer, the guards every script shares and the common part of
 --reproduce (T008; FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; research R7, R12, R16).
 Each guard refuses with exit 2 and writes nothing. No test here makes a heavy run."""
+import ast
 import datetime
 import gzip
 import json
@@ -2458,6 +2459,8 @@ Between the tables.
     def test_init_exits_2_once_the_manifest_exists(self):
         self.script("init")
         self.assertEqual(self.script("init"), 2)
+        write(self.root, evidence.DOWNLOADS_REL, evidence.pretty({"entries": []}))
+        self.assertEqual(self.script("init"), 2)
 
     def test_the_manifest_is_a_record_of_its_own_kind(self):
         self.script("init")
@@ -2561,6 +2564,91 @@ Between the tables.
         command = run.call_args[0][0]
         self.assertEqual(command[1], "-I")
         self.assertNotEqual(Path(run.call_args[1]["cwd"]), self.download)
+
+
+class Documents(unittest.TestCase):
+    """The documents against each other, at this commit (T023; the notes under the spec's table)."""
+
+    FEATURE = ROOT / evidence.FEATURE_REL
+    # The numbered families of the first list, which no row of the table holds until one is added.
+    FAMILIES = ("Log repair", "Environment record", "Owner-provided value", "Download")
+
+    def read(self, name: str) -> str:
+        return (self.FEATURE / name).read_text(encoding="utf-8").replace("\r\n", "\n")
+
+    def table(self) -> List[evidence.Row]:
+        return evidence.parse_table(evidence.table_section(self.read("spec.md")))
+
+    def first_list(self) -> str:
+        text = " ".join(self.read("spec.md").split())
+        start = text.index("The first holds the rows a guard reads at HEAD")
+        return text[start:text.index("The second holds the rows that record", start)]
+
+    def test_the_status_lines_and_the_table_agree(self):
+        spec = self.read("spec.md")
+        status = " ".join(spec[spec.index("**Status**"):spec.index("\n\n", spec.index("**Status**"))]
+                          .split())
+        choices = " ".join(self.read("checklist-choices.md").split())
+        rounds = [r for r in self.table() if r.name.startswith("Checklist choices")]
+        self.assertEqual(len(rounds), 11)
+        total = 0
+        for row in rounds:
+            self.assertEqual(row.decision, "Approved", row.name)
+            total += int(re.search(r"the (\d+) (?:open )?items", row.gate).group(1))
+            match = re.match(r"Checklist choices, (.+?) \(", row.gate)
+            if match is None:
+                self.assertIn("the first run", status)
+            else:
+                self.assertIn(match.group(1), status)
+        self.assertIn(f"**Status: all {total} rows answered and applied", choices)
+        tasks = next(r for r in self.table() if r.name == "Tasks approval")
+        self.assertEqual(tasks.decision, "Approved")
+        self.assertIn("tasks approved", status)
+        self.assertIn("confirmed at the tasks approval", choices)
+
+    def test_each_row_of_the_first_list_has_its_guard_in_the_contracts(self):
+        contract = self.read("contracts/cli.md")
+        rows = [r.name for r in self.table()]
+        listed = [name for name in rows + list(self.FAMILIES) if name in self.first_list()]
+        self.assertEqual(sorted(set(listed)), sorted({
+            "FUT-SEC-8 result review", "D4 tie", "Selection tie", "Security-target review",
+            "Owner design review", "External design review", "L1 recorded", "Log repair",
+            "Environment record", "Owner-provided value", "Download", "Place check",
+            "Readings set aside", "Second transcription go-ahead"}))
+        for name in listed:
+            if name != "Second transcription go-ahead":      # its guard is a test (FR-057)
+                self.assertIn(name, contract, name)
+
+    def test_each_row_the_contracts_guards_read_stands_in_the_first_list(self):
+        contract = " ".join(self.read("contracts/cli.md").split())
+        start = contract.index("**Approvals**")
+        approvals = contract[start:contract.index("**Order of US1**", start)]
+        first = self.first_list()
+        for row in self.table():
+            if row.name in approvals:
+                self.assertIn(row.name, first, row.name)
+        for family in self.FAMILIES:
+            self.assertIn(family, first)
+
+    def test_no_key_is_loaded_before_the_review_of_the_demonstration(self):
+        files = sorted((ROOT / "research/004/candidates").glob("*.py"))
+        files += [ROOT / "phycoweb/model_v3.py"]
+        defined = [path.name for path in files if path.exists() and re.search(
+            r"^\s*def (instantiate|load_key)\b", path.read_text(encoding="utf-8"), re.M)]
+        if defined:
+            evidence.guard_order_of_us1()
+
+    def test_every_load_of_an_earlier_seed_set_allows_dev_alone(self):
+        names = [ROOT / "scripts/fut_sec8.py"] + sorted((ROOT / "research/004").rglob("*.py"))
+        names += [ROOT / "protocol/evidence.py"]
+        for path in names:
+            if not path.exists():
+                continue
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.Call) and getattr(node.func, "attr", "") == "load" \
+                        and getattr(node.func.value, "id", "").endswith("seedsets"):
+                    allow = {k.arg: ast.literal_eval(k.value) for k in node.keywords}.get("allow")
+                    self.assertEqual(allow, ("dev",), path.name)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.13 (2026-11-01). The change history is in section 25.
+- **Document:** `security.md`, version 2.14 (2026-11-03). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -14,10 +14,11 @@
   property is claimed for any PhycoWeb-PRNG model.**
 
 > **Do not use PhycoWeb-PRNG to generate keys, nonces, tokens, salts or any other secret.**
-> Use an established cryptographic random-number generator instead: the operating system CSPRNG
-> (for example `os.urandom` or `getrandom()`), or a NIST SP 800-90A DRBG seeded from a validated
-> entropy source. Passing statistical tests does not show cryptographic security. That includes
-> NIST SP 800-22, PractRand and TestU01.
+> PhycoWeb-PRNG, every model included, must not be used to generate secrets. Use an established
+> cryptographic RNG instead: the operating system CSPRNG (for example `os.urandom` or
+> `getrandom()`), or a NIST SP 800-90A DRBG seeded from a validated entropy source. Passing
+> statistical tests does not show cryptographic security. That includes NIST SP 800-22, PractRand
+> and TestU01.
 
 ------------------------------------------------------------------------
 
@@ -30,6 +31,7 @@
 | `float-v0` | `baseline/float-v0/` (archived; SHA-256 in `MANIFEST.json`) | floating-point food generator (`np.sin`, `np.cos`) | 4 × 16 bits | Feature-001 screening only, done with the defective `nistrng` 1.2.3 (see the erratum in `reports/001-integer-lut-perturbation/summary.md`) | none | L0; no claim | archive only |
 | `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | L0; no claim | negative control |
 | `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). Passed the pre-registered PractRand/TestU01 attempt 1 (0 of 70 runs failing, `heldout-1` battery set; feature 003, section 11.4) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
+| `phyco-v3` | none yet: the design of feature 004, [`spec.md`](specs/004-crypto-architecture-v3/spec.md) | not specified yet | a key, not a seed; not specified yet | none | none | L0; no claim | design in progress; no model exists |
 
 ### 1.2 What is and is not established for `phyco-v2`
 
@@ -1130,6 +1132,8 @@ only after L1–L4 have recorded evidence.
 - `phyco-v2`: L0; no claim. It cannot reach L1, because its 64-bit seed is below FUT-SEC-1
   (S1–S3). Its statistical evaluation (Phase 3) may be completed when feature 003 closes; that
   changes no level.
+- `phyco-v3`: L0; no claim. Its design is in progress in feature 004, and no model exists. Its level
+  follows the spec's Review & Approval rows and `protocol/claims.json`, which the claim test checks.
 
 **Rules for every level:**
 
@@ -1655,7 +1659,8 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.11 | 2026-11-01 | Recorded the owner's decision on FUT-SEC-2 and FUT-GRID-2 at 2×2, option 1, taken on 2026-11-01 in the approved feature-004 spec (D3, FR-017), with the reason it weakens neither requirement (sections 9.2 and 20.1). Roadmap rows 5a.3 to 5a.5 now carry two feature-004 requirements: FUT-GRID-5's validation of 4×4 before 8×8 and 16×16 to features 006 and 008, and the checkable derivation of the held-out keys to feature 007 (feature-004 FR-040). From the owner's answers to the feature-004 checklist choices (SEC-010, PRO-010, HW-035). No claim level changes |
 | 2.12 | 2026-11-01 | Roadmap row 5a.5 carries feature 004's corrected order of sizes for the board: 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-HW-2), and a size that does not fit stays covered by feature 006's simulation. This corrects the wording 2.11 carried, which could have required a size the device cannot hold. From the owner's answers to the feature-004 checklist re-run (HW-041). FUT-GRID-5, FUT-HW-2 and every claim level are unchanged |
 | 2.13 | 2026-11-01 | Names constitution 1.3.0, which the owner approved on 2026-11-01, in the header, section 4, the tree of section 18 and roadmap stage 1. Version 1.3.0 amended only Principle IX, so the Security Policy that section 4 quotes is unchanged. The statements of what happened under 1.2.0 stay (sections 1 and 20, and roadmap row 5a), as do section 16.1, which describes features 001–003, and the review prompt's "never commit, push or publish", since review sessions hold no standing authorization. The L1 gate of section 15 reads "FUT-SEC-8 result review and security-target review" in place of "spec approval", and its evidence is unchanged: the feature-004 spec approval of 2026-11-01 started the design work and recorded no level, and `phyco-v3` stays at L0 until feature 004 records L1. Section 12.2 states that a 256-bit key meets k/2 = 128 with equality and no margin and that multi-target quantum search falls below it for u > 1, and section 5 records that feature 004 adopts T11 only as single-target key search. From the owner's answers to the second re-run of the feature-004 checklists (SEC-048, SEC-051, SEC-052). No requirement is weakened and no claim level changes |
+| 2.14 | 2026-11-03 | Gave `phyco-v3` its line at L0 in section 15's register and its row in section 1.1, "L0; no claim", before the claim test's first run (feature 004, FR-051, FR-069). The opening and closing blocks gained the fixed sentence "PhycoWeb-PRNG, every model included, must not be used to generate secrets." and now state the restriction with "an established cryptographic RNG", as README's block does. No requirement, level or finding changed |
 
-> Passing statistical batteries does not show cryptographic security. This generator must not be
-> used to generate secrets; use an established cryptographic random-number generator for keys,
+> Passing statistical batteries does not show cryptographic security. PhycoWeb-PRNG, every model
+> included, must not be used to generate secrets. Use an established cryptographic RNG for keys,
 > nonces, tokens and salts.

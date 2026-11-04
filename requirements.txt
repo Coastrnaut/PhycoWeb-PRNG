@@ -1,9 +1,15 @@
-# Comprehensive Python dependency manifest for Aetheris-PRNG and PhycoWeb-PRNG pipelines
-# Verified compatible with Python 3.8, 3.9, 3.10, and 3.11+ environments
+# The two tested environments of feature 004, by markers (research R1, R18).
+# The analysis tools need Python 3.10 or later; the model alone needs only the standard library.
+# The markers admit Python 3.11 to 3.13 untested.
 
-# Core Numerical Computing Arrays
-numpy>=1.21.0
+numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"
+numpy==2.5.4; python_version >= "3.14"
+scipy==1.15.3; python_version >= "3.10" and python_version < "3.14"
+scipy==1.18.1; python_version >= "3.14"
+nistrng==1.2.3
 
-# Statistical Analysis Framework (Optional, for advanced validation checks)
-scipy>=1.7.0
-nistrng
+# Open item (research R17, R19): the Hypothesis pins enter once their wheels are installed and
+# checked in an environment, each marked for that platform.
+# hypothesis==6.168.5
+# sortedcontainers==2.4.0
+# exceptiongroup==1.3.1; python_version < "3.11"
