@@ -281,7 +281,7 @@ def run_family(family: str, indices: Iterable[int], size: int, entry: Dict,
         planted = planted_position(family, j, s)
         counts = draw_set(seeds[j], s, planted, DELTA[size])
         text = set_text(counts)
-        keep(f"synthetic/n{size}/{j}.txt", text)
+        keep(f"synthetic-n{size}-{j}.txt", text)
         fired = [[int(p), int(counts[p])] for p in np.nonzero(fires(counts, entry))[0]]
         summaries.append({"j": j, "sha256": hashlib.sha256(text).hexdigest(), "planted": planted,
                           "planted_count": int(counts[planted]),

@@ -426,6 +426,18 @@ def validate(args: argparse.Namespace, command: List[str]) -> int:
     return exit_status
 
 
+def kept_outputs(local: Path) -> List[Dict]:
+    """The files a reproduction's run kept, as a record lists them, for the comparison with the
+    original's: each is deterministic and local-only."""
+    entries = []
+    for path in sorted(p for p in local.rglob("*") if p.is_file()):
+        data = path.read_bytes()
+        entries.append({"path": path.relative_to(local).as_posix(), "sha256": evidence.sha256(data),
+                        "sha256_kind": "raw", "bytes": len(data), "committed": False,
+                        "deterministic": True})
+    return entries
+
+
 def reproduce(args: argparse.Namespace, command: List[str]) -> int:
     path = Path(args.reproduce)
     path = path if path.is_absolute() else evidence.REPO.path(args.reproduce)
@@ -450,7 +462,7 @@ def reproduce(args: argparse.Namespace, command: List[str]) -> int:
         fields.update(kind="validation", model_id=original.get("model_id"), variant_id=None,
                       inputs=original["inputs"], exit_status=exit_status, assertions=assertions,
                       status=status, classification=evidence.classify("validation", outcome),
-                      code_sha256=original["code_sha256"], outputs=[],
+                      code_sha256=original["code_sha256"], outputs=kept_outputs(place.local),
                       validated_kind={k: r["validated_kind"] for k, r in results.items()},
                       found={k: r["found"] for k, r in results.items()}, outcome=outcome,
                       hours_used=(time.monotonic() - started) / 3600.0)

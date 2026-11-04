@@ -563,6 +563,20 @@ class Hooks(ValidationBase):
         self.main()
         self.assertEqual(self.records()[0]["inputs"], {"namespace": "dev", "known": "fake-known"})
 
+    def test_two_outputs_of_one_name_are_a_tool_failure(self):
+        """A reproduction compares by file name, so that the second would hide the first."""
+        self.tool_with('''
+_real = validation
+
+
+def validation(known_id, known, keep):
+    keep("n4/a.txt", b"{}")
+    keep("n8/a.txt", b"{}")
+    return _real(known_id, known, keep)
+''')
+        self.assertEqual(self.main(), evidence.EXIT_TOOL)
+        self.assertEqual(self.records()[0]["status"], "inconclusive")
+
     def test_kept_outputs_are_local_only_under_the_records_id(self):
         self.tool_with('''
 _real = validation
@@ -577,6 +591,7 @@ def validation(known_id, known, keep):
         output = record["outputs"][0]
         self.assertFalse(output["committed"])
         self.assertEqual(output["path"], f"{evidence.LOCAL_REL}/{record['record_id']}/sets/a.json")
+        self.assertTrue(output["deterministic"])
         self.assertEqual((self.root / output["path"]).read_bytes(), b"{}")
 
 
@@ -676,6 +691,52 @@ class Reproduce(ValidationBase):
                                "validated_kind": record["validated_kind"]["fake-known"]}}):
             path = f"{VALIDATION}/{record['record_id']}.json"
             self.assertEqual(self.vt.main(["--reproduce", path]), evidence.EXIT_VERDICT)
+
+    KEEPS = """
+_real = validation
+
+
+def validation(known_id, known, keep):
+    keep("a.txt", b"one")
+    keep("b.txt", b"two")
+    return _real(known_id, known, keep)
+"""
+
+    def test_a_reproduction_compares_what_the_run_kept(self):
+        write(self.root, TOOL_REL, TOOL_TEXT + self.KEEPS)
+        self.commit("the tool keeps files")
+        self.assertEqual(self.main(), evidence.EXIT_OK)
+        record = self.records()[0]
+        self.commit("the record")
+        path = f"{VALIDATION}/{record['record_id']}.json"
+        self.assertEqual(self.vt.main(["--reproduce", path]), evidence.EXIT_OK)
+        reproduced = [r for _, r in evidence.iter_records("reproduction")][0]
+        self.assertEqual(reproduced["compared"]["outputs"], "match")
+        kept = {entry["path"].rsplit("/", 1)[-1]: entry for entry in reproduced["outputs"]}
+        self.assertEqual(sorted(kept), ["a.txt", "b.txt"])
+        self.assertFalse(kept["a.txt"]["committed"])
+        wanted = f"{evidence.LOCAL_REL}/{reproduced['record_id']}/a.txt"
+        self.assertEqual(kept["a.txt"]["path"], wanted)
+        self.assertEqual((self.root / wanted).read_bytes(), b"one")
+
+    def test_a_reproduction_whose_kept_file_differs_is_exit_1(self):
+        write(self.root, TOOL_REL, TOOL_TEXT + self.KEEPS.replace('b"two"', 'b"two" + EXTRA') + 'EXTRA = b""\n')
+        self.commit("the tool keeps files")
+        self.assertEqual(self.main(), evidence.EXIT_OK)
+        record = self.records()[0]
+        real = self.vt.measure_in
+
+        def measured(worktree, tool, known_ids, local, binary):
+            out = real(worktree, tool, known_ids, local, binary)
+            (local / "b.txt").write_bytes(b"three")
+            return out
+
+        path = f"{VALIDATION}/{record['record_id']}.json"
+        with mock.patch.object(self.vt, "measure_in", side_effect=measured):
+            self.assertEqual(self.vt.main(["--reproduce", path]), evidence.EXIT_VERDICT)
+        reproduced = [r for _, r in evidence.iter_records("reproduction")][0]
+        self.assertEqual(reproduced["compared"]["outputs"], "differs")
+        self.assertEqual(reproduced["compared"]["found"], "match")
 
     def test_a_reproduction_of_nothing_is_refused(self):
         self.assertEqual(self.vt.main(["--reproduce", "nothing.json"]), evidence.EXIT_REFUSED)
@@ -1001,9 +1062,9 @@ class Bias(unittest.TestCase):
         entry = {"low": 1000, "high": 530000}
         with mock.patch.object(self.bias, "DELTA", {4: 0.49}):
             out = self.bias.run_family("second", range(100, 103), 4, entry, kept.__setitem__)
-        self.assertEqual(sorted(kept), [f"synthetic/n4/{j}.txt" for j in range(100, 103)])
+        self.assertEqual(sorted(kept), [f"synthetic-n4-{j}.txt" for j in range(100, 103)])
         first = out["sets"][0]
-        self.assertEqual(first["sha256"], evidence.sha256(kept["synthetic/n4/100.txt"]))
+        self.assertEqual(first["sha256"], evidence.sha256(kept["synthetic-n4-100.txt"]))
         self.assertTrue(first["planted_fires"])
         self.assertEqual(first["planted"], 0)
         self.assertEqual(first["unplanted"], [])

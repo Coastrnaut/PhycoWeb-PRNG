@@ -1588,8 +1588,12 @@ class Run:
                compared: Optional[str] = None, local: bool = False) -> Dict:
         """Write one output under a temporary name; the record renames it to its ID (Record files).
         A .gz name compresses it as research R16 states. A committed output needs an allowed suffix
-        and at most 10 MB; an output that is not deterministic is never local-only (R16)."""
+        and at most 10 MB; an output that is not deterministic is never local-only (R16). A
+        reproduction compares outputs by file name, so that two of one name are refused."""
         entry: Dict[str, Any] = {}
+        base = name.rsplit("/", 1)[-1]
+        if any(e["path"].rsplit("/", 1)[-1] == base for e in self.outputs):
+            raise ToolFailure(f"two outputs named {base}: a reproduction could not tell them apart")
         if name.endswith(".gz"):
             entry["uncompressed_sha256"] = sha256(data)
             data = gzip.compress(data, compresslevel=9, mtime=0)
