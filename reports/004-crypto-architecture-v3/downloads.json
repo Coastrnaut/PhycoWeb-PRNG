@@ -16,20 +16,19 @@
       "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
     }
   },
-  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched exceptiongroup-1.3.1-py3-none-any.whl C:/GIT/PhycoWeb-PRNG/data/local/004/downloads/exceptiongroup-1.3.1-py3-none-any/exceptiongroup-1.3.1-py3-none-any.whl --pypi-sha256 a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598",
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched typing_extensions-4.16.0-py3-none-any.whl C:/GIT/PhycoWeb-PRNG/data/local/004/downloads/typing_extensions-4.16.0-py3-none-any/typing_extensions-4.16.0-py3-none-any.whl --pypi-sha256 481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
   "config": {
     "cwd": "C:\\GIT\\PhycoWeb-PRNG",
     "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-04T13:54:39Z",
+  "created_utc": "2026-11-04T14:04:24Z",
   "design_sha256": "none",
   "design_sha256_kind": "raw",
   "design_version": "none",
   "dirty_paths": [
     "reports/004-crypto-architecture-v3/downloads.json",
-    "reports/004-crypto-architecture-v3/versions/03905e0baf8faef6654a146e120d3469d64f2291e96dfc2fff7709e9fee90e74.json",
-    "reports/004-crypto-architecture-v3/versions/199216ca6e7be3638f0fa8dea88b6670802b959e70849da753da60a186ffb78e.json",
-    "reports/004-crypto-architecture-v3/versions/234c59b6ad1d474071dc2b624536bb55b3019108b6f4129444d80644222959a0.json"
+    "reports/004-crypto-architecture-v3/spec-versions/c9cc83134e1329236e810858c9c29d5b7f5353fb3a6856085e55a1d3a0076a4c.md",
+    "reports/004-crypto-architecture-v3/versions/5d791d634d760a0d6b435e3f045ec5c66d438291e3649d136e4a7f3cfbbcad60.json"
   ],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
@@ -221,6 +220,26 @@
       "size": "16,740 bytes",
       "source": "PyPI",
       "status": "fetched"
+    },
+    {
+      "bytes": 45571,
+      "date_utc": "2026-11-04T14:04:24Z",
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "PSF-2.0",
+      "local_path": "C:\\GIT\\PhycoWeb-PRNG\\data\\local\\004\\downloads\\typing_extensions-4.16.0-py3-none-any\\typing_extensions-4.16.0-py3-none-any.whl",
+      "name": "typing_extensions-4.16.0-py3-none-any.whl",
+      "row": "Download 1",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "sha256_kind": "raw",
+      "size": "45,571 bytes",
+      "source": "PyPI",
+      "status": "fetched"
     }
   ],
   "environment": {
@@ -232,7 +251,7 @@
   },
   "exit_status": 0,
   "git_dirty": true,
-  "git_head": "7248054557b855882084df7b85aefae77e2f343c",
+  "git_head": "f33b5089d143af347d1a65f6be868ce7b64df4ef",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -251,16 +270,16 @@
     "ram": "68422496256 bytes",
     "system": "Windows-10-10.0.26300-SP0"
   },
-  "previous_sha256": "7c57082f676fb3c353a931196c4e032daa675062a66df5bea94354263d7b2a74",
+  "previous_sha256": "d5059353cdfdfeebcdd9a736e9fee29a5b579b834a059ec1239c139e0ba96179",
   "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
   "protocol_line_sha256_kind": "raw",
   "protocol_seq": 498,
-  "record_id": "downloads-20261104T135439Z-54dbc8f5",
+  "record_id": "downloads-20261104T140424Z-d0a09d08",
   "research_sha256": "d2ea189d456006532324babbe1db2fbc5e30b417253fd565d1797918222d413e",
   "research_sha256_kind": "raw",
   "review_status": "pending",
   "reviewer": "pending",
-  "spec_sha256": "613417867d0438c349a16ca6704b6ea0fb31d5061fd83a8c7934b4a7e298de51",
+  "spec_sha256": "c9cc83134e1329236e810858c9c29d5b7f5353fb3a6856085e55a1d3a0076a4c",
   "spec_sha256_kind": "raw",
   "status": "pass",
   "variant_id": null,

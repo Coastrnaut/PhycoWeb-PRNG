@@ -2235,8 +2235,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `numpy==2.2.6; python_version >= "3.10" and python_version < "3.14"`,
     `numpy==2.5.4; python_version >= "3.14"`, the same for scipy (1.15.3 and 1.18.1), and
     `nistrng==1.2.3` in both. The Hypothesis pins of R19, `hypothesis==6.168.5`,
-    `sortedcontainers==2.4.0` and `exceptiongroup==1.3.1; python_version < "3.11"`, enter it only
-    once their wheels are installed and checked in an environment, each marked for that platform;
+    `sortedcontainers==2.4.0`, `exceptiongroup==1.3.1; python_version < "3.11"` and
+    `typing_extensions==4.16.0; python_version < "3.11"`, which `exceptiongroup` needs there and
+    the row "Download 1" permits, enter it only once their wheels are installed and checked in an environment, each marked for that platform;
     until then they stand in it commented out, with the open item named (R17), and the
     environment record is written against the file as it stands. A check after each
     install compares `pip freeze` with these pins (R19). A comment in the
@@ -2311,8 +2312,11 @@ licence does not touch the project's GPL-3.0.
 
 **Software.** Installed from the downloaded files into the two existing environments, from outside
 the download directory: on Windows by `<python> -I -m pip install --user --no-index --no-deps`
-followed by the paths of the three Windows wheels, `<python>` being the full path of R1's Store
-Python, so that pip reads the downloaded files under `-I`, and in WSL by
+followed by the paths of the three Windows wheels and of
+`typing_extensions-4.16.0-py3-none-any.whl` (45,571 bytes, PSF-2.0), which `exceptiongroup` needs
+below Python 3.13 and the row "Download 1" permits, `<python>` being the full path of the app
+execution alias of R1's Store Python, since Windows refuses to run the versioned path itself, so
+that pip reads the downloaded files under `-I`, and in WSL by
 `~/.venvs/phycoweb/bin/python -I -m pip install --no-index --no-deps` with the two WSL wheels. If
 pip refuses a user install under `-I`, the install stops for the owner's decision, and
 nothing runs from the download directory. A check after each install compares
