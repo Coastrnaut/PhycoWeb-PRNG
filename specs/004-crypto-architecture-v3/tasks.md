@@ -85,7 +85,7 @@ task of phases 1 to 9 starts before T002.
   records as changed by an edit that no row made; and commit the file alone. A later commit that
   changes a place before the protocol change log exists needs the comparison again, confirmed in
   "Place check <k>". (FR-044; PRO-063, PRO-064)
-- [ ] T002 ⛔ **Tasks approval** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s Review
+- [X] T002 ⛔ **Tasks approval** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s Review
   & Approval table: review this list with the `/speckit-analyze` findings; review the ticks the
   agent set in the eight checklists on the owner's instructions of 2026-11-01 and 2026-11-02,
   unticking any item not accepted; confirm each list "Rows that change the protocol" of
