@@ -310,6 +310,12 @@ def required_readings(section_18: str, place_notes: str) -> List[str]:
     return rows + commits
 
 
+def guard_readings_decided(section_18: str, place_notes: str, readings: Dict[str, Dict]) -> None:
+    undecided = [key for key in required_readings(section_18, place_notes) if key not in readings]
+    if undecided:
+        raise Refused(f"a reading marked set_aside is not decided: {undecided}")
+
+
 def rule_for_reading(entry: Dict, reading: Dict) -> Dict:
     """The rule whose places the reading names, or else the entry's first `settled` rule, or else
     its first."""
@@ -382,9 +388,7 @@ def build_first_entries() -> List[Dict]:
         raise Refused("the row \"Readings set aside\" does not read Approved at HEAD")
     readings = set_aside_readings(decided.notes)
     model = evidence.show(evidence.FEATURE_REL + "/data-model.md").decode("utf-8")
-    undecided = [key for key in required_readings(model, row.notes) if key not in readings]
-    if undecided:
-        raise Refused(f"a reading marked set_aside is not decided: {undecided}")
+    guard_readings_decided(model, row.notes, readings)
     attach_readings(entries, readings)
     return entries
 

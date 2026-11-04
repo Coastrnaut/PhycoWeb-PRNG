@@ -124,7 +124,6 @@ def review(fields: Dict) -> Dict:
     """A review entry, or the review of an evidence record, on the owner's explicit word alone."""
     of_record = "record_id" in fields
     require(fields, RECORD_REVIEW_FIELDS if of_record else REVIEW_FIELDS)
-    evidence.head_table()
     guard_reviewer(fields)
     guard_row(fields)
     if of_record:

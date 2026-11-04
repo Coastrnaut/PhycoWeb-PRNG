@@ -1871,6 +1871,15 @@ class ProtocolWriter(TempRepo):
         with self.assertRaisesRegex(Refused, "drops or changes"):
             self.propose(self.addition(digest))
 
+    def test_the_latest_named_version_is_the_one_read(self):
+        self.name_list([refused_entry()])
+        digest = self.list_version([refused_entry(), refused_entry("GCM", "0x87")], "added")
+        self.propose(self.addition(digest))
+        self.commit("the second named version")
+        digest = self.list_version([refused_entry()], "drops what the second version added")
+        with self.assertRaisesRegex(Refused, "drops or changes"):
+            self.propose(self.addition(digest))
+
     def test_a_draft_that_no_entry_names_may_be_corrected(self):
         self.name_list([refused_entry()])
         self.list_version([refused_entry(), refused_entry("GCM", "0x87")], "a draft")
@@ -2004,6 +2013,13 @@ class FirstEntries(unittest.TestCase):
                  "rounds, and of SEC-093, with every other entry of that kind.")
         self.assertEqual(changelog.required_readings(model, self.PLACE),
                          ["RAT-036", "PRO-065", "SEC-093", "ccfd9d1"])
+
+    def test_a_reading_the_documents_name_and_the_row_does_not_decide_is_refused(self):
+        model = "The first entries that hold one are those of RAT-036, with every other entry."
+        readings = {"RAT-036": {}}
+        with self.assertRaisesRegex(Refused, r"not decided: \['ccfd9d1'\]"):
+            changelog.guard_readings_decided(model, self.PLACE, readings)
+        changelog.guard_readings_decided(model, self.PLACE, dict(readings, ccfd9d1={}))
 
     def test_a_row_decided_that_no_entry_holds_is_refused(self):
         with self.assertRaisesRegex(Refused, "do not exist"):
@@ -2539,8 +2555,11 @@ Between the tables.
     def test_a_later_copy_is_refused_under_the_listed_name_and_entered_under_its_own(self):
         self.script("init")
         self.script("fetched", "SpongePRNG.pdf", self.file("first", b"twelve bytes"))
+        same_size = self.file("copy", b"twelve BYTES")
+        self.assertEqual(self.script("fetched", "SpongePRNG.pdf", same_size), 2)
+        self.assertEqual(self.entry("SpongePRNG.pdf")["sha256"],
+                         evidence.sha256(b"twelve bytes"))
         path = self.file("second", b"seven b")
-        self.assertEqual(self.script("fetched", "SpongePRNG.pdf", path), 2)
         self.row("SpongePRNG-2.pdf")
         self.assertEqual(self.script("approve", "SpongePRNG-2.pdf"), 0)
         self.assertEqual(self.script("fetched", "SpongePRNG-2.pdf", path), 0)

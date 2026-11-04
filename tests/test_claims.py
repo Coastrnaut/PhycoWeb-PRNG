@@ -562,6 +562,10 @@ class WordingRules(unittest.TestCase):
         self.assert_passes("| 128 bits | a |\n| b | strength |")
         self.assert_rule("It has 128\nbits of\nstrength.", "a strength not labelled as a target")
 
+    def test_a_table_row_is_one_unit_whatever_sentences_it_holds(self):
+        self.assert_rule("| It has 128 bits. It goes on. | The strength stands here. |",
+                         "a strength not labelled as a target")
+
     def test_results_offered_as_evidence(self):
         rule = "results offered as evidence"
         for text in ("The avalanche test shows good mixing.",
