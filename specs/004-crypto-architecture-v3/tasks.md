@@ -634,7 +634,7 @@ hash, older than its first counted result.
   of `research/security/step_probes.py` as an input difference. Validate it on `s13-decay` and
   `s13-transport` on `phyco-v2` and on its stated lists at 4×4 and 3×3. (FR-037, FR-039; SC-007;
   R13)
-- [ ] T054 [P] [US4] Write `research/004/tools/symmetry.py` (R13): every composition of torus
+- [X] T054 [P] [US4] Write `research/004/tools/symmetry.py` (R13): every composition of torus
   translations, rotations by 90°, 180° and 270° and reflections that moves a node, and word
   rotations by k = 1…w − 1, against each round's constants, the food-node placement and every
   per-node constant, each pattern on its own; validate it on S7's three rotation relations of
