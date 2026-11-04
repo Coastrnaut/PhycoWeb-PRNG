@@ -536,7 +536,7 @@ hashes.
   `report` holding the nine items of security.md §12.4 with T1 as the attacker, the Poisson tests
   and `DESIGN_DISCLAIMER`; and `--verify RECORD` and `--reproduce RECORD` as their section states.
   (FR-001, FR-002, FR-060, FR-061; SC-001; R2)
-- [ ] T042 [US1] In WSL, build with `make -C fast -f seed_search.mk` and run `fast/build/seed_search
+- [X] T042 [US1] In WSL, build with `make -C fast -f seed_search.mk` and run `fast/build/seed_search
   --check-vectors vectors/phyco-v2_*.hex`, exit 0; run
   `python -W ignore -m unittest tests.test_seed_search` with `wpy`; commit `fast/build/seed_search`,
   so that the demonstration record's `code_sha256` entry for it has a blob at its `git_head`
