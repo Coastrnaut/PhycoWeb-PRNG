@@ -414,7 +414,7 @@ or key-loading code is written here.
 
 ### Step (6): the Hypothesis wheels
 
-- [ ] T030 Download each wheel of research R19's software table into its own new, empty directory:
+- [X] T030 Download each wheel of research R19's software table into its own new, empty directory:
   `hypothesis-6.168.5-cp310-abi3-win_amd64.whl` (684,616 bytes),
   `hypothesis-6.168.5-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl` (1,157,262 bytes),
   `sortedcontainers-2.4.0-py2.py3-none-any.whl` (29,575 bytes) and

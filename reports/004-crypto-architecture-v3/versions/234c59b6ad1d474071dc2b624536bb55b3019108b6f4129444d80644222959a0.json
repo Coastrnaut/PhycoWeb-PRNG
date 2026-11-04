@@ -1,0 +1,247 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "ee0f3aefcfec5eff2cfd711ada2de199e78828be92bd10b658b1662e5e2928c4"
+    },
+    "scripts/downloads.py": {
+      "kind": "raw",
+      "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py init",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-04T13:53:00Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "entries": [
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "none stated by CWI; the ePrint version, 2017/498, is CC BY 4.0",
+      "name": "Daemen.pdf",
+      "size": "604 kB, as CWI lists it",
+      "source": "https://ir.cwi.nl/pub/27254/Daemen.pdf (CWI repository, final version)",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "none stated (authors' copy)",
+      "name": "SpongePRNG.pdf",
+      "size": "238,714 bytes",
+      "source": "https://keccak.team/files/SpongePRNG.pdf",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "CC BY 4.0",
+      "name": "169.pdf",
+      "size": "not given",
+      "source": "https://eprint.iacr.org/2016/169.pdf; refused scripted requests, so the owner's browser",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "none stated; the extended ePrint version, 2013/853, is CC BY 4.0",
+      "name": "automatic-search-arx-trails.pdf",
+      "size": "about 383 kB, as ORBilu lists it",
+      "source": "https://orbilu.uni.lu/bitstream/10993/17183/1/automatic-search-arx-trails.pdf (author postprint)",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "none stated (COSIC copy)",
+      "name": "2657",
+      "size": "458,069 bytes",
+      "source": "https://www.esat.kuleuven.be/cosic/publications/article-2657.pdf, redirected to the COSIC database",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "© IACR; no open licence stated",
+      "name": "47270450.pdf",
+      "size": "not given",
+      "source": "https://www.iacr.org/archive/ches2007/47270450/47270450.pdf; refused scripted requests, so the owner's browser",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "none stated on the record",
+      "name": "main.pdf",
+      "size": "1.02 MB, as ORBilu lists it",
+      "source": "https://orbilu.uni.lu/bitstream/10993/41993/1/main.pdf (author preprint)",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "© BSI, under BSI's terms of use",
+      "name": "AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf",
+      "size": "6 MB, as BSI lists it",
+      "source": "https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Certification/Interpretations/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf?__blob=publicationFile&v=3",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "MPL-2.0",
+      "name": "hypothesis-6.168.5-cp310-abi3-win_amd64.whl",
+      "size": "684,616 bytes",
+      "source": "PyPI",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "MPL-2.0",
+      "name": "hypothesis-6.168.5-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "size": "1,157,262 bytes",
+      "source": "PyPI",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "Apache-2.0",
+      "name": "sortedcontainers-2.4.0-py2.py3-none-any.whl",
+      "size": "29,575 bytes",
+      "source": "PyPI",
+      "status": "approved"
+    },
+    {
+      "environment": {
+        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256_kind": "raw"
+      },
+      "licence": "MIT",
+      "name": "exceptiongroup-1.3.1-py3-none-any.whl",
+      "size": "16,740 bytes",
+      "source": "PyPI",
+      "status": "approved"
+    }
+  ],
+  "environment": {
+    "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "git_dirty": false,
+  "git_head": "43297fd1d78a77c4d5ea16be1aff0552f064f102",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "downloads",
+  "limitations": [],
+  "model_id": null,
+  "outputs": "none",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "previous_sha256": "none",
+  "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 498,
+  "record_id": "downloads-20261104T135300Z-491288be",
+  "research_sha256": "d2ea189d456006532324babbe1db2fbc5e30b417253fd565d1797918222d413e",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "spec_sha256": "613417867d0438c349a16ca6704b6ea0fb31d5061fd83a8c7934b4a7e298de51",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
