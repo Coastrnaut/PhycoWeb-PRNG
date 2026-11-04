@@ -2204,7 +2204,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     that each has an explicit rule or `binary`, or that its record marks the hash
     `lf-normalized`; it also looks for a byte-order mark. It replaces the one-off check noted in
     `.gitattributes` on 2026-10-31, and it runs from plan phase 1 on, so that a path missed later
-    fails it as soon as the first record that cites it is committed.
+    fails it as soon as the first record that cites it is committed. The local-only outputs under
+    `data/local/`, whose hashes committed records hold, take `data/local/** -text`, added on
+    2026-11-04; git ignores that folder, so the line moves no file.
   - **Encoding.** Every new text file is UTF-8 without a byte-order mark. Scripts write with
     `encoding="utf-8"` and `newline="\n"`, and no hashed file is written by Windows PowerShell
     5.1, whose `Out-File -Encoding utf8` adds a byte-order mark.

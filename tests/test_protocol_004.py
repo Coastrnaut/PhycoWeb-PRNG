@@ -2045,13 +2045,15 @@ class FirstEntries(unittest.TestCase):
 
 class FirstEntriesOfThisRepository(unittest.TestCase):
     """FR-044's comparison on the committed lists, and the first entries `create` would write,
-    built with the refused list that T027 writes standing in; nothing is written."""
+    built with the refused list that T027 writes standing in; nothing is written. `create` has run:
+    its guard refuses a place changed after `compared_to`, which a later entry's change is, so the
+    entries are built from the comparison as stored, up to that commit."""
 
     def test_they_agree_with_the_lists_and_the_confirmed_rows(self):
         stored = json.loads((ROOT / changelog.PLACE_CHECK_REL).read_bytes())
         self.assertEqual(changelog.check(stored["compared_to"]), stored)
         fake = {"path": changelog.REFUSED_REL, "sha256": "0" * 64, "sha256_kind": "raw"}
-        with mock.patch.object(changelog, "check_refused_list_at_head", return_value=fake):
+        with mock.patch.object(changelog, "check_refused_list_at_head", return_value=fake),                 mock.patch.object(changelog, "guard_comparison", return_value=stored):
             entries = changelog.build_first_entries()
         listed: Dict[str, set] = {}
         for item in stored["rounds"]:
