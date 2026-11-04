@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.14 (2026-11-03). The change history is in section 25.
+- **Document:** `security.md`, version 2.15 (2026-11-04). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -998,7 +998,7 @@ withdraws the claim at once (section 15).
 
 | Model | Attack class | Reach | Complexity | Source | Date | Margin |
 |-------|--------------|-------|------------|--------|------|--------|
-| `phyco-v2` | Exhaustive seed search (T1) | full generator | about 2⁷² steps: 2⁶⁴ seeds × (256 warm-up steps plus a few output steps); not executed | generic, S3 (section 5) | 2026-10-31 | none: 64 bits is below the 128-bit floor |
+| `phyco-v2` | Exhaustive seed search (T1) | full generator | about 2⁷² steps: 2⁶⁴ seeds × (256 warm-up steps plus a few output steps); not executed in full, and reproduced on a reduced domain, 2³² candidates for each of three development targets, all three recovered | generic, S3 (section 5); demonstration record `demonstration-20261104T165604Z-4406adb9`, SHA-256 `5c93e850284120dc9935d3e4317b8dc94df3a7b79fc038dbc8a6c49508613651`, under `reports/004-crypto-architecture-v3/fut-sec-8/` | 2026-11-04 | none: 64 bits is below the 128-bit floor |
 | `phyco-v2` | Time–memory trade-off (T1) | full generator | one-time precomputation of about 2⁶⁴ seed evaluations, then about 2⁴³ per target with 2⁴³ stored entries; not executed | generic (Hellman, 1980; section 5) | 2026-10-31 | none |
 
 `phyco-v2` has no rounds, so a margin is not defined for it; the rows record why it can carry no
@@ -1660,6 +1660,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.12 | 2026-11-01 | Roadmap row 5a.5 carries feature 004's corrected order of sizes for the board: 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-HW-2), and a size that does not fit stays covered by feature 006's simulation. This corrects the wording 2.11 carried, which could have required a size the device cannot hold. From the owner's answers to the feature-004 checklist re-run (HW-041). FUT-GRID-5, FUT-HW-2 and every claim level are unchanged |
 | 2.13 | 2026-11-01 | Names constitution 1.3.0, which the owner approved on 2026-11-01, in the header, section 4, the tree of section 18 and roadmap stage 1. Version 1.3.0 amended only Principle IX, so the Security Policy that section 4 quotes is unchanged. The statements of what happened under 1.2.0 stay (sections 1 and 20, and roadmap row 5a), as do section 16.1, which describes features 001–003, and the review prompt's "never commit, push or publish", since review sessions hold no standing authorization. The L1 gate of section 15 reads "FUT-SEC-8 result review and security-target review" in place of "spec approval", and its evidence is unchanged: the feature-004 spec approval of 2026-11-01 started the design work and recorded no level, and `phyco-v3` stays at L0 until feature 004 records L1. Section 12.2 states that a 256-bit key meets k/2 = 128 with equality and no margin and that multi-target quantum search falls below it for u > 1, and section 5 records that feature 004 adopts T11 only as single-target key search. From the owner's answers to the second re-run of the feature-004 checklists (SEC-048, SEC-051, SEC-052). No requirement is weakened and no claim level changes |
 | 2.14 | 2026-11-03 | Gave `phyco-v3` its line at L0 in section 15's register and its row in section 1.1, "L0; no claim", before the claim test's first run (feature 004, FR-051, FR-069). The opening and closing blocks gained the fixed sentence "PhycoWeb-PRNG, every model included, must not be used to generate secrets." and now state the restriction with "an established cryptographic RNG", as README's block does. No requirement, level or finding changed |
+| 2.15 | 2026-11-04 | The best-attack register's row for exhaustive seed search cites the FUT-SEC-8 demonstration record by ID and SHA-256, the search tool's validation record (feature 004, FR-003; sections 12.5 and 12.6). The owner's FUT-SEC-8 result review follows. No requirement, level or finding changed |
 
 > Passing statistical batteries does not show cryptographic security. PhycoWeb-PRNG, every model
 > included, must not be used to generate secrets. Use an established cryptographic RNG for keys,

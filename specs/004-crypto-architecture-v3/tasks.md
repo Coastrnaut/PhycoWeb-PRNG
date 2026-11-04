@@ -549,7 +549,7 @@ hashes.
   `wpy scripts/fut_sec8.py --verify RECORD`; commit the record. A disagreement with the expected
   counts is a finding (FR-060), analysed as the protocol says, and never a reason to sweep again.
   (FR-001, FR-002, FR-045, FR-060; SC-001)
-- [ ] T044 [US1] Cite the demonstration record by ID and SHA-256 in the best-attack register row for
+- [X] T044 [US1] Cite the demonstration record by ID and SHA-256 in the best-attack register row for
   exhaustive seed search, in a version of `security.md` of its own with its history entry, CRLF
   kept. (FR-003; data-model §4)
 - [ ] T045 [US1] ⛔ **FUT-SEC-8 result review** (**Owner**), in
