@@ -422,7 +422,7 @@ or key-loading code is written here.
   `$REP/downloads.json` with `python scripts/downloads.py fetched NAME PATH --pypi-sha256 HEX`, its
   SHA-256 checked against PyPI's, all four recorded `fetched` before any is installed. Nothing runs
   from a download directory. (FR-046; R19)
-- [ ] T031 Install the wheels from outside their directories: on Windows with
+- [X] T031 Install the wheels from outside their directories: on Windows with
   `<python> -I -m pip install --user --no-index --no-deps` and the three Windows wheels with
   `typing_extensions-4.16.0-py3-none-any.whl` (row "Download 1"), `<python>` being the full path of
   the app execution alias of research R1's Store Python, and in WSL with
