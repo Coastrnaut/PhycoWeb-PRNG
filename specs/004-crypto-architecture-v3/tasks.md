@@ -651,7 +651,7 @@ hash, older than its first counted result.
   w = 4, an ARX-box spread over two phases and a bitwise S-box, the exact degree from the truth
   table reported beside the count, and on its hand-derived inside-out count. (FR-037, FR-039;
   SC-007; R13)
-- [ ] T057 [P] [US4] Write `research/004/tools/bijectivity.py` (R13): all 2³² inputs of the 2×2
+- [X] T057 [P] [US4] Write `research/004/tools/bijectivity.py` (R13): all 2³² inputs of the 2×2
   variant at w = 4 through the batch interpreter into a 2³²-bit bitmap of outputs; validate it,
   **heavy**, each run projected first against the feature-wide row, on a known permutation and on
   the stated map with collisions. (FR-019, FR-037, FR-039; SC-004, SC-007; R13)
