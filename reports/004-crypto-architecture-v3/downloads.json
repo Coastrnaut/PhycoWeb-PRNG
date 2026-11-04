@@ -16,19 +16,17 @@
       "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
     }
   },
-  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched main.pdf data/local/004/downloads/main/main.pdf",
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched 47270450.pdf data/local/004/downloads/47270450/47270450.pdf",
   "config": {
     "cwd": "C:\\GIT\\PhycoWeb-PRNG",
     "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-04T20:12:04Z",
+  "created_utc": "2026-11-04T20:38:24Z",
   "design_sha256": "none",
   "design_sha256_kind": "raw",
   "design_version": "none",
   "dirty_paths": [
-    "reports/004-crypto-architecture-v3/downloads.json",
-    "reports/004-crypto-architecture-v3/versions/0e366fc6c5547c7938393d9cb69f18c491cc9d608ea4a83685536431b7af8c89.json",
-    "reports/004-crypto-architecture-v3/versions/5d73b045fe4fed4f4b2b772c63cbda5cf9ef79e7c0b84e4c0e05f0a4df361e1a.json"
+    "reports/004-crypto-architecture-v3/projections/projection-20261104T203446Z-b0f2f434.json"
   ],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
@@ -114,18 +112,23 @@
       "status": "fetched"
     },
     {
+      "bytes": 252370,
+      "date_utc": "2026-11-04T20:38:24Z",
       "environment": {
-        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
         "approval_sha256_kind": "canonical",
         "path": "reports/004-crypto-architecture-v3/environment-windows.json",
-        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
         "sha256_kind": "raw"
       },
       "licence": "© IACR; no open licence stated",
+      "local_path": "data\\local\\004\\downloads\\47270450\\47270450.pdf",
       "name": "47270450.pdf",
+      "sha256": "025697fddcdc33fcf15a41afa8f646dc3b5a31b676e15b48e9377b214ca8418b",
+      "sha256_kind": "raw",
       "size": "not given",
       "source": "https://www.iacr.org/archive/ches2007/47270450/47270450.pdf; refused scripted requests, so the owner's browser",
-      "status": "approved"
+      "status": "fetched"
     },
     {
       "bytes": 1019644,
@@ -266,7 +269,7 @@
   },
   "exit_status": 0,
   "git_dirty": true,
-  "git_head": "d89ebea83fe1b84708ac8e869f539607b7d8eb59",
+  "git_head": "28cecdc0fa6d5156903e9b57ab21461ad77253fc",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -285,11 +288,11 @@
     "ram": "68422496256 bytes",
     "system": "Windows-10-10.0.26300-SP0"
   },
-  "previous_sha256": "26c43c8ad2e5299c1ea503f88a5ddf2c102c13b6c2f75483c494d228777e4ae8",
+  "previous_sha256": "7328060c8c576fcec0fb0f6d0d6eb585bc2dcfd3268a7a9be684217a4c85408f",
   "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
   "protocol_line_sha256_kind": "raw",
   "protocol_seq": 498,
-  "record_id": "downloads-20261104T201204Z-055be72a",
+  "record_id": "downloads-20261104T203824Z-2b49b987",
   "research_sha256": "b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3",
   "research_sha256_kind": "raw",
   "review_status": "pending",

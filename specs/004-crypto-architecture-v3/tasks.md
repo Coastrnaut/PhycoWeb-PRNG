@@ -661,7 +661,7 @@ hash, older than its first counted result.
   being a tool defect (exit 3); validate it on its three planted results at every round count from 1
   to the variant's R, and on its verdict code for every count 0 to N_a with its exact power at
   research R4's δ_A. (FR-029, FR-037, FR-039; SC-007; R4, R13)
-- [ ] T059 [US4] Fetch the trail papers of research R19 when this task is reached, each into its own
+- [X] T059 [US4] Fetch the trail papers of research R19 when this task is reached, each into its own
   new directory: `automatic-search-arx-trails.pdf` and COSIC's article 2657 (SPECK32, and SPECK64
   where the papers give optimal trails, for w = 32), `main.pdf` (SPARKLE), and `47270450.pdf`
   (PRESENT) through the owner's browser into a folder the owner names; record each in
