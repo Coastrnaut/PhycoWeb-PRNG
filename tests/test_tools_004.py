@@ -1350,6 +1350,237 @@ class SymmetryOnKnown(unittest.TestCase):
         self.assertIsNone(self.tool.model_id("symmetry-planted"))
 
 
+def dependency_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import dependency
+    return dependency
+
+
+class Dependency(unittest.TestCase):
+    """research/004/tools/dependency.py on stated lists (T055)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = dependency_module()
+        import ir
+        cls.ir = ir
+
+    def sets(self, program, rounds=1, direction="forward"):
+        return self.tool.as_sets(self.tool.matrix(program, direction, rounds), program.w)
+
+    def one(self, update, w=8):
+        return self.ir.Program("one", 2, w, (self.ir.Phase(0, (update,)),))
+
+    def test_the_identity(self):
+        sets = self.tool.as_sets(self.tool.identity(2, 8), 8)
+        self.assertEqual(len(sets), 64)
+        self.assertTrue(all(value == {key} for key, value in sets.items()))
+
+    def test_a_row_holds_every_bit_at_any_length(self):
+        for bits in (1, 63, 64, 65, 128, 200):
+            row = self.tool.full_rows(bits)
+            self.assertEqual(len(row), self.tool.words_for(bits))
+            self.assertEqual(int(np.unpackbits(row.view(np.uint8)).sum()), bits)
+
+    def test_xor_unites_and_rotation_moves(self):
+        sets = self.sets(self.one(self.ir.Mix(0, "xor", self.ir.Rotl(self.ir.Lane(1), 3))))
+        self.assertEqual(sets[(0, 5)], {(0, 5), (1, 2)})
+        self.assertEqual(sets[(0, 1)], {(0, 1), (1, 6)})
+        self.assertEqual(sets[(1, 5)], {(1, 5)})
+
+    def test_shifts_bring_in_nothing(self):
+        left = self.sets(self.one(self.ir.Mix(0, "xor", self.ir.Shl(self.ir.Lane(1), 3))))
+        self.assertEqual(left[(0, 5)], {(0, 5), (1, 2)})
+        self.assertEqual(left[(0, 2)], {(0, 2)})
+        right = self.sets(self.one(self.ir.Mix(0, "xor", self.ir.Shr(self.ir.Lane(1), 3))))
+        self.assertEqual(right[(0, 2)], {(0, 2), (1, 5)})
+        self.assertEqual(right[(0, 5)], {(0, 5)})
+
+    def test_and_or_not_unite(self):
+        for form in (self.ir.And, self.ir.Or):
+            sets = self.sets(self.one(self.ir.Mix(0, "xor", form(self.ir.Not(self.ir.Lane(1)), self.ir.Lane(2)))))
+            self.assertEqual(sets[(0, 3)], {(0, 3), (1, 3), (2, 3)})
+
+    def test_addition_and_subtraction_reach_every_lower_bit(self):
+        for op in ("add", "sub"):
+            sets = self.sets(self.one(self.ir.Mix(0, op, self.ir.Lane(1))))
+            self.assertEqual(sets[(0, 2)], {(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)})
+            self.assertEqual(sets[(0, 0)], {(0, 0), (1, 0)})
+
+    def test_a_constant_holds_nothing(self):
+        sets = self.sets(self.one(self.ir.Mix(1, "add", self.ir.Constant(0))))
+        self.assertEqual(sets[(1, 2)], {(1, 0), (1, 1), (1, 2)})
+
+    def test_a_rotation_update_moves_a_lane(self):
+        sets = self.sets(self.one(self.ir.Rot(0, 3)))
+        self.assertEqual(sets[(0, 5)], {(0, 2)})
+
+    def test_a_phase_reads_the_values_at_its_start(self):
+        """On a list the loader would refuse, so that list order gives another answer."""
+        program = self.ir.Program("x", 2, 8, (self.ir.Phase(0, (
+            self.ir.Mix(1, "xor", self.ir.Lane(2)), self.ir.Mix(0, "xor", self.ir.Lane(1)))),))
+        self.assertEqual(self.sets(program)[(0, 3)], {(0, 3), (1, 3)})
+
+    def test_the_inverse_runs_the_undone_list(self):
+        program = self.ir.Program("x", 2, 8, (
+            self.ir.Phase(0, (self.ir.Rot(1, 1),)),
+            self.ir.Phase(0, (self.ir.Mix(0, "xor", self.ir.Lane(1)),))))
+        self.assertEqual(self.sets(program, 1, "forward")[(0, 3)], {(0, 3), (1, 2)})
+        self.assertEqual(self.sets(program, 1, "inverse")[(0, 3)], {(0, 3), (1, 3)})
+
+    def test_rounds_compose(self):
+        program = self.one(self.ir.Rot(0, 1))
+        self.assertEqual(self.sets(program, 3)[(0, 5)], {(0, 2)})
+
+    def test_first_full_stops_when_nothing_changes(self):
+        self.assertIsNone(self.tool.first_full(self.one(self.ir.Mix(0, "xor", self.ir.Lane(1))), "forward"))
+
+    def test_first_full_stops_at_its_limit(self):
+        """A rotation never settles, so that only the limit ends the walk."""
+        seen = []
+        for rounds, _ in self.tool.walk(self.one(self.ir.Rot(0, 1)), "forward", self.tool.identity(2, 8), 5):
+            seen.append(rounds)
+        self.assertEqual(seen, [1, 2, 3, 4, 5])
+
+    def test_missing_pairs_counts_what_is_absent(self):
+        n, w = 2, 4
+        bits = 32
+        self.assertEqual(self.tool.missing_pairs(self.tool.identity(n, w), bits), 32 * 32 - 32)
+
+    def test_dependent_bits_reads_one_input_bits_column(self):
+        state = self.tool.matrix(self.one(self.ir.Mix(0, "xor", self.ir.Rotl(self.ir.Lane(1), 3))), "forward", 1)
+        flipped = 1 * 8 + 2
+        out = self.tool.dependent_bits(state, flipped)
+        self.assertEqual({(int(a), int(b)) for a, b in zip(*np.nonzero(out))}, {(0, 5), (1, 2)})
+
+    def test_the_report_counts_each_round_and_finds_r_f(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        table = validate_tool.known_results()
+        known = validate_tool.load_known(table["dependency-small-second"])
+        out = self.tool.report(known.sweep(2, 4))
+        self.assertEqual(out["forward"]["first_full"], 2)
+        self.assertEqual(out["inverse"]["first_full"], 8)
+        self.assertEqual(out["forward"]["pairs_without_dependency"], [1024 - 604, 0])
+        self.assertEqual(out["inverse"]["pairs_without_dependency"][:2], [1024 - 176, 1024 - 320])
+        self.assertEqual(out["inverse"]["pairs_without_dependency"][-1], 0)
+
+    def test_the_report_of_a_list_that_never_fills(self):
+        out = self.tool.report(self.one(self.ir.Mix(0, "xor", self.ir.Lane(1))))
+        self.assertIsNone(out["forward"]["first_full"])
+        self.assertEqual(len(out["forward"]["pairs_without_dependency"]), 2)
+
+    def test_the_margin_through_instantiate(self):
+        """Two key bits, one in each word of a loop of two lanes: the sets fill after two rounds."""
+        n, w = 2, 4
+        program = self.ir.Program("m", n, w, (
+            self.ir.Phase(0, (self.ir.Mix(0, "add", self.ir.Rotl(self.ir.Lane(4), 1)),)),))
+        start = np.zeros((8, w, 1), dtype=np.uint64)
+        start[0, 0, 0] = 1
+        self.assertIsNone(self.tool.first_full(program, "forward", 8, start, 2))
+        out = self.tool.margin(program, start, 2, 7)
+        self.assertEqual(out["every_bit_reached_after"], None)
+        self.assertFalse(out["holds"])
+
+    def test_the_margin_when_every_lane_holds_every_symbol(self):
+        n, w = 2, 4
+        program = self.ir.Program("r", n, w, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        start = np.full((8, w, 1), np.uint64(3), dtype=np.uint64)
+        out = self.tool.margin(program, start, 2, 5, 8)
+        self.assertEqual(out["every_bit_reached_after"], 1)
+        self.assertTrue(out["holds"])
+        self.assertEqual(out["rounds_before_first_output"], 5)
+        self.assertIsNone(out["margin_over_r_f"])
+
+    def test_the_margin_over_r_f(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        known = validate_tool.load_known(validate_tool.known_results()["dependency-small-second"])
+        program = known.sweep(2, 4)
+        start = np.full((8, 4, 1), np.uint64(1), dtype=np.uint64)
+        out = self.tool.margin(program, start, 1, 5)
+        self.assertEqual((out["r_f"], out["margin_over_r_f"]), (2, 3))
+        self.assertEqual(out["every_bit_reached_after"], 1)
+
+    def test_a_late_arrival_does_not_hold(self):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        known = validate_tool.load_known(validate_tool.known_results()["dependency-small-second"])
+        program = known.sweep(2, 4)
+        start = np.zeros((8, 4, 1), dtype=np.uint64)
+        start[1, 0, 0] = 1
+        out = self.tool.margin(program, start, 1, 1)
+        self.assertEqual(out["every_bit_reached_after"], 2)
+        self.assertFalse(out["holds"])
+        self.assertTrue(self.tool.margin(program, start, 1, 2)["holds"], "the last round before it")
+
+
+class DependencyOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = dependency_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def test_each_is_re_found_entry_by_entry(self):
+        for name in ("dependency-small", "dependency-small-second"):
+            out = self.tool.validation(name, self.known(name), None)
+            self.assertTrue(out["re_found"], name)
+            self.assertEqual(sum(row["differences"] for row in out["found"]["rows"]), 0)
+
+    def test_one_entry_changed_breaks_the_first(self):
+        known = self.known("dependency-small")
+        real = known.expected
+
+        def wrong(name, n, w, direction, rounds):
+            out = {key: set(value) for key, value in real(name, n, w, direction, rounds).items()}
+            out[(0, 0)] = out[(0, 0)] | {(1, 1)}
+            return out
+
+        with mock.patch.object(known, "expected", wrong):
+            self.assertFalse(self.tool.validation("dependency-small", known, None)["re_found"])
+
+    def test_an_entry_too_few_breaks_the_second(self):
+        known = self.known("dependency-small-second")
+        real = known.expected
+
+        def wrong(n, w, direction, rounds):
+            out = {key: set(value) for key, value in real(n, w, direction, rounds).items()}
+            out[(0, 0)] = set(list(out[(0, 0)])[1:])
+            return out
+
+        with mock.patch.object(known, "expected", wrong), mock.patch.object(known, "PAIRS", ((2, 4),)):
+            self.assertFalse(self.tool.validation("dependency-small-second", known, None)["re_found"])
+
+    def test_a_stated_r_f_or_r_b_is_compared(self):
+        known = self.known("dependency-small-second")
+        with mock.patch.object(known, "first_full", lambda n: {"forward": 3, "inverse": 2 * n * n}), \
+                mock.patch.object(known, "PAIRS", ((2, 4),)):
+            self.assertFalse(self.tool.validation("dependency-small-second", known, None)["re_found"])
+        with mock.patch.object(known, "first_full", lambda n: {"forward": 2, "inverse": 1}), \
+                mock.patch.object(known, "PAIRS", ((2, 4),)):
+            self.assertFalse(self.tool.validation("dependency-small-second", known, None)["re_found"])
+
+    def test_a_first_that_should_never_fill_is_compared(self):
+        known = self.known("dependency-small")
+        with mock.patch.object(known, "FIRST_FULL", {"rules": 3, "chain": None}), \
+                mock.patch.object(known, "PAIRS", ((2, 4),)):
+            self.assertFalse(self.tool.validation("dependency-small", known, None)["re_found"])
+
+    def test_a_key_the_tool_found_that_is_not_wanted_counts(self):
+        self.assertEqual(self.tool.differences({1: 2, 3: 4}, {1: 2}), 1)
+        self.assertEqual(self.tool.differences({1: 2}, {1: 2, 3: 4}), 1)
+        self.assertEqual(self.tool.differences({1: 2}, {1: 2}), 0)
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
