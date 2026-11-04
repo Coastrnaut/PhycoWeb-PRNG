@@ -1855,14 +1855,23 @@ entry of its own or as no change of rule, with the reason; the agent's reading i
 check and states what 57763b5 and the owner's answers already decide, so that it sets no further
 reading aside.
 
-Over every span from the plan-approval commit, 65bcbf2, to 384bb19 outside the rounds' pairs, the
+Commit 5192c73, the twentieth report's remediation, on the owner's instruction of 2026-11-03 to make
+and commit the edits for its issues, changed research R16, data-model §1 and the cli contract. The
+clearing is now the `created_utc` of the record that `clear_lock.py` writes for the run,
+`ended_outside` is written as `created_utc` is, and FR-053's test's closing `projection` record
+holds `status` `inconclusive`, its time being what the re-check checks in place of hours used. The
+commit is recorded here for the owner to confirm at the tasks approval as an entry of its own or
+as no change of rule, with the reason; the agent's reading is that it only states what a record
+holds, so that it sets no further reading aside.
+
+Over every span from the plan-approval commit, 65bcbf2, to 5192c73 outside the rounds' pairs, the
 comparison that `research/004/place_check.py` wrote to `research/004/place-check.json`, committed
-in 8beeddd with `compared_to` 384bb19, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740,
-e1d7a90, c7dadf5, 0b60ab1, d6edec2, 92e91ae, ffcee2b and 57763b5 committed in 0a99462, c5a630c,
-ce902d5, c92383c, 637eb02, 9a74a9b, d3cdbf5, c9acd78, 85a5e1c, b49a4c3 and 42e1ba2, found
-twenty-three commits that changed places of rules with an edit that no row made: ad2c195's change
-to research R3, recorded beside the re-run's list above; and, in the span from 974ffef to
-384bb19, after this round's pair, research R16 and the cli
+in 44580ba with `compared_to` 5192c73, after comparisons up to addc940, 2e36613, 7f42e03, b9d9740,
+e1d7a90, c7dadf5, 0b60ab1, d6edec2, 92e91ae, ffcee2b, 57763b5 and 384bb19 committed in 0a99462,
+c5a630c, ce902d5, c92383c, 637eb02, 9a74a9b, d3cdbf5, c9acd78, 85a5e1c, b49a4c3, 42e1ba2 and
+8beeddd, found twenty-four commits that changed places of rules with an edit that no row made:
+ad2c195's change to research R3, recorded beside the re-run's list above; and, in the span from
+974ffef to 5192c73, after this round's pair, research R16 and the cli
 contract by 1c67100, data-model §18 by 57bd909, the cli contract by b6a93f0, spec FR-039, research
 R4 and the cli contract by 252512a, spec FR-020, FR-025 and FR-026 and research R5 and R8 by
 797c6da, research R15, data-model §1 and §18 and the cli contract by ce3cde1, research R15,
@@ -1872,15 +1881,17 @@ table by 5f34d5c and again by 7a6d0e8, research R12 by 2e36613, research R16, da
 cli contract by 7f42e03, b9d9740, 43baec5 and e1d7a90, the cli contract by c7dadf5, research R16,
 data-model §1 and the cli contract by 0b60ab1, d6edec2 and 92e91ae, research R7 by ffcee2b, and
 the protocol's rows "FUT-SEC-8 demonstration" and "Bias rule", research R4, R7 and R16, spec
-FR-039, the plan's values, data-model §1 and the cli contract by 57763b5, and research R7 and R16,
-data-model §1 and the cli contract by 384bb19, 40 entries in all, one per commit and rule, each
-recorded beside this list above. The span from
+FR-039, the plan's values, data-model §1 and the cli contract by 57763b5, research R7 and R16,
+data-model §1 and the cli contract by 384bb19, and research R16, data-model §1 and the cli contract
+by 5192c73, 41 entries in all, one per commit and rule, each recorded beside this list above. The
+span from
 832bd4d to 930494d, between the ninth and tenth
 re-runs' pairs, changed no place, nor did the span's other commits, 744ded0, ccaf8f0, 388551a,
 82bb979, 3c8eccb, 7e61f4f, 40768cd, e560a9c, addc940, 0a99462, d626a13, dc40078, a56d372, d9a17e7,
 99b6422, c5a630c, 280e360, ce902d5, c92383c, 00ee022, 637eb02, ab10bbb, 9a74a9b, 35e4ab2, d3cdbf5,
-552fba9, c9acd78, 592cd1d, 85a5e1c, 7814f61, b49a4c3, 9c58b5e, 42e1ba2 and 975e1a7. These results
-restate that file, which the owner confirms in the row "Place check" (PRO-063).
+552fba9, c9acd78, 592cd1d, 85a5e1c, 7814f61, b49a4c3, 9c58b5e, 42e1ba2, 975e1a7, 8beeddd and
+5ee49f6. These results restate that file, which the owner confirms in the row "Place check"
+(PRO-063).
 
 ## After the answer
 
