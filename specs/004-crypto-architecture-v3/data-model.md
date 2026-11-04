@@ -110,6 +110,7 @@ implementation can write byte-identical files:
 | `analyst`, `reviewer`, `review_status` | str | the AI agent and model, or a person; `reviewer` and `review_status` stay as written, `pending` where no review preceded the record, which is never overwritten: its review is a provenance entry that names the record's ID and SHA-256 (section 14) |
 | `limitations` | list[str] | known limitations, and the scope of any negative result; a MILP bound at w = 16 or 32 states that it is proven by the solver within HiGHS's built-in tolerances, with no exact confirmation (R12) |
 | `heavy_run`, `hours` | bool, object | `heavy_run` true if the run held the heavy-run lock (FR-045); `hours`, for a heavy run, the hours projected and the hours used (research R7), per run where a reproduction made two, which the Budget guard reads for research R7's feature-wide row (cli contract) and a reproduction reports only, and `none` for every other run |
+| `ended_outside` | str | in the `inconclusive` record of a run ended from outside (research R7), which `scripts/clear_lock.py` writes, the boot time of the lock's environment, later than the time the lock holds; `none` in every other record. Such a run gave no result: its record decides nothing, its kind's run has not finished, and a reproduction exits 2 for it (cli contract) |
 | `disclaimer` | str | `protocol.disclaimer.DESIGN_DISCLAIMER`, verbatim (FR-068) |
 
 Statistical records (section 5, `frequency`, `avalanche` and `control`) also hold the items of
@@ -117,7 +118,8 @@ security.md §11.6: `sample_size`, `test_parameters`, `raw_counts` (path and SHA
 `p_values` (path and SHA-256), each JSON or gzip-compressed JSON, never `.npy`, `failure_locations`
 (every fired bit with its round count, direction and input or difference set) and
 `exclusions_and_reruns` (each citing the recorded tool defect, one of the kinds of research R7, with
-its evidence; empty unless a tool defect is recorded).
+its evidence, or the record of a run ended from outside that this run makes again; empty
+otherwise).
 
 **Classification** by kind and outcome, computed by code (FR-060, FR-065). security.md §9.1
 classifies findings, so a record without one holds `none`; a reviewer may add a note, never change
@@ -125,7 +127,7 @@ the class.
 
 | Kind and outcome | `classification` |
 |------------------|------------------|
-| No finding: vectors, constants and constructed states with their generator runs and checks, the environment, downloads, freeze and review-package records (REP-085), projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap or a reproduction whose first run matched and whose second no longer fitted the hours left (Reproduction, below), which keep `status` `inconclusive` | `none` |
+| No finding: vectors, constants and constructed states with their generator runs and checks, the environment, downloads, freeze and review-package records (REP-085), projections, validations and cross-checks (a failed one is a tool defect, section 7), the size profile and the limits, the `cost` and `lock-cleared` records, a `recheck` record without a disagreement under the rules in force at a record's entry (one under a later stricter change is that change's recomputed verdict, section 18), the D4 choice, tie and tie-choice records, the round-rule and selection records and the selections' tie choices, a reproduction that matches, and a search at its cap, a run that died holding its lock or a reproduction whose first run matched and whose second no longer fitted the hours left (Reproduction, below), which keep `status` `inconclusive` | `none` |
 | A fired `control` (section 5) | `none`, with `status` `inconclusive` for that test and size |
 | A firing (a bias test's, or an invariant form held above its chance rate), a trail found by a validated tool (section 6), or a `dependency` record showing incomplete diffusion, raising R or not | `confirmed vulnerability` of the reduced rounds it covers, worded with its round count and, for a firing, the stated family-wise chance of a false firing |
 | A failed `inverse`, `bijectivity` or `symmetry` check, or a kept invariant | `confirmed vulnerability` of the candidate, worded as the failed property, with its decision |
@@ -168,7 +170,9 @@ the class.
   A heavy run that died holding its lock gets that `inconclusive` record when
   `scripts/clear_lock.py` clears the lock, which also writes a `lock-cleared` record under `locks/`
   with the lock's content (research R16); its `hours` used are the hours from the time the lock
-  holds to the clearing, the most it can have used, and for a run on a candidate
+  holds to the clearing, the most it can have used, or, for a run ended from outside, whose
+  record holds `ended_outside` and says that its partial outputs were discarded unread (research
+  R7), the hours up to that boot time, and for a run on a candidate
   `evidence_v3.py --aborted` appends that record's `evidence` entry, so that the run is charged
   and the log cites it (cli contract, `clear_lock.py`).
 - **Projection records.** A `projection` record (research R7) is written for every 60 s
@@ -546,12 +550,13 @@ proposed ─► entered-d4 ─► scored ─┐       (only candidates entered b
 | `cost` | steps per candidate, total steps and seconds, steps per second; extrapolation to 2⁶⁴ seeds |
 | `model_sha256` | `1260142d…` for `phycoweb/model_v2.py`, checked |
 | `report` | the nine items of security.md §12.4, with T1 as the attacker |
-| `supersedes`, `defect` | in a repeat after a tool defect, the earlier record's ID and the ID of the recorded defect it follows (cli contract, `fut_sec8.py`); `none` in the first record |
-| `owner_request` | in a repeat after a tool defect, the owner's request, quoted with its date, without which the repeat exits 2, the repeat being a heavy run charged to research R7's feature-wide row (cli contract, `fut_sec8.py`); `none` in the first record. It is the repeat's request: a reproduction's, `fut_sec8.py --reproduce` being a heavy run too, is kept in its `reproduction` record (section 1) |
+| `supersedes`, `defect` | in a repeat, the earlier record's ID and, after a tool defect, the ID of the recorded defect it follows, `none` after a pass ended from outside (cli contract, `fut_sec8.py`); `none` in the first record |
+| `owner_request` | in a repeat, the owner's request, quoted with its date, without which the repeat exits 2, the repeat being a heavy run charged to research R7's feature-wide row (cli contract, `fut_sec8.py`); `none` in the first record. It is the repeat's request: a reproduction's, `fut_sec8.py --reproduce` being a heavy run too, is kept in its `reproduction` record (section 1) |
 
-Each record is named by its `record_id`, which begins with `demonstration`, so that a repeat after a
-defect writes beside the first, which stays; a run exits 2 while a record exists and no new defect
-is named, or without the owner's request; a repeat, its vector check included, is a heavy run
+Each record is named by its `record_id`, which begins with `demonstration`, so that a repeat
+writes beside the first, which stays; a run exits 2 while a record exists and neither a new defect
+nor a pass ended from outside that no earlier record names is named, or without the owner's
+request; a repeat, its vector check included, is a heavy run
 charged to research R7's feature-wide row, against which it projects first, while the first
 record's pass falls under the demonstration's own budget row (cli contract).
 The record is the search tool's validation record (security.md §12.5). The
@@ -577,7 +582,7 @@ its ID, so that every earlier record stays reproducible and every run is reporte
 | `dependency` | per round and direction, the bit pairs without dependency; R_f, R_b; per-round summaries committed, full matrices local (R16) | R_f and R_b reported |
 | `frequency` | two input sets of N = 2²⁰ (key i with nonce i; key 0 with nonce i), S = 4b per call type's permutation, each permutation at its own threshold 0.005/S; per set, round count and direction the smallest p-value and the fired bits; the critical-count table it used (path and SHA-256) | fires or not, by comparing each count with its integer critical values (R4); raises R_dist |
 | `avalanche` | N_a = 2¹³; the flip set F, the 384 key and nonce bits flipped in instantiation states (forward only) and the rotation amounts 1…w − 1; S_A = (2·\|F\| + 384 + 2(w − 1))·b per call type's permutation, each permutation at its own threshold 0.005/(128·S_A); as for `frequency`; the `dependency` record it is cross-checked against, with every disagreement | fires or not; raises R_dist; any disagreement is a tool defect and makes the record `inconclusive` |
-| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code, and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
+| `control` | the test it controls, its counts, its inputs (R3's `control` states, taken as R4 states), whether it fired; `model_id` and `variant_id` null, since it belongs to no candidate. One record per test and size, `controls/<record_id>.json`, written before the test's first use at that size by any candidate, serves every candidate; it writes no candidate-log entry, and every candidate's 12 h row is charged its hours at that size, by projection until it exists (research R7); it is run again, with the same counts, only after a recorded tool defect in the control's own code or after it ended from outside, whose record holds `ended_outside` and counts as no control (section 1; research R7), and its inputs are never redrawn or replaced | if it fired, that size's bias evidence is `inconclusive` for every candidate, none is eligible at that size, and the feature recommends stopping, citing this record |
 | `symmetry` | patterns and symmetries checked, in the stated enumeration order, each pattern on its own (the K sets of amounts placed by their rule among them); symmetries that fix a pattern; the relations checked between the constants of one call (R13); at 2×2 and 3×3, the statement that the placements of the food nodes and of the amounts were checked together with the round constants as one pattern (R13) | `pass` if none |
 | `invariant` | the size and variant, at every supported size and every variant used as evidence, after one round and after a full call; forms and differences checked, over the whole state and over each colour class of the size's schedule (two at even n, three at odd n by research R14's colouring), each set with its level, the colour forms at odd n being a new set tested in addition (R13); any kept on every test state; per form and round count, the count of test states on which it holds against its chance rate (R13) | `pass` if none; a form above its chance rate by the binomial test of R13 raises R_dist |
 | `degree` | per claimable size, for Π and Π⁻¹: each phase's degree count from the operation list by R13's bottom-up rule (input lanes 1 and a constant 0; XOR, NOT, rotations and shifts the largest of their arguments; a bitwise function the largest sum of its arguments' degrees over its algebraic normal form's monomials, 2 for AND or OR of two lanes; ⊞ and ⊟ w − 1 times the larger operand's, a subtraction counting as an addition; an update its result's; a phase the largest of its updates', an unwritten lane 1), a round's count the product of its phases', a box's truth-table degree being computed only at w = 4 and 8, in the derivation's validation (section 7), never here; the count d for r rounds, the product of the per-round counts capped at b − 1, marked as the rule's count, not an upper bound; beside it an upper bound, by the same rules with w for ⊞ and ⊟, with the round counts at which it is at most 126; the round counts with d ≤ 126; and the inside-out count, the largest r₁ + r₂ with max(d_f(r₁), d_b(r₂)) ≤ 126, with its cost 2^(max(d_f, d_b) + 1) against 2¹²⁸ (R13) | each such round count, and the inside-out count, raises R_dist, since a zero-sum over a cube of dimension d + 1 costs 2^(d + 1) |

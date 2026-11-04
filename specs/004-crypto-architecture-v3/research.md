@@ -71,7 +71,7 @@ registered fan-out trees (R15; FR-025).
 | R6.1 | Width and rounds at which D4 is scored | As decided: the widest reduced width, 16 or else 8, at which both families have both bounds over a common r* ≥ 2 | w = 32 directly: bounds may not exist there for both families early. 2×2: a research size whose diffusion differs from the claimable sizes |
 | R6.2 | When D4 is decided, ties, and no scored family | Answered: once, by code, over the entered set recorded before the first score; an exact tie waits for R at 4×4 of both representatives; with no scored family, selection takes the eligible candidate with the smallest R at 4×4 from either family | A second D4 run after more candidates: reopens the choice. A stop when no family is scored: discards the evidence of both. The owner's free choice: no rule behind it |
 | R7.1 | Budget per candidate | As decided: 48 h of trail searches (8 h per instance), 6 h of structural checks, 12 h of statistics; at most about 16.5 days of runs for six candidates | Half: more searches end inconclusive, and stops come sooner. Double: up to about 33 days of runs |
-| R7.2 | Re-runs | As decided: one per kind of evidence, only after a recorded tool defect, inside the budget | None: one tool bug decides a candidate. More: invites running again until a result pleases |
+| R7.2 | Re-runs | As decided: one per kind of evidence, only after a recorded tool defect, inside the budget; a run ended from outside, which gives no result, runs again inside its row | None: one tool bug decides a candidate. More: invites running again until a result pleases |
 | R7.3 | Order of sizes | Change: each kind of evidence runs at 4×4, then 8×8, then 16×16; a larger size starts only when the smaller one's run of that kind has finished without making the candidate ineligible (FUT-GRID-5; checklist D8) | As decided, any order: a candidate that fails at 4×4 may already have spent its 16×16 hours |
 | R7.4 | Projection before heavy runs | Answered: a timing run of at most 60 s on the candidate; the run starts only if the projection fits the hours left in its row; counts never change to fit | No projection: a run can use up a budget row before anyone notices |
 | R8.1 | Mode vectors | As decided: 2 development keys × 10,000 words at every claimable size, in requests of 1, 7, 64 and 1,000 words | 10⁶ words: large files for little extra coverage. Shorter at 16×16: the spec allows it, but the model's speed does not need it |
@@ -394,11 +394,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     per size for the frequency control, by the union bound over its 2b bits at 0.005/S, and below
     0.005/128 for the avalanche control. Inconclusive bias evidence leaves R_dist unestablished at
     that size, which makes the candidate ineligible unless a recorded tool defect is fixed and the
-    one re-run that R7 allows is conclusive. That is one re-run per kind of evidence per candidate,
-    across all sizes: a second recorded defect in that kind leaves the evidence inconclusive, which
-    makes the candidate ineligible, and the tool is fixed and validated again before any other
-    candidate uses it (R7). A control runs again, with the same counts, only after a recorded tool
-    defect in its own code.
+    one re-run that R7 allows is conclusive, or a run ended from outside runs again and that run is
+    conclusive (R7). The re-run is one per kind of evidence per candidate, across all sizes: a
+    second recorded defect in that kind leaves the evidence inconclusive, which makes the candidate
+    ineligible, and the tool is fixed and validated again before any other candidate uses it (R7).
+    A control runs again, with the same counts and the same inputs, only after a recorded tool
+    defect in its own code or after it ended from outside (R7).
   - **Validation.** Before its first counted use, the bias test's validation record (R12;
     data-model §7) shows that it re-finds S14's bias on `phyco-v2`, and S12's ranges and classes and
     S15's 16 steps from its count on the vein lanes, bit 31 of each vein lane being set after 16
@@ -765,19 +766,21 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     (R16); or a bug in the tool's code, shown by the faulty line and a test that fails
     before the fix and passes after. It is recorded with that evidence before any re-run
     (data-model §1, `exclusions_and_reruns`). A disliked result is none of these, nor is the end
-    of a run by a reboot, a power loss or an update, which no fault of the tool brought: its
-    `inconclusive` record and its hours stand, and it takes no re-run.
-  - **Re-runs.** A run may be repeated only after a tool defect is found and recorded: one
-    re-run per kind of evidence per candidate, across all sizes, and its time counts against the
-    same budget. A second recorded defect in that kind leaves the evidence inconclusive, which
-    makes the candidate ineligible, and the tool is fixed and validated again before any other
-    candidate uses it. A candidate that fails an inverse or bijectivity test is investigated
+    of a run by a reboot, a power loss or an update, which no fault of the tool brought (Runs
+    ended from outside, below).
+  - **Re-runs.** Apart from a run ended from outside (below), a run may be repeated only after a
+    tool defect is found and recorded: one re-run per kind of evidence per candidate, across all
+    sizes, and its time counts against the same budget. A second recorded defect in that kind
+    leaves the evidence inconclusive, which makes the candidate ineligible, and the tool is fixed
+    and validated again before any other candidate uses it. A candidate that fails an inverse or
+    bijectivity test is investigated
     first: a recorded tool defect gets this one re-run; otherwise the candidate is rejected, logged
     with the failure and counted towards the stop rule. A search that reached its cap is never run
     again, with another tool or another version of the same one, except as this one re-run after a
     recorded tool defect, and a speed-up is not a defect (R12). A uniform control is run again only
-    after a recorded tool defect in the control's own code (R4). A reproduction (R16) is not a
-    re-run: it writes only its `reproduction` record, appends nothing to the candidate log and
+    after a recorded tool defect in the control's own code or after it ended from outside (R4). A
+    reproduction (R16) is not a re-run: it writes only its `reproduction` record, appends nothing
+    to the candidate log and
     charges no candidate's row, a heavy one only the feature-wide row (below), so it
     can neither replace evidence nor add any. The original stands, and a
     reproduction that differs from it on a field that enters a verdict is a finding that blocks the
@@ -787,6 +790,23 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     whose own result raises R by the round rule if it fires. A difference
     in a field that decides no verdict, such as a p-value, is reported and
     blocks nothing.
+  - **Runs ended from outside.** A reboot, a power loss or an update that ends a run is no fault
+    of the tool, and the run gives no result. `scripts/clear_lock.py` shows which run that is: the
+    boot time of the lock's environment, later than the time the heavy-run lock holds, goes into
+    the run's `inconclusive` record as `ended_outside` (data-model §1), and a run that died any
+    other way is no such run. Its partial outputs are discarded unread, and the record says so.
+    The record stands and decides nothing, so that its evidence stays inconclusive until the run
+    has been made again, and its hours, up to that boot time (R16), stand in the row it charged.
+    It may run again by the same command, on the same inputs, which is no re-run and spends none:
+    each time it projects first and is charged in full, so that the row's hours bound how often.
+    One that was itself the one re-run stays that re-run, and a statistical record names the ended
+    run's record in `exclusions_and_reruns`. No result was seen and nothing about the run changes,
+    so it can pick nothing. A search so ended did not reach its cap, and runs again under the same
+    cap. A uniform control so ended counts as none: no test of its kind starts at that size until
+    it has run again, with the same counts and the same inputs, every row it counts charged again
+    in full. A FUT-SEC-8 pass so ended is repeated only on the owner's request, charged to the
+    feature-wide row (below). Every other run keeps its own rule, a validation's recorded attempts
+    and a heavy reproduction's owner's request among them.
   - **Stricter changes during a candidate's runs.** A stricter change of a rule is applied first
     by recomputing the verdicts from saved outputs. New measurements it needs, such as more
     inputs, are a new measurement of the same kind under the changed rule, not a re-run: the
@@ -815,8 +835,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     at each width searched: each instance is capped at 8 h, and its projection reserves hours like
     any other run. The FUT-SEC-8 vector check and sweep, one pass per target, fall under the
     demonstration's own budget row, which holds nothing else (spec, Pre-registered Design Protocol);
-    a repeat after a fixed tool defect, its vector check included, is charged to the
-    feature-wide row (below). A uniform control (R4) belongs to no candidate and
+    a repeat, after a fixed tool defect or a pass ended from outside, its vector check included,
+    is charged to the feature-wide row (below). A uniform control (R4) belongs to no candidate and
     runs once per test and size, but every candidate's 12 h row is charged, at each size, that
     size's control hours, whether the control ran for it or before it, and the row's reservation
     counts them by projection until they exist; the control projects first and runs once every row
@@ -830,12 +850,13 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     feature-wide row of 66 h holds every heavy run that charges no candidate, the FUT-SEC-8 row's
     one pass per target excepted: validations and re-validations, on published values or on any
     other known result ("What else is charged", above; R12), heavy reproductions (R16), FUT-SEC-8
-    repeats after a fixed tool defect, each with its vector check, and FR-053's test with two worker
+    repeats, each with its vector check, and FR-053's test with two worker
     counts. Each projects first, as every heavy run does, and is refused, exit 2, once its
     projection does not fit the hours left in the row. A heavy reproduction or a FUT-SEC-8 repeat
     runs only on the owner's request, quoted with its date in its record as `owner_request`; the
     agent never starts one on its own, and a light reproduction needs no request. Each repeat
-    follows a defect that no earlier record names, and the row's hours bound their number.
+    follows a defect or an ended pass that no earlier record names, and the row's hours bound
+    their number.
   - **Order of sizes.** Each kind of evidence runs at 4×4, then 8×8, then 16×16. A larger size
     starts only when the smaller one's run of that kind has finished without making the
     candidate ineligible, so a candidate that fails at 4×4 spends none of its 16×16 hours
@@ -1999,7 +2020,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     `lock-cleared` record under `reports/004-crypto-architecture-v3/locks/` with the lock's content.
     A heavy run that died holding the lock then gets the `inconclusive` record that every started
     run writes, the hours from the time the lock holds to the clearing being its hours used, the
-    most it can have used (data-model §1; cli contract). Before the protocol change log exists a
+    most it can have used, or, where the boot time of the lock's environment is later than the
+    time the lock holds, a run ended from outside (R7), the hours up to that boot time, after
+    which it cannot have run (data-model §1; cli contract). Before the protocol change log exists a
     `lock-cleared` record and an
     environment record written by `owner_record.py environment` are the two kinds
     `protocol/evidence.py` writes, each with `protocol_seq` and `protocol_line_sha256` `none`, the

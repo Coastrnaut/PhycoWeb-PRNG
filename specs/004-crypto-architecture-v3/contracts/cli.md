@@ -31,7 +31,8 @@ original, the environment record the original cites, a re-check's reproduction e
 R1): it exits 2, writing nothing, with the reason "environment record <id> is not in
 force", while that record is not the platform's record in force, so that no
 difference is ever charged to a tool that a changed environment could explain
-(REP-100). It appends nothing to the candidate log, charges no candidate's
+(REP-100). It exits 2 for a record that holds `ended_outside`, whose run gave no result
+(research R7). It appends nothing to the candidate log, charges no candidate's
 budget row and is not a re-run under research R7, so it can neither replace
 evidence nor add any; the Order of sizes guard and the Budget guard's candidate rows, which concern
 evidence, do not refuse it, and every other guard applies, Committed code with the
@@ -186,7 +187,8 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   (PRO-079) and a `repair` entry whose list differs (REP-101).
 - **Order of sizes**: evidence of a kind at 8×8 or 16×16 exits 2 unless that kind's run for the
   candidate at the next smaller claimable size has finished without making it ineligible
-  (research R7). The guard counts evidence records only: a `--project` probe at a larger size writes
+  (research R7), and a run ended from outside has not finished. The guard counts evidence records
+  only: a `--project` probe at a larger size writes
   nothing but its `projection` record, which is not evidence, so this guard never refuses it, and
   the probes at 8×8 and 16×16 that a 4×4 run's projection needs run before that run (quickstart E7).
 - **Approvals**: every guard that reads the spec's Review & Approval table (Environment, above;
@@ -263,7 +265,7 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   (research R4, R7; ANA-074). Every heavy run that charges no candidate,
   the FUT-SEC-8 row's one pass per target excepted, a validation or re-validation, on a published
   value or on any other known result (research R7), a heavy reproduction, a FUT-SEC-8
-  repeat after a tool defect or FR-053's test with two worker counts, projects
+  repeat or FR-053's test with two worker counts, projects
   first against research R7's feature-wide 66 h row and exits 2, writing
   nothing but its `projection` record, unless its projection fits the hours left there, a heavy
   reproduction's being the projections of all the runs it will make, together (introduction). The
@@ -278,7 +280,7 @@ record and runs as a test, as their sections state (spec FR-061; research R16; R
   an earlier `re-found` record; a reproduction's rebuild so refused counts as a difference
   (introduction). A search that reached its cap is refused, exit 2, with any tool or
   version, except as research R7's one re-run after a recorded tool defect; a speed-up is not a
-  defect (research R12).
+  defect (research R12), and a search ended from outside did not reach its cap (research R7).
 
 ## `fast/build/seed_search` (C, WSL; built by `make -C fast -f seed_search.mk`)
 
@@ -305,7 +307,7 @@ seed_search --s0 S0 --s1 S1 --words W1 W2 W3 [--threads 32] [--progress SECONDS]
 
 ```text
 fut_sec8.py --binary fast/build/seed_search --out-dir $REP/fut-sec-8
-            [--repeat-after-defect ID --owner-request "WORDS (DATE)"]
+            [(--repeat-after-defect ID | --repeat-after-end RECORD) --owner-request "WORDS (DATE)"]
 fut_sec8.py --verify RECORD
 fut_sec8.py --reproduce RECORD --binary fast/build/seed_search --owner-request "WORDS (DATE)"
 ```
@@ -316,12 +318,13 @@ separates any extra three-word match with the fourth word, and writes a demonstr
 `fut-sec-8/<record_id>.json` (data model §4). The first run is the demonstration's one pass per
 target, with its vector check, under its own budget row (spec, Pre-registered Design Protocol). A
 second run exits 2 unless `--repeat-after-defect` names a recorded tool defect that no earlier
-record names (spec Edge Cases) and `--owner-request` quotes the owner's request with its date, so
-that the agent never starts a repeat; the repeat, its vector check included, is a heavy
-run charged to research R7's feature-wide row, against which it projects
+record names (spec Edge Cases), or `--repeat-after-end` the record of a pass ended from outside
+(research R7) that no earlier record names, and `--owner-request` quotes the owner's request
+with its date, so that the agent never starts a repeat; the repeat, its vector check included,
+is a heavy run charged to research R7's feature-wide row, against which it projects
 first (Budget, above), and writes beside the first, holding `supersedes`, the
-earlier record's ID, `defect`, the defect's, and `owner_request`. Exit 1
-if a target is not recovered.
+earlier record's ID, `defect`, the defect's, `none` after a pass ended from outside, and
+`owner_request`. Exit 1 if a target is not recovered.
 
 Neither of the other two modes is a demonstration attempt, and each takes a demonstration record by
 its ID, so that every earlier record stays reproducible:
@@ -481,7 +484,9 @@ a tool-defect entry, and exits 3. Every run started writes a record, even if abo
 heavy-run lock gets its record from `clear_lock.py` (below), which runs `--aborted RECORD`: that
 mode makes no run, so no budget row refuses it, and appends that record's `evidence` entry, with
 its `hours` in `budget_used_h`, so that the row is charged and the log cites the record (spec
-FR-041), and exits 2 for any other record or one that has its entry.
+FR-041), and exits 2 for any other record or one that has its entry. A run ended from outside
+runs again by the same command, its record deciding nothing, and a statistical record names it
+in `exclusions_and_reruns` (research R7; data model §1).
 `--project` runs the timing probe of research
 R7, writes a `projection` record and prints the projected hours against the budget row; it writes no
 evidence. A `control` run, the second form, belongs to no candidate and takes no `--candidate`: it
@@ -494,7 +499,9 @@ its evidence there inconclusive, and is charged nothing for it (ANA-074),
 writes its record under `$REP/controls/`, with `model_id` and `variant_id`
 null and its inputs from the `control` namespace, which serves every candidate, appends no
 candidate-log entry, and exits 2 if that record exists, except for the one re-run after a
-recorded tool defect in the control's own code (data model §5).
+recorded tool defect in the control's own code and where that record holds `ended_outside`,
+which counts as no control: the control runs again, with the same counts and the same inputs,
+and no test of its kind starts at that size before it has (research R7; data model §5).
 
 ## `scripts/d4_choice.py`
 
@@ -1185,7 +1192,11 @@ otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
 `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
 record (Budget, above), its hours used, or its time, being the hours from the time the lock holds
-to the clearing, the most the run can have used, since nothing else shows when it died; for a run
+to the clearing, the most the run can have used, since nothing else shows when it died. Where
+the boot time of the lock's environment is later than the time the lock holds, a reboot, a power
+loss or an update ended the run (research R7): that boot time shows when, so those hours stop
+there, the record holds it as `ended_outside`, and the outputs the run left under a temporary
+name are discarded unread, which the record says. For a run
 on a candidate it runs `evidence_v3.py --aborted RECORD` before it removes the lock
 (`evidence_v3.py`, above; data model §1; research R16). While the
 protocol change log does not exist, a `lock-cleared` record is one of the two kinds that the guard

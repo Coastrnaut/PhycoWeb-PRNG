@@ -819,8 +819,10 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (FR-065); or a bug in the tool's code, shown by the faulty line and by a test that fails before
   the fix and passes after. It is recorded with that evidence before any
   re-run. A disliked result is none of these, nor is the end of a run by a reboot, a power loss
-  or an update, which no fault of the tool brought: its `inconclusive` record and its hours
-  stand, and it takes no re-run (research R7).
+  or an update, which no fault of the tool brought: such a run gives no result, its partial
+  outputs are discarded unread, its `inconclusive` record and its hours up to the boot stand,
+  and it may run again on the same inputs, which spends no re-run, its row's hours bounding how
+  often (research R7).
 - **A tool fails its validation**: none of its results count, no bound from it enters the round
   rule, and the failure is recorded. The defect is recorded with its cause and fixed, and the tool
   is validated again on every known result it has, the first and the second at each of
@@ -2571,9 +2573,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   8 h per instance, and a heavy one projects first against research R7's feature-wide row and is
   refused, exit 2, once it does not fit; the D4 reduced-width searches count against their
   candidate's trail budget, and the FUT-SEC-8 vector check and sweep, one pass per target, against
-  the demonstration's own budget, which holds nothing else, while a repeat after a fixed tool
-  defect, its vector check included, is charged to research R7's feature-wide row and runs only on
-  the owner's request (Pre-registered Design Protocol).
+  the demonstration's own budget, which holds nothing else, while a repeat, its vector check
+  included, is charged to research R7's feature-wide row and runs only on the owner's request
+  (Pre-registered Design Protocol).
 
 **Protocol**
 
@@ -3002,8 +3004,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   lists them, and FR-053's test with two worker counts is a heavy run that charges no candidate.
   Every heavy run that charges no candidate, the FUT-SEC-8 row's one pass per target with its vector
   check excepted, is charged to research R7's feature-wide 66 h row and refused, exit 2, once its
-  projection does not fit the hours left there, and a heavy reproduction, like a FUT-SEC-8 repeat
-  after a fixed tool defect, runs only on the owner's request, quoted with its date in its record.
+  projection does not fit the hours left there, and a heavy reproduction, like a FUT-SEC-8 repeat,
+  runs only on the owner's request, quoted with its date in its record.
   Every heavy run takes the heavy-run lock,
   projects its hours first and records `heavy_run` true, and a test checks that every budgeted kind
   and every script with a worker option takes the lock. A stale lock, left by a crash or a reboot,
@@ -3814,7 +3816,7 @@ run it projects. *Stricter means*: the derivation does not change.
 | Random baseline | False matches expected per target: about 1 after one word (2³² candidates, 32-bit words), about 2⁻³² after two, about 2⁻⁶⁴ after three. Agreement is tested on the one-word count of each target against a Poisson distribution of mean (2³² − 1)/2³², and of the three pooled against three times that mean, two-sided at level 0.01; any false match after two or three words is reported as a deviation. The baseline assumes each candidate's output words uniform and independent of the target's; `phyco-v2`'s biases (S12, S14) could make false matches more frequent, so a count above the baseline is an observation about `phyco-v2`, reported as such, and does not change the success criterion. A disagreement is a finding (FR-060), never a reason to sweep again |
 | Cost | Steps and time per candidate, measured; the total; the extrapolation to 2⁶⁴ candidates. Expected: about 2³² × 257 steps per target, about 3.6 core-hours at 8.5 × 10⁷ steps/s |
 | Check before the sweep | The search tool reproduces the `phyco-v2` golden vectors |
-| Budget | One pass over the 2³² candidates per target, for three targets, with its vector check, and nothing else. A repeat, only after a tool defect is fixed (Edge Cases), its vector check included, is a heavy run charged to research R7's feature-wide row: it projects first, is refused, exit 2, once its projection does not fit the hours left there, and runs only on the owner's request, quoted with its date in its record as `owner_request`, so that the agent never starts one; each repeat follows a defect that no earlier record names, and the feature-wide row's hours bound their number. Checking a record's listed matches and recovered seeds runs no sweep and is not a repeat. Nor is a reproduction after the FUT-SEC-8 result review: a heavy run that writes its own record, compared field by field with the original, which can neither replace the demonstration record nor change the review; a difference is a finding |
+| Budget | One pass over the 2³² candidates per target, for three targets, with its vector check, and nothing else. A repeat, only after a tool defect is fixed (Edge Cases) or a pass ended from outside (research R7), its vector check included, is a heavy run charged to research R7's feature-wide row: it projects first, is refused, exit 2, once its projection does not fit the hours left there, and runs only on the owner's request, quoted with its date in its record as `owner_request`, so that the agent never starts one; each repeat follows a defect or an ended pass that no earlier record names, and the feature-wide row's hours bound their number. Checking a record's listed matches and recovered seeds runs no sweep and is not a repeat. Nor is a reproduction after the FUT-SEC-8 result review: a heavy run that writes its own record, compared field by field with the original, which can neither replace the demonstration record nor change the review; a difference is a finding |
 | Report | security.md §12.4, with T1 as the attacker, who knows the position of the observed words |
 
 *Stricter means*: no change.
@@ -3880,7 +3882,8 @@ fixed in the plan before any measurement. By the Bonferroni inequality, the rule
 fires on uniform states with probability at most 0.005 for one permutation.
 Before its first use at each size, it is applied once to the same number of
 uniform states, derived from public strings by SHA-256 as the development
-inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md §11.6).
+inputs are; if it fires there, the bias evidence of that size is inconclusive (security.md §11.6);
+a control ended from outside gives no result and runs again on the same inputs (research R7).
 The hours of this uniform control are charged to every entered candidate's 12 h row, whether the
 control ran for it or before it (research R7), and the control runs once every row it counts can
 hold them, each charged them in full: the 12 h row of every entered candidate, except a candidate

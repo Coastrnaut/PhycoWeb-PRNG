@@ -177,34 +177,36 @@ or key-loading code is written here.
   lock named with whether its holder still runs; Protocol log, with the two kinds admitted before
   the log exists and every other kind refused, a first entry whose digits do not match, a later
   entry and the last line whose digits do not match, a reading marked `set_aside` with no decision
-  and a `repair` entry whose list differs; Order of sizes, a `--project` probe never refused;
-  Approvals, the table read at HEAD and a working tree that differs refused; Order of US1; Tool
-  validation; Trail tools, once the first trail search has started, a tool outside research R12's
-  fixed set or without an earlier `re-found` record of its exact hash, for a C tool the pair of its
-  source's and its binary's SHA-256, and a search that reached its cap, save research R7's one
-  re-run after a recorded tool defect; and Budget, a refusal after a probe writing its `projection`
-  record and nothing else, a spent candidate row never refusing a reproduction and a heavy
-  reproduction refused once the projections of the runs it will make, after any rebuild, do not
-  together fit the hours left in research R7's feature-wide row, its hours used being the sum, read
-  from the records, of the time of every `projection` record that names the row and of the `hours`
-  used of every other record with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's
-  pass excepted. They also test the common part of `--reproduce`, with a mocked C tool and build on
-  a temporary repository: the worktree of `git_head` checked against its blobs, and the rebuild in a
-  second worktree, the committed binary removed there first, so that a make file that would find it
-  up to date compiles it all the same, one run where the rebuild's SHA-256 equals the committed
-  binary's, a second, compared too, where it differs and has a `re-found` record of its own, the
-  outcome `match` only when both runs match, and no second run and a difference in every compared
-  field, exit 1 with the record written, where the guards Tool validation and Trail tools do not
-  admit the rebuild, whatever the kind of the record reproduced, a demonstration, a validation and a
+  and a `repair` entry whose list differs; Order of sizes, a `--project` probe never refused and a
+  run ended from outside not finished; Approvals, the table read at HEAD and a working tree that
+  differs refused; Order of US1; Tool validation; Trail tools, once the first trail search has
+  started, a tool outside research R12's fixed set or without an earlier `re-found` record of its
+  exact hash, for a C tool the pair of its source's and its binary's SHA-256, and a search that
+  reached its cap, save research R7's one re-run after a recorded tool defect, one ended from
+  outside not having reached it; and Budget, a refusal after a probe writing its `projection` record
+  and nothing else, a spent candidate row never refusing a reproduction and a heavy reproduction
+  refused once the projections of the runs it will make, after any rebuild, do not together fit the
+  hours left in research R7's feature-wide row, its hours used being the sum, read from the records,
+  of the time of every `projection` record that names the row and of the `hours` used of every other
+  record with `heavy_run` true that charges no candidate, the FUT-SEC-8 row's pass excepted. They
+  also test the common part of `--reproduce`, with a mocked C tool and build on a temporary
+  repository: the worktree of `git_head` checked against its blobs, and the rebuild in a second
+  worktree, the committed binary removed there first, so that a make file that would find it up to
+  date compiles it all the same, one run where the rebuild's SHA-256 equals the committed binary's,
+  a second, compared too, where it differs and has a `re-found` record of its own, the outcome
+  `match` only when both runs match, and no second run and a difference in every compared field,
+  exit 1 with the record written, where the guards Tool validation and Trail tools do not admit the
+  rebuild, whatever the kind of the record reproduced, a demonstration, a validation and a
   cross-check among them, as where it fails; a heavy reproduction's exit 2 without
   `--owner-request`, the request quoted with its date in its record's `owner_request`, a light one
-  needing none; and a second run that no longer fits the hours left, the first run's hours counted
-  and the first having taken more than its projection, not made, exit 1, the outcome `differs` where
-  the first run differs and otherwise the record holding `status` `inconclusive`, with the reason,
-  and neither `match` nor `differs`. In `tests/test_protocol_004.py`, FR-045's test also checks that
-  every budgeted kind, the FUT-SEC-8 sweep among them, and every script with a worker option takes
-  the heavy-run lock, each script as it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053,
-  FR-061; R7, R12, R16; PRO-065, PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
+  needing none; exit 2 for a record that holds `ended_outside`; and a second run that no longer fits
+  the hours left, the first run's hours counted and the first having taken more than its projection,
+  not made, exit 1, the outcome `differs` where the first run differs and otherwise the record
+  holding `status` `inconclusive`, with the reason, and neither `match` nor `differs`. In
+  `tests/test_protocol_004.py`, FR-045's test also checks that every budgeted kind, the FUT-SEC-8
+  sweep among them, and every script with a worker option takes the heavy-run lock, each script as
+  it is added. (FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; R7, R12, R16; PRO-065,
+  PRO-068, PRO-071, PRO-077, PRO-079; REP-094, REP-101)
 - [ ] T009 Write `protocol/evidence.py`, the one writer of evidence records (data-model §1; R16):
   IDs and file names, the common fields, `DESIGN_DISCLAIMER` taken from `protocol/disclaimer.py`,
   canonical JSON, the suffix and 10 MB rules, every `.gz` file written by
@@ -226,9 +228,9 @@ or key-loading code is written here.
   together fit the hours left in research R7's feature-wide row, with exit 2 otherwise, the hours
   left read again before a second run, the first run's hours counted, which is not made where it no
   longer fits, exit 1, with `differs` where the first run differs and otherwise a record of `status`
-  `inconclusive`, with the reason, and neither `match` nor `differs`, and exit 2 while the
-  environment record the original cites is not in force. (FR-045, FR-053, FR-061, FR-065, FR-068;
-  R1, R7, R16, R18; REP-099, REP-100)
+  `inconclusive`, with the reason, and neither `match` nor `differs`, exit 2 while the environment
+  record the original cites is not in force, and exit 2 for a record that holds `ended_outside`.
+  (FR-045, FR-053, FR-061, FR-065, FR-068; R1, R7, R16, R18; REP-099, REP-100)
 - [ ] T010 Write the tests of the hash-chained logs in `tests/test_protocol_004.py`: every append
   takes `data/log-append.lock` by exclusive create, checks the chain to the last line and appends
   one line whose `prev_sha256` is the SHA-256 of the previous line's UTF-8 bytes with its final LF;
@@ -273,8 +275,11 @@ or key-loading code is written here.
   environment, that no process with the lock's PID and start time still runs, and writes a
   `lock-cleared` record, `$REP/locks/<record_id>.json`, and, for the heavy-run lock, the
   `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
-  record, the hours from the time the lock holds to the clearing being its hours used, with its
-  tests in `tests/test_protocol_004.py`; for a run on a candidate it runs
+  record, the hours from the time the lock holds to the clearing being its hours used, or, where the
+  boot time of the lock's environment is later than the time the lock holds, a run ended from
+  outside, the hours up to that boot time, the record then holding it as `ended_outside` and saying
+  that the outputs the run left under a temporary name were discarded unread, with its tests in
+  `tests/test_protocol_004.py`; for a run on a candidate it runs
   `scripts/evidence_v3.py --aborted RECORD` before it removes the lock, which T082 writes, so that
   task completes this path and T081 its test. (FR-041, FR-045; R7, R16; PRO-065, PRO-068)
 - [ ] T015 Write `scripts/owner_record.py` with `environment --platform windows|wsl --by NAME`,
@@ -496,11 +501,12 @@ hashes.
 - [ ] T039 [P] [US1] Write the tests of `scripts/fut_sec8.py` in `tests/test_protocol_004.py`, on a
   mocked tool and a temporary reports directory: the targets are
   `protocol.seedsets.load("dev", allow=("dev",))[:3]`, and a held-out set exits 2; a second run
-  exits 2 unless `--repeat-after-defect` names a recorded defect that no earlier record names and
-  `--owner-request` quotes the owner's request with its date (quickstart U4); `--reproduce` exits 2
-  before the FUT-SEC-8 result review and without `--owner-request`; `--verify` exits 1 on a
-  disagreement; the record holds every field of data-model §4; and the Poisson tests on constructed
-  counts. (FR-001, FR-002, FR-040, FR-053; R2)
+  exits 2 unless `--repeat-after-defect` names a recorded defect, or `--repeat-after-end` the record
+  of a pass ended from outside, that no earlier record names, and `--owner-request` quotes the
+  owner's request with its date (quickstart U4); `--reproduce` exits 2 before the FUT-SEC-8 result
+  review and without `--owner-request`; `--verify` exits 1 on a disagreement; the record holds every
+  field of data-model §4; and the Poisson tests on constructed counts. (FR-001, FR-002, FR-040,
+  FR-053; R2, R7)
 
 ### Implementation for User Story 1
 
@@ -852,12 +858,13 @@ candidates are otherwise `ineligible` (R6, R7).
   the candidate's `dependency` record at its size exits 2; every run started writes a record;
   `--aborted RECORD` appends the `evidence` entry of a record that `scripts/clear_lock.py` wrote,
   with its `hours` in `budget_used_h`, whatever the row holds, and exits 2 for any other record or
-  one that has its entry; a `control` run exits 2 once its record exists; `--reproduce` of a light
-  run of each kind, its latest and one older, matches (R7); and FR-053's test with two worker
-  counts, marked heavy, which writes, when it ends, a further `projection` record naming
-  research R7's feature-wide row, whose time is the time the test took and which says that the test
-  compared the outputs of its stated test operation list and kept none. (FR-037, FR-041, FR-045,
-  FR-053, FR-065; R4, R7, R16)
+  one that has its entry; a `control` run exits 2 once its record exists, unless that record holds
+  `ended_outside`, when it runs again with the same counts and the same inputs and no test of its
+  kind starts at that size before it has; `--reproduce` of a light run of each kind, its latest and
+  one older, matches (R7); and FR-053's test with two worker counts, marked heavy, which writes,
+  when it ends, a further `projection` record naming research R7's feature-wide row, whose time is
+  the time the test took and which says that the test compared the outputs of its stated test
+  operation list and kept none. (FR-037, FR-041, FR-045, FR-053, FR-065; R4, R7, R16)
 - [ ] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
   `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
   `invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) and
@@ -871,10 +878,11 @@ candidates are otherwise `ineligible` (R6, R7).
 - [ ] T083 [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
   `tests/test_protocol_004.py`: a second D4 run exits 2 (quickstart E4); `--tie` only after an exact
   tie, once both values of R at 4×4 exist; `--choose` writes nothing unless the owner types 16 hex
-  digits at an interactive terminal; R by the round rule with every input cited, eligibility,
-  selection and the stop rule; `--select` exits 2 after a D4 tie until its row reads Approved or
-  "Not needed"; `--decide` exits 2 while the latest selection record has a tie and no choice whose
-  row reads Approved. (FR-022, FR-028, FR-041; SC-005; R6, R7; PRO-074)
+  digits at an interactive terminal; R by the round rule with every input cited, eligibility, a
+  record that holds `ended_outside` deciding nothing, selection and the stop rule; `--select`
+  exits 2 after a D4 tie until its row reads Approved or "Not needed"; `--decide` exits 2 while the
+  latest selection record has a tie and no choice whose row reads Approved. (FR-022, FR-028, FR-041;
+  SC-005; R6, R7; PRO-074)
 - [ ] T084 [US4] Write `scripts/d4_choice.py` (contracts/cli.md; data-model §8; R5, R6): the score
   (min(W_D, W_L)/r*)/L over the entered set recorded before the first score, at 4×4 and at the
   widest reduced width, 16 or else 8, with a common r* ≥ 2, compared exactly; `--tie`;
