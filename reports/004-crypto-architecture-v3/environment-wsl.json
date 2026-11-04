@@ -1,8 +1,8 @@
 {
   "analyst": "Coastrnaut",
-  "approval_confirmed": "66d0d5e10f88ca92",
+  "approval_confirmed": "b62ba9e505df5ce9",
   "approved_by": "Coastrnaut",
-  "approved_utc": "2026-11-04T12:14:13Z",
+  "approved_utc": "2026-11-04T14:48:24Z",
   "assertions": [
     {
       "check": "research R1 and the pins",
@@ -27,9 +27,11 @@
   "command": "/home/coast/.venvs/phycoweb/bin/python scripts/owner_record.py environment --platform wsl --by Coastrnaut",
   "compared": {
     "packages": {
+      "hypothesis": "6.168.5",
       "nistrng": "1.2.3",
       "numpy": "2.5.4",
-      "scipy": "1.18.1"
+      "scipy": "1.18.1",
+      "sortedcontainers": "2.4.0"
     },
     "python": "3.14.4"
   },
@@ -37,21 +39,21 @@
     "cwd": "/mnt/c/GIT/PhycoWeb-PRNG",
     "repository_root": "/mnt/c/GIT/PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-04T12:12:54Z",
+  "created_utc": "2026-11-04T14:47:16Z",
   "design_sha256": "none",
   "design_sha256_kind": "raw",
   "design_version": "none",
   "dirty_paths": [
     "reports/004-crypto-architecture-v3/environment-windows.json",
-    "reports/004-crypto-architecture-v3/research-versions/d2ea189d456006532324babbe1db2fbc5e30b417253fd565d1797918222d413e.md",
-    "reports/004-crypto-architecture-v3/spec-versions/e50fbb172fea78f1415d28e6750cd516707b380f1328669f1c2ccafa0d7e6dc4.md"
+    "reports/004-crypto-architecture-v3/research-versions/b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3.md",
+    "reports/004-crypto-architecture-v3/versions/4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90.json"
   ],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
   "environment": "none",
   "exit_status": 0,
   "git_dirty": true,
-  "git_head": "6d1b668cc3346756c7cb1b728447c882720f91a2",
+  "git_head": "848df72a4e58af0a8f76d825df8b46cacca5fe4f",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -70,12 +72,12 @@
     "ram": "33505357824 bytes",
     "system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
   },
-  "previous_sha256": "none",
-  "protocol_line_sha256": "none",
+  "previous_sha256": "6fd3f31c86dac87d0a4f2538dc25673bf93a9bf78d5dd9749b1506a324d874f8",
+  "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
   "protocol_line_sha256_kind": "raw",
-  "protocol_seq": "none",
-  "record_id": "environment-20261104T121254Z-062f09d5",
-  "research_sha256": "d2ea189d456006532324babbe1db2fbc5e30b417253fd565d1797918222d413e",
+  "protocol_seq": 498,
+  "record_id": "environment-20261104T144716Z-c4da1837",
+  "research_sha256": "b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3",
   "research_sha256_kind": "raw",
   "review_status": "pending",
   "reviewer": "pending",
@@ -84,16 +86,18 @@
     "kernel": "6.18.54.1-microsoft-standard-WSL2",
     "make": "GNU Make 4.4.1",
     "packages": [
+      "hypothesis==6.168.5",
       "nistrng==1.2.3",
       "numpy==2.5.4",
       "pip==25.1.1",
-      "scipy==1.18.1"
+      "scipy==1.18.1",
+      "sortedcontainers==2.4.0"
     ],
     "platform": "wsl",
     "python": "3.14.4",
     "wsl_distribution": "Ubuntu 26.04.1 LTS"
   },
-  "spec_sha256": "e50fbb172fea78f1415d28e6750cd516707b380f1328669f1c2ccafa0d7e6dc4",
+  "spec_sha256": "c9cc83134e1329236e810858c9c29d5b7f5353fb3a6856085e55a1d3a0076a4c",
   "spec_sha256_kind": "raw",
   "status": "pass",
   "variant_id": null,
