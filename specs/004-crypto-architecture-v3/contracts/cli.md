@@ -904,7 +904,8 @@ lists both checks per kind, and it verifies the inventory of superseded operatio
 (data model §3). A record that `clear_lock.py` wrote for a run that died holding the heavy-run
 lock holds no saved output: it recomputes no verdict from it, and checks, against it and the
 `lock-cleared` record that names it, that its `status` is `inconclusive`, its `classification`
-`none` and its hours used those that `clear_lock.py` states, exit 1 otherwise (data model §1).
+`none` and its hours used, or a `projection` record's time, those that `clear_lock.py` states,
+exit 1 otherwise (data model §1).
 With `--reproduce RECORD` it runs a recorded re-check again, as the introduction
 describes, comparing its verdicts and counts (data model §1); like the re-check, it may run in any
 environment.
@@ -1196,8 +1197,8 @@ otherwise it exits 2 and removes nothing. It writes a `lock-cleared` record,
 `$REP/locks/<record_id>.json`, with the lock's content and, for the heavy-run lock, the
 `inconclusive` record of the run that died holding it, or FR-053's test's further `projection`
 record (Budget, above), which the `lock-cleared` record names, its hours used, or its time, being
-the hours from the time the lock holds to the clearing, the most the run can have used, since
-nothing else shows when it died. Where
+the hours from the time the lock holds to the clearing, that record's `created_utc`, the most the
+run can have used, since nothing else shows when it died. Where
 the boot time of the lock's environment is later than the time the lock holds, a reboot, a power
 loss or an update ended the run (research R7): that boot time shows when, so those hours stop
 there, the record holds it as `ended_outside`, and the outputs the run left under a temporary

@@ -1977,8 +1977,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     to re-derive a committed summary, which `recheck_004.py` also does when they are present;
     it lists both checks per kind. A record that `clear_lock.py` wrote for a run that died holding
     the lock holds no saved output: the re-check recomputes no verdict from it, and checks its
-    `status`, its `classification` and its hours used against it and the `lock-cleared` record that
-    names it (data-model §1). This re-check is the routine test of User Story 4. It recomputes
+    `status`, its `classification` and its hours used, or a `projection` record's time, against it
+    and the `lock-cleared` record that names it (data-model §1). This re-check is the routine test
+    of User Story 4. It recomputes
     each verdict under the rules in force at the protocol change-log entry its record cites and,
     where a later stricter change applies (FR-044), also under the current rules, listing both. A
     disagreement under the rules in force at a record's entry blocks the candidate as a differing

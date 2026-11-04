@@ -3544,8 +3544,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   summary), and local-only outputs serve only to re-derive a committed summary, which the re-check
   also does when they are present; it lists both checks per kind. A record that `clear_lock.py`
   wrote for a run that died holding the lock holds no saved output and no verdict: the re-check
-  checks its `status`, its classification and its hours used against it and the `lock-cleared`
-  record that names it (data-model §1). The re-check is the routine
+  checks its `status`, its classification and its hours used, or a `projection` record's time,
+  against it and the `lock-cleared` record that names it (data-model §1). The re-check is the
+  routine
   reproduction test (User Story 4), and it runs the frozen verdict scripts (FR-043): the verdict
   functions it applies are those of `protocol/evidence.py`, which the scripts that wrote the records
   call: for the rules in force at a record's entry, those at that record's `git_head`, from a
