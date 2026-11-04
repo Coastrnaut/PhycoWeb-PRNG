@@ -456,10 +456,13 @@ or key-loading code is written here.
 
 ### Step (9): the phyco-v2 archive
 
-- [ ] T035 [P] Write `tests/test_baseline_v2.py`: every file under `baseline/phyco-v2/` matches its
+- [X] T035 [P] Write `tests/test_baseline_v2.py`: every file under `baseline/phyco-v2/` matches its
   `MANIFEST.json` SHA-256 and its live source, and every frozen file of features 002 and 003 still
-  hashes as its freeze records it. (FR-042; SC-012)
-- [ ] T036 Write `scripts/archive_phyco_v2.py [--check]` (contracts/cli.md; R18), which copies
+  hashes as recorded: as its freeze records it, except `protocol/batteries.py`, whose blob at the
+  freeze's commit does and whose live file hashes as feature 003's `rescore-parser-fix.json` records
+  it, the parser fix 6039c52 being its one change since and older than this feature. (FR-042;
+  SC-012)
+- [X] T036 Write `scripts/archive_phyco_v2.py [--check]` (contracts/cli.md; R18), which copies
   `phycoweb/model_v2.py`, `phycoweb/lut.py`, `fast/phyco_stream.c`, `fast/lut_table.h`,
   `specs/002-core-dynamics-redesign/design.md` and both `vectors/phyco-v2_*.hex` byte for byte into
   `baseline/phyco-v2/`, with `MANIFEST.json` holding each file's SHA-256, source path and

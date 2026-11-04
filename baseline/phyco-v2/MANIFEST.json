@@ -1,0 +1,48 @@
+{
+  "created_utc": "2026-11-04T15:00:32.133609+00:00",
+  "git_head": "4b678a0278718cb671d61ce4a43404b8cccbfa70",
+  "files": [
+    {
+      "archive_path": "baseline/phyco-v2/model_v2.py",
+      "source": "phycoweb/model_v2.py@9d1cdb6",
+      "sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec",
+      "note": "The phyco-v2 reference model."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/lut.py",
+      "source": "phycoweb/lut.py@cec3316",
+      "sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3",
+      "note": "The lookup table the model reads."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/phyco_stream.c",
+      "source": "fast/phyco_stream.c@e342c03",
+      "sha256": "1b46c952f4914ebb12a536237508b21adbfe945dcbcdf0e10d9d1143c0e7c451",
+      "note": "The C stream of phyco-v2."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/lut_table.h",
+      "source": "fast/lut_table.h@1b18ca1",
+      "sha256": "fb1e468bd2834ce96be71b76ad63021fdcc561aa395864b96b9ecfcee1c2dac0",
+      "note": "The lookup table the C stream reads."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/design.md",
+      "source": "specs/002-core-dynamics-redesign/design.md@7b88af5",
+      "sha256": "a1109bf128732374efc6a5b68c43a54d037d2315362649c41b4522122c7216f3",
+      "note": "The phyco-v2 design document, version 1.0."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/phyco-v2_seed-41278-32039-25293-40850_10000.hex",
+      "source": "vectors/phyco-v2_seed-41278-32039-25293-40850_10000.hex@852b4a0",
+      "sha256": "2647415c585555cd094f480289e05bc2f99b9445c555b16135e336a98018e5bc",
+      "note": "A golden vector of phyco-v2."
+    },
+    {
+      "archive_path": "baseline/phyco-v2/phyco-v2_seed-56053-7029-30841-11050_10000.hex",
+      "source": "vectors/phyco-v2_seed-56053-7029-30841-11050_10000.hex@7290ad4",
+      "sha256": "57e77429353f2bb622ea5dc4ec8e947a633a32626bdcb2ac72ede2669acca773",
+      "note": "A golden vector of phyco-v2."
+    }
+  ]
+}
