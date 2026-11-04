@@ -332,6 +332,12 @@ class ProgressWriter(unittest.TestCase):
     def test_the_workers_update_the_counter_the_main_thread_reads(self):
         self.assertIn("rows_done", self.body_of("worker"))
 
+    def test_the_binary_is_committed_executable(self):
+        """A commit from Windows records no execute bit, and a clone on Linux could not run it."""
+        line = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-s", "fast/build/seed_search"],
+                              capture_output=True, text=True, check=True).stdout
+        self.assertTrue(line.startswith("100755 "), line)
+
     def test_the_tool_keeps_its_own_copy_of_the_step(self):
         text = SOURCE.read_text(encoding="utf-8")
         self.assertNotIn('#include "phyco_stream', text)
