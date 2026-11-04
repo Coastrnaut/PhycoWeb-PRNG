@@ -624,7 +624,7 @@ hash, older than its first counted result.
   its records showing the planted bit of each synthetic family firing in 82 to 97 of the family's
   100 sets, with at most 3 sets holding an unplanted firing. (FR-021, FR-037, FR-039, FR-065;
   SC-007; R4, R13)
-- [ ] T052 [US4] Write the validation record of `fut_sec8.py`'s tools on their known result
+- [X] T052 [US4] Write the validation record of `fut_sec8.py`'s tools on their known result
   `fut-sec-8` with `scripts/validate_tool.py`, from the reviewed demonstration record: its three
   seeds and its vector check (data-model §7). (FR-003, FR-039; SC-007; R2)
 - [ ] T053 [P] [US4] Write `research/004/tools/invariants.py` (R13): the sums modulo 2^w and the
