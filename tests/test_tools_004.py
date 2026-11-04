@@ -549,6 +549,11 @@ class Hooks(ValidationBase):
         self.main()
         self.assertEqual(self.records()[0]["model_id"], "phyco-v2")
 
+    def test_a_tool_may_name_its_model_per_known_result(self):
+        self.tool_with('def model_id(known_id):\n    return "of " + known_id\n')
+        self.main()
+        self.assertEqual(self.records()[0]["model_id"], "of fake-known")
+
     def test_no_model_by_default(self):
         self.main()
         self.assertIsNone(self.records()[0]["model_id"])
@@ -740,6 +745,338 @@ def validation(known_id, known, keep):
 
     def test_a_reproduction_of_nothing_is_refused(self):
         self.assertEqual(self.vt.main(["--reproduce", "nothing.json"]), evidence.EXIT_REFUSED)
+
+
+def invariants_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import invariants
+    return invariants
+
+
+class Invariants(unittest.TestCase):
+    """research/004/tools/invariants.py on stated lists (T053)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = invariants_module()
+        import ir
+        cls.ir = ir
+
+    def test_the_forms_of_each_parity(self):
+        self.assertEqual(len(self.tool.forms(4)), 12)
+        self.assertEqual(len(self.tool.forms(3)), 16)
+        self.assertIn(("sum", "vein", 2), self.tool.forms(3))
+        self.assertNotIn(("sum", "vein", 2), self.tool.forms(4))
+
+    def test_a_forms_value_on_stated_lanes(self):
+        n, w = 2, 8
+        states = np.zeros((8, 1), dtype=np.uint64)
+        states[self.ir.lane(n, 0, 0, 0), 0] = 0xF0
+        states[self.ir.lane(n, 1, 1, 0), 0] = 0x20
+        states[self.ir.lane(n, 0, 1, 0), 0] = 0x03
+        states[self.ir.lane(n, 0, 0, 1), 0] = 0x55
+        values = self.tool.form_values(states, n, w)
+        self.assertEqual(int(values[("sum", "pressure", 0)][0]), 0x10)
+        self.assertEqual(int(values[("xor", "pressure", 0)][0]), 0xD0)
+        self.assertEqual(int(values[("sum", "pressure", 1)][0]), 0x03)
+        self.assertEqual(int(values[("sum", "pressure", "all")][0]), 0x13)
+        self.assertEqual(int(values[("xor", "vein", "all")][0]), 0x55)
+
+    def test_the_levels_of_r13(self):
+        even = Fraction(5, 1000) / 24
+        self.assertEqual(self.tool.level_of(("sum", "vein", 0), 4), even)
+        self.assertEqual(self.tool.level_of(("sum", "vein", "all"), 4), even)
+        self.assertEqual(self.tool.level_of(("sum", "vein", "all"), 3), even)
+        self.assertEqual(self.tool.level_of(("sum", "vein", 2), 3), Fraction(5, 1000) / 32)
+
+    def tail(self, states, w, c):
+        chance = Fraction(1, 2 ** w)
+        return sum(math.comb(states, k) * chance ** k * (1 - chance) ** (states - k)
+                   for k in range(c, states + 1))
+
+    def test_the_critical_count_is_where_the_level_falls(self):
+        for states, w, level in ((1024, 8, Fraction(1, 4800)), (1024, 4, Fraction(1, 6400)),
+                                 (64, 2, Fraction(1, 1000))):
+            c = self.tool.critical_count(states, w, level)
+            self.assertLessEqual(self.tail(states, w, c), level)
+            self.assertGreater(self.tail(states, w, c - 1), level)
+
+    def test_a_count_at_the_critical_value_is_above_chance(self):
+        level = Fraction(1, 4800)
+        c = self.tool.critical_count(1024, 8, level)
+        self.assertTrue(self.tool.above_chance(c, 1024, 8, level))
+        self.assertFalse(self.tool.above_chance(c - 1, 1024, 8, level))
+
+    def conserved(self):
+        p, v = self.ir.lane(2, 0, 0, 0), self.ir.lane(2, 0, 1, 1)
+        q = self.ir.lane(2, 1, 1, 0)
+        r = self.ir.lane(2, 0, 1, 0)
+        return self.ir.Program("c", 2, 16, (
+            self.ir.Phase(0, (self.ir.Mix(p, "add", self.ir.Lane(v)), self.ir.Mix(q, "sub", self.ir.Lane(v)))),
+            self.ir.Phase(1, (self.ir.Mix(v, "xor", self.ir.Rotl(self.ir.Lane(r), 3)),))))
+
+    def test_a_kept_form_is_found_and_the_rest_are_not(self):
+        loaded = self.ir.load(self.conserved())
+        out = self.tool.check(loaded, self.tool.test_states(2, 16), (), (1, 3))
+        for rounds in (1, 3):
+            self.assertIn(("sum", "pressure", 0), out[rounds]["kept"])
+            self.assertNotIn(("xor", "pressure", 0), out[rounds]["kept"])
+            self.assertNotIn(("xor", "vein", 1), out[rounds]["kept"])
+            self.assertEqual(out[rounds]["held"][("sum", "pressure", 0)], 1024)
+            self.assertNotIn(("sum", "pressure", 0), out[rounds]["above_chance"])
+
+    def test_a_form_that_misses_one_state_is_not_kept(self):
+        n, w = 2, 8
+        lane, other = self.ir.lane(n, 0, 0, 0), self.ir.lane(n, 0, 1, 0)
+        states = np.zeros((8, 64), dtype=np.uint64)
+        states[other, 0] = 1
+        program = self.ir.Program("one", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(lane, "xor", self.ir.Lane(other)),)),))
+        out = self.tool.check(self.ir.load(program), states, (), (1,))
+        self.assertEqual(out[1]["held"][("xor", "pressure", 0)], 63)
+        self.assertNotIn(("xor", "pressure", 0), out[1]["kept"])
+
+    def test_each_round_count_is_run_for_itself(self):
+        """An XOR with an unwritten lane cancels every second round, as in `colour-class`."""
+        n, w = 2, 8
+        lane, other = self.ir.lane(n, 0, 0, 0), self.ir.lane(n, 0, 1, 0)
+        program = self.ir.Program("twice", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(lane, "xor", self.ir.Lane(other)),)),))
+        out = self.tool.check(self.ir.load(program), self.tool.test_states(n, w), (), (1, 2))
+        self.assertNotIn(("xor", "pressure", 0), out[1]["kept"])
+        self.assertIn(("xor", "pressure", 0), out[2]["kept"])
+
+    def test_a_form_above_chance_is_not_a_kept_one(self):
+        """A lane that changes only in its top bit keeps a form on half the states."""
+        n, w = 2, 8
+        lane = self.ir.lane(n, 0, 0, 0)
+        program = self.ir.Program("half", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(lane, "xor", self.ir.Shl(self.ir.Lane(self.ir.lane(n, 0, 1, 0)), 7)),)),))
+        out = self.tool.check(self.ir.load(program), self.tool.test_states(n, w), (), (1,))
+        over = out[1]["above_chance"]
+        self.assertIn(("xor", "pressure", 0), over)
+        self.assertNotIn(("xor", "pressure", 0), out[1]["kept"])
+
+    def test_a_table_is_read_a_round_at_a_time(self):
+        n, w = 2, 8
+        program = self.ir.Program("c", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),))
+        states = self.tool.test_states(n, w, 8)
+        out = self.tool.check(self.ir.load(program), states, [(0x11,), (0x11,), (0x22,)], (1, 2, 3))
+        self.assertNotIn(("xor", "pressure", 0), out[1]["kept"])
+        self.assertIn(("xor", "pressure", 0), out[2]["kept"])
+        self.assertNotIn(("xor", "pressure", 0), out[3]["kept"])
+
+    def test_a_difference_kept_and_one_lost(self):
+        n, w = 2, 8
+        lane, other = self.ir.lane(n, 0, 0, 0), self.ir.lane(n, 0, 1, 1)
+        program = self.ir.Program("d", n, w, (self.ir.Phase(1, (
+            self.ir.Mix(other, "add", self.ir.Lane(lane)),)),))
+        loaded = self.ir.load(program)
+        states = self.tool.test_states(n, w, 16)
+        on_other = self.tool.difference_kept(loaded, states, {other: 1}, (), 1)
+        self.assertEqual((on_other["unchanged"], on_other["coinciding"]), (16, 0))
+        on_lane = self.tool.difference_kept(loaded, states, {lane: 1}, (), 1)
+        self.assertEqual(on_lane["unchanged"], 0)
+
+    def test_a_difference_is_run_for_its_round_count(self):
+        """A rotation by half the width: a difference of 1 is back in place after two rounds."""
+        n, w = 2, 8
+        loaded = self.ir.load(self.ir.Program("r", n, w, (self.ir.Phase(0, (self.ir.Rot(0, 4),)),)))
+        states = np.zeros((8, 4), dtype=np.uint64)
+        self.assertEqual(self.tool.difference_kept(loaded, states, {0: 1}, (), 1)["unchanged"], 0)
+        self.assertEqual(self.tool.difference_kept(loaded, states, {0: 1}, (), 2)["unchanged"], 4)
+
+    def test_coinciding_successors_are_counted_beside(self):
+        n, w = 2, 8
+        states = self.tool.test_states(n, w, 16)
+        loaded = self.ir.load(self.ir.Program("r", n, w, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),)))
+        out = self.tool.difference_kept(loaded, states, {}, (), 1)
+        self.assertEqual((out["unchanged"], out["coinciding"]), (16, 16))
+
+    def test_a_difference_reads_the_constant_table(self):
+        n, w = 2, 8
+        states = self.tool.test_states(n, w, 8)
+        loaded = self.ir.load(self.ir.Program("c", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),)))
+        self.assertEqual(self.tool.difference_kept(loaded, states, {1: 1}, [(3,), (5,)], 2)["unchanged"], 8)
+
+    def test_a_count_must_lie_in_every_interval(self):
+        low, high = self.tool.interval(0.3, 1000)
+        self.assertEqual((low, high), (263, 338), "0.3 at 1000, 2.576 standard deviations of 14.5")
+        self.assertTrue(self.tool.in_interval(300, (0.3,), 1000))
+        self.assertFalse(self.tool.in_interval(low - 1, (0.3,), 1000))
+        self.assertFalse(self.tool.in_interval(high + 1, (0.3,), 1000))
+        self.assertFalse(self.tool.in_interval(300, (0.3, 0.5), 1000))
+
+
+class InvariantsOnKnown(unittest.TestCase):
+    """The tool on the known results that run quickly, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = invariants_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def test_the_seconds_of_s13_are_re_found(self):
+        for name in ("s13-transport-second", "s13-decay-second"):
+            self.assertTrue(self.tool.validation(name, self.known(name), None)["re_found"], name)
+
+    def test_a_stated_list_breaks_its_known_result_when_it_changes(self):
+        known = self.known("invariants-planted")
+        wrong = tuple((label, n, build, {1: (), known.ROUNDS: ()}) for label, n, build, _ in known.CASES[:1])
+        with mock.patch.object(known, "CASES", wrong), mock.patch.object(known, "WIDTHS", (16,)):
+            self.assertFalse(self.tool.validation("invariants-planted", known, None)["re_found"])
+
+    def test_a_form_said_kept_that_is_not_breaks_it(self):
+        known = self.known("invariants-planted")
+        label, n, build, _ = known.CASES[3]
+        wrong = ((label, n, build, {1: (("sum", "vein", 0),), known.ROUNDS: ()}),)
+        with mock.patch.object(known, "CASES", wrong), mock.patch.object(known, "WIDTHS", (16,)):
+            self.assertFalse(self.tool.validation("invariants-planted", known, None)["re_found"])
+
+    def test_on_none_a_form_above_chance_breaks_it(self):
+        known = self.known("invariants-planted")
+        label, n, build, wanted = known.CASES[3]
+        with mock.patch.object(known, "CASES", ((label, n, build, wanted),)), \
+                mock.patch.object(known, "WIDTHS", (16,)), \
+                mock.patch.object(self.tool, "above_chance", return_value=True):
+            self.assertFalse(self.tool.validation("invariants-planted", known, None)["re_found"])
+
+    def test_above_chance_on_a_planted_list_decides_nothing(self):
+        known = self.known("invariants-planted")
+        label, n, build, wanted = known.CASES[0]
+        with mock.patch.object(known, "CASES", ((label, n, build, wanted),)), \
+                mock.patch.object(known, "WIDTHS", (16,)), \
+                mock.patch.object(self.tool, "above_chance", return_value=True):
+            self.assertTrue(self.tool.validation("invariants-planted", known, None)["re_found"])
+
+    def test_a_difference_not_kept_breaks_the_transport_second(self):
+        known = self.known("s13-transport-second")
+        with mock.patch.object(known, "difference", return_value={0: 1}):
+            self.assertFalse(self.tool.validation("s13-transport-second", known, None)["re_found"])
+
+    def test_a_pair_that_does_not_merge_breaks_the_decay_second(self):
+        known = self.known("s13-decay-second")
+        with mock.patch.object(known, "pair", lambda m: (1, 2 ** 20)):
+            self.assertFalse(self.tool.validation("s13-decay-second", known, None)["re_found"])
+
+    def test_another_share_breaks_the_decay_second(self):
+        known = self.known("s13-decay-second")
+        with mock.patch.object(known, "SHARE", 0.5):
+            self.assertFalse(self.tool.validation("s13-decay-second", known, None)["re_found"])
+
+    def s13(self, name, measured, wanted, field):
+        function = {"decay": "decay_mode", "transport": "transport_mode"}[name]
+        recorded = {field: wanted}
+        run = {"decay": self.tool.re_find_decay, "transport": self.tool.re_find_transport}[name]
+        with mock.patch.object(self.tool, function, return_value=measured), \
+                mock.patch.object(self.tool, "recorded", return_value=recorded):
+            return run(None, None)["re_found"]
+
+    def test_s13_a_needs_every_pair_merged_and_both_shares(self):
+        wanted = {"share_with_a_partner": 0.42, "expected_share": 0.41}
+
+        def found(pairs=100, same=100, partners=2075):
+            return {"steps": 5000, "pairs_tested": pairs, "identical_successors": same,
+                    "states_with_a_partner": partners}
+
+        field = "s13_vein_decay"
+        self.assertTrue(self.s13("decay", found(), wanted, field))
+        self.assertFalse(self.s13("decay", found(same=99), wanted, field))
+        self.assertFalse(self.s13("decay", found(pairs=0, same=0), wanted, field))
+        self.assertFalse(self.s13("decay", found(partners=1500), wanted, field))
+
+    def test_s13_b_needs_every_sum_unchanged_and_both_shares(self):
+        wanted = {"share_identical": 0.316, "expected_share": 0.3164}
+
+        def found(states=1000, same=1000, coinciding=316):
+            return {"steps": 2000, "all_class_1_states": states, "transport_unchanged": same,
+                    "identical_successors": coinciding}
+
+        field = "s13_alternating_mode"
+        self.assertTrue(self.s13("transport", found(), wanted, field))
+        self.assertFalse(self.s13("transport", found(same=999), wanted, field))
+        self.assertFalse(self.s13("transport", found(states=0, same=0, coinciding=0), wanted, field))
+        self.assertFalse(self.s13("transport", found(coinciding=100), wanted, field))
+
+    def test_a_lost_difference_at_either_round_count_breaks_the_transport_second(self):
+        known = self.known("s13-transport-second")
+        for lost in (1, known.ROUNDS):
+            def kept(loaded, states, delta, table, rounds):
+                return {"states": 4, "unchanged": 3 if rounds == lost else 4, "coinciding": 0}
+
+            with mock.patch.object(self.tool, "difference_kept", kept):
+                self.assertFalse(self.tool.validation("s13-transport-second", known, None)["re_found"], lost)
+
+    def test_each_pair_of_s13_a_differs_by_one_where_the_decay_merges_it(self):
+        p = self.tool.probes()
+        seen = []
+        real = p.clone
+
+        def recording(engine):
+            copy = real(engine)
+            step = copy.compute_block
+
+            def stepped():
+                seen.append(list(copy.D))
+                return step()
+
+            copy.compute_block = stepped
+            return copy
+
+        with mock.patch.object(p, "DECAY_STEPS", 3), mock.patch.object(p, "clone", recording):
+            self.tool.decay_mode()
+        self.assertEqual(len(seen), 24)
+        for first, second in zip(seen[0::2], seen[1::2]):
+            moved = [(a, b) for a, b in zip(first, second) if a != b]
+            self.assertEqual(len(moved), 1)
+            self.assertEqual((moved[0][0] % 16, moved[0][1] - moved[0][0]), (15, 1))
+
+    def test_a_pair_across_a_class_edge_is_left_out(self):
+        class Engine:
+            def __init__(self, seed):
+                self.D = [(1 << 30) - 1, 5, 5, 5]
+
+            def compute_block(self):
+                pass
+
+        p = self.tool.probes()
+
+        def copied(engine):
+            other = Engine(None)
+            other.D = list(engine.D)
+            return other
+
+        with mock.patch.object(self.tool, "PhycoWebEngineV2", Engine), \
+                mock.patch.object(p, "DECAY_STEPS", 1), mock.patch.object(p, "clone", copied), \
+                mock.patch.object(p, "state", lambda e: tuple(e.D)):
+            self.assertEqual(self.tool.decay_mode()["pairs_tested"], 3)
+
+    def test_the_modes_on_a_short_sample_are_those_of_the_probes(self):
+        p = self.tool.probes()
+        with mock.patch.object(p, "DECAY_STEPS", 200), mock.patch.object(p, "ALT_STEPS", 500):
+            decay, ours = p.decay_collisions(), self.tool.decay_mode()
+            transport, theirs = p.alternating_mode(), self.tool.transport_mode()
+        for field in ("pairs_tested", "identical_successors", "states_with_a_partner"):
+            self.assertEqual(decay[field], ours[field], field)
+        self.assertEqual(transport["all_class_1_states"], theirs["all_class_1_states"])
+        self.assertEqual(transport["transport_unchanged"], theirs["transport_unchanged"])
+        self.assertEqual(transport["identical_successors"], theirs["identical_successors"])
+
+    def test_only_the_s13_results_are_of_the_model(self):
+        self.assertEqual(self.tool.model_id("s13-decay"), "phyco-v2")
+        self.assertEqual(self.tool.model_id("s13-transport"), "phyco-v2")
+        self.assertIsNone(self.tool.model_id("invariants-planted"))
+        self.assertEqual(self.tool.inputs("s13-decay")["kind"], "seed")
+        self.assertEqual(self.tool.inputs("invariants-planted")["kind"], "state")
 
 
 class FutSec8Known(unittest.TestCase):

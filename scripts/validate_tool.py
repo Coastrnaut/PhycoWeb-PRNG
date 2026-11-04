@@ -11,8 +11,8 @@ A tool's module gives `validation(known_id, known, keep)`, which runs the tool o
 returns what it found, whether that is the known result, and its validated kind. `known` is the
 module of a self-written or published known result, or None for a finding of security.md, and
 `keep(name, data)` holds a local-only output. It may give `CODE`, the other files it runs,
-`inputs(known_id)`, the record's `inputs`, `MODEL_ID`, and `HEAVY`, the known results that are heavy
-runs, with `projection(known_id)`, their hours and measured speed.
+`inputs(known_id)`, the record's `inputs`, `MODEL_ID` or `model_id(known_id)`, and `HEAVY`, the known
+results that are heavy runs, with `projection(known_id)`, their hours and measured speed.
 
 Known results are read from research/004/validation/, each module naming its tool, its known result and
 what it is the second of. A published value also names its download, or stands on an `owner-provided`
@@ -397,8 +397,10 @@ def validate(args: argparse.Namespace, command: List[str]) -> int:
     ids = [item.known_id for item in targets]
     inputs = getattr(module, "inputs", lambda _: NONE)(args.known)
     heavy = any(item in getattr(module, "HEAVY", ()) for item in ids)
-    run = evidence.Run("validation", model_id=getattr(module, "MODEL_ID", None), code_files=code,
-                       argv=command, inputs=inputs, heavy=heavy)
+    model = module.model_id(args.known) if hasattr(module, "model_id") \
+        else getattr(module, "MODEL_ID", None)
+    run = evidence.Run("validation", model_id=model, code_files=code, argv=command, inputs=inputs,
+                       heavy=heavy)
     with run:
         if heavy:
             started = time.monotonic()
