@@ -1079,6 +1079,277 @@ class InvariantsOnKnown(unittest.TestCase):
         self.assertEqual(self.tool.inputs("invariants-planted")["kind"], "state")
 
 
+def symmetry_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools"))
+    import symmetry
+    return symmetry
+
+
+class Symmetry(unittest.TestCase):
+    """research/004/tools/symmetry.py on stated patterns (T054)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = symmetry_module()
+        import ir
+        cls.ir = ir
+
+    def test_the_group_moves_a_node_and_holds_each_map_once(self):
+        for n, size in ((3, 71), (4, 127), (5, 199), (8, 511)):
+            items = self.tool.group(n)
+            self.assertEqual(len(items), size, n)
+            self.assertEqual(len({image for _, image in items}), size, n)
+            self.assertNotIn(tuple(self.tool.nodes(n)), [image for _, image in items])
+
+    def test_at_2x2_several_names_are_one_map(self):
+        items = self.tool.group(2)
+        self.assertEqual(len({image for _, image in items}), len(items))
+        self.assertLess(len(items), 8 * 4 - 1)
+
+    def test_each_symmetry_keeps_the_torus(self):
+        """A symmetry sends neighbours to neighbours, wrap-around links included."""
+        for n in (3, 4, 5):
+            order = self.tool.nodes(n)
+            for _, image in self.tool.group(n):
+                table = dict(zip(order, image))
+                for i, j in order:
+                    near = self.ir.neighbours(n, *table[(i, j)])
+                    self.assertIn(table[((i + 1) % n, j)], near)
+                    self.assertIn(table[(i, (j + 1) % n)], near)
+
+    def test_each_named_linear_part(self):
+        items = dict(self.tool.group(5))
+        self.assertEqual(items[("r90", 0, 0)][self.tool.nodes(5).index((1, 2))], (2, 4))
+        self.assertEqual(items[("r270", 0, 0)][self.tool.nodes(5).index((1, 2))], (3, 1))
+        self.assertEqual(items[("r180", 0, 0)][self.tool.nodes(5).index((1, 2))], (4, 3))
+        self.assertEqual(items[("swap", 0, 0)][self.tool.nodes(5).index((1, 2))], (2, 1))
+        self.assertEqual(items[("flip-j", 0, 0)][self.tool.nodes(5).index((1, 2))], (1, 3))
+        self.assertEqual(items[("flip-i", 0, 0)][self.tool.nodes(5).index((1, 2))], (4, 2))
+        self.assertEqual(items[("anti", 0, 0)][self.tool.nodes(5).index((1, 2))], (3, 4))
+        self.assertEqual(items[("id", 2, 3)][self.tool.nodes(5).index((1, 2))], (3, 0))
+
+    def test_the_uniform_pattern_is_fixed_by_everything(self):
+        pattern = {node: 1 for node in self.tool.nodes(3)}
+        self.assertEqual(len(self.tool.fixing(pattern, 3)), 71)
+
+    def test_a_node_outside_a_pattern_holds_nothing(self):
+        self.assertEqual(self.tool.fixing({(0, 0): 1, (0, 1): 1, (1, 2): 1}, 4), [])
+
+    def test_a_value_counts_not_only_a_place(self):
+        """Three values at three nodes not on a line: a symmetry would have to hold each in place."""
+        n = 3
+        same = {(0, 0): 1, (0, 1): 2, (1, 0): 2}
+        different = {(0, 0): 1, (0, 1): 2, (1, 0): 3}
+        self.assertEqual(len(self.tool.fixing(same, n)), 1)
+        self.assertEqual(self.tool.fixing(different, n), [])
+
+    def test_word_rotations_of_a_stated_round(self):
+        words = {(0, 0): ((0, 0x33),), (1, 1): ((0, 0x33),)}
+        self.assertEqual(self.tool.word_rotations(words, 8), [4])
+        self.assertEqual(self.tool.word_rotations({(0, 0): ((0, 0x1D),)}, 8), [])
+        self.assertEqual(self.tool.word_rotations({(0, 0): ((0, 0x55),)}, 8), [2, 4, 6])
+        self.assertEqual(self.tool.word_rotations({(0, 0): ((1, 0x33),)}, 8), [4], "on a vein")
+
+    def test_one_word_of_a_round_is_not_enough(self):
+        words = {(0, 0): ((0, 0x33),), (1, 1): ((0, 0x1D),)}
+        self.assertEqual(self.tool.word_rotations(words, 8), [])
+
+    def test_a_symmetry_composed_with_a_word_rotation(self):
+        """Neither alone fixes it: `swap` exchanges two words a rotation by 4 apart, and that rotation
+        leaves the third, of period 4, where it is."""
+        pattern = {(0, 0): ((0, 0x33),), (0, 1): ((0, 0x1D),), (1, 0): ((0, 0xD1),)}
+        self.assertEqual(self.tool.fixing(pattern, 3), [])
+        self.assertEqual(self.tool.word_rotations(pattern, 8), [])
+        self.assertEqual(self.tool.composed(pattern, 3, 8), [[["swap", 0, 0], 4]])
+
+    def test_a_list_gives_its_patterns(self):
+        n, w = 4, 8
+        p00, v01 = self.ir.lane(n, 0, 0, 0), self.ir.lane(n, 0, 1, 1)
+        program = self.ir.Program("p", n, w, (
+            self.ir.Phase(0, (self.ir.Mix(p00, "xor", self.ir.Xor(self.ir.Constant(1), self.ir.Rotl(
+                self.ir.Lane(self.ir.lane(n, 0, 0, 1)), 3))),)),
+            self.ir.Phase(1, (self.ir.Rot(v01, 5),))))
+        each = self.tool.patterns(program, [(0xA, 0xB), (0xC, 0xD)])
+        self.assertEqual(each["placement"], {(0, 0): 1})
+        self.assertEqual(each["round 0"], {(0, 0): ((0, 0xB),)})
+        self.assertEqual(each["round 1"], {(0, 0): ((0, 0xD),)})
+        self.assertEqual(each["amounts"], {(0, 0): (("Rotl", 3),), (0, 1): (("Rot", 5),)})
+
+    def test_a_lane_kind_is_part_of_a_constants_place(self):
+        n, w = 4, 8
+        program = self.ir.Program("p", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(self.ir.lane(n, 0, 0, 1), "xor", self.ir.Constant(0)),)),))
+        self.assertEqual(self.tool.patterns(program, [(7,)])["round 0"], {(0, 0): ((1, 7),)})
+
+    def test_amounts_are_read_at_every_depth(self):
+        lane = self.ir.Lane(0)
+        expr = self.ir.Not(self.ir.Xor(self.ir.Shl(lane, 1), self.ir.And(self.ir.Shr(lane, 2), self.ir.Or(
+            self.ir.Rotl(self.ir.Rotl(lane, 3), 4), lane))))
+        self.assertEqual(self.tool.amounts_in(expr), [("Shl", 1), ("Shr", 2), ("Rotl", 4), ("Rotl", 3)])
+
+    def test_no_amounts_gives_no_pattern_and_no_constants_gives_no_placement(self):
+        n, w = 4, 8
+        with_rot = self.ir.Program("r", n, w, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        self.assertEqual(sorted(self.tool.patterns(with_rot, ())), ["amounts"])
+        with_constant = self.ir.Program("c", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),))
+        self.assertNotIn("amounts", self.tool.patterns(with_constant, [(1,)]))
+
+    def test_a_claimable_size_checks_each_pattern_on_its_own(self):
+        n, w = 4, 8
+        program = self.ir.Program("c", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),))
+        out = self.tool.check(program, [(0x1D,)])
+        self.assertFalse(out["joined"])
+        self.assertEqual(sorted(out["fixed"]), ["placement", "round 0"])
+
+    def test_at_3x3_the_placements_join_the_constants(self):
+        n, w = 3, 8
+        program = self.ir.Program("c", n, w, (
+            self.ir.Phase(0, (self.ir.Mix(self.ir.lane(n, 0, 0, 0), "xor", self.ir.Constant(0)),)),
+            self.ir.Phase(1, (self.ir.Mix(self.ir.lane(n, 0, 1, 0), "xor", self.ir.Constant(1)),
+                              self.ir.Rot(self.ir.lane(n, 1, 0, 1), 3)))))
+        out = self.tool.check(program, [(0x1D, 0x2B)])
+        self.assertTrue(out["joined"])
+        self.assertEqual(sorted(out["fixed"]), ["round 0 with the placements"])
+        self.assertEqual(out["fixed"]["round 0 with the placements"], [])
+
+    def test_the_check_reports_word_rotations_and_compositions(self):
+        n, w = 4, 8
+        program = self.ir.Program("c", n, w, (self.ir.Phase(0, (
+            self.ir.Mix(0, "xor", self.ir.Constant(0)),)),))
+        out = self.tool.check(program, [(0x33,)])
+        self.assertEqual(out["word_rotations"]["round 0"], [4])
+        self.assertTrue(out["composed"]["round 0"] == [] or out["composed"]["round 0"])
+
+    def test_relations_between_stated_words(self):
+        found = self.tool.relations([0x12, 0x21, 0xED, 0x12, 0x55], 8)
+        self.assertEqual(found["equal"], [[0x12, 0x12]])
+        self.assertIn([0x12, 0x21, [4]], found["rotations"])
+        self.assertIn([0x12, 0xED], found["complements"])
+        self.assertIn([0x21, 0xED, [4]], found["rotated_complements"])
+        self.assertEqual(found["periodic"], [[0x55, [2, 4, 6]]])
+
+    def test_equal_words_are_equal_and_no_rotation_of_each_other(self):
+        found = self.tool.relations([0x55, 0x55], 8)
+        self.assertEqual(found["equal"], [[0x55, 0x55]])
+        self.assertEqual(found["rotations"], [])
+
+
+class SymmetryOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = symmetry_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def run_known(self, name, known=None):
+        return self.tool.validation(name, known or self.known(name), None)["re_found"]
+
+    def test_each_known_result_is_re_found(self):
+        for name in ("s7", "symmetry-s7-second", "symmetry-planted", "symmetry-planted-second"):
+            self.assertTrue(self.run_known(name), name)
+
+    def test_s7_needs_each_of_its_three_relations(self):
+        import phycoweb.model_v2 as model
+        with mock.patch.object(model, "X1", 0x5A5A5A5B):
+            self.assertFalse(self.run_known("s7"))
+        with mock.patch.object(model, "X3", 0xA5A5A5A4):
+            self.assertFalse(self.run_known("s7"))
+        with mock.patch.object(self.tool, "RESET_VEINS", (0x00010000, 0x00020000, 0x00040000, 0x00080001)):
+            self.assertFalse(self.run_known("s7"))
+
+    def test_s7_reads_its_periodic_word_for_itself(self):
+        import phycoweb.model_v2 as model
+        real = self.tool.relations
+
+        def without(words, w):
+            found = real(words, w)
+            return dict(found, periodic=[item for item in found["periodic"] if item[0] != model.X1])
+
+        with mock.patch.object(self.tool, "relations", without):
+            self.assertFalse(self.run_known("s7"))
+
+    def test_the_seconds_relations_are_compared_one_by_one(self):
+        name = "symmetry-s7-second"
+        for field, value in (("FIXED_BY", {}), ("ROTATIONS", ()), ("COMPLEMENTS", ())):
+            known = self.known(name)
+            with mock.patch.object(known, field, value):
+                self.assertFalse(self.run_known(name, known), field)
+        known = self.known(name)
+        with mock.patch.object(known, "WORDS", known.WORDS + (known.UNRELATED,)):
+            self.assertFalse(self.run_known(name, known), "two equal words")
+
+    def narrowed(self, known, **changes):
+        entry = dict(known.CASES[0], **changes)
+        return mock.patch.object(known, "CASES", (entry,)), mock.patch.object(known, "WIDTHS", (8,))
+
+    def test_a_planted_result_needs_each_pattern(self):
+        name = "symmetry-planted"
+        for changes in ({"placement": ()}, {"round": ()}, {"placement": (("id", 2, 2),)}):
+            known = self.known(name)
+            first, second = self.narrowed(known, **changes)
+            with first, second:
+                self.assertFalse(self.run_known(name, known), changes)
+
+    def test_a_planted_result_needs_its_word_rotations(self):
+        name = "symmetry-planted"
+        known = self.known(name)
+        first, second = self.narrowed(known)
+        with first, second, mock.patch.object(known, "word_rotations", lambda entry, w: (4,)):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_a_planted_result_needs_every_round(self):
+        name = "symmetry-planted"
+        known = self.known(name)
+        first, second = self.narrowed(known)
+        with first, second, mock.patch.object(known, "ROUNDS", 3):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_a_composition_on_a_planted_list_breaks_it(self):
+        name = "symmetry-planted"
+        known = self.known(name)
+        first, second = self.narrowed(known)
+        with first, second, mock.patch.object(self.tool, "composed", return_value=[[["id", 0, 0], 1]]):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_a_list_with_amounts_breaks_a_first_that_has_none(self):
+        name = "symmetry-planted"
+        known = self.known(name)
+        first, second = self.narrowed(known)
+        with first, second, mock.patch.object(self.tool, "amounts_at", return_value={(0, 0): (("Rot", 1),)}):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_the_second_needs_each_amounts_result_and_the_placement(self):
+        name = "symmetry-planted-second"
+        known = self.known(name)
+        label, n, amount, _ = known.AMOUNTS[0]
+        with mock.patch.object(known, "AMOUNTS", ((label, n, amount, ()),)):
+            self.assertFalse(self.run_known(name, known))
+        known = self.known(name)
+        with mock.patch.object(known, "TURNS", ()):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_the_second_needs_each_rounds_constants_unfixed(self):
+        name = "symmetry-planted-second"
+        known = self.known(name)
+        same = {w: tuple([known.WORDS[w][0]] * 8) for w in known.WIDTHS}
+        with mock.patch.object(known, "WORDS", same):
+            self.assertFalse(self.run_known(name, known))
+
+    def test_only_s7_is_of_the_model(self):
+        self.assertEqual(self.tool.model_id("s7"), "phyco-v2")
+        self.assertIsNone(self.tool.model_id("symmetry-planted"))
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
