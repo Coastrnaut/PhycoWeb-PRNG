@@ -468,7 +468,7 @@ or key-loading code is written here.
   `baseline/phyco-v2/`, with `MANIFEST.json` holding each file's SHA-256, source path and
   `git_head`; run it, then `--check`, 0 mismatches (quickstart P1). The live files stay unchanged.
   (FR-042; SC-012; R18)
-- [ ] T037 Run the whole suite under `tests/` on Windows,
+- [X] T037 Run the whole suite under `tests/` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and in WSL with `wpy`: every test passes,
   or skips naming its open item, and none fails (quickstart P0); record the commands and results for
   the phase report. The suite is light until T081 adds FR-053's test with two worker counts, marked
