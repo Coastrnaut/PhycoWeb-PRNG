@@ -597,7 +597,7 @@ hash, older than its first counted result.
   same way; enter each with its SHA-256 in `$REP/provenance.jsonl` before the tool it validates is
   drafted, so that its entry's `seq` comes before the tool's first entry. (FR-039; data-model §7,
   §14; R5, R12, R13)
-- [ ] T049 [P] [US4] Write `tests/test_tools_004.py` (data-model §5, §7): the validation record's
+- [X] T049 [P] [US4] Write `tests/test_tools_004.py` (data-model §5, §7): the validation record's
   fields; a counted record cites a validation of the tool's exact hash with an earlier
   `created_utc`, a C tool's hash being the pair of its source's and its binary's SHA-256, so that a
   change to either counts only after a validation of its own; a result without one is written
@@ -608,7 +608,7 @@ hash, older than its first counted result.
   `owner-provided` entry whose row does not read Approved at HEAD; and, in WSL, skipping on Windows
   and until the file exists, `research/004/tools/trails/arx_search.mk` builds a binary of the same
   SHA-256 in a second directory. (FR-039, FR-053, FR-065; SC-007; R4, R12, R16)
-- [ ] T050 [US4] Write `scripts/validate_tool.py` (contracts/cli.md; data-model §7) with
+- [X] T050 [US4] Write `scripts/validate_tool.py` (contracts/cli.md; data-model §7) with
   `--tool NAME --known KNOWN_ID --out-dir $REP/validation` and `--reproduce RECORD`: the source
   guard for published values and `owner-provided` entries; the second known result cited; after a
   failed validation, a re-validation that re-finds every known result of the tool; and, for the bias

@@ -987,24 +987,54 @@ def guard_order_of_us1() -> None:
 def validation_record(tool: Optional[str], tool_sha256: str, binary_sha256: Optional[str] = None,
                       known_kind: Optional[str] = None) -> Optional[Dict]:
     """The latest `re-found` record of the tool's exact hash, or None (cli, Tool validation). For a
-    C tool the exact hash is the pair of source and binary; a tool of None matches by hash alone."""
+    C tool the exact hash is the pair of source and binary; a tool of None matches by hash alone. A
+    `not re-found` of that exact hash later than it closes it: a validation on one known result
+    never outlasts a failure on another (data-model section 7)."""
     found = None
+    failed = ""
     for _, record in iter_records("validation", "validation"):
         if tool is not None and record.get("tool") != tool:
             continue
-        if record.get("outcome") != "re-found":
-            continue
         if record.get("tool_sha256") != tool_sha256:
-            continue
-        if known_kind is not None and record.get("validated_kind") != known_kind:
             continue
         if binary_sha256 is not None:
             hashes = [e.get("sha256") for e in (record.get("code_sha256") or {}).values()]
             if binary_sha256 not in hashes:
                 continue
+        if record.get("outcome") == "not re-found":
+            failed = max(failed, record["created_utc"])
+        if record.get("outcome") != "re-found":
+            continue
+        if known_kind is not None and record.get("validated_kind") != known_kind:
+            continue
         if found is None or record["created_utc"] > found["created_utc"]:
             found = record
-    return found
+    return None if found is not None and found["created_utc"] < failed else found
+
+
+def validation_citation(tool: Optional[str], tool_sha256: str, binary_sha256: Optional[str] = None,
+                        known_kind: Optional[str] = None) -> Optional[Dict]:
+    """What a counted record holds in `validation`: the ID and SHA-256 of the validation record of
+    the tool's exact hash (data-model section 5). None, and the result is `not evaluated`."""
+    record = validation_record(tool, tool_sha256, binary_sha256, known_kind)
+    if record is None:
+        return None
+    path = find_record(record["record_id"])
+    if path is None:
+        raise ToolFailure(f"{record['record_id']} is not under its own name")
+    return {"record_id": record["record_id"], "sha256": sha256(path[0].read_bytes()),
+            "sha256_kind": "raw"}
+
+
+def validation_cited_before(record: Dict) -> bool:
+    """A counted record's citation holds: the cited record has that hash and is earlier."""
+    citation = record.get("validation")
+    if not isinstance(citation, dict):
+        return False
+    found = find_record(citation["record_id"])
+    if found is None or sha256(found[0].read_bytes()) != citation["sha256"]:
+        return False
+    return found[1]["created_utc"] < record["created_utc"]
 
 
 def result_status(status: str, validated: bool) -> str:
