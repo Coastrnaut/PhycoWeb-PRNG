@@ -435,7 +435,7 @@ or key-loading code is written here.
 
 ### Step (7): the new environment records
 
-- [ ] T032 **Owner**: write each platform's new environment record with
+- [X] T032 **Owner**: write each platform's new environment record with
   `scripts/owner_record.py environment`, as in T025, matching the pins, into
   `$REP/environment-windows.json` and `$REP/environment-wsl.json`, and set its row "Environment
   record <n>" in `specs/004-crypto-architecture-v3/spec.md` to Approved before any later write; the
