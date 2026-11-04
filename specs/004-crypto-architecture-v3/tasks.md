@@ -575,12 +575,12 @@ a cap of 8 h, and a heavy one projects first against the feature-wide 66 h row (
 **Independent Test**: quickstart V1 and V2: every counted tool has a `re-found` record of its exact
 hash, older than its first counted result.
 
-- [ ] T046 [P] [US4] Write `tests/test_ir.py` (R11, R14): the three-colour schedule is a proper
+- [X] T046 [P] [US4] Write `tests/test_ir.py` (R11, R14): the three-colour schedule is a proper
   colouring at every odd n from 3 to 15 (FR-018); the loader's phase rule holds on every operation
   list at every supported size, `research/004/candidates/` included as it fills, and a stated list
   that breaks the rule at one size only is refused there (FR-019); the scalar and batch interpreters
   agree, and the derived inverse undoes Π, on stated lists. (FR-018, FR-019; R11, R13, R14)
-- [ ] T047 [US4] Write `research/004/ir.py` (R11): operation lists made only of invertible updates,
+- [X] T047 [US4] Write `research/004/ir.py` (R11): operation lists made only of invertible updates,
   each a word update from other lanes or a constant rotation, grouped into the colour phases with
   the loader's check; the neighbourhood resolved per size (R14); a scalar interpreter on Python
   integers and a batch interpreter on numpy arrays with explicit `uint64` dtypes; the inverse
