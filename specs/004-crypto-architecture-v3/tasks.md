@@ -365,7 +365,7 @@ or key-loading code is written here.
 
 ### Step (3): the provenance log
 
-- [ ] T026 Write the first entries of `$REP/provenance.jsonl` with
+- [X] T026 Write the first entries of `$REP/provenance.jsonl` with
   `python scripts/provenance.py add FILE`, one per file drafted before the log or per section
   changed: the feature's documents (spec, plan, research, data model, both contracts, quickstart,
   the checklists, `checklist-choices.md` and this file), `research/004/place_check.py`, the files of
