@@ -586,7 +586,7 @@ hash, older than its first counted result.
   integers and a batch interpreter on numpy arrays with explicit `uint64` dtypes; the inverse
   derived from the list; and each list's SHA-256 for the candidate log. Analysis code only, never
   imported by the model. (FR-018, FR-019, FR-020, FR-032; R11, R17)
-- [ ] T048 [US4] Fix each tool's known results before the tool is drafted, as research R13 lists
+- [X] T048 [US4] Fix each tool's known results before the tool is drafted, as research R13 lists
   them: write the known results this feature writes itself under `research/004/validation/`, the
   small operation lists with their hand-derived matrices at 3×3 and 4×4, the lists with planted
   symmetries and the one with none, the map with collisions, the variant with a planted gap, the
