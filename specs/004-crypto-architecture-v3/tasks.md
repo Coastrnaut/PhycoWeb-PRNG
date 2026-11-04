@@ -408,7 +408,7 @@ or key-loading code is written here.
 
 ### Step (5): the downloads manifest
 
-- [ ] T029 Run `python scripts/downloads.py init`, which writes `$REP/downloads.json` with twelve
+- [X] T029 Run `python scripts/downloads.py init`, which writes `$REP/downloads.json` with twelve
   `approved` entries, one per file of research R19's two tables, eight papers and four wheels, each
   with its name, source, size and licence, before any download. (FR-046; R19)
 
