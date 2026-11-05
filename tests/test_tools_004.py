@@ -7,6 +7,7 @@ claim.
 """
 import contextlib
 import io
+import itertools
 import json
 import math
 import platform
@@ -3669,6 +3670,246 @@ class ArxOnKnown(unittest.TestCase):
         known = self.known("speck32-lin-second")
         with mock.patch.object(known, "TOTAL", known.TOTAL + 1):
             self.assertFalse(self.holds("speck32-lin-second", known))
+
+
+def layer_steps(kind, h, relation):
+    """Each next state of `sparkle-box`'s layer for differences, or of `sparkle-box-second`'s for masks. A state is the left branches and then the
+    right, each a chain's length so far, 0 for inactive; in what this gives, -1 is a chain just started."""
+    outputs = {}
+    for before, after in relation:
+        outputs.setdefault(before, []).append(after)
+
+    def options(mine, added):
+        if not added:
+            return (mine,)
+        return (0, -1) if mine else (-1,)
+
+    def step(state):
+        left, right = state[:h], state[h:]
+        fed = left if kind == "differential" else right
+        for mixed in outputs[tuple(1 if value else 0 for value in fed)]:
+            if kind == "differential":
+                rows = [options(right[(j + 1) % h], mixed[(j + 1) % h]) for j in range(h)]
+                for pick in itertools.product(*rows):
+                    yield pick + tuple(left)
+            else:
+                rows = [options(left[j], mixed[j]) for j in range(h)]
+                copied = tuple(right[(j + 1) % h] for j in range(h))
+                for pick in itertools.product(*rows):
+                    yield copied + pick
+    return step
+
+
+def least_over_trails(h, rounds, step, costs, shorter, limit):
+    """The least sum of chain costs over the truncated trails of `rounds` steps, or None if none reaches `limit`. A chain's cost is added as it
+    grows, and a prefix goes only if it and the best of the steps left pass `limit`: costs built by the largest cutting are superadditive, so a
+    suffix costs at least a trail of its own length, `shorter`."""
+    states = {}
+    for pattern in itertools.product((0, 1), repeat=2 * h):
+        cost = sum(pattern) * costs[1]
+        if any(pattern) and cost + shorter[rounds - 1] <= limit:
+            states[pattern] = cost
+    for r in range(2, rounds + 1):
+        following = {}
+        for state, cost in states.items():
+            for target in step(state):
+                grown = tuple(1 if value == -1 else value + 1 if value else 0 for value in target)
+                total = cost + sum(costs[length] - costs[length - 1] for length in grown if length)
+                if any(grown) and total + shorter[rounds - r] <= limit and following.get(grown, limit + 1) > total:
+                    following[grown] = total
+        states = following
+    return min(states.values()) if states else None
+
+
+def mix_on_short_words(h):
+    """M_h of Definition 2 on words of 2 bits, with l(y || z) = z || (y xor z): every input, and the patterns of branches each gives."""
+    def ell(word):
+        return ((word & 1) << 1) | ((word >> 1) ^ (word & 1))
+
+    seen = set()
+    for branches in itertools.product(range(16), repeat=h):
+        xs, ys = [value >> 2 for value in branches], [value & 3 for value in branches]
+        tx, ty = 0, 0
+        for x, y in zip(xs, ys):
+            tx, ty = tx ^ x, ty ^ y
+        tx, ty = ell(tx), ell(ty)
+        before = tuple(1 if value else 0 for value in branches)
+        seen.add((before, tuple(1 if (x ^ ty) or (y ^ tx) else 0 for x, y in zip(xs, ys))))
+    return seen
+
+
+def mix_by_rule(h):
+    """What M_h does to patterns, from its definition. T is the sum of the input branches. T = 0 keeps the pattern, which then has no branch or
+    at least two. T != 0 adds one non-zero value to every branch, so that an inactive input's output is active, an active one's may cancel, and
+    not all may, as that would make T a fixed point of the map that gives the value added, which has none but 0."""
+    pairs = set()
+    for before in itertools.product((0, 1), repeat=h):
+        active = [i for i in range(h) if before[i]]
+        if len(active) != 1:
+            pairs.add((before, before))
+        for size in range(len(active)):
+            for gone in itertools.combinations(active, size):
+                pairs.add((before, tuple(0 if i in gone else 1 for i in range(h))))
+    return pairs
+
+
+class LongTrailKnown(unittest.TestCase):
+    """T062's known results, ahead of the tool: each value by a route that shares nothing with a solver."""
+    NAMES = ("sparkle-box", "sparkle-box-second", "long-trail-feistel", "long-trail-feistel-second")
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.table = validate_tool.known_results()
+        cls.first = cls.known_of("sparkle-box")
+        cls.second = cls.known_of("sparkle-box-second")
+        cls.feistel = cls.known_of("long-trail-feistel")
+        cls.copies = cls.known_of("long-trail-feistel-second")
+
+    @classmethod
+    def known_of(cls, name):
+        return cls.vt.load_known(cls.table[name])
+
+    def row_of(self, known, kind, h, relation, targets):
+        """The least cost at each step count of `targets`, in order, each search limited to that row's stated value."""
+        rounds = max(targets)
+        costs = self.feistel.chain_costs(known.BOX, rounds + 1)
+        step = layer_steps(kind, h, relation)
+        shorter = [0]
+        found = {}
+        for r in range(1, rounds + 1):
+            value = least_over_trails(h, r, step, costs, shorter, targets.get(r, shorter[-1] + 400))
+            shorter.append(value if value is not None else targets.get(r, 0))
+            found[r] = value
+        return found
+
+    def test_each_file_names_its_tool_and_its_second(self):
+        for name in self.NAMES:
+            self.assertEqual(self.table[name].tool, "long-trail active-box counting", name)
+        self.assertEqual(self.table["sparkle-box"].second_of, NONE)
+        self.assertEqual(self.table["sparkle-box-second"].second_of, "sparkle-box")
+        self.assertEqual(self.table["long-trail-feistel"].second_of, NONE)
+        self.assertEqual(self.table["long-trail-feistel-second"].second_of, "long-trail-feistel")
+
+    def test_a_chain_longer_than_the_bounds_is_cut_at_its_largest(self):
+        self.assertEqual(self.feistel.chain_costs((6, 32, 52), 6), (0, 6, 32, 52, 64, 84, 104))
+        self.assertEqual(self.feistel.chain_costs((2, 17), 5), (0, 2, 17, 19, 34, 36))
+        self.assertEqual(self.feistel.chain_costs((0, 6), 4), (0, 0, 6, 6, 12))
+
+    def test_every_kept_entry_of_table_6_comes_from_its_box_bounds(self):
+        for size, h in self.first.HALVES.items():
+            found = self.row_of(self.first, "differential", h, self.first.relation(h), self.first.BOUNDS[size])
+            self.assertEqual({r: found[r] for r in self.first.BOUNDS[size]}, self.first.BOUNDS[size], size)
+
+    def test_every_entry_of_table_7_comes_from_its_box_bounds(self):
+        for size, h in self.second.HALVES.items():
+            found = self.row_of(self.second, "linear", h, self.first.relation(h), self.second.BOUNDS[size])
+            self.assertEqual({r: found[r] for r in self.second.BOUNDS[size]}, self.second.BOUNDS[size], size)
+
+    def test_the_three_left_out_are_below_every_truncated_trail(self):
+        """Why they are left out. Each printed value is out of reach, and the rule's own values stand above it."""
+        targets = dict(self.first.BOUNDS[512])
+        targets.update({8: 304, 9: 396, 11: 460})
+        for relation in (self.first.relation(4), mix_on_short_words(4)):
+            found = self.row_of(self.first, "differential", 4, relation, targets)
+            self.assertEqual({r: found[r] for r in (8, 9, 11)}, {8: 304, 9: 396, 11: 460})
+        printed = self.first.LEFT_OUT[512]
+        self.assertEqual(printed, {8: 276, 9: 295, 11: 433})
+        costs = self.feistel.chain_costs(self.first.BOX, 13)
+        step = layer_steps("differential", 4, self.first.relation(4))
+        shorter = [0] + [targets[r] for r in range(1, 13)]
+        for r, value in printed.items():
+            self.assertLess(value, targets[r])
+            self.assertIsNone(least_over_trails(4, r, step, costs, shorter, value), r)
+
+    def test_two_left_out_are_no_sum_of_the_bounds(self):
+        self.assertTrue(all(cost % 2 == 0 for cost in self.feistel.chain_costs(self.first.BOX, 13)))
+        self.assertEqual({r: value % 2 for r, value in self.first.LEFT_OUT[512].items()}, {8: 0, 9: 1, 11: 1})
+
+    def test_nothing_left_out_is_kept(self):
+        self.assertFalse(set(self.first.LEFT_OUT[512]) & set(self.first.BOUNDS[512]))
+        self.assertEqual(sorted(set(self.first.LEFT_OUT[512]) | set(self.first.BOUNDS[512])), list(range(1, 13)))
+
+    def test_theorem_1_holds_of_M_itself(self):
+        """Every pattern M_h gives on short words is one the transcription allows, and the rule from its definition is exactly what it gives."""
+        for h in (2, 3, 4):
+            seen = mix_on_short_words(h)
+            self.assertEqual(seen - self.first.relation(h), set(), h)
+            self.assertEqual(seen, mix_by_rule(h), h)
+
+    def test_the_relation_says_what_theorem_1_says(self):
+        relation = self.first.relation(4)
+        one = (1, 0, 0, 0)
+        self.assertEqual([b for a, b in relation if a == one], [(1, 1, 1, 1)])
+        self.assertEqual({b for a, b in relation if a == (1, 1, 0, 0)},
+                         {(1, 1, 0, 0), (0, 1, 1, 1), (1, 0, 1, 1), (1, 1, 1, 1)})
+        self.assertEqual({a for a, b in relation if b == one}, {(1, 1, 1, 1)})
+        self.assertEqual({b for a, b in relation if a == (0, 0, 0, 0)}, {(0, 0, 0, 0)})
+        self.assertNotIn(((0, 0, 0, 0), one), relation)
+        self.assertEqual({b for a, b in self.first.relation(2) if a == (1, 1)}, {(1, 0), (0, 1), (1, 1)})
+        self.assertEqual(self.first.relation(1), {((0,), (0,)), ((1,), (1,))})
+
+    def test_the_minima_are_the_enumeration_of_every_trail(self):
+        known = self.feistel
+        for w in known.WIDTHS:
+            for kind, box in known.BOXES[w].items():
+                self.assertEqual({r: known.enumerated(kind, box, r) for r in range(1, known.ROUNDS + 1)}, known.MINIMA[w][kind], (w, kind))
+
+    def test_the_enumeration_is_the_search_at_one_half(self):
+        """Two routes, by different code, on the one layer: h = 1 of the wiring above and the file's own walk."""
+        known = self.feistel
+        relation = self.first.relation(1)
+        for w in known.WIDTHS:
+            for kind, box in known.BOXES[w].items():
+                costs = known.chain_costs(box, known.ROUNDS + 1)
+                step = layer_steps(kind, 1, relation)
+                shorter = [0]
+                for r in range(1, known.ROUNDS + 1):
+                    shorter.append(least_over_trails(1, r, step, costs, shorter, 1000))
+                self.assertEqual(dict(enumerate(shorter[1:], 1)), known.MINIMA[w][kind], (w, kind))
+
+    def test_the_trails_are_as_many_as_the_file_says(self):
+        self.assertEqual(len(self.feistel.trails("differential", 1)), 3)
+        self.assertEqual(len(self.feistel.trails("differential", 6)), 19)
+        self.assertEqual(len(self.feistel.trails("linear", 6)), 19)
+
+    def test_the_winners_by_hand(self):
+        repeated = [(0, 1), (1, 0), (1, 1), (0, 1), (1, 0), (1, 1)]
+        wanted = {1: [1], 2: [2], 3: [1, 3], 4: [2, 3], 5: [3, 3], 6: [1, 3, 4]}
+        for r, lengths in wanted.items():
+            self.assertEqual(self.feistel.chain_lengths("differential", repeated[:r]), lengths, r)
+        masks = [(1, 0), (0, 1), (1, 1), (1, 0), (0, 1), (1, 1)]
+        for r, lengths in wanted.items():
+            self.assertEqual(self.feistel.chain_lengths("linear", masks[:r]), lengths, r)
+        costs = self.feistel.chain_costs((5, 24), 6)
+        self.assertEqual([sum(costs[n] for n in wanted[r]) for r in range(1, 7)], [5, 24, 34, 53, 58, 82])
+
+    def test_the_layer_of_copies_is_one_chain(self):
+        known = self.copies
+        for w in known.WIDTHS:
+            for kind, box in known.BOXES[w].items():
+                costs = self.feistel.chain_costs(box, known.ROUNDS)
+                self.assertEqual(known.MINIMA[w][kind], {r: costs[r] for r in range(1, known.ROUNDS + 1)}, (w, kind))
+
+    def test_the_second_shares_the_first_s_boxes(self):
+        self.assertEqual(self.copies.BOXES, self.feistel.BOXES)
+        self.assertEqual(self.copies.WIDTHS, self.feistel.WIDTHS)
+
+    def test_the_paper_s_example_has_its_three_chains(self):
+        known = self.copies
+        self.assertEqual(tuple(self.feistel.chain_lengths(known.EXAMPLE_KIND, list(known.EXAMPLE))), known.EXAMPLE_LENGTHS)
+        self.assertEqual(known.EXAMPLE_LENGTHS, (1, 2, 3))
+
+    def test_the_box_bounds_are_the_ones_the_files_cite(self):
+        speck, masks, floors = self.known_of("speck32-diff"), self.known_of("speck32-lin"), self.known_of("box-tables-second")
+        boxes = self.feistel.BOXES
+        self.assertEqual(boxes[16]["differential"], (speck.WEIGHTS[4], speck.WEIGHTS[8]))
+        self.assertEqual(boxes[16]["linear"], (masks.EXPONENTS[4], masks.EXPONENTS[8]))
+        self.assertEqual(boxes[8]["differential"], (floors.FLOOR_DIFFERENTIAL[2], floors.FLOOR_DIFFERENTIAL[4]))
+        self.assertEqual(boxes[8]["linear"], (floors.FLOOR_SQUARED[2], floors.FLOOR_SQUARED[4]))
+        self.assertEqual(floors.FLOOR_WIDTH, 8)
 
 
 class FutSec8Known(unittest.TestCase):
