@@ -826,7 +826,7 @@ candidates are otherwise `ineligible` (R6, R7).
   and `scripts/candidate_log.py` with `propose`, `mapping`, `enter`, `decide`, `correct`, `replace`
   and `outcome` (contracts/cli.md; data-model §3), through which `scripts/repair_log.py` (T013)
   appends this log's `repair` entry. (FR-041; SC-011; R16)
-- [ ] T077 [US3] Write `scripts/gen_constants_v3.py` (contracts/cli.md, "Generators of constants and
+- [X] T077 [US3] Write `scripts/gen_constants_v3.py` (contracts/cli.md, "Generators of constants and
   vectors"; R15): the constant rule as fixed (degree 64, the first primitive polynomial in the
   stated order not on `research/004/refused-constants.json`, Fibonacci form seeded with ASCII
   `PhycoWeb`, each table read w bits per word in the stated order, skipping periodic and related
