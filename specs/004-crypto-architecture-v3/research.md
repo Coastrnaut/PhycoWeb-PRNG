@@ -63,9 +63,9 @@ registered fan-out trees (R15; FR-025).
 | R3.2 | Source of the uniform controls | As decided: the same strings under `control`, so every control run can be repeated | OS random controls: unrepeatable, the weakness of feature 003's `getrandom` control (checklist F8) |
 | R4.1 | Inputs per frequency measurement | As decided: N = 2²⁰ per claimable size | 2¹⁶: needs biases 4 times larger. 2²⁴: 16 times the cost, about 5.6 h per candidate at R = 32 |
 | R4.2 | Instantiation states for the frequency test | Change: two sets per size, key i with nonce i as now, and key 0 with nonce i, the many-nonces-under-one-key case an attacker sees (FUT-SEC-3); S = 4b; 0.35 h more at R = 32; the bias found at 50% power moves from 0.0023 to 0.0024 at 4×4 | As decided, key i with nonce i only. Uniform states: no information, since Π maps uniform inputs to uniform outputs |
-| R4.3 | Avalanche counts and threshold | Answered: N_a = 2¹³ per flipped bit; threshold 0.005/(128·S_A) | The first draft, N_a = 2¹² at 0.005/S_A per round count: a false raise of R at R = 32 about 38% instead of 23%. N_a = 2¹² at the per-size threshold: catches 0.053 instead of 0.037 at 4×4 |
+| R4.3 | Avalanche counts and threshold | Answered: N_a = 2¹³ per flipped bit; threshold 0.005/(128·S_A). Raised on 2026-11-04 to N_a = 8,256, the count over 2¹³ kept beside it (R4; the protocol change log) | The first draft, N_a = 2¹² at 0.005/S_A per round count: a false raise of R at R = 32 about 38% instead of 24%. N_a = 2¹² at the per-size threshold: catches 0.053 instead of 0.037 at 4×4 |
 | R4.4 | Flip set F at 8×8 and 16×16 | As decided: the 2w = 64 bits of each node on the main diagonal (\|F\| = 512 and 1,024) | Every state bit: 2²⁷ pairs per direction at 16×16, 16 times the diagonal set, beyond the 12 h of R7 |
-| R4.5 | Related-key, related-nonce and rotational differences before the freeze | Change: add to the avalanche measurement every key and nonce bit flipped in 2¹³ instantiation states, run forward as instantiate runs Π, and rotational pairs, every lane of 2¹³ test states rotated by each k = 1…w − 1, in both directions. Both count in S_A = (2·\|F\| + 384 + 2(w − 1))·b under the same threshold, so the chance of a false firing does not change; 0.6 h more at R = 32; sensitivity changes by under 1%. Their results can then still raise R before the freeze (checklist B4) | As decided, left to feature 005: after the freeze, a weakness found there can only lead to a new model ID |
+| R4.5 | Related-key, related-nonce and rotational differences before the freeze | Change: add to the avalanche measurement every key and nonce bit flipped in N_a instantiation states (R4.3), run forward as instantiate runs Π, and rotational pairs, every lane of N_a test states rotated by each k = 1…w − 1, in both directions. Both count in S_A = (2·\|F\| + 384 + 2(w − 1))·b under the same threshold, so the chance of a false firing does not change; 0.6 h more at R = 32; sensitivity changes by under 1%. Their results can then still raise R before the freeze (checklist B4) | As decided, left to feature 005: after the freeze, a weakness found there can only lead to a new model ID |
 | R4.6 | Detection power shown inside each avalanche run | Change: wherever the exact dependency matrices (R13) show an output bit independent of a flipped bit, that difference bit must never flip, and so must fire; any disagreement is recorded as a tool defect (checklist F9) | As decided: only the tools' validation on `phyco-v2` (FR-039) shows detection power |
 | R5.1 | Cost model for D4 | As decided: 6-input LUTs per node and round, with carry chains counted, and no packing or fusion | A LUT6_2 packing model: closer to the fabric, but more rules to argue before any result. Gate equivalents: not the FPGA's resource |
 | R5.2 | Throughput goal (checklist C3) | Change: state a goal of 10⁸ 32-bit words per second at the 200 MHz target for every claimable size, the goal feature 003 set for the C stream, which design 1.0 missed at 8.5 × 10⁷, and report FR-026's implied throughput beside it; not an eligibility rule | An eligibility rule: a slow candidate becomes ineligible, which could end the feature in a stop. As decided, no goal: C3 stays half answered |
@@ -328,22 +328,25 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     finding about the run's reproducibility that blocks no candidate, since a p-value never decides
     a verdict (data-model §1).
   - **Avalanche test.** FR-037 asks for it; using it as a source of R_dist is stricter than the
-    spec. For each flipped input bit j in a set F, N_a = 2¹³ test states x (kind `state`, R3);
+    spec. For each flipped input bit j in a set F, N_a = 8,256 test states x (kind `state`, R3);
     after every round r = 1…R_cur the difference Π^r(x) ⊕ Π^r(x ⊕ e_j) is counted bit by bit,
     and the same for Π⁻¹. F holds every state bit at 4×4 (|F| = 1,024) and the 2w = 64 bits of
     each node on the main diagonal at 8×8 and 16×16 (|F| = 512 and 1,024). Two further sets test
     related inputs before the freeze (checklist B4). Related keys and nonces: each of the 384 key
-    and nonce bits is flipped in the first 2¹³ instantiation states of the frequency test (key i,
+    and nonce bits is flipped in the first 8,256 instantiation states of the frequency test (key i,
     nonce i), and the difference is counted after every round of Π only, as instantiate runs Π.
     Rotational pairs: for each k = 1…w − 1, the difference Π^r(rot_k(x)) ⊕ rot_k(Π^r(x)) over
     the N_a test states, rot_k rotating every lane by k, and the same for Π⁻¹. With
-    S_A = (2·|F| + 384 + 2(w − 1))·b, a difference bit fires if its two-sided binomial p-value is
-    at most 0.005/(128·S_A). The factor 128 spreads the test's 0.005 over up to 128 round counts
-    at a size, so this extra test adds at most 0.005 per size, not per round count, to the chance
-    of a false firing (below). The threshold stays 0.005/(128·S_A) whatever the number of round
-    counts, so the rule never fires less. If more than 128 are measured, which needs R_cur above
-    128, the stated chance of a false firing becomes 0.005·m/128 per size for m round counts,
-    reported beside the result and entering the family-wise rate as a = m/128 (False firing, below;
+    S_A = (2·|F| + 384 + 2(w − 1))·b, each difference bit is counted over the N_a states and over
+    the first 2¹³ of them, and it fires if the two-sided binomial p-value of either count is at most
+    0.005/(128·S_A), each count at its own critical values. N_a rose from 2¹³ so that the power
+    stated below is met, and the count over 2¹³ stays, so that the rise can add firings and never
+    remove one (Stricter means, below). The factor 128 spreads the test's 0.005 over up to 128 round
+    counts at a size, so each of the two counts adds at most 0.005 per size, not per round count, to
+    the chance of a false firing (below). The threshold stays 0.005/(128·S_A) whatever the number of
+    round counts, so the rule never fires less. If more than 128 are measured, which needs R_cur
+    above 128, the stated chance of a false firing becomes 0.01·m/128 per size for m round counts,
+    reported beside the result and entering the family-wise rate as a = m/64 (False firing, below;
     ANA-079). A difference bit that never flips fires, so a dependency that is
     never observed raises R_dist.
   - **Null models.** Under a random permutation, p = 1/2 for each frequency bit, each avalanche
@@ -393,7 +396,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     recommends stopping (stop rule), citing the control record; the control inputs are never redrawn
     or replaced, and the rule is not loosened (Edge Cases). The chance accepted is at most 0.0025
     per size for the frequency control, by the union bound over its 2b bits at 0.005/S, and below
-    0.005/128 for the avalanche control. Inconclusive bias evidence leaves R_dist unestablished at
+    0.01/128 for the avalanche control, over its two counts. Inconclusive bias evidence leaves
+    R_dist unestablished at
     that size, which makes the candidate ineligible unless a recorded tool defect is fixed and the
     one re-run that R7 allows is conclusive, or a run ended from outside runs again and that run is
     conclusive (R7). The re-run is one per kind of evidence per candidate, across all sizes: a
@@ -434,9 +438,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     verdicts from committed files and a regeneration checks every count. The avalanche test's
     validation record also shows its verdict code and
     its power without new inputs: the verdict function, applied to every count 0 to N_a of one
-    difference bit, must fire exactly on the counts at or beyond the two critical values of
-    `critical_counts.json`, and the power at δ_A = 0.0443, 0.0451 and 0.0465, computed exactly from
-    the binomial distribution, must be at least 0.9, as the table below states. R13's three planted
+    difference bit and to every count 0 to 2¹³, must fire exactly on the counts at or beyond that
+    count's two critical values of `critical_counts.json`, and the power of the count over N_a at
+    δ_A = 0.0443, 0.0451 and 0.0465, computed exactly from the binomial distribution, must be at
+    least 0.9: it is 0.9047, 0.9070 and 0.9054, those biases being the table's at N_a = 2¹³, where
+    their power, 0.8985, 0.9007 and 0.8987, fell short by rounding. R13's three planted
     results, one for each path (the flip set, the related-key and related-nonce set and the
     rotational pairs), and the cross-check keep validating the counting; each planted result states
     the round counts tested, 1 to its variant's R, and at each round count its expected set, the
@@ -447,7 +453,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     before the tool is drafted as a round count at which the exact dependency matrices show
     every bit outside the expected set dependent on the flipped bit, the
     result is re-found only if exactly that set fires, with the chance that a
-    correct test fires there on a uniform bit, at most b times the threshold
+    correct test fires there on a uniform bit, at most 2b times the threshold
     0.005/(128·S_A) per flipped bit, stated beside it; "unmixed" means a lane
     that no update writes, which others may read, and the related-key, related-nonce and rotational
     planted results state their sets in the same way, from their own dependency matrices (R13). One
@@ -456,15 +462,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - **Sensitivity**, computed for this plan with scipy 1.15.3, for the bias |f − 1/2| of one bit
     that fires with probability 1/2 (and 0.9):
 
-    | Size | Frequency, N = 2²⁰ per set, threshold 0.005/S | Avalanche, N_a = 2¹³, threshold 0.005/(128·S_A) |
+    | Size | Frequency, N = 2²⁰ per set, threshold 0.005/S | Avalanche, N_a = 8,256, threshold 0.005/(128·S_A) |
     |------|-----------------------------------------------|-------------------------------------------------|
-    | 4×4 | 0.0024 (0.0030), S = 2¹² | 0.0373 (0.0443), S_A = 2,494·b |
-    | 8×8 | 0.0025 (0.0031), S = 2¹⁴ | 0.0380 (0.0451), S_A = 1,470·b |
-    | 16×16 | 0.0026 (0.0033), S = 2¹⁶ | 0.0395 (0.0465), S_A = 2,494·b |
+    | 4×4 | 0.0024 (0.0030), S = 2¹² | 0.0372 (0.0442), S_A = 2,494·b |
+    | 8×8 | 0.0025 (0.0031), S = 2¹⁴ | 0.0379 (0.0449), S_A = 1,470·b |
+    | 16×16 | 0.0026 (0.0033), S = 2¹⁶ | 0.0394 (0.0464), S_A = 2,494·b |
 
     Against one input set (S = 2b) and F alone, the values were 0.0023, 0.0024 and 0.0026 for the
-    frequency test and 0.0372, 0.0377 and 0.0394 for the avalanche test, so the added sets cost
-    little sensitivity, under 1% for the avalanche test. The first draft's avalanche test,
+    frequency test and, at N_a = 2¹³, 0.0372, 0.0377 and 0.0394 for the avalanche test, so the added
+    sets cost little sensitivity, under 1% for the avalanche test. The first draft's avalanche test,
     N_a = 2¹² at 0.005/S_A, caught 0.047 (0.057) at 4×4, so the test now detects smaller biases as
     well as firing by chance less often.
 
@@ -474,16 +480,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     for R8's 16 Π inputs at every variant the candidate uses, computed by the scalar interpreter
     and committed with the candidate (R11). A timing probe is a `projection` record (R7).
   - **False firing.** On uniform inputs the frequency test fires at a size and round count with
-    probability at most 0.005 (the spec's rule), and the avalanche test at most 0.005 per size
-    over all its round counts. A false firing can only raise R, but it does raise it: a firing
+    probability at most 0.005 (the spec's rule), and the avalanche test at most 0.01 per size
+    over all its round counts, 0.005 for each of its two counts. A false firing can only raise R,
+    but it does raise it: a firing
     is reported as a distinguisher at its round count that raises R, with the family-wise chance
     rate stated beside it, and it is never measured again to remove it. Only round
     counts r with 2r > R matter, ⌈R/2⌉ of them per size, so a Π whose outputs look uniform after
     a few rounds has R raised by chance with probability about 1 − 0.995^(3⌈R/2⌉): 11% at R = 16 and
-    21% at R = 32, or 23% with the avalanche test, for one permutation, T = 1. For T call types with
+    21% at R = 32, or 24% with the avalanche test, for one permutation, T = 1. For T call types with
     distinct streams, each tested at its own threshold, it is 1 − 0.995^(3⌈R/2⌉·T), about 62% at
-    R = 32 with T = 4, or 1 − 0.995^(T·(3⌈R/2⌉ + 3)) with the avalanche test, about
-    64% (computed on 2026-11-02), and the chance stated beside a firing is the one for the T call
+    R = 32 with T = 4, or 1 − 0.995^(T·3⌈R/2⌉)·0.99^(3T) with the avalanche test, about
+    66% (computed on 2026-11-04), and the chance stated beside a firing is the one for the T call
     types tested. The rate counts the pairs of a claimable size and a round count r at which the
     tests ran with 2r above the R then in force, the only round counts at which a firing raises R,
     N of them: 1 − 0.995^(T·N), or 1 − 0.995^(T·N)·∏(1 − 0.005·a)^T with the avalanche
@@ -492,9 +499,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     the final report and the spec's FR-041 count every pair tested by the
     freeze, each size's own R and every rise included, as `round_rule.py` computes it from the
     records (ANA-075). The avalanche test's term counts its runs up to the same record, size by
-    size, the product taken over the claimable sizes at which it ran by then, a being 1 at a size
-    where it measured at most 128 round counts and m/128 where it measured m above 128 (Avalanche
-    test, above), so that with every size run and none above 128 it is 1 − 0.995^(T·(N + 3)), and
+    size, the product taken over the claimable sizes at which it ran by then, a being 2 at a size
+    where it measured at most 128 round counts and m/64 where it measured m above 128, for its two
+    counts (Avalanche test, above), so that with every size run and none above 128 it is
+    1 − 0.995^(T·N)·0.99^(3T), and
     the final report's rate takes every avalanche run by the freeze, as `round_rule.py` computes
     a from the records with N (ANA-079). With the avalanche threshold at
     0.005/S_A per round count, as first drafted, it would be 38% at R = 32. A raised R adds round
@@ -527,7 +535,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 - **Alternatives**: uniform inputs (no information for a permutation); N = 2¹⁶ (detects only
   biases 4 times larger); N = 2²⁴ (16 times the cost); every input bit at 16×16 (2²⁷ pairs per
   direction, 16 times the diagonal set, which would not fit the 12 h of R7); the avalanche test
-  at 0.005/S_A per round count, as first drafted (38% instead of 23% at R = 32); N_a = 2¹² at
+  at 0.005/S_A per round count, as first drafted (38% instead of 24% at R = 32); N_a = 2¹² at
   the per-size threshold (half the cost, but 0.053 instead of 0.037 at 4×4); key i with nonce i
   only (no many-nonces case); related and rotational differences left to feature 005 (a weakness
   found after the freeze can only lead to a new model ID); detection power shown only by the

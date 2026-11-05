@@ -558,7 +558,7 @@ It computes from the evidence records the N of spec FR-028's family-wise rate, t
 claimable size and a round count r at which the bias tests ran with 2r above the R then in force, up
 to each firing's record for the rate stated beside it and by the freeze for the final report's
 (ANA-075). With N it computes the avalanche test's term, its runs up to the same record, size by
-size, a being 1 at a size where it measured at most 128 round counts and m/128 where it measured m
+size, a being 2 at a size where it measured at most 128 round counts and m/64 where it measured m
 above 128, and the rate 1 − 0.995^(T·N)·∏(1 − 0.005·a)^T over the sizes run (spec FR-028; ANA-079).
 `--close` writes the candidate log's `set-closed` entry once every candidate has a final
 decision (`withdrawn`, `rejected` or `ineligible`, or, for an eligible candidate, its round-rule

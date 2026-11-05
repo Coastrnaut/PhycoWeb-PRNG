@@ -656,11 +656,12 @@ hash, older than its first counted result.
   **heavy**, each run projected first against the feature-wide row, on a known permutation and on
   the stated map with collisions. (FR-019, FR-037, FR-039; SC-004, SC-007; R13)
 - [ ] T058 [US4] Write `research/004/tools/avalanche.py` (R4, R13): the flip set, the related-key
-  and related-nonce set and the rotational pairs, N_a = 2¹³ states per flipped bit, the threshold
-  0.005/(128·S_A), and every run cross-checked against the exact dependency matrices, a disagreement
-  being a tool defect (exit 3); validate it on its three planted results at every round count from 1
-  to the variant's R, and on its verdict code for every count 0 to N_a with its exact power at
-  research R4's δ_A. (FR-029, FR-037, FR-039; SC-007; R4, R13)
+  and related-nonce set and the rotational pairs, N_a = 8,256 states per flipped bit, each
+  difference bit counted over all of them and over the first 2¹³, the threshold 0.005/(128·S_A), and
+  every run cross-checked against the exact dependency matrices, a disagreement being a tool defect
+  (exit 3); validate it on its three planted results at every round count from 1 to the variant's R,
+  and on its verdict code for every count 0 to N_a and 0 to 2¹³, with the exact power of the count
+  over N_a at research R4's δ_A. (FR-029, FR-037, FR-039; SC-007; R4, R13)
 - [X] T059 [US4] Fetch the trail papers of research R19 when this task is reached, each into its own
   new directory: `automatic-search-arx-trails.pdf` and COSIC's article 2657 (SPECK32, and SPECK64
   where the papers give optimal trails, for w = 32), `main.pdf` (SPARKLE), and `47270450.pdf`
@@ -937,7 +938,7 @@ candidates are otherwise `ineligible` (R6, R7).
   dependency matrices with R_f, R_b and the propagation through instantiate, the symmetry and
   invariant checks, and the `degree` records last; then the frequency test on both input sets,
   N = 2²⁰ through Π and Π⁻¹, and the avalanche test on the flip set, the related-key and
-  related-nonce set and the rotational pairs, N_a = 2¹³, from the R the earlier kinds give and
+  related-nonce set and the rotational pairs, N_a = 8,256, from the R the earlier kinds give and
   extended to every later rise of R; each heavy run **heavy**, projected first (quickstart E1 to
   E3). (FR-019, FR-021, FR-029, FR-037, FR-038; SC-004, SC-005, SC-008; R4, R7, R12, R13)
 - [ ] T093 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence

@@ -3,8 +3,9 @@
 For each flipped bit of a set, N_a test states go through rounds 1 to R, and the difference of the two
 runs is counted bit by bit, for Π and Π⁻¹. Two further sets test related inputs: each key and nonce bit
 flipped in instantiation states, forward only, and the rotational pairs, the difference between Π^r(rot_k x)
-and rot_k(Π^r x) for each k, both ways. A difference bit fires at integer critical counts, so that a bit
-that never flips fires.
+and rot_k(Π^r x) for each k, both ways. Each difference bit is counted over the N_a states and over the
+first 2^13 of them, and it fires if either count lies at or beyond its integer critical counts, so that a
+bit that never flips fires.
 
 Every run is cross-checked against the exact dependency matrices: where they show a bit independent of a
 flipped bit, it must never flip. Any disagreement is a tool defect, exit 3 (research R4).
@@ -39,6 +40,7 @@ HEAVY = ("avalanche-planted-n8", "avalanche-planted-n16", "avalanche-planted-sec
          "avalanche-planted-second-n16")
 W = 32
 N_A = bias.N_A
+N_FIRST = bias.N_A_FIRST
 RELATED_BITS = 384
 DELTA_A = {4: Fraction(443, 10000), 8: Fraction(451, 10000), 16: Fraction(465, 10000)}
 LEAST_POWER = Fraction(9, 10)
@@ -60,15 +62,32 @@ def s_a(n: int, w: int = W) -> int:
     return (2 * len(flip_set(n, w)) + RELATED_BITS + 2 * (w - 1)) * (2 * n * n * w)
 
 
-def difference_counts(chosen: "ir.Loaded", first: np.ndarray, second: np.ndarray,
-                      rows: Sequence[Optional[Sequence[int]]], w: int) -> np.ndarray:
-    """The ones of the difference after each round, an array of (round, lane, bit)."""
-    out = np.zeros((len(rows), first.shape[0], w), dtype=np.int64)
-    a, b = first, second
-    for r, row in enumerate(rows):
-        a, b = bias.one_round(chosen, a, row), bias.one_round(chosen, b, row)
-        out[r] = bias.ones(a ^ b, w)
+def two_counts(difference: np.ndarray, w: int) -> Tuple[np.ndarray, np.ndarray]:
+    """The ones of a difference over the first 2^13 states and over all of them, a row per lane."""
+    early = bias.ones(difference[:, :N_FIRST], w)
+    return early, early + bias.ones(difference[:, N_FIRST:], w)
+
+
+def trajectory(chosen: "ir.Loaded", states: np.ndarray, rows: Sequence[Optional[Sequence[int]]]) -> List[np.ndarray]:
+    """The states after each round, computed once for every flip of a direction."""
+    out = []
+    for row in rows:
+        states = bias.one_round(chosen, states, row)
+        out.append(states)
     return out
+
+
+def difference_counts(chosen: "ir.Loaded", base: Sequence[np.ndarray], second: np.ndarray,
+                      rows: Sequence[Optional[Sequence[int]]], w: int) -> Tuple[np.ndarray, np.ndarray]:
+    """The ones of the difference from `base`, the first input's trajectory, after each round, over the
+    first 2^13 states and over all of them, two arrays of (round, lane, bit)."""
+    early = np.zeros((len(rows), second.shape[0], w), dtype=np.int64)
+    whole = early.copy()
+    b = second
+    for r, row in enumerate(rows):
+        b = bias.one_round(chosen, b, row)
+        early[r], whole[r] = two_counts(base[r] ^ b, w)
+    return early, whole
 
 
 def flipped(states: np.ndarray, number: int, w: int) -> np.ndarray:
@@ -83,14 +102,15 @@ def rotated(states: np.ndarray, k: int, w: int) -> np.ndarray:
 
 
 def rotational_counts(chosen: "ir.Loaded", states: np.ndarray, k: int,
-                      rows: Sequence[Optional[Sequence[int]]], w: int) -> np.ndarray:
-    """The ones of Π^r(rot_k x) xor rot_k(Π^r x) after each round."""
-    out = np.zeros((len(rows), states.shape[0], w), dtype=np.int64)
+                      rows: Sequence[Optional[Sequence[int]]], w: int) -> Tuple[np.ndarray, np.ndarray]:
+    """The ones of Π^r(rot_k x) xor rot_k(Π^r x) after each round, by the same two counts."""
+    early = np.zeros((len(rows), states.shape[0], w), dtype=np.int64)
+    whole = early.copy()
     a, b = rotated(states, k, w), states
     for r, row in enumerate(rows):
         a, b = bias.one_round(chosen, a, row), bias.one_round(chosen, b, row)
-        out[r] = bias.ones(a ^ rotated(b, k, w), w)
-    return out
+        early[r], whole[r] = two_counts(a ^ rotated(b, k, w), w)
+    return early, whole
 
 
 def lanes_mask(lanes: Sequence[int], shape: Tuple[int, int]) -> np.ndarray:
@@ -102,22 +122,23 @@ def lanes_mask(lanes: Sequence[int], shape: Tuple[int, int]) -> np.ndarray:
 class Tally:
     """One path's results: bits of the expected set that did not fire, firings outside it, by round."""
 
-    def __init__(self, path: str, rounds: int, entry: Dict):
-        self.path, self.rounds, self.entry = path, rounds, entry
+    def __init__(self, path: str, rounds: int, first: Dict, whole: Dict):
+        self.path, self.rounds, self.first, self.whole = path, rounds, first, whole
         self.tests = 0
         self.missed = 0
         self.other_by_round = [0] * rounds
         self.lines: List[str] = []
 
-    def add(self, tag: str, r: int, counts: np.ndarray, expected: np.ndarray) -> None:
-        fired = bias.fires(counts, self.entry)
+    def add(self, tag: str, r: int, early: np.ndarray, whole: np.ndarray, expected: np.ndarray) -> None:
+        """A bit fires if either count does, each at its own critical values (R4)."""
+        fired = bias.fires(early, self.first) | bias.fires(whole, self.whole)
         self.tests += 1
         self.missed += int(np.count_nonzero(expected & ~fired))
         other = fired & ~expected
         self.other_by_round[r] += int(np.count_nonzero(other))
         for lane, bit in zip(*np.nonzero(other)):
             self.lines.append(f"{self.path} {tag} round {r + 1} lane {lane} bit {bit} "
-                              f"count {counts[lane, bit]}\n")
+                              f"counts {early[lane, bit]} {whole[lane, bit]}\n")
 
     def summary(self) -> Dict:
         return {"path": self.path, "tests": self.tests, "expected_bits_that_did_not_fire": self.missed,
@@ -140,17 +161,18 @@ def run_flips(loaded: "ir.Loaded", states: np.ndarray, numbers: Sequence[int], r
     inverse = ir.Loaded(ir.invert(program))
     w = program.w
     shape = (states.shape[0], w)
+    lists = {direction: loaded if direction == dependency.FORWARD else inverse for direction in directions}
+    base = {direction: trajectory(lists[direction], states, rows_of_direction[direction]) for direction in directions}
     for number in numbers:
         other = flipped(states, number, w)
         mask = lanes_mask(planted(number // w), shape)
         for direction in directions:
-            chosen = loaded if direction == dependency.FORWARD else inverse
-            counts = difference_counts(chosen, states, other, rows_of_direction[direction], w)
-            for r in range(counts.shape[0]):
+            early, whole = difference_counts(lists[direction], base[direction], other, rows_of_direction[direction], w)
+            for r in range(whole.shape[0]):
                 independent = ~dependency.dependent_bits(matrices[direction][r], number)
                 tag = f"{direction} bit {number}"
-                cross_check(counts[r], independent, f"{tag}, round {r + 1}")
-                tally.add(tag, r, counts[r], independent | mask)
+                cross_check(whole[r], independent, f"{tag}, round {r + 1}")
+                tally.add(tag, r, early[r], whole[r], independent | mask)
 
 
 def run_rotations(loaded: "ir.Loaded", states: np.ndarray, planted: Sequence[int], tally: Tally,
@@ -161,9 +183,9 @@ def run_rotations(loaded: "ir.Loaded", states: np.ndarray, planted: Sequence[int
     mask = lanes_mask(planted, (states.shape[0], w))
     for k in range(1, w):
         for direction, chosen in ((dependency.FORWARD, loaded), (dependency.INVERSE, inverse)):
-            counts = rotational_counts(chosen, states, k, rows_of_direction[direction], w)
-            for r in range(counts.shape[0]):
-                tally.add(f"{direction} k {k}", r, counts[r], mask)
+            early, whole = rotational_counts(chosen, states, k, rows_of_direction[direction], w)
+            for r in range(whole.shape[0]):
+                tally.add(f"{direction} k {k}", r, early[r], whole[r], mask)
 
 
 def matrices_of(program: "ir.Program", rounds: int, directions: Sequence[str]) -> Dict[str, List[np.ndarray]]:
@@ -227,36 +249,40 @@ def power(entry: Dict, delta: Fraction) -> Fraction:
 def re_find(known, size: int, keep) -> Dict:
     n = size
     rounds = known.rounds(n)
+    first = bias.entry_for("avalanche", N_FIRST, s_a(n))
     entry = bias.entry_for("avalanche", N_A, s_a(n))
     states = bias_states(n)
     forward, inverse = dependency.FORWARD, dependency.INVERSE
     rows = {forward: [None] * rounds, inverse: [None] * rounds}
 
     unmixed = ir.load(known.unmixed(n))
-    flips = Tally("flip set", rounds, entry)
+    flips = Tally("flip set", rounds, first, entry)
     run_flips(unmixed, states, flip_set(n), rows, matrices_of(unmixed.program, rounds, (forward, inverse)),
               lambda lane: known.planted_bits("unmixed", n), flips, (forward, inverse))
 
     closed = ir.load(known.closed(n))
-    related = Tally("related keys and nonces", rounds, entry)
+    related = Tally("related keys and nonces", rounds, first, entry)
     run_flips(closed, instantiation_states(known, n, N_A), input_bits(known, n), rows,
               matrices_of(closed.program, rounds, (forward,)),
               lambda lane: known.planted_bits("closed", n, lane), related, (forward,))
 
     commuting = ir.load(known.commuting(n))
-    rotational = Tally("rotational pairs", rounds, entry)
+    rotational = Tally("rotational pairs", rounds, first, entry)
     run_rotations(commuting, states, known.planted_bits("commuting", n), rotational, rows)
 
     tallies = (flips, related, rotational)
     keep(f"other-firings-n{n}.txt", "".join(line for t in tallies for line in t.lines).encode("ascii"))
-    code = verdict_code(entry)
+    code = [verdict_code(first), verdict_code(entry)]
     strength = power(entry, DELTA_A[n])
     threshold = Fraction(entry["level_numerator"], entry["level_denominator"])
-    found = {"size": n, "rounds": rounds, "n_a": N_A, "s_a": s_a(n), "critical": [entry["low"], entry["high"]],
+    found = {"size": n, "rounds": rounds, "n_a": N_A, "s_a": s_a(n),
+             "critical": {"over the first 2^13": [first["low"], first["high"]],
+                          "over N_a": [entry["low"], entry["high"]]},
              "paths": [t.summary() for t in tallies], "verdict_code": code,
              "power": {"delta": float(DELTA_A[n]), "value": float(strength)},
-             "chance_of_a_false_firing_per_flipped_bit_at_most": float(threshold * 2 * n * n * W)}
-    held = all(t.summary()["holds"] for t in tallies) and code["holds"] and strength >= LEAST_POWER
+             "chance_of_a_false_firing_per_flipped_bit_at_most": float(2 * threshold * 2 * n * n * W)}
+    held = all(t.summary()["holds"] for t in tallies) and all(item["holds"] for item in code) \
+        and strength >= LEAST_POWER
     return {"found": found, "re_found": held, "validated_kind": KIND}
 
 
@@ -284,7 +310,8 @@ def inputs(known_id: str) -> Dict:
 
 
 def projection(known_id: str) -> Tuple[float, Dict]:
-    """Two flipped bits timed with their counts, and the whole record's flips, at most 60 s."""
+    """Two flipped bits run as a record runs them, with their cross-check and tally, and the whole
+    record's flips, with its three trajectories and its dependency matrices, at most a few minutes."""
     import importlib.util
     n = size_of(known_id)
     stem = known_id.rsplit("-n", 1)[0]
@@ -296,9 +323,19 @@ def projection(known_id: str) -> Tuple[float, Dict]:
     rounds = known.rounds(n)
     loaded = ir.load(known.unmixed(n))
     states = bias_states(n)
+    forward = dependency.FORWARD
     started = time.monotonic()
-    for number in flip_set(n)[:2]:
-        difference_counts(loaded, states, flipped(states, number, W), [None] * rounds, W)
-    per_flip = (time.monotonic() - started) / 2
+    matrices = matrices_of(loaded.program, rounds, (forward,))
+    tables = time.monotonic() - started
+    started = time.monotonic()
+    trajectory(loaded, states, [None] * rounds)
+    once = time.monotonic() - started
+    tally = Tally("projection", rounds, bias.entry_for("avalanche", N_FIRST, s_a(n)),
+                  bias.entry_for("avalanche", N_A, s_a(n)))
+    started = time.monotonic()
+    run_flips(loaded, states, flip_set(n)[:2], {forward: [None] * rounds}, matrices, lambda lane: (), tally, (forward,))
+    per_flip = (time.monotonic() - started - once) / 2
     flips = 2 * len(flip_set(n)) + RELATED_BITS + 2 * (W - 1)
-    return per_flip * flips / 3600.0, {"seconds_per_flip": per_flip, "flips": flips}
+    seconds = per_flip * flips + 3 * once + 3 * tables
+    return seconds / 3600.0, {"seconds_per_flip": per_flip, "flips": flips, "seconds_per_trajectory": once,
+                              "seconds_per_matrix_set": tables}

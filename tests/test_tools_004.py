@@ -2071,50 +2071,104 @@ class Avalanche(unittest.TestCase):
         loaded = self.rot_list()
         first = np.zeros((8, 4), dtype=np.uint64)
         second = self.tool.flipped(first, 0, 8)
-        out = self.tool.difference_counts(loaded, first, second, [None] * 3, 8)
+        base = self.tool.trajectory(loaded, first, [None] * 3)
+        early, out = self.tool.difference_counts(loaded, base, second, [None] * 3, 8)
         for r in range(3):
             self.assertEqual(out[r, 0].tolist(), [4 if b == r + 1 else 0 for b in range(8)])
+        self.assertTrue((early == out).all(), "no state lies past the first 2^13")
+
+    def test_the_two_counts_part_at_the_first_2_13_states(self):
+        difference = np.array([[1, 1, 0, 1, 1]], dtype=np.uint64)
+        with mock.patch.object(self.tool, "N_FIRST", 2):
+            early, whole = self.tool.two_counts(difference, 2)
+        self.assertEqual((int(early[0, 0]), int(whole[0, 0])), (2, 4))
+
+    def test_the_counts_of_a_run_part_there_too(self):
+        loaded = self.rot_list()
+        first = np.zeros((8, 6), dtype=np.uint64)
+        second = first.copy()
+        second[0, :] = 1
+        second[0, 4:] = 2
+        with mock.patch.object(self.tool, "N_FIRST", 4):
+            base = self.tool.trajectory(loaded, first, [None])
+            early, whole = self.tool.difference_counts(loaded, base, second, [None], 8)
+        self.assertEqual(early[0, 0].tolist()[:3], [0, 4, 0])
+        self.assertEqual(whole[0, 0].tolist()[:3], [0, 4, 2])
+
+    def test_a_trajectory_holds_each_round_and_leaves_its_input(self):
+        loaded = self.rot_list()
+        states = np.zeros((8, 4), dtype=np.uint64)
+        states[0, :] = 1
+        kept = states.copy()
+        out = self.tool.trajectory(loaded, states, [None] * 3)
+        self.assertEqual([int(step[0, 0]) for step in out], [2, 4, 8])
+        self.assertTrue((states == kept).all())
+
+    def test_the_projection_times_a_record(self):
+        hours, detail = self.tool.projection("avalanche-planted-n4")
+        self.assertEqual(detail["flips"], 2494)
+        self.assertGreater(hours * 3600, detail["seconds_per_flip"] * 2494)
+        self.assertLess(hours, 1)
 
     def test_rotational_counts_of_a_lane_that_commutes_are_0(self):
         states = np.array([[0x1D, 0x2B]] * 8, dtype=np.uint64)
-        out = self.tool.rotational_counts(self.rot_list(3), states, 2, [None] * 2, 8)
-        self.assertEqual(int(out.sum()), 0)
+        early, out = self.tool.rotational_counts(self.rot_list(3), states, 2, [None] * 2, 8)
+        self.assertEqual((int(early.sum()), int(out.sum())), (0, 0))
 
     def test_rotational_counts_of_a_list_that_does_not_commute(self):
         loaded = self.ir.load(self.ir.Program("a", 2, 8, (self.ir.Phase(0, (
             self.ir.Mix(0, "add", self.ir.Lane(1)),)),)))
         states = np.full((8, 1), 0xFF, dtype=np.uint64)
         states[1, 0] = 1
-        out = self.tool.rotational_counts(loaded, states, 1, [None], 8)
+        early, out = self.tool.rotational_counts(loaded, states, 1, [None], 8)
         self.assertGreater(int(out[0, 0].sum()), 0)
+        self.assertTrue((early == out).all())
+
+    def test_the_rotational_counts_part_there_too(self):
+        loaded = self.ir.load(self.ir.Program("a", 2, 8, (self.ir.Phase(0, (
+            self.ir.Mix(0, "add", self.ir.Lane(1)),)),)))
+        states = np.full((8, 3), 0xFF, dtype=np.uint64)
+        states[1, 0] = 0
+        states[1, 1:] = 1
+        with mock.patch.object(self.tool, "N_FIRST", 1):
+            early, whole = self.tool.rotational_counts(loaded, states, 1, [None], 8)
+        self.assertEqual(int(early.sum()), 0, "state 0 commutes: adding 0")
+        self.assertGreater(int(whole.sum()), 0)
 
     def test_a_mask_of_lanes(self):
         mask = self.tool.lanes_mask([1], (3, 2))
         self.assertEqual(mask.tolist(), [[False, False], [True, True], [False, False]])
 
     def tally(self):
-        return self.tool.Tally("p", 2, {"low": 1, "high": 9})
+        return self.tool.Tally("p", 2, {"low": 1, "high": 9}, {"low": 1, "high": 9})
 
     def test_a_tally_counts_a_missed_bit_and_an_other_firing(self):
         tally = self.tally()
         counts = np.array([[0, 5, 10], [5, 5, 5]])
         expected = np.array([[True, True, False], [False, False, False]])
-        tally.add("t", 0, counts, expected)
+        tally.add("t", 0, counts, counts, expected)
         self.assertEqual(tally.missed, 1)
         self.assertEqual(tally.other_by_round, [1, 0])
-        self.assertEqual(tally.lines, ["p t round 1 lane 0 bit 2 count 10\n"])
+        self.assertEqual(tally.lines, ["p t round 1 lane 0 bit 2 counts 10 10\n"])
         self.assertFalse(tally.summary()["holds"], "a missed bit")
+
+    def test_a_bit_fires_on_either_count(self):
+        first, whole = {"low": 1, "high": 9}, {"low": 10, "high": 90}
+        for early, later, fires in ((5, 50, False), (9, 50, True), (5, 90, True), (0, 50, True), (5, 10, True)):
+            tally = self.tool.Tally("p", 1, first, whole)
+            tally.add("t", 0, np.array([[early]]), np.array([[later]]), np.array([[False]]))
+            self.assertEqual(tally.other_by_round, [1 if fires else 0], (early, later))
 
     def test_another_firing_below_r_decides_nothing(self):
         tally = self.tally()
-        tally.add("t", 0, np.array([[10]]), np.array([[False]]))
-        tally.add("t", 1, np.array([[5]]), np.array([[False]]))
+        tally.add("t", 0, np.array([[10]]), np.array([[10]]), np.array([[False]]))
+        tally.add("t", 1, np.array([[5]]), np.array([[5]]), np.array([[False]]))
         self.assertTrue(tally.summary()["holds"])
         self.assertEqual(tally.summary()["other_firings_by_round"], [1, 0])
 
     def test_another_firing_at_r_decides(self):
         tally = self.tally()
-        tally.add("t", 1, np.array([[10]]), np.array([[False]]))
+        tally.add("t", 1, np.array([[10]]), np.array([[10]]), np.array([[False]]))
         summary = tally.summary()
         self.assertFalse(summary["holds"])
         self.assertEqual(summary["other_firings_at_r"], 1)
@@ -2129,7 +2183,7 @@ class Avalanche(unittest.TestCase):
         rounds = 2
         states = np.zeros((2 * program.n ** 2, 16), dtype=np.uint64)
         rows = {"forward": [None] * rounds, "inverse": [None] * rounds}
-        tally = self.tool.Tally("p", rounds, {"low": 0, "high": 16})
+        tally = self.tool.Tally("p", rounds, {"low": 0, "high": 16}, {"low": 0, "high": 16})
         matrices = self.tool.matrices_of(program, rounds, ("forward", "inverse"))
         self.tool.run_flips(loaded, states, numbers, rows, matrices, lambda lane: planted, tally,
                             ("forward", "inverse"))
@@ -2148,9 +2202,20 @@ class Avalanche(unittest.TestCase):
         program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
         loaded = self.ir.load(program)
         states = np.zeros((8, 16), dtype=np.uint64)
-        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16})
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16}, {"low": 0, "high": 16})
         still = {"forward": [self.dep.identity(2, 8)]}
         with self.assertRaises(ToolFailureClass()):
+            self.tool.run_flips(loaded, states, [3], {"forward": [None]}, still, lambda lane: (), tally,
+                                ("forward",))
+
+    def test_a_flip_past_the_first_states_stops_the_run_too(self):
+        """The cross-check reads the count over every state, so that no later state escapes it."""
+        program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
+        loaded = self.ir.load(program)
+        states = np.zeros((8, 16), dtype=np.uint64)
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16}, {"low": 0, "high": 16})
+        still = {"forward": [self.dep.identity(2, 8)]}
+        with mock.patch.object(self.tool, "N_FIRST", 0), self.assertRaises(ToolFailureClass()):
             self.tool.run_flips(loaded, states, [3], {"forward": [None]}, still, lambda lane: (), tally,
                                 ("forward",))
 
@@ -2158,7 +2223,7 @@ class Avalanche(unittest.TestCase):
         program = self.ir.Program("r", 2, 8, (self.ir.Phase(0, (self.ir.Rot(0, 1),)),))
         loaded = self.ir.load(program)
         states = np.zeros((8, 4), dtype=np.uint64)
-        tally = self.tool.Tally("p", 1, {"low": 0, "high": 4})
+        tally = self.tool.Tally("p", 1, {"low": 0, "high": 4}, {"low": 0, "high": 4})
         self.tool.run_rotations(loaded, states, (0,), tally, {"forward": [None], "inverse": [None]})
         self.assertEqual(tally.tests, 7 * 2)
 
@@ -2168,13 +2233,13 @@ class Avalanche(unittest.TestCase):
         loaded = self.ir.load(program)
         states = np.zeros((8, 16), dtype=np.uint64)
         states[0, ::2] = 0
-        tally = self.tool.Tally("p", 1, {"low": 0, "high": 16})
         matrices = self.tool.matrices_of(program, 1, ("forward",))
-        out = self.tool.difference_counts(loaded, states, self.tool.flipped(states, 8, 8), [None], 8)
+        base = self.tool.trajectory(loaded, states, [None])
+        _, out = self.tool.difference_counts(loaded, base, self.tool.flipped(states, 8, 8), [None], 8)
         self.assertEqual(int(out[0, 0, 0]), 16)
         rows = {"forward": [None]}
         half = {"low": 0, "high": 17}
-        tally = self.tool.Tally("p", 1, half)
+        tally = self.tool.Tally("p", 1, half, half)
         self.tool.run_flips(loaded, states, [8], rows, matrices, lambda lane: (0,), tally, ("forward",))
         self.assertGreater(tally.missed, 0, "lane 0 is planted, and bit 0 of it flips every time")
 
@@ -2207,12 +2272,16 @@ class Avalanche(unittest.TestCase):
         self.assertEqual(self.tool.power(entry, Fraction(0)), Fraction(22, 1024))
 
     def test_the_power_at_r4s_stated_biases_exactly(self):
-        """At N_a = 2^13 the stated biases, rounded to four places, give 0.8985, 0.9007 and 0.8987: under
-        0.9 at two sizes. Which of the protocol's numbers moves is the owner's decision (FR-044)."""
+        """At N_a = 2^13 the stated biases, rounded to four places, give 0.8985, 0.9007 and 0.8987, which
+        is why N_a rose: at 8,256 they give 0.9047, 0.9070 and 0.9054 (FR-044; the change log)."""
         table = self.tool.bias.read_table()
-        for n, wanted in ((4, 0.898546), (8, 0.900737), (16, 0.898723)):
+        for n, was, now in ((4, 0.898546, 0.90471), (8, 0.900737, 0.90699), (16, 0.898723, 0.90541)):
             entry = self.tool.bias.entry_for("avalanche", 2 ** 13, self.tool.s_a(n), table)
-            self.assertAlmostEqual(float(self.tool.power(entry, self.tool.DELTA_A[n])), wanted, places=5)
+            self.assertAlmostEqual(float(self.tool.power(entry, self.tool.DELTA_A[n])), was, places=5)
+            entry = self.tool.bias.entry_for("avalanche", 8256, self.tool.s_a(n), table)
+            value = self.tool.power(entry, self.tool.DELTA_A[n])
+            self.assertAlmostEqual(float(value), now, places=4)
+            self.assertGreaterEqual(value, self.tool.LEAST_POWER)
 
     def test_the_size_of_a_known_result(self):
         self.assertEqual(self.tool.size_of("avalanche-planted-n16"), 16)
@@ -2262,7 +2331,7 @@ class AvalancheStem(unittest.TestCase):
         self.known = self.vt.load_known(self.table["avalanche-planted-n4"])
         self.kept = {}
 
-    def run_known(self, least_power=Fraction(1, 2), **changes):
+    def run_known(self, least_power=Fraction(9, 10), **changes):
         tool = self.tool
         sample = {"flip_set": lambda n, w=32: [0, 511, tool.ir.lane(4, 1, 1, 1) * 32 + 3] if n == 4 else [],
                   "input_bits": lambda known, n: [0, 7 * 32, 8 * 32, 11 * 32 + 31]}
@@ -2282,13 +2351,21 @@ class AvalancheStem(unittest.TestCase):
         self.assertIn("other-firings-n4.txt", self.kept)
         self.assertTrue(self.kept["other-firings-n4.txt"])
 
+    def test_the_record_states_both_counts_and_the_chance_of_both(self):
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations):
+            found = self.run_known()["found"]
+        self.assertEqual(found["critical"], {"over the first 2^13": [3790, 4402], "over N_a": [3821, 4435]})
+        entry = self.tool.bias.entry_for("avalanche", 8256, 2494 * 1024)
+        threshold = Fraction(entry["level_numerator"], entry["level_denominator"])
+        self.assertEqual(found["chance_of_a_false_firing_per_flipped_bit_at_most"], float(2 * threshold * 1024))
+
     def few_rotations(self, loaded, states, planted, tally, rows):
         w = 32
         mask = self.tool.lanes_mask(planted, (states.shape[0], w))
         for k in (1, 16):
-            counts = self.tool.rotational_counts(loaded, states, k, rows["forward"], w)
-            for r in range(counts.shape[0]):
-                tally.add(f"k {k}", r, counts[r], mask)
+            early, whole = self.tool.rotational_counts(loaded, states, k, rows["forward"], w)
+            for r in range(whole.shape[0]):
+                tally.add(f"k {k}", r, early[r], whole[r], mask)
 
     def test_a_lane_said_to_be_planted_that_is_not_breaks_the_flip_path(self):
         with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
@@ -2297,12 +2374,15 @@ class AvalancheStem(unittest.TestCase):
 
     def test_a_failed_verdict_code_or_power_breaks_it(self):
         with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
-                mock.patch.object(self.tool, "verdict_code", return_value={"holds": False}):
-            self.assertFalse(self.run_known()["re_found"])
+                mock.patch.object(self.tool, "verdict_code", side_effect=[{"holds": True}, {"holds": False}]):
+            self.assertFalse(self.run_known()["re_found"], "the count over N_a")
+        with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
+                mock.patch.object(self.tool, "verdict_code", side_effect=[{"holds": False}, {"holds": True}]):
+            self.assertFalse(self.run_known()["re_found"], "the count over 2^13")
         with mock.patch.object(self.tool, "run_rotations", wraps=self.few_rotations), \
                 mock.patch.object(self.tool, "LEAST_POWER", Fraction(1, 2)):
-            self.assertFalse(self.run_known(least_power=Fraction(9, 10))["re_found"],
-                             "at N_a = 2^13 the power at 4x4 is 0.8985")
+            self.assertFalse(self.run_known(least_power=Fraction(91, 100))["re_found"],
+                             "at N_a = 8,256 the power at 4x4 is 0.9047")
 
     def test_the_inputs_name_the_three_kinds(self):
         kinds = [item["kind"] for item in self.tool.inputs("avalanche-planted-n4")["sets"]]
@@ -2512,7 +2592,7 @@ class CriticalCounts(unittest.TestCase):
         return ((1 << n) - middle) * level.denominator > level.numerator << n
 
     def test_the_tool_derives_the_committed_table(self):
-        self.assertEqual(self.bias.table_entries(), self.table["entries"][:7])
+        self.assertEqual(self.bias.table_entries(), self.table["entries"][:10])
 
     def test_each_level_is_the_rule_of_r4(self):
         for entry in self.table["entries"]:
@@ -2528,6 +2608,7 @@ class CriticalCounts(unittest.TestCase):
             b = 64 * size * size
             self.assertIn(("frequency", 2 ** 20, 4 * b), pairs)
             self.assertIn(("avalanche", 2 ** 13, (2 * flips + 384 + 62) * b), pairs)
+            self.assertIn(("avalanche", 8256, (2 * flips + 384 + 62) * b), pairs)
 
     def test_the_file_is_only_appended_to(self):
         log = evidence.git("log", "--format=%H", "--", self.REL, cwd=CODE_ROOT).decode().split()
@@ -2604,6 +2685,25 @@ class Bias(unittest.TestCase):
         self.assertAlmostEqual(float(self.bias.p_values(np.array([1]), 10)[0]), 22 / 1024, places=12)
         self.assertAlmostEqual(float(self.bias.p_values(np.array([9]), 10)[0]), 22 / 1024, places=12)
         self.assertEqual(float(self.bias.p_values(np.array([5]), 10)[0]), 1.0)
+
+    def test_ones_agrees_with_a_count_bit_by_bit(self):
+        rng = np.random.default_rng(7)
+        for w in (4, 8, 16, 32):
+            for states in (rng.integers(0, 2 ** w, size=(5, 37), dtype=np.uint64),
+                           np.full((3, 9), 2 ** w - 1, dtype=np.uint64), np.zeros((3, 0), dtype=np.uint64)):
+                by_bit = [[int(((states[lane] >> np.uint64(bit)) & np.uint64(1)).sum()) for bit in range(w)]
+                          for lane in range(states.shape[0])]
+                self.assertEqual(self.bias.ones(states, w).tolist(), by_bit, w)
+
+    def test_ones_reads_no_bit_past_the_width(self):
+        self.assertEqual(self.bias.ones(np.array([[0xFF0]], dtype=np.uint64), 4).tolist(), [[0, 0, 0, 0]])
+        self.assertEqual(self.bias.ones(np.array([[0x1FF]], dtype=np.uint64), 8).tolist(), [[1] * 8])
+        self.assertEqual(self.bias.ones(np.array([[1 << 32]], dtype=np.uint64), 8).tolist(), [[0] * 8])
+
+    def test_ones_reads_a_part_of_a_batch(self):
+        states = np.arange(40, dtype=np.uint64).reshape(4, 10)
+        for part in (states[:, 3:8], states[:, ::2], states[1:3]):
+            self.assertEqual(self.bias.ones(part, 8).tolist(), self.bias.ones(part.copy(), 8).tolist())
 
     def test_ones_counts_each_lane_and_bit(self):
         states = np.array([[0b101, 0b100], [0b011, 0b000]], dtype=np.uint64)

@@ -63,6 +63,33 @@
    "level_denominator": 6400,
    "low": 1197070,
    "high": 1202930
+  },
+  {
+   "test": "avalanche",
+   "n": 8256,
+   "s": 2553856,
+   "level_numerator": 1,
+   "level_denominator": 65378713600,
+   "low": 3821,
+   "high": 4435
+  },
+  {
+   "test": "avalanche",
+   "n": 8256,
+   "s": 6021120,
+   "level_numerator": 1,
+   "level_denominator": 154140672000,
+   "low": 3815,
+   "high": 4441
+  },
+  {
+   "test": "avalanche",
+   "n": 8256,
+   "s": 40861696,
+   "level_numerator": 1,
+   "level_denominator": 1046059417600,
+   "low": 3803,
+   "high": 4453
   }
  ]
 }

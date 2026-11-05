@@ -2005,15 +2005,15 @@ freeze hashes and the baseline manifest; run the claim-register test.
   of pairs of a claimable size and a round count r at which the tests ran
   with 2r above the R then in force, the only round counts at which a firing
   raises R: with one R at every size and no rise, N = 3⌈R/2⌉, so that the
-  rate is about 21% and 23% at R = 32 with one stream, T = 1, and about 62% and 64% with T = 4
+  rate is about 21% and 24% at R = 32 with one stream, T = 1, and about 62% and 66% with T = 4
   (research R4); beside a firing, N counts the pairs tested up to that firing's record, and the
   final report and FR-041's statement of the selection bias count every pair tested by the
   freeze, each size's own R and every rise included, and `round_rule.py` computes N from the records
   (ANA-075); the avalanche test's term counts its runs the same way, size by size, the product taken
   over the claimable sizes at which it ran up to that record, or by the freeze for the final report,
-  a being 1 at a size where it measured at most 128 round counts and m/128 where it measured
-  m above 128, research R4's chance, so that with every size run and none
-  above 128 the rate is 1 − 0.995^(T·(N + 3)), and `round_rule.py` computes a
+  a being 2 at a size where it measured at most 128 round counts and m/64 where it measured
+  m above 128, research R4's chance for its two counts, so that with every size run and none
+  above 128 the rate is 1 − 0.995^(T·N)·0.99^(3T), and `round_rule.py` computes a
   from the records with N (ANA-079). Before the freeze, a change is a new
   design-document version and a log entry. After the freeze, any change to a frozen file, a
   raise of R by feature 005, a new claimable size, or the correction of a disagreement between
@@ -2490,8 +2490,9 @@ freeze hashes and the baseline manifest; run the claim-register test.
   count and decides nothing below the variant's R, and at the variant's R, a round count fixed with
   the known result before the tool is drafted at which the exact dependency matrices show every bit
   outside the set dependent on the flipped bit, the result is re-found only if exactly that set
-  fires, bit for bit, with the chance that a correct test fires there on a uniform bit, at most b
-  times the threshold 0.005/(128·S_A) per flipped bit, stated beside it: for the
+  fires, bit for bit, with the chance that a correct test fires there on a uniform bit, at most 2b
+  times the threshold 0.005/(128·S_A) per flipped bit, a bit being counted twice (research R4),
+  stated beside it: for the
   flip set a stated variant that leaves one lane unmixed, a lane that no
   update writes, which others may read, the difference bits of that lane being the planted bits; for
   the related-key and related-nonce set a stated instantiation variant in which a stated key bit and
@@ -2659,7 +2660,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
   family, the evaluations (measurements and searches) behind the frozen one, the bias rule's
   family-wise chance rates over them, each counting every pair of a claimable size and a round count
   tested by the freeze, each size's own R and every rise included, and every avalanche run by the
-  freeze, with m/128 at a size where it measured m round counts above 128 (FR-028;
+  freeze, with m/64 at a size where it measured m round counts above 128 (FR-028;
   ANA-075, ANA-079), and that every result of the frozen candidate is on
   development inputs chosen among up to six candidates, so that feature 007's held-out
   evaluation is the unbiased test. The rationale's chapter on alternatives cites the log entries
@@ -3921,7 +3922,7 @@ the candidate's own where its earlier charges left too little (ANA-078).
 A firing is reported as a distinguisher at its round count that raises R,
 with the family-wise rate of chance firings for the call types tested stated beside it,
 over the pairs of a size and a round count tested up to that firing's record and the avalanche runs
-made up to it, size by size, with research R4's m/128 at a size where more than 128 round counts are
+made up to it, size by size, with research R4's m/64 at a size where more than 128 round counts are
 measured (FR-028; ANA-075, ANA-079), and it is never measured again to remove it. At each size
 it runs after the trail bounds and the structural checks, from the R they
 give, and a later rise of R extends it to the new R (round rule). *Stricter means*: only a change
