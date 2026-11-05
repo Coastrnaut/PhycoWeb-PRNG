@@ -114,6 +114,9 @@ PUBLISHED: Dict[str, str] = {
     "speck32-lin": "ARX search",
     "present-tables": "exhaustive tables",
     "present-5r": "active-S-box counting",
+    "present-linear": "active-S-box counting",
+    "speck64-diff": "ARX search",
+    "speck64-lin": "ARX search",
     "sparkle-box": "long-trail active-box counting",
 }
 
@@ -225,7 +228,8 @@ def owner_provided(known_id: str) -> Optional[Dict]:
 
 
 def guard_source(known: Known) -> Dict:
-    """A published value needs a `fetched` entry of the manifest, or an `owner-provided` one."""
+    """A published value needs a `fetched` entry of the manifest for each file it rests on, or an `owner-provided`
+    one. `present-tables` rests on two: no one paper prints both of its tables."""
     if known.known_id not in PUBLISHED:
         return {"repository": known.path or known.statement}
     provided = owner_provided(known.known_id)
@@ -234,12 +238,18 @@ def guard_source(known: Known) -> Dict:
     module = load_known(known)
     if module is None:
         raise Refused(f"{known.known_id}: no recorded source for its value")
-    fetched = [e for e in evidence.read_manifest()
-               if e.get("name") == module.DOWNLOAD and e.get("status") == "fetched"]
-    if not fetched:
-        raise Refused(f"{known.known_id}: {module.DOWNLOAD} is not a fetched entry of the manifest")
-    return {"entry": module.DOWNLOAD, "sha256": fetched[-1]["sha256"], "paper": module.PAPER,
-            "table": module.TABLE, "value": module.VALUE}
+    names = [module.DOWNLOAD] if isinstance(module.DOWNLOAD, str) else list(module.DOWNLOAD)
+    manifest = evidence.read_manifest()
+    digests = []
+    for name in names:
+        fetched = [e for e in manifest if e.get("name") == name and e.get("status") == "fetched"]
+        if not fetched:
+            raise Refused(f"{known.known_id}: {name} is not a fetched entry of the manifest")
+        digests.append(fetched[-1]["sha256"])
+    cited = {"paper": module.PAPER, "table": module.TABLE, "value": module.VALUE}
+    if len(names) == 1:
+        return dict(cited, entry=names[0], sha256=digests[0])
+    return dict(cited, entries=[{"entry": name, "sha256": digest} for name, digest in zip(names, digests)])
 
 
 def open_failure(tool: Tool) -> Optional[Dict]:

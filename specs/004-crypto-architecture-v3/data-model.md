@@ -659,7 +659,8 @@ characteristic that a search of Π returns with its weight is one, written besid
 
 `tool`, `version`, `tool_sha256`, `licence`, `source` (in the repository, or an entry of the
 downloads manifest `downloads.json`, research R19: a `fetched` file's entry with the paper's table
-and value, or the `owner-provided` entry of a value the owner provides, written by the
+and value, one such entry per file where a value rests on two, as `present-tables` does, or the
+`owner-provided` entry of a value the owner provides, written by the
 owner with `scripts/owner_record.py owner-provided` and Approved in its own
 Review & Approval row, "Owner-provided value <n>", at HEAD), `validated_kind` (the word widths its
 known results cover, the operation set and the kind of model, with each use this plan makes of the

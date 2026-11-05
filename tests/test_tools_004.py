@@ -402,6 +402,32 @@ class Source(ValidationBase):
         self.assertEqual((source["entry"], source["sha256"]), ("paper.pdf", "a" * 64))
         self.assertEqual((source["paper"], source["table"], source["value"]), ("A paper", "Table 1", 7))
 
+    def two_papers(self) -> None:
+        write(self.root, self.PAPER, 'TOOL = "fake"\nKNOWN_ID = "fake-paper"\nSECOND_OF = "none"\n'
+                                     'DOWNLOAD = ("paper.pdf", "other.pdf")\nPAPER = "Two papers"\nTABLE = "Tables 1 and 2"\n'
+                                     'VALUE = 7\nEXPECTED = 7\n')
+        self.entries.insert(0, self.entry_of(self.PAPER))
+        self.write_provenance()
+        self.commit("a value that rests on two papers")
+
+    def test_a_value_on_two_files_cites_each(self):
+        self.two_papers()
+        other = dict(self.fetched(), name="other.pdf", sha256="b" * 64)
+        self.manifest([self.fetched(), other])
+        self.assertEqual(self.main(known="fake-paper"), evidence.EXIT_OK)
+        source = self.records()[0]["source"]
+        self.assertEqual(source["entries"], [{"entry": "paper.pdf", "sha256": "a" * 64},
+                                             {"entry": "other.pdf", "sha256": "b" * 64}])
+        self.assertEqual((source["paper"], source["table"], source["value"]), ("Two papers", "Tables 1 and 2", 7))
+
+    def test_a_value_on_two_files_needs_both_fetched(self):
+        self.two_papers()
+        other = dict(self.fetched(), name="other.pdf", sha256="b" * 64)
+        for entries in ([self.fetched()], [other], [self.fetched(), dict(other, status="approved")]):
+            self.manifest(entries)
+            self.assertEqual(self.main(known="fake-paper"), evidence.EXIT_REFUSED, entries)
+        self.assertEqual(self.records(), [])
+
     def test_an_owner_provided_value_without_its_row_is_refused(self):
         self.manifest([self.provided()])
         self.assertEqual(self.main(known="fake-paper"), evidence.EXIT_REFUSED)
