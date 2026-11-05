@@ -9,23 +9,28 @@ S-box of each round, active where its input is not 0. An S-box's input and outpu
 difference table, or its linear table; the rest are cut away by whole cubes, each cube one inequality, a greedy cover
 of the forbidden patterns by the largest cubes that hold none of the allowed ones. A trail starts from a non-zero input.
 
-The count over r rounds is the integer at or below the solver's dual bound, with no tolerance and never the best solution found
-(R12), and a run that stops at its limit gives no count. `minima` counts each r in turn, and each count bounds every span
-of r consecutive rounds of the longer counts that follow (Matsui's lemma), since those rounds are themselves a trail of r
-rounds: a span holds at least that count, which holds no trail back and cuts the solver's work by a large factor.
+The count over r rounds is a whole number, never read from a float (R12). A run minimises it, and its solution, rounded to whole
+numbers, is checked S-box by S-box against the table, which gives the count k and a trail that holds it. The best solution found
+is no bound: that is the second run's, limited to k - 1 on the count, whose status must be infeasible, or else k must be the sum of
+the counts of two shorter spans of rounds. The two runs are one search instance of R7, within its 8 h, and a run stopped at its
+time limit gives no count. The solver's dual bound stands in the record beside the count, unread, since HiGHS reports it off by
+about 10^-13 either way, and differently per platform. `minima` counts each r in turn, and each count bounds every span of r
+consecutive rounds of the longer counts that follow (Matsui's lemma), since those rounds are themselves a trail of r rounds: a span
+holds at least that count, which holds no trail back and cuts the solver's work by a large factor.
 
 Every record states that its status rests on HiGHS's built-in tolerances. Analysis code: the model never imports it. This tool
 makes no security claim.
 """
-import math
+import importlib.util
 import sys
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Dict, FrozenSet, List, NamedTuple, Optional, Sequence, Tuple
 
 import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, milp
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csr_matrix, vstack
 
 ROOT = Path(__file__).resolve().parents[4]
 for place in (str(ROOT / "research/004"), str(ROOT)):
@@ -37,6 +42,9 @@ from protocol.evidence import ToolFailure  # noqa: E402
 SETTINGS = {"mip_rel_gap": 0, "time_limit": 8 * 3600}
 MOST_SBOX_BITS = 5
 OPTIMAL, LIMIT, INFEASIBLE = 0, 1, 2
+HEAVY = ("present-5r",)
+PROBE_ROUNDS = 4
+LAST_ROUND_RATIO = 64.0
 KINDS = ("differential", "linear")
 LIMITATION = "its status rests on the built-in feasibility and integrality tolerances of HiGHS in scipy 1.15.3"
 KIND = {"widths": [8, 16, 32], "operations": "bijective S-boxes of up to 5 bits under a bit permutation or under a rotation of each word",
@@ -199,18 +207,74 @@ def build(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Model
     return Model(matrix, low, high, cost, columns_of)
 
 
+def solve(model: Model, seconds: float, limit: Optional[int] = None):
+    """One run at R12's settings, `seconds` being what is left of the search instance's time limit. It minimises the count, or, with a
+    `limit` on the count, it looks for any solution."""
+    matrix, low, high, cost = model.matrix, model.low, model.high, model.cost
+    if limit is not None:
+        matrix = vstack([matrix, csr_matrix(model.cost)]).tocsr()
+        low, high, cost = low + [-np.inf], high + [limit], np.zeros(model.columns)
+    return milp(cost, constraints=LinearConstraint(matrix, low, high), integrality=np.ones(model.columns), bounds=Bounds(0, 1),
+                options=dict(SETTINGS, time_limit=seconds))
+
+
+def trail_of(layer: Layer, rounds: int, point: np.ndarray) -> Tuple[int, ...]:
+    """The state before each round and after the last, each bit of a solution rounded to a whole number."""
+    stride = layer.bits + len(layer.boxes)
+    whole = np.rint(point).astype(np.int64)
+    return tuple(sum(int(whole[r * stride + bit]) << bit for bit in range(layer.bits)) for r in range(rounds + 1))
+
+
+def counted(layer: Layer, kind: str, trail: Sequence[int]) -> int:
+    """The active S-boxes of a stated trail, in whole numbers, each S-box of each round checked against the table its model was
+    built from. A trail that does not hold is a tool failure."""
+    if trail[0] == 0:
+        raise ToolFailure("a trail starts from a non-zero input")
+    allowed = patterns(layer.sbox, kind)
+    bits = sbox_bits(layer.sbox)
+    total = 0
+    for before, after in zip(trail, trail[1:]):
+        middle = before_permutation(layer, after)
+        for box in layer.boxes:
+            given, taken = box_values(layer, before, box), box_values(layer, middle, box)
+            if given | (taken << bits) not in allowed:
+                raise ToolFailure(f"the table refuses {given} to {taken}")
+            total += given != 0
+    return total
+
+
+def largest_sum(rounds: int, floors: Dict[int, int]) -> Optional[Tuple[int, int, int]]:
+    """The largest sum of the counts of two shorter spans that together make `rounds`, with the two spans."""
+    sums = [(floors[s] + floors[rounds - s], s, rounds - s) for s in range(1, rounds // 2 + 1)
+            if s in floors and rounds - s in floors]
+    return max(sums) if sums else None
+
+
 def minimum(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Dict:
-    """The solver's count over `rounds` rounds. A run stopped at a limit gives no bound, and a tool failure's record says
-    `inconclusive` (R7, R12)."""
+    """The count over `rounds` rounds, with each status and the trail that holds it (R12). A run stopped at its time limit gives no
+    count, and a tool failure's record says `inconclusive` (R7, R12)."""
     model = build(layer, kind, rounds, floors)
-    result = milp(model.cost, constraints=LinearConstraint(model.matrix, model.low, model.high),
-                  integrality=np.ones(model.columns), bounds=Bounds(0, 1), options=dict(SETTINGS))
-    if result.status != OPTIMAL:
-        raise ToolFailure(f"{kind}, {rounds} rounds: status {result.status}, {result.message}: no bound")
-    if result.mip_dual_bound is None:
-        raise ToolFailure(f"{kind}, {rounds} rounds: an optimal status with no dual bound")
-    return {"status": int(result.status), "message": str(result.message), "dual_bound": float(result.mip_dual_bound),
-            "count": math.floor(result.mip_dual_bound)}
+    started = time.monotonic()
+    result = solve(model, SETTINGS["time_limit"])
+    if result.status != OPTIMAL or result.x is None:
+        raise ToolFailure(f"{kind}, {rounds} rounds: status {result.status}, {result.message}: no count")
+    trail = trail_of(layer, rounds, result.x)
+    count = counted(layer, kind, trail)
+    row = {"status": int(result.status), "message": str(result.message),
+           "dual_bound": None if result.mip_dual_bound is None else float(result.mip_dual_bound),
+           "count": count, "trail": [format(state, "x") for state in trail]}
+    shorter = largest_sum(rounds, floors)
+    if shorter is not None and count < shorter[0]:
+        raise ToolFailure(f"{kind}, {rounds} rounds: a solution of {count} lies below the sum {shorter[0]} of two shorter counts")
+    if shorter is not None and count == shorter[0]:
+        return dict(row, sum_of=list(shorter[1:]))
+    left = SETTINGS["time_limit"] - (time.monotonic() - started)
+    if left <= 0:
+        raise ToolFailure(f"{kind}, {rounds} rounds: no time left of the search instance: no count")
+    below = solve(model, left, count - 1)
+    if below.status != INFEASIBLE:
+        raise ToolFailure(f"{kind}, {rounds} rounds: status {below.status} with a limit of {count - 1}, {below.message}: no count")
+    return dict(row, below={"limit": count - 1, "status": int(below.status), "message": str(below.message)})
 
 
 def minima(layer: Layer, kind: str, rounds: int) -> Dict[int, Dict]:
@@ -336,3 +400,23 @@ RUNS: Dict[str, Callable] = {"present-5r": re_find_minimum, "present-5r-second":
 
 def validation(known_id: str, known, keep: Optional[Callable[[str, bytes], None]]) -> Dict:
     return RUNS[known_id](known, keep)
+
+
+def present():
+    """The known result `present-5r`, for the projection, which is given no module."""
+    spec = importlib.util.spec_from_file_location("present_5r", ROOT / "research/004/validation/present-5r.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def projection(known_id: str) -> Tuple[float, Dict]:
+    """The counts of PRESENT's differences up to 4 rounds, timed, and the fifth by the ratio LAST_ROUND_RATIO, from the two runs of its
+    count as this form's runs took them on the way to option A of R12's floor: 616 s to minimise and 506 s limited to 9, against 17.7 s
+    up to 4 rounds."""
+    if known_id not in HEAVY:
+        raise ToolFailure(f"{known_id} is no heavy run")
+    started = time.monotonic()
+    minima(layer_of(present()), "differential", PROBE_ROUNDS)
+    seconds = time.monotonic() - started
+    return seconds * LAST_ROUND_RATIO / 3600.0, {"seconds_up_to_the_probe": seconds, "ratio": LAST_ROUND_RATIO}

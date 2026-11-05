@@ -2999,8 +2999,8 @@ def active_sbox_module():
 class Solved:
     """What scipy's milp hands back, for the tests of what is read from it."""
 
-    def __init__(self, status, bound, message="stated"):
-        self.status, self.mip_dual_bound, self.message = status, bound, message
+    def __init__(self, status, bound=None, message="stated", x=None):
+        self.status, self.mip_dual_bound, self.message, self.x = status, bound, message, x
 
 
 class ActiveSbox(unittest.TestCase):
@@ -3017,6 +3017,34 @@ class ActiveSbox(unittest.TestCase):
     def small(self):
         """Two PRESENT S-boxes on 8 bits, the bits crossed between them."""
         return self.tool.spn(PRESENT_SBOX, 2, (0, 4, 1, 5, 2, 6, 3, 7))
+
+    def point(self, layer, states):
+        """A solution of the model that holds a stated trail: only its states are read."""
+        stride = layer.bits + len(layer.boxes)
+        point = np.zeros((len(states) - 1) * stride + layer.bits)
+        for r, state in enumerate(states):
+            for bit in range(layer.bits):
+                point[r * stride + bit] = (state >> bit) & 1
+        return point
+
+    def one_round(self):
+        """A true trail of one round of `small`, with one active S-box: its input and what its output becomes."""
+        layer = self.small()
+        out = next(b for b in range(16) if 1 | (b << 4) in self.tool.patterns(layer.sbox, "differential"))
+        return layer, (1, sum(((out >> i) & 1) << layer.permutation[i] for i in range(4)))
+
+    def two_rounds(self):
+        """A true trail of two rounds of `small`, found through the table, with its count of active S-boxes."""
+        layer, (first, second) = self.one_round()
+        allowed = self.tool.patterns(layer.sbox, "differential")
+        size = 1 << layer.bits
+        for third in range(size):
+            middle = self.tool.before_permutation(layer, third)
+            if all(self.tool.box_values(layer, second, box) | (self.tool.box_values(layer, middle, box) << 4) in allowed
+                   for box in layer.boxes):
+                states = (first, second, third)
+                return layer, states, self.tool.counted(layer, "differential", states)
+        raise AssertionError("no second round")
 
     def plain_minimum(self, layer, kind, rounds):
         """Every trail of a small layer, in plain Python."""
@@ -3114,48 +3142,195 @@ class ActiveSbox(unittest.TestCase):
             with self.assertRaises(ToolFailureClass()):
                 self.tool.columns(PRESENT_SBOX, 4, 8, amounts)
 
+    def runs(self, states, layer=None, second=None, bound=1.0):
+        """The two answers of a count, the first a solution of a stated trail, the second infeasible unless stated."""
+        layer = layer if layer is not None else self.small()
+        return [Solved(0, bound, x=self.point(layer, states)), second if second is not None else Solved(2)]
+
     def test_the_settings_are_r12s(self):
-        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0)) as solver:
-            self.tool.minimum(self.small(), "differential", 1, {})
-        options = solver.call_args.kwargs["options"]
-        self.assertEqual(options["mip_rel_gap"], 0)
-        self.assertEqual(options["time_limit"], 8 * 3600)
-        self.assertEqual(set(options), {"mip_rel_gap", "time_limit"})
+        layer, states = self.one_round()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states)) as solver:
+            self.tool.minimum(layer, "differential", 1, {})
+        self.assertEqual(solver.call_count, 2)
+        for call in solver.call_args_list:
+            options = call.kwargs["options"]
+            self.assertEqual(options["mip_rel_gap"], 0)
+            self.assertEqual(set(options), {"mip_rel_gap", "time_limit"})
+            self.assertLessEqual(options["time_limit"], 8 * 3600)
+        self.assertEqual(solver.call_args_list[0].kwargs["options"]["time_limit"], 8 * 3600)
 
     def test_every_variable_is_a_whole_binary(self):
-        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0)) as solver:
-            self.tool.minimum(self.small(), "differential", 2, {})
-        kwargs = solver.call_args.kwargs
-        self.assertTrue((kwargs["integrality"] == 1).all())
-        self.assertTrue((kwargs["bounds"].lb == 0).all() and (kwargs["bounds"].ub == 1).all())
+        layer, states = self.one_round()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states)) as solver:
+            self.tool.minimum(layer, "differential", 1, {})
+        for call in solver.call_args_list:
+            self.assertTrue((call.kwargs["integrality"] == 1).all())
+            self.assertTrue((call.kwargs["bounds"].lb == 0).all() and (call.kwargs["bounds"].ub == 1).all())
 
-    def test_a_count_is_the_integer_at_or_below_the_dual_bound(self):
-        for bound, count in ((10.0, 10), (9.9999999, 9), (9.999999999999906, 9), (10.5, 10)):
-            with mock.patch.object(self.tool, "milp", return_value=Solved(0, bound)):
-                out = self.tool.minimum(self.small(), "differential", 1, {})
-            self.assertEqual((out["dual_bound"], out["count"]), (bound, count), bound)
+    def test_a_count_is_never_read_from_a_float(self):
+        """R12: one solution, one count, whatever the dual bound beside it, which stands in the record unread."""
+        layer, states = self.one_round()
+        for bound in (1.0, 0.9999999, 0.999999999999906, 1.0000000001, 7.5, -3.0):
+            with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, bound=bound)):
+                out = self.tool.minimum(layer, "differential", 1, {})
+            self.assertEqual((out["dual_bound"], out["count"]), (bound, 1), bound)
 
-    def test_the_best_solution_found_is_never_read(self):
-        solved = Solved(0, 9.5)
-        solved.fun = 10.0
-        solved.x = np.ones(3)
-        with mock.patch.object(self.tool, "milp", return_value=solved):
-            self.assertEqual(self.tool.minimum(self.small(), "differential", 1, {})["count"], 9)
+    def test_a_missing_dual_bound_changes_no_count(self):
+        layer, states = self.one_round()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, bound=None)):
+            out = self.tool.minimum(layer, "differential", 1, {})
+        self.assertEqual((out["dual_bound"], out["count"]), (None, 1))
+
+    def test_the_solution_is_read_in_whole_numbers(self):
+        """A solver's ones and zeros are floats: each is rounded to a bit before anything is counted."""
+        layer, states = self.one_round()
+        solved = Solved(0, 1.0, x=self.point(layer, states) * (1 - 1e-7) + 1e-9)
+        with mock.patch.object(self.tool, "milp", side_effect=[solved, Solved(2)]):
+            out = self.tool.minimum(layer, "differential", 1, {})
+        self.assertEqual(out["count"], 1)
+        self.assertEqual(out["trail"], [format(state, "x") for state in states])
+
+    def test_the_activity_columns_are_not_read(self):
+        """A count comes from the states and the table: flags that say otherwise change nothing."""
+        layer, states = self.one_round()
+        point = self.point(layer, states)
+        point[layer.bits:layer.bits + len(layer.boxes)] = 1
+        with mock.patch.object(self.tool, "milp", side_effect=[Solved(0, 2.0, x=point), Solved(2)]):
+            self.assertEqual(self.tool.minimum(layer, "differential", 1, {})["count"], 1)
+
+    def test_the_second_run_is_limited_to_one_below_the_count(self):
+        layer, states, count = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer)) as solver:
+            out = self.tool.minimum(layer, "differential", 2, {})
+        first, second = solver.call_args_list
+        model = self.tool.build(layer, "differential", 2, {})
+        rows = model.matrix.shape[0]
+        limited = second.kwargs["constraints"]
+        self.assertEqual(limited.A.shape[0], rows + 1)
+        self.assertEqual((limited.A[:rows] != model.matrix).nnz, 0)
+        self.assertEqual(limited.ub[rows], count - 1)
+        self.assertEqual(limited.lb[rows], -np.inf)
+        self.assertEqual(limited.A[rows].toarray().ravel().tolist(), model.cost.tolist())
+        self.assertFalse(np.any(second.args[0]), "a run with a limit looks for any solution")
+        self.assertEqual(first.args[0].tolist(), model.cost.tolist())
+        self.assertEqual(first.kwargs["constraints"].A.shape[0], rows)
+        self.assertEqual(out["below"], {"limit": count - 1, "status": 2, "message": "stated"})
+
+    def test_a_solution_below_the_count_gives_no_count(self):
+        """The first run's solution is no bound: a run limited below it that holds a solution ends the count."""
+        layer, states, count = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer, second=Solved(0, 1.0))), \
+                self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, "differential", 2, {})
 
     def test_a_search_that_stops_at_its_limit_gives_no_bound(self):
         """R12: a search that times out gives no bound, and its record says `inconclusive`, which a tool failure writes."""
+        layer, states = self.one_round()
         for status in (1, 4):
             with mock.patch.object(self.tool, "milp", return_value=Solved(status, 7.0)), \
                     self.assertRaises(ToolFailureClass()):
-                self.tool.minimum(self.small(), "differential", 1, {})
+                self.tool.minimum(layer, "differential", 1, {})
+            with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, second=Solved(status))), \
+                    self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(layer, "differential", 1, {})
+
+    def test_the_runs_of_one_count_share_its_time_limit(self):
+        layer, states = self.one_round()
+        clock = iter((1000.0, 1000.0 + 8 * 3600 - 90.0))
+        with mock.patch.object(self.tool.time, "monotonic", lambda: next(clock)), \
+                mock.patch.object(self.tool, "milp", side_effect=self.runs(states)) as solver:
+            self.tool.minimum(layer, "differential", 1, {})
+        self.assertEqual(solver.call_args_list[1].kwargs["options"]["time_limit"], 90.0)
+
+    def test_no_time_left_gives_no_count_and_no_second_run(self):
+        layer, states = self.one_round()
+        clock = iter((1000.0, 1000.0 + 8 * 3600))
+        with mock.patch.object(self.tool.time, "monotonic", lambda: next(clock)), \
+                mock.patch.object(self.tool, "milp", side_effect=self.runs(states)) as solver, \
+                self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, "differential", 1, {})
+        self.assertEqual(solver.call_count, 1)
+
+    def test_the_sum_of_two_shorter_counts_stands_in_place_of_the_second_run(self):
+        layer, states, _ = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer)) as solver, \
+                mock.patch.object(self.tool, "counted", return_value=4):
+            out = self.tool.minimum(layer, "differential", 2, {1: 2})
+        self.assertEqual(solver.call_count, 1)
+        self.assertEqual((out["count"], out["sum_of"]), (4, [1, 1]))
+        self.assertNotIn("below", out)
+
+    def test_a_count_above_every_sum_still_needs_the_second_run(self):
+        layer, states, _ = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer)) as solver, \
+                mock.patch.object(self.tool, "counted", return_value=5):
+            out = self.tool.minimum(layer, "differential", 2, {1: 2})
+        self.assertEqual(solver.call_count, 2)
+        self.assertEqual(out["below"]["limit"], 4)
+        self.assertNotIn("sum_of", out)
+
+    def test_a_sum_needs_every_span_it_names(self):
+        """A count with a shorter span missing is not a sum: the second run decides."""
+        layer, states, count = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer)) as solver:
+            out = self.tool.minimum(layer, "differential", 2, {})
+        self.assertEqual(solver.call_count, 2)
+        self.assertNotIn("sum_of", out)
+
+    def test_a_solution_below_a_sum_gives_no_count(self):
+        layer, states, count = self.two_rounds()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, layer=layer)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, "differential", 2, {1: count})
 
     def test_a_layer_with_no_trail_is_a_tool_defect(self):
         with mock.patch.object(self.tool, "milp", return_value=Solved(2, None)), self.assertRaises(ToolFailureClass()):
             self.tool.minimum(self.small(), "differential", 1, {})
 
-    def test_an_optimal_status_with_no_bound_is_a_tool_defect(self):
-        with mock.patch.object(self.tool, "milp", return_value=Solved(0, None)), self.assertRaises(ToolFailureClass()):
+    def test_an_optimal_status_with_no_solution_is_a_tool_defect(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0, x=None)), self.assertRaises(ToolFailureClass()):
             self.tool.minimum(self.small(), "differential", 1, {})
+
+    def test_a_solution_the_table_refuses_gives_no_count(self):
+        layer, states = self.one_round()
+        wrong = (states[0], states[1] ^ (1 << layer.permutation[0]) ^ (1 << layer.permutation[1]))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.counted(layer, "differential", wrong)
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs(wrong)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, "differential", 1, {})
+
+    def test_a_solution_from_no_input_gives_no_count(self):
+        layer, _ = self.one_round()
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.counted(layer, "differential", (0, 0))
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs((0, 0))), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, "differential", 1, {})
+
+    def test_an_inactive_sbox_that_gives_an_output_is_refused(self):
+        """A flag on an inactive S-box cannot hide it: the model refuses it, and so does the table."""
+        layer, states = self.one_round()
+        model = self.tool.build(layer, "differential", 1, {})
+        point = self.point(layer, states)
+        active = [self.tool.box_values(layer, states[0], box) != 0 for box in layer.boxes]
+        point[layer.bits:layer.bits + len(layer.boxes)] = active
+        held = model.matrix @ point
+        self.assertTrue((held >= np.array(model.low)).all() and (held <= np.array(model.high)).all())
+        flagged = point.copy()
+        flagged[layer.bits + active.index(False)] = 1
+        held = model.matrix @ flagged
+        self.assertFalse((held >= np.array(model.low)).all() and (held <= np.array(model.high)).all())
+
+    def test_a_count_carries_into_the_counts_after_it(self):
+        """Each count bounds the spans of the longer counts: a spy on what each count is given."""
+        seen = []
+        real = self.tool.minimum
+
+        def spy(layer, kind, rounds, floors):
+            seen.append((rounds, dict(floors)))
+            return real(layer, kind, rounds, floors)
+
+        with mock.patch.object(self.tool, "minimum", spy):
+            found = self.tool.minima(self.small(), "differential", 3)
+        self.assertEqual(seen, [(1, {}), (2, {1: found[1]["count"]}), (3, {1: found[1]["count"], 2: found[2]["count"]})])
 
     def test_the_minimum_of_a_small_layer_is_every_trail(self):
         for kind in ("differential", "linear"):
@@ -3165,6 +3340,23 @@ class ActiveSbox(unittest.TestCase):
     def test_the_minimum_counts_the_rounds_it_is_asked(self):
         found = self.tool.minima(self.small(), "differential", 2)
         self.assertEqual(sorted(found), [1, 2])
+
+    def test_each_trail_of_a_real_count_holds_at_its_count(self):
+        for kind in ("differential", "linear"):
+            for r, row in self.tool.minima(self.small(), kind, 3).items():
+                trail = [int(state, 16) for state in row["trail"]]
+                self.assertEqual(len(trail), r + 1)
+                self.assertEqual(self.tool.counted(self.small(), kind, trail), row["count"], (kind, r))
+
+    def test_a_real_count_has_a_status_or_a_sum_for_what_lies_below_it(self):
+        found = self.tool.minima(self.small(), "differential", 4)
+        for r, row in found.items():
+            if "sum_of" in row:
+                low, high = row["sum_of"]
+                self.assertEqual((low + high, found[low]["count"] + found[high]["count"]), (r, row["count"]))
+                self.assertNotIn("below", row)
+            else:
+                self.assertEqual((row["below"]["limit"], row["below"]["status"]), (row["count"] - 1, 2))
 
     def test_the_windows_are_each_round_span_at_its_count(self):
         """Matsui's lemma: r' consecutive rounds of a trail are a trail of r' rounds."""
@@ -3263,22 +3455,46 @@ class ActiveSboxOnKnown(unittest.TestCase):
             for patch in patches:
                 patch.stop()
 
-    def test_a_dual_bound_a_hair_below_the_minimum_is_not_re_found(self):
-        """R12 again, on the known result: 9.9999999 counts as 9, and 9 is not the stated 10."""
-        known = self.known("present-5r")
-        with mock.patch.object(known, "ROUNDS", 1), mock.patch.object(known, "MINIMUM", 10), \
-                mock.patch.object(self.tool, "milp", return_value=Solved(0, 9.9999999)):
-            out = self.tool.validation("present-5r", known, None)
-        self.assertFalse(out["re_found"])
-        self.assertEqual(out["found"]["rounds"]["1"]["dual_bound"], 9.9999999)
-        self.assertEqual(out["found"]["rounds"]["1"]["count"], 9)
+    def test_a_dual_bound_a_hair_below_the_minimum_changes_nothing(self):
+        """R12 on the known result: the noise that floored PRESENT's 3 rounds to 3 on one platform reaches no count."""
+        real = self.tool.milp
 
-    def test_the_record_holds_the_float_and_the_rounded_value_of_each_round(self):
+        def noisy(*args, **kwargs):
+            result = real(*args, **kwargs)
+            if result.mip_dual_bound is not None:
+                result.mip_dual_bound = result.mip_dual_bound - 4.75e-14
+            return result
+
+        with mock.patch.object(self.tool, "milp", noisy):
+            out = self.run_known("present-5r")
+        self.assertTrue(out["re_found"])
+        self.assertEqual(out["found"]["rounds"]["3"]["count"], 4)
+
+    def test_the_record_holds_each_status_the_check_and_the_float_of_each_round(self):
         rounds = self.run_known("present-5r")["found"]["rounds"]
         self.assertEqual(sorted(rounds), ["1", "2", "3"])
-        for row in rounds.values():
-            self.assertEqual(set(row), {"status", "message", "dual_bound", "count"})
+        for r, row in rounds.items():
+            self.assertLessEqual({"status", "message", "dual_bound", "count", "trail"}, set(row), r)
+            self.assertEqual(len({"below", "sum_of"} & set(row)), 1, r)
             self.assertIsInstance(row["dual_bound"], float)
+            self.assertEqual(len(row["trail"]), int(r) + 1)
+
+    def test_the_record_is_plain_json(self):
+        import json
+        out = self.run_known("present-5r")["found"]
+        self.assertEqual(json.loads(json.dumps(out)), out)
+
+    def test_present_at_5_rounds_is_the_heavy_run(self):
+        self.assertEqual(self.tool.HEAVY, ("present-5r",))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.projection("present-linear")
+        clock = iter((100.0, 130.0))
+        with mock.patch.object(self.tool.time, "monotonic", lambda: next(clock)), mock.patch.object(self.tool, "minima") as counted:
+            hours, speed = self.tool.projection("present-5r")
+        counted.assert_called_once()
+        self.assertEqual(counted.call_args.args[1:], ("differential", self.tool.PROBE_ROUNDS))
+        self.assertEqual(speed["seconds_up_to_the_probe"], 30.0)
+        self.assertEqual(hours, 30.0 * self.tool.LAST_ROUND_RATIO / 3600.0)
 
     def test_each_stated_trail_decides(self):
         known = self.known("present-5r-second")
@@ -3316,7 +3532,7 @@ class ActiveSboxOnKnown(unittest.TestCase):
 
         def counted(layer, kind, rounds):
             seen.append((layer.bits, kind))
-            return {r: {"status": 0, "message": "", "dual_bound": float(r), "count": r} for r in range(1, rounds + 1)}
+            return {r: {"count": r} for r in range(1, rounds + 1)}
 
         with mock.patch.object(self.tool, "minima", counted):
             self.assertTrue(self.tool.validation("rotation-layer", known, None)["re_found"])
@@ -3328,7 +3544,7 @@ class ActiveSboxOnKnown(unittest.TestCase):
         for bits, wrong_kind in ((32, "differential"), (64, "linear"), (128, "differential")):
             def counted(layer, kind, rounds):
                 low = 1 if (layer.bits, kind) == (bits, wrong_kind) else 0
-                return {r: {"status": 0, "message": "", "dual_bound": float(r), "count": r - low} for r in range(1, rounds + 1)}
+                return {r: {"count": r - low} for r in range(1, rounds + 1)}
 
             with mock.patch.object(self.tool, "minima", counted):
                 self.assertFalse(self.tool.validation("rotation-layer", known, None)["re_found"], (bits, wrong_kind))

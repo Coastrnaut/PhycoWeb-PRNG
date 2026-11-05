@@ -2,7 +2,7 @@
 
 Bogdanov et al., "PRESENT: An Ultra-Lightweight Block Cipher", CHES 2007, `47270450.pdf` of research R19, Theorem 1:
 any five-round differential characteristic of PRESENT has a minimum of 10 active S-boxes. What must match is the
-stated minimum, exactly, as the integer at or below the solver's dual bound (R12).
+stated minimum, exactly, as a count of R12, which is never read from a float.
 
 SBOX is the paper's S-box, and PERMUTATION its pLayer table as printed: bit i of the state moves to position
 PERMUTATION[i]. The state's 64 bits go through sixteen S-boxes, the S-box j taking bits 4j to 4j + 3, the lowest
