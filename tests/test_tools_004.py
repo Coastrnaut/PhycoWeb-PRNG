@@ -2394,6 +2394,574 @@ class AvalancheStem(unittest.TestCase):
         self.assertIn("avalanche-planted-second-n8", self.tool.HEAVY)
 
 
+def tables_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools/trails"))
+    import tables
+    return tables
+
+
+PRESENT_SBOX = (0xC, 5, 6, 0xB, 9, 0, 0xA, 0xD, 3, 0xE, 0xF, 8, 4, 7, 1, 2)
+
+
+class Tables(unittest.TestCase):
+    """research/004/tools/trails/tables.py on stated maps (T060)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = tables_module()
+
+    def sbox(self):
+        return np.array(PRESENT_SBOX, dtype=np.uint16)
+
+    def test_a_box_is_a_lookup_of_a_power_of_two_entries(self):
+        self.assertEqual(self.tool.bits_of(np.arange(16)), 4)
+        self.assertEqual(self.tool.bits_of(np.arange(4, dtype=np.uint8)), 2)
+        for wrong in (np.arange(5), np.arange(1), np.zeros((4, 4), dtype=np.int64), np.array([0.0, 1.0]),
+                      np.array([0, 4, 1, 2]), np.array([0, -1, 1, 2]), np.arange(1 << 17)):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.bits_of(wrong)
+
+    def test_a_difference_row_by_hand(self):
+        box = np.array([0, 0, 0, 1])
+        self.assertEqual(self.tool.difference_row(box, 0).tolist(), [4, 0, 0, 0])
+        for difference in (1, 2, 3):
+            self.assertEqual(self.tool.difference_row(box, difference).tolist(), [2, 2, 0, 0])
+
+    def test_a_linear_row_by_hand(self):
+        box = np.array([0, 0, 0, 1])
+        self.assertEqual(self.tool.linear_row(box, 0).tolist(), [4, 0, 0, 0])
+        self.assertEqual(self.tool.linear_row(box, 1).tolist(), [2, 2, 2, -2])
+        self.assertEqual(self.tool.linear_row(box, 2).tolist(), [4, 0, 0, 0])
+
+    def test_a_row_is_read_by_its_own_index(self):
+        """x -> rotl(x, 1) on 3 bits, whose tables are not symmetric, tells a row from a column: the difference 1
+        becomes 2, and the output mask 2 reads the input mask 1."""
+        box = np.array([0, 2, 4, 6, 1, 3, 5, 7])
+        self.assertEqual(self.tool.difference_row(box, 1).tolist(), [0, 0, 8, 0, 0, 0, 0, 0])
+        self.assertEqual(self.tool.difference_row(box, 2).tolist(), [0, 0, 0, 0, 8, 0, 0, 0])
+        self.assertEqual(self.tool.linear_row(box, 2).tolist(), [0, 8, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(self.tool.linear_row(box, 1).tolist(), [0, 0, 0, 0, 8, 0, 0, 0])
+
+    def test_the_tables_of_the_present_sbox_by_definition(self):
+        box = self.sbox()
+        difference = self.tool.difference_table(box)
+        sums = self.tool.linear_table(box)
+        for a in range(16):
+            for b in range(16):
+                self.assertEqual(int(difference[a, b]),
+                                 sum(1 for x in range(16) if PRESENT_SBOX[x] ^ PRESENT_SBOX[x ^ a] == b))
+                dot = lambda p, q: bin(p & q).count("1") & 1
+                self.assertEqual(int(sums[b, a]), sum((-1) ** (dot(a, x) ^ dot(b, PRESENT_SBOX[x])) for x in range(16)))
+
+    def test_the_tables_are_their_rows(self):
+        box = np.random.default_rng(7).permutation(32)
+        self.assertEqual(self.tool.difference_table(box).tolist(),
+                         [self.tool.difference_row(box, a).tolist() for a in range(32)])
+        self.assertEqual(self.tool.linear_table(box).tolist(),
+                         [self.tool.linear_row(box, b).tolist() for b in range(32)])
+
+    def test_the_rows_iterate_in_order(self):
+        box = np.random.default_rng(8).permutation(8)
+        for index, row in enumerate(self.tool.difference_rows(box)):
+            self.assertEqual(row.tolist(), self.tool.difference_row(box, index).tolist())
+        self.assertEqual(index, 7)
+        for index, row in enumerate(self.tool.linear_rows(box)):
+            self.assertEqual(row.tolist(), self.tool.linear_row(box, index).tolist())
+        self.assertEqual(index, 7)
+
+    def test_each_row_keeps_its_sum(self):
+        """Every row of a difference table sums to the inputs, and the squares of a row of sums to their square."""
+        box = np.random.default_rng(9).permutation(256)
+        for index in (0, 1, 77, 255):
+            self.assertEqual(int(self.tool.difference_row(box, index).sum()), 256)
+            row = self.tool.linear_row(box, index).astype(np.int64)
+            self.assertEqual(int((row * row).sum()), 256 ** 2)
+
+    def test_a_row_holds_every_type_of_lookup(self):
+        for kind in (np.uint8, np.uint16, np.uint32, np.int32, np.int64):
+            box = np.array(PRESENT_SBOX, dtype=kind)
+            self.assertEqual(self.tool.difference_row(box, 3).tolist(), self.tool.difference_row(self.sbox(), 3).tolist())
+            self.assertEqual(self.tool.linear_row(box, 3).tolist(), self.tool.linear_row(self.sbox(), 3).tolist())
+
+    def test_a_row_at_16_bits_is_exact(self):
+        """The widest box: the entries reach 2^16, which a narrow type would wrap."""
+        box = np.arange(1 << 16, dtype=np.uint32)
+        self.assertEqual(int(self.tool.difference_row(box, 0)[0]), 1 << 16)
+        self.assertEqual(int(self.tool.linear_row(box, 0)[0]), 1 << 16)
+        self.assertEqual(int(self.tool.linear_row(box, 0xABCD)[0xABCD]), 1 << 16)
+
+    def test_a_row_leaves_the_box(self):
+        box = self.sbox()
+        kept = box.copy()
+        self.tool.difference_row(box, 3)
+        self.tool.linear_row(box, 3)
+        self.assertTrue((box == kept).all())
+
+    def test_the_transform_leaves_its_input(self):
+        values = np.array([1, -1, 1, 1], dtype=np.int32)
+        kept = values.copy()
+        self.assertEqual(self.tool.walsh(values).tolist(), [2, 2, -2, 2])
+        self.assertEqual(values.tolist(), kept.tolist())
+
+    def test_the_rows_refuse_what_is_no_box(self):
+        for rows in (self.tool.difference_rows, self.tool.linear_rows, self.tool.difference_table, self.tool.linear_table,
+                     lambda box: self.tool.difference_floor(box, 1), lambda box: self.tool.linear_floor(box, 1)):
+            with self.assertRaises(ToolFailureClass()):
+                list(rows(np.arange(5)))
+
+    def test_a_weight_is_exact_and_rounded_down(self):
+        units = self.tool.UNITS
+        self.assertEqual(units, 1 << 16)
+        self.assertEqual(self.tool.weight_units(4, 4), 2 * units)
+        self.assertEqual(self.tool.weight_units(16, 4), 0)
+        self.assertEqual(self.tool.weight_units(1, 16), 16 * units)
+        for count, bits in ((3, 8), (5, 8), (255, 8), (65535, 16), (3, 16), (7, 4)):
+            k = self.tool.weight_units(count, bits)
+            self.assertLessEqual(count ** units * 2 ** k, 2 ** (bits * units))
+            self.assertGreater(count ** units * 2 ** (k + 1), 2 ** (bits * units))
+
+    def test_a_squared_weight_is_exact_and_rounded_down(self):
+        units = self.tool.UNITS
+        self.assertEqual(self.tool.weight_units(8, 4, squared=True), 2 * units)
+        for count, bits in ((3, 8), (255, 8)):
+            k = self.tool.weight_units(count, bits, squared=True)
+            self.assertLessEqual(count ** (2 * units) * 2 ** k, 2 ** (2 * bits * units))
+            self.assertGreater(count ** (2 * units) * 2 ** (k + 1), 2 ** (2 * bits * units))
+
+    def test_a_weight_of_nothing_is_refused(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.weight_units(0, 4)
+
+    def plain_floor(self, table, rounds, squared):
+        """Every chain in plain Python: table[row][column], a chain's next row being its column."""
+        size = len(table)
+        best = {start: 0 for start in range(1, size)}
+        out = {}
+        for r in range(1, rounds + 1):
+            new = {}
+            for start, weight in best.items():
+                for column in range(size):
+                    entry = abs(int(table[start][column]))
+                    if entry:
+                        total = weight + self.tool.weight_units(entry, 4, squared=squared)
+                        if total < new.get(column, 1 << 60):
+                            new[column] = total
+            new.pop(0, None)
+            best = new
+            out[r] = min(best.values())
+        return out
+
+    def test_the_floor_is_the_best_chain_of_entries(self):
+        box = self.sbox()
+        self.assertEqual(self.tool.difference_floor(box, 4), self.plain_floor(self.tool.difference_table(box), 4, False))
+        self.assertEqual(self.tool.linear_floor(box, 4), self.plain_floor(self.tool.linear_table(box), 4, True))
+
+    def test_the_floor_starts_from_a_non_zero_row(self):
+        units = self.tool.UNITS
+        self.assertEqual(self.tool.difference_floor(self.sbox(), 1), {1: 2 * units})
+        self.assertEqual(self.tool.linear_floor(self.sbox(), 1), {1: 2 * units})
+
+    def test_a_chain_sums_weights_rounded_down(self):
+        """Entries of 5 and 6 of 8 have irrational weights, and a chain sums the rounded parts."""
+        table = {1: [0, 0, 3, 5], 2: [0, 3, 0, 5], 3: [0, 0, 6, 2]}
+        out = self.tool.chain(lambda index: np.array(table[index]), 4, 3, 2)
+        weight = self.tool.weight_units
+        self.assertEqual(out, {1: weight(6, 3), 2: weight(6, 3) + weight(5, 3)})
+
+    def test_a_chain_never_goes_through_the_zero_row(self):
+        table = {1: [8, 0, 0, 1], 2: [8, 0, 0, 1], 3: [8, 0, 0, 1]}
+        out = self.tool.chain(lambda index: np.array(table[index]), 4, 3, 1)
+        self.assertEqual(out, {1: 3 * self.tool.UNITS})
+
+    def test_the_tables_of_an_operation_are_a_whole_count(self):
+        for kind, op in (("add", lambda p, q: p + q), ("sub", lambda p, q: p - q)):
+            for w in (2, 3):
+                size = 1 << w
+                counts, sums = self.tool.operation_tables(kind, w)
+                dot = lambda p, q: bin(p & q).count("1") & 1
+                for a in range(size):
+                    for b in range(size):
+                        for c in range(size):
+                            pairs = [(x, y) for x in range(size) for y in range(size)]
+                            self.assertEqual(int(counts[a, b, c]), sum(
+                                1 for x, y in pairs if (op(x, y) % size) ^ (op(x ^ a, y ^ b) % size) == c), (kind, w))
+                            self.assertEqual(int(sums[a, b, c]), sum(
+                                (-1) ** (dot(a, op(x, y) % size) ^ dot(b, x) ^ dot(c, y)) for x, y in pairs), (kind, w))
+
+    def test_an_exponent_that_is_no_power_of_two_is_a_tool_defect(self):
+        self.assertEqual(self.tool.exponents(np.array([256, 128, 1, 0]), 8)[:3].tolist(), [0, 1, 8])
+        self.assertGreaterEqual(int(self.tool.exponents(np.array([0]), 8)[0]), self.tool.FAR)
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.exponents(np.array([3]), 8)
+
+    def test_a_step_that_is_no_bijection_or_no_step_is_refused(self):
+        for step in (("mix", 0, 1, 0), ("add", 0, 0, 1), ("sub", 1, 1, 0), ("xor", 1, 1, 1), ("rot", 2, 1), ("add", 0, 2, 0),
+                     ("rot", 0, 4), ("add", 0, 1, -1), ("xor", 0, 1, 4), ("add", 0, 1), ("rot", 0)):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.check_steps((step,), 4)
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.check_steps((), 4)
+
+    def test_a_search_and_a_box_refuse_what_is_no_step(self):
+        """An unknown step must stop here: the search would read it as a subtraction."""
+        for steps in ((("mix", 0, 1, 0),), (("add", 0, 0, 1),), ()):
+            for search in (self.tool.differential_trails, self.tool.linear_trails):
+                with self.assertRaises(ToolFailureClass()):
+                    search(steps, 4, 1)
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.box_of(steps, 4)
+
+    def test_addition_and_subtraction_share_their_difference_table(self):
+        """xdp+ is symmetric in its three arguments, so a subtraction's table at (a, b, c), which is the addition's at
+        (c, b, a), is the addition's own, and the table does not tell its two inputs apart."""
+        add, sub = self.tool.operation_tables("add", 3)[0], self.tool.operation_tables("sub", 3)[0]
+        self.assertTrue((add == sub).all())
+        self.assertTrue((add == add.transpose(1, 0, 2)).all())
+        self.assertTrue((add == add.transpose(2, 1, 0)).all())
+
+    def test_the_box_of_steps_by_hand(self):
+        box = self.tool.box_of((("rot", 0, 1), ("add", 0, 1, 1), ("xor", 1, 0, 1), ("sub", 1, 0, 0)), 4)
+        x, y = 0b0011, 0b0101
+        p = (0b0110 + 0b1010) & 15
+        q = y ^ ((p << 1) & 15 | p >> 3)
+        self.assertEqual(int(box[x | y << 4]), p | ((q - p) & 15) << 4)
+
+    def test_no_carry_means_no_weight(self):
+        steps = (("xor", 0, 1, 1), ("rot", 1, 3), ("xor", 1, 0, 2))
+        self.assertEqual(self.tool.differential_trails(steps, 4, 3), {1: 0, 2: 0, 3: 0})
+        self.assertEqual(self.tool.linear_trails(steps, 4, 3), {1: 0, 2: 0, 3: 0})
+
+    def test_the_lone_addition_by_hand(self):
+        """(8, 0) passes the addition at chance 1, the top bit having no carry out, and the mask 1 likewise."""
+        steps = (("add", 0, 1, 0),)
+        self.assertEqual(self.tool.differential_trails(steps, 4, 2), {1: 0, 2: 0})
+        self.assertEqual(self.tool.linear_trails(steps, 4, 2), {1: 0, 2: 0})
+
+    def test_a_rotation_moves_the_weight_of_a_trail(self):
+        """The rotation sends the top bit away, so that a second addition must pay."""
+        steps = (("add", 0, 1, 0), ("rot", 0, 1), ("xor", 1, 0, 1))
+        self.assertGreater(self.tool.differential_trails(steps, 4, 3)[3], 0)
+
+    def test_a_trail_search_refuses_a_width_of_no_table(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.differential_trails((("add", 0, 1, 0),), 9, 1)
+
+
+class TablesOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once. `box-tables` and its second run at w = 4 here;
+    w = 8 is the validation's own."""
+
+    NAMES = ("present-tables", "present-tables-second", "box-tables", "box-tables-second", "internal-trails",
+             "internal-trails-second")
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = tables_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def narrow(self, known):
+        """At w = 4 alone, the floor of the second read there from `internal-trails`."""
+        patches = [mock.patch.object(known, "WIDTHS", (4,))]
+        if hasattr(known, "FLOOR_WIDTH"):
+            patches += [mock.patch.object(known, "FLOOR_WIDTH", 4),
+                        mock.patch.object(known, "FLOOR_DIFFERENTIAL", {1: 0, 2: 1, 3: 2, 4: 4}),
+                        mock.patch.object(known, "FLOOR_SQUARED", {1: 0, 2: 0, 3: 2, 4: 4})]
+        return patches
+
+    def run_known(self, name, known=None):
+        known = known if known is not None else self.known(name)
+        patches = self.narrow(known) if hasattr(known, "WIDTHS") else []
+        for patch in patches:
+            patch.start()
+        try:
+            return self.tool.validation(name, known, None)
+        finally:
+            for patch in patches:
+                patch.stop()
+
+    def holds(self, name, known=None):
+        return self.run_known(name, known)["re_found"]
+
+    def test_each_is_re_found(self):
+        for name in self.NAMES:
+            self.assertTrue(self.holds(name), name)
+
+    def test_each_file_names_its_tool_and_its_second(self):
+        for name in self.NAMES:
+            self.assertEqual(self.table[name].tool, "exhaustive tables", name)
+        for first in ("present-tables", "box-tables", "internal-trails"):
+            self.assertEqual(self.table[first].second_of, NONE)
+            self.assertEqual(self.table[first + "-second"].second_of, first)
+
+    def test_every_entry_of_each_published_table_is_compared(self):
+        found = self.run_known("present-tables")["found"]
+        self.assertEqual((found["difference_entries"], found["linear_entries"]), (256, 225))
+        self.assertEqual((found["difference_differing"], found["linear_differing"]), (0, 0))
+
+    def test_one_wrong_entry_of_the_difference_table_is_not_re_found(self):
+        known = self.known("present-tables")
+        for row, column in ((0, 0), (1, 3), (15, 15), (15, 1), (6, 2)):
+            wrong = [list(line) for line in known.DIFFERENCE]
+            wrong[row][column] += 2
+            with mock.patch.object(known, "DIFFERENCE", wrong):
+                self.assertFalse(self.holds("present-tables", known), (row, column))
+
+    def test_one_wrong_entry_of_the_linear_table_is_not_re_found(self):
+        known = self.known("present-tables")
+        for row, column in ((0, 8), (14, 14), (14, 0), (4, 0), (1, 1)):
+            wrong = [list(line) for line in known.EIGHTHS]
+            wrong[row][column] = -wrong[row][column] or 1
+            with mock.patch.object(known, "EIGHTHS", wrong):
+                self.assertFalse(self.holds("present-tables", known), (row, column))
+
+    def test_a_table_read_across_is_not_re_found(self):
+        known = self.known("present-tables")
+        with mock.patch.object(known, "DIFFERENCE", tuple(zip(*known.DIFFERENCE))):
+            self.assertFalse(self.holds("present-tables", known))
+        with mock.patch.object(known, "EIGHTHS", tuple(zip(*known.EIGHTHS))):
+            self.assertFalse(self.holds("present-tables", known))
+
+    def test_a_table_of_the_wrong_shape_is_a_tool_defect(self):
+        known = self.known("present-tables")
+        with mock.patch.object(known, "EIGHTHS", known.EIGHTHS[:14]):
+            with self.assertRaises(ToolFailureClass()):
+                self.run_known("present-tables", known)
+
+    def test_another_sbox_is_not_re_found(self):
+        known = self.known("present-tables")
+        other = list(known.SBOX)
+        other[0], other[1] = other[1], other[0]
+        with mock.patch.object(known, "SBOX", tuple(other)):
+            self.assertFalse(self.holds("present-tables", known))
+
+    def test_each_condition_of_the_second_decides(self):
+        known = self.known("present-tables-second")
+        for field, value in (("MOST_INPUTS", 2), ("MOST_SUM", 4), ("SINGLE_BIT_SUM", 8), ("COUNT_AT_MOST_SUM", 35),
+                             ("SINGLE_BIT_PAIRS", known.SINGLE_BIT_PAIRS - {(1, 1)}),
+                             ("SINGLE_BIT_PAIRS", known.SINGLE_BIT_PAIRS | {(3, 2)})):
+            with mock.patch.object(known, field, value):
+                self.assertFalse(self.holds("present-tables-second", known), (field, value))
+
+    def condition(self, field, value, key):
+        known = self.known("present-tables-second")
+        with mock.patch.object(known, field, value):
+            return self.run_known("present-tables-second", known)["found"]["conditions"][key]
+
+    def test_each_condition_states_its_own_verdict(self):
+        known = self.known("present-tables-second")
+        self.assertTrue(all(self.run_known("present-tables-second", known)["found"]["conditions"].values()))
+        self.assertFalse(self.condition("MOST_INPUTS", 2, "1"))
+        self.assertFalse(self.condition("MOST_SUM", 4, "3"))
+        self.assertFalse(self.condition("SINGLE_BIT_SUM", 8, "4"))
+        self.assertFalse(self.condition("SINGLE_BIT_PAIRS", known.SINGLE_BIT_PAIRS - {(1, 1)}, "4"))
+        self.assertFalse(self.condition("COUNT_AT_MOST_SUM", 35, "5"))
+
+    def test_the_inverse_states_each_of_its_verdicts(self):
+        known = self.known("present-tables-second")
+        other = list(known.INVERSE)
+        other[0], other[1] = other[1], other[0]
+        for key in ("the inverse is the inverse", "the inverse's difference table is the transpose",
+                    "the inverse's linear table is the transpose"):
+            self.assertFalse(self.condition("INVERSE", tuple(other), key), key)
+
+    def test_the_fourth_condition_as_the_paper_prints_it_does_not_hold(self):
+        """The PRESENT paper prints S^W_b(a) = +-4 for all single-bit a and b. The sums are 0 at 8 of the 16 pairs, so
+        the second known result takes Ohkuma's statement in its place (present-tables-second.py)."""
+        known = self.known("present-tables-second")
+        sums = self.tool.linear_table(np.array(known.SBOX, dtype=np.uint16))
+        values = [abs(int(sums[1 << o, 1 << i])) for i in range(4) for o in range(4)]
+        self.assertEqual((values.count(4), values.count(0)), (8, 8))
+
+    def test_the_inverse_of_the_second_decides(self):
+        known = self.known("present-tables-second")
+        other = list(known.INVERSE)
+        other[0], other[1] = other[1], other[0]
+        with mock.patch.object(known, "INVERSE", tuple(other)):
+            self.assertFalse(self.holds("present-tables-second", known))
+
+    def test_an_sbox_with_a_single_bit_difference_fails_the_second(self):
+        """The identity's difference table holds 16 at each single-bit pair, against conditions 1 and 2."""
+        known = self.known("present-tables-second")
+        with mock.patch.object(known, "SBOX", tuple(range(16))), mock.patch.object(known, "INVERSE", tuple(range(16))):
+            found = self.run_known("present-tables-second", known)
+        self.assertFalse(found["re_found"])
+        self.assertFalse(found["found"]["conditions"]["2"])
+
+    def test_every_entry_of_each_box_is_compared(self):
+        for name in ("box-tables", "box-tables-second"):
+            found = self.run_known(name)["found"]["w4"]
+            self.assertEqual((found["difference_entries"], found["linear_entries"]), (1 << 16, 1 << 16), name)
+            self.assertEqual((found["difference_differing"], found["linear_differing"]), (0, 0), name)
+
+    def changed(self, function, row_index, column):
+        def wrapped(known, index):
+            row = function(known, index).copy()
+            if index == row_index:
+                row[column] += 2
+            return row
+        return wrapped
+
+    def test_one_wrong_entry_of_a_box_is_not_re_found(self):
+        for name in ("box-tables", "box-tables-second"):
+            for field in ("difference_row", "linear_row"):
+                for row, column in ((1, 3), (255, 255), (128, 0), (0, 0)):
+                    known = self.known(name)
+                    with mock.patch.object(known, field, self.changed(getattr(known, field), row, column)):
+                        self.assertFalse(self.holds(name, known), (name, field, row, column))
+
+    def test_another_box_is_not_re_found(self):
+        for name in ("box-tables", "box-tables-second"):
+            known = self.known(name)
+            lookup = known.box(4).copy()
+            lookup[[3, 4]] = lookup[[4, 3]]
+            with mock.patch.object(known, "box", lambda w: lookup):
+                self.assertFalse(self.holds(name, known), name)
+
+    def test_each_width_of_a_box_is_run(self):
+        known = self.known("box-tables")
+        self.assertEqual(known.WIDTHS, (4, 8))
+        self.assertEqual(self.known("box-tables-second").WIDTHS, (4, 8))
+        with mock.patch.object(self.tool, "compare_box", return_value={"difference_differing": 0, "linear_differing": 0}) as seen:
+            self.tool.validation("box-tables", known, None)
+        self.assertEqual([call.args[1] for call in seen.call_args_list], [4, 8])
+
+    def test_a_box_that_is_no_lookup_is_a_tool_defect(self):
+        known = self.known("box-tables")
+        for wrong in (np.arange(5), np.arange(256) + 1):
+            with mock.patch.object(known, "box", lambda w: wrong), self.assertRaises(ToolFailureClass()):
+                self.run_known("box-tables", known)
+
+    def test_a_failure_at_one_width_stands_beside_a_pass_at_the_other(self):
+        known = self.known("box-tables")
+        for failing in (4, 8):
+            def result(_, w):
+                wrong = 1 if w == failing else 0
+                return {"difference_differing": wrong, "linear_differing": 0}
+            with mock.patch.object(self.tool, "compare_box", side_effect=result):
+                self.assertFalse(self.tool.validation("box-tables", known, None)["re_found"], failing)
+
+    def test_the_floor_runs_on_the_box_of_its_stated_width(self):
+        known = self.known("box-tables-second")
+        seen = []
+        stated = {r: k * self.tool.UNITS for r, k in known.FLOOR_DIFFERENTIAL.items()}
+        squared = {r: k * self.tool.UNITS for r, k in known.FLOOR_SQUARED.items()}
+
+        def low(box, rounds):
+            seen.append((box.size, rounds))
+            return stated
+
+        def high(box, rounds):
+            seen.append((box.size, rounds))
+            return squared
+
+        clean = {"difference_differing": 0, "linear_differing": 0}
+        with mock.patch.object(self.tool, "compare_box", return_value=clean), \
+                mock.patch.object(self.tool, "difference_floor", low), mock.patch.object(self.tool, "linear_floor", high), \
+                mock.patch.object(known, "WIDTHS", (4,)):
+            out = self.tool.validation("box-tables-second", known, None)
+        self.assertTrue(out["re_found"])
+        self.assertEqual(seen, [(1 << 16, 4), (1 << 16, 4)])
+
+    def test_each_floor_of_the_second_box_decides(self):
+        for field, wrong in (("FLOOR_DIFFERENTIAL", {1: 0, 2: 1, 3: 2, 4: 5}), ("FLOOR_SQUARED", {1: 0, 2: 0, 3: 2, 4: 6})):
+            known = self.known("box-tables-second")
+            patches = self.narrow(known)
+            for patch in patches:
+                patch.start()
+            try:
+                with mock.patch.object(known, field, wrong):
+                    self.assertFalse(self.tool.validation("box-tables-second", known, None)["re_found"], field)
+            finally:
+                for patch in patches:
+                    patch.stop()
+
+    def test_the_floor_runs_at_its_stated_width_alone(self):
+        known = self.known("box-tables-second")
+        self.assertEqual((known.FLOOR_WIDTH, known.FLOOR_ROUNDS), (8, 4))
+        self.assertEqual(set(known.FLOOR_DIFFERENTIAL), {1, 2, 3, 4})
+        self.assertEqual(set(known.FLOOR_SQUARED), {1, 2, 3, 4})
+
+    def test_each_stated_weight_decides(self):
+        for name in ("internal-trails", "internal-trails-second"):
+            for field in ("DIFFERENTIAL", "LINEAR"):
+                for r in (1, 8):
+                    known = self.known(name)
+                    wrong = dict(getattr(known, field))
+                    wrong[r] += 1
+                    with mock.patch.object(known, field, wrong):
+                        self.assertFalse(self.holds(name, known), (name, field, r))
+
+    def test_the_trail_files_enumerations_give_their_stated_values(self):
+        for name in ("internal-trails", "internal-trails-second"):
+            known = self.known(name)
+            self.assertEqual(known.differential(known.ROUNDS), known.DIFFERENTIAL, name)
+            self.assertEqual(known.linear(known.ROUNDS), known.LINEAR, name)
+
+    def test_the_second_box_files_chain_gives_the_trail_files_values_at_4(self):
+        second, trails = self.known("box-tables-second"), self.known("internal-trails")
+        self.assertEqual(second.chain_weights(4, 8, second.difference_row, 1), trails.DIFFERENTIAL)
+        self.assertEqual(second.chain_weights(4, 8, second.linear_row, 2), {r: 2 * k for r, k in trails.LINEAR.items()})
+
+    def test_the_two_routes_agree_on_addition_at_4(self):
+        first, second = self.known("box-tables"), self.known("box-tables-second")
+        self.assertTrue((first.tables(4).counts == second.tables(4).counts).all())
+        self.assertTrue((first.tables(4).sums == second.tables(4).sums).all())
+
+    def test_the_box_of_the_trail_file_is_the_second_box(self):
+        self.assertEqual(self.tool.box_of(self.known("internal-trails").ROUND, 4).tolist(),
+                         self.known("box-tables-second").box(4).tolist())
+
+    def test_the_floor_equals_the_trail_in_the_one_addition_box(self):
+        found = self.run_known("internal-trails")["found"]
+        units = self.tool.UNITS
+        known = self.known("internal-trails")
+        self.assertEqual(found["difference_floor"], {r: k * units for r, k in known.DIFFERENTIAL.items()})
+        self.assertEqual(found["linear_floor"], {r: 2 * k * units for r, k in known.LINEAR.items()})
+
+    def test_the_floor_lies_at_or_below_the_trail_in_the_other_box(self):
+        found = self.run_known("internal-trails-second")["found"]
+        known = self.known("internal-trails-second")
+        units = self.tool.UNITS
+        for r in range(1, known.ROUNDS + 1):
+            self.assertLessEqual(found["difference_floor"][r], known.DIFFERENTIAL[r] * units)
+            self.assertLessEqual(found["linear_floor"][r], 2 * known.LINEAR[r] * units)
+        self.assertTrue(any(found["difference_floor"][r] < known.DIFFERENTIAL[r] * units for r in found["difference_floor"]),
+                        "several trails share an entry here, so that the floor lies strictly below somewhere")
+
+    def test_each_floor_relation_decides(self):
+        known = self.known("internal-trails-second")
+        with mock.patch.object(known, "ONE_ADDITION", True):
+            self.assertFalse(self.holds("internal-trails-second", known))
+        low = self.known("internal-trails")
+        for field in ("difference_floor", "linear_floor"):
+            with mock.patch.object(self.tool, field, lambda box, rounds: {r: 0 for r in range(1, rounds + 1)}):
+                self.assertFalse(self.holds("internal-trails", low), field)
+        high = self.known("internal-trails-second")
+        for field in ("difference_floor", "linear_floor"):
+            with mock.patch.object(self.tool, field, lambda box, rounds: {r: 1 << 40 for r in range(1, rounds + 1)}):
+                self.assertFalse(self.holds("internal-trails-second", high), field)
+
+    def test_the_kind_names_each_use_and_a_known_result_that_covers_it(self):
+        kind = self.tool.KIND
+        self.assertEqual(kind["widths"], [4, 8])
+        self.assertTrue(kind["uses"])
+        for use in kind["uses"]:
+            self.assertTrue(use["covered_by"], use)
+            for name in use["covered_by"]:
+                self.assertIn(name, self.NAMES)
+        for name in ("present-tables", "box-tables", "internal-trails"):
+            self.assertTrue(any(name in use["covered_by"] for use in kind["uses"]), name)
+        for name in self.NAMES:
+            self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
