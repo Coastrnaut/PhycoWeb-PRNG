@@ -694,7 +694,7 @@ hash, older than its first counted result.
   weights of SPECK32's optimal trails over the first rounds, and at w = 32 on its known result from
   the same papers, each run over 10 minutes **heavy**. (FR-038, FR-039, FR-053; SC-007; R12, R16,
   R18)
-- [ ] T064 [US4] Run `tests/test_tools_004.py` and `tests/test_ir.py`, `python -W ignore -m unittest
+- [X] T064 [US4] Run `tests/test_tools_004.py` and `tests/test_ir.py`, `python -W ignore -m unittest
   tests.test_tools_004 tests.test_ir`, on both platforms and list for the owner every tool without a
   `re-found` record, whose results stay `not evaluated`. The trail tools are fixed when the first
   trail search starts (T088): the rows of research R12's table that then have a `re-found` record,
