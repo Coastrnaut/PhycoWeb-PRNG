@@ -3828,6 +3828,12 @@ class LongTrailKnown(unittest.TestCase):
         self.assertTrue(all(cost % 2 == 0 for cost in self.feistel.chain_costs(self.first.BOX, 13)))
         self.assertEqual({r: value % 2 for r, value in self.first.LEFT_OUT[512].items()}, {8: 0, 9: 1, 11: 1})
 
+    def test_a_validation_stops_short_of_what_is_left_out(self):
+        for known in (self.first, self.second):
+            for size, rounds in known.ROUNDS.items():
+                self.assertLessEqual(set(range(1, rounds + 1)), set(known.BOUNDS[size]), size)
+        self.assertLess(self.first.ROUNDS[512], min(self.first.LEFT_OUT[512]))
+
     def test_nothing_left_out_is_kept(self):
         self.assertFalse(set(self.first.LEFT_OUT[512]) & set(self.first.BOUNDS[512]))
         self.assertEqual(sorted(set(self.first.LEFT_OUT[512]) | set(self.first.BOUNDS[512])), list(range(1, 13)))

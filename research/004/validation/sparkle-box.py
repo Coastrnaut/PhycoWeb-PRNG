@@ -20,9 +20,11 @@ Table 4 gives 6, 32 and at least 52 for the 4, 8 and 12 rounds of one, two and t
 holds is cut, and costs the largest sum over the ways of cutting it, so that a chain of 4 costs 32 + 32 = 64 and of 6 costs 52 + 52 = 104.
 The bound of r steps is the least of these over every truncated trail allowed.
 
-What must match is BOUNDS: Table 6's value at each stated step count of each size, and the two the paper's caption gives, 6 and 32 at 1 and 2
-steps. Entries printed as "at least" a size are left out, being no value. An exhaustive search over truncated trails by these rules, outside
-this file, gave every entry of BOUNDS before this file was fixed; a test of tests/test_tools_004.py repeats it.
+What must match is BOUNDS up to ROUNDS at each size: Table 6's value at each step count, and the two the paper's caption gives, 6 and 32 at 1
+and 2 steps. Entries printed as "at least" a size are left out, being no value. An exhaustive search over truncated trails by these rules, outside
+this file, gave every entry of BOUNDS before this file was fixed; a test of tests/test_tools_004.py repeats it, at every entry. ROUNDS only says how
+far a validation goes: Sparkle512 stops at 7 steps, the last before the entries left out below, and past 8 steps a look with a solver, before this
+file was fixed, took more than a minute an instance.
 
 Three entries of Table 6, all at Sparkle512, are left out in the open. LEFT_OUT holds them as printed. The same search gives 304, 396 and 460 at
 those steps. 295 and 433 are odd, and every cost here is even, so no sum of the box bounds is either of them, and 276 is not reached by any
@@ -38,10 +40,11 @@ SECOND_OF = "none"
 DOWNLOAD = "main.pdf"
 PAPER = "Beierle et al., Lightweight AEAD and Hashing using the Sparkle Permutation Family, ToSC 2020"
 TABLE = "Table 6, from the bounds of Alzette in Table 4"
-VALUE = "the bounds of Sparkle256 at 1 to 8 steps, Sparkle384 at 1 to 10, and Sparkle512 at 1 to 7, 10 and 12"
+VALUE = "the bounds of Sparkle256 at 1 to 8 steps, Sparkle384 at 1 to 10, and Sparkle512 at 1 to 7"
 KIND = "differential"
 BOX = (6, 32, 52)
 HALVES = {256: 2, 384: 3, 512: 4}
+ROUNDS = {256: 8, 384: 10, 512: 7}
 BOUNDS = {256: {1: 6, 2: 32, 3: 64, 4: 88, 5: 140, 6: 168, 7: 192, 8: 216},
           384: {1: 6, 2: 32, 3: 70, 4: 100, 5: 178, 6: 200, 7: 230, 8: 260, 9: 326, 10: 356},
           512: {1: 6, 2: 32, 3: 76, 4: 112, 5: 210, 6: 232, 7: 268, 10: 424, 12: 496}}
