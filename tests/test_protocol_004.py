@@ -2747,6 +2747,427 @@ class CandidateLog(TempRepo):
             self.propose("cand-B1")
 
 
+def generator():
+    """scripts/gen_constants_v3.py, loaded as a module, since it is no package member."""
+    from scripts import gen_constants_v3
+    return gen_constants_v3
+
+
+# A stated list of three food nodes at 4×4: no symmetry of the torus maps them to themselves.
+STATED_LIST = """import ir
+
+P, V = ir.PRESSURE, ir.VEIN
+
+
+def build(n, w):
+    def food(i, j, column):
+        return ir.Mix(ir.lane(n, i, j, P), "xor", ir.Constant(column))
+
+    return ir.Program("stated", n, w, (ir.Phase(0, (food(0, 0, 0),)),
+                                       ir.Phase(1, (food(0, 1, 1), food(1, 2, 2)))))
+"""
+WIDE = 1 << 64
+
+
+class ConstantRule(unittest.TestCase):
+    """The rule of research R15, on its own, with nothing on disk."""
+
+    def setUp(self):
+        self.gen = generator()
+
+    def test_the_order_of_x_divides_into_the_stated_primes(self):
+        product = 1
+        for prime in self.gen.ORDER_PRIMES:
+            product *= prime
+        self.assertEqual(product, WIDE - 1)
+
+    def test_a_plain_search_finds_cmacs_polynomial_first(self):
+        """R15's computed fact: x⁶⁴ + x⁴ + x³ + x + 1 is first, which is why the list exists."""
+        self.assertEqual(self.gen.chosen_polynomial([]), 0x1B)
+
+    def test_a_listed_polynomial_is_passed_over(self):
+        listed = [{"name": "p", "kind": "polynomial", "degree": 64, "c": "0x1b", "source": "s"}]
+        self.assertEqual(self.gen.chosen_polynomial(listed), 0x1D)
+
+    def test_a_polynomial_of_another_degree_passes_over_nothing(self):
+        listed = [{"name": "p", "kind": "polynomial", "degree": 8, "c": "0x1b", "source": "s"}]
+        self.assertEqual(self.gen.chosen_polynomial(listed), 0x1B)
+
+    def test_an_order_too_small_is_no_primitive_polynomial(self):
+        """x⁶⁴ + 1 = (x + 1)⁶⁴, and x⁶⁴ + x + 1 is reducible or of smaller order: c = 2 has c(0) = 0."""
+        self.assertFalse(self.gen.is_primitive(1))
+        self.assertFalse(self.gen.is_primitive(3))
+
+    def test_the_seed_is_the_ascii_word_with_32_bits_set(self):
+        self.assertEqual(self.gen.SEED, 0x506879636F576562)
+        self.assertEqual(bin(self.gen.SEED).count("1"), 32)
+
+    def test_the_stream_is_the_recurrence_read_from_s64(self):
+        c = 0x1D
+        bits = [self.gen.SEED >> (63 - i) & 1 for i in range(64)]
+        for t in range(256):
+            bits.append(sum(bits[t + i] for i in range(64) if c >> i & 1) & 1)
+        stream = self.gen.Stream(c)
+        self.assertEqual([stream.bit() for _ in range(256)], bits[64:])
+
+    def test_a_word_is_read_most_significant_bit_first(self):
+        first, second = self.gen.Stream(0x1D), self.gen.Stream(0x1D)
+        bits = [first.bit() for _ in range(8)]
+        self.assertEqual(second.word(8), int("".join(map(str, bits)), 2))
+
+    def test_periodic_words(self):
+        for word, w in ((0x0, 4), (0xF, 4), (0x5, 4), (0xA, 4), (0x55, 8), (0x3333, 16)):
+            self.assertTrue(self.gen.is_periodic(word, w), hex(word))
+        for word, w in ((0x1, 4), (0x7, 4), (0x53, 8)):
+            self.assertFalse(self.gen.is_periodic(word, w), hex(word))
+
+    def test_a_class_holds_rotations_and_complements(self):
+        w = 8
+        base = self.gen.class_of(0x53, w)
+        self.assertEqual(self.gen.class_of(self.gen.rotl(0x53, 3, w), w), base)
+        self.assertEqual(self.gen.class_of(0x53 ^ 0xFF, w), base)
+        self.assertEqual(self.gen.class_of(self.gen.rotl(0x53 ^ 0xFF, 5, w), w), base)
+        self.assertNotEqual(self.gen.class_of(0x01, w), base)
+
+    def test_the_counted_classes_by_hand_at_w_4(self):
+        """Twelve aperiodic words of 4 bits: 0001's rotations with 0111's, and 0011's: two classes."""
+        self.assertEqual(self.gen.aperiodic_classes(4), 2)
+
+    def test_the_largest_width_counted_has_no_number_above_it(self):
+        self.assertIsNone(self.gen.aperiodic_classes(16))
+
+    def test_a_table_skips_a_related_word_and_counts_it(self):
+        words = iter((0x53, 0x53 ^ 0xFF, 0x55, 0x01, 0x12))
+
+        class Fake:
+            def __init__(self, c):
+                pass
+
+            def word(self, w):
+                return next(words)
+
+        with mock.patch.object(self.gen, "Stream", Fake):
+            read = self.gen.read_table(1, 1, 3, 8)
+        self.assertEqual(read["table"], [[0x53, 0x01, 0x12]])
+        self.assertEqual((read["skipped"], read["repeats"]), (2, []))
+
+    def test_every_repeat_is_recorded_once_the_classes_run_out(self):
+        """w = 4 has two classes, so six constants hold four repeats, the record restarting."""
+        read = self.gen.read_table(0x1D, 2, 3, 4)
+        self.assertEqual(len(read["repeats"]), 4)
+        self.assertEqual(len({self.gen.class_of(word, 4) for row in read["table"] for word in row}), 2)
+
+    def test_the_run_lengths_of_r15(self):
+        self.assertEqual([self.gen.run_length(w) for w in (4, 8, 16, 32)], [16, 8, 4, 2])
+
+    def listed(self, words, bits):
+        digits = (bits + 3) // 4
+        return [{"name": "set", "kind": "constant-set", "word_bits": bits, "source": "s",
+                 "words": [f"0x{word:0{digits}x}" for word in words]}]
+
+    def planted(self, w, run):
+        rest = [(0x13 * i + 7) & ((1 << w) - 1) for i in range(1, 5)]
+        return rest + list(run) + rest[::-1]
+
+    def test_a_planted_run_is_found_under_each_of_the_2w_transforms(self):
+        for w in (8, 16):
+            length = self.gen.run_length(w)
+            source = [(0x9E37 * (i + 1)) & ((1 << w) - 1) for i in range(length)]
+            mask = (1 << w) - 1
+            for k in range(w):
+                for complement in (False, True):
+                    run = [self.gen.rotl(word, k, w) ^ (mask if complement else 0) for word in source]
+                    found = self.gen.refused_matches(self.planted(w, run), w, self.listed(source, w))
+                    self.assertTrue(found, (w, k, complement))
+
+    def test_a_run_one_word_short_of_64_bits_is_not_found(self):
+        w = 16
+        source = [0x1234, 0x5678, 0x9ABC, 0xDEF1]
+        words = [0x0F31, 0x1234, 0x5678, 0x9ABC, 0x0F32]
+        self.assertEqual(self.gen.refused_matches(words, w, self.listed(source, w)), [])
+        words[4] = 0xDEF1
+        self.assertTrue(self.gen.refused_matches(words, w, self.listed(source, w)))
+
+    def test_a_listed_string_is_read_at_the_tables_width_from_any_multiple_of_it(self):
+        """Published as 32-bit words, read at w = 16: a run may start in the middle of one."""
+        listed = self.listed([0x11112222, 0x33334444, 0x55556666], 32)
+        run = [0x2222, 0x3333, 0x4444, 0x5555]
+        found = self.gen.refused_matches(run, 16, listed)
+        self.assertEqual(found[0]["listed_word"], 1)
+
+    def test_a_polynomial_of_the_list_is_no_string_of_it(self):
+        listed = [{"name": "p", "kind": "polynomial", "degree": 64, "c": "0x1b", "source": "s"}]
+        self.assertEqual(self.gen.refused_matches([1, 2, 3, 4, 5], 32, listed), [])
+
+    def test_a_record_states_the_chance_of_a_match(self):
+        """T·L·2w·2⁻⁶⁴ with T = 10, L = 3 and w = 32."""
+        listed = self.listed([1, 2, 3], 32)
+        self.assertEqual(self.gen.chance_of_a_match(10, listed, 32), "1920 / 2^64")
+
+    def test_the_committed_list_parses_and_each_word_fits(self):
+        entries = changelog.parse_refused_list((ROOT / evidence.REFUSED_LIST_REL).read_bytes())
+        for entry in entries:
+            for word in entry.get("words", ()):
+                self.assertLess(int(word, 16), 1 << entry["word_bits"], entry["name"])
+
+    def test_each_named_version_of_the_list_keeps_every_earlier_one(self):
+        named = [e["refused_list"]["sha256"] for e, _ in evidence.log_entries(evidence.PROTOCOL_LOG_REL)
+                 if isinstance(e.get("refused_list"), dict)]
+        versions = []
+        for digest in dict.fromkeys(named):
+            blob = changelog.version_with(digest)
+            self.assertIsNotNone(blob, digest)
+            versions.append(changelog.parse_refused_list(blob))
+        for earlier, later in zip(versions, versions[1:]):
+            self.assertTrue(all(entry in later for entry in earlier))
+
+
+class ConstantGenerator(ProtocolWriter):
+    """The script's modes, each on a temporary repository whose log names its list."""
+
+    def setUp(self):
+        super().setUp()
+        self.gen = generator()
+        for rel in self.gen.CODE:
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        write(self.root, "phycoweb/__init__.py", "")
+        write(self.root, "phycoweb/model_v2.py", (CODE_ROOT / "phycoweb/model_v2.py").read_bytes())
+        write(self.root, "phycoweb/lut.py", (CODE_ROOT / "phycoweb/lut.py").read_bytes())
+        self.commit("the generator")
+        self.entries = [{"name": "p", "kind": "polynomial", "degree": 64, "c": "0x1b", "source": "s"}]
+        self.polynomial = 0x1D
+
+    def proposal(self) -> Dict:
+        digest = evidence.sha256(STATED_LIST.encode("utf-8"))
+        parameters = {name: "stated" for name in candidates.PARAMETERS}
+        parameters["constant_instance"] = {"polynomial": f"0x{self.polynomial:016x}",
+                                           "seed": f"0x{self.gen.SEED:016x}"}
+        return {"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": digest,
+                "parameters": parameters}
+
+    def stated(self, name_the_list: bool = True) -> None:
+        write(self.root, candidates.module_rel("cand-A1"), STATED_LIST)
+        self.commit("the list")
+        if name_the_list:
+            self.name_list(self.entries)
+        candidates.propose(self.proposal())
+        self.commit("proposed")
+
+    def run_gen(self, *argv) -> int:
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return self.gen.main(list(argv))
+
+    def candidate(self) -> int:
+        return self.run_gen("--candidate", "cand-A1", "--variant", "n4-w32-R4-c384")
+
+    def table_rel(self) -> str:
+        return f"{candidates.CANDIDATES_REL}/cand-A1/constants/n4-w32-R4-c384.json"
+
+    def records(self, kind: str = "generator-run") -> List[Dict]:
+        return [record for _, record in evidence.iter_records(kind, self.gen_directory(kind))]
+
+    def gen_directory(self, kind: str) -> str:
+        return {"generator-run": "generator-runs", "generator-check": "generator-checks"}[kind]
+
+    # the guard --------------------------------------------------------------------------------
+
+    def test_no_entry_that_names_the_list_exits_2_and_writes_nothing(self):
+        write(self.root, evidence.REFUSED_LIST_REL, evidence.pretty({"entries": self.entries}))
+        self.commit("a list")
+        self.stated(name_the_list=False)
+        self.assertEqual(self.candidate(), 2)
+        self.assertFalse((self.root / self.table_rel()).exists())
+
+    def test_a_list_that_differs_from_the_latest_named_exits_2(self):
+        self.stated()
+        write(self.root, evidence.REFUSED_LIST_REL, evidence.pretty({"entries": []}))
+        self.commit("a draft")
+        self.assertEqual(self.candidate(), 2)
+        self.assertEqual(self.records(), [])
+
+    # a candidate's table ----------------------------------------------------------------------
+
+    def test_a_candidates_table_and_its_record(self):
+        self.stated()
+        self.assertEqual(self.candidate(), 0)
+        table = json.loads((self.root / self.table_rel()).read_bytes())
+        self.assertEqual((table["rounds"], table["columns"], table["polynomial"]),
+                         (4, 3, "0x000000000000001d"))
+        record = self.records()[0]
+        self.assertEqual(record["refused_list"]["sha256"],
+                         evidence.sha256((self.root / evidence.REFUSED_LIST_REL).read_bytes()))
+        self.assertEqual(record["files"][0]["sha256"],
+                         evidence.sha256((self.root / self.table_rel()).read_bytes()))
+        self.assertEqual(record["status"], "pass")
+        self.assertTrue(record["checks"]["relations_hold"])
+        self.assertTrue(record["checks"]["symmetry_holds"])
+
+    def test_the_table_reads_the_rule_in_order(self):
+        self.stated()
+        self.candidate()
+        table = json.loads((self.root / self.table_rel()).read_bytes())
+        stream = self.gen.Stream(self.polynomial)
+        self.assertEqual([int(word, 16) for row in table["table"] for word in row],
+                         [stream.word(32) for _ in range(12)])
+
+    def test_a_match_with_the_list_leaves_no_table(self):
+        write(self.root, candidates.module_rel("cand-A1"), STATED_LIST)
+        self.commit("the list")
+        read = self.gen.read_table(self.polynomial, 4, 3, 32)
+        words = [word for row in read["table"] for word in row][:2]
+        self.entries.append({"name": "planted", "kind": "constant-set", "word_bits": 32, "source": "s",
+                             "words": [f"0x{word:08x}" for word in words]})
+        self.name_list(self.entries)
+        candidates.propose(self.proposal())
+        self.commit("proposed")
+        self.assertEqual(self.candidate(), 1)
+        self.assertFalse((self.root / self.table_rel()).exists())
+        record = self.records()[0]
+        self.assertEqual((record["status"], record["files"]), ("fail", []))
+        self.assertEqual(record["checks"]["refused_matches"][0]["name"], "planted")
+
+    def test_an_instance_that_is_not_the_rules_exits_2(self):
+        self.stated()
+        with mock.patch.object(self.gen, "chosen_polynomial", return_value=0x2F):
+            self.assertEqual(self.candidate(), 2)
+
+    def test_a_table_after_the_freeze_exits_2(self):
+        self.stated()
+        with mock.patch.object(evidence, "pinned_entries", return_value=[("a", "b")]):
+            self.assertEqual(self.candidate(), 2)
+
+    def test_candidate_and_variant_go_together(self):
+        self.stated()
+        self.assertEqual(self.run_gen("--candidate", "cand-A1"), 2)
+
+    def test_a_variant_that_is_no_variant_id_exits_2(self):
+        self.stated()
+        self.assertEqual(self.run_gen("--candidate", "cand-A1", "--variant", "n4"), 2)
+
+    def test_a_list_that_reads_no_constant_exits_2(self):
+        write(self.root, candidates.module_rel("cand-A1"), STATED_LIST.replace(
+            'ir.Constant(column)', 'ir.Lane(ir.lane(n, i, j, V))'))
+        self.commit("no constants")
+        self.name_list(self.entries)
+        fields = self.proposal()
+        fields["oplist_sha256"] = evidence.sha256((self.root / candidates.module_rel("cand-A1")).read_bytes())
+        candidates.propose(fields)
+        self.assertEqual(self.candidate(), 2)
+
+    # --reproduce ------------------------------------------------------------------------------
+
+    def test_a_reproduction_compares_the_file_in_memory(self):
+        self.stated()
+        self.candidate()
+        self.commit("the table")
+        path = evidence.REPO.rep / "generator-runs" / f"{self.records()[0]['record_id']}.json"
+        self.assertEqual(self.run_gen("--reproduce", str(path)), 0)
+        found = [r for _, r in evidence.iter_records("reproduction")]
+        self.assertEqual(found[0]["outcome"], "match")
+
+    def test_a_reproduction_reads_the_list_at_the_records_head(self):
+        """The list changed later, and the reproduction still reads the version the record names."""
+        self.stated()
+        self.candidate()
+        self.commit("the table")
+        self.name_list(self.entries + [{"name": "q", "kind": "polynomial", "degree": 8, "c": "0x1b",
+                                        "source": "s"}])
+        path = evidence.REPO.rep / "generator-runs" / f"{self.records()[0]['record_id']}.json"
+        self.assertEqual(self.run_gen("--reproduce", str(path)), 0)
+
+    def test_a_record_of_another_kind_cannot_be_reproduced(self):
+        path = write(self.root, f"{evidence.REP_REL}/other.json", json.dumps({"kind": "bound"}))
+        self.assertEqual(self.run_gen("--reproduce", str(path)), 2)
+
+    # the frozen files and an exploration table ------------------------------------------------
+
+    def selected(self, sizes=None) -> None:
+        pairs = sizes or [pair for pair in self.gen.ir.PAIRS]
+        variant_map = {f"cand-A1/n{n}-w{w}-R4-c{64}": f"phyco-v3/n{n}-w{w}-R4-c{64}" for n, w in pairs}
+        candidates.append({"candidate_id": "cand-A1", "event": "decision", "decision": "selected",
+                           "variant_map": variant_map})
+
+    def design(self) -> None:
+        write(self.root, evidence.DESIGN_REL, f"Polynomial 0x{self.polynomial:016x}, seed "
+                                              f"0x{self.gen.SEED:016x}.\nVersion: 0.1\n")
+        self.commit("the design")
+
+    def frozen_stub(self):
+        """Tables at every size take a while; these two sizes stand for the rest."""
+        return mock.patch.object(self.gen.ir, "PAIRS", ((4, 32), (8, 32)))
+
+    def test_the_frozen_files_and_the_sidecar(self):
+        self.stated()
+        self.selected([(4, 32), (8, 32)])
+        self.design()
+        self.commit("selected")
+        with self.frozen_stub():
+            self.assertEqual(self.run_gen(), 0)
+        text = (self.root / self.gen.MODULE_REL).read_text(encoding="utf-8")
+        self.assertIn("POLYNOMIAL = 0x000000000000001d", text)
+        self.assertIn("(4, 32): (4, (", text)
+        held = {}
+        exec(compile(text, "constants_v3", "exec"), held)
+        self.assertEqual(len(held["TABLES"][(8, 32)][1]), 4)
+        self.assertTrue((self.root / self.gen.VECTORS_REL / "constants_n4_w32.json").exists())
+        sidecar = json.loads((self.root / self.gen.SIDECAR_REL).read_bytes())
+        self.assertEqual(sidecar["entries"][0]["record_id"], self.records()[0]["record_id"])
+
+    def test_check_compares_byte_for_byte(self):
+        self.stated()
+        self.selected([(4, 32), (8, 32)])
+        self.design()
+        self.commit("selected")
+        with self.frozen_stub():
+            self.run_gen()
+            self.commit("the files")
+            self.assertEqual(self.run_gen("--check"), 0)
+            self.assertEqual(self.records("generator-check")[-1]["verdict"], "match")
+            path = self.root / self.gen.MODULE_REL
+            path.write_bytes(path.read_bytes() + b"# changed\n")
+            self.commit("changed")
+            self.assertEqual(self.run_gen("--check"), 1)
+        verdicts = sorted(r["verdict"] for r in self.records("generator-check"))
+        self.assertEqual(verdicts, ["differs", "match"])
+
+    def test_a_design_that_does_not_restate_the_rule_exits_2(self):
+        self.stated()
+        self.selected([(4, 32), (8, 32)])
+        write(self.root, evidence.DESIGN_REL, "Version: 0.1\n")
+        self.commit("selected")
+        with self.frozen_stub():
+            self.assertEqual(self.run_gen(), 2)
+
+    def test_no_selected_entry_exits_2(self):
+        self.stated()
+        self.assertEqual(self.run_gen(), 2)
+
+    def test_a_supported_size_without_a_variant_exits_2(self):
+        self.stated()
+        self.selected([(4, 32)])
+        self.design()
+        with self.frozen_stub():
+            self.assertEqual(self.run_gen(), 2)
+
+    def test_an_exploration_table_sits_in_its_own_directory(self):
+        self.stated()
+        self.selected([(4, 32)])
+        self.commit("selected")
+        self.assertEqual(self.run_gen("--exploration", "5", "32"), 0)
+        rel = f"{self.gen.EXPLORATION_REL}/constants_n5_w32.json"
+        self.assertTrue((self.root / rel).exists())
+        records = list((self.root / self.gen.EXPLORATION_REL).glob("generator-run-*.json"))
+        record = json.loads(records[0].read_bytes())
+        self.assertTrue(record["exploration"])
+        self.assertIn("refused_list", record)
+
+    def test_an_exploration_of_a_supported_size_exits_2(self):
+        self.stated()
+        self.selected([(4, 32)])
+        self.assertEqual(self.run_gen("--exploration", "4", "32"), 2)
+        self.assertEqual(self.run_gen("--exploration", "5", "4"), 2)
+
+
 class ClearLock(TempRepo):
     def stale(self, descriptor: Dict = None, hours: float = 2.0, boot: str = None):
         """A heavy-run lock whose holder is gone, taken `hours` before now."""
