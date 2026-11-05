@@ -16,20 +16,16 @@
       "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
     }
   },
-  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf data/local/004/downloads/AIS_31_Functionality_classes_for_random_number_generators_e_2024/AIS_31_Functionality_classes_for_random_number_generators_e_2024.pdf",
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched 169.pdf data/local/004/downloads/169/169.pdf",
   "config": {
     "cwd": "C:\\GIT\\PhycoWeb-PRNG",
     "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-05T16:39:24Z",
-  "design_sha256": "none",
+  "created_utc": "2026-11-05T18:09:57Z",
+  "design_sha256": "aa54d12e3dc32f284c564e82d4d219a1e8d52fe45dfedbe75217f6a5265f0c32",
   "design_sha256_kind": "raw",
-  "design_version": "none",
-  "dirty_paths": [
-    "reports/004-crypto-architecture-v3/downloads.json",
-    "reports/004-crypto-architecture-v3/versions/11d3ebf339ab3bf1b9fb6b47cae836d73f1c1fbaedb39b1a7b0163614f26cb97.json",
-    "reports/004-crypto-architecture-v3/versions/a64a9aa7e91f112cde2e5d97c5476f42dda33650197de695b6f833074b9a22d9.json"
-  ],
+  "design_version": "0.2",
+  "dirty_paths": [],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
   "entries": [
@@ -72,18 +68,23 @@
       "status": "fetched"
     },
     {
+      "bytes": 715606,
+      "date_utc": "2026-11-05T18:09:57Z",
       "environment": {
-        "approval_sha256": "6d05a1592aaa7a2881fc07ecec9e96fc97a05b215e8d6d9d78d0e9f8ec594b50",
+        "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
         "approval_sha256_kind": "canonical",
         "path": "reports/004-crypto-architecture-v3/environment-windows.json",
-        "sha256": "4ea97cdeb5febe879c9aa64b39fa13559cd5a0969b411f727705b6b51341af90",
+        "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
         "sha256_kind": "raw"
       },
       "licence": "CC BY 4.0",
+      "local_path": "data\\local\\004\\downloads\\169\\169.pdf",
       "name": "169.pdf",
+      "sha256": "32c5f17b8f4f748b885810f796b8dbf8dcda7d78ce28fa9474d69d85072956c8",
+      "sha256_kind": "raw",
       "size": "not given",
       "source": "https://eprint.iacr.org/2016/169.pdf; refused scripted requests, so the owner's browser",
-      "status": "approved"
+      "status": "fetched"
     },
     {
       "bytes": 383423,
@@ -345,8 +346,8 @@
     "sha256_kind": "raw"
   },
   "exit_status": 0,
-  "git_dirty": true,
-  "git_head": "ddc6aed26d8a2708d5b34b978cfb4071c1556657",
+  "git_dirty": false,
+  "git_head": "3dd121f04b9b9fe233ef59c6ec3c1f9b1b6c3220",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -365,12 +366,12 @@
     "ram": "68422496256 bytes",
     "system": "Windows-10-10.0.26300-SP0"
   },
-  "previous_sha256": "4ea53a0593fa4f35cb5f4cd84df62aa2210db1c1cacf54195f430917b3e2ecf9",
-  "protocol_line_sha256": "377805b057367f0e96687ebc48de2adc59db903331163e102cfea2f816268ae5",
+  "previous_sha256": "dedfe75f6c94b57eeac423bc0e9309b2cd142e114586ed05808250550ee561f8",
+  "protocol_line_sha256": "1cf77cededb678a18c804cc05042aaf3089650b16fbc6412c4370a9fa22f2241",
   "protocol_line_sha256_kind": "raw",
-  "protocol_seq": 507,
-  "record_id": "downloads-20261105T163924Z-e5696d2d",
-  "research_sha256": "6ff833834075872d36713f9abd195fc77e2967dd0ce2de426ea031ba56ea6461",
+  "protocol_seq": 510,
+  "record_id": "downloads-20261105T180957Z-4469e2b4",
+  "research_sha256": "25cd94f1fd8ee8a36f3a7aaf8f9cd7f095dee1ddd1f62b2796adafeda981f1d2",
   "research_sha256_kind": "raw",
   "review_status": "pending",
   "reviewer": "pending",

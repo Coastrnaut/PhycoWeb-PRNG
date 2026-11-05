@@ -716,7 +716,7 @@ T1 to T11 and the generic bounds of security.md §12.2 against the parameter tab
 chapter; the tests of `scripts/mode_limits_v3.py` pass on stated tables, and quickstart T1 and T2
 run with T107.
 
-- [ ] T065 [US2] Fetch the theorem papers of research R19 when this task is reached, each into its
+- [X] T065 [US2] Fetch the theorem papers of research R19 when this task is reached, each into its
   own new directory: `Daemen.pdf`, `SpongePRNG.pdf` and `169.pdf`, the last through the owner's
   browser into a folder the owner names, and the AIS 20/31 version 3.0 proposal of R19's paper
   table; record each in `$REP/downloads.json` with `python scripts/downloads.py fetched NAME PATH`
