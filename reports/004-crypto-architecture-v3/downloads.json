@@ -9,50 +9,23 @@
     },
     "protocol/evidence.py": {
       "kind": "raw",
-      "sha256": "5d50fb6c12348aa8f19f2941af6efa459ae4c4735ff282db155763266ade31e4"
+      "sha256": "431bebc928f9af047ac13eb93b7c4fec54cd5cb73744c7cb8c352c432c4286c2"
     },
     "scripts/downloads.py": {
       "kind": "raw",
       "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
     }
   },
-  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched nistspecialpublication800-90a.pdf data/local/004/downloads/nistspecialpublication800-90a/nistspecialpublication800-90a.pdf",
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched 62250016.pdf data/local/004/downloads/62250016/62250016.pdf",
   "config": {
     "cwd": "C:\\GIT\\PhycoWeb-PRNG",
     "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-05T21:19:12Z",
+  "created_utc": "2026-11-05T22:03:04Z",
   "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
   "design_sha256_kind": "raw",
   "design_version": "0.4",
-  "dirty_paths": [
-    "reports/004-crypto-architecture-v3/design-versions/60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b.md",
-    "reports/004-crypto-architecture-v3/downloads.json",
-    "reports/004-crypto-architecture-v3/research-versions/d64aa622218355de4e1338af360fc86bf8f1dc5b58671570ac9fc41a1f1120fe.md",
-    "reports/004-crypto-architecture-v3/spec-versions/e49cb3ea9a827d674c9ecf885cba3873afa892734a0015ba465ce2448fce903a.md",
-    "reports/004-crypto-architecture-v3/versions/003e9bc4b20732ecb6c295d84e6b0c7b44283dfebca1bd53718f329b8eb423d3.json",
-    "reports/004-crypto-architecture-v3/versions/05b3b103d1bea354afe316a7a306e072be83c938128cf6fa70307ce0b2b77525.json",
-    "reports/004-crypto-architecture-v3/versions/21d466a7954043ce6d381d82a3e15257a1a1de6a9c97b2ca9730fb0fd319e2f0.json",
-    "reports/004-crypto-architecture-v3/versions/261ca5d1f720b488686a9f2550e6626afd42272ca35f99bad1201072cd122f98.json",
-    "reports/004-crypto-architecture-v3/versions/2fa19c3a9763b2ab5a9d32f01e9a6f8017745f308162e03d1e462e5bc60f19d2.json",
-    "reports/004-crypto-architecture-v3/versions/4fb9be61f0a7889753c249ca198c72e347f9829c989b7f494f76b63e9c531b40.json",
-    "reports/004-crypto-architecture-v3/versions/5404c07aa1ad2741bdab042ff1c00af3fb4b222d2571e764be1e9bc93828f29d.json",
-    "reports/004-crypto-architecture-v3/versions/60f95d1e19b3caa0b6ff6b9fc253bc7a567ae5272f6c564fa8a20bd44098e29b.json",
-    "reports/004-crypto-architecture-v3/versions/8dd2270d66eb1527d01991f1d988434c6e6e972ecf621979490342d6b5083462.json",
-    "reports/004-crypto-architecture-v3/versions/8faa4581b4f7064d3ad7f56a8c232747875a87dec1ed499eb1a9c967c8fb6f5a.json",
-    "reports/004-crypto-architecture-v3/versions/8ff9e01c2fd1091cdf6f48d473b1db546de3bf918fd05f58874ebfe53a3868a6.json",
-    "reports/004-crypto-architecture-v3/versions/9669e2fa7d92e2aa5b523d19dd24fb6a60bd1e188434215ae8df1b27c674463b.json",
-    "reports/004-crypto-architecture-v3/versions/a4071f53cd5cf8b15e1abbf4f0bf35e5a8dcf34710c7d2745553a80cfff05a39.json",
-    "reports/004-crypto-architecture-v3/versions/ada6951ccbe718ae9b3c9e4712b90181c00186f693a7ee911ce1718e284587e7.json",
-    "reports/004-crypto-architecture-v3/versions/b6c17251147402951df549a555e9168152a91898f9138742c7f1eec0ced8e641.json",
-    "reports/004-crypto-architecture-v3/versions/d4a079680818ea7275d8626c351513632d05eeb59a63da9337fa8ca1e6ad95ed.json",
-    "reports/004-crypto-architecture-v3/versions/d56e57f29270fdc47f32ea1bafd084400e93474254f9785bd3b6113a7017f972.json",
-    "reports/004-crypto-architecture-v3/versions/d9ba6acbe2a6762582d44d3ca793877607f289d110e63d550e11abc335382ced.json",
-    "reports/004-crypto-architecture-v3/versions/da7c6cf14cf4dac1c6d1677a56f544a6fa95db01c46a0ea62607d85cb04173df.json",
-    "reports/004-crypto-architecture-v3/versions/e793dc595c6d2876443a16999004b3b4fc4e4680995d660f8222863f7595a16a.json",
-    "reports/004-crypto-architecture-v3/versions/ea424972aaffb7dbd97179493b8984646ed69b03300ca12224a088a401c2854e.json",
-    "reports/004-crypto-architecture-v3/versions/eb263969f0c4cedefda81366ab12cfcefe5818554f4ee25894d65d49c9613b04.json"
-  ],
+  "dirty_paths": [],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
   "entries": [
@@ -505,6 +478,8 @@
       "status": "fetched"
     },
     {
+      "bytes": 468516,
+      "date_utc": "2026-11-05T22:03:04Z",
       "environment": {
         "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
         "approval_sha256_kind": "canonical",
@@ -513,11 +488,14 @@
         "sha256_kind": "raw"
       },
       "licence": "(c) IACR, no open licence stated",
+      "local_path": "data\\local\\004\\downloads\\62250016\\62250016.pdf",
       "name": "62250016.pdf",
       "row": "Download 12",
+      "sha256": "0b9d70ccc7e0c88ccb541d9f70adf52643ea8701d4d87839f7e242e32466403d",
+      "sha256_kind": "raw",
       "size": "not given",
       "source": "https://www.iacr.org/archive/ches2010/62250016/62250016.pdf, through the owner's browser, since the site refuses scripted requests",
-      "status": "approved"
+      "status": "fetched"
     },
     {
       "bytes": 202216,
@@ -608,8 +586,8 @@
     "sha256_kind": "raw"
   },
   "exit_status": 0,
-  "git_dirty": true,
-  "git_head": "68dd106cc8c5938fdbc17f2f645dc91b40eb3e32",
+  "git_dirty": false,
+  "git_head": "8de0872396d0f8b371e70d328b6add835e84ea2b",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -628,16 +606,16 @@
     "ram": "68422496256 bytes",
     "system": "Windows-10-10.0.26300-SP0"
   },
-  "previous_sha256": "fa0a6ce5e53111cb6a02592d27fced5c342f3cd5738ed37547df043e591036c9",
-  "protocol_line_sha256": "fa0b25f0409db3154219150b65e2685fe21dbe9e469c51989941fb286fa1ef29",
+  "previous_sha256": "6e65b8b38e9263f437432963fa5b61111b9e2a93c1d344fb8d5004a67722fadf",
+  "protocol_line_sha256": "f932378b4cac7fd1410ba2fea7b14d71f395645b6a372ae62f2b60b35fc28fa2",
   "protocol_line_sha256_kind": "raw",
-  "protocol_seq": 516,
-  "record_id": "downloads-20261105T211912Z-16314183",
-  "research_sha256": "d64aa622218355de4e1338af360fc86bf8f1dc5b58671570ac9fc41a1f1120fe",
+  "protocol_seq": 518,
+  "record_id": "downloads-20261105T220304Z-85acced2",
+  "research_sha256": "63655adb8bbbf0e8a7d8eab6aaf897205b77ae52a0afa6a9437979a533f87ea4",
   "research_sha256_kind": "raw",
   "review_status": "pending",
   "reviewer": "pending",
-  "spec_sha256": "e49cb3ea9a827d674c9ecf885cba3873afa892734a0015ba465ce2448fce903a",
+  "spec_sha256": "77122dc34d256b03668426672c23ada3a34b5eef1f01b8b8faa235642c95f3a8",
   "spec_sha256_kind": "raw",
   "status": "pass",
   "variant_id": null,

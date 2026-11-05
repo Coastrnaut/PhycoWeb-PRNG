@@ -401,6 +401,25 @@ PRESENT_SBOX = (
     0xc, 0x5, 0x6, 0xb, 0x9, 0x0, 0xa, 0xd, 0x3, 0xe, 0xf, 0x8, 0x4, 0x7, 0x1, 0x2,
 )
 
+PRINTCIPHER_SBOX = (
+    0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2,
+)
+
+PRINTCIPHER_VIRTUAL = (
+    0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x1, 0x7, 0x4, 0x3, 0x6, 0x5, 0x2, 0x0, 0x3, 0x1,
+    0x6, 0x7, 0x5, 0x4, 0x2, 0x0, 0x7, 0x3, 0x5, 0x1, 0x4, 0x6, 0x2,
+)
+
+PRINTCIPHER_RC96 = (
+    0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7e, 0x7d, 0x7b, 0x77, 0x6f, 0x5f, 0x3e, 0x7c, 0x79,
+    0x73, 0x67, 0x4f, 0x1e, 0x3d, 0x7a, 0x75, 0x6b, 0x57, 0x2e, 0x5c, 0x38, 0x70, 0x61, 0x43,
+    0x06, 0x0d, 0x1b, 0x37, 0x6e, 0x5d, 0x3a, 0x74, 0x69, 0x53, 0x26, 0x4c, 0x18, 0x31, 0x62,
+    0x45, 0x0a, 0x15, 0x2b, 0x56, 0x2c, 0x58, 0x30, 0x60, 0x41, 0x02, 0x05, 0x0b, 0x17, 0x2f,
+    0x5e, 0x3c, 0x78, 0x71, 0x63, 0x47, 0x0e, 0x1d, 0x3b, 0x76, 0x6d, 0x5b, 0x36, 0x6c, 0x59,
+    0x32, 0x64, 0x49, 0x12, 0x25, 0x4a, 0x14, 0x29, 0x52, 0x24, 0x48, 0x10, 0x21, 0x42, 0x04,
+    0x09, 0x13, 0x27, 0x4e, 0x1c, 0x39,
+)
+
 GRAIN_V1_F = (80, 67, 57, 42, 29, 18, 0)
 GRAIN_128AEAD_F = (128, 121, 90, 58, 47, 32, 0)
 SOSEMANUK_Q = (8, 7, 5, 3, 0)
@@ -450,6 +469,17 @@ def sparkle_constants() -> List[int]:
 
 def counter_from_one(count: int) -> List[int]:
     return list(range(1, count + 1))
+
+
+def printcipher_counter(bits: int, count: int) -> List[int]:
+    """Section 3's shift register: from zeros, t = 1 + x_(n-1) + x_(n-2) enters at x_0, each value
+    taken after its round's update."""
+    register, out = 0, []
+    for _ in range(count):
+        fresh = 1 ^ (register >> (bits - 1) & 1) ^ (register >> (bits - 2) & 1)
+        register = (register << 1 | fresh) & ((1 << bits) - 1)
+        out.append(register)
+    return out
 
 
 # ------------------------------------------------------------------------------------ the list
@@ -586,6 +616,12 @@ def read_entries() -> List[Dict]:
         read_set("PRESENT S-box", 4, PRESENT_SBOX, "47270450.pdf, section 3: S[x]"),
         read_set("PRESENT key-schedule counter", 5, counter_from_one(PRESENT_ROUNDS),
                  "47270450.pdf, section 3: round_counter"),
+        read_set("PRINTcipher S-box", 3, PRINTCIPHER_SBOX, "62250016.pdf, section 3: S[x]"),
+        read_set("PRINTcipher virtual S-boxes", 3, PRINTCIPHER_VIRTUAL,
+                 "62250016.pdf, section 3.1: V0 to V3"),
+        read_set("PRINTcipher-48 round counter", 6, printcipher_counter(6, 48),
+                 "62250016.pdf, section 3: the shift register of 6 bits, RC1 to RC48"),
+        read_set("PRINTcipher-96 round counter", 7, PRINTCIPHER_RC96, "62250016.pdf, Table 5"),
     ]
 
 
@@ -646,7 +682,7 @@ DESIGNS = (
     Design("Rabbit", ("security",), "listed", "Rabbit"),
     Design("SOSEMANUK", ("security",), "listed", "SOSEMANUK"),
     Design("Enocoro", ("security",), "listed", "Enocoro"),
-    Design("PRINTcipher", ("strategy",), "file", "Knudsen et al., CHES 2010"),
+    Design("PRINTcipher", ("strategy",), "listed", "PRINTcipher"),
     Design("Luffa", ("strategy",), "listed", "Luffa"),
     Design("Sparx", ("strategy",), "listed", "Sparx"),
     Design("LAX", ("strategy",), "nothing",

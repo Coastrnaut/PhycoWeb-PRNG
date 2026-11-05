@@ -573,6 +573,20 @@ def present80(plain: int, key: int, sbox, counters) -> int:
     return state ^ (register >> 16)
 
 
+def printcipher48(plain: int, key: int, permutation_key: int, boxes, counters) -> int:
+    state = plain
+    for counter in counters:
+        state ^= key
+        state = sum((state >> i & 1) << (3 * i % 47 if i != 47 else 47) for i in range(48))
+        state ^= counter
+        out = 0
+        for j in range(16):
+            box = permutation_key >> (2 * j) & 3
+            out |= boxes[8 * box + (state >> (3 * j) & 7)] << (3 * j)
+        state = out
+    return state
+
+
 class Polynomials(unittest.TestCase):
 
     def test_irreducibility_on_known_cases(self):
@@ -834,6 +848,21 @@ class SetsReadFromFiles(unittest.TestCase):
         self.assertEqual(words_of("SPARKLE round constants"),
                          [0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738,
                           0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D])
+
+    def test_printcipher_tables_build_the_files_vector(self):
+        boxes = words_of("PRINTcipher virtual S-boxes")
+        counters = words_of("PRINTcipher-48 round counter")
+        self.assertEqual(printcipher48(0x4C847555C35B, 0xC28895BA327B, 0x69D2CDB6, boxes, counters),
+                         0xEB4AF95E7D37)
+
+    def test_printcipher_register_rebuilds_table_5(self):
+        self.assertEqual(refused.printcipher_counter(7, 96), words_of("PRINTcipher-96 round counter"))
+
+    def test_printcipher_s_box_is_the_first_virtual_box(self):
+        boxes = words_of("PRINTcipher virtual S-boxes")
+        self.assertEqual(words_of("PRINTcipher S-box"), boxes[:8])
+        for k in range(4):
+            self.assertEqual(sorted(boxes[8 * k:8 * k + 8]), list(range(8)))
 
     def test_present_builds_the_files_vectors(self):
         sbox, counters = words_of("PRESENT S-box"), words_of("PRESENT key-schedule counter")
