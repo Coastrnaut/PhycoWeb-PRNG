@@ -1791,6 +1791,57 @@ class ProtocolWriter(TempRepo):
         self.assertEqual(entry["readings"][0]["decision"], "kept, for the owner's reason")
         evidence.guard_protocol_log("inverse")
 
+    # the owner's written approval (spec FR-044) ----------------------------------------------
+
+    WRITTEN = {"words": "approve this change", "date": "2026-11-05", "entered_by": "agent"}
+
+    def no_terminal(self, fields: Dict) -> Dict:
+        with mock.patch("builtins.print"), \
+                mock.patch.object(evidence, "interactive_terminal", return_value=False):
+            return changelog.propose(fields)
+
+    def test_a_written_approval_needs_no_terminal_and_stays_in_the_entry(self):
+        entry = self.no_terminal(self.later(written_approval=dict(self.WRITTEN)))
+        self.assertEqual(entry["written_approval"], self.WRITTEN)
+        self.assertEqual(entry["approver"]["approval_confirmed"],
+                         evidence.later_entry_hash(entry)[:16])
+        evidence.guard_protocol_log("inverse")
+
+    def test_the_owners_words_stand_inside_the_hash_the_digits_confirm(self):
+        entry = self.no_terminal(self.later(written_approval=dict(self.WRITTEN)))
+        other = dict(entry, written_approval=dict(self.WRITTEN, words="something else"))
+        self.assertNotEqual(evidence.later_entry_hash(entry), evidence.later_entry_hash(other))
+
+    def test_each_refusal_of_a_written_approval(self):
+        count = self.lines()
+        wanted = {"no words": dict(self.WRITTEN, words=" "), "no date": dict(self.WRITTEN, date="today"),
+                  "entered": dict(self.WRITTEN, entered_by="owner"), "object": "approved"}
+        for message, written in wanted.items():
+            with self.assertRaisesRegex(Refused, message):
+                self.no_terminal(self.later(written_approval=written))
+        with self.assertRaisesRegex(Refused, "no words"):
+            self.no_terminal(self.later(written_approval={}))
+        self.assertEqual(self.lines(), count)
+
+    def test_the_guard_reads_a_written_approval_in_the_log(self):
+        with mock.patch.object(evidence, "guard_written_approval"):
+            self.no_terminal(self.later(written_approval={"words": ""}))
+        with self.assertRaisesRegex(Refused, "no words"):
+            evidence.guard_protocol_log("inverse")
+
+    def test_a_written_approval_leaves_a_reading_set_aside_to_its_decision(self):
+        count = self.lines()
+        reading = {"reading": "r", "set_aside": True, "case": "every candidate"}
+        fields = self.later(direction="settled", readings=[reading],
+                            written_approval=dict(self.WRITTEN))
+        with self.assertRaisesRegex(Refused, "interactive terminal"):
+            self.no_terminal(fields)
+        self.assertEqual(self.lines(), count)
+        decided = dict(reading, decision="kept, in the owner's words")
+        entry = self.no_terminal(dict(fields, readings=[decided]))
+        self.assertEqual(entry["readings"], [decided])
+        evidence.guard_protocol_log("inverse")
+
     # the refused list -----------------------------------------------------------------------
 
     def list_version(self, entries: List[Dict], message: str) -> str:
@@ -2404,6 +2455,32 @@ class OwnerRecord(TempRepo):
     def test_digits_that_do_not_match_write_nothing(self):
         before = (self.root / evidence.environment_rel()).read_bytes()
         self.assertEqual(self.environment(digits="0" * 16), 2)
+        self.assertEqual((self.root / evidence.environment_rel()).read_bytes(), before)
+
+    def no_terminal(self, *argv) -> int:
+        from scripts import owner_record
+        write(self.root, "requirements.txt", self.PINS)
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), \
+                mock.patch.object(owner_record, "pinned_python", return_value="3.10.11"):
+            return owner_record.main(list(argv))
+
+    def test_the_owners_written_words_stand_in_for_the_terminal_and_stay_in_the_record(self):
+        code = self.no_terminal("environment", "--platform", evidence.platform_name(), "--by",
+                                "owner", "--written-approval", "write the new record")
+        self.assertEqual(code, 0)
+        record = self.stored()
+        written = record["written_approval"]
+        self.assertEqual(written["words"], "write the new record")
+        self.assertEqual(written["entered_by"], "agent")
+        self.assertEqual(record["approval_confirmed"], evidence.approval_hash(record)[:16])
+        tampered = dict(record, written_approval=dict(written, words="other"))
+        self.assertNotEqual(evidence.approval_hash(tampered), evidence.approval_hash(record))
+
+    def test_empty_written_words_write_nothing(self):
+        before = (self.root / evidence.environment_rel()).read_bytes()
+        code = self.no_terminal("environment", "--platform", evidence.platform_name(), "--by",
+                                "owner", "--written-approval", " ")
+        self.assertEqual(code, 2)
         self.assertEqual((self.root / evidence.environment_rel()).read_bytes(), before)
 
     def test_markers_choose_the_pins_of_the_running_python(self):

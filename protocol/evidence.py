@@ -761,6 +761,8 @@ def guard_protocol_log(kind: str) -> Tuple[Any, Any]:
         for reading in readings_of(entry):
             if reading.get("set_aside") and not reading.get("decision"):
                 raise Refused(f"entry {entry.get('seq')}: a reading set aside holds no decision")
+        if "written_approval" in entry:
+            guard_written_approval(entry["written_approval"])
         if "repair" in entry:
             guard_repair_list(entry)
     last, raw = entries[-1]
@@ -1363,7 +1365,8 @@ def interactive_terminal() -> bool:
 def confirm_digits(digest: str) -> str:
     """The first 16 hex digits of the hash, which the owner types at an interactive terminal."""
     if not interactive_terminal():
-        raise Refused("the approval step needs an interactive terminal: it is the owner's own act")
+        raise Refused("the approval step needs an interactive terminal, or the owner's written "
+                      "approval in what it approves")
     try:
         typed = input("type its first 16 hex digits: ").strip()
     except EOFError:
@@ -1373,11 +1376,36 @@ def confirm_digits(digest: str) -> str:
     return typed
 
 
-def approval_step(digest: str) -> str:
-    """An owner's own act, which the agent never performs: it prints the hash, kind `canonical`,
-    and writes nothing unless the owner types its first 16 digits (spec FR-044; REP-083)."""
+def written_approval(words: str) -> Dict:
+    """The owner's written approval as a record holds it: the owner's words, their date and who
+    entered the digits, so that the record shows who acted (spec FR-044)."""
+    return {"words": words, "date": utc_now()[:10], "entered_by": "agent"}
+
+
+def guard_written_approval(written: Any) -> None:
+    """Refuses a written approval that does not hold the owner's words, a date and `entered_by`
+    `agent` (spec FR-044; data-model section 18)."""
+    if not isinstance(written, dict):
+        raise Refused("written_approval is no object")
+    words = written.get("words")
+    if not isinstance(words, str) or not words.strip():
+        raise Refused("written_approval holds no words of the owner")
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(written.get("date"))):
+        raise Refused("written_approval holds no date")
+    if written.get("entered_by") != "agent":
+        raise Refused("written_approval does not say that the agent entered the digits")
+
+
+def approval_step(digest: str, written: Optional[Dict] = None) -> str:
+    """The step that ends every approval: it prints the hash, kind `canonical`, and writes nothing
+    unless the owner types its first 16 digits, or unless `written` holds the owner's written
+    approval, given before this step and naming what it approves, when the writer takes those
+    digits itself (spec FR-044; REP-083). The agent never decides an approval."""
     print(f"approval hash (canonical): {digest}")
-    return confirm_digits(digest)
+    if written is None:
+        return confirm_digits(digest)
+    guard_written_approval(written)
+    return digest[:16]
 
 
 # ------------------------------------------------------------------------------- the design file

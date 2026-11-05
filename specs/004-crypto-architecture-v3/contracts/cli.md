@@ -537,7 +537,7 @@ owner types its first 16 hex digits; it writes `d4/tie-choice.json` with the cho
 `seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash differs from
 `tie.json`'s, if no tie exists, if a tie-break decided it (`decided_by` other
 than `owner`) or if a choice exists; `tie.json` is never rewritten. Running
-`--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
+`--choose` is the owner's own act, which the agent performs only on the owner's written approval (spec FR-043, FR-044).
 
 ## `scripts/round_rule.py`
 
@@ -608,7 +608,7 @@ and the owner types its first 16 hex digits; it writes `freeze/selection-tie-cho
 record has no tie or if a choice for it exists. A choice binds only the record whose hash it names:
 a tie in a later record needs a new choice and a row of its own, "Selection tie
 <k>", which `design_freeze.py create` reads as it reads "Selection tie".
-Running `--choose` is the owner's own act, which the agent never performs (spec FR-043, FR-044).
+Running `--choose` is the owner's own act, which the agent performs only on the owner's written approval (spec FR-043, FR-044).
 `round-rule.json` keeps its fixed name: before it changes, `protocol/evidence.py` keeps its current
 content as `versions/<sha256>.json` beside it, and the new content holds `previous_sha256` (data
 model introduction). A selection record is never rewritten. `--decide`, run by the agent after the
@@ -848,7 +848,7 @@ the owner, prints `draft_sha256` and exits 2 unless standard input is an interac
 the owner types its first 16 hex digits; it then changes `freeze_status` from `draft` to `approved`,
 adds `approved_by`, `approved_utc`, `approval_wording` and `approval_confirmed`, and changes nothing
 else, the record keeping the `record_id` that `create` gave it (REP-092). Steps (1), (3)
-and (4) are the owner's own acts, which the agent never performs (FR-043).
+and (4) are the owner's own acts, which the agent performs only on the owner's written approval (FR-043, FR-044).
 `validate` recomputes `draft_sha256` and every hash
 and checks the format rules; it exits 1 if anything but the approval fields changed or a hash does
 not match, and 2 while `freeze_status` is `draft` (data model §13). It has no `--reproduce`: the
@@ -980,12 +980,14 @@ mode (spec FR-061).
 ## `scripts/owner_record.py`
 
 ```text
-owner_record.py environment --platform windows|wsl --by NAME   # $REP/environment-<platform>.json
+owner_record.py environment --platform windows|wsl --by NAME [--written-approval WORDS]
+                                                               # $REP/environment-<platform>.json
 owner_record.py owner-provided --known KNOWN_ID --value TEXT --source TEXT --words TEXT --by NAME
+                               [--written-approval WORDS]
 ```
 
-Run by the owner only: each mode is an owner's own act, outside the standing authorization for local
-commits, which the agent never performs (spec FR-044). `environment` records the running environment
+Each mode is an owner's own act, outside the standing authorization for local
+commits, which the agent performs only on the owner's written approval (spec FR-044). `environment` records the running environment
 as research R1 lists it, the one write the Environment guard admits while the running environment
 differs from the platform's record in force or none is in force, checked against R1 and the pins of
 `requirements.txt` for that platform instead, exit 2, writing nothing, on any difference, its
@@ -1006,7 +1008,9 @@ canonical JSON without the approval fields, `approved_by`, `approved_utc` and
 `approval_confirmed`, an environment record's `record_id` included, which is computed
 first, without them (data model introduction; REP-083, REP-092), and exits 2,
 writing nothing, unless standard input is an interactive terminal and the owner
-types its first 16 hex digits; it then writes the record or entry with `approved_by`, `approved_utc`
+types its first 16 hex digits, or `--written-approval` holds the owner's words, which the record or
+entry keeps as `written_approval`, inside that hash, with their date and `entered_by` `agent`
+(data model §18); it then writes the record or entry with `approved_by`, `approved_utc`
 and `approval_confirmed`, keeping the fixed-name file's current content under `versions/` first
 (data model introduction). The owner then adds and commits its Review & Approval row, "Environment
 record <n>" or "Owner-provided value <n>", with that hash, which the Environment guard and
@@ -1108,15 +1112,17 @@ fields (data model §18) in place of `rule`, `old_text`, `new_text`, `direction`
 `last_record_id` and `results_known`, goes through the same approval step and is refused without
 them; the reading under which it too needs a `direction`, under which no chain of this log
 could be repaired, is part of the one that PRO-076's entry marks `set_aside`
-(PRO-076, PRO-079). Each then ends in the approval step, an owner's own act that
-the agent never performs (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
+(PRO-076, PRO-079). Each then ends in the approval step, which the agent performs
+only on the owner's written approval (spec FR-044): it prints the SHA-256 of the entry, or of the first entries
 together, taken over one canonical JSON array of the first entries in log order, or over the later
 entry alone, each entry without its approval field, `approver` whole, and
-without `prev_sha256`, both filled once the owner has typed the digits, a hash
+without `prev_sha256`, both filled once the digits are entered, a hash
 of kind `canonical` (data model §1, §18; REP-094), `create` printing also
 their number, counted from the lists (PRO-069), and appends nothing unless
-standard input is an interactive terminal and the owner types its first 16 hex digits, which
-`approver` records as `approval_confirmed`, and which the guard "Protocol log"
+standard input is an interactive terminal and the owner types its first 16 hex digits, or a later
+entry holds `written_approval`, the owner's words, their date and `entered_by` `agent` (data
+model §18), where the writer takes those digits itself, and exits 2 on one that lacks any of the
+three. `approver` records the digits as `approval_confirmed`, which the guard "Protocol log"
 checks for every entry, the last line included (Guards, above; PRO-077).
 After the approval step `create` writes the first entries to a temporary
 file beside the log's path and renames it to that path once all are written,

@@ -4,10 +4,11 @@
     protocol_change.py create          the first entries, from checklist-choices.md
     protocol_change.py propose FILE    one later entry, its fields in FILE
 
-`create` and `propose` end in the approval step, an owner's own act that the agent never performs:
-it prints the approval hash and appends nothing unless standard input is an interactive terminal and
-the owner types its first 16 hex digits. It writes log entries and no record, and so has no
---reproduce mode.
+`create` and `propose` end in the approval step, which the agent performs only on the owner's written
+approval (spec FR-044): it prints the approval hash and appends nothing unless standard input is an
+interactive terminal and the owner types its first 16 hex digits, or the entry holds
+`written_approval`, the owner's words with their date. It writes log entries and no record, and so
+has no --reproduce mode.
 """
 import argparse
 import json

@@ -3,7 +3,8 @@
 
 `check` makes FR-044's comparison and writes nothing; `create` writes the first entries, from the
 lists "Rows that change the protocol", and `propose` one later entry, each ending in the approval
-step, an owner's own act that the agent never performs. Every refusal exits 2 and appends nothing.
+step, which the agent performs only on the owner's written approval (spec FR-044). Every refusal
+exits 2 and appends nothing.
 
 This module makes no security claim.
 """
@@ -449,9 +450,11 @@ def create() -> int:
 
 def later_step(entry: Dict) -> Dict:
     """The approval step of one later entry: the hash covers it without `approver` and
-    `prev_sha256`, both filled once the owner has typed the digits."""
+    `prev_sha256`, both filled once the digits are entered, by the owner at a terminal or, for an
+    entry that holds `written_approval`, by the writer (spec FR-044)."""
     digest = evidence.later_entry_hash(entry)
-    return dict(entry, approver=approver(evidence.approval_step(digest)))
+    digits = evidence.approval_step(digest, entry.get("written_approval"))
+    return dict(entry, approver=approver(digits))
 
 
 def decide_readings(fields: Dict) -> Dict:

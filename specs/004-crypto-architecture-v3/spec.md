@@ -2830,7 +2830,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
   R10's list, in a new version reviewed again, or the feature stops (Edge Cases).
   Steps (1), (3) and (4) are the owner's own acts: like a constitution amendment, they fall outside
   the standing authorization for local commits (constitution 1.3.0, Principle IX), and the agent
-  never performs them, even when asked in general terms. The tie choices are owner's own acts of the
+  performs them only on the owner's written approval (FR-044). The tie choices are owner's own acts of the
   same kind: running `d4_choice.py --choose` or `round_rule.py --choose`, each of which prints the
   tie record's SHA-256 and refuses unless standard input is an interactive terminal and the owner
   types its first 16 hex digits, kept in the choice record as `choice_confirmed` (data-model §8,
@@ -2871,7 +2871,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   `$REP/reproductions/`.
 - **FR-044**: After spec approval the pre-registered design protocol MAY only become stricter,
   and every change MUST be recorded with its reason before any result it affects, with the
-  owner's recorded approval: the agent may propose a stricter change but not make it. Settling a
+  owner's recorded approval: the agent may propose a stricter change, and it carries one out only on
+  the owner's written approval, as below. Settling a
   case the protocol leaves undefined is a change of the same kind: allowed only before any
   result it affects exists, with the owner's approval, recorded in the change log, and never
   looser than any reading of the existing text. The plan's rules for an exact D4 tie, for no
@@ -2976,14 +2977,22 @@ freeze hashes and the baseline manifest; run the claim-register test.
   dies leaves no partial log, only the lock, which `scripts/clear_lock.py`
   removes (PRO-065). A round answered after the log exists adds entries the
   usual way, proposed by the agent and approved by the owner. Approving a
-  change is the owner's own act, outside the standing authorization like the freeze's steps (1), (3)
-  and (4), the tie choices, the environment records and the values the owner provides, each written
-  by `scripts/owner_record.py`, which the owner runs, with a Review & Approval row of its own
+  change is the owner's own decision, outside the standing authorization like the freeze's steps (1),
+  (3) and (4), the tie choices, the environment records and the values the owner provides, each
+  written by `scripts/owner_record.py`, with a Review & Approval row of its own
   (research R1, R19), and every Review & Approval decision that opens a guard (FR-043; section
-  "Review & Approval"), and the agent never performs it, even when asked in
-  general terms: the change log's approval step prints the SHA-256 of what is approved and refuses
-  unless standard input is an interactive terminal and the owner types its first 16 hex digits, and
-  the entry records that confirmation (data-model §18). Every commit carries the owner's git
+  "Review & Approval"). The agent never makes that decision, and never takes it from a general
+  request, a question, a notification or its own recommendation: only the owner's written approval,
+  given before the act and naming what it approves, decides it. After that approval the agent
+  may carry out the act's steps for the owner, running its script, entering its hex digits and
+  writing its row, as the owner instructed on 2026-11-05, and what the act writes says so: a row in
+  its notes, a change-log entry and a record of `scripts/owner_record.py` in `written_approval`, the
+  owner's words with their date and `entered_by` `agent` (data-model §18). Each approval step prints
+  the SHA-256 of what is approved and refuses unless standard input is an interactive terminal and
+  the owner types its first 16 hex digits, or what it approves holds `written_approval`, where the
+  writer takes those digits itself, and the entry records that confirmation (data-model §18). Each
+  push, tag, release and publication still needs the owner's word for that action, and each download
+  the owner's permission for that file. Every commit carries the owner's git
   identity and no AI co-author line, so the history cannot show who acted, and the owner's review at
   each ⛔ gate lists these acts since the last gate. A stricter change applies to every candidate,
   those already evaluated included. It is applied first by recomputing verdicts from saved outputs;

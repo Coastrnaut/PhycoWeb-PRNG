@@ -819,7 +819,7 @@ terminal and the owner types its first 16 hex digits; it writes `d4/tie-choice.j
 choice, who, when, `seen_sha256` and `choice_confirmed`, the digits typed, and exits 2 if that hash
 differs from `tie.json`'s, if no tie exists, if a tie-break decided it or if a
 choice exists, so the choice never changes. Running it is the owner's own
-act, which the agent never performs (spec FR-043). `tie.json` stays as the
+act, which the agent performs only on the owner's written approval (spec FR-043, FR-044). `tie.json` stays as the
 script wrote it, and the Review & Approval row "D4 tie" holds, where the owner chose, the date, the
 choice and both records' SHA-256. The design rationale's Alternatives chapter cites these records by
 path and SHA-256 (spec FR-034).
@@ -891,7 +891,7 @@ its first 16 hex digits; it writes `freeze/selection-tie-choice.json`, or
 `freeze/selection-<k>-tie-choice.json` for `selection-<k>.json`, with the choice, who, when,
 `seen_sha256` and `choice_confirmed`, and exits 2 if that hash differs from the record's, if the
 record has no tie or if a choice for it exists, so the choice never changes. Running it
-is the owner's own act, which the agent never performs (spec FR-043). Every selection record stays
+is the owner's own act, which the agent performs only on the owner's written approval (spec FR-043, FR-044). Every selection record stays
 as the script wrote it, and the design rationale's Alternatives chapter cites each with its tie
 choice (spec FR-034). A choice binds only the record whose hash it names, so a tie in a later
 record needs a new choice, and the Review & Approval row "Selection tie", or "Selection tie <k>" for
@@ -1163,7 +1163,7 @@ row's approval (PRO-072); (2) `design_freeze.py create` runs with `git_dirty`
 false, records that commit as `owner_commit` and writes the record with `freeze_status` `draft`;
 (3) the owner runs `design_freeze.py approve --by NAME --wording TEXT`; (4) the owner commits the
 record; (5) `validate` exits 0. Steps (1), (3) and (4) are the owner's own acts, which the agent
-never performs (spec FR-043). Before step (1), the agent writes the owner design review's review
+performs only on the owner's written approval (spec FR-043, FR-044). Before step (1), the agent writes the owner design review's review
 entries with `provenance.py review`, on the owner's word, after the commit that records that
 review's approval, leaving them in the working tree, so that the owner's commit of step (1) holds
 them and the frozen provenance log carries the status FR-034 keeps there, and `create` reads the
@@ -1551,7 +1551,8 @@ every append takes `data/log-append.lock` and checks the chain first (R16).
 | `reason` | why it changed; for an entry from the checklist answers, its row ID in checklist-choices.md; for an entry made from a place the owner confirmed, the owner's confirmation with its reason, naming the commit (PRO-064) |
 | `direction` | `stricter`, in the rule's stated stricter direction, the one spec FR-044's list gives the rule's heading of the lists "Rows that change the protocol" (PRO-066), or `settled`: a case the protocol leaves open, fixed only before any result it affects exists, with the owner's approval, and never looser than any reading of the existing text (FR-044); under a rule whose direction is "no change", `settled`, with its `readings`, whatever the row's kind; `settled` too, with its `readings`, for a rule whose change sets aside a reading of the old text (`readings`; PRO-079); for a first entry, per rule in `rules` |
 | `readings` | for a `settled` entry, each reading of the existing text compared, with why the new text is no looser than it, or, for a reading that the new text sets aside, admitting what that reading refuses, the mark `set_aside`, with the case under which the old text fails, every candidate, every correct tool or a write the protocol needs, and the owner's decision on it, the change kept, with the owner's reason, as a change spec FR-044's words do not allow, or the old text restored (PRO-079); empty for a `stricter` entry, which sets aside no reading |
-| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256 that the owner typed at the approval step (below), `approver` and `prev_sha256` being left out of the hash it confirms (REP-094); checked for every entry, the first entries' together and each later one's alone, the last line included, by the guard "Protocol log", and by `recheck_004.py`, which applies only entries whose digits match (PRO-077) |
+| `approver` | the owner, with the approval's date, and `approval_confirmed`: the first 16 hex digits of the approved SHA-256, typed by the owner at the approval step or, in an entry that holds `written_approval`, taken by the writer (below), `approver` and `prev_sha256` being left out of the hash it confirms (REP-094); checked for every entry, the first entries' together and each later one's alone, the last line included, by the guard "Protocol log", and by `recheck_004.py`, which applies only entries whose digits match (PRO-077) |
+| `written_approval` | for a later entry the owner approved in writing, and absent otherwise: `words`, the owner's words, which name what they approve, `date`, and `entered_by`, `agent`, so that the entry shows who entered the digits (spec FR-044); it stands inside the hash that `approval_confirmed` confirms, and the writer and the guard "Protocol log" exit 2 on one that lacks any of the three |
 | `environment` | the platform's environment record in force when the entry was written, named as in section 1 (REP-082) |
 | `last_record_id` | the last evidence record ID that existed when the change was made, so that "before any result it affects" can be checked; `none` while no evidence record exists |
 | `results_known` | the results known at the time, by record ID, and for each candidate already evaluated, the verdicts recomputed under the new rule (R7); empty while no result exists |
@@ -1648,14 +1649,16 @@ it; and the guard "Protocol log" exits 2 while a reading marked `set_aside` hold
 PRO-065, PRO-068, PRO-071, REP-063 and REP-085, from earlier rounds, the last two added by the owner
 on 2026-11-03, and of SEC-093, RAT-086, ANA-087, PRO-076, REP-100 and REP-101, from the tenth
 re-run, with every other entry of that kind that the agent finds before the log is created
-(PRO-079). Approving an entry is the owner's own act, which the agent never performs (spec
+(PRO-079). Approving an entry is the owner's own decision, which the agent never makes, and the
+agent carries out its step only on the owner's written approval (spec
 FR-044): the writer's approval step prints the SHA-256 of the entry, or of the first entries
 together when the log is created, taken over one canonical JSON array of the first entries in log
 order, or over the later entry alone, each entry without its approval field, `approver` whole, and
-without `prev_sha256`, both filled once the owner has typed the digits, `approver` with the owner,
+without `prev_sha256`, both filled once the digits are entered, `approver` with the owner,
 the date and `approval_confirmed`, and `prev_sha256` chaining each line to the one before as stored,
 a hash of kind `canonical` (section 1, Hashes; REP-094), and appends nothing unless standard input
-is an interactive terminal and the owner types its first 16 hex digits; each entry records that
+is an interactive terminal and the owner types its first 16 hex digits, or the entry holds
+`written_approval`, where the writer takes those digits itself; each entry records that
 confirmation in `approver`, and the guard "Protocol log" recomputes that hash for every entry, from
 the first entries together for theirs and from each later entry alone for its own, and checks each
 one's `approval_confirmed` against its first 16 digits, exit 2 otherwise, the last line included,

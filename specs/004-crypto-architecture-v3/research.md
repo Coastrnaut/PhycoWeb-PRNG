@@ -2077,9 +2077,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     text; the readings compared for a settled case; the approver, with the confirmation of the
     approval step, the last record ID that existed before it, so that "before any result it affects"
     can be checked, and the results known at the time (FR-044). Approving an entry is the owner's
-    own act, which the agent never performs: the writer's approval step prints the SHA-256 of the
+    own decision, which the agent never makes, and the agent carries out its step only on the owner's
+    written approval (FR-044): the writer's approval step prints the SHA-256 of the
     entry, or of the first entries together when the log is created, and appends nothing unless
-    standard input is an interactive terminal and the owner types its first 16 hex digits; the entry
+    standard input is an interactive terminal and the owner types its first 16 hex digits, or the
+    entry holds `written_approval`; the entry
     records that confirmation (data-model §18). The spec's Clarifications point to it.
   - **A broken chain** is repaired only with the owner's go-ahead, recorded as a row "Log
     repair <n>" of the spec's Review & Approval table that names the log, the `seq` of the break and
@@ -2136,7 +2138,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     REP-093), and every hash, exits 0. Dirty means a tracked file modified or an
     untracked file not ignored. Ignored files, the locks and the local-only outputs, do not count,
     and local-only outputs are in the record by SHA-256 anyway. Steps (1), (3) and (4) are the
-    owner's own acts, which the agent never performs (spec FR-043). The record hashes every module
+    owner's own acts, which the agent performs only on the owner's written approval (spec FR-043, FR-044). The record hashes every module
     of the repository that a frozen script imports, directly or through another module,
     `protocol/candidates.py` among them and, where a frozen script imports them, the log writers
     `protocol/changelog.py` and `protocol/provenance.py`, which `create` lists from the scripts'

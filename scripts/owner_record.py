@@ -1,14 +1,15 @@
 """Feature 004: the owner's own records (contracts/cli.md; research R1, R19; REP-082, REP-083).
 
-    owner_record.py environment --platform windows|wsl --by NAME
+    owner_record.py environment --platform windows|wsl --by NAME [--written-approval WORDS]
     owner_record.py owner-provided --known KNOWN_ID --value TEXT --source TEXT --words TEXT
-                                   --by NAME
+                                   --by NAME [--written-approval WORDS]
 
-Run by the owner only: each mode is an owner's own act, which the agent writes and tests and never
-runs (spec FR-044). Each prints the approval hash of what it writes, kind `canonical`, and writes
-nothing unless standard input is an interactive terminal and the owner types its first 16 hex
-digits. The owner then adds and commits its Review & Approval row with that hash. It has no
---reproduce: each mode records an owner's act, which a later run cannot regenerate.
+Each mode is an owner's own act, which the agent performs only on the owner's written approval,
+given before the act and quoted in --written-approval (spec FR-044). Each prints the approval hash of
+what it writes, kind `canonical`, and writes nothing unless standard input is an interactive
+terminal and the owner types its first 16 hex digits, or --written-approval holds the owner's words,
+which the record keeps. Its Review & Approval row, with that hash, is then added and committed. It
+has no --reproduce: each mode records an owner's act, which a later run cannot regenerate.
 """
 import argparse
 import re
@@ -84,7 +85,13 @@ def compare_with_pins(platform: str, snapshot: Dict) -> Dict:
     return {"python": snapshot["python"], "packages": pins}
 
 
-def write_environment(platform: str, by: str, argv: List[str]) -> int:
+def held(written: Optional[Dict]) -> Dict:
+    """The field that keeps the owner's written approval, inside the hash it confirms."""
+    return {} if written is None else {"written_approval": written}
+
+
+def write_environment(platform: str, by: str, argv: List[str],
+                      written: Optional[Dict] = None) -> int:
     if platform != evidence.platform_name():
         raise Refused(f"this is {evidence.platform_name()}, not {platform}")
     snapshot = evidence.snapshot()
@@ -92,11 +99,11 @@ def write_environment(platform: str, by: str, argv: List[str]) -> int:
     run = evidence.Run("environment", directory="", file_name=f"environment-{platform}.json",
                        fixed=True, argv=argv, code_files=CODE, writes_evidence=False, analyst=by)
     with run:
+        fields = {"snapshot": snapshot, "compared": compared, "inputs": NONE, "outputs": NONE}
         record = run.prepare("pass", assertions=[{"check": "research R1 and the pins",
                                                   "outcome": "pass"}],
-                             fields={"snapshot": snapshot, "compared": compared, "inputs": NONE,
-                                     "outputs": NONE})
-        digits = evidence.approval_step(evidence.approval_hash(record))
+                             fields=dict(fields, **held(written)))
+        digits = evidence.approval_step(evidence.approval_hash(record), written)
         path = run.write(record, {"approved_by": by, "approved_utc": evidence.utc_now(),
                                   "approval_confirmed": digits})
     print(f"{evidence.rel_to_repo(path)} written; add its row \"Environment record <n>\" with that "
@@ -104,7 +111,8 @@ def write_environment(platform: str, by: str, argv: List[str]) -> int:
     return evidence.EXIT_OK
 
 
-def write_owner_provided(args: argparse.Namespace, argv: List[str]) -> int:
+def write_owner_provided(args: argparse.Namespace, argv: List[str],
+                         written: Optional[Dict] = None) -> int:
     run = evidence.manifest_run(argv, CODE)
     with run:
         entry = {"name": f"owner-provided: {args.known}", "status": "owner-provided",
@@ -112,7 +120,8 @@ def write_owner_provided(args: argparse.Namespace, argv: List[str]) -> int:
                  "date_utc": evidence.utc_now(), "value": args.value,
                  "value_sha256": evidence.sha256(args.value.encode("utf-8")),
                  "environment": run.environment}
-        digits = evidence.approval_step(evidence.approval_hash(entry))
+        entry.update(held(written))
+        digits = evidence.approval_step(evidence.approval_hash(entry), written)
         entry.update({"approved_by": args.by, "approved_utc": evidence.utc_now(),
                       "approval_confirmed": digits})
         evidence.write_manifest(run, evidence.read_manifest() + [entry])
@@ -127,16 +136,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     environment = modes.add_parser("environment")
     environment.add_argument("--platform", required=True, choices=("windows", "wsl"))
     environment.add_argument("--by", required=True)
+    environment.add_argument("--written-approval")
     provided = modes.add_parser("owner-provided")
     for name in ("--known", "--value", "--source", "--words", "--by"):
         provided.add_argument(name, required=True)
+    provided.add_argument("--written-approval")
     args = parser.parse_args(argv)
     command = ["scripts/owner_record.py"] + list(argv if argv is not None else sys.argv[1:])
 
     def run() -> int:
+        given = args.written_approval
+        written = None if given is None else evidence.written_approval(given)
         if args.mode == "environment":
-            return write_environment(args.platform, args.by, command)
-        return write_owner_provided(args, command)
+            return write_environment(args.platform, args.by, command, written)
+        return write_owner_provided(args, command, written)
 
     return evidence.main_guard(run)
 
