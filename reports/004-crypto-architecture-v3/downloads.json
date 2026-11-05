@@ -16,17 +16,24 @@
       "sha256": "486d2d844a00f71fc4572ceb84827dd7e48bc9d96976f67f579206aaf76f0d34"
     }
   },
-  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched 47270450.pdf data/local/004/downloads/47270450/47270450.pdf",
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/downloads.py fetched 978-3-642-05445-7_16.pdf 'data\\local\\004\\downloads\\978-3-642-05445-7_16\\978-3-642-05445-7_16.pdf'",
   "config": {
     "cwd": "C:\\GIT\\PhycoWeb-PRNG",
     "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
   },
-  "created_utc": "2026-11-04T20:38:24Z",
+  "created_utc": "2026-11-05T02:30:25Z",
   "design_sha256": "none",
   "design_sha256_kind": "raw",
   "design_version": "none",
   "dirty_paths": [
-    "reports/004-crypto-architecture-v3/projections/projection-20261104T203446Z-b0f2f434.json"
+    "reports/004-crypto-architecture-v3/downloads.json",
+    "reports/004-crypto-architecture-v3/projections/projection-20261105T022520Z-1325a03d.json",
+    "reports/004-crypto-architecture-v3/spec-versions/deb9087c531dc1051ad0b2aed5b9c3f2b86764d90b9725e17a9e08eef2320bf2.md",
+    "reports/004-crypto-architecture-v3/versions/01250d2eb9699b83694582ed192d56366f957d403bbd204b58eb3ff6c82b70f7.json",
+    "reports/004-crypto-architecture-v3/versions/150bb976c5b0b3109ed9586ec6818ceca30cae52eec3e6a64e9c2555b0d774a6.json",
+    "reports/004-crypto-architecture-v3/versions/d0c0e7d59d329b07af6a444082a5c719804ec677af0d8e5c9e3fc5070c70ebcf.json",
+    "reports/004-crypto-architecture-v3/versions/d4a33978606f7fa66824f786c4cf1a09399e64044747ae3df9e3e95faff63ef1.json",
+    "reports/004-crypto-architecture-v3/versions/d65e1a7c51d63cde7b1c77e59a215ee2d59383302578c626e9c32daee97a3686.json"
   ],
   "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
   "ended_outside": "none",
@@ -258,6 +265,66 @@
       "size": "45,571 bytes",
       "source": "PyPI",
       "status": "fetched"
+    },
+    {
+      "bytes": 296979,
+      "date_utc": "2026-11-05T02:30:22Z",
+      "environment": {
+        "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+        "sha256_kind": "raw"
+      },
+      "licence": "CC BY 4.0",
+      "local_path": "data\\local\\004\\downloads\\409\\409.pdf",
+      "name": "409.pdf",
+      "row": "Download 2",
+      "sha256": "825d3c0836bb24f5448b67ef2a35828601de40302df456c9cde9767a7e3489f3",
+      "sha256_kind": "raw",
+      "size": "not given",
+      "source": "https://eprint.iacr.org/2016/409.pdf, through the owner's browser, since the site refuses scripted requests",
+      "status": "fetched"
+    },
+    {
+      "bytes": 156128,
+      "date_utc": "2026-11-05T02:30:23Z",
+      "environment": {
+        "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+        "sha256_kind": "raw"
+      },
+      "licence": "CC BY 4.0",
+      "local_path": "data\\local\\004\\downloads\\408\\408.pdf",
+      "name": "408.pdf",
+      "row": "Download 3",
+      "sha256": "4ce6efc9e712f422b6f0fbe523968b1523fc494beac89d29eeeb84ddb156a2e3",
+      "sha256_kind": "raw",
+      "size": "not given",
+      "source": "https://eprint.iacr.org/2007/408.pdf, through the owner's browser, since the site refuses scripted requests",
+      "status": "fetched"
+    },
+    {
+      "bytes": 683786,
+      "date_utc": "2026-11-05T02:30:25Z",
+      "environment": {
+        "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+        "approval_sha256_kind": "canonical",
+        "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+        "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+        "sha256_kind": "raw"
+      },
+      "licence": "(c) Springer, no open licence stated",
+      "local_path": "data\\local\\004\\downloads\\978-3-642-05445-7_16\\978-3-642-05445-7_16.pdf",
+      "name": "978-3-642-05445-7_16.pdf",
+      "row": "Download 4",
+      "sha256": "7fcb93d257f6acd854aa07346e507d12d126b42b3cb3f571fb59941debf4815b",
+      "sha256_kind": "raw",
+      "size": "683,786 bytes",
+      "source": "https://rd.springer.com/content/pdf/10.1007/978-3-642-05445-7_16.pdf",
+      "status": "fetched"
     }
   ],
   "environment": {
@@ -269,7 +336,7 @@
   },
   "exit_status": 0,
   "git_dirty": true,
-  "git_head": "28cecdc0fa6d5156903e9b57ab21461ad77253fc",
+  "git_head": "d21bae1367fe7a96c03bc7b9813f27c6d68d5b25",
   "heavy_run": false,
   "hours": "none",
   "inputs": "none",
@@ -288,16 +355,16 @@
     "ram": "68422496256 bytes",
     "system": "Windows-10-10.0.26300-SP0"
   },
-  "previous_sha256": "7328060c8c576fcec0fb0f6d0d6eb585bc2dcfd3268a7a9be684217a4c85408f",
-  "protocol_line_sha256": "a0e8655dae7118aae79ba1af674cad8abbd487ff9beafe65db5ab0ec3cc585f3",
+  "previous_sha256": "8c52714b92733ce55dea719b15d9095bb1a6cf0e9b026dc0eb57aeda4e3d976c",
+  "protocol_line_sha256": "47cac3011c5e5454fc5413bfb618562632a05ccb37026fb2b6f4a58b85df2a13",
   "protocol_line_sha256_kind": "raw",
-  "protocol_seq": 498,
-  "record_id": "downloads-20261104T203824Z-2b49b987",
-  "research_sha256": "b453b0f4ef86ffca4b7f76e169c58e22f524d6076dc3aa1f9cf2da19e54350b3",
+  "protocol_seq": 504,
+  "record_id": "downloads-20261105T023025Z-8743bf42",
+  "research_sha256": "fa6797d57bed09cceea08d2c1fe143bff98552d864b1e6308f026ea096af5bf2",
   "research_sha256_kind": "raw",
   "review_status": "pending",
   "reviewer": "pending",
-  "spec_sha256": "e9565d1cb0653f977a045c257bcd3eaf5d5134d6f8e4f0739de0f3c892923133",
+  "spec_sha256": "deb9087c531dc1051ad0b2aed5b9c3f2b86764d90b9725e17a9e08eef2320bf2",
   "spec_sha256_kind": "raw",
   "status": "pass",
   "variant_id": null,
