@@ -4,7 +4,7 @@
 > to generate secrets; use an established cryptographic random-number generator for keys,
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
-Version: 0.3
+Version: 0.4
 
 ## Security target
 
@@ -429,6 +429,7 @@ and states no theorem for it.
 | No seed: every input is taken as chosen by the adversary | the inputs | Padding and domain separation |
 | Several blocks from one `next`: the paper's remark on page 15, which it does not work out | a request | Forget |
 | The sum over the calls of `next` stays within ε at the limits | computed by the script | Limits |
+| The sum across instantiations and keys, with a nonce the adversary chooses: this chapter's own hybrid, which the paper does not state | an argument, for the review to read | Limits |
 
 Both entries of `limits.json` stay `unverified`, with no precondition marked met, until the
 security-target review (R10).
@@ -475,6 +476,13 @@ leads, and the bound stays well within ε.
 adds once per instantiation. At N = 2¹²⁸ Lemma 12's quadratic term is 2⁻¹²⁶ at c = 384. So M/2 may
 reach 2⁶¹ and no more, which is u·Q·C ≤ 2⁶². This is what sets the limits, and it is why c is 384: at
 c = 256 that term is 4, which is no bound, and at c = 320 it is 2⁻⁶², which misses ε (R9).
+
+**What the paper does not state.** Theorem 4 is stated for one generator, and Lemma 10 for a state fixed
+before the adversary's queries, while here the adversary chooses each nonce. The sum across
+instantiations and keys is this chapter's own hybrid: step by step, each `next` is replaced by the ideal
+one, every query of every step counted, and a key stays uniform given what the adversary has seen,
+since each earlier step's output has already been replaced. That is an argument and no published
+statement, and it stands in the theorems' table as a precondition for the security-target review.
 
 **The choice.** Three limits share that one product, so they trade against one another, and R9 asks
 for the choice and its reason. u = 2²⁰, Q = 2²⁰ and C = 2²² give about a million keys, each with about

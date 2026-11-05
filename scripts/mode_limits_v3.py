@@ -97,6 +97,8 @@ THEOREMS: Tuple[Dict[str, Any], ...] = (
           "only the inner part's secrecy", "Padding and domain separation"),
          ("several blocks from one next: the paper's remark on page 15, which it does not work out", "Forget"),
          ("the sum over the calls of next stays within the target advantage at the limits", "Limits"),
+         ("the sum across instantiations and keys, with a nonce the adversary chooses: the mode "
+          "chapter's own hybrid, which the paper does not state", "Limits"),
      )},
 )
 

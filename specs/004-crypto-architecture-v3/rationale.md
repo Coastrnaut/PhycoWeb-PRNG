@@ -4,7 +4,7 @@
 > to generate secrets; use an established cryptographic random-number generator for keys,
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
-Version: 0.3
+Version: 0.4
 
 ## Security target
 
@@ -79,6 +79,10 @@ construction and an argument, and no theorem for it.
 **Hypothesis.** Several blocks from one `next` affect that bound only marginally. The paper says so
 (page 15), and it does not work the change out. Every other precondition of the result is met by the
 form of a call; this one rests on the remark (design document, chapter "Mode", section "Forget").
+
+**Argument.** The sum across instantiations and keys, with a nonce the adversary chooses, is the design
+document's own hybrid over the calls of `next`, since the paper states its result for one generator
+and a state fixed in advance (design document, chapter "Mode", section "Limits").
 
 **Argument.** A keyed duplex was chosen over a stream-cipher construction because every property then
 reduces to one assumption, and because a permutation already has Π⁻¹ for its own tests, so that a
