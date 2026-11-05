@@ -808,11 +808,11 @@ fourth `proposed` entry exiting 2 (SC-011). The production-width analysis covers
 the other family is analysed there only if the chosen one ends with no eligible candidate, and its
 candidates are otherwise `ineligible` (R6, R7).
 
-- [ ] T073 [P] [US4] Write `tests/test_costmodel.py` (R5): research R5's hand-counted examples
+- [X] T073 [P] [US4] Write `tests/test_costmodel.py` (R5): research R5's hand-counted examples
   reproduced exactly; 0 LUTs for rotations, constant shifts and wiring; w per bitwise word operation
   with fan-in k ≤ 6 and w·⌈(k − 1)/5⌉ above; w and one carry chain per addition or subtraction; no
   fusion. (FR-022, FR-026; R5)
-- [ ] T074 [US4] Write `research/004/tools/costmodel.py` (R5) and validate it with
+- [X] T074 [US4] Write `research/004/tools/costmodel.py` (R5) and validate it with
   `scripts/validate_tool.py` on R5's hand-counted examples, entered in the provenance log by T048;
   the implied throughput is reported beside the goal of 10⁸ words per second at 200 MHz, never an
   eligibility rule. (FR-022, FR-026, FR-039; SC-007; R5)

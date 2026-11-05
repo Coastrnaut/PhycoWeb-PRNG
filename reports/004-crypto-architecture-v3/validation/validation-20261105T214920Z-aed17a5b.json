@@ -1,0 +1,431 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "costmodel-examples is re-found",
+      "holds": true
+    }
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "431bebc928f9af047ac13eb93b7c4fec54cd5cb73744c7cb8c352c432c4286c2"
+    },
+    "research/004/ir.py": {
+      "kind": "raw",
+      "sha256": "118566f4faf3ad8dd9a00e7e7593ce2087d572a78cf46142beee6631f288a311"
+    },
+    "research/004/tools/costmodel.py": {
+      "kind": "raw",
+      "sha256": "906cfb7007ae95e373afc8190012564aad4e3342bd7eedcee3f139b275654983"
+    },
+    "research/004/validation/costmodel-examples-second.py": {
+      "kind": "raw",
+      "sha256": "ff2117c26dff4482d71a920ecbb019493bd27601616bf0c459c3def9b12719a3"
+    },
+    "research/004/validation/costmodel-examples.py": {
+      "kind": "raw",
+      "sha256": "9b35e5c427cf9219ec304b9f6c0e800463d1845605f1ea9fb4e1a624f97d10c1"
+    },
+    "scripts/validate_tool.py": {
+      "kind": "raw",
+      "sha256": "926565e3adfe64e47300d13891711832268d6da26630fd5d30db963d34e1bbde"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/validate_tool.py --tool costmodel --known costmodel-examples --out-dir reports/004-crypto-architecture-v3/validation",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-05T21:49:20Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "found": {
+    "costmodel-examples": {
+      "rows": [
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "0",
+          "depth": [
+            0,
+            0
+          ],
+          "flip_flops": 64,
+          "luts": "0",
+          "n": 4,
+          "name": "rotations",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "xor-two",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "six-inputs",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "256/3",
+          "depth": [
+            2,
+            2
+          ],
+          "flip_flops": 64,
+          "luts": "64",
+          "n": 4,
+          "name": "seven-inputs",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "128",
+          "depth": [
+            3,
+            3
+          ],
+          "flip_flops": 64,
+          "luts": "96",
+          "n": 4,
+          "name": "twelve-inputs",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "chi-row",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "shifted",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 1,
+          "chains_per_phase": [
+            1,
+            1
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "addition",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 1,
+          "chains_per_phase": [
+            1,
+            1
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "subtraction",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 1,
+          "chains_per_phase": [
+            1,
+            1
+          ],
+          "cost": "256/3",
+          "depth": [
+            2,
+            2
+          ],
+          "flip_flops": 64,
+          "luts": "64",
+          "n": 4,
+          "name": "addition-function",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 2,
+          "chains_per_phase": [
+            1,
+            1
+          ],
+          "cost": "128/3",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "32",
+          "n": 4,
+          "name": "dependent",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 1,
+          "chains_per_phase": [
+            1,
+            0,
+            1,
+            0
+          ],
+          "cost": "512/3",
+          "depth": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "64",
+          "n": 4,
+          "name": "arx-box",
+          "phases": 4,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        },
+        {
+          "chains": 0,
+          "chains_per_phase": [
+            0,
+            0
+          ],
+          "cost": "8",
+          "depth": [
+            1,
+            1
+          ],
+          "flip_flops": 64,
+          "luts": "6",
+          "n": 4,
+          "name": "food",
+          "phases": 2,
+          "rate": 768,
+          "re_found": true,
+          "rounds": 32,
+          "w": 32
+        }
+      ]
+    }
+  },
+  "git_dirty": false,
+  "git_head": "34254e3460f954d5cad315d0e91506f7e61d4d79",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "validation",
+  "known_result": {
+    "known_id": "costmodel-examples",
+    "path": "research/004/validation/costmodel-examples.py",
+    "provenance_seq": 101,
+    "sha256": "9b35e5c427cf9219ec304b9f6c0e800463d1845605f1ea9fb4e1a624f97d10c1",
+    "sha256_kind": "raw"
+  },
+  "licence": "GPL-3.0, this repository",
+  "limitations": [],
+  "model_id": null,
+  "outcome": "re-found",
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "f932378b4cac7fd1410ba2fea7b14d71f395645b6a372ae62f2b60b35fc28fa2",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 518,
+  "record_id": "validation-20261105T214920Z-aed17a5b",
+  "research_sha256": "63655adb8bbbf0e8a7d8eab6aaf897205b77ae52a0afa6a9437979a533f87ea4",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "second_known_result": {
+    "known_id": "costmodel-examples-second",
+    "path": "research/004/validation/costmodel-examples-second.py",
+    "provenance_seq": 100,
+    "sha256": "ff2117c26dff4482d71a920ecbb019493bd27601616bf0c459c3def9b12719a3",
+    "sha256_kind": "raw"
+  },
+  "source": {
+    "repository": "research/004/validation/costmodel-examples.py"
+  },
+  "spec_sha256": "77122dc34d256b03668426672c23ada3a34b5eef1f01b8b8faa235642c95f3a8",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "tool": "costmodel",
+  "tool_sha256": "906cfb7007ae95e373afc8190012564aad4e3342bd7eedcee3f139b275654983",
+  "validated_kind": {
+    "costmodel-examples": {
+      "model": "the table of research R5 on 6-input LUTs, with no packing or fusion",
+      "operations": "rotations, shifts, bitwise functions, additions, subtractions and constants",
+      "uses": [
+        {
+          "covered_by": [
+            "costmodel-examples"
+          ],
+          "use": "L and the chains per round in the D4 score and its tie-breaks"
+        },
+        {
+          "covered_by": [
+            "costmodel-examples"
+          ],
+          "use": "the cost per output bit and the depth of FR-026's figures"
+        }
+      ],
+      "widths": [
+        8,
+        16,
+        32
+      ]
+    }
+  },
+  "variant_id": null,
+  "version": "906cfb7007ae95e373afc8190012564aad4e3342bd7eedcee3f139b275654983",
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
