@@ -671,7 +671,7 @@ hash, older than its first counted result.
   the owner may provide a value (**Owner**: run `python scripts/owner_record.py owner-provided`, its
   row "Owner-provided value <n>" Approved); without either, the tool it validates stays unvalidated.
   (FR-046; R12, R19)
-- [ ] T060 [P] [US4] Write `research/004/tools/trails/tables.py`, exhaustive difference and linear
+- [X] T060 [P] [US4] Write `research/004/tools/trails/tables.py`, exhaustive difference and linear
   tables of every distinct box and S-box of up to 16 bits; validate it on every entry of the PRESENT
   S-box's published difference and linear tables. (FR-038, FR-039; SC-007; R12)
 - [ ] T061 [P] [US4] Write `research/004/tools/trails/active_sbox.py`, MILP counting of active
