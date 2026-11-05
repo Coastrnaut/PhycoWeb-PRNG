@@ -1014,7 +1014,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
 - **FR-005**: The target strength MUST be s = 128 bits at every claimable size, and no parameter
   MAY admit a generic attack that costs less than 2¹²⁸ evaluations of Π or Π⁻¹ (FR-004;
   FUT-SEC-1).
-- **FR-006**: For the production parameter sets (the claimable sizes, w = 32, c = 256), the key
+- **FR-006**: For the production parameter sets (the claimable sizes, w = 32, c = 384), the key
   MUST be 256 bits (D2). The key is assumed to have full entropy, to be uniform and secret, and
   to come from an established cryptographic random-number generator, never from a PhycoWeb-PRNG
   model. The generator cannot check this, a key with less entropy caps the strength at that
@@ -1253,7 +1253,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
   arrives after one 32-bit word that gives its length in bytes, so the core knows the length before
   it pads the input, and the unused bytes of a last partial word must be zero (FR-025 "Flow
   control").
-- **FR-015**: The capacity MUST be c ≥ 256 bits at every claimable size, with rate r = b − c.
+- **FR-015**: The capacity MUST be c ≥ 384 bits at every claimable size, with rate r = b − c.
   Output MUST come only from the outer (rate) part, after a full call of Π. One canonical
   serialization of the output (word width, byte order, bit order) MUST be stated for every tool
   and for the hardware export. A request whose length is not a multiple of r keeps the first
@@ -1623,7 +1623,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   - **Key loading and reset.** The design document specifies the key-loading interface and the
     reset sequence: serial key loading along the registered shift chain below, the four latencies
     stated below, an output-valid signal, and the zeroization of key and state. The key-loading
-    interface is generic in c: a c-bit key, with the c/2-bit nonce given at each instantiate on the
+    interface is generic in the key's length k, which is c at a keyed reduced variant and 256 at a
+    claimable size: a k-bit key, with the k/2-bit nonce given at each instantiate on the
     absorption interface (research R14), 256 and 128 bits at every claimable
     size, both whole 32-bit words, since a keyed variant's c is a multiple of
     64; keyless variants have none, and no core is built at one: the generics refuse a keyless
@@ -1944,8 +1945,8 @@ freeze hashes and the baseline manifest; run the claim-register test.
   request's end, with instantiate's calls spread over a stated number of requests
   per instantiation; the rate before forget calls is reported beside it as
   an upper bound. A rate below the goal of 10⁸ words per second (for example at most about
-  0.55 × 10⁸ at 4×4 with R = 32, P = 2 and i = 32 before the trees' latencies are stated: 768 bits
-  in 64 + 24 = 88 cycles plus t_s + t_o, about 8.7 bits per cycle at t_s = t_o = 0, before forget
+  0.48 × 10⁸ at 4×4 with R = 32, P = 2 and i = 32 before the trees' latencies are stated: 640 bits
+  in 64 + 20 = 84 cycles plus t_s + t_o, about 7.6 bits per cycle at t_s = t_o = 0, before forget
   calls; the design document computes the example again once it states the trees' latencies) is
   reported and is never an eligibility rule. It MUST also give the estimated
   hardware cost per output bit, from the operation-count model of the nonlinearity choice rule,
@@ -1953,7 +1954,7 @@ freeze hashes and the baseline manifest; run the claim-register test.
   (strategy note §10), and, from the same model, the estimated LUTs, flip-flops and block RAM per
   claimable size, each part with its own figure: the nodes and stages (LUTs per node and round × n²
   for the stages built), the absorption and output trees, the reset and start fan-out trees with the
-  call-type field at every node, the ROMs, the output buffer (r bits, 16,128 at 16×16)
+  call-type field at every node, the ROMs, the output buffer (r bits, 16,000 at 16×16)
   with its read-out to the interface width and the read-out's two counters
   (FR-025 "Zeroization"; HW-094), the key registers and the key-loading buffer,
   the nonce chain and the rate lanes' nonce registers, the instantiate lane

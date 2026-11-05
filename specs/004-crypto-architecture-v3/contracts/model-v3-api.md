@@ -45,18 +45,18 @@ shown as `<…>` are fixed by the design document.
 
 ## Variant IDs (FR-032, FR-033; R14)
 
-`<design>/n<n>-w<w>-R<R>-c<c>`, for example `phyco-v3/n4-w32-R<R4>-c256`.
+`<design>/n<n>-w<w>-R<R>-c<c>`, for example `phyco-v3/n4-w32-R<R4>-c384`.
 
 | Constant or function | Contract |
 |----------------------|----------|
-| `PRODUCTION_VARIANTS` | exactly the three IDs at n = 4, 8 and 16, w = 32, c = 256 and the frozen R of each size |
+| `PRODUCTION_VARIANTS` | exactly the three IDs at n = 4, 8 and 16, w = 32, c = 384 and the frozen R of each size |
 | `parse_variant(variant_id)` | returns `(n, w, R, c)`; raises `VariantRefused` for a malformed ID or a value neither supported nor open to exploration |
 | `is_production(variant_id)` | true only for the three production IDs |
 
 Supported values: n ∈ {2, 4, 8, 16}, and 3 where the design document specifies a three-colour
 schedule, the sizes spec FR-018 lists; w ∈ {4, 8, 16, 32}, with w = 4 at 2×2 only; R from 1 to the
 frozen R at those sizes; c a multiple of w and of 16 with 0 < c < b, a multiple of 64 for a keyed
-variant, whose r = b − c is a multiple of 32 (spec FR-018; HW-093), and c = 256
+variant, whose r = b − c is a multiple of 32 (spec FR-018; HW-093), and c = 384
 at every claimable size (research R14). Every other n from 2 to 16 is for
 exploration only, where the design document's update schedule covers n (even n, and odd n only with
 a three-colour schedule): the research interface accepts its ID, which carries its R, with the table
@@ -148,8 +148,9 @@ d = ResearchDuplex.from_state(variant_id, key, lanes, counters)   # research onl
 The same calls and rules as `Generator`, on any supported variant, for evidence on reduced
 variants, except two: it runs no self-test, since `gen_vectors_v3.py` writes the vectors, and the
 self-test data copied from them, through it (data model §11), so its constructor checks the variant
-and then the key length only; and the lengths: a key of c/8 bytes and a nonce of c/16 bytes for the
-variant's capacity c, so 32 and 16 bytes at every claimable size (research R14). Other lengths raise
+and then the key length only; and the lengths: a key of k/8 bytes and a nonce of k/16 bytes, k being
+the variant's capacity c at a keyed reduced variant and 256 at a claimable size, so 32 and 16 bytes
+at every claimable size (research R14). Other lengths raise
 `ValueError`. A keyless variant, whose c is not a multiple of 64, whose r is not a multiple of 32
 (HW-093) or whose key and nonce leave no room in the state for the padding and domain bits (research
 R14), raises `VariantRefused`; only the permutation interface applies to it. It is

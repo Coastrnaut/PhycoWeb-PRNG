@@ -641,8 +641,8 @@ row per variant with its ID, n, w, b, c, r, R and status, and the chapter "Mode"
 "Layout", which lanes form the rate part and which the capacity part at each size, and "Limits",
 each limit in calls of Π and in bits at every claimable size, with u and the two ways of choosing
 nonces; exit 2 if a table is missing, appears twice or holds a row it cannot read (spec FR-034;
-RAT-085). Evaluates the theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴
-and N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if the bound exceeds ε at the limits;
+RAT-085). Evaluates each theorem's bound at the limits stated in the design document with ε = 2⁻⁶⁴
+and N = 2¹²⁸ (research R9), and the doubling check. Exit 1 if a bound exceeds ε at the limits;
 `theorem` is `unverified` until its paper has been read: each theorem's entry cites the paper's
 `fetched` entry in `downloads.json` by SHA-256, with the theorem's number and page, and the
 script refuses `verified`, exit 2, without such an entry or when the file on

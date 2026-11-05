@@ -614,8 +614,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     calls spread over a stated number of requests per instantiation; the rate
     before forget calls is reported beside it as an upper bound. At 4×4 with P = 2 and i = 32,
     before the trees' latencies are stated (t_s = t_o = 0), the rate before forget calls is at most
-    768 bits per 88 cycles, about 0.55 × 10⁸ words per second, at R = 32, and 768 bits per 152
-    cycles, about 0.32 × 10⁸, at R = 64, both below the goal; the design document computes them
+    640 bits per 84 cycles, about 0.48 × 10⁸ words per second, at R = 32, and 640 bits per 148
+    cycles, about 0.27 × 10⁸, at R = 64, both below the goal; the design document computes them
     again with the trees' latencies (FR-026).
   - `research/004/tools/costmodel.py` computes every number from the operation list, and a test
     checks the table above on hand-counted examples, written with their SHA-256 and entered in the
@@ -991,8 +991,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Tracing every phase, not only every round, lets an RTL mismatch be located to one stage
     (FR-036); lengths only grow, so this rule allows it.
 
-  - Lengths are the same at 4×4, 8×8 and 16×16. The output per call of Π grows with n² (r = 768,
-    3,840 and 16,128 bits), so the 320,000 bits of a 10,000-word vector take at least 417, 84
+  - Lengths are the same at 4×4, 8×8 and 16×16. The output per call of Π grows with n² (r = 640,
+    3,712 and 16,000 bits), so the 320,000 bits of a 10,000-word vector take at least 500, 87
     and 20 calls of Π, plus one forget call per request. The timing probe of R4 measured 60 ns per
     pure-Python word operation, so at R = 32 and 32 word operations per node and round a call
     takes about 1 ms at 4×4 and 16 ms at 16×16, and the 2²⁰-word digest under a minute at every
@@ -1022,7 +1022,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 ## R9. The target advantage for the output limits (FR-007, FR-010) — protocol
 
 - **Decision**: the output limits per instantiation and per key, and the number of keys u, are
-  powers of two at which the mode theorem's bound (R10), with Π modelled as a random
+  powers of two at which the bound of each theorem the mode uses (R10), with Π modelled as a random
   permutation (FR-004), is at most
 
   ```text
@@ -1030,10 +1030,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   and with every online quantity (data, calls, instantiations, reseeds, keys) at its limit.
   ```
 
-  - A committed script evaluates the bound at the limits and checks that doubling any one limit
-    that a term of the bound reads, alone or as a factor of another, would push it above ε. The
+  - A committed script evaluates each bound at the limits and checks that doubling any one limit
+    that a term of a bound reads, alone or as a factor of another, would push a bound above ε. The
     per-request cap, which no term reads, and a limit that another limit holds, as the limit on
-    calls holds the reseeds, each of which takes a call of Π, are evaluated in the bound at their
+    calls holds the reseeds, each of which takes a call of Π, are evaluated in the bounds at their
     values and stand outside that check. Where limits trade against one another, the design
     document states its choice and the reason.
   - **Units.** The theorem's unit, calls of Π, is primary, and each limit is also given in bits
@@ -1067,15 +1067,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     per-key limits for its key. Across objects, processes and devices, the per-key limits and u
     are usage rules that the design document states for the caller; no single object sees them.
   - If no positive limit reaches ε (a term such as N/2^c needs c ≥ 192), the mode or the
-    capacity changes (c may only rise); ε does not.
+    capacity changes (c may only rise); ε does not. The forget result's term 4N²/2^c (R10) needs
+    c ≥ 322, so c = 384, the least multiple of 64 above it, at every claimable size.
 - **Stricter means**: ε may only fall, N may only rise, and the per-request cap and the
   random-nonce instantiation limit may only fall.
 - **Rationale**: at the limits, an attack with 2¹²⁸ evaluations gains at most 2⁻⁶⁴, so its time
-  over advantage stays at least 2¹⁹², well above 2¹²⁸. ε = 2⁻¹²⁸ is unreachable: a term such as
-  N/2^c alone is 2⁻¹²⁸ at c = 256. 2⁻⁶⁴ is stricter than the 2⁻³² of SP 800-38D's IV-collision
-  rule. Terms of the form M·N/2^c and u·N/2^k, typical of keyed-duplex bounds, would give limits
-  of the order of 2⁶⁴ blocks per key and 2⁶⁴ keys at c = k = 256; the values come from the
-  theorem once its paper is read (R10).
+  over advantage stays at least 2¹⁹², well above 2¹²⁸. ε = 2⁻¹²⁸ is unreachable: the term 4N²/2^c
+  alone is 2⁻¹²⁶ at c = 384. 2⁻⁶⁴ is stricter than the 2⁻³² of SP 800-38D's IV-collision rule.
+  The limits come from the two bounds of R10, read on 2026-11-05: at c = 384 the forget result's
+  sum over the calls of `next` sets them, in place of the keyed duplex's first term.
 - **Alternatives**: ε = 2⁻³² (looser); stating the bound without ε (FR-007 asks for it); a limit
   set by hand (it must follow from the theorem).
 
@@ -1085,17 +1085,24 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   Assche (ASIACRYPT 2017) for keystream and multi-user security. For backtracking resistance
   across forget, it uses the result for exactly its forget construction: the sponge-based PRNG of
   Bertoni et al. (CHES 2010) or the forward security of Gaži and Tessaro (EUROCRYPT 2016),
-  whichever matches it. Each call (instantiate, generate, forget, reseed) is mapped to the
-  theorem's calls, and each precondition is listed with the design feature that meets it.
+  whichever matches it. Read on 2026-11-05, the first gives the construction, in its section 4.3,
+  and no theorem for it, and the second gives one: its Lemma 12, preserving security, from a state
+  of zeros in the rate and a secret inner part, with its Lemma 10 from the key's state and its
+  Theorem 4's sum over the calls of `next`, so the mode takes that paper's form. Each call
+  (instantiate, generate, forget, reseed) is mapped to the theorem's calls, and each precondition is
+  listed with the design feature that meets it.
   - **Initialization.** Key and nonce are placed in the initial state at stated positions, and
     the rest of it is set to stated constants, as the full-state keyed duplex initializes
     (FR-013). Later inputs, the personalization string and the reseed input, are absorbed over
     the rate only (FR-018), and the mode chapter shows that this is a special case of the
     theorem's absorption.
   - **Instantiate ends with a forget call**, in the form the theorem covers, so that no state
-    compromise walks back through Π⁻¹ to the key (R9).
+    compromise walks back through Π⁻¹ to the key (R9). It holds a second one before the
+    personalization string, which takes the key's state to the state Lemma 12 starts from.
   - **Reseed** is mapped to the theorem's absorption call with attacker-chosen input (T9;
-    FR-016). A reseed never resets a counter (model contract).
+    FR-016), and it ends with one more call of Π, since that paper's `refresh` runs Π after its
+    last input and `next` runs Π again before reading. A reseed never resets a counter (model
+    contract).
   - Each of these is listed among the preconditions, "unverified" until its paper is read. If a
     paper's form differs, the design takes the paper's form in a new design-document version, or the
     feature stops (below).
@@ -1551,7 +1558,7 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
 ## R14. Supported sizes and variants (FR-017, FR-018, FR-032, FR-033)
 
 - **Decision**:
-  - Claimable sizes: 4×4, 8×8 and 16×16, at w = 32 and c = 256 with the frozen R (D3). Research
+  - Claimable sizes: 4×4, 8×8 and 16×16, at w = 32 and c = 384 with the frozen R (D3; R9). Research
     sizes: 2×2, at every width with reduced capacity, and 3×3 if the design document specifies a
     three-colour schedule from the same generics; otherwise 3×3 is unsupported with that reason.
   - **Colour schedule.** The schedule is a function of n's parity, computed at elaboration from
@@ -1592,8 +1599,9 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   - Variant ID: `<design>/n<n>-w<w>-R<R>-c<c>`, for example `cand-A1/n2-w16-R8-c64`, where the
     design is a candidate ID or, after selection, `phyco-v3`. The production interface accepts
     only the three production IDs and refuses every other ID with an error (FR-033).
-  - **Keys of reduced variants** (FUT-GRID-2; checklist A7): a keyed variant of capacity c takes
-    a c-bit key and a c/2-bit nonce, so 256 and 128 bits at every claimable size, and its row of the
+  - **Keys of reduced variants** (FUT-GRID-2; checklist A7): a keyed variant's key has k = min(c,
+    256) bits and its nonce k/2, so a keyed reduced variant of capacity c takes a c-bit key and a
+    c/2-bit nonce, and a claimable size 256 and 128 bits at c = 384. A reduced variant's row of the
     size profile checks FR-010's relations at s = c/2, its bound being its `bound_bits` at its own
     k, nonce bits and c, the multi-target term at the u that `limits.json` states and a term below
     zero counting as zero, so that it is never above c/2, one of its terms; s = c/2 is the
@@ -1610,12 +1618,12 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     is not a multiple of 32, or whose key and nonce leave no room in the
     state for the padding and domain bits, is keyless: the research duplex refuses it, and only the
     permutation interface applies. The model contract and data-model §10 take these lengths.
-    The key-loading interface is generic in c in the same way (FR-025): a c-bit key, with the
-    c/2-bit nonce on the absorption interface, and none for a keyless variant.
+    The key-loading interface is generic in k in the same way (FR-025): a k-bit key, with the
+    k/2-bit nonce on the absorption interface, and none for a keyless variant.
 - **Rationale**: the strategy note's table (§4.5). Every claimable size needs an established
   R_bound at the production width, so each one added costs trail searches. Powers of two keep
-  the folded-torus layout regular. A key of c bits keeps key loading the same construction at
-  every size, so evidence on reduced variants transfers, and a 2×2 state, 256 bits at w = 32
+  the folded-torus layout regular. A key in the state's first k bits keeps key loading the same
+  construction at every size, so evidence on reduced variants transfers, and a 2×2 state, 256 bits at w = 32
   and 32 bits at w = 4, could not hold a 256-bit key and a 128-bit nonce.
 - **Alternatives**: every n from 2 to 16 supported (each claimable size needs its own R_bound,
   which would multiply the solver budget); a 256-bit key and 128-bit nonce everywhere, absorbed

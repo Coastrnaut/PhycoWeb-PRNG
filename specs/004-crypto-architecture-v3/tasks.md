@@ -734,7 +734,7 @@ run with T107.
   `--reproduce RECORD` (contracts/cli.md; data-model §10), with its tests in
   `tests/test_records_004.py` on stated tables: it reads the design document's three tables, the
   chapter "Permutation"'s section "Variant table" and the chapter "Mode"'s sections "Layout" and
-  "Limits", exit 2 if one is missing, appears twice or holds a row it cannot read; evaluates the
+  "Limits", exit 2 if one is missing, appears twice or holds a row it cannot read; evaluates each
   theorem's bound at the limits the "Limits" table states, the per-request cap of 2¹⁹ bits and at
   most 2³² instantiations per key among them, with ε = 2⁻⁶⁴ and N = 2¹²⁸ (research R9), exit 1 if
   the bound exceeds ε there, and the doubling check; keeps `theorem` `unverified` until its paper is
@@ -762,7 +762,7 @@ run with T107.
   target", first in FR-034's order: the properties sought as bounds on an adversary's advantage
   (keystream under nonces never repeated, multi-user for u keys, backtracking across each forget
   call; prediction resistance not sought, D7); the security target's parameters, s = 128, a 256-bit
-  key with its assumptions and a 128-bit nonce used once per key, c = 256 at every claimable size;
+  key with its assumptions and a 128-bit nonce used once per key, c = 384 at every claimable size;
   the output limits; threats T1 to T11, each adopted or excluded with its reason, and the assets of
   a keyed design; every generic bound at every supported size, with the parameter table; the
   claimable sizes and the 2×2 decision; the certification route with "class unconfirmed" beside it

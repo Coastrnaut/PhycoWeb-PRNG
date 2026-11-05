@@ -1934,6 +1934,13 @@
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
+        "date": "2026-11-05",
+        "path": "specs/004-crypto-architecture-v3/research.md",
+        "reason": "A requirement's text: the word stands as the Python module's name, in a published title or term, in a stated use or in the rule that forbids it; it describes no model",
+        "text": "  powers of two at which the bound of each theorem the mode uses (R10), with Π modelled as a random",
+        "writer": "Claude Code, model claude-opus-5-5"
+      },
+      {
         "date": "2026-11-03",
         "path": "specs/004-crypto-architecture-v3/research.md",
         "reason": "A requirement's text: the word stands as the Python module's name, in a published title or term, in a stated use or in the rule that forbids it; it describes no model",

@@ -920,8 +920,8 @@ RAT-085). Each row holds:
 - `n`, `w`, `lanes_per_node` (2), `b`, `c`, `r`, `variant_id`, and `R`. A research variant's R
   carries its reason: the round rule's value where its inputs exist at that variant, or a
   reduced count chosen for a stated test and marked as reduced; the variant ID carries R.
-- `key_entropy_bits` and `nonce_bits`: c and c/2, so 256 and 128 at every claimable size, and 0
-  for a keyless variant (R14). `keyed_variants` names each size's keyed variants: the production
+- `key_entropy_bits` and `nonce_bits`: k and k/2, k being c at a keyed reduced variant and 256 at a
+  claimable size, so 256 and 128 at every claimable size, and 0 for a keyless variant (R14). `keyed_variants` names each size's keyed variants: the production
   variant at every claimable size, and at 2×2, and at a supported 3×3, at least one keyed reduced
   variant, such as `n2-w16-R8-c64` with an 8-byte key and a 4-byte nonce, each with c a multiple of
   64 and r = b − c a multiple of 32, a supported 3×3's at w = 16 or 32 (spec FR-018; R14; HW-093).
@@ -1001,7 +1001,7 @@ to every key whatever its nonces (R9); the bound at the limits and the doubling 
 The header of a mode vector file reads, for example:
 
 ```text
-# model=phyco-v3 variant=phyco-v3/n4-w32-R<R>-c256 key=dev/0 nonce=dev/0 pers=empty requests=1,7,64,1000 schedule=cyclic-truncated count=10000 format=u32-hex
+# model=phyco-v3 variant=phyco-v3/n4-w32-R<R>-c384 key=dev/0 nonce=dev/0 pers=empty requests=1,7,64,1000 schedule=cyclic-truncated count=10000 format=u32-hex
 ```
 
 The header's fields come in this fixed order, each `key=value`, separated by single spaces.
@@ -1010,7 +1010,7 @@ is left: nine cycles of 1, 7, 64 and 1,000 words, then 1, 7, 64 and 280 words fo
 R8). Generated files hold only deterministic content, under the format rules of the introduction,
 so that `--check` can compare them byte for byte; everything that differs between runs or
 platforms goes to the sidecar `MANIFEST.json` (R8). In the file names above, `<variant>` is the
-variant ID with `/` replaced by `_`, for example `mode_phyco-v3_n4-w32-R<R>-c256_dev0.hex`, and
+variant ID with `/` replaced by `_`, for example `mode_phyco-v3_n4-w32-R<R>-c384_dev0.hex`, and
 every file sits in the one directory `vectors/phyco-v3/`, with no directory per variant.
 
 **Generator runs** (FR-061). Each run of `gen_constants_v3.py`, `gen_vectors_v3.py` or
