@@ -655,7 +655,7 @@ hash, older than its first counted result.
   variant at w = 4 through the batch interpreter into a 2³²-bit bitmap of outputs; validate it,
   **heavy**, each run projected first against the feature-wide row, on a known permutation and on
   the stated map with collisions. (FR-019, FR-037, FR-039; SC-004, SC-007; R13)
-- [ ] T058 [US4] Write `research/004/tools/avalanche.py` (R4, R13): the flip set, the related-key
+- [X] T058 [US4] Write `research/004/tools/avalanche.py` (R4, R13): the flip set, the related-key
   and related-nonce set and the rotational pairs, N_a = 8,256 states per flipped bit, each
   difference bit counted over all of them and over the first 2¹³, the threshold 0.005/(128·S_A), and
   every run cross-checked against the exact dependency matrices, a disagreement being a tool defect
