@@ -2962,6 +2962,370 @@ class TablesOnKnown(unittest.TestCase):
             self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
 
 
+def active_sbox_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools/trails"))
+    import active_sbox
+    return active_sbox
+
+
+class Solved:
+    """What scipy's milp hands back, for the tests of what is read from it."""
+
+    def __init__(self, status, bound, message="stated"):
+        self.status, self.mip_dual_bound, self.message = status, bound, message
+
+
+class ActiveSbox(unittest.TestCase):
+    """research/004/tools/trails/active_sbox.py on stated layers (T061)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = active_sbox_module()
+
+    def present(self, rounds=None):
+        permutation = tuple((16 * i) % 63 for i in range(63)) + (63,)
+        return self.tool.spn(PRESENT_SBOX, 16, permutation)
+
+    def small(self):
+        """Two PRESENT S-boxes on 8 bits, the bits crossed between them."""
+        return self.tool.spn(PRESENT_SBOX, 2, (0, 4, 1, 5, 2, 6, 3, 7))
+
+    def plain_minimum(self, layer, kind, rounds):
+        """Every trail of a small layer, in plain Python."""
+        allowed = self.tool.patterns(layer.sbox, kind)
+        size = 1 << layer.bits
+
+        def through(state):
+            options = {0: 0}
+            for box in layer.boxes:
+                value = sum(((state >> bit) & 1) << place for place, bit in enumerate(box))
+                chosen = {}
+                for held, cost in options.items():
+                    for out in range(16):
+                        if value | (out << 4) in allowed:
+                            spread = sum(((out >> place) & 1) << bit for place, bit in enumerate(box))
+                            total = cost + (1 if value else 0)
+                            if total < chosen.get(held | spread, 1 << 30):
+                                chosen[held | spread] = total
+                options = chosen
+            return options
+
+        def moved(state):
+            return sum(((state >> i) & 1) << layer.permutation[i] for i in range(layer.bits))
+
+        best = {state: 0 for state in range(1, size)}
+        out = {}
+        for r in range(1, rounds + 1):
+            new = {}
+            for state, cost in best.items():
+                for after, extra in through(state).items():
+                    following = moved(after)
+                    if cost + extra < new.get(following, 1 << 30):
+                        new[following] = cost + extra
+            best = new
+            out[r] = min(best.values())
+        return out
+
+    def test_the_patterns_of_differences_are_the_table(self):
+        allowed = self.tool.patterns(PRESENT_SBOX, "differential")
+        for a in range(16):
+            for b in range(16):
+                held = any(PRESENT_SBOX[x] ^ PRESENT_SBOX[x ^ a] == b for x in range(16))
+                self.assertEqual(a | (b << 4) in allowed, held, (a, b))
+        self.assertEqual(len(allowed), 97)
+
+    def test_the_patterns_of_masks_are_the_table(self):
+        allowed = self.tool.patterns(PRESENT_SBOX, "linear")
+        dot = lambda p, q: bin(p & q).count("1") & 1
+        for a in range(16):
+            for b in range(16):
+                total = sum((-1) ** (dot(a, x) ^ dot(b, PRESENT_SBOX[x])) for x in range(16))
+                self.assertEqual(a | (b << 4) in allowed, total != 0, (a, b))
+
+    def test_a_kind_that_is_neither_is_a_tool_defect(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.patterns(PRESENT_SBOX, "other")
+
+    def test_the_cuts_refuse_exactly_the_forbidden_patterns(self):
+        for kind in ("differential", "linear"):
+            allowed = self.tool.patterns(PRESENT_SBOX, kind)
+            cuts = self.tool.cuts(PRESENT_SBOX, kind)
+            self.assertLess(len(cuts), 256 - len(allowed), "a cut of a whole cube takes several patterns at once")
+            for point in range(256):
+                refused = any(point & mask == value for mask, value in cuts)
+                self.assertEqual(refused, point not in allowed, (kind, point))
+
+    def test_an_sbox_is_a_bijection_of_up_to_5_bits(self):
+        for wrong in ((0, 0, 1, 2), (0, 1, 2), tuple(range(64)), (0, 1, 2, 4)):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.spn(wrong, 1, tuple(range(len(wrong))))
+
+    def test_a_layer_is_refused_where_its_bits_do_not_fit(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.spn(PRESENT_SBOX, 2, (0, 0, 1, 5, 2, 6, 3, 7))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.spn(PRESENT_SBOX, 2, (0, 1, 2, 3, 4, 5, 6))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.check(self.tool.Layer(8, ((0, 1, 2, 3), (3, 4, 5, 6)), PRESENT_SBOX, tuple(range(8))))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.check(self.tool.Layer(8, ((0, 1, 2), (3, 4, 5)), PRESENT_SBOX, tuple(range(8))))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.check(self.tool.Layer(8, ((0, 1, 2, 3), (4, 5, 6, 8)), PRESENT_SBOX, tuple(range(8))))
+
+    def test_columns_take_one_bit_of_each_word(self):
+        layer = self.tool.columns(PRESENT_SBOX, 4, 8, (1, 2, 3, 4))
+        self.assertEqual(layer.bits, 32)
+        self.assertEqual(layer.boxes[3], (3, 11, 19, 27))
+        self.assertEqual(len(layer.boxes), 8)
+        self.assertEqual(layer.permutation[3], 4)
+        self.assertEqual(layer.permutation[8 + 7], 8 + 1)
+        self.assertEqual(layer.permutation[24 + 6], 24 + 2)
+
+    def test_a_column_layer_needs_an_amount_per_word_below_the_width(self):
+        for amounts in ((1, 2, 3), (1, 2, 3, 8), (1, 2, 3, -1)):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.columns(PRESENT_SBOX, 4, 8, amounts)
+
+    def test_the_settings_are_r12s(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0)) as solver:
+            self.tool.minimum(self.small(), "differential", 1, {})
+        options = solver.call_args.kwargs["options"]
+        self.assertEqual(options["mip_rel_gap"], 0)
+        self.assertEqual(options["time_limit"], 8 * 3600)
+        self.assertEqual(set(options), {"mip_rel_gap", "time_limit"})
+
+    def test_every_variable_is_a_whole_binary(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0)) as solver:
+            self.tool.minimum(self.small(), "differential", 2, {})
+        kwargs = solver.call_args.kwargs
+        self.assertTrue((kwargs["integrality"] == 1).all())
+        self.assertTrue((kwargs["bounds"].lb == 0).all() and (kwargs["bounds"].ub == 1).all())
+
+    def test_a_count_is_the_integer_at_or_below_the_dual_bound(self):
+        for bound, count in ((10.0, 10), (9.9999999, 9), (9.999999999999906, 9), (10.5, 10)):
+            with mock.patch.object(self.tool, "milp", return_value=Solved(0, bound)):
+                out = self.tool.minimum(self.small(), "differential", 1, {})
+            self.assertEqual((out["dual_bound"], out["count"]), (bound, count), bound)
+
+    def test_the_best_solution_found_is_never_read(self):
+        solved = Solved(0, 9.5)
+        solved.fun = 10.0
+        solved.x = np.ones(3)
+        with mock.patch.object(self.tool, "milp", return_value=solved):
+            self.assertEqual(self.tool.minimum(self.small(), "differential", 1, {})["count"], 9)
+
+    def test_a_search_that_stops_at_its_limit_gives_no_bound(self):
+        """R12: a search that times out gives no bound, and its record says `inconclusive`, which a tool failure writes."""
+        for status in (1, 4):
+            with mock.patch.object(self.tool, "milp", return_value=Solved(status, 7.0)), \
+                    self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(self.small(), "differential", 1, {})
+
+    def test_a_layer_with_no_trail_is_a_tool_defect(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(2, None)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(self.small(), "differential", 1, {})
+
+    def test_an_optimal_status_with_no_bound_is_a_tool_defect(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, None)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(self.small(), "differential", 1, {})
+
+    def test_the_minimum_of_a_small_layer_is_every_trail(self):
+        for kind in ("differential", "linear"):
+            found = self.tool.minima(self.small(), kind, 4)
+            self.assertEqual({r: row["count"] for r, row in found.items()}, self.plain_minimum(self.small(), kind, 4), kind)
+
+    def test_the_minimum_counts_the_rounds_it_is_asked(self):
+        found = self.tool.minima(self.small(), "differential", 2)
+        self.assertEqual(sorted(found), [1, 2])
+
+    def test_the_windows_are_each_round_span_at_its_count(self):
+        """Matsui's lemma: r' consecutive rounds of a trail are a trail of r' rounds."""
+        model = self.tool.build(self.small(), "differential", 3, {1: 1, 2: 2})
+        plain = self.tool.build(self.small(), "differential", 3, {})
+        self.assertEqual(model.matrix.shape[0] - plain.matrix.shape[0], 3 + 2)
+        tight = model.matrix[plain.matrix.shape[0]:]
+        self.assertEqual(sorted(int(v) for v in tight.sum(axis=1).A1), [2, 2, 2, 4, 4])
+        self.assertEqual(sorted(model.low[plain.matrix.shape[0]:]), [1, 1, 1, 2, 2])
+
+    def test_a_window_never_changes_the_minimum(self):
+        self.assertEqual(self.tool.minimum(self.small(), "differential", 3, {1: 1, 2: 2})["count"],
+                         self.tool.minimum(self.small(), "differential", 3, {})["count"])
+
+    def test_the_model_admits_a_true_trail_and_counts_it(self):
+        layer = self.present()
+        trail = (0x11, 0x0000000000030003, 0x11)
+        self.assertEqual(self.tool.admitted(layer, "differential", trail), (2, 2))
+
+    def test_the_model_refuses_a_trail_that_cannot_be(self):
+        layer = self.present()
+        for trail in ((0x11, 0x0000000000030004), (0x1, 0x1), (0x0, 0x0), (0x11, 0x0)):
+            self.assertIsNone(self.tool.admitted(layer, "differential", trail), trail)
+
+    def test_a_trail_is_weighed_by_the_table(self):
+        layer = self.present()
+        self.assertEqual(self.tool.weight_of(layer, (0x11, 0x0000000000030003)), 4)
+        self.assertEqual(self.tool.weight_of(layer, (0x0000000000030003, 0x11)), 6)
+
+    def test_a_trail_the_table_refuses_has_no_weight(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.weight_of(self.present(), (0x1, 0x1))
+
+
+class ActiveSboxOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once. The minima run at few rounds and the narrow width here, with
+    the true counts for those rounds; the full counts are the validation's own."""
+
+    NAMES = ("present-5r", "present-5r-second", "present-linear", "present-linear-second", "rotation-layer",
+             "rotation-layer-second")
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = active_sbox_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def short(self, name, known):
+        patches = {"present-5r": {"ROUNDS": 3, "MINIMUM": 4}, "present-linear": {"ROUNDS": 3, "MINIMA": {1: 1, 2: 2, 3: 3}},
+                   "present-linear-second": {"ROUNDS": 4}}.get(name, {})
+        if name.startswith("rotation-layer"):
+            patches = {"WIDTHS": (8,), "ROUNDS": 2}
+        return [mock.patch.object(known, field, value) for field, value in patches.items()]
+
+    def run_known(self, name, known=None):
+        known = known if known is not None else self.known(name)
+        patches = self.short(name, known)
+        for patch in patches:
+            patch.start()
+        try:
+            return self.tool.validation(name, known, None)
+        finally:
+            for patch in patches:
+                patch.stop()
+
+    def holds(self, name, known=None):
+        return self.run_known(name, known)["re_found"]
+
+    def test_each_is_re_found(self):
+        for name in self.NAMES:
+            self.assertTrue(self.holds(name), name)
+
+    def test_each_file_names_its_tool_and_its_second(self):
+        for name in self.NAMES:
+            self.assertEqual(self.table[name].tool, "active-S-box counting", name)
+        for first in ("present-5r", "present-linear", "rotation-layer"):
+            self.assertEqual(self.table[first].second_of, NONE)
+            self.assertEqual(self.table[first + "-second"].second_of, first)
+
+    def test_the_stated_minimum_decides(self):
+        known = self.known("present-5r")
+        self.assertEqual((known.ROUNDS, known.MINIMUM), (5, 10))
+        patches = self.short("present-5r", known)
+        for patch in patches:
+            patch.start()
+        try:
+            for wrong in (3, 5):
+                with mock.patch.object(known, "MINIMUM", wrong):
+                    self.assertFalse(self.tool.validation("present-5r", known, None)["re_found"], wrong)
+        finally:
+            for patch in patches:
+                patch.stop()
+
+    def test_a_dual_bound_a_hair_below_the_minimum_is_not_re_found(self):
+        """R12 again, on the known result: 9.9999999 counts as 9, and 9 is not the stated 10."""
+        known = self.known("present-5r")
+        with mock.patch.object(known, "ROUNDS", 1), mock.patch.object(known, "MINIMUM", 10), \
+                mock.patch.object(self.tool, "milp", return_value=Solved(0, 9.9999999)):
+            out = self.tool.validation("present-5r", known, None)
+        self.assertFalse(out["re_found"])
+        self.assertEqual(out["found"]["rounds"]["1"]["dual_bound"], 9.9999999)
+        self.assertEqual(out["found"]["rounds"]["1"]["count"], 9)
+
+    def test_the_record_holds_the_float_and_the_rounded_value_of_each_round(self):
+        rounds = self.run_known("present-5r")["found"]["rounds"]
+        self.assertEqual(sorted(rounds), ["1", "2", "3"])
+        for row in rounds.values():
+            self.assertEqual(set(row), {"status", "message", "dual_bound", "count"})
+            self.assertIsInstance(row["dual_bound"], float)
+
+    def test_each_stated_trail_decides(self):
+        known = self.known("present-5r-second")
+        for field, value in (("ITERATIVE", known.ITERATIVE[:-1] + (known.B + 1,)), ("OTHER", known.OTHER[:-1] + (1,)),
+                             ("ITERATIVE_ACTIVE", (2, 2, 2, 2, 3)), ("OTHER_ACTIVE", (2, 1, 1, 2, 3)), ("OTHER_WEIGHT", 22)):
+            with mock.patch.object(known, field, value):
+                self.assertFalse(self.holds("present-5r-second", known), field)
+
+    def test_each_stated_minimum_decides(self):
+        for name, fields in (("present-linear", ("MINIMA",)), ("present-linear-second", ("DIFFERENTIAL", "LINEAR")),
+                             ("rotation-layer", ("DIFFERENTIAL", "LINEAR")), ("rotation-layer-second", ("DIFFERENTIAL", "LINEAR"))):
+            for field in fields:
+                known = self.known(name)
+                patches = self.short(name, known)
+                for patch in patches:
+                    patch.start()
+                try:
+                    wrong = dict(getattr(known, field))
+                    wrong[known.ROUNDS] += 1
+                    with mock.patch.object(known, field, wrong):
+                        self.assertFalse(self.tool.validation(name, known, None)["re_found"], (name, field))
+                finally:
+                    for patch in patches:
+                        patch.stop()
+
+    def test_the_second_spn_file_finds_its_stated_values(self):
+        known = self.known("present-linear-second")
+        self.assertEqual(known.minima("differential"), known.DIFFERENTIAL)
+        self.assertEqual(known.minima("linear"), known.LINEAR)
+
+    def test_each_width_of_a_layer_is_run(self):
+        known = self.known("rotation-layer")
+        self.assertEqual(known.WIDTHS, (8, 16, 32))
+        seen = []
+
+        def counted(layer, kind, rounds):
+            seen.append((layer.bits, kind))
+            return {r: {"status": 0, "message": "", "dual_bound": float(r), "count": r} for r in range(1, rounds + 1)}
+
+        with mock.patch.object(self.tool, "minima", counted):
+            self.assertTrue(self.tool.validation("rotation-layer", known, None)["re_found"])
+        self.assertEqual(seen, [(32, "differential"), (32, "linear"), (64, "differential"), (64, "linear"),
+                                (128, "differential"), (128, "linear")])
+
+    def test_a_failure_at_one_width_or_kind_stands_beside_a_pass(self):
+        known = self.known("rotation-layer")
+        for bits, wrong_kind in ((32, "differential"), (64, "linear"), (128, "differential")):
+            def counted(layer, kind, rounds):
+                low = 1 if (layer.bits, kind) == (bits, wrong_kind) else 0
+                return {r: {"status": 0, "message": "", "dual_bound": float(r), "count": r - low} for r in range(1, rounds + 1)}
+
+            with mock.patch.object(self.tool, "minima", counted):
+                self.assertFalse(self.tool.validation("rotation-layer", known, None)["re_found"], (bits, wrong_kind))
+
+    def test_a_layer_of_known_rotations_reads_its_amounts(self):
+        known = self.known("rotation-layer-second")
+        layer = self.tool.layer_of(known, 8)
+        self.assertEqual(layer.permutation[8 + 7], 8)
+        self.assertEqual(layer.permutation[24 + 7], 24 + 2)
+        self.assertEqual(layer.permutation[5], 5)
+
+    def test_the_kind_names_each_use_and_a_known_result_that_covers_it(self):
+        kind = self.tool.KIND
+        self.assertEqual(kind["widths"], [8, 16, 32])
+        for use in kind["uses"]:
+            self.assertTrue(use["covered_by"], use)
+            for name in use["covered_by"]:
+                self.assertIn(name, self.NAMES)
+        for name in ("present-5r", "present-linear", "rotation-layer"):
+            self.assertTrue(any(name in use["covered_by"] for use in kind["uses"]), name)
+        for name in self.NAMES:
+            self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
