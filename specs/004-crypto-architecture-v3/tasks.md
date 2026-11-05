@@ -676,12 +676,14 @@ hash, older than its first counted result.
   S-box's published difference and linear tables. (FR-038, FR-039; SC-007; R12)
 - [ ] T061 [P] [US4] Write `research/004/tools/trails/active_sbox.py`, MILP counting of active
   S-boxes with `scipy.optimize.milp` (HiGHS) at research R12's fixed settings (`mip_rel_gap` 0, the
-  8 h `time_limit`, and only the solver's dual bound used, rounded down, never the best solution
-  found); validate it on `present-5r`, PRESENT's 5-round minimum of 10 active S-boxes. (FR-038,
-  FR-039; SC-007; R12)
+  8 h `time_limit` over the runs of one count, and each count from those runs, checked in whole
+  numbers, never read from a float and never the best solution found); validate it on `present-5r`,
+  PRESENT's 5-round minimum of 10 active S-boxes, and on `present-linear` and `rotation-layer` for
+  R12's other uses of it. (FR-038, FR-039; SC-007; R12)
 - [ ] T062 [P] [US4] Write `research/004/tools/trails/long_trail.py`, MILP counting of active
   ARX-boxes at the same settings; validate it on `sparkle-box`, SPARKLE's published long-trail bound
-  from its box bounds. (FR-038, FR-039; SC-007; R12)
+  from its box bounds, on `sparkle-box-second` for masks at w = 32, and on `long-trail-feistel` at
+  w = 8 and 16. (FR-038, FR-039; SC-007; R12)
 - [ ] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c`, a branch-and-bound search for
   ARX differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén),
   with `research/004/tools/trails/arx_search.mk` (C99, WSL), which builds

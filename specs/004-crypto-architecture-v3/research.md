@@ -1210,11 +1210,15 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     scipy documents the algorithm as deterministic. Every MILP bound record states that its status
     rests on these built-in tolerances, and the design document and the final report say so beside
     R_bound. A floating-point weight becomes data-model §6's rational by rounding down to a multiple
-    of 2⁻¹⁶, never up, which weakens the bound, and an active-box or active-S-box count is the
-    integer at or below its proven dual bound, with no tolerance, so a dual bound of 9.9999999
-    counts as 9; the record holds the float and the rounded value. A box lost to this rounding is
-    recovered only by an exact method where one exists, the cross-checks at w = 4 and 8, never by
-    rounding up.
+    of 2⁻¹⁶, never up, which weakens the bound. An active-box or active-S-box count, or any other
+    objective that takes only whole values, is never read from a float: it comes, in place of the
+    dual bound, from runs of the model at these settings. A count k stands where the status is
+    infeasible with a limit of k − 1 on that objective, or k is the sum of the counts of two shorter
+    spans of rounds, and where a solution at k holds when the tool checks it in whole numbers
+    against the tables its model was built from; the record holds each status, that check and the
+    dual bound, which no count reads. The runs of one count are one search instance of R7, within
+    its 8 h. A dual bound of such a model is never rounded up, and a run stopped at its time limit
+    gives no bound.
   - **What counts as a bound.** Only a proven result: an optimal or infeasible status with the
     proven dual bound used, or a search that exhausts its space within its cap. A search that times
     out gives no bound, and its record says `inconclusive` (R7). A bound that sets R_bound is

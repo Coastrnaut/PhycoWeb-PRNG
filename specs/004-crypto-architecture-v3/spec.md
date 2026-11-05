@@ -2451,10 +2451,12 @@ freeze hashes and the baseline manifest; run the claim-register test.
   that decide a bound are fixed and recorded (a MIP gap of 0, the feasibility and integrality
   tolerances, the thread count and the 8 h limit), and a floating-point weight becomes an exact
   rational by rounding down to a multiple of 2⁻¹⁶, never up, which weakens the bound, while an
-  active-box or active-S-box count is the integer at or below its proven dual
-  bound, with no tolerance (9.9999999 counts as 9); the record holds the
-  float and the rounded value, and a box lost to the rounding is recovered
-  only by an exact method where one exists, never by rounding up. Every MILP
+  active-box or active-S-box count, or any other objective that takes only whole values, is never
+  read from a float: it stands where the status is infeasible with a limit of one less on that
+  objective, or it is the sum of the counts of two shorter spans of rounds, and where a solution at
+  that count holds when checked in whole numbers against the tables its model was built from; the
+  record holds each status, that check and the dual bound, which no count reads, and a dual bound
+  of such a model is never rounded up. The runs of one count stay within one 8 h limit. Every MILP
   bound record states that its status rests on the solver's built-in tolerances, and the design
   document and the final report say so beside R_bound. A bound that sets R_bound is confirmed where
   an exact method exists, by the exhaustive tables at w = 4 and 8; at 16 and 32, where no exact
