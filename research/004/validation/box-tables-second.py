@@ -23,8 +23,14 @@ signed count of paths from carry 0, the top carry being free. An output mask (u,
 
 since p.rotl(q, r) = rotr(p, r).q for all words. So the entry is the sum at (u xor m, rotr(v, ALPHA), n xor
 rotr(m, BETA)).
+
+The floor of the cross-checks (research R12) is the best product of one-round entries over r rounds, from a non-zero
+start. This round has one addition, so each entry is one trail and its weight a whole number: 2w - log2 of the
+entry for a difference, and twice that for a mask, the weight being of the squared correlation. FLOOR_DIFFERENTIAL
+and FLOOR_SQUARED are what `chain_weights` below gives at w = 8, going through every row of each table once per
+round, a search that shares no code with the tool's. `internal-trails` states the same at w = 4.
 """
-from typing import NamedTuple
+from typing import Callable, Dict, NamedTuple
 
 import numpy as np
 
@@ -34,6 +40,10 @@ SECOND_OF = "box-tables"
 SOURCE = "self-written: the carries' automaton and the rotations, as this file's docstring states them"
 WIDTHS = (4, 8)
 AMOUNTS = {4: (1, 2), 8: (3, 1)}
+FLOOR_WIDTH = 8
+FLOOR_ROUNDS = 4
+FLOOR_DIFFERENTIAL = {1: 0, 2: 1, 3: 3, 4: 6}
+FLOOR_SQUARED = {1: 0, 2: 0, 3: 2, 4: 6}
 
 
 class Tables(NamedTuple):
@@ -125,3 +135,26 @@ def linear_row(known: Tables, mask: int) -> np.ndarray:
     v = rotr(word, alpha, w)
     t = word ^ rotr(m, beta, w)
     return known.sums[u ^ m][v][:, t].T.ravel()
+
+
+def chain_weights(w: int, rounds: int, row: Callable[[Tables, int], np.ndarray], factor: int) -> Dict[int, int]:
+    """The least sum of factor * (2w - log2 of an entry) along a chain of `rounds` rows, each next row being a column
+    of the last, from any non-zero row."""
+    known = tables(w)
+    size = 1 << (2 * w)
+    far = 1 << 40
+    best = np.zeros(size, dtype=np.int64)
+    best[0] = far
+    out = {}
+    for r in range(1, rounds + 1):
+        new = np.full(size, far, dtype=np.int64)
+        for start in np.flatnonzero(best < far):
+            entries = np.abs(row(known, int(start)))
+            weights = np.full(size, far, dtype=np.int64)
+            there = entries > 0
+            weights[there] = factor * (2 * w - np.rint(np.log2(entries[there])).astype(np.int64))
+            new = np.minimum(new, best[start] + weights)
+        new[0] = far
+        best = new
+        out[r] = int(best.min())
+    return out
