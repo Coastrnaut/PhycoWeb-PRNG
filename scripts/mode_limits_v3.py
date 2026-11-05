@@ -7,11 +7,14 @@ Reads three tables of the design document, each a Markdown table with fixed colu
 its own (data-model section 10): "Variant table" in the chapter "Permutation", "Layout" and "Limits"
 in the chapter "Mode". Exit 2 if one is missing, appears twice or holds a row it cannot read, or if
 a theorem marked verified has no `fetched` entry in downloads.json, or its file on disk has another
-SHA-256. Exit 1 if the bound exceeds the target advantage at the limits, if doubling a limit that
-sets the bound leaves it within that advantage, or on a violation at a claimable size.
+SHA-256. Exit 1 if a bound exceeds the target advantage at the limits, if doubling a limit that a
+term of a bound reads leaves both within that advantage, or on a violation at a claimable size.
 
-Every bound is computed in whole numbers and fractions, and a float only ever prints one, so that no
-limit rests on a rounding. Writes `parameters.json` beside `limits.json`, each under its fixed name.
+Two bounds are evaluated: Theorem 1 of Daemen, Mennink and Van Assche, for keystream and multi-user
+security, and the forget result of Gazi and Tessaro, Lemmas 10 and 12 summed by their Theorem 4, for
+backtracking resistance. Every bound is computed in whole numbers and fractions, and a float only
+ever prints one, so that no limit rests on a rounding. Writes `parameters.json` beside `limits.json`,
+each under its fixed name.
 """
 import argparse
 import json
@@ -35,6 +38,7 @@ OFFLINE_CALLS = 2 ** 128
 REQUEST_CAP_BITS = 2 ** 19
 MOST_INSTANTIATIONS = 2 ** 32
 TARGET_LEVEL = 128
+MOST_KEY_BITS = 256
 LANES_PER_NODE = 2
 WORD_BITS = 32
 THROUGHPUT_GOAL = 10 ** 8
@@ -56,7 +60,7 @@ FIRST_WAY = "nonces, first way"
 SECOND_WAY = "nonces, second way"
 FOR_ALL_SIZES = (KEYS, INSTANTIATIONS, RESEEDS, PERSONALIZATION, RESEED_INPUT, FIRST_WAY, SECOND_WAY)
 PER_SIZE = (PER_INSTANTIATION, PER_KEY, PER_REQUEST, PER_INSTANTIATE)
-PERSONALIZATION_BLOCK, RESEED_BLOCK, GENERATE_BLOCK, FORGET_BLOCK = 1, 2, 3, 4
+PERSONALIZATION_BLOCK, RESEED_BLOCK = 1, 2
 VARIANT_ID = re.compile(r"^[\w-]+/n(\d+)-w(\d+)-R(\d+)-c(\d+)$")
 LIMITS_FIELDS = ("epsilon", "N", "theorems", "u", "per_instantiation", "per_key", "per_request", "per_instantiate",
                  "other_limits", "nonces", "bound", "doubling", "outside_the_doubling_check")
@@ -81,12 +85,18 @@ THEOREMS: Tuple[Dict[str, Any], ...] = (
          ("a reseed input is sigma chosen by the adversary before that call's Z", "Calls"),
          ("output is the outer part of the state after a full call of f", "Serialization"),
      )},
-    {"id": "forget", "paper": "169.pdf", "theorem": "not yet read", "page": "not yet read",
-     "citation": "Gazi and Tessaro, EUROCRYPT 2016", "status": "unverified", "covers": ["backtracking"],
+    {"id": "forget", "paper": "169.pdf", "theorem": "Lemma 12, with Lemma 10 and Theorem 4", "page": "25, 22, 14",
+     "citation": "Gazi and Tessaro, EUROCRYPT 2016, ePrint 2016/169", "status": "unverified", "covers": ["backtracking"],
      "preconditions": (
-         ("forget overwrites the outer part, as Bertoni et al., CHES 2010, section 4.3 states it, "
-          "with r >= c, so one call leaves c bits to guess going backwards", "Forget"),
-         ("instantiate ends with a forget call, so no walk through the inverse reaches the key", "Forget"),
+         ("one ideal permutation of b bits, in both directions", "Calls"),
+         ("next: f, the outer part read, then t times f and the outer part set to zero", "Forget"),
+         ("refresh: an input added to the outer part, then f", "Calls"),
+         ("before each next, a state of zeros in the outer part and a secret inner part", "Forget"),
+         ("the key's state has min-entropy k, and is independent of f, for Lemma 10", "Key loading"),
+         ("no seed: every input is taken as chosen by the adversary, and Lemma 12's proof reads "
+          "only the inner part's secrecy", "Padding and domain separation"),
+         ("several blocks from one next: the paper's remark on page 15, which it does not work out", "Forget"),
+         ("the sum over the calls of next stays within the target advantage at the limits", "Limits"),
      )},
 )
 
@@ -300,10 +310,16 @@ def read_limits(text: str, claimable: Sequence[Variant]) -> Limits:
 
 # ------------------------------------------------------------------------------ the mode's arithmetic
 
+def key_bits(v: Variant) -> int:
+    """Research R14: k = min(c, 256), so 256 at a claimable size and c at a keyed reduced variant."""
+    return min(v.c, MOST_KEY_BITS)
+
+
 def keyed(v: Variant) -> bool:
-    """Research R14: c a multiple of 64, r of 32, and room for the key, the nonce and the initial word,
-    which at c >= 64 also leaves a rate of two words, one of data and one of domain bits."""
-    return v.c % 64 == 0 and v.r % 32 == 0 and v.c + v.c // 2 + WORD_BITS <= v.b
+    """Research R14: c a multiple of 64, r of 32 and of two words at least, one of data and one of
+    domain bits, and room in the state for the key, the nonce and the initial word."""
+    k = key_bits(v)
+    return v.c % 64 == 0 and v.r % 32 == 0 and v.r >= 2 * WORD_BITS and k + k // 2 + WORD_BITS <= v.b
 
 
 def forget_calls(v: Variant) -> int:
@@ -326,11 +342,6 @@ def absorbed_blocks(code: int, data: bytes, r: int) -> List[bytes]:
     return [encoded[at:at + size].ljust(size, b"\0") + domain for at in range(0, len(encoded), size)]
 
 
-def control_block(code: int, r: int) -> bytes:
-    """A block that holds no input: zero words and its domain word, G and F of the mode chapter."""
-    return bytes(r // 8 - 4) + code.to_bytes(4, "little")
-
-
 def decoded_input(blocks: Sequence[bytes]) -> Tuple[int, bytes, int]:
     """The call type, the input and the blocks read, from the first block on: the other way of the
     proof, which needs nothing but the domain word and the length word."""
@@ -346,12 +357,84 @@ def request_calls(bits: int, v: Variant) -> int:
     return -(-bits // v.r) + forget_calls(v)
 
 
+def reseed_calls(length: int, r: int) -> int:
+    """One call per block, and one more: `refresh` runs f after its last input, and `next` again."""
+    return input_blocks(length, r) + 1
+
+
+def instantiate_calls(length: int, v: Variant) -> int:
+    """`next` from the key's state, the string as a refresh, then `next` again, its block withheld."""
+    return (1 + forget_calls(v)) + reseed_calls(length, v.r) + (1 + forget_calls(v))
+
+
+def call_blocks(call: str, value: Any, r: int) -> List[Tuple[Optional[bytes], bool]]:
+    """What one call of the interface adds to the state, call of f by call of f: a block or None,
+    and whether the outer part is overwritten. FR-014's encoding of every call type."""
+    plain, flagged = (None, False), (None, True)
+    if call == "generate":
+        return [plain] * value + [flagged]
+    if call == "reseed":
+        return [(block, False) for block in absorbed_blocks(RESEED_BLOCK, value, r)] + [plain]
+    if call == "instantiate":
+        blocks = [(block, False) for block in absorbed_blocks(PERSONALIZATION_BLOCK, value, r)]
+        return [plain, flagged] + blocks + [plain, plain, flagged]
+    raise ValueError(call)
+
+
+def decoded_calls(sequence: Sequence[Tuple[Optional[bytes], bool]]) -> List[Tuple[str, Any]]:
+    """The calls back from what `call_blocks` gives, an instantiate first: the other way of the proof.
+    A block's length word says where its input ends, and a run of plain calls ends at the flag."""
+    def read_input(at: int) -> Tuple[bytes, int]:
+        end = at
+        while end < len(sequence) and sequence[end][0] is not None:
+            end += 1
+        _, data, count = decoded_input([block for block, _ in sequence[at:end]])
+        return data, count
+
+    data, count = read_input(2)
+    out: List[Tuple[str, Any]] = [("instantiate", data)]
+    at = 2 + count + 3
+    while at < len(sequence):
+        if sequence[at][0] is not None:
+            data, count = read_input(at)
+            out.append(("reseed", data))
+            at += count + 1
+        else:
+            count = 0
+            while not sequence[at + count][1]:
+                count += 1
+            out.append(("generate", count))
+            at += count + 1
+    return out
+
+
 def multicollision_limit(balls: int, r: int, c: int) -> int:
     """An upper bound on Definition 2's function: the union bound Pr(mu > x) <= C(balls, x + 1) 2^(-rx)."""
     x = 1
     while math.comb(balls, x + 1) * 2 ** c > x * 2 ** (r * x):
         x += 1
     return x
+
+
+def forget_terms(queries: int, blocks: int, v: Variant) -> Dict[str, Fraction]:
+    """Lemma 12 of Gazi and Tessaro, one call of `next`, and Lemma 10, from the key's state, at t = forget calls."""
+    t, b, c, r = forget_calls(v), v.b, v.c, v.r
+    rate_term = Fraction(queries, 2 ** ((r - 1) * t))
+    return {"preserving": Fraction((2 * blocks + 2) * (queries + blocks), 2 ** b) + rate_term
+            + Fraction(4 * (queries + t) ** 2 + queries, 2 ** c),
+            "from the key": Fraction(queries, 2 ** key_bits(v)) + rate_term + Fraction(4 * (queries + t) ** 2, 2 ** c)
+            + Fraction(1, 2 ** b)}
+
+
+def forget_bound(keys: int, instantiations: int, calls: int, v: Variant) -> Dict[str, Any]:
+    """Theorem 4's sum: Lemma 12 over every call of `next`, at most one for each 1 + t calls of f, and
+    Lemma 10 once per instantiation. Every call of f the construction makes counts among the queries,
+    and a step's blocks are at most the calls of an instantiation."""
+    total = keys * instantiations * calls
+    steps = total // (1 + forget_calls(v))
+    terms = forget_terms(OFFLINE_CALLS + total, calls, v)
+    summed = {"preserving": steps * terms["preserving"], "from the key": keys * instantiations * terms["from the key"]}
+    return {"steps": steps, "queries": OFFLINE_CALLS + total, "terms": summed, "total": sum(summed.values(), Fraction(0))}
 
 
 def resources(keys: int, instantiations: int, calls: int, v: Variant) -> Dict[str, int]:
@@ -366,7 +449,7 @@ def resources(keys: int, instantiations: int, calls: int, v: Variant) -> Dict[st
 def theorem_terms(have: Dict[str, int], v: Variant, instantiations: int) -> Dict[str, Fraction]:
     """Theorem 1 of Daemen et al., term by term, with H_min = H_coll = k, and the nonces' collision term."""
     big_m, omega, q, q_iv, big_l, u, big_n = (have[name] for name in ("M", "Omega", "q", "q_iv", "L", "u", "N"))
-    k, b, c, r = v.c, v.b, v.c, v.r
+    k, b, c, r = key_bits(v), v.b, v.c, v.r
     nu = multicollision_limit(2 * (big_m - big_l), r, c)
     left = (big_m - q - big_l) * q
     return {"overwrites": Fraction((big_l + omega) * big_n, 2 ** c),
@@ -387,12 +470,14 @@ def log2_of(value: Fraction) -> str:
 
 
 def bound_at(keys: int, instantiations: int, calls: int, v: Variant) -> Fraction:
-    return sum(theorem_terms(resources(keys, instantiations, calls, v), v, instantiations).values(), Fraction(0))
+    """The larger of the two bounds, each of which must stay within the target advantage."""
+    keystream = sum(theorem_terms(resources(keys, instantiations, calls, v), v, instantiations).values(), Fraction(0))
+    return max(keystream, forget_bound(keys, instantiations, calls, v)["total"])
 
 
 def doubled(limits: Limits, v: Variant) -> Dict[str, Dict]:
-    """R9's doubling check, limit by limit. The per-key limit is the product of two others, so that
-    doubling it is doubling the calls of an instantiation."""
+    """R9's doubling check, limit by limit, against the larger bound. The per-key limit is the
+    product of two others, so that doubling it is doubling the calls of an instantiation."""
     out = {}
     for name, keys, instantiations, calls in (
             (KEYS, 2 * limits.keys, limits.instantiations, limits.calls),
@@ -424,7 +509,7 @@ def table_faults(limits: Limits, claimable: Sequence[Variant]) -> List[str]:
         cap = min(REQUEST_CAP_BITS, limits.calls * v.r)
         if limits.per_size[(PER_REQUEST, v.n)] != (request_calls(cap, v), cap):
             faults.append(f"{PER_REQUEST} at {v.n}×{v.n} is not the cap's calls")
-        first = input_blocks(limits.personalization, v.r) + forget_calls(v)
+        first = instantiate_calls(limits.personalization, v)
         if limits.per_size[(PER_INSTANTIATE, v.n)] != (first, first * v.r):
             faults.append(f"{PER_INSTANTIATE} at {v.n}×{v.n} is not the {first} calls of the longest string")
     return faults
@@ -436,8 +521,8 @@ def layout_faults(layout: Layout, v: Variant) -> List[str]:
     lanes, width = LANES_PER_NODE * v.n * v.n, v.w
     rate = tuple(range(v.r // width))
     capacity = tuple(range(v.r // width, lanes))
-    key = tuple(range(v.c // width))
-    nonce = tuple(range(len(key), len(key) + v.c // 2 // width))
+    key = tuple(range(key_bits(v) // width))
+    nonce = tuple(range(len(key), len(key) + key_bits(v) // 2 // width))
     faults = []
     for name, lanes_read, lanes_wanted in (("rate", layout.rate, rate), ("capacity", layout.capacity, capacity),
                                            ("key", layout.key, key), ("nonce", layout.nonce, nonce)):
@@ -463,7 +548,7 @@ def profile_row(v: Variant, layouts: Dict[Tuple[int, int, int], Layout], limits:
     if layout is None:
         raise Refused(f"the layout holds no row for {v.variant_id}")
     secret = len(layout.capacity) * v.w
-    key, nonce = v.c, v.c // 2
+    key, nonce = key_bits(v), key_bits(v) // 2
     terms = {"key entropy": key, "half the reachable secret state": secret // 2,
              "multi-target": max(key - int(math.log2(limits.keys)), 0),
              "half of key and nonce": (key + nonce) // 2, "half the capacity": v.c // 2,
@@ -541,12 +626,17 @@ def compute(text: str, manifest: Sequence[Dict], root: Path) -> Dict[str, Any]:
         terms = theorem_terms(have, v, limits.instantiations)
         total = sum(terms.values(), Fraction(0))
         condition = 10 * (have["N"] + have["M"]) <= 2 ** v.c
-        bounds[v.variant_id] = {"resources": {k: power(n) for k, n in have.items()},
-                                "terms_log2": {k: log2_of(t) for k, t in terms.items()},
-                                "log2_bound": log2_of(total), "at_most_target_advantage": total <= TARGET_ADVANTAGE,
-                                "theorem_condition": condition}
+        forget = forget_bound(limits.keys, limits.instantiations, limits.calls, v)
+        bounds[v.variant_id] = {"keystream": {"resources": {k: power(n) for k, n in have.items()},
+                                              "terms_log2": {k: log2_of(t) for k, t in terms.items()},
+                                              "log2_bound": log2_of(total), "at_most_target_advantage": total <= TARGET_ADVANTAGE,
+                                              "theorem_condition": condition},
+                                "backtracking": {"calls_of_next": power(forget["steps"]), "queries": "N + M",
+                                                 "terms_log2": {k: log2_of(t) for k, t in forget["terms"].items()},
+                                                 "log2_bound": log2_of(forget["total"]),
+                                                 "at_most_target_advantage": forget["total"] <= TARGET_ADVANTAGE}}
         doubling[v.variant_id] = doubled(limits, v)
-        within[v.variant_id] = total <= TARGET_ADVANTAGE and condition \
+        within[v.variant_id] = total <= TARGET_ADVANTAGE and forget["total"] <= TARGET_ADVANTAGE and condition \
             and all(entry["above_target_advantage"] for entry in doubling[v.variant_id].values())
 
     rows = [profile_row(v, layouts, limits, variants, nonce_section, within.get(v.variant_id)) for v in variants]
@@ -567,8 +657,8 @@ def compute(text: str, manifest: Sequence[Dict], root: Path) -> Dict[str, Any]:
             "per-request cap": "research R9 fixes it at 2^19 bits, and no term of the theorem reads it",
             RESEEDS: "a reseed takes at least one call, so that the limit on calls holds it"}}
     profile_fields = {"rows": rows, "u": power(limits.keys), "throughput_goal": THROUGHPUT_GOAL}
-    assertions = [{"assertion": "the bound is within the target advantage at the limits, and doubling a limit that "
-                                "sets it passes that advantage, at every claimable size", "holds": all(within.values())},
+    assertions = [{"assertion": "each bound is within the target advantage at the limits, and doubling a limit that a "
+                                "term reads passes that advantage, at every claimable size", "holds": all(within.values())},
                   {"assertion": "no violation of a generic bound at a claimable size", "holds": not broken}]
     return {"limits": limits_fields, "parameters": profile_fields, "held": held, "assertions": assertions}
 

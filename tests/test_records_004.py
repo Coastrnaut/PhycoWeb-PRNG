@@ -161,40 +161,40 @@ class Disclaimers(unittest.TestCase):
 
 STATED_VARIANTS = """| ID | n | w | b | c | r | R | status |
 |----|---|---|---|---|---|---|--------|
-| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 768 | 20 | claimable |
-| phyco-v3/n8-w32-R24-c256 | 8 | 32 | 4,096 | 256 | 3,840 | 24 | claimable |
-| phyco-v3/n16-w32-R32-c256 | 16 | 32 | 16,384 | 256 | 16,128 | 32 | claimable |
+| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 640 | 20 | claimable |
+| phyco-v3/n8-w32-R24-c384 | 8 | 32 | 4,096 | 384 | 3,712 | 24 | claimable |
+| phyco-v3/n16-w32-R32-c384 | 16 | 32 | 16,384 | 384 | 16,000 | 32 | claimable |
 | phyco-v3/n2-w16-R8-c64 | 2 | 16 | 128 | 64 | 64 | 8 (reduced, for a stated test) | research |
 | phyco-v3/n2-w4-R8-c16 | 2 | 4 | 32 | 16 | 16 | 8 (reduced, for a stated test) | research |
 """
 STATED_LAYOUT = """| Size | w | c | Rate lanes | Capacity lanes | Key lanes | Nonce lanes |
 |------|---|---|------------|----------------|-----------|-------------|
-| 4×4 | 32 | 256 | 0-23 | 24-31 | 0-7 | 8-11 |
-| 8×8 | 32 | 256 | 0-119 | 120-127 | 0-7 | 8-11 |
-| 16×16 | 32 | 256 | 0-503 | 504-511 | 0-7 | 8-11 |
+| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |
+| 8×8 | 32 | 384 | 0-115 | 116-127 | 0-7 | 8-11 |
+| 16×16 | 32 | 384 | 0-499 | 500-511 | 0-7 | 8-11 |
 | 2×2 | 16 | 64 | 0-3 | 4-7 | 0-3 | 4,5 |
 """
 STATED_LIMITS = """| Limit | Size | Value | Bits |
 |-------|------|-------|------|
 | keys u | all | 2^20 | none |
 | instantiations per key | all | 2^20 | none |
-| reseeds per instantiation | all | 2^24 | none |
+| reseeds per instantiation | all | 2^21 | none |
 | personalization string, bytes | all | 4,096 | none |
 | reseed input, bytes | all | 4,096 | none |
 | nonces, first way | all | a counter per key, never repeated or wrapped | none |
 | nonces, second way | all | uniform values of the nonce's length | none |
-| calls of Π per instantiation | 4×4 | 2^24 | 12,884,901,888 |
-| calls of Π per instantiation | 8×8 | 2^24 | 64,424,509,440 |
-| calls of Π per instantiation | 16×16 | 2^24 | 270,582,939,648 |
-| calls of Π per key | 4×4 | 2^44 | 13,510,798,882,111,488 |
-| calls of Π per key | 8×8 | 2^44 | 67,553,994,410,557,440 |
-| calls of Π per key | 16×16 | 2^44 | 283,726,776,524,341,248 |
-| calls of Π per request | 4×4 | 684 | 524,288 |
-| calls of Π per request | 8×8 | 138 | 524,288 |
+| calls of Π per instantiation | 4×4 | 2^22 | 2,684,354,560 |
+| calls of Π per instantiation | 8×8 | 2^22 | 15,569,256,448 |
+| calls of Π per instantiation | 16×16 | 2^22 | 67,108,864,000 |
+| calls of Π per key | 4×4 | 2^42 | 2,814,749,767,106,560 |
+| calls of Π per key | 8×8 | 2^42 | 16,325,548,649,218,048 |
+| calls of Π per key | 16×16 | 2^42 | 70,368,744,177,664,000 |
+| calls of Π per request | 4×4 | 821 | 524,288 |
+| calls of Π per request | 8×8 | 143 | 524,288 |
 | calls of Π per request | 16×16 | 34 | 524,288 |
-| calls of Π per instantiate | 4×4 | 46 | 35,328 |
-| calls of Π per instantiate | 8×8 | 10 | 38,400 |
-| calls of Π per instantiate | 16×16 | 4 | 64,512 |
+| calls of Π per instantiate | 4×4 | 59 | 37,760 |
+| calls of Π per instantiate | 8×8 | 14 | 51,968 |
+| calls of Π per instantiate | 16×16 | 8 | 128,000 |
 """
 
 
@@ -227,11 +227,11 @@ class ModeLimitsTables(unittest.TestCase):
         self.assertEqual(variants[0].reason, "none")
         layouts = self.tool.read_layouts(text)
         self.assertEqual(layouts[(2, 16, 64)].nonce, (4, 5))
-        self.assertEqual(layouts[(4, 32, 256)].capacity, tuple(range(24, 32)))
+        self.assertEqual(layouts[(4, 32, 384)].capacity, tuple(range(20, 32)))
         limits = self.tool.read_limits(text, variants[:3])
         self.assertEqual((limits.keys, limits.instantiations, limits.calls, limits.per_key),
-                         (2 ** 20, 2 ** 20, 2 ** 24, 2 ** 44))
-        self.assertEqual(limits.per_size[(self.tool.PER_REQUEST, 8)], (138, 524288))
+                         (2 ** 20, 2 ** 20, 2 ** 22, 2 ** 42))
+        self.assertEqual(limits.per_size[(self.tool.PER_REQUEST, 8)], (143, 524288))
 
     def refused(self, text: str, reader=None):
         reader = reader or self.tool.read_variants
@@ -274,29 +274,29 @@ class ModeLimitsTables(unittest.TestCase):
         self.assertEqual(self.tool.mode_sections(stated_design())[:2], ["Calls", "Layout"])
 
     def test_a_row_it_cannot_read_is_refused(self):
-        row = "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 768 | 20 | claimable |"
-        for wrong in ("| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 768 | 20 |",
-                      "| phyco-v3/n4-w32-R20 | 4 | 32 | 1,024 | 256 | 768 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 8 | 32 | 1,024 | 256 | 768 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 16 | 1,024 | 256 | 768 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 128 | 768 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R21-c256 | 4 | 32 | 1,024 | 256 | 768 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 768 | twenty | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,000 | 256 | 744 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 700 | 20 | claimable |",
+        row = "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 640 | 20 | claimable |"
+        for wrong in ("| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 640 | 20 |",
+                      "| phyco-v3/n4-w32-R20 | 4 | 32 | 1,024 | 384 | 640 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 8 | 32 | 1,024 | 384 | 640 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 16 | 1,024 | 384 | 640 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 128 | 640 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R21-c384 | 4 | 32 | 1,024 | 384 | 640 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 640 | twenty | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,000 | 384 | 616 | 20 | claimable |",
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 700 | 20 | claimable |",
                       "| phyco-v3/n4-w32-R20-c0 | 4 | 32 | 1,024 | 0 | 1,024 | 20 | claimable |",
                       "| phyco-v3/n4-w32-R20-c1024 | 4 | 32 | 1,024 | 1,024 | 0 | 20 | claimable |",
-                      "| phyco-v3/n4-w32-R20-c256 | 4 | 32 | 1,024 | 256 | 768 | 20 | production |",
-                      "| phyco-v3/n4-w32-R20-c256 | four | 32 | 1,024 | 256 | 768 | 20 | claimable |"):
+                      "| phyco-v3/n4-w32-R20-c384 | 4 | 32 | 1,024 | 384 | 640 | 20 | production |",
+                      "| phyco-v3/n4-w32-R20-c384 | four | 32 | 1,024 | 384 | 640 | 20 | claimable |"):
             self.refused(stated_design(variants=STATED_VARIANTS.replace(row, wrong)))
         self.refused(stated_design(variants=STATED_VARIANTS + row + "\n"))
 
     def test_a_layout_row_it_cannot_read_is_refused(self):
-        row = "| 4×4 | 32 | 256 | 0-23 | 24-31 | 0-7 | 8-11 |"
-        for wrong in ("| 4x4 | 32 | 256 | 0-23 | 24-31 | 0-7 | 8-11 |", "| 4×8 | 32 | 256 | 0-23 | 24-31 | 0-7 | 8-11 |",
-                      "| 4×4 | 32 | 256 | 0-23 | 24-32 | 0-7 | 8-11 |", "| 4×4 | 32 | 256 | 0-23 | 24-31 | 7-0 | 8-11 |",
-                      "| 4×4 | 32 | 256 | 0-23 | 24-31 | 0-7,7 | 8-11 |", "| 4×4 | 32 | 256 | a | 24-31 | 0-7 | 8-11 |",
-                      "| 4×4 | 32 | 256 | 0-23/0 | 24-31 | 0-7 | 8-11 |"):
+        row = "| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |"
+        for wrong in ("| 4x4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |", "| 4×8 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |",
+                      "| 4×4 | 32 | 384 | 0-19 | 20-32 | 0-7 | 8-11 |", "| 4×4 | 32 | 384 | 0-19 | 20-31 | 7-0 | 8-11 |",
+                      "| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7,7 | 8-11 |", "| 4×4 | 32 | 384 | a | 20-31 | 0-7 | 8-11 |",
+                      "| 4×4 | 32 | 384 | 0-19/0 | 20-31 | 0-7 | 8-11 |"):
             self.refused(stated_design(layout=STATED_LAYOUT.replace(row, wrong)), self.tool.read_layouts)
         self.refused(stated_design(layout=STATED_LAYOUT + row + "\n"), self.tool.read_layouts)
 
@@ -309,16 +309,16 @@ class ModeLimitsTables(unittest.TestCase):
 
     def test_a_limits_row_it_cannot_read_is_refused(self):
         self.refused(stated_design(limits=STATED_LIMITS + "| keys u | all | 2^20 | none |\n"), self.tool.read_limits)
-        self.refused(stated_design(limits=STATED_LIMITS + "| calls of Π per key | 4×4 | 2^44 | 1 |\n"), self.tool.read_limits)
+        self.refused(stated_design(limits=STATED_LIMITS + "| calls of Π per key | 4×4 | 2^42 | 1 |\n"), self.tool.read_limits)
         self.refused(stated_design(limits=STATED_LIMITS + "| another limit | all | 1 | none |\n"), self.tool.read_limits)
-        self.refused(stated_design(limits=STATED_LIMITS + "| calls of Π per key | 2×2 | 2^44 | 1 |\n"), self.tool.read_limits)
+        self.refused(stated_design(limits=STATED_LIMITS + "| calls of Π per key | 2×2 | 2^42 | 1 |\n"), self.tool.read_limits)
         self.refused(stated_design(limits=STATED_LIMITS.replace("| keys u | all | 2^20 | none |\n", "")), self.tool.read_limits)
-        self.refused(stated_design(limits=STATED_LIMITS.replace("| calls of Π per request | 8×8 | 138 | 524,288 |\n", "")),
+        self.refused(stated_design(limits=STATED_LIMITS.replace("| calls of Π per request | 8×8 | 143 | 524,288 |\n", "")),
                      self.tool.read_limits)
         self.refused(stated_design(limits=STATED_LIMITS.replace("| keys u | all | 2^20 |", "| keys u | all | many |")),
                      self.tool.read_limits)
-        self.refused(stated_design(limits=STATED_LIMITS.replace("| 16×16 | 2^24 |", "| 16×16 | 2^25 |")), self.tool.read_limits)
-        self.refused(stated_design(limits=STATED_LIMITS.replace("| 16×16 | 2^44 |", "| 16×16 | 2^45 |")), self.tool.read_limits)
+        self.refused(stated_design(limits=STATED_LIMITS.replace("| 16×16 | 2^22 |", "| 16×16 | 2^23 |")), self.tool.read_limits)
+        self.refused(stated_design(limits=STATED_LIMITS.replace("| 16×16 | 2^42 |", "| 16×16 | 2^43 |")), self.tool.read_limits)
 
     def test_a_table_with_no_separator_or_no_rows_is_refused(self):
         lines = STATED_VARIANTS.splitlines()
@@ -334,14 +334,33 @@ class ModeLimitsArithmetic(unittest.TestCase):
 
     def test_the_calls_of_an_input_and_a_request(self):
         self.assertEqual([self.tool.input_blocks(n, 64) for n in (0, 1, 4, 5, 8, 9)], [1, 2, 2, 3, 3, 4])
-        self.assertEqual(self.tool.input_blocks(4096, 768), 45)
-        self.assertEqual(self.tool.input_blocks(4096, 16128), 3)
-        self.assertEqual(self.tool.input_blocks(88, 768), 1)
-        self.assertEqual(self.tool.input_blocks(89, 768), 2)
+        self.assertEqual(self.tool.input_blocks(4096, 640), 54)
+        self.assertEqual(self.tool.input_blocks(4096, 16000), 3)
+        self.assertEqual(self.tool.input_blocks(72, 640), 1)
+        self.assertEqual(self.tool.input_blocks(73, 640), 2)
         variant = self.tool.read_variants(stated_design())[0]
-        self.assertEqual(self.tool.request_calls(2 ** 19, variant), 684)
-        self.assertEqual(self.tool.request_calls(768, variant), 2)
-        self.assertEqual(self.tool.request_calls(769, variant), 3)
+        self.assertEqual(self.tool.request_calls(2 ** 19, variant), 821)
+        self.assertEqual(self.tool.request_calls(640, variant), 2)
+        self.assertEqual(self.tool.request_calls(641, variant), 3)
+
+    def test_the_calls_of_a_reseed_and_an_instantiate(self):
+        variant = self.tool.read_variants(stated_design())[0]
+        self.assertEqual(self.tool.reseed_calls(0, 640), 2, "one block and the call after it")
+        self.assertEqual(self.tool.reseed_calls(4096, 640), 55)
+        self.assertEqual(self.tool.instantiate_calls(0, variant), 6, "two, one block and the call after it, two")
+        self.assertEqual(self.tool.instantiate_calls(4096, variant), 59)
+        tight = small_variant()._replace(c=256, r=128)
+        self.assertEqual(self.tool.instantiate_calls(0, tight), 8, "each forget takes 2 calls there")
+        for length in (0, 5, 4096):
+            self.assertEqual(len(self.tool.call_blocks("instantiate", bytes(length), 640)), self.tool.instantiate_calls(length, variant))
+            self.assertEqual(len(self.tool.call_blocks("reseed", bytes(length), 640)), self.tool.reseed_calls(length, 640))
+        self.assertEqual(len(self.tool.call_blocks("generate", 7, 640)), self.tool.request_calls(7 * 640, variant))
+
+    def test_the_key_stays_256_bits_at_a_claimable_size(self):
+        variant = self.tool.read_variants(stated_design())[0]
+        self.assertEqual(self.tool.key_bits(variant), 256)
+        self.assertEqual(self.tool.key_bits(small_variant()), 64)
+        self.assertEqual(self.tool.key_bits(small_variant()._replace(c=256, r=768, b=1024)), 256)
 
     def test_a_forget_takes_as_many_calls_as_c_needs(self):
         base = small_variant()
@@ -360,6 +379,10 @@ class ModeLimitsArithmetic(unittest.TestCase):
         self.assertFalse(self.tool.keyed(base._replace(c=128, r=64, b=192)), "no room for the key, the nonce and a word")
         self.assertTrue(self.tool.keyed(base._replace(c=128, r=96, b=224)))
         self.assertFalse(self.tool.keyed(base._replace(c=128, r=95, b=223)))
+        self.assertFalse(self.tool.keyed(base._replace(c=512, r=32, b=544)), "room for the key, and a rate of one word")
+        self.assertTrue(self.tool.keyed(base._replace(c=512, r=64, b=576)))
+        self.assertTrue(self.tool.keyed(base._replace(c=384, r=640, b=1024)), "room reads the key of 256 bits")
+        self.assertFalse(self.tool.keyed(base._replace(c=384, r=32, b=416)), "the same at a rate of one word")
 
     def test_the_multicollision_limit_on_small_cases(self):
         self.assertEqual(self.tool.multicollision_limit(194, 64, 64), 2)
@@ -394,21 +417,71 @@ class ModeLimitsArithmetic(unittest.TestCase):
 
     def test_the_resources_at_the_limits(self):
         variant = self.tool.read_variants(stated_design())[0]
-        self.assertEqual(self.tool.resources(2 ** 20, 2 ** 20, 2 ** 24, variant),
-                         {"M": 2 ** 64, "Omega": 2 ** 63, "q": 2 ** 40, "q_iv": 2 ** 20, "L": 0, "u": 2 ** 20, "N": 2 ** 128})
+        self.assertEqual(self.tool.resources(2 ** 20, 2 ** 20, 2 ** 22, variant),
+                         {"M": 2 ** 62, "Omega": 2 ** 61, "q": 2 ** 40, "q_iv": 2 ** 20, "L": 0, "u": 2 ** 20, "N": 2 ** 128})
         tight = small_variant()._replace(c=256, r=128)
         self.assertEqual(self.tool.resources(1, 1, 3, tight)["Omega"], 2)
 
+    def test_each_term_of_the_forget_result_on_a_small_case(self):
+        """Lemma 12 at q = 7, d' = 3, t = 1, b = 128, c = r = 64, and Lemma 10 at k = 64."""
+        terms = self.tool.forget_terms(7, 3, small_variant())
+        self.assertEqual(terms["preserving"], Fraction(8 * 10, 2 ** 128) + Fraction(7, 2 ** 63) + Fraction(4 * 64 + 7, 2 ** 64))
+        self.assertEqual(terms["from the key"], Fraction(7, 2 ** 64) + Fraction(7, 2 ** 63) + Fraction(4 * 64, 2 ** 64) + Fraction(1, 2 ** 128))
+
+    def test_a_second_forget_call_raises_the_exponent_and_the_quadratic_term(self):
+        terms = self.tool.forget_terms(7, 0, small_variant()._replace(b=128, c=96, r=32))
+        self.assertEqual(terms["preserving"], Fraction(2 * 7, 2 ** 128) + Fraction(7, 2 ** (31 * 3)) + Fraction(4 * 10 ** 2 + 7, 2 ** 96), "t = 96/32")
+
+    def test_the_sum_over_the_calls_of_next(self):
+        small = small_variant()
+        out = self.tool.forget_bound(2, 3, 8, small)
+        self.assertEqual(out["steps"], 24, "48 calls, 2 to each next")
+        self.assertEqual(out["queries"], 2 ** 128 + 48)
+        terms = self.tool.forget_terms(2 ** 128 + 48, 8, small)
+        self.assertEqual(out["terms"], {"preserving": 24 * terms["preserving"], "from the key": 6 * terms["from the key"]})
+        self.assertEqual(out["total"], 24 * terms["preserving"] + 6 * terms["from the key"])
+
+    def test_the_sum_reads_the_calls_a_next_takes(self):
+        """At t = 2 a call of next takes 3 calls of f, so 48 calls hold 16 of them."""
+        wide = small_variant()._replace(b=384, c=256, r=128)
+        self.assertEqual(self.tool.forget_calls(wide), 2)
+        self.assertEqual(self.tool.forget_bound(2, 3, 8, wide)["steps"], 16)
+
+    def test_the_larger_bound_is_each_in_turn(self):
+        variant = self.tool.read_variants(stated_design())[0]
+        terms = {"a": Fraction(1, 8), "b": Fraction(1, 8)}
+        small = {"total": Fraction(1, 16)}
+        with mock.patch.object(self.tool, "theorem_terms", return_value=terms), mock.patch.object(self.tool, "forget_bound", return_value=small):
+            self.assertEqual(self.tool.bound_at(1, 1, 1, variant), Fraction(1, 4), "every term of the keystream bound, which leads")
+        with mock.patch.object(self.tool, "theorem_terms", return_value=terms), mock.patch.object(self.tool, "forget_bound", return_value={"total": Fraction(1, 2)}):
+            self.assertEqual(self.tool.bound_at(1, 1, 1, variant), Fraction(1, 2), "the forget bound, which leads")
+
+    def test_the_forget_result_at_c_256_gives_no_bound_at_n_2_128(self):
+        """The reason for c = 384: 4 (2^128)^2 / 2^256 is 4, and 2^-62 at c = 320 still misses the target."""
+        wide = small_variant()._replace(b=1024, c=256, r=768)
+        self.assertGreaterEqual(self.tool.forget_terms(2 ** 128, 0, wide)["preserving"], 4)
+        narrow = wide._replace(c=320, r=704)
+        self.assertGreater(self.tool.forget_terms(2 ** 128, 0, narrow)["preserving"], Fraction(1, 2 ** 64))
+        chosen = wide._replace(c=384, r=640)
+        self.assertLess(self.tool.forget_terms(2 ** 128, 0, chosen)["preserving"], Fraction(1, 2 ** 125))
+
     def test_the_bound_at_the_stated_limits_worked_by_hand(self):
-        """2^63 flagged calls over 2^128 give 2^-65, the nonces' term 2^-69, the rest under 2^-107."""
+        """Keystream: 2^61 flagged calls over 2^256 give 2^-195, so the nonce's 2^-69 leads, and 2^-108 the key search. Backtracking: 2^61
+        calls of next at 2^-126 give 2^-65, and 2^40 instantiations from the key add 2^-85.68, 2^40 (2^-128 + 2^-126)."""
         out = self.tool.compute(stated_design(), [], ROOT)
         for variant, entry in out["limits"]["bound"].items():
-            self.assertEqual(entry["log2_bound"], "-64.912537", variant)
-            self.assertEqual(entry["terms_log2"]["overwrites"], "-65.000000")
-            self.assertEqual(entry["terms_log2"]["nonce collisions"], "-69.000000")
-            self.assertEqual(entry["terms_log2"]["key search"], "-108.000000")
-            self.assertTrue(entry["at_most_target_advantage"])
-            self.assertTrue(entry["theorem_condition"])
+            keystream, backward = entry["keystream"], entry["backtracking"]
+            self.assertEqual(keystream["log2_bound"], "-69.000000", variant)
+            self.assertEqual(keystream["terms_log2"]["overwrites"], "-195.000000")
+            self.assertEqual(keystream["terms_log2"]["nonce collisions"], "-69.000000")
+            self.assertEqual(keystream["terms_log2"]["key search"], "-108.000000")
+            self.assertTrue(keystream["at_most_target_advantage"])
+            self.assertTrue(keystream["theorem_condition"])
+            self.assertEqual(backward["log2_bound"], "-64.999999", variant)
+            self.assertEqual(backward["terms_log2"]["preserving"], "-65.000000")
+            self.assertEqual(backward["terms_log2"]["from the key"], "-85.678072")
+            self.assertEqual(backward["calls_of_next"], "2^61")
+            self.assertTrue(backward["at_most_target_advantage"])
         self.assertTrue(out["held"])
 
     def test_doubling_each_limit_passes_the_target_advantage(self):
@@ -416,8 +489,8 @@ class ModeLimitsArithmetic(unittest.TestCase):
         for variant, rows in out["limits"]["doubling"].items():
             self.assertEqual(set(rows), {self.tool.KEYS, self.tool.INSTANTIATIONS, self.tool.PER_INSTANTIATION, self.tool.PER_KEY})
             self.assertTrue(all(row["above_target_advantage"] for row in rows.values()), variant)
-            self.assertEqual(rows[self.tool.KEYS]["log2_bound"], "-63.912537")
-            self.assertEqual(rows[self.tool.PER_INSTANTIATION]["log2_bound"], "-63.955606")
+            self.assertEqual(rows[self.tool.KEYS]["log2_bound"], "-63.999999")
+            self.assertEqual(rows[self.tool.PER_INSTANTIATION]["log2_bound"], "-64.000000")
 
     def test_each_doubling_doubles_its_own_limit(self):
         limits = self.tool.read_limits(stated_design(), self.tool.read_variants(stated_design())[:3])
@@ -425,11 +498,11 @@ class ModeLimitsArithmetic(unittest.TestCase):
         with mock.patch.object(self.tool, "bound_at", return_value=Fraction(1)) as bound:
             self.tool.doubled(limits, variant)
         self.assertEqual([c.args[:3] for c in bound.call_args_list],
-                         [(2 ** 21, 2 ** 20, 2 ** 24), (2 ** 20, 2 ** 21, 2 ** 24), (2 ** 20, 2 ** 20, 2 ** 25), (2 ** 20, 2 ** 20, 2 ** 25)])
+                         [(2 ** 21, 2 ** 20, 2 ** 22), (2 ** 20, 2 ** 21, 2 ** 22), (2 ** 20, 2 ** 20, 2 ** 23), (2 ** 20, 2 ** 20, 2 ** 23)])
 
     def test_limits_past_the_target_advantage_fail(self):
         text = stated_design()
-        for name, value in (("calls", 2 ** 25), ("keys", 2 ** 21), ("instantiations", 2 ** 21)):
+        for name, value in (("calls", 2 ** 23), ("keys", 2 ** 21), ("instantiations", 2 ** 21)):
             limits = self.tool.read_limits(text, self.tool.read_variants(text)[:3])
             with mock.patch.object(self.tool, "read_limits", return_value=limits._replace(**{name: value})), \
                     mock.patch.object(self.tool, "table_faults", return_value=[]):
@@ -440,18 +513,31 @@ class ModeLimitsArithmetic(unittest.TestCase):
     def test_a_limit_set_below_the_most_allowed_fails_the_doubling_check(self):
         text = stated_design()
         limits = self.tool.read_limits(text, self.tool.read_variants(text)[:3])
-        with mock.patch.object(self.tool, "read_limits", return_value=limits._replace(calls=2 ** 22)), \
+        with mock.patch.object(self.tool, "read_limits", return_value=limits._replace(calls=2 ** 20)), \
                 mock.patch.object(self.tool, "table_faults", return_value=[]):
             out = self.tool.compute(text, [], ROOT)
         self.assertFalse(out["held"])
         entry = next(iter(out["limits"]["bound"].values()))
-        self.assertTrue(entry["at_most_target_advantage"])
+        self.assertTrue(entry["keystream"]["at_most_target_advantage"])
+        self.assertTrue(entry["backtracking"]["at_most_target_advantage"])
+
+    def test_either_bound_past_the_target_advantage_fails(self):
+        text = stated_design()
+        keystream = {"overwrites": Fraction(1)}
+        with mock.patch.object(self.tool, "theorem_terms", return_value=keystream):
+            out = self.tool.compute(text, [], ROOT)
+        self.assertFalse(out["held"], "the keystream bound alone")
+        forget = {"steps": 1, "queries": 1, "terms": {"preserving": Fraction(1)}, "total": Fraction(1)}
+        with mock.patch.object(self.tool, "forget_bound", return_value=forget):
+            out = self.tool.compute(text, [], ROOT)
+        self.assertFalse(out["held"], "the forget bound alone")
+        self.assertTrue(next(iter(out["limits"]["bound"].values()))["keystream"]["at_most_target_advantage"])
 
     def test_a_doubled_bound_under_the_target_advantage_fails_though_past_half_of_it(self):
-        """At 2^23 calls the doubled bound is 2^-65 and a little: past half the target, and within it."""
+        """At 2^21 calls the doubled bound is 2^-65 and a little: past half the target, and within it."""
         text = stated_design()
         limits = self.tool.read_limits(text, self.tool.read_variants(text)[:3])
-        with mock.patch.object(self.tool, "read_limits", return_value=limits._replace(calls=2 ** 23)), \
+        with mock.patch.object(self.tool, "read_limits", return_value=limits._replace(calls=2 ** 21)), \
                 mock.patch.object(self.tool, "table_faults", return_value=[]):
             out = self.tool.compute(text, [], ROOT)
         rows = next(iter(out["limits"]["doubling"].values()))
@@ -459,19 +545,23 @@ class ModeLimitsArithmetic(unittest.TestCase):
         self.assertFalse(out["held"])
 
     def test_the_condition_on_n_plus_m_is_read(self):
-        """At N = 2^253, 10 (N + M) passes 2^256, so that the theorem does not apply, whatever the bound
-        reads. A target of 3 2^59 keeps the bound within it and its doubling past it, so that only this fails."""
-        target = Fraction(3 * 2 ** 59)
-        with mock.patch.object(self.tool, "OFFLINE_CALLS", 2 ** 253), mock.patch.object(self.tool, "TARGET_ADVANTAGE", target):
+        """At N = 2^381, 10 (N + M) passes 2^384, so that the theorem does not apply, whatever the bound
+        reads. The larger bound stands near 2^443 there, so a target just above it leaves only this to fail."""
+        with mock.patch.object(self.tool, "OFFLINE_CALLS", 2 ** 381):
+            limits = self.tool.read_limits(stated_design(), self.tool.read_variants(stated_design())[:3])
+            variants = self.tool.read_variants(stated_design())[:3]
+            target = max(self.tool.bound_at(limits.keys, limits.instantiations, limits.calls, v) for v in variants)
+        with mock.patch.object(self.tool, "OFFLINE_CALLS", 2 ** 381), mock.patch.object(self.tool, "TARGET_ADVANTAGE", target):
             out = self.tool.compute(stated_design(), [], ROOT)
         entry = next(iter(out["limits"]["bound"].values()))
-        self.assertFalse(entry["theorem_condition"])
-        self.assertTrue(entry["at_most_target_advantage"], "the bound alone would pass")
+        self.assertFalse(entry["keystream"]["theorem_condition"])
+        self.assertTrue(entry["keystream"]["at_most_target_advantage"], "the bounds alone would pass")
+        self.assertTrue(entry["backtracking"]["at_most_target_advantage"], "the bounds alone would pass")
         self.assertTrue(all(row["above_target_advantage"] for row in next(iter(out["limits"]["doubling"].values())).values()))
         self.assertFalse(out["held"])
-        with mock.patch.object(self.tool, "OFFLINE_CALLS", 2 ** 252), mock.patch.object(self.tool, "TARGET_ADVANTAGE", Fraction(2 ** 70)):
+        with mock.patch.object(self.tool, "OFFLINE_CALLS", 2 ** 380), mock.patch.object(self.tool, "TARGET_ADVANTAGE", Fraction(2 ** 900)):
             out = self.tool.compute(stated_design(), [], ROOT)
-        self.assertTrue(next(iter(out["limits"]["bound"].values()))["theorem_condition"], "10 2^252 is under 2^256")
+        self.assertTrue(next(iter(out["limits"]["bound"].values()))["keystream"]["theorem_condition"], "10 2^380 is under 2^384")
 
     def test_the_table_faults_are_each_found(self):
         text = stated_design()
@@ -480,15 +570,15 @@ class ModeLimitsArithmetic(unittest.TestCase):
         self.assertEqual(self.tool.table_faults(limits, claimable), [])
         for change, word in (({"keys": 3}, "keys u"), ({"instantiations": 3}, "instantiations"), ({"calls": 3}, "per instantiation"),
                              ({"per_key": 3}, "per key"), ({"instantiations": 2 ** 33}, "most R9"),
-                             ({"per_key": 2 ** 43}, "product"), ({"reseeds": 2 ** 25}, "reseeds")):
+                             ({"per_key": 2 ** 41}, "product"), ({"reseeds": 2 ** 23}, "reseeds")):
             self.assertTrue(any(word in fault for fault in self.tool.table_faults(limits._replace(**change), claimable)), change)
         wrong = dict(limits.per_size)
-        for key, value, word in (((self.tool.PER_INSTANTIATION, 8), (2 ** 24, 1), "per instantiation at 8×8"),
-                                 ((self.tool.PER_KEY, 16), (2 ** 44, 1), "per key at 16×16"),
-                                 ((self.tool.PER_REQUEST, 4), (685, 2 ** 19), "per request at 4×4"),
-                                 ((self.tool.PER_REQUEST, 4), (684, 2 ** 20), "per request at 4×4"),
-                                 ((self.tool.PER_INSTANTIATE, 4), (45, 45 * 768), "per instantiate at 4×4"),
-                                 ((self.tool.PER_INSTANTIATE, 4), (46, 1), "per instantiate at 4×4")):
+        for key, value, word in (((self.tool.PER_INSTANTIATION, 8), (2 ** 22, 1), "per instantiation at 8×8"),
+                                 ((self.tool.PER_KEY, 16), (2 ** 42, 1), "per key at 16×16"),
+                                 ((self.tool.PER_REQUEST, 4), (822, 2 ** 19), "per request at 4×4"),
+                                 ((self.tool.PER_REQUEST, 4), (821, 2 ** 20), "per request at 4×4"),
+                                 ((self.tool.PER_INSTANTIATE, 4), (58, 58 * 640), "per instantiate at 4×4"),
+                                 ((self.tool.PER_INSTANTIATE, 4), (59, 1), "per instantiate at 4×4")):
             changed = dict(wrong)
             changed[key] = value
             self.assertTrue(any(word in fault for fault in self.tool.table_faults(limits._replace(per_size=changed), claimable)), key)
@@ -504,8 +594,8 @@ class ModeLimitsArithmetic(unittest.TestCase):
             small[(self.tool.PER_INSTANTIATION, v.n)] = (64, 64 * v.r)
             small[(self.tool.PER_KEY, v.n)] = (64 * 2 ** 20, 64 * 2 ** 20 * v.r)
         faults = self.tool.table_faults(limits._replace(calls=64, per_key=64 * 2 ** 20, reseeds=64, per_size=small), claimable)
-        self.assertTrue(any("per request at 4×4" in fault for fault in faults), "64 calls of 768 bits are under the cap")
-        self.assertFalse(any("per request at 16×16" in fault for fault in faults), "64 calls of 16,128 bits are over it")
+        self.assertTrue(any("per request at 4×4" in fault for fault in faults), "64 calls of 640 bits are under the cap")
+        self.assertFalse(any("per request at 16×16" in fault for fault in faults), "64 calls of 16,000 bits are over it")
 
     def test_the_log_prints_exactly(self):
         self.assertEqual(self.tool.log2_of(Fraction(1, 8)), "-3.000000")
@@ -525,28 +615,27 @@ class ModeLimitsProfile(unittest.TestCase):
 
     def test_a_row_for_every_variant(self):
         self.assertEqual(len(self.rows), 5)
-        row = self.rows["phyco-v3/n8-w32-R24-c256"]
-        self.assertEqual((row["n"], row["w"], row["lanes_per_node"], row["b"], row["c"], row["r"], row["R"]), (8, 32, 2, 4096, 256, 3840, 24))
+        row = self.rows["phyco-v3/n8-w32-R24-c384"]
+        self.assertEqual((row["n"], row["w"], row["lanes_per_node"], row["b"], row["c"], row["r"], row["R"]), (8, 32, 2, 4096, 384, 3712, 24))
         self.assertEqual(row["status"], "claimable")
-        self.assertEqual(row["keyed_variants"], ["phyco-v3/n8-w32-R24-c256"])
+        self.assertEqual(row["keyed_variants"], ["phyco-v3/n8-w32-R24-c384"])
         self.assertEqual(self.rows["phyco-v3/n2-w4-R8-c16"]["keyed_variants"], ["phyco-v3/n2-w16-R8-c64"])
         self.assertEqual(self.rows["phyco-v3/n2-w16-R8-c64"]["R_reason"], "reduced, for a stated test")
 
     def test_a_claimable_row(self):
-        row = self.rows["phyco-v3/n4-w32-R20-c256"]
+        row = self.rows["phyco-v3/n4-w32-R20-c384"]
         self.assertEqual((row["key_entropy_bits"], row["nonce_bits"]), (256, 128))
-        self.assertEqual(row["reachable_secret_state_bits"], {"after_instantiate": 256, "after_generate": 256, "after_reseed": 256,
+        self.assertEqual(row["reachable_secret_state_bits"], {"after_instantiate": 384, "after_generate": 384, "after_reseed": 384,
                                                               "basis": "by specification"})
         self.assertEqual(row["bound_bits"], 128)
-        self.assertEqual(row["bound_terms"], {"key entropy": 256, "half the reachable secret state": 128, "multi-target": 236,
-                                              "half of key and nonce": 192, "half the capacity": 128,
-                                              "single-target quantum search": 128,
-                                              "sets": ["half the capacity", "half the reachable secret state", "single-target quantum search"]})
+        self.assertEqual(row["bound_terms"], {"key entropy": 256, "half the reachable secret state": 192, "multi-target": 236,
+                                              "half of key and nonce": 192, "half the capacity": 192,
+                                              "single-target quantum search": 128, "sets": ["single-target quantum search"]})
         self.assertEqual(row["level_checked"], 128)
         self.assertTrue(row["quantum_met_with_equality"])
         self.assertEqual(row["violations"], [])
         self.assertEqual(row["bound_label"], "target, not a claim")
-        self.assertEqual((row["rate_lanes"], row["capacity_lanes"], row["forget_calls"]), (24, 8, 1))
+        self.assertEqual((row["rate_lanes"], row["capacity_lanes"], row["forget_calls"]), (20, 12, 1))
         self.assertTrue(all(row["checks"].values()))
 
     def test_a_keyed_reduced_row_is_checked_at_half_its_capacity(self):
@@ -582,6 +671,7 @@ class ModeLimitsProfile(unittest.TestCase):
         v = variants[0]
         layouts = self.tool.read_layouts(text)
         shrunk = v._replace(c=64, r=960)
+        self.assertEqual(self.tool.key_bits(shrunk), 64)
         wide = dict(layouts)
         wide[(4, 32, 64)] = self.tool.Layout(4, 32, 64, tuple(range(30)), (30, 31), (0, 1), (2,))
         row = self.tool.profile_row(shrunk, wide, limits, variants, True, True)
@@ -589,6 +679,7 @@ class ModeLimitsProfile(unittest.TestCase):
                                              "reachable secret state"])
         half = v._replace(c=128, r=896)
         wide[(4, 32, 128)] = self.tool.Layout(4, 32, 128, tuple(range(28)), tuple(range(28, 32)), tuple(range(4)), (4, 5))
+        self.assertEqual(self.tool.key_bits(half), 128)
         row = self.tool.profile_row(half, wide, limits, variants, True, True)
         self.assertEqual(row["violations"], ["capacity", "key and nonce", "multi-target", "quantum search", "reachable secret state"],
                          "a key of 128 bits meets the level; c, key and nonce, and the quantum check need twice it")
@@ -602,7 +693,7 @@ class ModeLimitsProfile(unittest.TestCase):
         variants = self.tool.read_variants(text)
         limits = self.tool.read_limits(text, variants[:3])
         layouts = dict(self.tool.read_layouts(text))
-        layouts[(4, 32, 256)] = layouts[(4, 32, 256)]._replace(capacity=(28, 29, 30, 31))
+        layouts[(4, 32, 384)] = layouts[(4, 32, 384)]._replace(capacity=(28, 29, 30, 31))
         row = self.tool.profile_row(variants[0], layouts, limits, variants, True, True)
         self.assertEqual(row["reachable_secret_state_bits"]["after_generate"], 128)
         self.assertEqual(row["bound_bits"], 64)
@@ -625,10 +716,10 @@ class ModeLimitsProfile(unittest.TestCase):
         self.assertTrue(out["assertions"][0]["holds"])
 
     def test_a_layout_outside_the_theorems_form_is_a_violation(self):
-        for wrong in ("| 4×4 | 32 | 256 | 8-31 | 0-7 | 8-15 | 16-19 |", "| 4×4 | 32 | 256 | 0-23 | 24-31 | 24-31 | 8-11 |",
-                      "| 4×4 | 32 | 256 | 0-23 | 24-31 | 0-7 | 12-15 |", "| 4×4 | 32 | 256 | 0-22 | 23-31 | 0-7 | 8-11 |",
-                      "| 4×4 | 32 | 256 | 0-22 | 24-31 | 0-7 | 8-11 |"):
-            out = self.tool.compute(stated_design(layout=STATED_LAYOUT.replace("| 4×4 | 32 | 256 | 0-23 | 24-31 | 0-7 | 8-11 |", wrong)), [], ROOT)
+        for wrong in ("| 4×4 | 32 | 384 | 12-31 | 0-11 | 12-19 | 20-23 |", "| 4×4 | 32 | 384 | 0-19 | 20-31 | 20-27 | 8-11 |",
+                      "| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 12-15 |", "| 4×4 | 32 | 384 | 0-18 | 19-31 | 0-7 | 8-11 |",
+                      "| 4×4 | 32 | 384 | 0-18 | 20-31 | 0-7 | 8-11 |", "| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-11 | 12-17 |"):
+            out = self.tool.compute(stated_design(layout=STATED_LAYOUT.replace("| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |", wrong)), [], ROOT)
             self.assertFalse(out["held"], wrong)
 
     def test_a_keyed_variant_needs_a_layout_row(self):
@@ -784,10 +875,14 @@ class ModeLimitsCommand(unittest.TestCase):
         for name in ("epsilon", "N", "theorems", "u", "per_instantiation", "per_key", "per_request", "other_limits", "nonces",
                      "bound", "doubling"):
             self.assertIn(name, fields)
-        self.assertEqual(fields["per_instantiation"]["bits"]["phyco-v3/n4-w32-R20-c256"], 2 ** 24 * 768)
-        self.assertEqual(fields["per_key"]["calls"], "2^44")
+        self.assertEqual(fields["per_instantiation"]["bits"]["phyco-v3/n4-w32-R20-c384"], 2 ** 22 * 640)
+        self.assertEqual(fields["per_key"]["calls"], "2^42")
         self.assertEqual(fields["nonces"]["collision_term"], "q^2/2^129")
-        self.assertEqual(fields["per_request"]["phyco-v3/n16-w32-R32-c256"], {"calls": 34, "bits": 2 ** 19})
+        self.assertEqual(fields["per_request"]["phyco-v3/n16-w32-R32-c384"], {"calls": 34, "bits": 2 ** 19})
+        self.assertEqual(fields["theorems"][1]["theorem"], "Lemma 12, with Lemma 10 and Theorem 4")
+        outside = fields["outside_the_doubling_check"]
+        self.assertEqual(set(outside), {"per-request cap", self.tool.RESEEDS})
+        self.assertIn("R9", outside["per-request cap"], "the row says whose rule fixes it")
         self.assertEqual(set(fields), set(self.tool.LIMITS_FIELDS))
 
 
@@ -897,6 +992,11 @@ class Chapters(unittest.TestCase):
         self.assertTrue(out["held"], out["assertions"])
         self.assertEqual(sorted(row["bound_bits"] for row in out["parameters"]["rows"] if row["status"] == "claimable"), [128, 128, 128])
 
+    def test_the_layout_and_limits_of_the_draft_are_at_c_384(self):
+        self.assertIn("| 4×4 | 32 | 384 | 0-19 | 20-31 | 0-7 | 8-11 |", self.design)
+        self.assertIn("| keys u | all | 2^20 | none |", self.design)
+        self.assertNotIn("c256", self.design)
+
     def test_the_two_limit_tables_of_the_draft_agree(self):
         tool = limits_script()
         source = tool.read_table(tool.section_lines(self.design, "Mode", "Limits"), tool.LIMIT_COLUMNS, "limits")
@@ -909,9 +1009,10 @@ class Chapters(unittest.TestCase):
 
     def test_the_chapters_preconditions_are_the_scripts(self):
         tool = limits_script()
-        columns = ("Precondition", "The feature that meets it", "Section")
-        table = tool.read_table(tool.section_lines(self.design, "Mode", "Theorems"), columns, "preconditions")
-        self.assertEqual([row["Section"] for row in table], [section for _, section in tool.THEOREMS[0]["preconditions"]])
+        lines = tool.section_lines(self.design, "Mode", "Theorems")
+        for theorem, first in zip(tool.THEOREMS, ("Precondition of Theorem 1", "Precondition of the forget result")):
+            table = tool.read_table(lines, (first, "The feature that meets it", "Section"), "preconditions")
+            self.assertEqual([row["Section"] for row in table], [section for _, section in theorem["preconditions"]], first)
 
     def test_each_header_holds_its_title_disclaimer_and_version_only(self):
         for name, text in (("design", self.design), ("rationale", self.rationale)):
@@ -951,8 +1052,37 @@ class PaddingInjective(unittest.TestCase):
             for length in list(range(0, 300)) + [self.MOST - 1, self.MOST]:
                 data = bytes((i * 7 + 1) % 251 for i in range(length))
                 blocks = self.tool.absorbed_blocks(self.tool.RESEED_BLOCK, data, r)
-                code, read, count = self.tool.decoded_input(blocks + [self.tool.control_block(self.tool.FORGET_BLOCK, r)])
+                code, read, count = self.tool.decoded_input(blocks + [bytes(r // 8)])
                 self.assertEqual((code, read, count), (self.tool.RESEED_BLOCK, data, len(blocks)), (r, length))
+
+    def test_every_call_type_reads_back_from_its_blocks_and_flags(self):
+        """FR-014 over the four call types: generate and forget hold no block, so the flag tells them apart."""
+        sequences = (
+            [("instantiate", b"")],
+            [("instantiate", b"p"), ("generate", 1)],
+            [("instantiate", b""), ("generate", 3), ("generate", 1), ("reseed", b"x"), ("reseed", b""), ("generate", 2)],
+            [("instantiate", bytes(100)), ("reseed", bytes(200)), ("generate", 1), ("reseed", b"\0"), ("generate", 4)],
+        )
+        for r in self.RATES:
+            for calls in sequences:
+                blocks = [item for call, value in calls for item in self.tool.call_blocks(call, value, r)]
+                self.assertEqual(self.tool.decoded_calls(blocks), calls, r)
+
+    def test_each_input_carries_its_own_domain_word(self):
+        reseed = self.tool.call_blocks("reseed", b"", 640)
+        self.assertEqual(reseed[0][0][-4:], b"\x02\0\0\0")
+        first = self.tool.call_blocks("instantiate", b"", 640)
+        self.assertEqual(first[2][0][-4:], b"\x01\0\0\0")
+
+    def test_a_forget_is_the_only_flagged_call_of_a_request_and_ends_it(self):
+        blocks = self.tool.call_blocks("generate", 3, 640)
+        self.assertEqual(blocks, [(None, False)] * 3 + [(None, True)])
+        self.assertEqual(self.tool.call_blocks("reseed", b"", 640)[-1], (None, False), "the call after the last input adds nothing")
+        first = self.tool.call_blocks("instantiate", b"", 640)
+        self.assertEqual([flag for _, flag in first], [False, True, False, False, False, True], "two forget calls, the last call one of them")
+        self.assertEqual([block is None for block, _ in first], [True, True, False, True, True, True])
+        with self.assertRaises(ValueError):
+            self.tool.call_blocks("forget", 1, 640)
 
     def test_a_blocks_shape_and_count_are_the_chapters(self):
         for r in self.RATES:
@@ -966,11 +1096,9 @@ class PaddingInjective(unittest.TestCase):
         self.assertEqual(self.tool.absorbed_blocks(2, b"abcde", 96),
                          [b"\x05\0\0\0abcd\x02\0\0\0", b"e\0\0\0\0\0\0\0\x02\0\0\0"])
         self.assertEqual(self.tool.absorbed_blocks(1, b"", 64), [b"\0\0\0\0\x01\0\0\0"])
-        self.assertEqual(self.tool.control_block(4, 96), bytes(8) + b"\x04\0\0\0")
 
-    def test_the_four_domain_words_are_distinct_and_none_is_zero(self):
-        codes = (self.tool.PERSONALIZATION_BLOCK, self.tool.RESEED_BLOCK, self.tool.GENERATE_BLOCK, self.tool.FORGET_BLOCK)
-        self.assertEqual(sorted(codes), [1, 2, 3, 4])
+    def test_the_two_domain_words_are_distinct_and_neither_is_zero(self):
+        self.assertEqual(sorted((self.tool.PERSONALIZATION_BLOCK, self.tool.RESEED_BLOCK)), [1, 2])
 
     def test_a_trailing_zero_byte_changes_the_blocks(self):
         for r in self.RATES:
