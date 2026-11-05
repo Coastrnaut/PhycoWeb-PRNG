@@ -3269,6 +3269,19 @@ class ActiveSbox(unittest.TestCase):
         self.assertEqual(out["below"]["limit"], 4)
         self.assertNotIn("sum_of", out)
 
+    def test_every_split_of_the_rounds_gives_a_sum(self):
+        layer = self.small()
+        with mock.patch.object(self.tool, "milp", side_effect=self.runs((1, 0, 0, 0, 0), layer=layer)) as solver,                 mock.patch.object(self.tool, "counted", return_value=6):
+            out = self.tool.minimum(layer, "differential", 4, {1: 1, 2: 3, 3: 1})
+        self.assertEqual(solver.call_count, 1)
+        self.assertEqual(out["sum_of"], [2, 2])
+
+    def test_the_largest_sum_is_of_counted_spans(self):
+        self.assertEqual(self.tool.largest_sum(4, {1: 1, 2: 3, 3: 1}), (6, 2, 2))
+        self.assertEqual(self.tool.largest_sum(4, {1: 4, 2: 3, 3: 4}), (8, 1, 3))
+        self.assertIsNone(self.tool.largest_sum(1, {}))
+        self.assertIsNone(self.tool.largest_sum(3, {1: 1}))
+
     def test_a_sum_needs_every_span_it_names(self):
         """A count with a shorter span missing is not a sum: the second run decides."""
         layer, states, count = self.two_rounds()
@@ -4132,6 +4145,526 @@ class LongTrailKnown(unittest.TestCase):
         self.assertEqual(boxes[8]["differential"], (floors.FLOOR_DIFFERENTIAL[2], floors.FLOOR_DIFFERENTIAL[4]))
         self.assertEqual(boxes[8]["linear"], (floors.FLOOR_SQUARED[2], floors.FLOOR_SQUARED[4]))
         self.assertEqual(floors.FLOOR_WIDTH, 8)
+
+
+def long_trail_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools/trails"))
+    import long_trail
+    return long_trail
+
+
+def plain_long_trail_minimum(layer, costs, rounds):
+    """The least cost of a layer's trails, by a walk over states of chain lengths that shares nothing with the model. Each branch of the next
+    step is a copy of its source, with one added output: nothing added carries a chain on, and an active output ends it, the branch either
+    cancelled or starting a chain, unless the source was inactive, when it must start one."""
+    outputs = {}
+    for given, taken in layer.relation:
+        outputs.setdefault(given, []).append(taken)
+    states = {}
+    for pattern in itertools.product((0, 1), repeat=layer.branches):
+        if any(pattern):
+            states[pattern] = sum(pattern) * costs[1]
+    found = {1: min(states.values())}
+    for r in range(2, rounds + 1):
+        following = {}
+        for state, cost in states.items():
+            for mixed in outputs.get(tuple(1 if state[b] else 0 for b in layer.fed), ()):
+                rows = []
+                for j in range(layer.branches):
+                    mine = state[layer.source[j]]
+                    added = layer.added[j]
+                    if added is None or not mixed[added]:
+                        rows.append((mine + 1,) if mine else (0,))
+                    else:
+                        rows.append((0, 1) if mine else (1,))
+                for grown in itertools.product(*rows):
+                    if any(grown):
+                        total = cost + sum(costs[length] - costs[length - 1] for length in grown if length)
+                        if following.get(grown, 1 << 30) > total:
+                            following[grown] = total
+        states = following
+        found[r] = min(states.values())
+    return found
+
+
+class LongTrail(unittest.TestCase):
+    """research/004/tools/trails/long_trail.py on stated layers (T062)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = long_trail_module()
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.first = validate_tool.load_known(validate_tool.known_results()["sparkle-box"])
+
+    def small(self, kind="differential", h=2):
+        return self.tool.feistel(h, kind, self.first.relation(h))
+
+    def point(self, layer, costs, steps, outputs):
+        """A solution of the model that holds a stated trail: only its active and output columns are read."""
+        model = self.tool.build(layer, costs, len(steps), {})
+        point = np.zeros(model.columns)
+        for row, values in zip(model.active + model.outputs, list(steps) + list(outputs)):
+            for name, value in zip(row, values):
+                point[name] = value
+        return point
+
+    def trail(self):
+        """A true trail of two steps of `small`: one left branch, the map's every output, a full next step."""
+        return ((1, 0, 0, 0), (1, 1, 1, 0)), ((1, 1),)
+
+    def runs(self, costs, second=None, bound=1.0):
+        layer = self.small()
+        steps, outputs = self.trail()
+        return layer, [Solved(0, bound, x=self.point(layer, costs, steps, outputs)), second if second is not None else Solved(2)]
+
+    def test_a_feistel_layer_of_differences_is_the_papers(self):
+        layer = self.small("differential", 2)
+        self.assertEqual(layer.fed, (0, 1))
+        self.assertEqual(layer.source, (3, 2, 0, 1))
+        self.assertEqual(layer.added, (1, 0, None, None))
+
+    def test_a_feistel_layer_of_masks_is_the_transpose_of_the_inverse(self):
+        layer = self.small("linear", 2)
+        self.assertEqual(layer.fed, (2, 3))
+        self.assertEqual(layer.source, (3, 2, 0, 1))
+        self.assertEqual(layer.added, (None, None, 0, 1))
+
+    def test_a_layer_of_copies_moves_each_branch_and_adds_nothing(self):
+        layer = self.tool.copies(4)
+        self.assertEqual(layer.source, (3, 0, 1, 2))
+        self.assertEqual(layer.added, (None,) * 4)
+        self.assertEqual(layer.fed, ())
+
+    def test_a_kind_that_is_neither_is_a_tool_defect(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.feistel(2, "other", self.first.relation(2))
+
+    def test_a_layer_is_refused_where_it_does_not_fit(self):
+        good = self.small()
+        for wrong in (good._replace(source=(0, 0, 1, 2)), good._replace(source=(1, 2, 3, 4)), good._replace(added=(0, 1, None)),
+                      good._replace(added=(2, 0, None, None)), good._replace(added=(-1, 0, None, None)), good._replace(fed=(0, 4)),
+                      good._replace(relation=frozenset()), good._replace(relation=frozenset({((0,), (0, 0))})),
+                      good._replace(relation=frozenset({((0, 0), (0,))})), good._replace(relation=good.relation - {((0, 0), (0, 0))}),
+                      good._replace(relation=frozenset({((1, 1), (1, 1))}))):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.check(wrong)
+        self.assertEqual(self.tool.check(good), good)
+
+    def test_a_chain_longer_than_the_bounds_is_cut_at_its_largest(self):
+        self.assertEqual(self.tool.chain_costs((6, 32, 52), 6), (0, 6, 32, 52, 64, 84, 104))
+        self.assertEqual(self.tool.chain_costs((2, 17), 5), (0, 2, 17, 19, 34, 36))
+        self.assertEqual(self.tool.chain_costs((0, 6), 4), (0, 0, 6, 6, 12))
+        self.assertEqual(self.tool.chain_costs((1,), 3), (0, 1, 2, 3))
+
+    def test_a_box_holds_whole_numbers(self):
+        for wrong in ((), (1.5, 2), (-1, 2), (True, 2), ("6", 32)):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.chain_costs(wrong, 3)
+
+    def test_the_paper_s_example_decomposes_into_its_chains(self):
+        layer = self.tool.feistel(1, "differential", self.tool.ONE_TO_ONE)
+        steps = ((1, 1), (1, 1), (0, 1), (1, 0))
+        self.assertEqual(self.tool.chain_lengths(layer, steps, ((1,), (1,), (0,))), (1, 2, 3))
+
+    def test_the_winners_by_hand_decompose_as_the_file_says(self):
+        for kind, repeated in (("differential", ((0, 1), (1, 0), (1, 1), (0, 1), (1, 0), (1, 1))),
+                               ("linear", ((1, 0), (0, 1), (1, 1), (1, 0), (0, 1), (1, 1)))):
+            layer = self.tool.feistel(1, kind, self.tool.ONE_TO_ONE)
+            outputs = tuple((step[layer.fed[0]],) for step in repeated[:-1])
+            wanted = {1: (1,), 2: (2,), 3: (1, 3), 4: (2, 3), 5: (3, 3), 6: (1, 3, 4)}
+            for r, lengths in wanted.items():
+                self.assertEqual(self.tool.chain_lengths(layer, repeated[:r], outputs[:r - 1]), lengths, (kind, r))
+
+    def test_a_chain_of_copies_runs_the_whole_way(self):
+        layer = self.tool.copies(4)
+        steps = ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1), (1, 0, 0, 0))
+        self.assertEqual(self.tool.chain_lengths(layer, steps, ((), (), (), ())), (5,))
+
+    def test_a_cancelled_branch_ends_its_chain_and_no_other(self):
+        """Branch 3 cancels against the map's output, so its chain ends there. Branch 0 goes on into branch 2, and branch 1 starts one."""
+        layer = self.small()
+        steps = ((1, 0, 0, 1), (0, 1, 1, 0))
+        self.tool.held(layer, steps, ((1, 1),))
+        self.assertEqual(self.tool.chain_lengths(layer, steps, ((1, 1),)), (1, 1, 2))
+
+    def test_a_trail_is_held_only_where_the_tables_allow_it(self):
+        layer = self.small()
+        steps, outputs = self.trail()
+        self.tool.held(layer, steps, outputs)
+        for wrong_steps, wrong_outputs in ((((1, 0, 0, 0), (0, 0, 0, 0)), outputs), (((1, 0, 0, 0), (1, 1, 0, 0)), outputs),
+                                           (((1, 0, 0, 0), (0, 0, 1, 0)), outputs), (steps, ((0, 1),)), (steps, ((0, 0),)),
+                                           (((0, 0, 0, 0), (0, 0, 0, 1)), ((0, 0),)), (steps, ())):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.held(layer, wrong_steps, wrong_outputs)
+
+    def test_a_copy_must_be_what_it_copies(self):
+        layer = self.tool.copies(2)
+        self.tool.held(layer, ((1, 0), (0, 1)), ((),))
+        for wrong in (((1, 0), (1, 0)), ((1, 0), (1, 1))):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.held(layer, wrong, ((),))
+
+    def test_a_trail_is_costed_over_its_chains(self):
+        layer = self.small()
+        costs = self.tool.chain_costs((6, 32, 52), 2)
+        steps, outputs = self.trail()
+        self.assertEqual(self.tool.chain_lengths(layer, steps, outputs), (1, 1, 2))
+        self.assertEqual(self.tool.counted(layer, costs, steps, outputs), 6 + 6 + 32)
+
+    def test_a_count_refuses_a_trail_the_tables_refuse(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.counted(self.small(), (0, 6, 32), ((1, 0, 0, 0), (0, 0, 0, 0)), ((1, 1),))
+
+    def test_the_settings_are_r12s(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        with mock.patch.object(self.tool, "milp", side_effect=answers) as solver:
+            self.tool.minimum(layer, costs, 2, {})
+        self.assertEqual(solver.call_count, 2)
+        for call in solver.call_args_list:
+            options = call.kwargs["options"]
+            self.assertEqual(options["mip_rel_gap"], 0)
+            self.assertEqual(set(options), {"mip_rel_gap", "time_limit"})
+            self.assertLessEqual(options["time_limit"], 8 * 3600)
+            self.assertTrue((call.kwargs["integrality"] == 1).all())
+            self.assertTrue((call.kwargs["bounds"].lb == 0).all() and (call.kwargs["bounds"].ub == 1).all())
+        self.assertEqual(solver.call_args_list[0].kwargs["options"]["time_limit"], 8 * 3600)
+
+    def test_a_count_is_never_read_from_a_float(self):
+        costs = (0, 6, 32)
+        for bound in (44.0, 43.99999999999386, 44.0000000001, 7.5, None):
+            layer, answers = self.runs(costs, bound=bound)
+            with mock.patch.object(self.tool, "milp", side_effect=answers):
+                out = self.tool.minimum(layer, costs, 2, {})
+            self.assertEqual((out["dual_bound"], out["count"]), (bound, 44), bound)
+
+    def test_the_solution_is_read_in_whole_numbers(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        answers[0].x = answers[0].x * (1 - 1e-7) + 1e-9
+        with mock.patch.object(self.tool, "milp", side_effect=answers):
+            out = self.tool.minimum(layer, costs, 2, {})
+        self.assertEqual(out["count"], 44)
+        self.assertEqual((out["steps"], out["outputs"]), (["1000", "1110"], ["11"]))
+
+    def test_the_second_run_is_limited_to_one_below_the_count(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        with mock.patch.object(self.tool, "milp", side_effect=answers) as solver:
+            out = self.tool.minimum(layer, costs, 2, {})
+        first, second = solver.call_args_list
+        model = self.tool.build(layer, costs, 2, {})
+        rows = model.matrix.shape[0]
+        limited = second.kwargs["constraints"]
+        self.assertEqual(limited.A.shape[0], rows + 1)
+        self.assertEqual((limited.A[:rows] != model.matrix).nnz, 0)
+        self.assertEqual((limited.ub[rows], limited.lb[rows]), (43, -np.inf))
+        self.assertEqual(limited.A[rows].toarray().ravel().tolist(), model.cost.tolist())
+        self.assertFalse(np.any(second.args[0]))
+        self.assertEqual(first.args[0].tolist(), model.cost.tolist())
+        self.assertEqual(first.kwargs["constraints"].A.shape[0], rows)
+        self.assertEqual(out["below"], {"limit": 43, "status": 2, "message": "stated"})
+
+    def test_a_solution_below_the_count_gives_no_count(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs, second=Solved(0, 1.0))
+        with mock.patch.object(self.tool, "milp", side_effect=answers), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, costs, 2, {})
+
+    def test_a_search_that_stops_at_its_limit_gives_no_bound(self):
+        costs = (0, 6, 32)
+        for status in (1, 4):
+            layer, answers = self.runs(costs)
+            with mock.patch.object(self.tool, "milp", return_value=Solved(status, 7.0)), self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(layer, costs, 2, {})
+            layer, answers = self.runs(costs, second=Solved(status))
+            with mock.patch.object(self.tool, "milp", side_effect=answers), self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(layer, costs, 2, {})
+
+    def test_an_optimal_status_with_no_solution_is_a_tool_defect(self):
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0, x=None)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(self.small(), (0, 6, 32), 2, {})
+
+    def test_a_solution_the_tables_refuse_gives_no_count(self):
+        costs = (0, 6, 32)
+        layer = self.small()
+        point = self.point(layer, costs, ((1, 0, 0, 0), (0, 0, 0, 0)), ((1, 1),))
+        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0, x=point)), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, costs, 2, {})
+
+    def test_the_runs_of_one_count_share_its_time_limit(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        clock = iter((1000.0, 1000.0 + 8 * 3600 - 90.0))
+        with mock.patch.object(self.tool.time, "monotonic", lambda: next(clock)), \
+                mock.patch.object(self.tool, "milp", side_effect=answers) as solver:
+            self.tool.minimum(layer, costs, 2, {})
+        self.assertEqual(solver.call_args_list[1].kwargs["options"]["time_limit"], 90.0)
+
+    def test_no_time_left_gives_no_count_and_no_second_run(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        clock = iter((1000.0, 1000.0 + 8 * 3600))
+        with mock.patch.object(self.tool.time, "monotonic", lambda: next(clock)), \
+                mock.patch.object(self.tool, "milp", side_effect=answers) as solver, self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, costs, 2, {})
+        self.assertEqual(solver.call_count, 1)
+
+    def test_the_sum_of_two_shorter_counts_stands_in_place_of_the_second_run(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        with mock.patch.object(self.tool, "milp", side_effect=answers) as solver:
+            out = self.tool.minimum(layer, costs, 2, {1: 22})
+        self.assertEqual(solver.call_count, 1)
+        self.assertEqual((out["count"], out["sum_of"]), (44, [1, 1]))
+        self.assertNotIn("below", out)
+
+    def test_a_count_above_every_sum_still_needs_the_second_run(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        with mock.patch.object(self.tool, "milp", side_effect=answers) as solver:
+            out = self.tool.minimum(layer, costs, 2, {1: 21})
+        self.assertEqual(solver.call_count, 2)
+        self.assertEqual(out["below"]["limit"], 43)
+
+    def test_a_solution_below_a_sum_gives_no_count(self):
+        costs = (0, 6, 32)
+        layer, answers = self.runs(costs)
+        with mock.patch.object(self.tool, "milp", side_effect=answers), self.assertRaises(ToolFailureClass()):
+            self.tool.minimum(layer, costs, 2, {1: 23})
+
+    def test_the_largest_sum_is_of_counted_spans(self):
+        self.assertEqual(self.tool.largest_sum(4, {1: 1, 2: 3, 3: 1}), (6, 2, 2))
+        self.assertEqual(self.tool.largest_sum(4, {1: 4, 2: 3, 3: 4}), (8, 1, 3))
+        self.assertIsNone(self.tool.largest_sum(1, {}))
+        self.assertIsNone(self.tool.largest_sum(3, {1: 1}))
+
+    def test_the_windows_are_each_span_at_its_count(self):
+        costs = self.tool.chain_costs((6, 32, 52), 3)
+        layer = self.small()
+        model = self.tool.build(layer, costs, 3, {1: 6, 2: 32})
+        plain = self.tool.build(layer, costs, 3, {})
+        self.assertEqual(model.matrix.shape[0] - plain.matrix.shape[0], 3 + 2)
+        self.assertEqual(sorted(model.low[plain.matrix.shape[0]:]), [6, 6, 6, 32, 32])
+
+    def test_a_window_never_changes_the_minimum(self):
+        costs = self.tool.chain_costs((6, 32, 52), 3)
+        self.assertEqual(self.tool.minimum(self.small(), costs, 3, {1: 6, 2: 32})["count"], self.tool.minimum(self.small(), costs, 3, {})["count"])
+
+    def test_a_count_carries_into_the_counts_after_it(self):
+        seen = []
+        real = self.tool.minimum
+
+        def spy(layer, costs, rounds, floors):
+            seen.append((rounds, dict(floors)))
+            return real(layer, costs, rounds, floors)
+
+        with mock.patch.object(self.tool, "minimum", spy):
+            found = self.tool.minima(self.small(), (6, 32, 52), 3)
+        self.assertEqual(seen, [(1, {}), (2, {1: found[1]["count"]}), (3, {1: found[1]["count"], 2: found[2]["count"]})])
+
+    def test_a_cost_of_nothing_at_one_step_is_a_count_of_0(self):
+        """A box bound of 0 leaves the objective with no term and the limit at -1: the status must still be infeasible."""
+        found = self.tool.minima(self.tool.feistel(1, "linear", self.tool.ONE_TO_ONE), (0, 6), 2)
+        self.assertEqual((found[1]["count"], found[1]["below"]["limit"], found[1]["below"]["status"]), (0, -1, 2))
+        self.assertEqual(found[2]["count"], 6)
+
+    def test_the_minimum_is_a_walk_of_every_trail_on_each_small_layer(self):
+        for h, rounds in ((1, 6), (2, 5), (3, 3)):
+            for kind in ("differential", "linear"):
+                for box in ((6, 32, 52), (2, 17), (0, 6), (1,)):
+                    layer = self.tool.feistel(h, kind, self.first.relation(h))
+                    costs = self.tool.chain_costs(box, rounds)
+                    found = self.tool.minima(layer, box, rounds)
+                    self.assertEqual({r: row["count"] for r, row in found.items()}, plain_long_trail_minimum(layer, costs, rounds), (h, kind, box))
+
+    def test_the_minimum_is_a_walk_on_seeded_layers(self):
+        """Seeded layers of no paper: any permutation of branches, any outputs added, and a map allowing a seeded set of patterns."""
+        rng = np.random.default_rng(62)
+        for _ in range(30):
+            branches = int(rng.integers(2, 5))
+            width = int(rng.integers(1, 3))
+            fed = tuple(int(b) for b in rng.choice(branches, size=width, replace=False))
+            every = list(itertools.product((0, 1), repeat=width))
+            relation = {((0,) * width, (0,) * width)}
+            for given in every[1:]:
+                for taken in every[1:]:
+                    if rng.random() < 0.6:
+                        relation.add((given, taken))
+                if not any(pair[0] == given for pair in relation):
+                    relation.add((given, every[-1]))
+            added = [None] * branches
+            for output, branch in enumerate(rng.permutation(branches)[:width]):
+                added[int(branch)] = output
+            layer = self.tool.check(self.tool.Layer(branches, fed, frozenset(relation), tuple(int(b) for b in rng.permutation(branches)), tuple(added)))
+            box = tuple(sorted(int(v) for v in rng.integers(0, 40, size=int(rng.integers(1, 4)))))
+            costs = self.tool.chain_costs(box, 4)
+            found = self.tool.minima(layer, box, 4)
+            self.assertEqual({r: row["count"] for r, row in found.items()}, plain_long_trail_minimum(layer, costs, 4), (layer, box))
+
+    def test_each_trail_of_a_real_count_holds_at_its_count(self):
+        for kind in ("differential", "linear"):
+            layer = self.small(kind, 3)
+            costs = self.tool.chain_costs((6, 32, 52), 4)
+            for r, row in self.tool.minima(layer, (6, 32, 52), 4).items():
+                steps = [tuple(int(bit) for bit in step) for step in row["steps"]]
+                outputs = [tuple(int(bit) for bit in step) for step in row["outputs"]]
+                self.assertEqual(self.tool.counted(layer, costs, steps, outputs), row["count"], (kind, r))
+
+    def test_a_real_count_has_a_status_or_a_sum_for_what_lies_below_it(self):
+        found = self.tool.minima(self.small(), (6, 32, 52), 5)
+        for r, row in found.items():
+            if "sum_of" in row:
+                low, high = row["sum_of"]
+                self.assertEqual((low + high, found[low]["count"] + found[high]["count"]), (r, row["count"]))
+            else:
+                self.assertEqual((row["below"]["limit"], row["below"]["status"]), (row["count"] - 1, 2))
+
+
+class LongTrailOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once. SPARKLE runs at few steps and its smallest sizes here, with its stated values
+    for those steps; the full counts are the validation's own."""
+
+    NAMES = ("sparkle-box", "sparkle-box-second", "long-trail-feistel", "long-trail-feistel-second")
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = long_trail_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def run_known(self, name, known=None):
+        known = known if known is not None else self.known(name)
+        if name.startswith("sparkle"):
+            with mock.patch.object(known, "ROUNDS", {size: 4 for size in known.ROUNDS}), \
+                    mock.patch.object(known, "HALVES", {256: 2, 384: 3}):
+                return self.tool.validation(name, known, None)
+        return self.tool.validation(name, known, None)
+
+    def test_each_is_re_found(self):
+        for name in self.NAMES:
+            self.assertTrue(self.run_known(name)["re_found"], name)
+
+    def test_each_stated_value_of_sparkle_decides(self):
+        for name in ("sparkle-box", "sparkle-box-second"):
+            known = self.known(name)
+            wrong = {size: dict(row) for size, row in known.BOUNDS.items()}
+            wrong[384][3] += 1
+            with mock.patch.object(known, "BOUNDS", wrong):
+                self.assertFalse(self.run_known(name, known)["re_found"], name)
+
+    def test_each_size_of_sparkle_decides(self):
+        known = self.known("sparkle-box")
+        wrong = {size: dict(row) for size, row in known.BOUNDS.items()}
+        wrong[256][1] += 1
+        with mock.patch.object(known, "BOUNDS", wrong):
+            self.assertFalse(self.run_known("sparkle-box", known)["re_found"])
+
+    def test_each_stated_minimum_of_the_feistel_files_decides(self):
+        for name in ("long-trail-feistel", "long-trail-feistel-second"):
+            for w, kind in ((8, "differential"), (8, "linear"), (16, "differential"), (16, "linear")):
+                known = self.known(name)
+                wrong = {width: {k: dict(row) for k, row in rows.items()} for width, rows in known.MINIMA.items()}
+                wrong[w][kind][6] += 1
+                with mock.patch.object(known, "MINIMA", wrong):
+                    self.assertFalse(self.tool.validation(name, known, None)["re_found"], (name, w, kind))
+
+    def test_the_example_decides(self):
+        known = self.known("long-trail-feistel-second")
+        with mock.patch.object(known, "EXAMPLE_LENGTHS", (1, 1, 3)):
+            self.assertFalse(self.tool.validation("long-trail-feistel-second", known, None)["re_found"])
+
+    def test_a_stated_example_that_cannot_be_is_a_tool_defect(self):
+        known = self.known("long-trail-feistel-second")
+        with mock.patch.object(known, "EXAMPLE", ((1, 1), (0, 0), (0, 1), (1, 0))), self.assertRaises(ToolFailureClass()):
+            self.tool.validation("long-trail-feistel-second", known, None)
+
+    def test_a_kind_of_each_file_is_what_runs(self):
+        seen = []
+
+        def counted(layer, box, rounds):
+            seen.append((layer.fed, tuple(box)))
+            return {r: {"count": 0} for r in range(1, rounds + 1)}
+
+        known = self.known("long-trail-feistel")
+        with mock.patch.object(self.tool, "minima", counted):
+            self.tool.validation("long-trail-feistel", known, None)
+        self.assertEqual(seen, [((0,), (1, 6)), ((1,), (0, 6)), ((0,), (5, 24)), ((1,), (3, 12))])
+
+    def test_sparkle_runs_each_size_on_its_own_relation_and_kind(self):
+        for name, fed in (("sparkle-box", lambda h: tuple(range(h))), ("sparkle-box-second", lambda h: tuple(range(h, 2 * h)))):
+            seen = []
+            known = self.known(name)
+
+            def counted(layer, box, rounds):
+                seen.append((layer.branches, layer.fed, tuple(box), rounds))
+                return {r: {"count": 0} for r in range(1, rounds + 1)}
+
+            with mock.patch.object(self.tool, "minima", counted):
+                self.tool.validation(name, known, None)
+            self.assertEqual(seen, [(2 * h, fed(h), known.BOX, known.ROUNDS[size]) for size, h in known.HALVES.items()], name)
+
+    def test_the_second_reads_the_relation_of_the_first(self):
+        first = self.known("sparkle-box")
+        self.assertEqual(self.tool.first_known().relation(3), first.relation(3))
+
+    def test_the_counts_of_sparkle_at_its_smallest_size(self):
+        """Sparkle256's differences in full, as the validation runs them."""
+        known = self.known("sparkle-box")
+        with mock.patch.object(known, "HALVES", {256: 2}):
+            out = self.tool.validation("sparkle-box", known, None)
+        self.assertTrue(out["re_found"])
+        rows = out["found"]["256"]
+        self.assertEqual({int(r): row["count"] for r, row in rows.items()}, known.BOUNDS[256])
+
+    def test_a_dual_bound_a_hair_below_changes_nothing(self):
+        real = self.tool.milp
+
+        def noisy(*args, **kwargs):
+            result = real(*args, **kwargs)
+            if result.mip_dual_bound is not None:
+                result.mip_dual_bound = result.mip_dual_bound - 6.14e-12
+            return result
+
+        with mock.patch.object(self.tool, "milp", noisy):
+            out = self.run_known("sparkle-box")
+        self.assertTrue(out["re_found"])
+
+    def test_the_record_holds_each_status_the_check_and_the_float_of_each_step(self):
+        rows = self.run_known("sparkle-box")["found"]["256"]
+        self.assertEqual(sorted(rows), ["1", "2", "3", "4"])
+        for r, row in rows.items():
+            self.assertLessEqual({"status", "message", "dual_bound", "count", "steps", "outputs"}, set(row), r)
+            self.assertEqual(len({"below", "sum_of"} & set(row)), 1, r)
+            self.assertIsInstance(row["dual_bound"], float)
+            self.assertEqual(len(row["steps"]), int(r))
+
+    def test_the_record_is_plain_json(self):
+        for name in self.NAMES:
+            found = self.run_known(name)["found"]
+            self.assertEqual(json.loads(json.dumps(found)), found, name)
+
+    def test_the_kind_names_each_use_and_a_known_result_that_covers_it(self):
+        kind = self.tool.KIND
+        self.assertEqual(kind["widths"], [8, 16, 32])
+        for use in kind["uses"]:
+            self.assertTrue(use["covered_by"], use)
+            for name in use["covered_by"]:
+                self.assertIn(name, self.NAMES)
+        for name in ("sparkle-box", "sparkle-box-second", "long-trail-feistel"):
+            self.assertTrue(any(name in use["covered_by"] for use in kind["uses"]), name)
+        for name in self.NAMES:
+            self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
+
+    def test_no_known_result_of_this_tool_is_heavy(self):
+        self.assertFalse(hasattr(self.tool, "HEAVY"))
 
 
 class FutSec8Known(unittest.TestCase):
