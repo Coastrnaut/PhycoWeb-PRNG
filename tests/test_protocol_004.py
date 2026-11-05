@@ -13,12 +13,13 @@ from pathlib import Path
 from typing import Dict, List
 from unittest import mock
 
-from protocol import changelog, evidence, provenance
+from protocol import candidates, changelog, evidence, provenance
 from protocol.disclaimer import DESIGN_DISCLAIMER
 from protocol.evidence import NONE, Refused
 from tests.support_004 import CODE_ROOT, SNAPSHOT, TempRepo, Tool, report_files, write
 
 ROOT = Path(__file__).resolve().parents[1]
+WORD = {"words": "go on with this candidate", "date": "2026-11-05"}
 ARGV = ["scripts/tool.py", "--flag"]
 CODE = ["scripts/tool.py"]
 SEARCH = {"bound_kind": "differential", "rounds": 8, "width": 32, "size": 4}
@@ -2233,6 +2234,517 @@ class RepairedLogs(ProtocolWriter):
         entry = evidence.log_entries(rel)[-1][0]
         self.assertEqual(sorted(k for k in entry if k in ("rule", "direction", "readings")), [])
         self.assertIn("repair", entry)
+
+
+class CandidateLog(TempRepo):
+    """scripts/candidate_log.py and protocol/candidates.py, the log's one writer (T075, T076)."""
+
+    def setUp(self):
+        super().setUp()
+        self.log = evidence.CANDIDATE_LOG_REL
+
+    def module(self, candidate: str, text: str = "# the list\n", commit: bool = True) -> str:
+        write(self.root, candidates.module_rel(candidate), text)
+        if commit:
+            self.commit(f"the list of {candidate}")
+        return evidence.sha256(text.encode("utf-8"))
+
+    def proposal(self, candidate: str = "cand-A1", **changes) -> Dict:
+        parameters = {name: "stated" for name in candidates.PARAMETERS}
+        fields = {"candidate_id": candidate, "family": candidates.FAMILIES[candidate[5]],
+                  "oplist_sha256": self.module(candidate), "parameters": parameters}
+        fields.update(changes)
+        return fields
+
+    def propose(self, candidate: str = "cand-A1", **changes) -> Dict:
+        return candidates.propose(self.proposal(candidate, **changes))
+
+    def lines(self) -> int:
+        path = self.root / self.log
+        return len(path.read_bytes().splitlines()) if path.exists() else 0
+
+    def run_log(self, *argv) -> int:
+        from scripts import candidate_log
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return candidate_log.main(list(argv))
+
+    def file(self, fields: Dict) -> str:
+        return str(write(self.root, "data/local/entry.json", json.dumps(fields)))
+
+    def mapping_table(self) -> Dict:
+        return {name: {"place": "here", "serves": "that"} for name in candidates.MAPPING}
+
+    def record(self, kind: str, candidate: str = "cand-A1", name: str = "r1", **fields) -> Dict:
+        body = {"kind": kind, "record_id": name, "candidate": candidate, "status": "pass"}
+        body.update(fields)
+        data = evidence.pretty(body)
+        write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/{name}.json", data)
+        return {"record_id": name, "sha256": evidence.sha256(data)}
+
+    def scored(self, candidate: str = "cand-A1") -> None:
+        candidates.append({"candidate_id": candidate, "event": "scored"})
+
+    # propose ----------------------------------------------------------------------------------
+
+    def test_propose_appends_an_entry_chained_from_seq_0(self):
+        fields = self.proposal()
+        self.assertEqual(self.run_log("propose", self.file(fields)), 0)
+        entry = evidence.check_chain(self.log)[0][0]
+        self.assertEqual((entry["seq"], entry["event"]), (0, "proposed"))
+        self.assertEqual(entry["oplist_sha256"], fields["oplist_sha256"])
+        self.assertEqual((entry["evidence"], entry["budget_used_h"]), ([], {}))
+
+    def test_a_tool_takes_the_proposed_hash_and_refuses_any_other(self):
+        digest = self.propose()["oplist_sha256"]
+        evidence.guard_oplist(digest)
+        with self.assertRaises(Refused):
+            evidence.guard_oplist("f" * 64)
+
+    def test_a_fourth_proposed_entry_of_a_family_exits_2(self):
+        """Quickstart E6: the ID's own rule and the count both refuse it."""
+        for k in (1, 2, 3):
+            self.propose(f"cand-A{k}")
+        before = self.lines()
+        self.assertEqual(self.run_log("propose", self.file(self.proposal("cand-A3"))), 2)
+        self.assertEqual(self.run_log("propose", self.file(dict(
+            self.proposal("cand-A3"), candidate_id="cand-A4"))), 2)
+        self.assertEqual(self.lines(), before)
+
+    def test_three_per_family_stand_in_each_family(self):
+        for family in "AB":
+            for k in (1, 2, 3):
+                self.propose(f"cand-{family}{k}")
+        self.assertEqual(self.lines(), 6)
+
+    def test_the_count_holds_whatever_became_of_the_three(self):
+        for k in (1, 2):
+            self.propose(f"cand-A{k}")
+        candidates.decide({"candidate_id": "cand-A1", "decision": "withdrawn", "reason": "why"})
+        self.propose("cand-A3")
+        with mock.patch.object(candidates, "CANDIDATE_ID", re.compile(r"cand-([AB])(\d)")):
+            with self.assertRaisesRegex(Refused, "fourth"):
+                self.propose("cand-A4")
+
+    def test_a_family_that_is_not_the_ids_is_refused(self):
+        with self.assertRaisesRegex(Refused, "family"):
+            self.propose(family="Boolean")
+
+    def test_each_part_of_parameters_is_required(self):
+        for name in candidates.PARAMETERS:
+            fields = self.proposal()
+            del fields["parameters"][name]
+            with self.assertRaisesRegex(Refused, name):
+                candidates.propose(fields)
+        self.assertEqual(self.lines(), 0)
+
+    def test_a_field_the_writer_adds_is_refused(self):
+        with self.assertRaisesRegex(Refused, "seq"):
+            candidates.propose(dict(self.proposal(), seq=7))
+
+    def test_a_module_that_is_uncommitted_or_another_is_refused(self):
+        fields = self.proposal()
+        write(self.root, candidates.module_rel("cand-A1"), "# changed\n")
+        with self.assertRaisesRegex(Refused, "SHA-256"):
+            candidates.propose(fields)
+        with self.assertRaisesRegex(Refused, "committed"):
+            candidates.propose(dict(fields, oplist_sha256=evidence.sha256(b"# changed\n")))
+
+    def test_no_entry_is_ever_deleted_or_rewritten(self):
+        self.propose("cand-A1")
+        first = (self.root / self.log).read_bytes()
+        self.propose("cand-B1")
+        self.assertTrue((self.root / self.log).read_bytes().startswith(first))
+
+    def test_a_second_proposed_entry_of_a_candidate_is_a_correction(self):
+        self.propose()
+        with self.assertRaisesRegex(Refused, "correction"):
+            self.propose()
+
+    def test_after_the_first_score_a_candidate_comes_only_in_place_of_another(self):
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        self.scored()
+        with self.assertRaisesRegex(Refused, "in place of"):
+            self.propose("cand-A2")
+
+    def pending(self) -> Dict:
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        self.scored()
+        cited = self.record("inverse", status="fail")
+        written = candidates.decide({"candidate_id": "cand-A1", "decision": "rejected",
+                                     "reason": "the inverse test failed", "cause": candidates.FAILED_CHECK,
+                                     "record": cited})
+        return written[1]
+
+    def test_a_replacement_cites_a_pending_entry_on_the_owners_word(self):
+        target = self.pending()
+        with self.assertRaisesRegex(Refused, "explicit word"):
+            self.propose("cand-A2", replaces=target["seq"])
+        with self.assertRaisesRegex(Refused, "pending"):
+            self.propose("cand-A2", replaces=0, owner_word=WORD)
+        with self.assertRaisesRegex(Refused, "family"):
+            self.propose("cand-B2", replaces=target["seq"], owner_word=WORD)
+        entry = self.propose("cand-A2", replaces=target["seq"], owner_word=WORD)
+        self.assertEqual(entry["owner_word"], WORD)
+
+    # after the set closes ---------------------------------------------------------------------
+
+    def closed(self) -> None:
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        candidates.append({"event": "set-closed"})
+
+    def decline(self, further: str = "cand-A2") -> None:
+        self.add_row("Owner design review", "Declined", "the reasons")
+        candidates.outcome({"candidate_id": "cand-A1", "outcome": "declined", "reasons": "why",
+                            "needs": "an R below the declined one", "further_candidate": further})
+
+    def test_after_set_closed_propose_exits_2(self):
+        self.closed()
+        with self.assertRaisesRegex(Refused, "closed"):
+            self.propose("cand-A2", owner_word=WORD)
+
+    def test_a_decline_reopens_the_set_for_its_further_candidate(self):
+        self.closed()
+        self.decline()
+        with self.assertRaisesRegex(Refused, "explicit word"):
+            self.propose("cand-A2")
+        with self.assertRaisesRegex(Refused, "further"):
+            self.propose("cand-A3", owner_word=WORD)
+        self.assertEqual(self.propose("cand-A2", owner_word=WORD)["candidate_id"], "cand-A2")
+
+    def test_the_set_reopens_once(self):
+        self.closed()
+        self.decline()
+        self.propose("cand-A2", owner_word=WORD)
+        candidates.append({"event": "set-closed"})
+        with self.assertRaisesRegex(Refused, "closed"):
+            self.propose("cand-A3", owner_word=WORD)
+
+    # mapping and enter ------------------------------------------------------------------------
+
+    def test_mapping_comes_before_the_first_score_and_holds_every_part(self):
+        self.propose()
+        fields = {"candidate_id": "cand-A1", "mapping": self.mapping_table()}
+        self.assertEqual(self.run_log("mapping", self.file(fields)), 0)
+        for name in candidates.MAPPING:
+            table = self.mapping_table()
+            del table[name]
+            with self.assertRaisesRegex(Refused, name):
+                candidates.mapping({"candidate_id": "cand-A1", "mapping": table})
+        self.scored()
+        with self.assertRaisesRegex(Refused, "before its first score"):
+            candidates.mapping(fields)
+
+    def test_mapping_needs_a_proposed_entry(self):
+        with self.assertRaisesRegex(Refused, "proposed"):
+            candidates.mapping({"candidate_id": "cand-A1", "mapping": self.mapping_table()})
+
+    def test_mapping_holds_place_and_purpose(self):
+        self.propose()
+        table = self.mapping_table()
+        table["food nodes"] = {"place": "here"}
+        with self.assertRaisesRegex(Refused, "food nodes"):
+            candidates.mapping({"candidate_id": "cand-A1", "mapping": table})
+
+    def test_enter_writes_one_entry_per_candidate(self):
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        self.assertEqual(self.run_log("enter"), 0)
+        entered = candidates.of_event(candidates.entries(), "entered-d4")
+        self.assertEqual([e["candidate_id"] for e in entered], ["cand-A1", "cand-B1"])
+
+    def test_enter_needs_each_family(self):
+        self.propose("cand-A1")
+        with self.assertRaisesRegex(Refused, "each family"):
+            candidates.enter()
+
+    def test_enter_exits_2_once_a_scored_entry_exists(self):
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        self.scored()
+        self.assertEqual(self.run_log("enter"), 2)
+
+    def test_enter_leaves_out_a_withdrawn_candidate_and_repeats_no_entry(self):
+        self.propose("cand-A1")
+        self.propose("cand-A2")
+        self.propose("cand-B1")
+        candidates.decide({"candidate_id": "cand-A2", "decision": "withdrawn", "reason": "why"})
+        candidates.enter()
+        with self.assertRaisesRegex(Refused, "entered-d4"):
+            candidates.enter()
+        entered = candidates.of_event(candidates.entries(), "entered-d4")
+        self.assertEqual([e["candidate_id"] for e in entered], ["cand-A1", "cand-B1"])
+
+    # decide -----------------------------------------------------------------------------------
+
+    def test_selected_and_not_selected_belong_to_round_rule(self):
+        self.propose()
+        for decision in ("selected", "not selected", "liked"):
+            with self.assertRaisesRegex(Refused, "decision"):
+                candidates.decide({"candidate_id": "cand-A1", "decision": decision, "reason": "r"})
+
+    def test_withdrawn_stands_only_before_the_first_tool_run(self):
+        self.propose()
+        candidates.append({"candidate_id": "cand-A1", "event": "evidence", "budget_used_h": {}})
+        with self.assertRaisesRegex(Refused, "first"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "withdrawn", "reason": "r"})
+
+    def test_a_rejection_shows_a_failed_check_and_brings_a_pending_replacement(self):
+        self.propose()
+        cited = self.record("bijectivity", status="fail")
+        written = candidates.decide({"candidate_id": "cand-A1", "decision": "rejected", "reason": "r",
+                                     "cause": candidates.FAILED_CHECK, "record": cited})
+        self.assertEqual([e["event"] for e in written], ["decision", "replacement"])
+        self.assertEqual((written[1]["state"], written[1]["decision_seq"]), ("pending", written[0]["seq"]))
+
+    def test_a_record_that_does_not_show_the_reason_exits_2(self):
+        self.propose()
+        for cited in (self.record("bijectivity", name="r1", status="pass"),
+                      self.record("frequency", name="r2", status="fail"),
+                      self.record("inverse", candidate="cand-B1", name="r3", status="fail")):
+            with self.assertRaisesRegex(Refused, "does not show"):
+                candidates.decide({"candidate_id": "cand-A1", "decision": "rejected", "reason": "r",
+                                   "cause": candidates.FAILED_CHECK, "record": cited})
+        self.assertEqual(self.lines(), 1)
+
+    def test_a_record_with_another_hash_is_not_the_record_cited(self):
+        self.propose()
+        cited = self.record("inverse", status="fail")
+        with self.assertRaisesRegex(Refused, "SHA-256"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "rejected", "reason": "r",
+                               "cause": candidates.FAILED_CHECK, "record": dict(cited, sha256="0" * 64)})
+
+    def test_a_cause_outside_the_rules_exits_2(self):
+        self.propose()
+        cited = self.record("inverse", status="fail")
+        with self.assertRaisesRegex(Refused, "cause"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "R is high",
+                               "cause": "R is high", "record": cited})
+
+    def test_an_eligibility_item_is_read_from_the_round_rule_record(self):
+        self.propose()
+        passes = self.record("round-rule", name="r2", sizes={"4": {"eligible": {"FR-018": {"met": True}}}})
+        fails = self.record("round-rule", name="r3", sizes={"4": {"eligible": {"FR-018": {"met": False}}}})
+        with self.assertRaisesRegex(Refused, "does not show"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                               "cause": candidates.ITEM, "record": passes})
+        written = candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                                     "cause": candidates.ITEM, "record": fails})
+        self.assertEqual(written[1]["state"], "pending")
+
+    def test_inconclusive_evidence_is_shown_by_its_record(self):
+        self.propose()
+        cited = self.record("bound", status="inconclusive")
+        candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                           "cause": candidates.INCONCLUSIVE, "record": cited})
+
+    def test_an_eligible_decision_cites_the_round_rule_record(self):
+        self.propose()
+        cited = self.record("frequency")
+        with self.assertRaisesRegex(Refused, "round-rule"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "eligible", "reason": "r", "record": cited})
+        cited = self.record("round-rule", name="r2", sizes={"4": {"eligible": {"FR-018": {"met": True}}}})
+        entry = candidates.decide({"candidate_id": "cand-A1", "decision": "eligible", "reason": "r",
+                                   "record": cited})
+        self.assertEqual(len(entry), 1)
+
+    def test_a_final_decision_is_final(self):
+        self.propose()
+        candidates.decide({"candidate_id": "cand-A1", "decision": "withdrawn", "reason": "r"})
+        with self.assertRaisesRegex(Refused, "final"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "withdrawn", "reason": "r"})
+
+    def d4_record(self, chosen: str = "Boolean") -> Dict:
+        return self.record("d4-choice", candidate="none", name="d4", chosen_family=chosen)
+
+    def test_a_d4_reason_waits_for_the_chosen_familys_final_decisions(self):
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        cited = self.d4_record()
+        fields = {"candidate_id": "cand-A1", "decision": "ineligible", "reason": candidates.D4_NOT_ANALYSED,
+                  "cause": candidates.D4_NOT_ANALYSED, "record": cited}
+        with self.assertRaisesRegex(Refused, "final decisions"):
+            candidates.decide(fields)
+        rule = self.record("round-rule", candidate="cand-B1", name="r2",
+                           sizes={"4": {"eligible": {"FR-018": {"met": True}}}})
+        candidates.decide({"candidate_id": "cand-B1", "decision": "eligible", "reason": "r", "record": rule})
+        written = candidates.decide(fields)
+        self.assertEqual((written[1]["state"], written[1]["reason"]), ("closed", candidates.SHARED_REASON))
+
+    def test_a_d4_record_that_chose_the_candidates_family_shows_nothing(self):
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        with self.assertRaisesRegex(Refused, "does not show"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                               "cause": candidates.D4_TIE, "record": self.d4_record("ARX")})
+
+    def test_a_replacement_state_the_rules_do_not_give_exits_2(self):
+        self.propose()
+        cited = self.record("inverse", status="fail")
+        with self.assertRaisesRegex(Refused, "the rules give"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "rejected", "reason": "r",
+                               "cause": candidates.FAILED_CHECK, "record": cited,
+                               "replacement": {"state": "closed", "reason": candidates.SHARED_REASON}})
+        self.assertEqual(self.lines(), 1)
+
+    def need(self, hours: float, name: str = "n1") -> Dict:
+        return self.record("projection", name=name, projected_hours=hours, row="cand-A1/statistics")
+
+    def test_a_spent_budget_is_the_candidates_own_where_its_charges_left_too_little(self):
+        self.propose()
+        candidates.append({"candidate_id": "cand-A1", "event": "evidence",
+                           "budget_used_h": {"statistics": 11.0}})
+        written = candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                                     "cause": candidates.SPENT, "record": self.need(2.0), "row": "statistics"})
+        self.assertEqual(written[1]["state"], "pending")
+
+    def test_a_spent_budget_is_shared_where_the_need_exceeds_the_rows_value(self):
+        self.propose()
+        written = candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                                     "cause": candidates.SPENT, "record": self.need(13.0), "row": "statistics"})
+        self.assertEqual((written[1]["state"], written[1]["reason"]), ("closed", candidates.SHARED_REASON))
+
+    def test_a_need_the_row_can_hold_shows_no_spent_budget(self):
+        self.propose()
+        with self.assertRaisesRegex(Refused, "does not show"):
+            candidates.decide({"candidate_id": "cand-A1", "decision": "ineligible", "reason": "r",
+                               "cause": candidates.SPENT, "record": self.need(2.0), "row": "statistics"})
+
+    def test_the_causes_every_candidate_shares_close_at_once(self):
+        for cause, kind in ((candidates.UNIFORM_CONTROL, "control"), (candidates.SHARED_MATCH, "generator-run"),
+                            (candidates.NO_TRAIL_ROUTE, "cross-check")):
+            with self.subTest(cause):
+                candidate = {"control": "cand-A1", "generator-run": "cand-A2", "cross-check": "cand-A3"}[kind]
+                self.propose(candidate)
+                cited = self.record(kind, candidate=candidate, name=kind, status="fail")
+                written = candidates.decide({"candidate_id": candidate, "decision": "ineligible", "reason": "r",
+                                             "cause": cause, "record": cited})
+                self.assertEqual(written[1]["reason"], candidates.SHARED_REASON)
+
+    # correct ----------------------------------------------------------------------------------
+
+    def test_a_correction_cites_the_seq_it_corrects(self):
+        entry = self.propose()
+        fields = {"candidate_id": "cand-A1", "corrects": entry["seq"], "reason": "a stated value"}
+        self.assertEqual(self.run_log("correct", self.file(fields)), 0)
+        self.assertEqual(self.run_log("correct", self.file(dict(fields, corrects=9))), 2)
+
+    def test_a_new_list_needs_the_old_one_kept_and_listed(self):
+        entry = self.propose()
+        old = entry["oplist_sha256"]
+        new = self.module("cand-A1", "# a fix\n")
+        fields = {"candidate_id": "cand-A1", "corrects": entry["seq"], "reason": "r", "oplist_sha256": new}
+        with self.assertRaisesRegex(Refused, "kept unchanged"):
+            candidates.correct(fields)
+        rel = f"{candidates.CANDIDATES_REL}/cand-A1/superseded/{old}.py"
+        write(self.root, rel, "# the list\n")
+        with self.assertRaisesRegex(Refused, "does not list"):
+            candidates.correct(fields)
+        write(self.root, evidence.SUPERSEDED_REL, json.dumps({old: rel}))
+        written = candidates.correct(fields)
+        evidence.guard_oplist(new)
+        self.assertEqual(written["event"], "correction")
+
+    # replace ----------------------------------------------------------------------------------
+
+    def test_replace_closes_a_pending_entry_for_each_stated_reason(self):
+        target = self.pending()
+        for bad in ({"closes": 0, "reason": candidates.FULL}, {"closes": target["seq"], "reason": "tired"},
+                    {"closes": target["seq"], "reason": candidates.FULL},
+                    {"closes": target["seq"], "reason": candidates.OWNER_DECLINED}):
+            with self.assertRaises(Refused):
+                candidates.replace(bad)
+        written = candidates.replace({"closes": target["seq"], "reason": candidates.OWNER_DECLINED,
+                                      "owner_word": WORD})
+        self.assertEqual(candidates.pending_replacements(candidates.entries()), [])
+        self.assertEqual(written["state"], "closed")
+
+    def test_a_full_family_closes_the_entry(self):
+        target = self.pending()
+        self.propose("cand-A2", replaces=target["seq"], owner_word=WORD)
+        with mock.patch.object(candidates, "MOST_PER_FAMILY", 2):
+            written = candidates.replace({"closes": target["seq"], "reason": candidates.FULL})
+        self.assertEqual(written["closes"], target["seq"])
+
+    def test_the_budget_closes_the_entry_only_where_its_rows_show_it(self):
+        target = self.pending()
+        fields = {"closes": target["seq"], "reason": candidates.BUDGET_SPENT, "row": "statistics"}
+        with self.assertRaisesRegex(Refused, "by ID"):
+            candidates.replace(fields)
+        with self.assertRaisesRegex(Refused, "budget allows"):
+            candidates.replace(dict(fields, record=self.need(2.0)))
+        with self.assertRaisesRegex(Refused, "lowers no budget"):
+            candidates.replace(dict(fields, record=self.need(2.0, "n2"), lowered_by=0, row_hours=1.0))
+        candidates.replace(dict(fields, record=self.need(13.0, "n3")))
+
+    def test_a_lowered_row_is_read_from_the_entry_that_lowered_it(self):
+        target = self.pending()
+        real = evidence.log_entries
+
+        def lowered(rel):
+            return [({"seq": 7, "rule": "Stop rule"}, b"")] if rel == evidence.PROTOCOL_LOG_REL else real(rel)
+
+        fields = {"closes": target["seq"], "reason": candidates.BUDGET_SPENT, "row": "statistics",
+                  "lowered_by": 7}
+        with mock.patch.object(evidence, "log_entries", side_effect=lowered):
+            with self.assertRaisesRegex(Refused, "budget allows"):
+                candidates.replace(dict(fields, record=self.need(2.0), row_hours=3.0))
+            candidates.replace(dict(fields, record=self.need(2.0, "n2"), row_hours=1.0))
+
+    # outcome ----------------------------------------------------------------------------------
+
+    def test_outcome_reads_the_row_with_the_highest_k_at_head(self):
+        self.propose()
+        fields = {"candidate_id": "cand-A1", "outcome": "fixed", "reasons": "why", "old_version": "0.4",
+                  "new_version": "0.5"}
+        with self.assertRaisesRegex(Refused, "does not record"):
+            candidates.outcome(fields)
+        self.add_row("Owner design review", "Approved", "the reasons")
+        with self.assertRaisesRegex(Refused, "does not record"):
+            candidates.outcome(fields)
+        self.add_row("Owner design review 2", "Declined", "fixed, logged under the candidate")
+        self.assertEqual(candidates.outcome(fields)["row"], "Owner design review 2")
+
+    def test_an_outcome_outside_the_four_exits_2(self):
+        self.propose()
+        self.add_row("Owner design review", "Declined", "liked")
+        with self.assertRaisesRegex(Refused, "outcome"):
+            candidates.outcome({"candidate_id": "cand-A1", "outcome": "liked", "reasons": "why"})
+
+    def test_a_decline_states_what_the_rules_need_and_a_revision_its_versions(self):
+        self.propose()
+        self.add_row("Owner design review", "Declined", "revised")
+        with self.assertRaisesRegex(Refused, "needs"):
+            candidates.outcome({"candidate_id": "cand-A1", "outcome": "declined", "reasons": "why"})
+        with self.assertRaisesRegex(Refused, "old_version"):
+            candidates.outcome({"candidate_id": "cand-A1", "outcome": "revised", "reasons": "why"})
+
+    # repair -----------------------------------------------------------------------------------
+
+    def test_repair_log_restores_this_log(self):
+        from scripts import repair_log
+        self.propose("cand-A1")
+        self.propose("cand-B1")
+        path = self.root / self.log
+        path.write_bytes(path.read_bytes().replace(b'"seq": 1', b'"seq": 9'))
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            self.assertEqual(repair_log.main(["--log", self.log, "--approval", "Log repair 1"]), 2)
+        self.add_row("Log repair 1", "Approved", f"{self.log}, seq 1, 2026-11-03")
+        with mock.patch("builtins.print"):
+            self.assertEqual(repair_log.main(["--log", self.log, "--approval", "Log repair 1"]), 0)
+        restored = candidates.entries()
+        self.assertEqual(len(restored), 2)
+        self.assertEqual(restored[1]["repair"]["break_seq"], 1)
+        self.assertNotIn("event", restored[1])
+
+    def test_a_broken_chain_refuses_every_append(self):
+        self.propose("cand-A1")
+        path = self.root / self.log
+        path.write_bytes(path.read_bytes().replace(b'"seq": 0', b'"seq": 4'))
+        with self.assertRaisesRegex(Refused, "chain"):
+            self.propose("cand-B1")
 
 
 class ClearLock(TempRepo):
