@@ -1,0 +1,752 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "sparkle-box is re-found",
+      "holds": true
+    }
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "5d50fb6c12348aa8f19f2941af6efa459ae4c4735ff282db155763266ade31e4"
+    },
+    "research/004/tools/trails/long_trail.py": {
+      "kind": "raw",
+      "sha256": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f"
+    },
+    "research/004/validation/sparkle-box-second.py": {
+      "kind": "raw",
+      "sha256": "428155d229f8ae8b9142739fd6bbf78746788b555fe1dac0a870aa7fb2ca0413"
+    },
+    "research/004/validation/sparkle-box.py": {
+      "kind": "raw",
+      "sha256": "8a504955447a6b10396568bbd93c4cc0f680c948360807c11e162d26e7c8c367"
+    },
+    "scripts/validate_tool.py": {
+      "kind": "raw",
+      "sha256": "926565e3adfe64e47300d13891711832268d6da26630fd5d30db963d34e1bbde"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/validate_tool.py --tool 'long-trail active-box counting' --known sparkle-box --out-dir reports/004-crypto-architecture-v3/validation",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-05T15:18:22Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "found": {
+    "sparkle-box": {
+      "256": {
+        "1": {
+          "below": {
+            "limit": 5,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "0001"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 31,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 32,
+          "dual_bound": 32.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "00"
+          ],
+          "status": 0,
+          "steps": [
+            "0010",
+            "0100"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 63,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 64,
+          "dual_bound": 64.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "00",
+            "11"
+          ],
+          "status": 0,
+          "steps": [
+            "0001",
+            "1000",
+            "1110"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 87,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 88,
+          "dual_bound": 88.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "11",
+            "00",
+            "11"
+          ],
+          "status": 0,
+          "steps": [
+            "0111",
+            "0001",
+            "1000",
+            "1110"
+          ]
+        },
+        "5": {
+          "below": {
+            "limit": 139,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 140,
+          "dual_bound": 140.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "10",
+            "11",
+            "00",
+            "11"
+          ],
+          "status": 0,
+          "steps": [
+            "1100",
+            "0111",
+            "0001",
+            "1000",
+            "1110"
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 167,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 168,
+          "dual_bound": 167.99999999999994,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "00",
+            "11",
+            "11",
+            "11",
+            "00"
+          ],
+          "status": 0,
+          "steps": [
+            "0001",
+            "1000",
+            "1110",
+            "1011",
+            "0010",
+            "0100"
+          ]
+        },
+        "7": {
+          "below": {
+            "limit": 191,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 192,
+          "dual_bound": 191.9999999999983,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "11",
+            "00",
+            "11",
+            "01",
+            "11",
+            "00"
+          ],
+          "status": 0,
+          "steps": [
+            "1011",
+            "0010",
+            "0100",
+            "1101",
+            "1011",
+            "0010",
+            "0100"
+          ]
+        },
+        "8": {
+          "below": {
+            "limit": 215,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 216,
+          "dual_bound": 215.99999999999986,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "11",
+            "00",
+            "11",
+            "01",
+            "11",
+            "00",
+            "11"
+          ],
+          "status": 0,
+          "steps": [
+            "1011",
+            "0010",
+            "0100",
+            "1101",
+            "1011",
+            "0010",
+            "0100",
+            "1101"
+          ]
+        }
+      },
+      "384": {
+        "1": {
+          "below": {
+            "limit": 5,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "000001"
+          ]
+        },
+        "10": {
+          "count": 356,
+          "dual_bound": 355.9999999999983,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "000",
+            "111",
+            "100",
+            "000",
+            "010",
+            "111",
+            "000",
+            "111"
+          ],
+          "status": 0,
+          "steps": [
+            "010111",
+            "000010",
+            "100000",
+            "111100",
+            "000111",
+            "111000",
+            "100111",
+            "000100",
+            "001000",
+            "111001"
+          ],
+          "sum_of": [
+            5,
+            5
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 31,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 32,
+          "dual_bound": 32.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "000"
+          ],
+          "status": 0,
+          "steps": [
+            "000010",
+            "100000"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 69,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 70,
+          "dual_bound": 69.99999999999994,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "000",
+            "111"
+          ],
+          "status": 0,
+          "steps": [
+            "000010",
+            "100000",
+            "111100"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 99,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 100,
+          "dual_bound": 100.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "000",
+            "111"
+          ],
+          "status": 0,
+          "steps": [
+            "010111",
+            "000010",
+            "100000",
+            "111100"
+          ]
+        },
+        "5": {
+          "below": {
+            "limit": 177,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 178,
+          "dual_bound": 177.99999999999878,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "011",
+            "111",
+            "111"
+          ],
+          "status": 0,
+          "steps": [
+            "010001",
+            "101010",
+            "010101",
+            "100010",
+            "011100"
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 199,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 200,
+          "dual_bound": 200.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "000",
+            "111",
+            "100",
+            "111",
+            "000"
+          ],
+          "status": 0,
+          "steps": [
+            "000010",
+            "100000",
+            "111100",
+            "001111",
+            "000001",
+            "010000"
+          ]
+        },
+        "7": {
+          "below": {
+            "limit": 229,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 230,
+          "dual_bound": 230.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "000",
+            "111",
+            "001",
+            "111",
+            "000"
+          ],
+          "status": 0,
+          "steps": [
+            "100111",
+            "000100",
+            "001000",
+            "111001",
+            "010111",
+            "000010",
+            "100000"
+          ]
+        },
+        "8": {
+          "below": {
+            "limit": 259,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 260,
+          "dual_bound": 260.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "000",
+            "111",
+            "010",
+            "111",
+            "000",
+            "111"
+          ],
+          "status": 0,
+          "steps": [
+            "001111",
+            "000001",
+            "010000",
+            "111010",
+            "100111",
+            "000100",
+            "001000",
+            "111001"
+          ]
+        },
+        "9": {
+          "below": {
+            "limit": 325,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 326,
+          "dual_bound": 325.99999999999994,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "111",
+            "000",
+            "111",
+            "010",
+            "000",
+            "100",
+            "111",
+            "000"
+          ],
+          "status": 0,
+          "steps": [
+            "001111",
+            "000001",
+            "010000",
+            "111010",
+            "000111",
+            "111000",
+            "001111",
+            "000001",
+            "010000"
+          ]
+        }
+      },
+      "512": {
+        "1": {
+          "below": {
+            "limit": 5,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "00000001"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 31,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 32,
+          "dual_bound": 32.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0000"
+          ],
+          "status": 0,
+          "steps": [
+            "00000010",
+            "01000000"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 75,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 76,
+          "dual_bound": 76.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0000",
+            "1111"
+          ],
+          "status": 0,
+          "steps": [
+            "00000001",
+            "00100000",
+            "11110010"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 111,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 112,
+          "dual_bound": 112.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1111",
+            "0000",
+            "1111"
+          ],
+          "status": 0,
+          "steps": [
+            "00101111",
+            "00000010",
+            "01000000",
+            "11110100"
+          ]
+        },
+        "5": {
+          "below": {
+            "limit": 209,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 210,
+          "dual_bound": 209.99999999999994,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1001",
+            "0000",
+            "0011",
+            "1011"
+          ],
+          "status": 0,
+          "steps": [
+            "10011001",
+            "00001001",
+            "00110000",
+            "01100011",
+            "00010110"
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 231,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 232,
+          "dual_bound": 231.99999999999952,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0000",
+            "1111",
+            "1001",
+            "1111",
+            "0000"
+          ],
+          "status": 0,
+          "steps": [
+            "00000100",
+            "10000000",
+            "11111000",
+            "00101111",
+            "00000010",
+            "01000000"
+          ]
+        },
+        "7": {
+          "below": {
+            "limit": 267,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 268,
+          "dual_bound": 267.9999999999729,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1111",
+            "0000",
+            "1111",
+            "0101",
+            "1111",
+            "0000"
+          ],
+          "status": 0,
+          "steps": [
+            "00101111",
+            "00000010",
+            "01000000",
+            "11110100",
+            "00101111",
+            "00000010",
+            "01000000"
+          ]
+        }
+      }
+    }
+  },
+  "git_dirty": false,
+  "git_head": "10e6277cf98fbb7a00979e7133a2761b0b2e0c9b",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "validation",
+  "known_result": {
+    "known_id": "sparkle-box",
+    "path": "research/004/validation/sparkle-box.py",
+    "provenance_seq": 201,
+    "sha256": "8a504955447a6b10396568bbd93c4cc0f680c948360807c11e162d26e7c8c367",
+    "sha256_kind": "raw",
+    "value": "the bounds of Sparkle256 at 1 to 8 steps, Sparkle384 at 1 to 10, and Sparkle512 at 1 to 7"
+  },
+  "licence": "GPL-3.0, this repository",
+  "limitations": [],
+  "model_id": null,
+  "outcome": "re-found",
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "377805b057367f0e96687ebc48de2adc59db903331163e102cfea2f816268ae5",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 507,
+  "record_id": "validation-20261105T151822Z-6303c526",
+  "research_sha256": "6ff833834075872d36713f9abd195fc77e2967dd0ce2de426ea031ba56ea6461",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "second_known_result": {
+    "known_id": "sparkle-box-second",
+    "path": "research/004/validation/sparkle-box-second.py",
+    "provenance_seq": 202,
+    "sha256": "428155d229f8ae8b9142739fd6bbf78746788b555fe1dac0a870aa7fb2ca0413",
+    "sha256_kind": "raw"
+  },
+  "source": {
+    "entry": "main.pdf",
+    "paper": "Beierle et al., Lightweight AEAD and Hashing using the Sparkle Permutation Family, ToSC 2020",
+    "sha256": "dcf32cbc558878119c3acf804eee207c5273b20ab425773d2943e2cd3b18e529",
+    "table": "Table 6, from the bounds of Alzette in Table 4",
+    "value": "the bounds of Sparkle256 at 1 to 8 steps, Sparkle384 at 1 to 10, and Sparkle512 at 1 to 7"
+  },
+  "spec_sha256": "1122328ff9001256a94d65ba7713b06cf9f231351230121b1b0c7dfe49281bb4",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "tool": "long-trail active-box counting",
+  "tool_sha256": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f",
+  "validated_kind": {
+    "sparkle-box": {
+      "limitations": [
+        "its status rests on the built-in feasibility and integrality tolerances of HiGHS in scipy 1.15.3"
+      ],
+      "model": "MILP on truncated trails and on the place of each branch in its chain, from the box's bounds as whole numbers",
+      "operations": "boxes of 2w bits between layers of Feistel type, each next branch a copy of one branch with at most one output of a linear map added, the map known by the patterns of branches it may give",
+      "uses": [
+        {
+          "covered_by": [
+            "sparkle-box"
+          ],
+          "use": "a Feistel layer with a map of branches, boxes on 32-bit words, differences"
+        },
+        {
+          "covered_by": [
+            "sparkle-box-second"
+          ],
+          "use": "a Feistel layer with a map of branches, boxes on 32-bit words, masks"
+        },
+        {
+          "covered_by": [
+            "long-trail-feistel"
+          ],
+          "use": "a Feistel layer, differences and masks, at the D4 width, w = 8 and w = 16"
+        }
+      ],
+      "widths": [
+        8,
+        16,
+        32
+      ]
+    }
+  },
+  "variant_id": null,
+  "version": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f",
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}

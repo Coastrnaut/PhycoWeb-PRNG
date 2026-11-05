@@ -1,0 +1,663 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "long-trail-feistel is re-found",
+      "holds": true
+    }
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "5d50fb6c12348aa8f19f2941af6efa459ae4c4735ff282db155763266ade31e4"
+    },
+    "research/004/tools/trails/long_trail.py": {
+      "kind": "raw",
+      "sha256": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f"
+    },
+    "research/004/validation/long-trail-feistel-second.py": {
+      "kind": "raw",
+      "sha256": "b0e5b512e573b95ed92f2cf17f1849bb66c093c103cbcd2997ab2441d304773f"
+    },
+    "research/004/validation/long-trail-feistel.py": {
+      "kind": "raw",
+      "sha256": "7d78bdf0a27ceb61d8a99425bd2ac87a71cb2009988bcf35441e5c0faa8ce5eb"
+    },
+    "scripts/validate_tool.py": {
+      "kind": "raw",
+      "sha256": "926565e3adfe64e47300d13891711832268d6da26630fd5d30db963d34e1bbde"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/validate_tool.py --tool 'long-trail active-box counting' --known long-trail-feistel --out-dir reports/004-crypto-architecture-v3/validation",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-05T15:21:21Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [
+    "reports/004-crypto-architecture-v3/research-versions/6ff833834075872d36713f9abd195fc77e2967dd0ce2de426ea031ba56ea6461.md",
+    "reports/004-crypto-architecture-v3/spec-versions/1122328ff9001256a94d65ba7713b06cf9f231351230121b1b0c7dfe49281bb4.md",
+    "reports/004-crypto-architecture-v3/validation/validation-20261105T151822Z-6303c526.json",
+    "reports/004-crypto-architecture-v3/validation/validation-20261105T152119Z-c6904018.json"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "found": {
+    "long-trail-feistel": {
+      "w16 differential": {
+        "1": {
+          "below": {
+            "limit": 4,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 5,
+          "dual_bound": 5.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "01"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 23,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 24,
+          "dual_bound": 24.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 33,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 34,
+          "dual_bound": 34.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 52,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 53,
+          "dual_bound": 53.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11",
+            "01"
+          ]
+        },
+        "5": {
+          "count": 58,
+          "dual_bound": 57.99999999999999,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11",
+            "01",
+            "10"
+          ],
+          "sum_of": [
+            2,
+            3
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 81,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 82,
+          "dual_bound": 82.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11",
+            "11",
+            "01",
+            "10"
+          ]
+        }
+      },
+      "w16 linear": {
+        "1": {
+          "below": {
+            "limit": 2,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 3,
+          "dual_bound": 3.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "01"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 11,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 12,
+          "dual_bound": 12.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 17,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 18,
+          "dual_bound": 18.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 26,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 27,
+          "dual_bound": 27.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "10"
+          ]
+        },
+        "5": {
+          "count": 30,
+          "dual_bound": 30.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "10",
+            "01"
+          ],
+          "sum_of": [
+            2,
+            3
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 41,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 42,
+          "dual_bound": 42.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "10",
+            "01",
+            "11"
+          ]
+        }
+      },
+      "w8 differential": {
+        "1": {
+          "below": {
+            "limit": 0,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 1,
+          "dual_bound": 1.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "01"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 5,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10"
+          ]
+        },
+        "3": {
+          "below": {
+            "limit": 7,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 8,
+          "dual_bound": 8.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11"
+          ]
+        },
+        "4": {
+          "below": {
+            "limit": 12,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 13,
+          "dual_bound": 13.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11",
+            "01"
+          ]
+        },
+        "5": {
+          "count": 14,
+          "dual_bound": 14.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "01",
+            "10",
+            "11",
+            "01",
+            "10"
+          ],
+          "sum_of": [
+            2,
+            3
+          ]
+        },
+        "6": {
+          "below": {
+            "limit": 19,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 20,
+          "dual_bound": 20.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1",
+            "0",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "11",
+            "01",
+            "10",
+            "11",
+            "01",
+            "10"
+          ]
+        }
+      },
+      "w8 linear": {
+        "1": {
+          "below": {
+            "limit": -1,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 0,
+          "dual_bound": 0.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [],
+          "status": 0,
+          "steps": [
+            "10"
+          ]
+        },
+        "2": {
+          "below": {
+            "limit": 5,
+            "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+            "status": 2
+          },
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "11",
+            "10"
+          ]
+        },
+        "3": {
+          "count": 6,
+          "dual_bound": 6.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "11",
+            "10",
+            "01"
+          ],
+          "sum_of": [
+            1,
+            2
+          ]
+        },
+        "4": {
+          "count": 12,
+          "dual_bound": 12.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "10"
+          ],
+          "sum_of": [
+            2,
+            2
+          ]
+        },
+        "5": {
+          "count": 12,
+          "dual_bound": 12.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "10",
+            "01"
+          ],
+          "sum_of": [
+            2,
+            3
+          ]
+        },
+        "6": {
+          "count": 18,
+          "dual_bound": 18.0,
+          "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+          "outputs": [
+            "0",
+            "1",
+            "1",
+            "1",
+            "0"
+          ],
+          "status": 0,
+          "steps": [
+            "10",
+            "01",
+            "11",
+            "11",
+            "10",
+            "01"
+          ],
+          "sum_of": [
+            2,
+            4
+          ]
+        }
+      }
+    }
+  },
+  "git_dirty": true,
+  "git_head": "10e6277cf98fbb7a00979e7133a2761b0b2e0c9b",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "validation",
+  "known_result": {
+    "known_id": "long-trail-feistel",
+    "path": "research/004/validation/long-trail-feistel.py",
+    "provenance_seq": 203,
+    "sha256": "7d78bdf0a27ceb61d8a99425bd2ac87a71cb2009988bcf35441e5c0faa8ce5eb",
+    "sha256_kind": "raw"
+  },
+  "licence": "GPL-3.0, this repository",
+  "limitations": [],
+  "model_id": null,
+  "outcome": "re-found",
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "377805b057367f0e96687ebc48de2adc59db903331163e102cfea2f816268ae5",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 507,
+  "record_id": "validation-20261105T152121Z-bafacadf",
+  "research_sha256": "6ff833834075872d36713f9abd195fc77e2967dd0ce2de426ea031ba56ea6461",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "second_known_result": {
+    "known_id": "long-trail-feistel-second",
+    "path": "research/004/validation/long-trail-feistel-second.py",
+    "provenance_seq": 204,
+    "sha256": "b0e5b512e573b95ed92f2cf17f1849bb66c093c103cbcd2997ab2441d304773f",
+    "sha256_kind": "raw"
+  },
+  "source": {
+    "repository": "research/004/validation/long-trail-feistel.py"
+  },
+  "spec_sha256": "1122328ff9001256a94d65ba7713b06cf9f231351230121b1b0c7dfe49281bb4",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "tool": "long-trail active-box counting",
+  "tool_sha256": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f",
+  "validated_kind": {
+    "long-trail-feistel": {
+      "limitations": [
+        "its status rests on the built-in feasibility and integrality tolerances of HiGHS in scipy 1.15.3"
+      ],
+      "model": "MILP on truncated trails and on the place of each branch in its chain, from the box's bounds as whole numbers",
+      "operations": "boxes of 2w bits between layers of Feistel type, each next branch a copy of one branch with at most one output of a linear map added, the map known by the patterns of branches it may give",
+      "uses": [
+        {
+          "covered_by": [
+            "sparkle-box"
+          ],
+          "use": "a Feistel layer with a map of branches, boxes on 32-bit words, differences"
+        },
+        {
+          "covered_by": [
+            "sparkle-box-second"
+          ],
+          "use": "a Feistel layer with a map of branches, boxes on 32-bit words, masks"
+        },
+        {
+          "covered_by": [
+            "long-trail-feistel"
+          ],
+          "use": "a Feistel layer, differences and masks, at the D4 width, w = 8 and w = 16"
+        }
+      ],
+      "widths": [
+        8,
+        16,
+        32
+      ]
+    }
+  },
+  "variant_id": null,
+  "version": "6060d0672be1864f02ce0dc4a72e81ca82ea16511f9c0a96aa171cc7a7ff376f",
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}

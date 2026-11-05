@@ -680,7 +680,7 @@ hash, older than its first counted result.
   numbers, never read from a float and never the best solution found); validate it on `present-5r`,
   PRESENT's 5-round minimum of 10 active S-boxes, and on `present-linear` and `rotation-layer` for
   R12's other uses of it. (FR-038, FR-039; SC-007; R12)
-- [ ] T062 [P] [US4] Write `research/004/tools/trails/long_trail.py`, MILP counting of active
+- [X] T062 [P] [US4] Write `research/004/tools/trails/long_trail.py`, MILP counting of active
   ARX-boxes at the same settings; validate it on `sparkle-box`, SPARKLE's published long-trail bound
   from its box bounds, on `sparkle-box-second` for masks at w = 32, and on `long-trail-feistel` at
   w = 8 and 16. (FR-038, FR-039; SC-007; R12)
