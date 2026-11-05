@@ -816,13 +816,13 @@ candidates are otherwise `ineligible` (R6, R7).
   `scripts/validate_tool.py` on R5's hand-counted examples, entered in the provenance log by T048;
   the implied throughput is reported beside the goal of 10⁸ words per second at 200 MHz, never an
   eligibility rule. (FR-022, FR-026, FR-039; SC-007; R5)
-- [ ] T075 [US3] Write the candidate log's tests in `tests/test_protocol_004.py`: each mode of
+- [X] T075 [US3] Write the candidate log's tests in `tests/test_protocol_004.py`: each mode of
   `scripts/candidate_log.py` and its refusals; a fourth `proposed` entry of one family exits 2
   (quickstart E6); every tool refuses an operation list whose hash has no `proposed` or `correction`
   entry; no entry is ever deleted; `scripts/repair_log.py`'s `repair` entry on this log (T013); the
   budget rows, the order of sizes (quickstart E7) and the stop rule. (FR-041; SC-011; R7; ANA-080,
   ANA-083)
-- [ ] T076 [US3] Write `protocol/candidates.py`, the one writer of `research/004/candidates.jsonl`,
+- [X] T076 [US3] Write `protocol/candidates.py`, the one writer of `research/004/candidates.jsonl`,
   and `scripts/candidate_log.py` with `propose`, `mapping`, `enter`, `decide`, `correct`, `replace`
   and `outcome` (contracts/cli.md; data-model §3), through which `scripts/repair_log.py` (T013)
   appends this log's `repair` entry. (FR-041; SC-011; R16)
