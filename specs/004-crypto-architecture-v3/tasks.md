@@ -722,7 +722,7 @@ run with T107.
   table; record each in `$REP/downloads.json` with `python scripts/downloads.py fetched NAME PATH`
   or `not-obtained NAME --reason TEXT`, and read each with Python under `-I` only. A theorem paper
   not obtained leaves the mode chapter "unverified" (R10). (FR-011, FR-013, FR-046; R10, R19)
-- [ ] T066 [US2] Write the security-target tests in `tests/test_records_004.py`, skipping, with
+- [X] T066 [US2] Write the security-target tests in `tests/test_records_004.py`, skipping, with
   their reason, until the two files exist (T107): `$REP/security-target/parameters.json` and
   `limits.json` hold data-model §10's fields; the chapter "Security target"'s parameter table and
   output limits restate them row by row and value by value; each row's `bound_bits` is recomputed
@@ -730,7 +730,7 @@ run with T107.
   holds no line that writes a field of either file, or a symbol FR-010 gives one, with a value
   outside a citation of the design document's chapter and section or of a record's ID and SHA-256
   (RAT-090). (FR-010, FR-034, FR-065; SC-003; RAT-085)
-- [ ] T067 [US2] Write `scripts/mode_limits_v3.py` with `--out $REP/security-target/limits.json` and
+- [X] T067 [US2] Write `scripts/mode_limits_v3.py` with `--out $REP/security-target/limits.json` and
   `--reproduce RECORD` (contracts/cli.md; data-model §10), with its tests in
   `tests/test_records_004.py` on stated tables: it reads the design document's three tables, the
   chapter "Permutation"'s section "Variant table" and the chapter "Mode"'s sections "Layout" and
@@ -743,7 +743,7 @@ run with T107.
   its key entropy, its reachable secret state, c, r, R, `bound_bits` and `bound_terms`, FR-010's
   generic-bound checks computed by code, the keyed reduced variants with a c-bit key and a c/2-bit
   nonce checked at s = c/2. (FR-007, FR-009, FR-010, FR-015; SC-003; R9, R14)
-- [ ] T068 [US2] Write FR-034's chapters' test in `tests/test_records_004.py`, skipping, with its
+- [X] T068 [US2] Write FR-034's chapters' test in `tests/test_records_004.py`, skipping, with its
   reason, until `specs/004-crypto-architecture-v3/design.md` and `rationale.md` exist: the design
   document's level-2 chapters "Security target", "Mode", "Permutation", "Hardware structure",
   "Replaced mechanisms" and "Slime-mould mapping", each once and in this order; each section FR-034
@@ -757,7 +757,7 @@ run with T107.
   "Network questions" and "Alternatives", each once and in this order; and each file's header, its
   title, its disclaimer and one "Version: 0.<k>" line and nothing else, the two version lines equal.
   (FR-034, FR-059; SC-013; RAT-074, RAT-084, RAT-085, RAT-087)
-- [ ] T069 [US2] Draft `specs/004-crypto-architecture-v3/design.md` with its header, which holds
+- [X] T069 [US2] Draft `specs/004-crypto-architecture-v3/design.md` with its header, which holds
   only the title, the design-form disclaimer and "Version: 0.<k>", and its chapter "Security
   target", first in FR-034's order: the properties sought as bounds on an adversary's advantage
   (keystream under nonces never repeated, multi-user for u keys, backtracking across each forget
@@ -768,18 +768,18 @@ run with T107.
   claimable sizes and the 2×2 decision; the certification route with "class unconfirmed" beside it
   until the class is confirmed or changed; and the claim template, marked "target, not a claim".
   (FR-004 to FR-012, FR-017, FR-034; R9, R14)
-- [ ] T070 [US2] Draft the design document's chapter "Mode", with its sections "Key loading",
+- [X] T070 [US2] Draft the design document's chapter "Mode", with its sections "Key loading",
   "Diffusion through instantiation", "Layout" and "Limits": the keyed duplex over Π with
   instantiate, generate, forget and the optional reseed, forget after every request and at the end
   of instantiate in the form the theorem covers; the theorem with every precondition and the design
   feature that meets it; padding and domain separation with their injectivity shown both ways; the
   reseed input taken as chosen by the attacker (T9); the rate, the capacity and the canonical
   serialization; and the limits from `limits.json`. (FR-013 to FR-016, FR-034; R10)
-- [ ] T071 [US2] Draft `specs/004-crypto-architecture-v3/rationale.md` with its header (title,
+- [X] T071 [US2] Draft `specs/004-crypto-architecture-v3/rationale.md` with its header (title,
   design-form disclaimer, the design document's "Version: 0.<k>") and its chapters "Security target"
   and "Mode", which explain the design document's chapters, each statement carrying one of FR-062's
   seven labels. (FR-034, FR-062; RAT-086, RAT-087)
-- [ ] T072 [US2] Record the four chapters as under review in `$REP/provenance.jsonl`, one entry per
+- [X] T072 [US2] Record the four chapters as under review in `$REP/provenance.jsonl`, one entry per
   section drafted with the tool and model, the date, the task ID and the status, and no mark in
   either file; the security-target review of phase 8 reads them once the records of phase 5 that it
   cites exist. (FR-034, FR-067; RAT-068, RAT-069, RAT-086)

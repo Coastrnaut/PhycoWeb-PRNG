@@ -4,7 +4,7 @@
 > to generate secrets; use an established cryptographic random-number generator for keys,
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
-Version: 0.1
+Version: 0.2
 
 ## Security target
 

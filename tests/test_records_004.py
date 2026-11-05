@@ -886,6 +886,33 @@ class Chapters(unittest.TestCase):
         if "Hardware structure" in present:
             tool.read_table(tool.section_lines(self.design, "Hardware structure", "Self-test"), K_COLUMNS, "k")
 
+    def test_the_drafts_tables_hold_at_the_limits_they_state(self):
+        """The script's first run waits for the variant table (T107); its check of the draft need not."""
+        tool = limits_script()
+        stub = "## Permutation\n\nNot drafted yet.\n"
+        if stub not in self.design:
+            self.skipTest("the variant table is drafted: the file's own run takes over")
+        text = self.design.replace(stub, f"## Permutation\n\n### Variant table\n\n{STATED_VARIANTS}\n")
+        out = tool.compute(text, [], ROOT)
+        self.assertTrue(out["held"], out["assertions"])
+        self.assertEqual(sorted(row["bound_bits"] for row in out["parameters"]["rows"] if row["status"] == "claimable"), [128, 128, 128])
+
+    def test_the_two_limit_tables_of_the_draft_agree(self):
+        tool = limits_script()
+        source = tool.read_table(tool.section_lines(self.design, "Mode", "Limits"), tool.LIMIT_COLUMNS, "limits")
+        stated = tool.read_table(tool.section_lines(self.design, "Security target", "Output limits"), OUTPUT_COLUMNS, "output limits")
+        names = {"per instantiation": tool.PER_INSTANTIATION, "per key": tool.PER_KEY, "per request": tool.PER_REQUEST}
+        read = {(row["Limit"], row["Size"]): (row["Value"], row["Bits"]) for row in source}
+        self.assertEqual(len(stated), 9)
+        for row in stated:
+            self.assertEqual((row["Calls of Π"], row["Bits"]), read[(names[row["Limit"]], row["Size"])], row)
+
+    def test_the_chapters_preconditions_are_the_scripts(self):
+        tool = limits_script()
+        columns = ("Precondition", "The feature that meets it", "Section")
+        table = tool.read_table(tool.section_lines(self.design, "Mode", "Theorems"), columns, "preconditions")
+        self.assertEqual([row["Section"] for row in table], [section for _, section in tool.THEOREMS[0]["preconditions"]])
+
     def test_each_header_holds_its_title_disclaimer_and_version_only(self):
         for name, text in (("design", self.design), ("rationale", self.rationale)):
             header = header_of(text)

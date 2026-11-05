@@ -4,7 +4,7 @@
 > to generate secrets; use an established cryptographic random-number generator for keys,
 > nonces, tokens and salts. Passing statistical tests does not show cryptographic security.
 
-Version: 0.1
+Version: 0.2
 
 ## Security target
 
@@ -426,10 +426,11 @@ per-key limit passes ε at every claimable size. The script computes this in who
 cap, which R9 fixes and allows only to fall, and the reseeds, each of which takes a call of Π, so
 that the limit on calls holds them. Each is still evaluated in the bound at its limit.
 
-**Counters.** The object counts calls of Π per instantiation, calls per key and instantiations per key,
-and a call that would pass a limit raises `LimitExceeded`, with no output and no state change, except at
-a per-key limit, which also ends the object. A reseed never resets a counter. Counters wider than 32
-bits are held as 32-bit words. Reseeds count through the calls they take.
+**Counters.** The object and the core count calls of Π per instantiation, calls per key, instantiations
+per key and reseeds per instantiation, FR-007 asking a counter of each, though the limit on calls is
+reached first. A call that would pass a limit raises `LimitExceeded`, with no output and no state
+change, except at a per-key limit, which also ends the object. A reseed never resets a counter.
+Counters wider than 32 bits are held as 32-bit words.
 
 ### Nonce reuse
 
@@ -487,7 +488,7 @@ zeroizes in every state that accepts one, whatever its other bits hold. An insta
 absorption interface is the nonce's words, then the personalization string's length word, then the
 string's words, if any; a reseed's is its length word, then its words. The length word gives bytes, a
 length over the maximum is refused before the lanes, the key or a counter changes, and the unused bytes
-of a last partial word must be zero. The key and the nonce are whole 32-bit words in the order of
+of a last partial word must be zero. A reseed input's length is public even when its content is secret. The key and the nonce are whole 32-bit words in the order of
 "Serialization". Output leaves through a buffer of one block, read out to the interface width i in
 ⌈r/i⌉ transfers, and the next call starts only after the consumer has taken the block, so that a stall
 holds only the buffer and no cycle count depends on secret data.
