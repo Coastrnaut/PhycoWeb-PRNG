@@ -3326,6 +3326,325 @@ class ActiveSboxOnKnown(unittest.TestCase):
             self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
 
 
+def arx_module():
+    sys.path.insert(0, str(CODE_ROOT / "research/004"))
+    sys.path.insert(0, str(CODE_ROOT / "research/004/tools/trails"))
+    import arx_search_known
+    return arx_search_known
+
+
+ARX_BINARY = CODE_ROOT / "research/004/tools/trails/build/arx_search"
+ARX_RUNS = platform.system() == "Linux" and ARX_BINARY.exists()
+SPECK32_ROUND = (("rot", 0, 9), ("add", 0, 1, 0), ("rot", 1, 2), ("xor", 1, 0, 0))
+WALKS_OF_MASKS = 1464644
+
+
+class ArxDriver(unittest.TestCase):
+    """research/004/tools/trails/arx_search_known.py on stated output, with no binary (T063)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = arx_module()
+
+    def done(self, code=0, out="", err=""):
+        return subprocess.CompletedProcess([], code, out, err)
+
+    def test_a_search_reads_each_round_and_its_trail(self):
+        text = "optimal 1 0 7\ntrail 1 8000 0 8000 8000\noptimal 2 1 9\ntrail 2 1 2 3 4 5 6\n"
+        with mock.patch.object(self.tool.subprocess, "run", return_value=self.done(out=text)):
+            found = self.tool.search("differential", 16, 2, SPECK32_ROUND)
+        self.assertEqual(found[1], {"weight": 0, "walks": 7, "trail": [[0x8000, 0], [0x8000, 0x8000]]})
+        self.assertEqual(found[2]["trail"], [[1, 2], [3, 4], [5, 6]])
+
+    def test_a_search_that_misses_a_round_is_a_tool_defect(self):
+        with mock.patch.object(self.tool.subprocess, "run", return_value=self.done(out="optimal 1 0 7\ntrail 1 1 0 1 0\n")):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.search("differential", 16, 2, SPECK32_ROUND)
+
+    def test_a_failed_run_is_a_tool_defect(self):
+        with mock.patch.object(self.tool.subprocess, "run", return_value=self.done(code=3, err="no such step")):
+            with self.assertRaises(ToolFailureClass()) as caught:
+                self.tool.search("differential", 16, 1, SPECK32_ROUND)
+        self.assertIn("no such step", str(caught.exception))
+
+    def test_a_search_at_its_cap_gives_no_bound(self):
+        stopped = subprocess.TimeoutExpired("arx_search", 1)
+        with mock.patch.object(self.tool.subprocess, "run", side_effect=stopped) as ran:
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.search("differential", 16, 1, SPECK32_ROUND)
+        self.assertEqual(ran.call_args.kwargs["timeout"], 8 * 3600)
+
+    def test_a_step_reads_as_the_binary_takes_it(self):
+        self.assertEqual(self.tool.step_text(("add", 0, 1, 3)), "add:0:1:3")
+        self.assertEqual(self.tool.step_text(("rot", 1, 2)), "rot:1:2")
+
+    def test_a_check_reads_each_round(self):
+        with mock.patch.object(self.tool.subprocess, "run", return_value=self.done(out="round 1 5\nround 2 -1\n")) as ran:
+            self.assertEqual(self.tool.stated("differential", 16, SPECK32_ROUND, ((1, 2), (3, 4), (5, 15))), (5, -1))
+        command = ran.call_args.args[0]
+        self.assertEqual(command[1:3], ["check-differential", "16"])
+        self.assertEqual(command[-7:], ["--", "1", "2", "3", "4", "5", "f"])
+
+    def test_a_relative_binary_is_read_from_the_root_and_a_rebuilt_one_as_given(self):
+        self.assertEqual(Path(self.tool.program()), ARX_BINARY)
+        rebuilt = str(Path(tempfile.gettempdir()).resolve() / "arx_search")
+        with mock.patch.object(self.tool, "BINARY", rebuilt):
+            self.assertEqual(self.tool.program(), rebuilt)
+
+    def test_the_heavy_run_is_projected_by_its_measured_ratio(self):
+        self.assertEqual(self.tool.HEAVY, ("speck64-lin",))
+        text = "".join(f"optimal {r} 0 1\ntrail {r} 1 0 1 0\n" for r in range(1, 5))
+        with mock.patch.object(self.tool.subprocess, "run", return_value=self.done(out=text)) as ran, \
+                mock.patch.object(self.tool.time, "monotonic", side_effect=[0.0, 8.0]):
+            hours, detail = self.tool.projection("speck64-lin")
+        self.assertEqual(ran.call_args.args[0][1:4], ["linear", "32", "4"])
+        self.assertAlmostEqual(hours, 8.0 * 9_042_695_762 / 9_196_884 / 3600.0)
+        self.assertEqual(detail["seconds_of_4_rounds"], 8.0)
+
+    def test_a_projection_of_a_light_run_is_a_tool_defect(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.projection("speck32-diff")
+
+    def test_the_kind_names_each_use_and_a_known_result_that_covers_it(self):
+        self.assertEqual(self.tool.KIND["widths"], [16, 32])
+        covered = {name for use in self.tool.KIND["uses"] for name in use["covered_by"]}
+        self.assertEqual(covered, {"speck32-diff", "speck32-lin", "speck64-diff", "speck64-lin"})
+        self.assertEqual(set(self.tool.RUNS), covered | {name + "-second" for name in covered})
+
+
+@unittest.skipUnless(ARX_RUNS, "the binary runs in WSL (research R1)")
+class ArxSearch(unittest.TestCase):
+    """research/004/tools/trails/arx_search.c itself, built by its make file (T063)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = arx_module()
+        cls.tables = tables_module()
+
+    def weights(self, kind, w, rounds, steps):
+        return {r: row["weight"] for r, row in self.tool.search(kind, w, rounds, steps).items()}
+
+    def test_the_binary_is_of_the_committed_source(self):
+        done = subprocess.run([str(ARX_BINARY), "--source-sha256"], capture_output=True, text=True, check=True)
+        self.assertEqual(done.stdout.strip(), evidence.sha256((CODE_ROOT / "research/004/tools/trails/arx_search.c").read_bytes()))
+
+    def boxes(self, seed, count, w):
+        """Boxes from a seeded generator, each of one to three carrying steps with rotations and xors between them."""
+        rng = np.random.default_rng(seed)
+
+        def linear_steps(steps, most):
+            for _ in range(int(rng.integers(0, most + 1))):
+                i = int(rng.integers(0, 2))
+                if rng.integers(0, 2):
+                    steps.append(("rot", i, int(rng.integers(0, w))))
+                else:
+                    steps.append(("xor", i, 1 - i, int(rng.integers(0, w))))
+
+        out = []
+        for _ in range(count):
+            steps = []
+            linear_steps(steps, 2)
+            for _ in range(int(rng.integers(1, 4))):
+                i = int(rng.integers(0, 2))
+                steps.append((str(rng.choice(["add", "sub"])), i, 1 - i, int(rng.integers(0, w))))
+                linear_steps(steps, 3)
+            out.append(tuple(steps))
+        return out
+
+    def test_the_search_is_the_exhaustive_tool_on_boxes_of_every_form_at_4(self):
+        """R12's cross-check between kinds: a C search on the models of addition against a Python search on whole counts."""
+        for steps in self.boxes(11, 40, 4):
+            self.assertEqual(self.weights("differential", 4, 5, steps), self.tables.differential_trails(steps, 4, 5), steps)
+            self.assertEqual(self.weights("linear", 4, 5, steps), self.tables.linear_trails(steps, 4, 5), steps)
+
+    def test_the_search_is_the_exhaustive_tool_at_other_widths(self):
+        for w in (2, 3, 5):
+            for steps in self.boxes(w, 12, w):
+                self.assertEqual(self.weights("differential", w, 4, steps), self.tables.differential_trails(steps, w, 4), (w, steps))
+                self.assertEqual(self.weights("linear", w, 4, steps), self.tables.linear_trails(steps, w, 4), (w, steps))
+
+    def test_the_free_word_is_decided_through_several_rotations(self):
+        """Its mask reaches the next addition by three rotations at once, so that solving for it takes the whole inverse."""
+        steps = (("add", 0, 1, 0), ("xor", 1, 0, 1), ("xor", 0, 1, 2), ("xor", 1, 0, 3))
+        for w in (4, 5):
+            self.assertEqual(self.weights("linear", w, 5, steps), self.tables.linear_trails(steps, w, 5), w)
+
+    def test_a_free_word_may_need_its_last_value(self):
+        steps = (("add", 0, 1, 0), ("add", 0, 1, 1), ("xor", 1, 0, 1))
+        self.assertEqual(self.weights("linear", 2, 3, steps), {1: 0, 2: 0, 3: 0})
+        self.assertEqual(self.weights("linear", 2, 3, steps), self.tables.linear_trails(steps, 2, 3))
+
+    def test_the_search_reaches_the_published_weights_of_speck32(self):
+        table = self.known("speck32-diff").WEIGHTS
+        self.assertEqual(self.weights("differential", 16, 7, SPECK32_ROUND), {r: table[r] for r in range(1, 8)})
+        table = self.known("speck32-lin").EXPONENTS
+        self.assertEqual(self.weights("linear", 16, 7, SPECK32_ROUND), {r: table[r] for r in range(1, 8)})
+
+    def test_the_walks_of_a_search_are_pinned(self):
+        """The bounds cut walks, not answers, so that a bound that stops cutting shows here alone. A change to the search may move these."""
+        self.assertEqual(self.tool.search("differential", 16, 5, SPECK32_ROUND)[5]["walks"], 2150130)
+        self.assertEqual(self.tool.search("linear", 16, 5, SPECK32_ROUND)[5]["walks"], WALKS_OF_MASKS)
+
+    def test_the_search_is_each_trail_files_enumeration(self):
+        for name in ("internal-trails", "internal-trails-second"):
+            known = self.known(name)
+            self.assertEqual(self.weights("differential", known.W, known.ROUNDS, known.ROUND), known.DIFFERENTIAL, name)
+            self.assertEqual(self.weights("linear", known.W, known.ROUNDS, known.ROUND), known.LINEAR, name)
+
+    def known(self, name):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        return validate_tool.load_known(validate_tool.known_results()[name])
+
+    def test_each_trail_it_prints_has_the_weight_it_states(self):
+        for kind in ("differential", "linear"):
+            found = self.tool.search(kind, 16, 6, SPECK32_ROUND)
+            for r, row in found.items():
+                self.assertEqual(len(row["trail"]), r + 1)
+                weights = self.tool.stated(kind, 16, SPECK32_ROUND, [tuple(pair) for pair in row["trail"]])
+                self.assertEqual(sum(weights), row["weight"], (kind, r))
+                self.assertNotIn(-1, weights)
+                self.assertNotEqual(row["trail"][0], [0, 0])
+
+    def test_each_trail_of_another_box_has_the_weight_it_states(self):
+        """An addition with a rotation of its own, ahead of it a rotation, and behind it a rotation and an xor."""
+        steps = (("rot", 0, 5), ("add", 0, 1, 3), ("rot", 1, 1), ("xor", 1, 0, 2))
+        for kind in ("differential", "linear"):
+            for r, row in self.tool.search(kind, 8, 4, steps).items():
+                weights = self.tool.stated(kind, 8, steps, [tuple(pair) for pair in row["trail"]])
+                self.assertEqual(sum(weights), row["weight"], (kind, r))
+                self.assertNotIn(-1, weights)
+
+    def test_a_second_run_is_the_same_to_the_walk(self):
+        self.assertEqual(self.tool.search("linear", 16, 5, SPECK32_ROUND), self.tool.search("linear", 16, 5, SPECK32_ROUND))
+
+    def test_a_check_finds_a_trail_that_cannot_be(self):
+        self.assertEqual(self.tool.stated("differential", 16, SPECK32_ROUND, ((0x0A60, 0x4205), (0x0211, 0x0A05))), (-1,))
+        self.assertEqual(self.tool.stated("differential", 16, SPECK32_ROUND, ((1, 0), (1, 0))), (-1,))
+        known = self.known("speck32-lin-second")
+        printed = list(known.TRAIL)
+        printed[3] = known.PRINTED_ROW_4
+        found = self.tool.stated("linear", 16, SPECK32_ROUND, printed)
+        self.assertEqual((found[2], found[3]), (-1, -1), "the misprint of Table 3, row 4, at the two rounds that touch it")
+        self.assertEqual(found[:2] + found[4:], known.EXPONENTS[:2] + known.EXPONENTS[4:])
+
+    def test_an_output_the_addition_cannot_give_cannot_be(self):
+        """The printed first round with the lowest bit of the sum flipped and y as the round makes it: a difference of the sum must have
+        a xor b at bit 0, and no other test of a check reaches that."""
+        self.assertEqual(self.tool.stated("differential", 16, SPECK32_ROUND, ((0x0A60, 0x4205), (0x0211, 0x0A04))), (5,))
+        self.assertEqual(self.tool.stated("differential", 16, SPECK32_ROUND, ((0x0A60, 0x4205), (0x0210, 0x0A05))), (-1,))
+
+    def test_a_mask_on_one_input_alone_cannot_be(self):
+        """Output mask 0 and input mask 0 on x with a mask on y: u = v = 0 and t = 1, a correlation of 0."""
+        self.assertEqual(self.tool.stated("linear", 16, SPECK32_ROUND, ((0, 1), (0, 0))), (-1,))
+
+    def test_what_is_no_box_is_refused(self):
+        for arguments in (["differential", "16", "1", "mix:0:1:0"], ["differential", "16", "1", "add:0:0:1"],
+                          ["linear", "16", "1", "add:0:2:1"], ["differential", "16", "1", "add:0:1:16"],
+                          ["differential", "16", "1", "rot:2:1", "add:0:1:0"], ["differential", "16", "1", "rot:0:16", "add:0:1:0"],
+                          ["differential", "16", "1", "rot:0:1"], ["differential", "16", "1", "xor:0:1:1"],
+                          ["differential", "1", "1", "add:0:1:0"], ["differential", "64", "1", "add:0:1:0"],
+                          ["differential", "16", "0", "add:0:1:0"], ["differential", "16", "65", "add:0:1:0"],
+                          ["sideways", "16", "1", "add:0:1:0"]):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.run(arguments)
+
+    def test_a_check_takes_a_box_of_one_addition_and_pairs_of_words(self):
+        for arguments in (["check-differential", "16", "add:0:1:0", "add:1:0:0", "--", "1", "2", "3", "4"],
+                          ["check-linear", "16", "add:0:1:0", "--", "1", "2", "3"],
+                          ["check-linear", "16", "add:0:1:0", "--", "1", "2", "3", "4", "5"],
+                          ["check-linear", "16", "add:0:1:0", "--", "1", "2"]):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.run(arguments)
+
+    def test_a_box_whose_free_word_is_undecided_is_searched_at_8_and_refused_above(self):
+        """Word 1 is only ever read: its mask at the next addition decides nothing about the free word."""
+        steps = (("add", 0, 1, 0), ("add", 0, 1, 1))
+        self.assertEqual(self.weights("linear", 4, 2, steps), self.tables.linear_trails(steps, 4, 2))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.search("linear", 16, 2, steps)
+
+
+class ArxOnKnown(unittest.TestCase):
+    """The tool on its known results, each deciding fact broken once. The searches run at few rounds here; the full counts are the validation's
+    own, in WSL. Where the binary cannot run, the runner is stated."""
+
+    NAMES = ("speck32-diff", "speck32-diff-second", "speck32-lin", "speck32-lin-second", "speck64-diff", "speck64-diff-second",
+             "speck64-lin", "speck64-lin-second")
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(CODE_ROOT))
+        from scripts import validate_tool
+        cls.vt = validate_tool
+        cls.tool = arx_module()
+        cls.table = validate_tool.known_results()
+
+    def known(self, name):
+        return self.vt.load_known(self.table[name])
+
+    def holds(self, name, known=None, rounds=4):
+        known = known if known is not None else self.known(name)
+        if hasattr(known, "ROUNDS"):
+            with mock.patch.object(known, "ROUNDS", rounds):
+                return self.tool.validation(name, known, None)["re_found"]
+        return self.tool.validation(name, known, None)["re_found"]
+
+    def test_each_file_names_its_tool_and_its_second(self):
+        for name in self.NAMES:
+            self.assertEqual(self.table[name].tool, "ARX search", name)
+        for first in ("speck32-diff", "speck32-lin", "speck64-diff", "speck64-lin"):
+            self.assertEqual(self.table[first].second_of, NONE)
+            self.assertEqual(self.table[first + "-second"].second_of, first)
+
+    def test_the_rounds_stay_where_every_source_agrees(self):
+        self.assertLessEqual(self.known("speck64-diff").ROUNDS, 7)
+        self.assertEqual(self.known("speck32-lin-second").PRINTED_ROW_4, (0x0C1E, 0x0818))
+        self.assertEqual(self.known("speck32-lin-second").TRAIL[3], (0x0C1E, 0x0C18))
+
+    def test_a_trail_file_totals_its_rounds(self):
+        for name in ("speck32-lin-second", "speck64-lin-second"):
+            known = self.known(name)
+            self.assertEqual(sum(known.EXPONENTS), known.TOTAL)
+        self.assertEqual(sum(self.known("speck32-diff-second").WEIGHTS), 31)
+        self.assertEqual(sum(self.known("speck64-diff-second").WEIGHTS), 58)
+
+    @unittest.skipUnless(ARX_RUNS, "the binary runs in WSL (research R1)")
+    def test_each_is_re_found(self):
+        for name in self.NAMES:
+            self.assertTrue(self.holds(name), name)
+
+    @unittest.skipUnless(ARX_RUNS, "the binary runs in WSL (research R1)")
+    def test_each_stated_weight_decides(self):
+        for name, field in (("speck32-diff", "WEIGHTS"), ("speck32-lin", "EXPONENTS"), ("speck64-diff", "WEIGHTS"), ("speck64-lin", "EXPONENTS")):
+            for r in (1, 4):
+                known = self.known(name)
+                wrong = dict(getattr(known, field))
+                wrong[r] += 1
+                with mock.patch.object(known, field, wrong):
+                    self.assertFalse(self.holds(name, known), (name, r))
+
+    @unittest.skipUnless(ARX_RUNS, "the binary runs in WSL (research R1)")
+    def test_each_stated_trail_decides(self):
+        for name, field in (("speck32-diff-second", "WEIGHTS"), ("speck32-lin-second", "EXPONENTS"), ("speck64-diff-second", "WEIGHTS"),
+                            ("speck64-lin-second", "EXPONENTS")):
+            known = self.known(name)
+            wrong = list(getattr(known, field))
+            wrong[-1] += 1
+            with mock.patch.object(known, field, tuple(wrong)):
+                self.assertFalse(self.holds(name, known), name)
+            other = list(known.TRAIL)
+            other[1] = (other[1][0] ^ 1, other[1][1])
+            with mock.patch.object(known, "TRAIL", tuple(other)):
+                self.assertFalse(self.holds(name, known), name)
+
+    @unittest.skipUnless(ARX_RUNS, "the binary runs in WSL (research R1)")
+    def test_a_total_decides(self):
+        known = self.known("speck32-lin-second")
+        with mock.patch.object(known, "TOTAL", known.TOTAL + 1):
+            self.assertFalse(self.holds("speck32-lin-second", known))
+
+
 class FutSec8Known(unittest.TestCase):
     """research/004/tools/fut_sec8_known.py, on the reviewed demonstration record (T052)."""
 
