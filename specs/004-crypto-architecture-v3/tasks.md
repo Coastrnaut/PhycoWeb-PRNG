@@ -684,7 +684,7 @@ hash, older than its first counted result.
   ARX-boxes at the same settings; validate it on `sparkle-box`, SPARKLE's published long-trail bound
   from its box bounds, on `sparkle-box-second` for masks at w = 32, and on `long-trail-feistel` at
   w = 8 and 16. (FR-038, FR-039; SC-007; R12)
-- [ ] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c`, a branch-and-bound search for
+- [X] T063 [P] [US4] Write `research/004/tools/trails/arx_search.c`, a branch-and-bound search for
   ARX differential and linear trails with the exact models of addition (Lipmaa and Moriai; Wallén),
   with `research/004/tools/trails/arx_search.mk` (C99, WSL), which builds
   `research/004/tools/trails/build/arx_search`, committed after each build and before the run that
