@@ -674,7 +674,7 @@ hash, older than its first counted result.
 - [X] T060 [P] [US4] Write `research/004/tools/trails/tables.py`, exhaustive difference and linear
   tables of every distinct box and S-box of up to 16 bits; validate it on every entry of the PRESENT
   S-box's published difference and linear tables. (FR-038, FR-039; SC-007; R12)
-- [ ] T061 [P] [US4] Write `research/004/tools/trails/active_sbox.py`, MILP counting of active
+- [X] T061 [P] [US4] Write `research/004/tools/trails/active_sbox.py`, MILP counting of active
   S-boxes with `scipy.optimize.milp` (HiGHS) at research R12's fixed settings (`mip_rel_gap` 0, the
   8 h `time_limit` over the runs of one count, and each count from those runs, checked in whole
   numbers, never read from a float and never the best solution found); validate it on `present-5r`,
