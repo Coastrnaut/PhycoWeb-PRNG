@@ -3112,9 +3112,17 @@ class ActiveSbox(unittest.TestCase):
                 self.assertEqual(refused, point not in allowed, (kind, point))
 
     def test_an_sbox_is_a_bijection_of_up_to_5_bits(self):
-        for wrong in ((0, 0, 1, 2), (0, 1, 2), tuple(range(64)), (0, 1, 2, 4)):
+        """Asked of the S-box itself: a layer around a wrong one would be refused for its permutation, whatever this check did."""
+        for wrong in ((0, 0, 1, 2), (0, 1, 2), tuple(range(64)), (0, 1, 2, 4), (0,), ()):
             with self.assertRaises(ToolFailureClass()):
-                self.tool.spn(wrong, 1, tuple(range(len(wrong))))
+                self.tool.sbox_bits(wrong)
+        for right, bits in ((PRESENT_SBOX, 4), ((1, 0), 1), (tuple(range(32)), 5)):
+            self.assertEqual(self.tool.sbox_bits(right), bits)
+
+    def test_a_model_is_refused_on_a_layer_that_does_not_fit(self):
+        wrong = self.tool.Layer(8, ((0, 1, 2, 3), (3, 4, 5, 6)), PRESENT_SBOX, tuple(range(8)))
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.build(wrong, "differential", 1, {})
 
     def test_a_layer_is_refused_where_its_bits_do_not_fit(self):
         with self.assertRaises(ToolFailureClass()):
@@ -3233,6 +3241,15 @@ class ActiveSbox(unittest.TestCase):
             with mock.patch.object(self.tool, "milp", side_effect=self.runs(states, second=Solved(status))), \
                     self.assertRaises(ToolFailureClass()):
                 self.tool.minimum(layer, "differential", 1, {})
+
+    def test_a_stop_at_the_time_limit_gives_no_count_even_with_a_solution_in_hand(self):
+        """A run that times out can hold a solution, and that solution would pass the table. R12: it gives no bound."""
+        layer, states = self.one_round()
+        for status in (1, 4):
+            stopped = Solved(status, 0.5, x=self.point(layer, states))
+            with mock.patch.object(self.tool, "milp", side_effect=[stopped, Solved(2)]) as solver, self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(layer, "differential", 1, {})
+            self.assertEqual(solver.call_count, 1, status)
 
     def test_the_runs_of_one_count_share_its_time_limit(self):
         layer, states = self.one_round()
@@ -3580,6 +3597,11 @@ class ActiveSboxOnKnown(unittest.TestCase):
             self.assertTrue(any(name in use["covered_by"] for use in kind["uses"]), name)
         for name in self.NAMES:
             self.assertEqual(self.run_known(name)["validated_kind"], kind, name)
+
+    def test_the_kind_states_what_its_status_rests_on(self):
+        """R12: every MILP bound record states that its status rests on HiGHS's built-in tolerances."""
+        self.assertEqual(self.tool.KIND["limitations"], [self.tool.LIMITATION])
+        self.assertIn("built-in feasibility and integrality tolerances of HiGHS", self.tool.LIMITATION)
 
 
 def arx_module():
@@ -4231,6 +4253,15 @@ class LongTrail(unittest.TestCase):
         self.assertEqual(layer.source, (3, 2, 0, 1))
         self.assertEqual(layer.added, (None, None, 0, 1))
 
+    def test_three_halves_tell_the_rotation_from_its_inverse(self):
+        """At h = 2, j + 1 and j - 1 are one branch: h = 3 says which way the right branches go."""
+        layer = self.small("differential", 3)
+        self.assertEqual(layer.source, (4, 5, 3, 0, 1, 2))
+        self.assertEqual(layer.added, (1, 2, 0, None, None, None))
+        layer = self.small("linear", 3)
+        self.assertEqual(layer.source, (4, 5, 3, 0, 1, 2))
+        self.assertEqual(layer.added, (None, None, None, 0, 1, 2))
+
     def test_a_layer_of_copies_moves_each_branch_and_adds_nothing(self):
         layer = self.tool.copies(4)
         self.assertEqual(layer.source, (3, 0, 1, 2))
@@ -4247,7 +4278,8 @@ class LongTrail(unittest.TestCase):
                       good._replace(added=(2, 0, None, None)), good._replace(added=(-1, 0, None, None)), good._replace(fed=(0, 4)),
                       good._replace(relation=frozenset()), good._replace(relation=frozenset({((0,), (0, 0))})),
                       good._replace(relation=frozenset({((0, 0), (0,))})), good._replace(relation=good.relation - {((0, 0), (0, 0))}),
-                      good._replace(relation=frozenset({((1, 1), (1, 1))}))):
+                      good._replace(relation=frozenset({((1, 1), (1, 1))})),
+                      good._replace(relation=good.relation | {((1,), (1, 1))}), good._replace(relation=good.relation | {((1, 1), (1,))})):
             with self.assertRaises(ToolFailureClass()):
                 self.tool.check(wrong)
         self.assertEqual(self.tool.check(good), good)
@@ -4257,6 +4289,10 @@ class LongTrail(unittest.TestCase):
         self.assertEqual(self.tool.chain_costs((2, 17), 5), (0, 2, 17, 19, 34, 36))
         self.assertEqual(self.tool.chain_costs((0, 6), 4), (0, 0, 6, 6, 12))
         self.assertEqual(self.tool.chain_costs((1,), 3), (0, 1, 2, 3))
+
+    def test_a_model_is_refused_on_a_layer_that_does_not_fit(self):
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.build(self.small()._replace(source=(0, 0, 1, 2)), (0, 6, 32), 2, {})
 
     def test_a_box_holds_whole_numbers(self):
         for wrong in ((), (1.5, 2), (-1, 2), (True, 2), ("6", 32)):
@@ -4298,6 +4334,20 @@ class LongTrail(unittest.TestCase):
                                            (((0, 0, 0, 0), (0, 0, 0, 1)), ((0, 0),)), (steps, ())):
             with self.assertRaises(ToolFailureClass()):
                 self.tool.held(layer, wrong_steps, wrong_outputs)
+
+    def test_an_empty_step_is_refused_where_every_link_holds(self):
+        layer = self.small()
+        for steps, outputs in ((((0, 0, 0, 0), (0, 0, 0, 0)), ((0, 0),)), (((0, 0, 0, 0),), ())):
+            with self.assertRaises(ToolFailureClass()):
+                self.tool.held(layer, steps, outputs)
+
+    def test_the_maps_table_is_asked_where_every_link_holds(self):
+        """One active input gives every output, so (1, 0) is refused though each branch of the next step fits it."""
+        layer = self.small()
+        steps = ((1, 0, 0, 0), (0, 1, 1, 0))
+        self.assertNotIn(((1, 0), (1, 0)), layer.relation)
+        with self.assertRaises(ToolFailureClass()):
+            self.tool.held(layer, steps, ((1, 0),))
 
     def test_a_copy_must_be_what_it_copies(self):
         layer = self.tool.copies(2)
@@ -4383,6 +4433,15 @@ class LongTrail(unittest.TestCase):
             with mock.patch.object(self.tool, "milp", side_effect=answers), self.assertRaises(ToolFailureClass()):
                 self.tool.minimum(layer, costs, 2, {})
 
+    def test_a_stop_at_the_time_limit_gives_no_count_even_with_a_solution_in_hand(self):
+        costs = (0, 6, 32)
+        for status in (1, 4):
+            layer, answers = self.runs(costs)
+            answers[0].status = status
+            with mock.patch.object(self.tool, "milp", side_effect=answers) as solver, self.assertRaises(ToolFailureClass()):
+                self.tool.minimum(layer, costs, 2, {})
+            self.assertEqual(solver.call_count, 1, status)
+
     def test_an_optimal_status_with_no_solution_is_a_tool_defect(self):
         with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0, x=None)), self.assertRaises(ToolFailureClass()):
             self.tool.minimum(self.small(), (0, 6, 32), 2, {})
@@ -4391,8 +4450,10 @@ class LongTrail(unittest.TestCase):
         costs = (0, 6, 32)
         layer = self.small()
         point = self.point(layer, costs, ((1, 0, 0, 0), (0, 0, 0, 0)), ((1, 1),))
-        with mock.patch.object(self.tool, "milp", return_value=Solved(0, 1.0, x=point)), self.assertRaises(ToolFailureClass()):
+        with mock.patch.object(self.tool, "milp", side_effect=[Solved(0, 1.0, x=point), Solved(2)]) as solver, \
+                self.assertRaises(ToolFailureClass()):
             self.tool.minimum(layer, costs, 2, {})
+        self.assertEqual(solver.call_count, 1, "the check refuses it, not the second run")
 
     def test_the_runs_of_one_count_share_its_time_limit(self):
         costs = (0, 6, 32)
@@ -4665,6 +4726,10 @@ class LongTrailOnKnown(unittest.TestCase):
 
     def test_no_known_result_of_this_tool_is_heavy(self):
         self.assertFalse(hasattr(self.tool, "HEAVY"))
+
+    def test_the_kind_states_what_its_status_rests_on(self):
+        self.assertEqual(self.tool.KIND["limitations"], [self.tool.LIMITATION])
+        self.assertIn("built-in feasibility and integrality tolerances of HiGHS", self.tool.LIMITATION)
 
 
 class FutSec8Known(unittest.TestCase):

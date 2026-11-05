@@ -73,7 +73,7 @@ class Model(NamedTuple):
 def sbox_bits(sbox: Sequence[int]) -> int:
     size = len(sbox)
     bits = size.bit_length() - 1
-    if size != 1 << bits or not 1 <= bits <= MOST_SBOX_BITS or sorted(sbox) != list(range(size)):
+    if not 1 <= bits <= MOST_SBOX_BITS or size != 1 << bits or sorted(sbox) != list(range(size)):
         raise ToolFailure(f"an S-box is a bijection of 1 to {MOST_SBOX_BITS} bits: not {tuple(sbox)[:8]}")
     return bits
 
