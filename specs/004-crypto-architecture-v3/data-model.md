@@ -685,9 +685,9 @@ a `re-found` record of its own. A reproduction's rebuild that differs is such a 
 that record it is not run and counts as a difference (section 1, Reproduction).
 
 - **What must match.** The exact published value over the stated rounds: for a trail search,
-  the weight of the optimal trail, not the trail itself; for the S-box tables, every entry; for
-  PRESENT, the stated minimum of active S-boxes over 5 rounds. Any difference is `not
-  re-found`.
+  the weight of the optimal trail, not the trail itself, and for the ARX search's published trail,
+  the weight of each round; for the S-box tables, every entry; for PRESENT, the stated minimum of
+  active S-boxes over 5 rounds. Any difference is `not re-found`.
   For the known results that are not published values, what must match is exact equality for every
   deterministic fact: S12's ranges and classes and S15's 16 steps and its bound 2¹²⁸ · (2³¹ + 1)⁴,
   both re-found by the bias test's count on the vein lanes (research R4); S13(a)'s merged pair
