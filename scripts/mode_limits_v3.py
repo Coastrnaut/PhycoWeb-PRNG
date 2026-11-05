@@ -56,6 +56,7 @@ FIRST_WAY = "nonces, first way"
 SECOND_WAY = "nonces, second way"
 FOR_ALL_SIZES = (KEYS, INSTANTIATIONS, RESEEDS, PERSONALIZATION, RESEED_INPUT, FIRST_WAY, SECOND_WAY)
 PER_SIZE = (PER_INSTANTIATION, PER_KEY, PER_REQUEST, PER_INSTANTIATE)
+PERSONALIZATION_BLOCK, RESEED_BLOCK, GENERATE_BLOCK, FORGET_BLOCK = 1, 2, 3, 4
 VARIANT_ID = re.compile(r"^[\w-]+/n(\d+)-w(\d+)-R(\d+)-c(\d+)$")
 LIMITS_FIELDS = ("epsilon", "N", "theorems", "u", "per_instantiation", "per_key", "per_request", "per_instantiate",
                  "other_limits", "nonces", "bound", "doubling", "outside_the_doubling_check")
@@ -314,6 +315,31 @@ def input_blocks(length: int, r: int) -> int:
     """Blocks of an input of `length` bytes: its length word and its words, on r/32 - 1 words each."""
     words = 1 + -(-length // 4)
     return -(-words // (r // WORD_BITS - 1))
+
+
+def absorbed_blocks(code: int, data: bytes, r: int) -> List[bytes]:
+    """FR-014's encoding: a length word, the input and zero bytes to a whole word, cut into blocks of
+    r/32 - 1 words, zero words filling the last, each block closed by its domain word."""
+    size = r // 8 - 4
+    encoded = len(data).to_bytes(4, "little") + data + bytes(-len(data) % 4)
+    domain = code.to_bytes(4, "little")
+    return [encoded[at:at + size].ljust(size, b"\0") + domain for at in range(0, len(encoded), size)]
+
+
+def control_block(code: int, r: int) -> bytes:
+    """A block that holds no input: zero words and its domain word, G and F of the mode chapter."""
+    return bytes(r // 8 - 4) + code.to_bytes(4, "little")
+
+
+def decoded_input(blocks: Sequence[bytes]) -> Tuple[int, bytes, int]:
+    """The call type, the input and the blocks read, from the first block on: the other way of the
+    proof, which needs nothing but the domain word and the length word."""
+    code = int.from_bytes(blocks[0][-4:], "little")
+    size = len(blocks[0]) - 4
+    length = int.from_bytes(blocks[0][:4], "little")
+    count = -(-(4 + length + -length % 4) // size)
+    joined = b"".join(block[:-4] for block in blocks[:count])
+    return code, joined[4:4 + length], count
 
 
 def request_calls(bits: int, v: Variant) -> int:

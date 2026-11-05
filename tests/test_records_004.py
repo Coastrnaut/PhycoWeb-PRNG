@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Dict, Iterator, List, Tuple
 from unittest import mock
 
-from protocol import evidence
+from protocol import devinputs_v3, evidence
 from protocol.disclaimer import DESIGN_DISCLAIMER
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -805,9 +805,25 @@ PARAMETER_COLUMNS = ("Variant", "n", "w", "b", "c", "r", "R", "Key entropy", "Re
 OUTPUT_COLUMNS = ("Limit", "Size", "Calls of Π", "Bits")
 
 
+STUB = "Not drafted yet."
+
+
 def chapters_of(text: str) -> List[str]:
     tool = limits_script()
     return [title for _, level, title in tool.headings(text.split("\n")) if level == 2]
+
+
+def drafted(text: str) -> List[str]:
+    """The chapters that hold more than the stub line of a chapter still to come."""
+    tool = limits_script()
+    lines = text.split("\n")
+    heads = tool.headings(lines)
+    out = []
+    for name in chapters_of(text):
+        first, last = tool.span(heads, 2, name, 0, len(lines))
+        if [line for line in lines[first + 1:last] if line.strip()] != [STUB]:
+            out.append(name)
+    return out
 
 
 def header_of(text: str) -> List[str]:
@@ -819,7 +835,8 @@ def header_of(text: str) -> List[str]:
 
 class Chapters(unittest.TestCase):
     """FR-034's chapters, each once and in this order, and each named section in its chapter (T068).
-    Drafts hold the first chapters only, so a missing tail waits for the chapter that closes it."""
+    Both files hold every chapter from their first version, since FR-030's test needs the mapping
+    chapter's heading: one still to come holds the stub line alone, and what names it waits."""
 
     def setUp(self):
         for path in (DESIGN_FILE, RATIONALE_FILE):
@@ -829,26 +846,30 @@ class Chapters(unittest.TestCase):
         self.rationale = RATIONALE_FILE.read_bytes().decode("utf-8")
 
     def test_the_design_documents_chapters_stand_in_order(self):
-        found = chapters_of(self.design)
-        self.assertEqual(found, list(DESIGN_CHAPTERS[:len(found)]))
-        self.assertGreaterEqual(len(found), 2)
+        self.assertEqual(chapters_of(self.design), list(DESIGN_CHAPTERS))
 
     def test_the_rationales_chapters_stand_in_order(self):
-        found = chapters_of(self.rationale)
-        self.assertEqual(found, list(RATIONALE_CHAPTERS[:len(found)]))
-        self.assertGreaterEqual(len(found), 2)
-
-    def test_every_chapter_is_there(self):
-        if chapters_of(self.design)[-1:] != [DESIGN_CHAPTERS[-1]] or chapters_of(self.rationale)[-1:] != [RATIONALE_CHAPTERS[-1]]:
-            self.skipTest("the later chapters are drafted in plan phases 5 to 8 (T095 on)")
-        self.assertEqual(chapters_of(self.design), list(DESIGN_CHAPTERS))
         self.assertEqual(chapters_of(self.rationale), list(RATIONALE_CHAPTERS))
+
+    def test_the_first_two_chapters_of_each_are_drafted(self):
+        self.assertEqual(drafted(self.design)[:2], ["Security target", "Mode"])
+        self.assertEqual(drafted(self.rationale)[:2], ["Security target", "Mode"])
+
+    def test_every_chapter_is_drafted(self):
+        if len(drafted(self.design)) < len(DESIGN_CHAPTERS) or len(drafted(self.rationale)) < len(RATIONALE_CHAPTERS):
+            self.skipTest("the later chapters are drafted from plan phase 6 on")
+        self.assertEqual(drafted(self.design), list(DESIGN_CHAPTERS))
+        self.assertEqual(drafted(self.rationale), list(RATIONALE_CHAPTERS))
+
+    def test_a_stub_is_not_a_drafted_chapter(self):
+        text = "# t\n\n## One\n\nwords\n\n## Two\n\nNot drafted yet.\n\n## Three\n\nNot drafted yet.\nmore\n"
+        self.assertEqual(drafted(text), ["One", "Three"])
 
     def test_each_named_section_stands_once_in_its_chapter(self):
         tool = limits_script()
         lines = self.design.split("\n")
         heads = tool.headings(lines)
-        present = chapters_of(self.design)
+        present = drafted(self.design)
         for chapter, sections in NAMED_SECTIONS.items():
             if chapter in present:
                 first, last = tool.span(heads, 2, chapter, 0, len(lines))
@@ -857,7 +878,7 @@ class Chapters(unittest.TestCase):
 
     def test_the_tables_stand_once_each_and_read(self):
         tool = limits_script()
-        present = chapters_of(self.design)
+        present = drafted(self.design)
         tool.read_table(tool.section_lines(self.design, "Mode", "Layout"), tool.LAYOUT_COLUMNS, "layout")
         tool.read_table(tool.section_lines(self.design, "Mode", "Limits"), tool.LIMIT_COLUMNS, "limits")
         if "Permutation" in present:
@@ -875,6 +896,73 @@ class Chapters(unittest.TestCase):
 
     def test_the_two_versions_are_equal(self):
         self.assertEqual(header_of(self.design)[-1], header_of(self.rationale)[-1])
+
+
+class PaddingInjective(unittest.TestCase):
+    """FR-014's committed check: every input length from 0 to its maximum and every call type, at each
+    keyed rate, with 0 collisions, and distinct development inputs giving distinct block sequences."""
+    RATES = (64, 224, 768, 3840, 16128)
+    MOST = 4096
+
+    def setUp(self):
+        self.tool = limits_script()
+
+    def test_every_length_and_call_type_gives_its_own_layout_at_each_rate(self):
+        codes = (self.tool.PERSONALIZATION_BLOCK, self.tool.RESEED_BLOCK)
+        for r in self.RATES:
+            seen = {}
+            for code in codes:
+                for length in range(self.MOST + 1):
+                    blocks = self.tool.absorbed_blocks(code, bytes(length), r)
+                    digest = hashlib.sha256(b"".join(blocks)).digest()
+                    self.assertNotIn(digest, seen, (r, code, length, seen.get(digest)))
+                    seen[digest] = (code, length)
+            self.assertEqual(len(seen), 2 * (self.MOST + 1))
+
+    def test_every_length_reads_back_at_each_rate(self):
+        for r in self.RATES:
+            for length in list(range(0, 300)) + [self.MOST - 1, self.MOST]:
+                data = bytes((i * 7 + 1) % 251 for i in range(length))
+                blocks = self.tool.absorbed_blocks(self.tool.RESEED_BLOCK, data, r)
+                code, read, count = self.tool.decoded_input(blocks + [self.tool.control_block(self.tool.FORGET_BLOCK, r)])
+                self.assertEqual((code, read, count), (self.tool.RESEED_BLOCK, data, len(blocks)), (r, length))
+
+    def test_a_blocks_shape_and_count_are_the_chapters(self):
+        for r in self.RATES:
+            for length in (0, 1, 4, 5, 87, 88, 89, self.MOST):
+                blocks = self.tool.absorbed_blocks(self.tool.PERSONALIZATION_BLOCK, bytes(length), r)
+                self.assertEqual(len(blocks), self.tool.input_blocks(length, r), (r, length))
+                self.assertTrue(all(len(block) == r // 8 for block in blocks))
+                self.assertTrue(all(block[-4:] == b"\x01\0\0\0" for block in blocks))
+
+    def test_the_encoding_on_a_small_case_by_hand(self):
+        self.assertEqual(self.tool.absorbed_blocks(2, b"abcde", 96),
+                         [b"\x05\0\0\0abcd\x02\0\0\0", b"e\0\0\0\0\0\0\0\x02\0\0\0"])
+        self.assertEqual(self.tool.absorbed_blocks(1, b"", 64), [b"\0\0\0\0\x01\0\0\0"])
+        self.assertEqual(self.tool.control_block(4, 96), bytes(8) + b"\x04\0\0\0")
+
+    def test_the_four_domain_words_are_distinct_and_none_is_zero(self):
+        codes = (self.tool.PERSONALIZATION_BLOCK, self.tool.RESEED_BLOCK, self.tool.GENERATE_BLOCK, self.tool.FORGET_BLOCK)
+        self.assertEqual(sorted(codes), [1, 2, 3, 4])
+
+    def test_a_trailing_zero_byte_changes_the_blocks(self):
+        for r in self.RATES:
+            self.assertNotEqual(self.tool.absorbed_blocks(1, b"ab", r), self.tool.absorbed_blocks(1, b"ab\0", r))
+
+    def test_distinct_development_inputs_give_distinct_block_sequences(self):
+        count = 100
+        reseeds = list(devinputs_v3.load("dev", "reseed", ("dev",), count))
+        strings = list(devinputs_v3.load("dev", "pers", ("dev",), count, m=32))
+        short = list(devinputs_v3.load("dev", "pers", ("dev",), count, m=5))
+        for r in self.RATES:
+            for code, inputs in ((self.tool.RESEED_BLOCK, reseeds), (self.tool.PERSONALIZATION_BLOCK, strings + short)):
+                sequences = {b"".join(self.tool.absorbed_blocks(code, data, r)) for data in inputs}
+                self.assertEqual(len(sequences), len(set(inputs)), (r, code))
+                self.assertEqual(len(set(inputs)), len(inputs), "the development inputs are distinct")
+
+    def test_the_two_input_types_differ_on_one_input(self):
+        for r in self.RATES:
+            self.assertNotEqual(self.tool.absorbed_blocks(1, b"same", r), self.tool.absorbed_blocks(2, b"same", r))
 
 
 class SecurityTargetFiles(unittest.TestCase):

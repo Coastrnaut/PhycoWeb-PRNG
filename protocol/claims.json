@@ -1843,6 +1843,13 @@
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
+        "date": "2026-11-05",
+        "path": "specs/004-crypto-architecture-v3/design.md",
+        "reason": "The design document: FR-004 asks that it be stated as not sought, and this sentence says so; no text implies it (D7)",
+        "text": "Prediction resistance is not sought (D7; FUT-SEC-4): this feature has no validated entropy source.",
+        "writer": "Claude Code, model claude-opus-5-5"
+      },
+      {
         "date": "2026-11-03",
         "path": "specs/004-crypto-architecture-v3/plan.md",
         "reason": "A requirement's text: a standard's own status, the rule that forbids the word, or the owner's approval of a file, beside a standard's name by chance",
