@@ -1031,8 +1031,11 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
   ```
 
   - A committed script evaluates the bound at the limits and checks that doubling any one limit
-    would push it above ε. Where limits trade against one another, the design document states
-    its choice and the reason.
+    that a term of the bound reads, alone or as a factor of another, would push it above ε. The
+    per-request cap, which no term reads, and a limit that another limit holds, as the limit on
+    calls holds the reseeds, each of which takes a call of Π, are evaluated in the bound at their
+    values and stand outside that check. Where limits trade against one another, the design
+    document states its choice and the reason.
   - **Units.** The theorem's unit, calls of Π, is primary, and each limit is also given in bits
     at every claimable size. A request of n bits takes ⌈n/r⌉ output calls plus one forget call,
     and instantiate's calls are stated; `limits.json` lists both units (data-model §10).
@@ -1649,8 +1652,10 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     streams are distinct), round, food node, skipping any word that is periodic or related to a
     constant already taken in the same call (R13); where a call needs more constants than there are
     aperiodic classes, the record of taken classes starts afresh each time every class has been used
-    once, and every repeat is recorded. The design document restates these values, and the script
-    checks that the two agree.
+    once, and every repeat is recorded. The four call types share one stream, so t = 1 and no table
+    is read by call type: the mode's theorem has one permutation, and FR-023 asks that its
+    preconditions hold (R10), so the domain words carry the separation. The design document restates
+    these values, and the script checks that the two agree.
   - **Refused constants.** The script reads a committed list,
     `research/004/refused-constants.json`, of the polynomials and constant sets it refuses, each
     with its source, frozen with the rule before the first candidate is scored, its SHA-256 in
