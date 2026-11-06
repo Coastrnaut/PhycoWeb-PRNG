@@ -862,7 +862,7 @@ candidates are otherwise `ineligible` (R6, R7).
   before its first tool run, and append its `mapping` entry with
   `python scripts/candidate_log.py mapping FILE` before its first score. (FR-023, FR-024, FR-041;
   R15)
-- [ ] T081 [US4] Write the evidence-run tests in `tests/test_protocol_004.py` and
+- [X] T081 [US4] Write the evidence-run tests in `tests/test_protocol_004.py` and
   `tests/test_records_004.py`: `scripts/evidence_v3.py` refuses a candidate not in the log, a spent
   budget row, a size out of order and a `bound` without a validated tool; an `avalanche` run without
   the candidate's `dependency` record at its size exits 2; every run started writes a record;
@@ -875,7 +875,7 @@ candidates are otherwise `ineligible` (R6, R7).
   when it ends, a further `projection` record naming research R7's feature-wide row, whose time is
   the time the test took and which says that the test compared the outputs of its stated test
   operation list and kept none. (FR-037, FR-041, FR-045, FR-053, FR-065; R4, R7, R16)
-- [ ] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
+- [X] T082 [US4] Write `scripts/evidence_v3.py` (contracts/cli.md; data-model §5, §6) with the kinds
   `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
   `invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) and
   `cross-check` (with `--tool NAME`); the counts of research R4 and R13, which no option lowers;
@@ -885,7 +885,7 @@ candidates are otherwise `ineligible` (R6, R7).
   (T014); and `--reproduce RECORD`. Every finding carries one of the four classes of
   security.md §9.1, and every other record `none`. (FR-037, FR-038, FR-041, FR-060, FR-061; SC-017;
   R4, R7, R12, R13)
-- [ ] T083 [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
+- [X] T083 [US4] Write the tests of `scripts/d4_choice.py` and `scripts/round_rule.py` in
   `tests/test_protocol_004.py`: a second D4 run exits 2 (quickstart E4); `--tie` only after an exact
   tie, once both values of R at 4×4 exist; `--choose` writes nothing unless the owner types 16 hex
   digits at an interactive terminal; R by the round rule with every input cited, eligibility, a
@@ -893,11 +893,11 @@ candidates are otherwise `ineligible` (R6, R7).
   exits 2 after a D4 tie until its row reads Approved or "Not needed"; `--decide` exits 2 while the
   latest selection record has a tie and no choice whose row reads Approved. (FR-022, FR-028, FR-041;
   SC-005; R6, R7; PRO-074)
-- [ ] T084 [US4] Write `scripts/d4_choice.py` (contracts/cli.md; data-model §8; R5, R6): the score
+- [X] T084 [US4] Write `scripts/d4_choice.py` (contracts/cli.md; data-model §8; R5, R6): the score
   (min(W_D, W_L)/r*)/L over the entered set recorded before the first score, at 4×4 and at the
   widest reduced width, 16 or else 8, with a common r* ≥ 2, compared exactly; `--tie`;
   `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`. (FR-022; R5, R6)
-- [ ] T085 [US4] Write `scripts/round_rule.py` (contracts/cli.md; data-model §9): `--candidate ID`,
+- [X] T085 [US4] Write `scripts/round_rule.py` (contracts/cli.md; data-model §9): `--candidate ID`,
   R per claimable size with every input cited, into `$REP/candidates/<ID>/round-rule.json`;
   `--close`; `--select`, into `$REP/freeze/selection.json` and later `selection-<k>.json`;
   `--decide`; `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`, with
