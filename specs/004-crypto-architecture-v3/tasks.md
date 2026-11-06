@@ -848,16 +848,16 @@ candidates are otherwise `ineligible` (R6, R7).
   of each earlier named version unchanged, checked against the file's history, and a set of a stated
   list, planted in a stated table, is found under each of the 2w transforms and not found when the
   planted run is one word short of 64 bits. (FR-023, FR-024, FR-044, FR-047; SC-006; R13, R15)
-- [ ] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
+- [X] T078 [US3] Write candidate A1, the 64-bit ARX-box over a node's pressure and vein lanes (D10),
   as `research/004/candidates/cand-A1.py`, an operation list of invertible updates with its
   reference outputs, and append its `proposed` entry with
   `python scripts/candidate_log.py propose FILE` before any tool runs on it; a replaced list stays
   unchanged as `research/004/candidates/cand-A1/superseded/<sha256>.py`, listed in
   `research/004/candidates/superseded.json`. (FR-019, FR-020, FR-021, FR-022, FR-041; R6, R11)
-- [ ] T079 [US3] Write at least one Boolean candidate, `research/004/candidates/cand-B1.py`, the
+- [X] T079 [US3] Write at least one Boolean candidate, `research/004/candidates/cand-B1.py`, the
   same way, with its `proposed` entry; a further candidate, at most three per family, is entered
   only where the rules can select it. (FR-022, FR-041; SC-011; R6)
-- [ ] T080 [US3] Generate each candidate's constant tables with `python scripts/gen_constants_v3.py
+- [X] T080 [US3] Generate each candidate's constant tables with `python scripts/gen_constants_v3.py
   --candidate ID --variant VARIANT` into `research/004/candidates/<id>/constants/<variant>.json`
   before its first tool run, and append its `mapping` entry with
   `python scripts/candidate_log.py mapping FILE` before its first score. (FR-023, FR-024, FR-041;
