@@ -1502,6 +1502,8 @@ def remeasure(text: str, out: str, out_dir: str, local_dir: str, binary: str) ->
         subject = plain_subject(candidate, config["size"], config["width"], config["rounds"])
         result = run_cross_check(subject, holder, args) if kind == "cross-check" else run_bound(
             subject, holder, args, original["tool"], original["validation"], original["cross_check"])
+        if kind == "bound":
+            result["fields"]["budget"] = {"cap_hours": INSTANCE_HOURS}
     else:
         subject = plain_subject(candidate, config["size"], config["width"]) if kind in NO_TABLE \
             else subject_of(candidate, config["size"], config["width"], config["rounds"])

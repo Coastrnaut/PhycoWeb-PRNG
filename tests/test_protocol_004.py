@@ -3556,6 +3556,7 @@ class EvidenceLayers(unittest.TestCase):
 
 
 STUDIED = ("cand-A1/constants/n2-w16-R8-c64.json", "cand-A1/constants/n2-w4-R8-c16.json")
+EVIDENCE_RESERVED = [evidence_script().reserved_hours]
 
 
 class EvidenceRuns(TempRepo):
@@ -3793,6 +3794,51 @@ class EvidenceRuns(TempRepo):
         self.assertTrue(record["rounds_fired"])
         self.assertEqual(min(record["counts"]["forward"][-1], record["counts"]["inverse"][-1]), 63)
         self.assertLess(record["rounds"][-1], 256)
+
+    def test_a_counted_bound_run_writes_its_fields_and_its_reproduction_matches(self):
+        """Candidate A1's own layer at 4×4, w = 16, on a stated box record, by the long-trail counter (data-model section 6)."""
+        tool = "long-trail active-box counting"
+        write(self.root, self.script.TRAIL_PATHS["exhaustive tables"], (CODE_ROOT / self.script.TRAIL_PATHS["exhaustive tables"]).read_bytes())
+        self.validated((tool, self.script.TRAIL_PATHS[tool]))
+        box = {"kind": "bound", "record_id": "bound-box", "created_utc": "2026-11-05T00:00:00Z", "method": "branch-and-bound", "candidate": "cand-A1",
+               "bound_kind": "differential", "width": 16, "status": "pass", "rounds": 1, "boxes": {"box 0": {"weights": {"1": 5}}}}
+        write(self.root, f"{self.out}/bound-box.json", evidence.pretty(box))
+        self.commit("the box record")
+        argv = ("--candidate", "cand-A1", "--kind", "bound", "--bound-kind", "differential", "--method", "active-box count", "--size", "4",
+                "--width", "16", "--rounds", "2", "--out-dir", self.out)
+        self.assertEqual(self.run_script(*argv), 0)
+        record = [item for item in self.records("bound") if item["record_id"] != "bound-box"][0]
+        self.assertEqual((record["status"], record["classification"]), ("pass", "no weakness identified within the analysis performed"))
+        self.assertEqual((record["bound_kind"], record["rounds"], record["width"], record["size"]), ("differential", 2, 16, 4))
+        self.assertEqual(record["budget"]["cap_hours"], 8.0)
+        self.assertIn("independence assumptions", record["scope"])
+        self.assertTrue(record["limitations"])
+        self.assertEqual(self.log()[-1]["budget_used_h"].keys(), {"trails"})
+        self.commit("the bound")
+        path = evidence.find_record(record["record_id"])[0]
+        self.assertEqual(self.reproduced(path)["outcome"], "match")
+
+    def test_a_search_that_reached_its_cap_is_refused_again(self):
+        tool = "long-trail active-box counting"
+        self.validated((tool, self.script.TRAIL_PATHS[tool]))
+        fields = {"kind": "bound", "record_id": "bound-capped", "created_utc": "2026-11-05T00:00:00Z", "status": "inconclusive", "capped": True,
+                  "ended_outside": NONE, "bound_kind": "differential", "rounds": 2, "width": 16, "size": 4}
+        write(self.root, f"{self.out}/bound-capped.json", evidence.pretty(fields))
+        self.commit("capped")
+        self.assertEqual(self.run_kind("bound", "--bound-kind", "differential", "--method", "active-box count", "--rounds", "2"), 2)
+
+    def test_a_kind_of_the_row_without_its_probe_exits_2(self):
+        """The reservation counts the probe of every run the row still needs, and a probe that does not exist comes first."""
+        with self.assertRaisesRegex(Refused, "comes first"):
+            EVIDENCE_RESERVED[0]("cand-A1", "structural", "inverse", 4)
+
+    def test_the_probes_of_later_runs_are_reserved(self):
+        real = EVIDENCE_RESERVED[0]
+        for kind, at in self.script.needed_after("statistics", "frequency", 4):
+            evidence.write_projection(run="x", row="cand-A1/statistics", inputs=NONE, measured_speed=1, projected_hours=0.5, time_hours=0.0,
+                                      extra={"probe": self.script.probe_of(kind, at)})
+        self.assertAlmostEqual(real("cand-A1", "statistics", "frequency", 4), 2.5)
+
 
     # --aborted --------------------------------------------------------------------------------------
 
@@ -4041,6 +4087,41 @@ class EvidenceCounts(TempRepo):
                                   self.script.frequency_worker((self.subject, 40, 24, False))])
         self.assertEqual(one["forward"].tobytes(), two["forward"].tobytes())
         self.assertEqual(one["inverse"].tobytes(), two["inverse"].tobytes())
+
+    def remeasured(self, original: Dict, **patched) -> Dict:
+        """What a reproduction's worktree computes, here in the test's own process with the stated size's counts."""
+        out, parts, local = self.root / "fields.json", self.root / "outputs", self.root / "local"
+        with mock.patch.object(self.script, "subject_of", return_value=self.subject), mock.patch.object(self.script.evidence, "guard_order_of_us1"):
+            with mock.patch.object(self.script, "FREQUENCY_N", 2 ** 9), mock.patch.object(self.script.bias, "entry_for", return_value={"low": 150, "high": 362}):
+                self.script.remeasure(json.dumps(original), str(out), str(parts), str(local), NONE)
+        return json.loads(out.read_bytes())
+
+    def test_a_frequency_reproduction_counts_the_same(self):
+        first = self.frequency()
+        original = {"kind": "frequency", "candidate": "cand-A1", "config": {"size": 2, "width": 32, "rounds": 4}, "parallelism": {"workers": 1},
+                    "variant_id": "cand-A1/n2-w32-R4-c64", "model_id": "cand-A1"}
+        with mock.patch.object(self.script, "citation_of", return_value={"record_id": "v"}):
+            again = self.remeasured(original)
+        for name in ("summaries", "rounds_fired", "raises"):
+            self.assertEqual(again[name], first["fields"][name], name)
+        self.assertEqual(again["status"], first["status"])
+        self.assertEqual((self.root / "outputs/counts.json.gz").exists(), True)
+
+    def test_a_control_counts_as_its_test_does_and_a_reproduction_counts_the_same(self):
+        with mock.patch.object(self.script, "FREQUENCY_N", 2 ** 9), mock.patch.object(self.script.bias, "BATCH", 2 ** 8), \
+                mock.patch.object(self.script.bias, "entry_for", return_value={"low": 150, "high": 362}):
+            run = self.run_of("control")
+            run.workers = 1
+            fields, inputs = self.script.control_frequency(run, 4)
+            second = self.run_of("control")
+            second.workers = 1
+            repeat, _ = self.script.control_frequency(second, 4)
+        self.assertEqual(fields["summaries"], repeat["summaries"])
+        self.assertEqual(sorted(fields["summaries"]), ["first set", "second set"])
+        self.assertEqual(inputs["namespace"], "control")
+        self.assertEqual(inputs["index_range"], [0, 2 ** 10 - 1])
+        self.assertEqual(fields["test_parameters"]["s"], 4 * 2 * 16 * 32)
+
 
     def avalanche_run(self, directory: Path) -> List[Dict]:
         self.script.store_matrices(self.subject, directory)
@@ -4991,6 +5072,90 @@ class Recheck(TempRepo):
             self.commit("the re-check")
             path, _ = next(iter(evidence.iter_records("recheck", "rechecks")))
             self.assertEqual(self.script.main(["--reproduce", str(path)]), 0)
+
+
+class CostRecord(TempRepo):
+    """research/004/tools/costmodel.py's writer of `cost` records, on candidate A1's list (data-model section 9)."""
+
+    TREES = {"start": {"latency_cycles": 2}, "output": {"latency_cycles": 3}, "absorption": {"latency_cycles": 3}, "reset": {"latency_cycles": 2}}
+
+    def setUp(self):
+        super().setUp()
+        import sys
+        evidence_script()
+        self.ir = sys.modules["ir"]
+        self.tool = __import__("costmodel")
+        self.loaded = self.ir.load(self.ir.candidate_modules(ROOT / candidates.CANDIDATES_REL)["cand-A1"](4, 32))
+
+    def proposed(self) -> None:
+        rel = candidates.module_rel("cand-A1")
+        for name in (rel, "research/004/ir.py", self.tool.SOURCE, "protocol/candidates.py", "protocol/devinputs_v3.py"):
+            write(self.root, name, (CODE_ROOT / name).read_bytes())
+        self.commit("the code")
+        parameters = {name: "stated" for name in candidates.PARAMETERS}
+        parameters["trees"] = {"4": self.TREES}
+        digest = evidence.sha256((self.root / rel).read_bytes())
+        candidates.propose({"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": digest, "parameters": parameters})
+        self.commit("proposed")
+
+    def refound(self) -> None:
+        digest = evidence.sha256((self.root / self.tool.SOURCE).read_bytes())
+        write(self.root, f"{evidence.REP_REL}/validation/validation-c.json", evidence.pretty(
+            {"kind": "validation", "record_id": "validation-c", "tool": "costmodel", "tool_sha256": digest, "outcome": "re-found",
+             "created_utc": "2026-11-03T00:00:00Z"}))
+
+    def test_the_self_tests_call_sequence(self):
+        self.assertEqual(self.tool.self_test_calls(1), 6 + 2 + 2 + 2)
+        self.assertEqual(self.tool.self_test_calls(3), 6 + 4 + 2 + 4)
+
+    def test_one_block_meets_every_item_where_the_list_writes_every_lane(self):
+        found = self.tool.least_k(self.loaded.program, 640)
+        self.assertEqual((found["least_k"], found["calls"]), (1, 12))
+        self.assertIn("one whole block", found["structure"])
+
+    def test_a_lane_no_update_writes_has_no_k(self):
+        ir = self.ir
+        program = ir.Program("stated", 2, 32, (ir.Phase(0, (ir.Mix(ir.lane(2, 0, 0, ir.PRESSURE), "xor", ir.Lane(ir.lane(2, 0, 0, ir.VEIN))),)),))
+        found = self.tool.least_k(program, 64)
+        self.assertIsNone(found["least_k"])
+        self.assertIn("lanes no update writes", found["structure"])
+
+    def test_the_cycles_of_a_call_count_the_start_tree(self):
+        found = self.tool.cycles_per_call(18, 10, 640, 32, 2, 3)
+        self.assertEqual(found["call of Π"], 182)
+        self.assertEqual(found["generate of one block with its forget"], 2 * 182 + 3 + 20)
+        self.assertEqual(found["instantiate, one block of input"], 6 * 182 + 20)
+        self.assertEqual(found["reseed, one block of input"], 2 * 182 + 20)
+
+    def test_the_fields_of_a_variant(self):
+        found = self.tool.cost_fields(self.loaded, 10, 640, self.TREES)
+        self.assertEqual(found["figures"]["phases"], 18)
+        self.assertEqual(sorted(found["throughput"]), sorted(str(bits) for bits in self.tool.STATED_REQUESTS))
+        self.assertEqual(found["self_test"]["least_k"], 1)
+        self.assertEqual(found["throughput"]["524288"]["throughput_goal"], 10 ** 8)
+
+    def test_a_candidate_not_in_the_log_exits_2(self):
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.tool.main(["--candidate", "cand-A2", "--size", "4", "--rounds", "10"]), 2)
+
+    def test_a_tool_with_no_validation_writes_not_evaluated(self):
+        self.proposed()
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.tool.main(["--candidate", "cand-A1", "--size", "4", "--rounds", "10"]), 0)
+        record = next(iter(evidence.iter_records("cost")))[1]
+        self.assertEqual((record["status"], record["validation"]), ("not evaluated", NONE))
+
+    def test_the_record_holds_its_figures_at_its_variant(self):
+        self.proposed()
+        self.refound()
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.tool.main(["--candidate", "cand-A1", "--size", "4", "--rounds", "10"]), 0)
+        record = next(iter(evidence.iter_records("cost")))[1]
+        self.assertEqual((record["kind"], record["status"], record["classification"]), ("cost", "pass", NONE))
+        self.assertEqual(record["config"], dict(record["config"], size=4, rounds=10))
+        self.assertEqual(record["variant_id"], "cand-A1/n4-w32-R10-c384")
+        self.assertEqual(record["self_test"]["least_k"], 1)
+        self.assertEqual(record["validation"]["record_id"], "validation-c")
 
 
 class ClearLock(TempRepo):
