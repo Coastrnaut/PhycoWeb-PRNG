@@ -36,15 +36,16 @@ for place in (str(ROOT), str(ROOT / "research/004"), str(ROOT / "research/004/to
     if place not in sys.path:
         sys.path.insert(0, place)
 
-from protocol import candidates, changelog, evidence  # noqa: E402
-from protocol.evidence import NONE, Refused  # noqa: E402
+from protocol import candidates, changelog, devinputs_v3, evidence  # noqa: E402
+from protocol.evidence import NONE, Refused, ToolFailure  # noqa: E402
 
 import ir  # noqa: E402
+import numpy as np  # noqa: E402
 import symmetry  # noqa: E402
 
 CODE = ["scripts/gen_constants_v3.py", "protocol/evidence.py", "protocol/disclaimer.py",
-        "protocol/candidates.py", "protocol/changelog.py", "research/004/ir.py",
-        "research/004/tools/symmetry.py"]
+        "protocol/candidates.py", "protocol/changelog.py", "protocol/devinputs_v3.py",
+        "research/004/ir.py", "research/004/tools/symmetry.py"]
 SCRIPT = CODE[0]
 DEGREE = 64
 SEED = int.from_bytes(b"PhycoWeb", "big")
@@ -57,6 +58,7 @@ MODULE_REL = "phycoweb/constants_v3.py"
 VECTORS_REL = "vectors/phyco-v3"
 SIDECAR_REL = VECTORS_REL + "/MANIFEST.json"
 EXPLORATION_REL = "research/004/exploration"
+REFERENCE_STATES = 12
 RUN_FIELDS = ("files", "refused_list", "checks")
 CHECK_FIELDS = ("files", "refused_list", "verdict")
 
@@ -276,7 +278,7 @@ def checked(program: "ir.Program", rounds: int, c: int, entries: Sequence[Dict])
     joined = fixed["joined"]
     checks = {"relations": {name: len(items) for name, items in related.items()},
               "relations_hold": not any(related.values()),
-              "symmetry_holds": symmetry_holds(fixed) or joined, "symmetry_joined": joined,
+              "symmetry_holds": symmetry_holds(fixed), "symmetry_joined": joined,
               "refused_matches": matches, "chance_of_a_match": chance_of_a_match(len(words), entries, w)}
     return read, checks
 
@@ -297,6 +299,36 @@ def table_file(variant: str, program: "ir.Program", rounds: int, c: int, read: D
 
 def file_row(rel: str, data: bytes) -> Dict:
     return {"path": rel, "sha256": evidence.sha256(data), "sha256_kind": "raw"}
+
+
+def reference_inputs(n: int, w: int) -> List[Tuple[str, List[int]]]:
+    """Research R8's 16 inputs: all-zero, all-one, alternating, a counting pattern and test states
+    0 to 11, the fixed patterns being constructed inputs of research R3's classes (1) and (2)."""
+    lanes = 2 * n * n
+    mask = (1 << w) - 1
+    values = devinputs_v3.load("dev", "state", ("dev",), REFERENCE_STATES, n=n, w=w)
+    fixed = [("all-zero", [0] * lanes), ("all-one", [mask] * lanes),
+             ("alternating", [int("01" * w, 2) & mask] * lanes),
+             ("counting", [index & mask for index in range(lanes)])]
+    return fixed + [(f"test state {i}", list(values[i])) for i in range(REFERENCE_STATES)]
+
+
+def reference_file(variant: str, program: "ir.Program", read: Dict) -> bytes:
+    """The scalar interpreter's outputs; the batch interpreter must agree on each, or it is a tool
+    defect (research R11)."""
+    loaded = ir.Loaded(program)
+    table = read["table"]
+    inputs = reference_inputs(program.n, program.w)
+    outputs = [ir.permute(loaded, state, table) for _, state in inputs]
+    batch = np.array([state for _, state in inputs], dtype=np.uint64).T
+    other = ir.permute_batch(loaded, batch, table).T.tolist()
+    if [[int(word) for word in row] for row in other] != outputs:
+        raise ToolFailure(f"{variant}: the scalar and batch interpreters disagree")
+    digits = (program.w + 3) // 4
+    return evidence.pretty({"variant": variant, "rows": [
+        {"name": name, "input": [f"{word:0{digits}x}" for word in state],
+         "output": [f"{word:0{digits}x}" for word in out]}
+        for (name, state), out in zip(inputs, outputs)]})
 
 
 # ------------------------------------------------------------------------------ candidates
@@ -338,9 +370,11 @@ def candidate_table(root: Path, candidate: str, variant: str, entries: Sequence[
     guard_instance(log, candidate, c)
     program = build_list(root, candidate, n, w)
     read, checks = checked(program, rounds, c, entries)
-    rel = f"{candidates.CANDIDATES_REL}/{candidate}/constants/{variant}.json"
-    data = table_file(f"{candidate}/{variant}", program, rounds, c, read)
-    return {"rel": rel, "data": data, "checks": checks}
+    base = f"{candidates.CANDIDATES_REL}/{candidate}"
+    named = f"{candidate}/{variant}"
+    return {"files": {f"{base}/constants/{variant}.json": table_file(named, program, rounds, c, read),
+                      f"{base}/reference/{variant}.json": reference_file(named, program, read)},
+            "checks": checks}
 
 
 def write_one(result: Dict, argv: Sequence[str], candidate: Optional[str], refused: Dict,
@@ -351,11 +385,12 @@ def write_one(result: Dict, argv: Sequence[str], candidate: Optional[str], refus
     with evidence.Run("generator-run", candidate=candidate, argv=argv, code_files=CODE,
                       variant_id=variant_id, directory=directory) as run:
         if held:
-            target = evidence.REPO.path(result["rel"])
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(result["data"])
-        fields = {"files": [file_row(result["rel"], result["data"])] if held else [],
-                  "refused_list": refused, "checks": result["checks"], "inputs": NONE,
+            for rel, data in result["files"].items():
+                target = evidence.REPO.path(rel)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(data)
+        fields = {"files": files_held(result), "refused_list": refused, "checks": result["checks"],
+                  "inputs": inputs_field(result),
                   "exploration": exploration, "generation_seconds": time.monotonic() - started}
         status, code = ("pass", evidence.EXIT_OK) if held else ("fail", evidence.EXIT_VERDICT)
         path = run.finish(status, fields=fields, exit_status=code,
@@ -377,7 +412,7 @@ def exploration_table(root: Path, n: int, w: int, entries: Sequence[Dict], log: 
     program = build_list(root, selected, n, w, exploration=True)
     read, checks = checked(program, rounds, c, entries)
     data = table_file(f"phyco-v3/n{n}-w{w}-R{rounds}", program, rounds, c, read)
-    return {"rel": f"{EXPLORATION_REL}/constants_n{n}_w{w}.json", "data": data, "checks": checks}
+    return {"files": {f"{EXPLORATION_REL}/constants_n{n}_w{w}.json": data}, "checks": checks}
 
 
 # --------------------------------------------------------------------------- the frozen files
@@ -512,17 +547,17 @@ def reproduce(args: argparse.Namespace, command: List[str]) -> int:
         if "--candidate" in argv:
             result = candidate_table(root, value_of(argv, "--candidate"), value_of(argv, "--variant"),
                                      entries, log)
-            fields.update(checks=result["checks"], files=files_held(result))
+            fields.update(checks=result["checks"], files=files_held(result), inputs=inputs_field(result))
         elif "--exploration" in argv:
             at = argv.index("--exploration")
             result = exploration_table(root, int(argv[at + 1]), int(argv[at + 2]), entries, log)
-            fields.update(checks=result["checks"], files=files_held(result))
+            fields.update(checks=result["checks"], files=files_held(result), inputs=NONE)
         else:
             files = frozen_files(root, entries, log)
-            fields["files"] = [file_row(rel, blob) for rel, blob in sorted(files.items())]
+            fields.update(files=[file_row(rel, blob) for rel, blob in sorted(files.items())], inputs=NONE)
             if original["kind"] == "generator-check":
                 fields["verdict"] = original.get("verdict")
-        return dict(fields, kind=original["kind"], inputs=NONE, model_id=original.get("model_id"),
+        return dict(fields, kind=original["kind"], model_id=original.get("model_id"),
                     variant_id=original.get("variant_id"), exit_status=original["exit_status"],
                     assertions=[], status=original["status"], classification=original["classification"],
                     code_sha256=original["code_sha256"], outputs=[])
@@ -535,7 +570,17 @@ def reproduce(args: argparse.Namespace, command: List[str]) -> int:
 
 
 def files_held(result: Dict) -> List[Dict]:
-    return [file_row(result["rel"], result["data"])] if all_held(result["checks"]) else []
+    if not all_held(result["checks"]):
+        return []
+    return [file_row(rel, data) for rel, data in result["files"].items()]
+
+
+def inputs_field(result: Dict) -> Any:
+    """The test states a reference file read, by namespace, kind and range (spec FR-061)."""
+    if not any("/reference/" in rel for rel in result["files"]):
+        return NONE
+    return {"namespace": "dev", "kind": "state", "indices": [0, REFERENCE_STATES - 1],
+            "constructed": ["all-zero", "all-one", "alternating", "counting"]}
 
 
 def value_of(argv: Sequence[str], name: str) -> str:

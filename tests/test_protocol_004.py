@@ -2998,9 +2998,35 @@ class ConstantGenerator(ProtocolWriter):
                          evidence.sha256((self.root / evidence.REFUSED_LIST_REL).read_bytes()))
         self.assertEqual(record["files"][0]["sha256"],
                          evidence.sha256((self.root / self.table_rel()).read_bytes()))
+        self.assertTrue(record["checks"]["symmetry_joined"] is False)
         self.assertEqual(record["status"], "pass")
         self.assertTrue(record["checks"]["relations_hold"])
         self.assertTrue(record["checks"]["symmetry_holds"])
+
+    def test_a_variant_gets_its_reference_outputs_with_its_table(self):
+        self.stated()
+        self.candidate()
+        rel = f"{candidates.CANDIDATES_REL}/cand-A1/reference/n4-w32-R4-c384.json"
+        rows = json.loads((self.root / rel).read_bytes())["rows"]
+        self.assertEqual([row["name"] for row in rows[:5]],
+                         ["all-zero", "all-one", "alternating", "counting", "test state 0"])
+        self.assertEqual(len(rows), 16)
+        record = self.records()[0]
+        self.assertEqual(len(record["files"]), 2)
+        self.assertEqual(record["inputs"]["indices"], [0, 11])
+
+    def test_interpreters_that_disagree_are_a_tool_failure(self):
+        self.stated()
+        with mock.patch.object(self.gen.ir, "permute_batch", side_effect=lambda loaded, states, table: states):
+            self.assertEqual(self.candidate(), 3)
+        self.assertFalse((self.root / self.table_rel()).exists())
+
+    def test_the_reference_input_patterns(self):
+        rows = dict(self.gen.reference_inputs(2, 8))
+        self.assertEqual(rows["all-one"], [0xFF] * 8)
+        self.assertEqual(rows["alternating"], [0x55] * 8)
+        self.assertEqual(rows["counting"], list(range(8)))
+        self.assertEqual(rows["all-zero"], [0] * 8)
 
     def test_the_table_reads_the_rule_in_order(self):
         self.stated()
@@ -3009,6 +3035,13 @@ class ConstantGenerator(ProtocolWriter):
         stream = self.gen.Stream(self.polynomial)
         self.assertEqual([int(word, 16) for row in table["table"] for word in row],
                          [stream.word(32) for _ in range(12)])
+
+    def test_a_symmetry_at_a_joined_size_fails_as_at_any_other(self):
+        self.stated()
+        found = {"joined": True, "fixed": {"pattern": [("t", 1, 0)]}, "word_rotations": {}, "composed": {}}
+        with mock.patch.object(self.gen.symmetry, "check", return_value=found):
+            self.assertEqual(self.candidate(), 1)
+        self.assertFalse((self.root / self.table_rel()).exists())
 
     def test_a_match_with_the_list_leaves_no_table(self):
         write(self.root, candidates.module_rel("cand-A1"), STATED_LIST)
