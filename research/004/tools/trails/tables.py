@@ -20,6 +20,7 @@ Run on its known results by scripts/validate_tool.py. Analysis code: the model n
 security claim.
 """
 import hashlib
+import itertools
 import math
 import sys
 from functools import lru_cache
@@ -327,6 +328,86 @@ def linear_trails(steps: Sequence[Tuple], w: int, rounds: int) -> Dict[int, int]
     """The least weight of a trail of masks over r rounds, each addition's being k where its correlation has magnitude
     2^-k, for each r, from any non-zero mask out of the last round."""
     return trails(steps, w, rounds, mask_step, tuple(reversed(steps)))
+
+
+# ---------------------------------------------------------------------- S-box layers, exhaustively
+
+def transitions(sbox: Sequence[int], kind: str) -> Dict[int, Tuple[int, ...]]:
+    """Each non-zero input's outputs with a non-zero entry in the S-box's difference or linear table, a mask out of the table's column."""
+    size = len(sbox)
+    out: Dict[int, Tuple[int, ...]] = {}
+    array = np.array(sbox, dtype=np.int64)
+    for given in range(1, size):
+        if kind == "differential":
+            row = difference_row(array, given)
+            out[given] = tuple(int(taken) for taken in np.nonzero(row)[0])
+        else:
+            entries = [sum(1 - 2 * (bin((given & x) ^ (taken & int(array[x]))).count("1") & 1) for x in range(size))
+                       for taken in range(size)]
+            out[given] = tuple(taken for taken, entry in enumerate(entries) if entry)
+    return out
+
+
+def trail_within(sbox: Sequence[int], layers: Sequence[Tuple], kind: str, steps: int, limit: int) -> bool:
+    """Whether a trail of `steps` steps holds at most `limit` active S-boxes in all, every trail walked. A layer is (boxes, permutation)."""
+    moves = transitions(sbox, kind)
+    bits = len(sbox).bit_length() - 1
+    every = len(layers)
+    places = [{bit: (index, place) for index, box in enumerate(boxes) for place, bit in enumerate(box)} for boxes, _ in layers]
+    dead = set()
+
+    def next_states(layer: int, state: Tuple[int, ...]):
+        boxes, permutation = layers[layer % every]
+        held: Dict[int, int] = {}
+        for bit in state:
+            index, place = places[layer % every][bit]
+            held[index] = held.get(index, 0) | 1 << place
+        rows = [[(index, taken) for taken in moves[value]] for index, value in sorted(held.items())]
+        return len(held), rows, boxes, permutation
+
+    def walk(layer: int, state: Tuple[int, ...], spent: int) -> bool:
+        if layer == steps:
+            return True
+        key = (layer, state, spent)
+        if key in dead:
+            return False
+        active, rows, boxes, permutation = next_states(layer, state)
+        spent += active
+        if spent + (steps - layer - 1) > limit:
+            dead.add(key)
+            return False
+        for choice in itertools.product(*rows):
+            after = []
+            for index, taken in choice:
+                after += [permutation[boxes[index][place]] for place in range(bits) if taken >> place & 1]
+            if walk(layer + 1, tuple(sorted(after)), spent):
+                return True
+        dead.add(key)
+        return False
+
+    boxes = layers[0][0]
+    room = limit - (steps - 1)
+    for count in range(1, room + 1):
+        for chosen in itertools.combinations(range(len(boxes)), count):
+            for values in itertools.product(range(1, len(sbox)), repeat=count):
+                state = tuple(sorted(boxes[index][place] for index, value in zip(chosen, values)
+                                     for place in range(bits) if value >> place & 1))
+                if walk(0, state, 0):
+                    return True
+    return False
+
+
+def layers_minimum(sbox: Sequence[int], layers: Sequence[Tuple], kind: str, rounds: int) -> Dict[int, int]:
+    """The least active S-boxes over r whole cycles of the layers, for each r, every trail walked: a count k stands where no trail holds
+    k - 1 and one holds k. No step is without an active S-box, and r cycles hold r - 1 cycles and one, so a count starts from those."""
+    out: Dict[int, int] = {}
+    for r in range(1, rounds + 1):
+        steps = r * len(layers)
+        limit = out[r - 1] + out[1] if r > 1 else steps
+        while not trail_within(sbox, layers, kind, steps, limit):
+            limit += 1
+        out[r] = limit
+    return out
 
 
 # ------------------------------------------------------------------------------------- the validation

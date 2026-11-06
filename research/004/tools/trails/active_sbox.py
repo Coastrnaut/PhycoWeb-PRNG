@@ -62,12 +62,21 @@ class Layer(NamedTuple):
     permutation: Tuple[int, ...]
 
 
+class Cycle(NamedTuple):
+    """Layers taken in turn, one per step: a round of a list whose S-boxes change from step to step. All hold the same state and S-box."""
+    layers: Tuple[Layer, ...]
+
+
 class Model(NamedTuple):
     matrix: object
     low: List[float]
     high: List[float]
     cost: np.ndarray
     columns: int
+
+
+def layers_of(layer) -> Tuple[Layer, ...]:
+    return layer.layers if isinstance(layer, Cycle) else (layer,)
 
 
 def sbox_bits(sbox: Sequence[int]) -> int:
@@ -78,8 +87,15 @@ def sbox_bits(sbox: Sequence[int]) -> int:
     return bits
 
 
-def check(layer: Layer) -> Layer:
+def check(layer):
     """A layer whose S-boxes take each bit at most once, of the S-box's size, under a true permutation."""
+    if isinstance(layer, Cycle):
+        first = layer.layers[0]
+        if any((item.bits, len(item.boxes), item.sbox) != (first.bits, len(first.boxes), first.sbox) for item in layer.layers):
+            raise ToolFailure("layers in turn hold one state, one S-box and as many S-boxes each")
+        for item in layer.layers:
+            check(item)
+        return layer
     bits = sbox_bits(layer.sbox)
     taken = [bit for box in layer.boxes for bit in box]
     if any(len(box) != bits for box in layer.boxes) or len(set(taken)) != len(taken) or \
@@ -150,10 +166,12 @@ def cuts(sbox: Tuple[int, ...], kind: str) -> Tuple[Tuple[int, int], ...]:
     return tuple(chosen)
 
 
-def build(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Model:
-    """The model of `rounds` rounds, `floors` holding the count of each shorter span."""
+def build(layer, kind: str, rounds: int, floors: Dict[int, int]) -> Model:
+    """The model of `rounds` steps, `floors` holding the count of each shorter span, which starts at a whole cycle of the layers."""
     check(layer)
-    bits, boxes = layer.bits, len(layer.boxes)
+    layers = layers_of(layer)
+    every = len(layers)
+    bits, boxes = layers[0].bits, len(layers[0].boxes)
     stride = bits + boxes
     columns_of = rounds * stride + bits
     rows: List[int] = []
@@ -176,11 +194,12 @@ def build(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Model
     def active(r: int, box: int) -> int:
         return r * stride + bits + box
 
-    cubes = cuts(layer.sbox, kind)
+    cubes = cuts(layers[0].sbox, kind)
     for r in range(rounds):
-        for index, box in enumerate(layer.boxes):
+        chosen = layers[r % every]
+        for index, box in enumerate(chosen.boxes):
             ins = [state(r, bit) for bit in box]
-            outs = [state(r + 1, layer.permutation[bit]) for bit in box]
+            outs = [state(r + 1, chosen.permutation[bit]) for bit in box]
             for x in ins:
                 add([(active(r, index), 1), (x, -1)], 0)
             add([(x, 1) for x in ins] + [(active(r, index), -1)], 0)
@@ -197,7 +216,7 @@ def build(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Model
                 add(terms, 1 - ones)
     add([(state(0, bit), 1) for bit in range(bits)], 1)
     for span, count in sorted(floors.items()):
-        for start in range(rounds - span + 1):
+        for start in range(0, rounds - span + 1, every):
             add([(active(r, box), 1) for r in range(start, start + span) for box in range(boxes)], count)
     cost = np.zeros(columns_of)
     for r in range(rounds):
@@ -218,25 +237,28 @@ def solve(model: Model, seconds: float, limit: Optional[int] = None):
                 options=dict(SETTINGS, time_limit=seconds))
 
 
-def trail_of(layer: Layer, rounds: int, point: np.ndarray) -> Tuple[int, ...]:
+def trail_of(layer, rounds: int, point: np.ndarray) -> Tuple[int, ...]:
     """The state before each round and after the last, each bit of a solution rounded to a whole number."""
-    stride = layer.bits + len(layer.boxes)
+    first = layers_of(layer)[0]
+    stride = first.bits + len(first.boxes)
     whole = np.rint(point).astype(np.int64)
-    return tuple(sum(int(whole[r * stride + bit]) << bit for bit in range(layer.bits)) for r in range(rounds + 1))
+    return tuple(sum(int(whole[r * stride + bit]) << bit for bit in range(first.bits)) for r in range(rounds + 1))
 
 
-def counted(layer: Layer, kind: str, trail: Sequence[int]) -> int:
+def counted(layer, kind: str, trail: Sequence[int]) -> int:
     """The active S-boxes of a stated trail, in whole numbers, each S-box of each round checked against the table its model was
     built from. A trail that does not hold is a tool failure."""
     if trail[0] == 0:
         raise ToolFailure("a trail starts from a non-zero input")
-    allowed = patterns(layer.sbox, kind)
-    bits = sbox_bits(layer.sbox)
+    layers = layers_of(layer)
+    allowed = patterns(layers[0].sbox, kind)
+    bits = sbox_bits(layers[0].sbox)
     total = 0
-    for before, after in zip(trail, trail[1:]):
-        middle = before_permutation(layer, after)
-        for box in layer.boxes:
-            given, taken = box_values(layer, before, box), box_values(layer, middle, box)
+    for step, (before, after) in enumerate(zip(trail, trail[1:])):
+        chosen = layers[step % len(layers)]
+        middle = before_permutation(chosen, after)
+        for box in chosen.boxes:
+            given, taken = box_values(chosen, before, box), box_values(chosen, middle, box)
             if given | (taken << bits) not in allowed:
                 raise ToolFailure(f"the table refuses {given} to {taken}")
             total += given != 0
@@ -250,7 +272,7 @@ def largest_sum(rounds: int, floors: Dict[int, int]) -> Optional[Tuple[int, int,
     return max(sums) if sums else None
 
 
-def minimum(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Dict:
+def minimum(layer, kind: str, rounds: int, floors: Dict[int, int]) -> Dict:
     """The count over `rounds` rounds, with each status and the trail that holds it (R12). A run stopped at its time limit gives no
     count, and a tool failure's record says `inconclusive` (R7, R12)."""
     model = build(layer, kind, rounds, floors)
@@ -277,13 +299,15 @@ def minimum(layer: Layer, kind: str, rounds: int, floors: Dict[int, int]) -> Dic
     return dict(row, below={"limit": count - 1, "status": int(below.status), "message": str(below.message)})
 
 
-def minima(layer: Layer, kind: str, rounds: int) -> Dict[int, Dict]:
-    """Each r from 1 to `rounds`, each count bounding every span of its size in the counts after it."""
+def minima(layer, kind: str, rounds: int) -> Dict[int, Dict]:
+    """Each r from 1 to `rounds`, each count bounding every span of its size in the counts after it. For layers in turn, r counts whole
+    cycles, since a count over one starts at one."""
+    every = len(layers_of(layer))
     out: Dict[int, Dict] = {}
     floors: Dict[int, int] = {}
     for r in range(1, rounds + 1):
-        out[r] = minimum(layer, kind, r, floors)
-        floors[r] = out[r]["count"]
+        out[r] = minimum(layer, kind, r * every, floors)
+        floors[r * every] = out[r]["count"]
     return out
 
 

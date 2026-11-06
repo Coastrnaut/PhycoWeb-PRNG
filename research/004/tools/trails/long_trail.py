@@ -69,6 +69,16 @@ class Layer(NamedTuple):
     added: Tuple[Optional[int], ...]
 
 
+class Local(NamedTuple):
+    """A layer whose outputs each have a small map of their own, so that a torus of any size has a model. A map names its inputs as
+    (ahead, branch), ahead being 1 for the branch as the next step has it, which a layer of two phases needs, and `relation` holds the
+    pairs (pattern of its inputs, value of its output) that it may take and give."""
+    branches: int
+    source: Tuple[int, ...]
+    added: Tuple[Optional[int], ...]
+    maps: Tuple[Tuple[Tuple[Tuple[int, int], ...], FrozenSet[Tuple[Pattern, int]]], ...]
+
+
 class Model(NamedTuple):
     matrix: object
     low: List[float]
@@ -79,12 +89,47 @@ class Model(NamedTuple):
     outputs: List[List[int]]
 
 
-def outputs_of(layer: Layer) -> int:
+def outputs_of(layer) -> int:
+    if isinstance(layer, Local):
+        return len(layer.maps)
     return len(next(iter(layer.relation))[1])
 
 
-def check(layer: Layer) -> Layer:
+def xor_relation(inputs: int) -> FrozenSet[Tuple[Pattern, int]]:
+    """The output of a sum of bijections of each input: inactive where no input is active, active where one is, and free where two or
+    more may cancel."""
+    out = set()
+    for pattern in itertools.product((0, 1), repeat=inputs):
+        active = sum(pattern)
+        out.update((pattern, value) for value in ((0,) if active == 0 else (1,) if active == 1 else (0, 1)))
+    return frozenset(out)
+
+
+def check_local(layer: Local) -> Local:
+    """Every branch goes on into exactly one, each output reaches at most one branch, and a map that reads ahead reads a branch whose own
+    output comes before it, so that the layer's phases have an order."""
+    if sorted(layer.source) != list(range(layer.branches)) or len(layer.added) != layer.branches:
+        raise ToolFailure("each branch goes on into exactly one branch of the next step, with one added output named")
+    named = [item for item in layer.added if item is not None]
+    if len(set(named)) != len(named) or not all(0 <= item < len(layer.maps) for item in named):
+        raise ToolFailure("an output reaches at most one branch, and only outputs that exist are named")
+    for number, (inputs, relation) in enumerate(layer.maps):
+        for ahead, branch in inputs:
+            if not 0 <= branch < layer.branches or ahead not in (0, 1):
+                raise ToolFailure(f"map {number} reads what no step holds: {(ahead, branch)}")
+            if ahead and (layer.added[branch] is None or layer.added[branch] >= number):
+                raise ToolFailure(f"map {number} reads ahead a branch that no earlier map reaches: {branch}")
+        if any(len(given) != len(inputs) or value not in (0, 1) for given, value in relation):
+            raise ToolFailure(f"map {number}: a pattern holds one place per input and one output")
+        if ((0,) * len(inputs), 0) not in relation:
+            raise ToolFailure(f"map {number}: no input gives no output")
+    return layer
+
+
+def check(layer):
     """A layer in which every branch goes on into exactly one, each output named exists, and no input gives no output but nothing."""
+    if isinstance(layer, Local):
+        return check_local(layer)
     if sorted(layer.source) != list(range(layer.branches)):
         raise ToolFailure("each branch goes on into exactly one branch of the next step")
     if len(layer.added) != layer.branches or not all(0 <= bit < layer.branches for bit in layer.fed):
@@ -128,7 +173,16 @@ def chain_costs(box: Sequence[int], longest: int) -> Tuple[int, ...]:
     return tuple(costs)
 
 
-def build(layer: Layer, costs: Sequence[int], rounds: int, floors: Dict[int, int]) -> Model:
+def cuts_of(layer, active: List[List[int]], outputs: List[List[int]], r: int) -> List[Tuple[List[int], FrozenSet[Pattern]]]:
+    """The binaries of each map after step r, with the patterns that they may hold."""
+    if isinstance(layer, Local):
+        return [([active[r + ahead][branch] for ahead, branch in inputs] + [outputs[r][number]],
+                 frozenset(given + (value,) for given, value in relation))
+                for number, (inputs, relation) in enumerate(layer.maps)]
+    return [([active[r][b] for b in layer.fed] + outputs[r], frozenset(given + taken for given, taken in layer.relation))]
+
+
+def build(layer, costs: Sequence[int], rounds: int, floors: Dict[int, int]) -> Model:
     """The model of `rounds` steps, `floors` holding the count of each shorter span."""
     check(layer)
     width = outputs_of(layer)
@@ -159,12 +213,11 @@ def build(layer: Layer, costs: Sequence[int], rounds: int, floors: Dict[int, int
         add([(active[r][b], 1) for b in range(layer.branches)], 1)
         for b in range(layer.branches):
             add([(name, 1) for name in places[r][b].values()] + [(active[r][b], -1)], 0, 0)
-    fed = len(layer.fed)
     for r in range(rounds - 1):
-        names = [active[r][b] for b in layer.fed] + outputs[r]
-        for pair in itertools.product((0, 1), repeat=fed + width):
-            if (pair[:fed], pair[fed:]) not in layer.relation:
-                add([(name, -1 if bit else 1) for name, bit in zip(names, pair)], 1 - sum(pair))
+        for names, allowed in cuts_of(layer, active, outputs, r):
+            for pair in itertools.product((0, 1), repeat=len(names)):
+                if pair not in allowed:
+                    add([(name, -1 if bit else 1) for name, bit in zip(names, pair)], 1 - sum(pair))
         for j in range(layer.branches):
             came, reached, added = active[r][layer.source[j]], active[r + 1][j], layer.added[j]
             before, after = places[r][layer.source[j]], places[r + 1][j]
@@ -214,7 +267,14 @@ def trail_of(model: Model, point: np.ndarray) -> Tuple[Tuple[Pattern, ...], Tupl
             tuple(tuple(int(whole[name]) for name in row) for row in model.outputs))
 
 
-def held(layer: Layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> None:
+def map_holds(layer, before: Pattern, after: Pattern, mixed: Pattern) -> bool:
+    if isinstance(layer, Local):
+        return all((tuple((after if ahead else before)[branch] for ahead, branch in inputs), mixed[number]) in relation
+                   for number, (inputs, relation) in enumerate(layer.maps))
+    return (tuple(before[b] for b in layer.fed), mixed) in layer.relation
+
+
+def held(layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> None:
     """A stated truncated trail, in whole numbers, against the tables of the layer, or a tool failure."""
     if len(outputs) != len(steps) - 1:
         raise ToolFailure("a trail states the map's outputs after each step but the last")
@@ -222,7 +282,7 @@ def held(layer: Layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> 
         if not any(step):
             raise ToolFailure(f"step {r} holds no active branch")
     for r, (before, after, mixed) in enumerate(zip(steps, steps[1:], outputs)):
-        if (tuple(before[b] for b in layer.fed), mixed) not in layer.relation:
+        if not map_holds(layer, before, after, mixed):
             raise ToolFailure(f"the map may not give {mixed} after step {r}")
         for j in range(layer.branches):
             came, reached = before[layer.source[j]], after[j]
@@ -231,7 +291,7 @@ def held(layer: Layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> 
                 raise ToolFailure(f"branch {j} of step {r + 1} cannot be {reached} from {came} with {added} added")
 
 
-def chain_lengths(layer: Layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> Tuple[int, ...]:
+def chain_lengths(layer, steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> Tuple[int, ...]:
     """The length of each chain of a stated truncated trail, sorted."""
     alive = {b: 1 for b in range(layer.branches) if steps[0][b]}
     ended: List[int] = []
@@ -248,7 +308,7 @@ def chain_lengths(layer: Layer, steps: Sequence[Pattern], outputs: Sequence[Patt
     return tuple(sorted(ended + list(alive.values())))
 
 
-def counted(layer: Layer, costs: Sequence[int], steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> int:
+def counted(layer, costs: Sequence[int], steps: Sequence[Pattern], outputs: Sequence[Pattern]) -> int:
     """The cost of a stated truncated trail in whole numbers, over its chains, once it has been checked against the layer's tables."""
     held(layer, steps, outputs)
     return sum(costs[length] for length in chain_lengths(layer, steps, outputs))
@@ -265,7 +325,7 @@ def text_of(patterns: Sequence[Pattern]) -> List[str]:
     return ["".join(str(bit) for bit in pattern) for pattern in patterns]
 
 
-def minimum(layer: Layer, costs: Sequence[int], rounds: int, floors: Dict[int, int]) -> Dict:
+def minimum(layer, costs: Sequence[int], rounds: int, floors: Dict[int, int]) -> Dict:
     """The count over `rounds` steps, with each status and the trail that holds it (R12). A run stopped at its time limit gives no count,
     and a tool failure's record says `inconclusive` (R7, R12)."""
     model = build(layer, costs, rounds, floors)
@@ -292,7 +352,7 @@ def minimum(layer: Layer, costs: Sequence[int], rounds: int, floors: Dict[int, i
     return dict(row, below={"limit": count - 1, "status": int(below.status), "message": str(below.message)})
 
 
-def minima(layer: Layer, box: Sequence[int], rounds: int) -> Dict[int, Dict]:
+def minima(layer, box: Sequence[int], rounds: int) -> Dict[int, Dict]:
     """Each r from 1 to `rounds`, each count bounding every span of its size in the counts after it."""
     costs = chain_costs(box, rounds)
     out: Dict[int, Dict] = {}

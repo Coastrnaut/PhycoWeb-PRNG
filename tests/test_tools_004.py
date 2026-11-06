@@ -3082,6 +3082,62 @@ class ActiveSbox(unittest.TestCase):
             out[r] = min(best.values())
         return out
 
+    def cycle(self):
+        sbox = (0xC, 5, 6, 0xB, 9, 0, 0xA, 0xD, 3, 0xE, 0xF, 8, 4, 7, 1, 2)
+        first = self.tool.spn(sbox, 2, (4, 1, 6, 3, 0, 5, 2, 7))
+        second = self.tool.spn(sbox, 2, (0, 5, 2, 7, 4, 1, 6, 3))
+        return self.tool.Cycle((first, second)), sbox
+
+    def test_layers_in_turn_are_walked_in_turn(self):
+        cycle, _ = self.cycle()
+        for kind in ("differential", "linear"):
+            allowed = self.tool.patterns(cycle.layers[0].sbox, kind)
+
+            def through(layer, state):
+                options = {0: 0}
+                for box in layer.boxes:
+                    value = sum(((state >> bit) & 1) << place for place, bit in enumerate(box))
+                    chosen = {}
+                    for held, cost in options.items():
+                        for out in range(16):
+                            if value | (out << 4) in allowed:
+                                spread = sum(((out >> place) & 1) << bit for place, bit in enumerate(box))
+                                total = cost + (1 if value else 0)
+                                if total < chosen.get(held | spread, 1 << 30):
+                                    chosen[held | spread] = total
+                    options = chosen
+                return options
+
+            best = {state: 0 for state in range(1, 256)}
+            wanted = {}
+            for step in range(1, 7):
+                layer = cycle.layers[(step - 1) % 2]
+                new = {}
+                for state, cost in best.items():
+                    for after, extra in through(layer, state).items():
+                        moved = sum(((after >> i) & 1) << layer.permutation[i] for i in range(8))
+                        if cost + extra < new.get(moved, 1 << 30):
+                            new[moved] = cost + extra
+                best = new
+                if step % 2 == 0:
+                    wanted[step // 2] = min(best.values())
+            found = self.tool.minima(cycle, kind, 3)
+            self.assertEqual({r: row["count"] for r, row in found.items()}, wanted, kind)
+
+    def test_a_cycle_holds_one_state_and_one_s_box(self):
+        cycle, sbox = self.cycle()
+        other = self.tool.spn(sbox, 1, (0, 1, 2, 3))
+        with self.assertRaisesRegex(evidence.ToolFailure, "in turn"):
+            self.tool.check(self.tool.Cycle((cycle.layers[0], other)))
+
+    def test_the_exhaustive_count_agrees_with_the_counter_on_layers_in_turn(self):
+        tables = tables_module()
+        cycle, sbox = self.cycle()
+        layers = [(layer.boxes, layer.permutation) for layer in cycle.layers]
+        for kind in ("differential", "linear"):
+            found = self.tool.minima(cycle, kind, 2)
+            self.assertEqual(tables.layers_minimum(sbox, layers, kind, 2), {r: row["count"] for r, row in found.items()}, kind)
+
     def test_the_patterns_of_differences_are_the_table(self):
         allowed = self.tool.patterns(PRESENT_SBOX, "differential")
         for a in range(16):
@@ -4176,6 +4232,49 @@ def long_trail_module():
     return long_trail
 
 
+def plain_local_minimum(layer, costs, rounds):
+    """The least cost of a local layer's trails, by a walk over states of chain lengths that shares nothing with the model.
+    The maps run in order, since a map may read a branch as the next step has it."""
+    owner = {output: j for j, output in enumerate(layer.added) if output is not None}
+
+    def walk(state, number, after):
+        if number == len(layer.maps):
+            yield tuple(after)
+            return
+        inputs, relation = layer.maps[number]
+        given = tuple(1 if (after[branch] if ahead else state[branch]) else 0 for ahead, branch in inputs)
+        for pattern, value in relation:
+            if pattern != given:
+                continue
+            j = owner.get(number)
+            if j is None:
+                yield from walk(state, number + 1, after)
+                continue
+            mine = state[layer.source[j]]
+            options = ((mine + 1,) if mine else (0,)) if not value else ((0, 1) if mine else (1,))
+            for option in options:
+                yield from walk(state, number + 1, after[:j] + [option] + after[j + 1:])
+
+    states = {}
+    for pattern in itertools.product((0, 1), repeat=layer.branches):
+        if any(pattern):
+            states[pattern] = sum(pattern) * costs[1]
+    found = {1: min(states.values())}
+    for r in range(2, rounds + 1):
+        following = {}
+        for state, cost in states.items():
+            start = [state[layer.source[j]] + 1 if state[layer.source[j]] and layer.added[j] is None else 0
+                     for j in range(layer.branches)]
+            for grown in walk(state, 0, start):
+                if any(grown):
+                    total = cost + sum(costs[length] - costs[length - 1] for length in grown if length)
+                    if following.get(grown, 1 << 30) > total:
+                        following[grown] = total
+        states = following
+        found[r] = min(states.values())
+    return found
+
+
 def plain_long_trail_minimum(layer, costs, rounds):
     """The least cost of a layer's trails, by a walk over states of chain lengths that shares nothing with the model. Each branch of the next
     step is a copy of its source, with one added output: nothing added carries a chain on, and an active output ends it, the branch either
@@ -4564,6 +4663,85 @@ class LongTrail(unittest.TestCase):
             costs = self.tool.chain_costs(box, 4)
             found = self.tool.minima(layer, box, 4)
             self.assertEqual({r: row["count"] for r, row in found.items()}, plain_long_trail_minimum(layer, costs, 4), (layer, box))
+
+    def ring(self, branches=4):
+        """Even branches gain from their two neighbours, and odd ones from theirs as the next step has them."""
+        maps, added = [], [None] * branches
+        for start in (0, 1):
+            for j in range(start, branches, 2):
+                added[j] = len(maps)
+                inputs = ((start, (j - 1) % branches), (start, (j + 1) % branches))
+                maps.append((inputs, self.tool.xor_relation(2)))
+        return self.tool.check(self.tool.Local(branches, tuple(range(branches)), tuple(added), tuple(maps)))
+
+    def test_a_sum_is_inactive_active_or_free(self):
+        relation = self.tool.xor_relation(2)
+        self.assertEqual(relation, frozenset({((0, 0), 0), ((0, 1), 1), ((1, 0), 1), ((1, 1), 0), ((1, 1), 1)}))
+        self.assertEqual(self.tool.xor_relation(1), frozenset({((0,), 0), ((1,), 1)}))
+
+    def test_a_local_layer_counts_as_the_same_layer_written_whole(self):
+        """Feistel's one branch and one output, as a map of its own."""
+        for kind, added, inputs in (("differential", (0, None), ((0, 0),)), ("linear", (None, 0), ((0, 1),))):
+            local = self.tool.check(self.tool.Local(2, (1, 0), added, ((inputs, self.tool.xor_relation(1)),)))
+            whole = self.tool.feistel(1, kind, frozenset({((0,), (0,)), ((1,), (1,))}))
+            for box in ((5, 24), (3, 12), (0, 6)):
+                self.assertEqual({r: row["count"] for r, row in self.tool.minima(local, box, 6).items()},
+                                 {r: row["count"] for r, row in self.tool.minima(whole, box, 6).items()}, (kind, box))
+
+    def test_the_minimum_of_a_local_layer_is_a_walk(self):
+        for branches, rounds in ((4, 4), (6, 3)):
+            layer = self.ring(branches)
+            for box in ((6, 32, 52), (5, 24), (2, 17), (1,)):
+                costs = self.tool.chain_costs(box, rounds)
+                found = self.tool.minima(layer, box, rounds)
+                self.assertEqual({r: row["count"] for r, row in found.items()}, plain_local_minimum(layer, costs, rounds),
+                                 (branches, box))
+
+    def test_the_minimum_is_a_walk_on_seeded_local_layers(self):
+        rng = np.random.default_rng(78)
+        for _ in range(20):
+            branches = 4
+            order = [int(b) for b in rng.permutation(branches)]
+            maps, added, done = [], [None] * branches, []
+            for j in order[:int(rng.integers(1, branches + 1))]:
+                others = [b for b in range(branches) if b != j]
+                inputs = []
+                for b in rng.permutation(others)[:int(rng.integers(1, 3))]:
+                    inputs.append((1 if int(b) in done else 0, int(b)))
+                added[j] = len(maps)
+                maps.append((tuple(inputs), self.tool.xor_relation(len(inputs))))
+                done.append(j)
+            source = tuple(int(b) for b in rng.permutation(branches))
+            layer = self.tool.check(self.tool.Local(branches, source, tuple(added), tuple(maps)))
+            box = tuple(sorted(int(v) for v in rng.integers(0, 40, size=int(rng.integers(1, 4)))))
+            found = self.tool.minima(layer, box, 3)
+            self.assertEqual({r: row["count"] for r, row in found.items()},
+                             plain_local_minimum(layer, self.tool.chain_costs(box, 3), 3), (layer, box))
+
+    def test_each_trail_of_a_local_count_holds_at_its_count(self):
+        layer = self.ring(4)
+        costs = self.tool.chain_costs((5, 24), 3)
+        for r, row in self.tool.minima(layer, (5, 24), 3).items():
+            steps = [tuple(int(bit) for bit in step) for step in row["steps"]]
+            outputs = [tuple(int(bit) for bit in step) for step in row["outputs"]]
+            self.assertEqual(self.tool.counted(layer, costs, steps, outputs), row["count"], r)
+
+    def test_a_stated_trail_that_breaks_a_local_map_is_a_tool_failure(self):
+        layer = self.ring(4)
+        with self.assertRaisesRegex(evidence.ToolFailure, "may not give"):
+            self.tool.held(layer, ((1, 0, 0, 0), (1, 1, 0, 1)), ((0, 0, 0, 0),))
+
+    def test_what_a_local_layer_refuses(self):
+        one = ((((0, 1),), self.tool.xor_relation(1)),)
+        relation = self.tool.xor_relation(1)
+        for layer, text in ((self.tool.Local(2, (0, 0), (0, None), one), "exactly one"),
+                            (self.tool.Local(2, (0, 1), (0, 0), one), "at most one"),
+                            (self.tool.Local(2, (0, 1), (5, None), one), "at most one"),
+                            (self.tool.Local(2, (0, 1), (0, None), (((((0, 9),), relation),))), "no step"),
+                            (self.tool.Local(2, (0, 1), (0, None), (((((1, 1),), relation),))), "ahead"),
+                            (self.tool.Local(2, (0, 1), (0, None), (((((0, 1),), frozenset({((0,), 1), ((1,), 1)})),))), "no input")):
+            with self.assertRaisesRegex(evidence.ToolFailure, text):
+                self.tool.check(layer)
 
     def test_each_trail_of_a_real_count_holds_at_its_count(self):
         for kind in ("differential", "linear"):
