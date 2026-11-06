@@ -1,0 +1,180 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "present-tables is re-found",
+      "holds": true
+    }
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "431bebc928f9af047ac13eb93b7c4fec54cd5cb73744c7cb8c352c432c4286c2"
+    },
+    "research/004/tools/trails/tables.py": {
+      "kind": "raw",
+      "sha256": "aa2b060fd7153d2b0ade6b45a8f55825ed9f55ccb7c5d392c1e28f06faa5863f"
+    },
+    "research/004/validation/present-tables-second.py": {
+      "kind": "raw",
+      "sha256": "37c249577c5179c9021cd81aedac1e13e5950aedec09df948ebedf2ed8012658"
+    },
+    "research/004/validation/present-tables.py": {
+      "kind": "raw",
+      "sha256": "66dce27411a324ec195e4da557c0c9306a3b4efd82b16c36c05428a850f3b46a"
+    },
+    "scripts/validate_tool.py": {
+      "kind": "raw",
+      "sha256": "926565e3adfe64e47300d13891711832268d6da26630fd5d30db963d34e1bbde"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/validate_tool.py --tool 'exhaustive tables' --known present-tables --out-dir reports/004-crypto-architecture-v3/validation",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-06T01:22:15Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [
+    "scripts/evidence_v3.py"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "found": {
+    "present-tables": {
+      "difference_differing": 0,
+      "difference_entries": 256,
+      "difference_sha256": "e9ec2515d96f8ab10deedd8465ada53951e4a9a5e05f8cb0c3c89f24b478552a",
+      "linear_differing": 0,
+      "linear_entries": 225,
+      "linear_sha256": "de36193c549b91f2b9649f351a63e1ff99d95ff64c86129ed227bc3681cb4243"
+    }
+  },
+  "git_dirty": true,
+  "git_head": "1b8c61016275ea0e13bab43d4450cf83bc55e44a",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "validation",
+  "known_result": {
+    "known_id": "present-tables",
+    "path": "research/004/validation/present-tables.py",
+    "provenance_seq": 164,
+    "sha256": "66dce27411a324ec195e4da557c0c9306a3b4efd82b16c36c05428a850f3b46a",
+    "sha256_kind": "raw",
+    "value": "every entry: the 256 of the difference table and the 225 of the linear table"
+  },
+  "licence": "GPL-3.0, this repository",
+  "limitations": [],
+  "model_id": null,
+  "outcome": "re-found",
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "780564809a20545c175dd0187bb496a90e7d93080f7061e28e9676929112428c",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 519,
+  "record_id": "validation-20261106T012215Z-d1e65399",
+  "research_sha256": "63655adb8bbbf0e8a7d8eab6aaf897205b77ae52a0afa6a9437979a533f87ea4",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "second_known_result": {
+    "known_id": "present-tables-second",
+    "path": "research/004/validation/present-tables-second.py",
+    "provenance_seq": 165,
+    "sha256": "37c249577c5179c9021cd81aedac1e13e5950aedec09df948ebedf2ed8012658",
+    "sha256_kind": "raw"
+  },
+  "source": {
+    "entries": [
+      {
+        "entry": "408.pdf",
+        "sha256": "4ce6efc9e712f422b6f0fbe523968b1523fc494beac89d29eeeb84ddb156a2e3"
+      },
+      {
+        "entry": "978-3-642-05445-7_16.pdf",
+        "sha256": "7fcb93d257f6acd854aa07346e507d12d126b42b3cb3f571fb59941debf4815b"
+      }
+    ],
+    "paper": "Wang, Differential Cryptanalysis of PRESENT, ePrint 2007/408; Ohkuma, Weak Keys of Reduced-Round PRESENT for Linear Cryptanalysis, SAC 2009",
+    "table": "Wang, Table 3; Ohkuma, Table 2",
+    "value": "every entry: the 256 of the difference table and the 225 of the linear table"
+  },
+  "spec_sha256": "77122dc34d256b03668426672c23ada3a34b5eef1f01b8b8faa235642c95f3a8",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "tool": "exhaustive tables",
+  "tool_sha256": "aa2b060fd7153d2b0ade6b45a8f55825ed9f55ccb7c5d392c1e28f06faa5863f",
+  "validated_kind": {
+    "present-tables": {
+      "model": "exhaustive tables, and an exhaustive search over a box's internal trails on tables of its operations",
+      "operations": "a lookup of up to 16 bits: a 4-bit S-box, or a box of two words of w bits, of addition, subtraction, xor and rotations",
+      "uses": [
+        {
+          "covered_by": [
+            "present-tables"
+          ],
+          "use": "the tables of a 4-bit S-box or of a Boolean candidate's nonlinear layer at w = 4"
+        },
+        {
+          "covered_by": [
+            "box-tables"
+          ],
+          "use": "the tables and the floor of a box of 8 bits at w = 4"
+        },
+        {
+          "covered_by": [
+            "box-tables"
+          ],
+          "use": "the tables and the floor of a box of 16 bits at w = 8"
+        },
+        {
+          "covered_by": [
+            "internal-trails"
+          ],
+          "use": "the search over a box's internal trails at w = 4, in the cross-checks between kinds"
+        }
+      ],
+      "widths": [
+        4,
+        8
+      ]
+    }
+  },
+  "variant_id": null,
+  "version": "aa2b060fd7153d2b0ade6b45a8f55825ed9f55ccb7c5d392c1e28f06faa5863f",
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
