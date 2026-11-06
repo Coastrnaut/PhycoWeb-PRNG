@@ -110,7 +110,7 @@ def check_demonstration(record: Dict, v: ModuleType) -> Dict:
 
 
 def check_validation(record: Dict, v: ModuleType) -> Dict:
-    held = all(row["re_found"] for row in record["found"].values())
+    held = all(item["holds"] for item in record["assertions"])
     return {"status": "pass" if held else "fail", "outcome": "re-found" if held else "not re-found", "classification": NONE}
 
 

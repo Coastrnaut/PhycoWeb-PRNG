@@ -4880,9 +4880,9 @@ class Recheck(TempRepo):
         self.assertTrue(self.found(dict(record, r_f=4)))
 
     def test_a_validation_reads_each_known_result(self):
-        record = self.record("validation", "validation", found={"k": {"re_found": True}}, outcome="re-found")
+        record = self.record("validation", "validation", assertions=[{"assertion": "k is re-found", "holds": True}], outcome="re-found")
         self.assertEqual(self.found(record), [])
-        self.assertTrue(self.found(dict(record, found={"k": {"re_found": False}})))
+        self.assertTrue(self.found(dict(record, assertions=[{"assertion": "k is re-found", "holds": False}])))
 
     def test_a_count_stands_on_its_infeasible_run_or_its_sum(self):
         rows = {"1": {"status": 0, "count": 5, "below": {"status": 2}}, "2": {"status": 0, "count": 10, "sum_of": [1, 1]}}
@@ -4975,7 +4975,7 @@ class Recheck(TempRepo):
         self.assertEqual(record["disagreements"][0]["field"], "status")
 
     def test_it_runs_outside_the_environment_of_the_records(self):
-        with mock.patch.object(evidence, "snapshot", return_value={"platform": "elsewhere"}), \
+        with mock.patch.object(evidence, "snapshot", return_value=dict(SNAPSHOT, python="3.14.4")), \
                 mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
             self.assertEqual(self.script.main(["--kind", "inverse"]), 0)
 
