@@ -8,6 +8,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import unittest
 from fractions import Fraction
 from pathlib import Path
@@ -4809,6 +4810,187 @@ class Selection(RuleRecords):
         entries = candidates.of_event(candidates.entries(), "decision")
         self.assertEqual([entry["decision"] for entry in entries], ["selected", "selected"])
         self.assertEqual(entries[-1]["variant_map"]["cand-A1/n8-w32-R18-c384"], "phyco-v3/n8-w32-R18-c384")
+
+
+class Recheck(TempRepo):
+    """scripts/recheck_004.py on stated records, each with the fields its kind's verdict reads (T086)."""
+
+    def setUp(self):
+        super().setUp()
+        self.script = rule_script("recheck_004")
+        for rel in self.script.CODE:
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        self.commit("the code")
+        self.head = evidence.head()
+        self.number = 0
+        self.script_verdicts = self.script.Verdicts()
+        self.addCleanup(self.script_verdicts.close)
+
+    def record(self, kind: str, directory: str = "candidates/cand-A1", **fields) -> Dict:
+        self.number += 1
+        body = {"kind": kind, "record_id": f"{kind}-{self.number}", "status": "pass", "classification": NONE, "git_head": self.head,
+                "ended_outside": NONE, "created_utc": f"2026-11-05T00:{self.number:02d}:00Z", "config": {"size": 4, "width": 32, "rounds": 8},
+                "limitations": []}
+        body.update(fields)
+        write(self.root, f"{evidence.REP_REL}/{directory}/{body['record_id']}.json", evidence.pretty(body))
+        return body
+
+    def found(self, record: Dict) -> List[Dict]:
+        return self.script.differences(record, self.script.CHECKS[record["kind"]](record, self.script_verdicts.at(self.head)))
+
+    def test_it_imports_only_the_standard_library_and_protocol(self):
+        tree = ast.parse((ROOT / "scripts/recheck_004.py").read_text(encoding="utf-8"))
+        allowed = set(sys.stdlib_module_names) | {"protocol"}
+        for node in ast.walk(tree):
+            names = [alias.name for alias in node.names] if isinstance(node, ast.Import) else \
+                [node.module] if isinstance(node, ast.ImportFrom) else []
+            for name in names:
+                self.assertIn(name.split(".")[0], allowed, name)
+        tree = ast.parse((ROOT / "protocol/rules.py").read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                self.assertIn(node.module.split(".")[0], allowed, node.module)
+
+    def test_each_kinds_verdict_again_and_a_changed_field_is_a_disagreement(self):
+        low, high = 10, 90
+        rows = {"s": {"forward": [[0, 95], [20, 80]], "inverse": [[20, 80], [20, 80]]}}
+        for kind, fields, changed in (
+                ("inverse", {"mismatches": {"a": 0, "b": 0}}, {"status": "fail"}),
+                ("inverse", {"mismatches": {"a": 1, "b": 0}, "status": "fail", "classification": "confirmed vulnerability"}, {"status": "pass"}),
+                ("bijectivity", {"inputs": 16, "ones": 16}, {"status": "fail"}),
+                ("frequency", {"summaries": rows, "test_parameters": {"critical": [low, high]}, "rounds_fired": [1], "raises": [],
+                               "classification": "confirmed vulnerability"}, {"rounds_fired": [2]}),
+                ("symmetry", {"fixed": {"a": 0}, "word_rotations": {}, "composed": {}, "relations": {"equal": 0}}, {"fixed": {"a": 2}}),
+                ("invariant", {"round_counts": {"1": {"kept": [], "above_chance": []}}, "differences": {}, "rounds_fired": []},
+                 {"round_counts": {"1": {"kept": ["f"], "above_chance": []}}}),
+                ("degree", {"rounds_within_limit": {"forward": [1], "inverse": []}, "inside_out": None, "rounds_fired": [1],
+                            "classification": "strong theoretical concern"}, {"rounds_fired": []}),
+                ("cross-check", {"rows": [{"equal": True, "above_floor": True}]}, {"rows": [{"equal": False}]}),
+                ("control", {"summaries": {"first set": [20, 80]}, "test_parameters": {"critical": [low, high]}, "fires": False},
+                 {"summaries": {"first set": [5, 80]}})):
+            with self.subTest(kind=kind, fields=sorted(fields)):
+                record = self.record(kind, **fields)
+                self.assertEqual(self.found(record), [])
+                self.assertTrue(self.found(dict(record, **changed)))
+
+    def test_dependency_rounds_come_from_the_per_round_counts(self):
+        report = {"forward": {"first_full": 3, "pairs_without_dependency": [9, 2, 0]}, "inverse": {"first_full": 2, "pairs_without_dependency": [4, 0]}}
+        record = self.record("dependency", per_round=report, r_f=3, r_b=2, incomplete_rounds=2, classification="confirmed vulnerability")
+        self.assertEqual(self.found(record), [])
+        self.assertTrue(self.found(dict(record, r_f=4)))
+
+    def test_a_validation_reads_each_known_result(self):
+        record = self.record("validation", "validation", found={"k": {"re_found": True}}, outcome="re-found")
+        self.assertEqual(self.found(record), [])
+        self.assertTrue(self.found(dict(record, found={"k": {"re_found": False}})))
+
+    def test_a_count_stands_on_its_infeasible_run_or_its_sum(self):
+        rows = {"1": {"status": 0, "count": 5, "below": {"status": 2}}, "2": {"status": 0, "count": 10, "sum_of": [1, 1]}}
+        record = self.record("bound", method="active-box count", rounds=2, bound_kind="linear", counts=rows, bound="10",
+                             classification=evidence.classify("bound", "established"))
+        self.assertEqual(self.found(record), [])
+        self.assertTrue(self.found(dict(record, bound="15")))
+        worse = dict(rows, **{"2": {"status": 0, "count": 10, "below": {"status": 1}}})
+        self.assertTrue(self.found(dict(record, counts=worse)))
+
+    def test_a_box_bound_keeps_its_doubled_exponent(self):
+        record = self.record("bound", method="branch-and-bound", rounds=1, bound_kind="linear", bound="262144/65536",
+                             boxes={"box 0": {"weights": {"1": 2}}, "box 1": {"weights": {"1": 3}}},
+                             classification=evidence.classify("bound", "established"))
+        self.assertEqual(self.found(record), [])
+
+    def test_a_capped_search_keeps_status_inconclusive_and_no_bound(self):
+        record = self.record("bound", status="inconclusive", capped=True, bound=NONE, method="active-box count", rounds=2)
+        self.assertEqual(self.found(record), [])
+
+    def test_the_d4_arithmetic_again(self):
+        candidates.propose({"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": self.module("cand-A1"), "parameters": self.parameters()})
+        candidates.propose({"candidate_id": "cand-B1", "family": "Boolean", "oplist_sha256": self.module("cand-B1"), "parameters": self.parameters()})
+        rows = {"cand-A1": {"W_D": "24", "W_L": "20", "luts": "160", "score": str(Fraction(10, 160))},
+                "cand-B1": {"W_D": "16", "W_L": "16", "luts": "128", "score": str(Fraction(8, 128))}}
+        record = self.record("d4-choice", "d4", scored=rows, r_star=2, outcome="tie", chosen_family=NONE,
+                             representatives={"ARX": "cand-A1", "Boolean": "cand-B1"})
+        self.assertEqual(self.found(record), [])
+        self.assertTrue(self.found(dict(record, outcome="chosen")))
+
+    def module(self, candidate: str) -> str:
+        write(self.root, candidates.module_rel(candidate), "# the list\n")
+        self.commit(f"the list of {candidate}")
+        return evidence.sha256(b"# the list\n")
+
+    def parameters(self) -> Dict:
+        return {name: "stated" for name in candidates.PARAMETERS}
+
+    def test_the_selection_again(self):
+        record = self.record("selection", "freeze", R_at_4x4={"cand-A1": 12, "cand-B1": 10}, selected="cand-B1")
+        self.assertEqual(self.found(record), [])
+        self.assertTrue(self.found(dict(record, selected="cand-A1")))
+        tied = self.record("selection", "freeze", R_at_4x4={"cand-A1": 12, "cand-B1": 12}, outcome="tie", tie=["cand-A1", "cand-B1"])
+        self.assertEqual(self.found(tied), [])
+
+    def test_the_round_rule_again_from_the_records_that_stood_then(self):
+        self.record("dependency", per_round={}, r_f=4, r_b=5, incomplete_rounds=4)
+        late = self.record("round-rule", candidate="cand-A1", sizes={"4": {"R_f": 4, "R_b": 5, "R_bound": None, "R_dist": 4, "R": None}})
+        self.record("dependency", per_round={}, r_f=6, r_b=7, incomplete_rounds=6)
+        self.assertEqual(self.found(late), [])
+        self.assertTrue(self.found(dict(late, sizes={"4": {"R_f": 4, "R_b": 5, "R_bound": None, "R_dist": 9, "R": None}})))
+
+    def dead_run(self, record_fields: Dict, hours: float) -> Dict:
+        record = self.record("frequency", status="inconclusive", code_sha256={"scripts/clear_lock.py": {}}, created_utc="2026-11-05T02:00:00Z",
+                             hours={"projected": 1.0, "used": hours}, **record_fields)
+        self.record("lock-cleared", "locks", lock={"time": "2026-11-05T00:30:00Z"}, run_record={"record_id": record["record_id"]})
+        return record
+
+    def test_a_record_clear_lock_wrote_holds_no_output_and_is_no_disagreement(self):
+        record = self.dead_run({}, 1.5)
+        self.assertEqual(self.script.check_cleared(record), [])
+
+    def test_its_status_class_and_hours_are_checked_against_the_lock(self):
+        record = self.dead_run({}, 1.25)
+        self.assertEqual(self.script.check_cleared(record)[0]["field"], "hours")
+        self.assertEqual(self.script.check_cleared(dict(record, hours={"used": 1.5}, status="pass"))[0]["field"], "status")
+        self.assertEqual(self.script.check_cleared(dict(record, record_id="none"))[-1]["field"], "lock-cleared")
+
+    def test_a_run_ended_from_outside_counts_up_to_the_boot_time(self):
+        record = self.dead_run({"ended_outside": "2026-11-05T01:30:00Z"}, 1.0)
+        self.assertEqual(self.script.check_cleared(record), [])
+
+    def test_a_clear_run_writes_its_record_and_exits_0(self):
+        self.record("inverse", mismatches={"a": 0})
+        self.commit("the record")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=["numpy==2.2.6"]):
+            self.assertEqual(self.script.main([]), 0)
+        record = [item for _, item in evidence.iter_records("recheck", "rechecks")][0]
+        self.assertEqual(record["results"]["inverse"]["checked"], 1)
+        self.assertEqual(record["environment_of_the_run"]["pip_freeze"], ["numpy==2.2.6"])
+        self.assertEqual(record["disagreements"], [])
+
+    def test_a_disagreement_exits_1_blocks_and_is_a_finding(self):
+        self.record("inverse", mismatches={"a": 1})
+        self.commit("the record")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
+            self.assertEqual(self.script.main(["--kind", "inverse"]), 1)
+        record = [item for _, item in evidence.iter_records("recheck", "rechecks")][0]
+        self.assertEqual((record["status"], record["classification"]), ("blocked", "unverified hypothesis"))
+        self.assertEqual(record["disagreements"][0]["field"], "status")
+
+    def test_it_runs_outside_the_environment_of_the_records(self):
+        with mock.patch.object(evidence, "snapshot", return_value={"platform": "elsewhere"}), \
+                mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
+            self.assertEqual(self.script.main(["--kind", "inverse"]), 0)
+
+    def test_a_replaced_list_that_changed_is_a_disagreement(self):
+        write(self.root, evidence.SUPERSEDED_REL, json.dumps({"0" * 64: "research/004/candidates/cand-A1/superseded/x.py"}))
+        self.assertEqual(self.script.logs_checked()[0]["field"], "superseded")
+
+    def test_a_reproduction_of_a_recheck_runs_anywhere_and_matches(self):
+        self.record("inverse", mismatches={"a": 0})
+        self.commit("the record")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
+            self.assertEqual(self.script.main(["--kind", "inverse"]), 0)
+            self.commit("the re-check")
+            path, _ = next(iter(evidence.iter_records("recheck", "rechecks")))
+            self.assertEqual(self.script.main(["--reproduce", str(path)]), 0)
 
 
 class ClearLock(TempRepo):
