@@ -1885,6 +1885,11 @@ def verdict_cross_check(rows: Sequence[Dict]) -> str:
     return "pass" if rows and held else "fail"
 
 
+def trail_weight(record: Dict) -> float:
+    """A `trail` record's weight, the -log2 of its exact probability or squared correlation (data-model section 6)."""
+    return float(record["weight_log2"])
+
+
 def false_firing_chance(pairs: int, sizes: Sequence[float], call_types: int = 1) -> float:
     """1 - 0.995^(T·N)·∏(1 - 0.005·a)^T, reported beside a firing (research R4, False firing): N the pairs of a size and a round
     count that could raise R, and one a per size at which the avalanche test ran."""

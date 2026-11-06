@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import unittest
+from fractions import Fraction
 from pathlib import Path
 from typing import Dict, List, Tuple
 from unittest import mock
@@ -4189,6 +4190,625 @@ class EvidenceBounds(TempRepo):
         self.assertEqual(widths, {4, 8})
         self.assertTrue(all(row["equal"] is True for row in result["fields"]["rows"] if row["width"] == 4))
         self.assertTrue(all(row["equal"] is None for row in result["fields"]["rows"] if row["width"] == 8))
+
+
+def rule_script(name: str):
+    """A script of the rules under its own name, as a worktree's run loads it."""
+    import importlib.util
+    import sys
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, ROOT / f"scripts/{name}.py")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+    return sys.modules[name]
+
+
+class D4Rule(unittest.TestCase):
+    """Research R6's rule, on stated bounds, with nothing on disk."""
+
+    FAMILIES = {"cand-A1": "ARX", "cand-A2": "ARX", "cand-B1": "Boolean"}
+    LUTS = {16: {"cand-A1": Fraction(160), "cand-A2": Fraction(120), "cand-B1": Fraction(128)},
+            8: {"cand-A1": Fraction(80), "cand-A2": Fraction(60), "cand-B1": Fraction(64)}}
+
+    def setUp(self):
+        self.d4 = rule_script("d4_choice")
+
+    def table(self, **rounds):
+        """r2=(W_D, W_L) gives both bounds over 2 rounds."""
+        out = {"differential": {}, "linear": {}}
+        for name, (w_d, w_l) in rounds.items():
+            r = int(name[1:])
+            if w_d is not None:
+                out["differential"][r] = (Fraction(w_d), f"bound-d{r}")
+            if w_l is not None:
+                out["linear"][r] = (Fraction(w_l), f"bound-l{r}")
+        return out
+
+    def widths(self, at_16=None, at_8=None):
+        return {16: at_16 or {}, 8: at_8 or {}}
+
+    def test_the_widest_width_with_a_common_number_of_rounds_and_the_largest_there(self):
+        tables = {"cand-A1": self.table(r2=(10, 10), r3=(20, 20), r5=(30, 30)), "cand-B1": self.table(r2=(9, 9), r3=(18, 18))}
+        self.assertEqual(self.d4.locate(self.widths(tables, tables), self.FAMILIES), (16, 3, "chosen", None))
+
+    def test_a_round_count_of_one_is_not_common(self):
+        tables = {"cand-A1": self.table(r1=(10, 10)), "cand-B1": self.table(r1=(9, 9))}
+        self.assertEqual(self.d4.locate(self.widths(tables, tables), self.FAMILIES)[2], "not computable")
+
+    def test_one_bound_alone_gives_no_rounds(self):
+        tables = {"cand-A1": self.table(r2=(10, None)), "cand-B1": self.table(r2=(None, 9))}
+        self.assertEqual(self.d4.locate(self.widths(tables), self.FAMILIES)[2], "not computable")
+
+    def test_with_no_common_number_at_16_the_rule_goes_to_8(self):
+        at_16 = {"cand-A1": self.table(r2=(10, 10)), "cand-B1": self.table(r3=(9, 9))}
+        at_8 = {"cand-A1": self.table(r4=(10, 10)), "cand-B1": self.table(r4=(9, 9))}
+        self.assertEqual(self.d4.locate(self.widths(at_16, at_8), self.FAMILIES), (8, 4, "chosen", None))
+
+    def test_a_family_alone_at_the_widest_width_is_chosen_by_default(self):
+        at_16 = {"cand-A1": self.table(r2=(10, 10)), "cand-B1": self.table()}
+        at_8 = {"cand-A1": self.table(), "cand-B1": self.table(r2=(9, 9), r4=(9, 9))}
+        self.assertEqual(self.d4.locate(self.widths(at_16, at_8), self.FAMILIES)[1:], (2, "chosen by default", "ARX"))
+
+    def test_both_families_at_a_width_with_no_common_number_go_to_the_larger_number(self):
+        at_16 = {"cand-A1": self.table(r2=(10, 10)), "cand-B1": self.table(r3=(9, 9))}
+        self.assertEqual(self.d4.locate(self.widths(at_16), self.FAMILIES), (16, 3, "chosen by default", "Boolean"))
+
+    def test_the_score_compares_exactly(self):
+        self.assertEqual(self.d4.higher((Fraction(3), Fraction(7)), (Fraction(3, 2), Fraction(7, 2))), 0)
+        self.assertEqual(self.d4.higher((Fraction(65537, 65536), Fraction(1)), (Fraction(1), Fraction(1))), 1)
+        self.assertEqual(self.d4.higher((Fraction(1), Fraction(2)), (Fraction(1), Fraction(1))), -1)
+
+    def test_the_family_with_the_higher_representative_is_chosen(self):
+        tables = {"cand-A1": self.table(r2=(32, 16)), "cand-A2": self.table(r2=(24, 18)), "cand-B1": self.table(r2=(16, 16))}
+        found = self.d4.decide(self.widths(tables), self.FAMILIES, self.LUTS)
+        self.assertEqual(found["representatives"], {"ARX": "cand-A2", "Boolean": "cand-B1"})
+        self.assertEqual((found["outcome"], found["chosen_family"], found["r_star"]), ("chosen", "ARX", 2))
+        self.assertEqual(found["scored"]["cand-A2"]["score"], str(Fraction(18, 2) / 120))
+
+    def test_an_exact_tie_chooses_no_family(self):
+        tables = {"cand-A1": self.table(r2=(40, 40)), "cand-B1": self.table(r2=(32, 32))}
+        found = self.d4.decide(self.widths(tables), self.FAMILIES, self.LUTS)
+        self.assertEqual((found["outcome"], found["chosen_family"]), ("tie", NONE))
+
+    def test_not_computable_scores_nobody(self):
+        found = self.d4.decide(self.widths({"cand-A1": self.table(), "cand-B1": self.table()}), self.FAMILIES, self.LUTS)
+        self.assertEqual((found["outcome"], found["width"], found["scored"]), ("not computable", NONE, {}))
+
+    def test_only_the_chosen_familys_candidates_are_scored_by_default(self):
+        tables = {"cand-A1": self.table(r2=(10, 10)), "cand-B1": self.table()}
+        found = self.d4.decide(self.widths(tables), self.FAMILIES, self.LUTS)
+        self.assertEqual((found["outcome"], found["chosen_family"], sorted(found["scored"])), ("chosen by default", "ARX", ["cand-A1"]))
+
+
+class RuleRecords(TempRepo):
+    """The rules on a temporary repository, each record stated."""
+
+    def setUp(self):
+        super().setUp()
+        self.d4 = rule_script("d4_choice")
+        self.rule = rule_script("round_rule")
+        self.number = 0
+        for rel in ("cand-A1.py", "cand-B1.py"):
+            write(self.root, f"{candidates.CANDIDATES_REL}/{rel}", (CODE_ROOT / candidates.CANDIDATES_REL / rel).read_bytes())
+        for rel in (self.d4.CODE + self.rule.CODE):
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        self.commit("the code")
+        for candidate, family in (("cand-A1", "ARX"), ("cand-B1", "Boolean")):
+            digest = evidence.sha256((self.root / candidates.module_rel(candidate)).read_bytes())
+            parameters = {name: "stated" for name in candidates.PARAMETERS}
+            parameters.update(longest_link={str(n): "2" for n in (4, 8, 16)}, trees={str(n): {} for n in (4, 8, 16)},
+                              food_nodes={"reason": "stated"}, constant_instance={"reason": "one stream"})
+            candidates.propose({"candidate_id": candidate, "family": family, "oplist_sha256": digest, "parameters": parameters})
+        self.commit("proposed")
+
+    def record(self, kind: str, candidate: str = "cand-A1", size: int = 4, status: str = "pass", rounds: int = 8, **fields) -> Dict:
+        self.number += 1
+        name = f"{kind}-{self.number:04d}"
+        body = {"kind": kind, "record_id": name, "candidate": candidate, "status": status, "ended_outside": NONE,
+                "created_utc": f"2026-11-05T{self.number // 60:02d}:{self.number % 60:02d}:00Z",
+                "config": {"size": size, "width": 32, "rounds": rounds}}
+        if kind in ("bound", "trail"):
+            body.update(size=size, rounds=rounds)
+        body.update(fields)
+        write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/{name}.json", evidence.pretty(body))
+        return body
+
+    def cross_check(self, candidate: str) -> str:
+        return self.record("cross-check", candidate)["record_id"]
+
+    def counted(self, candidate: str, width: int, weights: Dict[str, Dict[int, int]], size: int = 4) -> List[Dict]:
+        """Two Π-level records, their counts cross-checked."""
+        out = []
+        if candidate == "cand-A1":
+            box = self.record("bound", candidate, method="branch-and-bound", bound_kind="linear", width=width, size=size, rounds=1,
+                              cross_check=self.cross_check(candidate))
+            source = {"method": "active-box count", "box_record": box["record_id"], "cross_check": NONE}
+        else:
+            source = {"method": "active-S-box count", "weight_per_sbox": 1, "cross_check": self.cross_check(candidate)}
+        for kind, rows in weights.items():
+            out.append(self.record("bound", candidate, bound_kind=kind, width=width, size=size, rounds=max(rows),
+                                   counts={str(r): {"count": value} for r, value in rows.items()}, **source))
+        return out
+
+    def enter(self) -> None:
+        candidates.enter()
+
+    def run_d4(self, *argv) -> int:
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return self.d4.main(list(argv))
+
+    def run_rule(self, *argv) -> int:
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return self.rule.main(list(argv))
+
+    def choice(self) -> int:
+        return self.run_d4("--log", evidence.CANDIDATE_LOG_REL, "--out", f"{evidence.REP_REL}/d4/choice.json")
+
+    def scored_set(self, a=(24, 24), b=(10, 10)) -> None:
+        self.enter()
+        self.counted("cand-A1", 16, {"differential": {1: 5, 2: a[0]}, "linear": {1: 4, 2: a[1]}})
+        self.counted("cand-B1", 16, {"differential": {1: 4, 2: b[0]}, "linear": {1: 4, 2: b[1]}})
+
+
+class D4Script(RuleRecords):
+    def test_no_entered_set_exits_2(self):
+        self.assertEqual(self.choice(), 2)
+
+    def test_a_candidate_without_an_outcome_exits_2_and_writes_nothing(self):
+        self.enter()
+        self.counted("cand-A1", 16, {"differential": {2: 24}, "linear": {2: 24}})
+        self.assertEqual(self.choice(), 2)
+        self.assertFalse((self.root / evidence.REP_REL / "d4/choice.json").exists())
+
+    def test_the_choice_cites_its_records_and_each_scored_candidate_gets_an_entry(self):
+        self.scored_set()
+        self.assertEqual(self.choice(), 0)
+        path = self.root / evidence.REP_REL / "d4/choice.json"
+        record = json.loads(path.read_bytes())
+        self.assertEqual(record["kind"], "d4-choice")
+        self.assertEqual((record["width"], record["r_star"], record["outcome"]), (16, 2, "chosen"))
+        self.assertIn("not a rate per round", record["r_star_statement"])
+        self.assertEqual(record["luts"] if "luts" in record else record["scored"]["cand-A1"]["luts"], str(self.luts("cand-A1")))
+        scored = candidates.of_event(candidates.entries(), "scored")
+        self.assertEqual(sorted(entry["candidate_id"] for entry in scored), ["cand-A1", "cand-B1"])
+        self.assertEqual(scored[0]["record"]["sha256"], evidence.sha256(path.read_bytes()))
+
+    def luts(self, candidate: str):
+        return self.d4.lists_at([candidate])[16][candidate]
+
+    def test_a_second_run_exits_2(self):
+        """Quickstart E4."""
+        self.scored_set()
+        self.assertEqual(self.choice(), 0)
+        self.assertEqual(self.choice(), 2)
+        self.assertEqual(len(candidates.of_event(candidates.entries(), "scored")), 2)
+
+    def test_a_bound_without_its_cross_check_does_not_count(self):
+        self.enter()
+        self.record("bound", "cand-A1", method="active-box count", bound_kind="differential", width=16, size=4, rounds=2,
+                    box_record="none", counts={"2": {"count": 24}})
+        table = self.d4.bounds_of("cand-A1", 16)
+        self.assertEqual(table["differential"], {})
+
+    def test_a_capped_search_is_an_outcome_and_no_bound(self):
+        self.enter()
+        self.record("bound", "cand-A1", method="active-box count", bound_kind="differential", width=16, size=4, rounds=2,
+                    status="inconclusive", capped=True)
+        self.assertEqual(list(self.d4.outcome_of("cand-A1", 16, "differential", [])), ["inconclusive"])
+
+    def test_a_rejected_candidate_has_its_outcome(self):
+        self.assertEqual(self.d4.outcome_of("cand-A1", 16, "linear", ["rejected"]), {"decision": "rejected"})
+        self.assertIsNone(self.d4.outcome_of("cand-A1", 16, "linear", ["eligible"]))
+
+    def test_a_bound_at_another_size_or_width_is_not_read(self):
+        self.counted("cand-A1", 16, {"differential": {2: 24}}, size=8)
+        self.counted("cand-A1", 8, {"differential": {2: 24}})
+        self.assertEqual(self.d4.bounds_of("cand-A1", 16)["differential"], {})
+
+    # the tie ----------------------------------------------------------------------------------------
+
+    def tied(self) -> None:
+        self.scored_set()
+        with mock.patch.object(self.d4, "lists_at", return_value={16: {"cand-A1": Fraction(4), "cand-B1": Fraction(2)}, 8: {}}):
+            self.assertEqual(self.choice(), 0)
+        self.assertEqual(json.loads((self.root / evidence.REP_REL / "d4/choice.json").read_bytes())["outcome"], "chosen")
+
+    def tie_record(self, r_a=None, r_b=None) -> None:
+        self.scored_set((20, 20), (10, 10))
+        with mock.patch.object(self.d4, "lists_at", return_value={16: {"cand-A1": Fraction(4), "cand-B1": Fraction(2)}, 8: {}}):
+            self.assertEqual(self.choice(), 0)
+        self.assertEqual(json.loads((self.root / evidence.REP_REL / "d4/choice.json").read_bytes())["outcome"], "tie")
+        for candidate, value in (("cand-A1", r_a), ("cand-B1", r_b)):
+            if value is not None:
+                write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/round-rule.json", evidence.pretty({"sizes": {"4": {"R": value}}}))
+
+    def tie(self) -> int:
+        return self.run_d4("--tie", "--log", evidence.CANDIDATE_LOG_REL, "--out", f"{evidence.REP_REL}/d4/tie.json")
+
+    def tie_read(self) -> Dict:
+        return json.loads((self.root / evidence.REP_REL / "d4/tie.json").read_bytes())
+
+    def test_tie_exits_2_without_an_exact_tie(self):
+        self.tied()
+        self.assertEqual(self.tie(), 2)
+
+    def test_tie_exits_2_until_both_values_of_r_exist(self):
+        self.tie_record(r_a=20)
+        self.assertEqual(self.tie(), 2)
+
+    def test_the_smaller_r_decides_a_tie(self):
+        self.tie_record(r_a=20, r_b=24)
+        self.assertEqual(self.tie(), 0)
+        self.assertEqual((self.tie_read()["decided_by"], self.tie_read()["chosen_family"]), ("R at 4×4", "ARX"))
+        self.assertEqual(self.tie(), 2)
+
+    def test_fewer_carry_chains_decide_next(self):
+        self.tie_record(r_a=20, r_b=20)
+        self.assertEqual(self.tie(), 0)
+        self.assertEqual((self.tie_read()["decided_by"], self.tie_read()["chosen_family"]), ("carry chains", "Boolean"))
+
+    def test_an_ineligible_representative_loses_the_tie(self):
+        self.tie_record()
+        with mock.patch.object(candidates, "decisions", side_effect=lambda log, candidate: ["ineligible"] if candidate == "cand-B1" else []):
+            self.assertEqual(self.tie(), 0)
+        self.assertEqual((self.tie_read()["decided_by"], self.tie_read()["chosen_family"]), ("ineligible", "ARX"))
+
+    def owner_tie(self) -> str:
+        self.tie_record(r_a=20, r_b=20)
+        with mock.patch.object(self.d4, "carry_chains", return_value=4):
+            self.assertEqual(self.tie(), 0)
+        self.assertEqual(self.tie_read()["decided_by"], "owner")
+        return evidence.sha256((self.root / evidence.REP_REL / "d4/tie.json").read_bytes())
+
+    def choose(self, digest: str, *more) -> int:
+        return self.run_d4("--choose", "cand-A1", "--seen", digest, "--by", "owner", "--out", f"{evidence.REP_REL}/d4/tie-choice.json", *more)
+
+    def test_choose_writes_nothing_unless_the_digits_are_typed_at_a_terminal(self):
+        digest = self.owner_tie()
+        self.assertEqual(self.choose(digest), 2)
+        self.assertFalse((self.root / evidence.REP_REL / "d4/tie-choice.json").exists())
+
+    def test_choose_takes_the_typed_digits(self):
+        digest = self.owner_tie()
+        with mock.patch.object(evidence, "confirm_digits", return_value=digest[:16]):
+            self.assertEqual(self.choose(digest), 0)
+        record = json.loads((self.root / evidence.REP_REL / "d4/tie-choice.json").read_bytes())
+        self.assertEqual((record["choice"], record["seen_sha256"], record["choice_confirmed"]), ("cand-A1", digest, digest[:16]))
+        self.assertEqual(self.choose(digest), 2)
+
+    def test_the_owners_written_approval_stands_for_the_digits_and_the_record_says_so(self):
+        digest = self.owner_tie()
+        self.assertEqual(self.choose(digest, "--written-approval", "choose cand-A1"), 0)
+        record = json.loads((self.root / evidence.REP_REL / "d4/tie-choice.json").read_bytes())
+        self.assertEqual(record["written_approval"]["entered_by"], "agent")
+        self.assertEqual(record["written_approval"]["words"], "choose cand-A1")
+
+    def test_choose_exits_2_on_another_hash_and_when_a_tie_break_decided_it(self):
+        digest = self.owner_tie()
+        self.assertEqual(self.choose("0" * 64, "--written-approval", "w"), 2)
+        path = self.root / evidence.REP_REL / "d4/tie.json"
+        write(self.root, evidence.rel_to_repo(path), evidence.pretty(dict(self.tie_read(), decided_by="R at 4×4")))
+        self.assertEqual(self.choose(evidence.sha256(path.read_bytes()), "--written-approval", "w"), 2)
+        self.assertNotEqual(digest, evidence.sha256(path.read_bytes()))
+
+    def test_a_reproduction_of_the_choice_matches(self):
+        self.scored_set()
+        self.commit("the bounds")
+        self.assertEqual(self.choice(), 0)
+        self.commit("the choice")
+        write(self.root, "research/004/tools/.keep", "")
+        code = self.run_d4("--reproduce", f"{evidence.REP_REL}/d4/choice.json")
+        self.assertEqual(code, 0)
+
+
+class RoundRule(RuleRecords):
+    def evidence_at(self, candidate="cand-A1", size=4, r_f=4, r_b=5, fired=(1, 2), rounds=12, bias=True) -> None:
+        self.record("dependency", candidate, size, r_f=r_f, r_b=r_b, incomplete_rounds=max(r_f, r_b) - 1,
+                    through_instantiate={"every_bit_reached_after": 20})
+        self.counted(candidate, 32, {"differential": {6: 120, 8: 140}, "linear": {6: 100, 8: 130}}, size=size)
+        if bias:
+            self.record("frequency", candidate, size, rounds=rounds, rounds_fired=list(fired))
+            self.record("avalanche", candidate, size, rounds=rounds, rounds_fired=[1])
+        self.record("degree", candidate, size, rounds_fired=[1, 2, 3])
+        self.record("inverse", candidate, size, rounds=rounds)
+        self.record("symmetry", candidate, size)
+        self.record("invariant", candidate, size, rounds=rounds, round_counts={"1": {"kept": [], "above_chance": []}}, rounds_fired=[])
+
+    def test_r_is_the_rules_largest_term(self):
+        self.assertEqual(self.rule.round_count(3, 8, 4, 5), 10)
+        self.assertEqual(self.rule.round_count(7, 8, 4, 5), 14)
+        self.assertEqual(self.rule.round_count(3, 12, 4, 5), 14)
+        self.assertIsNone(self.rule.round_count(3, None, 4, 5))
+        self.assertIsNone(self.rule.round_count(3, 8, None, 5))
+        self.assertEqual(self.rule.round_count(None, 8, 4, 5), 10)
+
+    def test_r_bound_needs_both_bounds_above_the_target(self):
+        self.counted("cand-A1", 32, {"differential": {6: 128, 7: 129, 8: 140}, "linear": {6: 200, 7: 128, 8: 129}})
+        found, records = self.rule.r_bound_of("cand-A1", 4)
+        self.assertEqual(found, 8)
+        self.assertEqual(len(records), 2)
+
+    def test_a_bound_at_another_size_gives_no_r_bound_here(self):
+        self.counted("cand-A1", 32, {"differential": {8: 140}, "linear": {8: 140}}, size=8)
+        self.assertEqual(self.rule.r_bound_of("cand-A1", 4), (None, []))
+
+    def test_r_dist_is_the_largest_source_with_every_input_cited(self):
+        self.record("frequency", rounds_fired=[1, 2, 3])
+        self.record("avalanche", rounds_fired=[1, 5])
+        self.record("invariant", rounds_fired=[4])
+        self.record("degree", rounds_fired=[6])
+        self.record("dependency", r_f=4, r_b=4, incomplete_rounds=3)
+        found, sources = self.rule.r_dist_of("cand-A1", 4)
+        self.assertEqual(found, 6)
+        self.assertEqual(sorted(item["source"] for item in sources),
+                         ["avalanche", "degree", "frequency", "incomplete diffusion", "invariant"])
+
+    def test_a_trail_counts_only_lighter_than_the_target(self):
+        self.record("trail", width=32, rounds=7, weight_log2="127.5")
+        self.record("trail", width=32, rounds=9, weight_log2="128")
+        self.assertEqual(self.rule.r_dist_of("cand-A1", 4)[0], 7)
+
+    def test_a_record_ended_from_outside_decides_nothing(self):
+        self.record("frequency", rounds_fired=[9], ended_outside="2026-11-05T00:00:00Z", status="inconclusive")
+        self.assertEqual(self.rule.r_dist_of("cand-A1", 4), (None, []))
+        self.record("dependency", r_f=4, r_b=4, ended_outside="2026-11-05T00:00:00Z")
+        self.assertEqual(self.rule.r_f_and_b("cand-A1", 4), (None, None, []))
+
+    def test_a_firing_recorded_stands_after_a_rise(self):
+        self.record("frequency", rounds=12, rounds_fired=[7])
+        self.record("frequency", rounds=14, rounds_fired=[2])
+        self.assertEqual(self.rule.r_dist_of("cand-A1", 4)[0], 7)
+
+    def test_the_rule_writes_each_size_with_every_input_cited(self):
+        for size in (4, 8, 16):
+            self.evidence_at(size=size)
+        self.assertEqual(self.run_rule("--candidate", "cand-A1"), 0)
+        record = json.loads((self.root / evidence.REP_REL / "candidates/cand-A1/round-rule.json").read_bytes())
+        row = record["sizes"]["4"]
+        self.assertEqual((row["R_f"], row["R_b"], row["R_bound"], row["R_dist"], row["delta"], row["R"]), (4, 5, 8, 4, 2, 10))
+        self.assertTrue(row["R_bound_records"])
+        self.assertTrue(row["R_dist_sources"])
+        self.assertEqual(record["candidate"], "cand-A1")
+        self.assertIsInstance(record["false_firing_rate"], float)
+
+    def test_a_missing_item_fails_eligibility(self):
+        for size in (4, 8, 16):
+            self.evidence_at(size=size)
+        self.assertEqual(self.run_rule("--candidate", "cand-A1"), 0)
+        record = self.rule.read_round_rule("cand-A1")
+        self.assertFalse(self.rule.row_met(record))
+        self.assertTrue(candidates.failed_items(record))
+        self.assertFalse(record["sizes"]["4"]["eligible"]["FR-030 mapping"]["met"])
+
+    def test_a_rerun_of_the_rule_keeps_the_old_file_and_records_a_rise(self):
+        for size in (4, 8, 16):
+            self.evidence_at(size=size)
+        self.run_rule("--candidate", "cand-A1")
+        self.record("frequency", rounds_fired=[6], rounds=10)
+        self.assertEqual(self.run_rule("--candidate", "cand-A1"), 0)
+        record = self.rule.read_round_rule("cand-A1")
+        self.assertEqual(record["sizes"]["4"]["R"], 12)
+        self.assertEqual(record["sizes"]["4"]["rises"][0]["from"], 10)
+        self.assertEqual(record["sizes"]["4"]["rises"][0]["to"], 12)
+        self.assertTrue(list((self.root / evidence.REP_REL / "candidates/cand-A1/versions").glob("*.json")))
+
+    def test_a_control_that_fired_fails_the_item_at_that_size(self):
+        write(self.root, f"{evidence.REP_REL}/controls/c.json", evidence.pretty(
+            {"kind": "control", "test": "frequency", "size": 4, "fires": True, "created_utc": "2026-11-05T00:00:00Z", "ended_outside": NONE,
+             "record_id": "control-c", "status": "inconclusive"}))
+        self.assertFalse(self.rule.bias_item("cand-A1", "frequency", 4, 12)["met"])
+
+    def test_an_inconclusive_bias_record_fails_the_item(self):
+        write(self.root, f"{evidence.REP_REL}/controls/c.json", evidence.pretty(
+            {"kind": "control", "test": "frequency", "size": 4, "fires": False, "created_utc": "2026-11-05T00:00:00Z", "ended_outside": NONE,
+             "record_id": "control-c", "status": "pass"}))
+        self.record("frequency", rounds=12, status="inconclusive")
+        self.assertFalse(self.rule.bias_item("cand-A1", "frequency", 4, 12)["met"])
+
+    def test_a_bias_test_must_stand_at_the_sizes_r(self):
+        write(self.root, f"{evidence.REP_REL}/controls/c.json", evidence.pretty(
+            {"kind": "control", "test": "frequency", "size": 4, "fires": False, "created_utc": "2026-11-05T00:00:00Z", "ended_outside": NONE,
+             "record_id": "control-c", "status": "pass"}))
+        self.record("frequency", rounds=10)
+        self.assertFalse(self.rule.bias_item("cand-A1", "frequency", 4, 12)["met"])
+        self.assertTrue(self.rule.bias_item("cand-A1", "frequency", 4, 10)["met"])
+
+    def test_a_reproduction_that_differs_blocks_until_a_re_run_resolves_it(self):
+        held = self.record("inverse")
+        write(self.root, f"{evidence.REP_REL}/reproductions/x/1/r.json", evidence.pretty(
+            {"kind": "reproduction", "record_id": "reproduction-x", "status": "blocked", "original": {"record_id": held["record_id"]}}))
+        self.assertEqual(self.rule.unresolved("cand-A1"), ["reproduction-x"])
+        self.record("inverse", exclusions_and_reruns=[{"record_id": held["record_id"], "why": "tool defect"}])
+        self.assertEqual(self.rule.unresolved("cand-A1"), [])
+
+    def test_a_recheck_that_disagrees_blocks_too(self):
+        held = self.record("inverse")
+        write(self.root, f"{evidence.REP_REL}/rechecks/r.json", evidence.pretty(
+            {"kind": "recheck", "record_id": "recheck-x", "disagreements": [{"record_id": held["record_id"]}]}))
+        self.assertEqual(self.rule.unresolved("cand-A1"), ["recheck-x"])
+
+    def test_the_key_path_runs_between_neighbours_through_the_key_lanes(self):
+        good = {"key_path": [[0, 0], [0, 1], [0, 2], [0, 3]]}
+        self.assertTrue(self.rule.key_path_item(good, 4)["met"])
+        self.assertFalse(self.rule.key_path_item({"key_path": [[0, 0], [0, 2], [0, 1], [0, 3]]}, 4)["met"])
+        self.assertFalse(self.rule.key_path_item({"key_path": [[0, 0], [0, 1]]}, 4)["met"])
+        self.assertFalse(self.rule.key_path_item(None, 4)["met"])
+
+    def test_the_stages_are_read_from_the_list_and_set_against_its_declaration(self):
+        import sys
+        script = evidence_script()
+        loaded = script.build_list("cand-A1", 4, 32)
+        costmodel = sys.modules["costmodel"] if "costmodel" in sys.modules else __import__("costmodel")
+        counted = costmodel.count(loaded, 1, 1)
+        right = {"stages": {"phases": counted["phases"], "chains_per_phase": counted["chains_per_phase"]}}
+        self.assertTrue(self.rule.stages_item(right, "cand-A1", 4)["met"])
+        wrong = {"stages": {"phases": counted["phases"] + 1, "chains_per_phase": counted["chains_per_phase"]}}
+        self.assertFalse(self.rule.stages_item(wrong, "cand-A1", 4)["met"])
+        self.assertFalse(self.rule.stages_item(None, "cand-A1", 4)["met"])
+
+    def test_semantics_are_read_from_the_declaration(self):
+        whole = {"semantics": dict.fromkeys(("width", "signedness", "wrap", "shift", "rotation"), "stated")}
+        self.assertTrue(self.rule.semantics_item(whole)["met"])
+        self.assertFalse(self.rule.semantics_item({"semantics": {"width": "w"}})["met"])
+
+    def test_through_instantiate_needs_every_bit_before_the_first_output(self):
+        self.record("dependency", r_f=4, r_b=4, through_instantiate={"every_bit_reached_after": 20})
+        self.assertTrue(self.rule.diffusion_item("cand-A1", 4, 3)["met"])
+        self.assertFalse(self.rule.diffusion_item("cand-A1", 4, 2)["met"])
+        self.assertEqual(self.rule.diffusion_item("cand-A1", 4, 3)["evidence"][1]["margin_over_r_f"], 17)
+
+
+class Selection(RuleRecords):
+    """--close, --select, --choose and --decide, each round-rule record stated."""
+
+    def row(self, r: int, met: bool = True) -> Dict:
+        return {"R": r, "eligible": {"item": {"met": met}}}
+
+    def round_rule(self, candidate: str, r_4: int = 12, met: bool = True, r_8: int = 14, r_16: int = 16) -> None:
+        write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/round-rule.json", evidence.pretty(
+            {"kind": "round-rule", "candidate": candidate, "sizes": {"4": self.row(r_4, met), "8": self.row(r_8), "16": self.row(r_16)}}))
+
+    def choice_record(self, outcome: str = "chosen", family: str = "ARX") -> None:
+        write(self.root, f"{evidence.REP_REL}/d4/choice.json", evidence.pretty({"outcome": outcome, "chosen_family": family, "representatives": {}}))
+
+    def closed(self, *rows) -> None:
+        for row in rows:
+            self.round_rule(*row)
+        self.assertEqual(self.run_rule("--close"), 0)
+
+    def selected(self, n: str = "selection.json") -> Dict:
+        return json.loads((self.root / evidence.REP_REL / "freeze" / n).read_bytes())
+
+    def test_close_needs_a_final_decision_of_every_candidate(self):
+        self.round_rule("cand-A1")
+        self.assertEqual(self.run_rule("--close"), 2)
+        self.assertEqual(candidates.of_event(candidates.entries(), "set-closed"), [])
+
+    def test_close_needs_no_replacement_pending(self):
+        self.round_rule("cand-A1")
+        self.round_rule("cand-B1")
+        with mock.patch.object(candidates, "pending_replacements", return_value=[{"seq": 1}]):
+            self.assertEqual(self.run_rule("--close"), 2)
+
+    def test_select_exits_2_before_the_close(self):
+        self.choice_record()
+        self.assertEqual(self.run_rule("--select"), 2)
+
+    def test_the_chosen_familys_eligible_candidate_is_selected(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 0)
+        record = self.selected()
+        self.assertEqual((record["outcome"], record["selected"], record["fallback"]), ("selected", "cand-A1", False))
+
+    def test_a_family_with_none_eligible_falls_back_to_the_other(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12, False), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 0)
+        record = self.selected()
+        self.assertEqual((record["selected"], record["fallback"]), ("cand-B1", True))
+
+    def test_not_computable_takes_both_families(self):
+        self.choice_record("not computable", NONE)
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.selected()["selected"], "cand-B1")
+
+    def test_none_eligible_is_a_stop_and_exits_1(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12, False), ("cand-B1", 10, False))
+        self.assertEqual(self.run_rule("--select"), 1)
+        self.assertEqual(self.selected()["outcome"], "stop")
+        self.assertEqual(self.run_rule("--decide"), 2)
+
+    def test_a_later_selection_cites_the_one_before_and_keeps_it(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 0)
+        first = (self.root / evidence.REP_REL / "freeze/selection.json").read_bytes()
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual((self.root / evidence.REP_REL / "freeze/selection.json").read_bytes(), first)
+        self.assertEqual(self.selected("selection-2.json")["previous"]["sha256"], evidence.sha256(first))
+
+    def test_select_waits_on_a_d4_tie_until_its_row_reads(self):
+        self.choice_record("tie", NONE)
+        write(self.root, f"{evidence.REP_REL}/d4/tie.json", evidence.pretty({"decided_by": "R at 4×4", "chosen_family": "ARX"}))
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 2)
+        self.add_row("D4 tie", "Not needed", "d4/tie.json, by R at 4×4")
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.selected()["selected"], "cand-A1")
+
+    def test_an_owners_d4_choice_needs_its_row_with_the_hash(self):
+        self.choice_record("tie", NONE)
+        write(self.root, f"{evidence.REP_REL}/d4/tie.json", evidence.pretty({"decided_by": "owner", "chosen_family": NONE}))
+        data = evidence.pretty({"choice": "cand-B1"})
+        write(self.root, f"{evidence.REP_REL}/d4/tie-choice.json", data)
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.add_row("D4 tie", "Approved", "no hash here")
+        self.assertEqual(self.run_rule("--select"), 2)
+        self.rows.pop()
+        self.add_row("D4 tie", "Approved", evidence.sha256(data))
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.selected()["selected"], "cand-B1")
+
+    def test_an_unresolved_disagreement_stops_select(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        with mock.patch.object(self.rule, "unresolved", return_value=["recheck-x"]):
+            self.assertEqual(self.run_rule("--select"), 2)
+
+    def test_the_declined_candidate_selected_again_is_a_stop(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        candidates.append({"candidate_id": "cand-A1", "event": "review-outcome", "outcome": "declined", "declined": "cand-A1"})
+        self.assertEqual(self.run_rule("--select"), 1)
+        self.assertIn("declined", self.selected()["reason"])
+
+    def tied_selection(self) -> str:
+        self.choice_record("not computable", NONE)
+        self.closed(("cand-A1", 12), ("cand-B1", 12))
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.selected()["tie"], ["cand-A1", "cand-B1"])
+        return evidence.sha256((self.root / evidence.REP_REL / "freeze/selection.json").read_bytes())
+
+    def test_decide_exits_2_while_a_tie_has_no_approved_choice(self):
+        self.tied_selection()
+        self.assertEqual(self.run_rule("--decide"), 2)
+
+    def test_a_choice_needs_the_digits_and_the_records_hash(self):
+        digest = self.tied_selection()
+        self.assertEqual(self.run_rule("--choose", "cand-A1", "--seen", digest, "--by", "owner"), 2)
+        self.assertEqual(self.run_rule("--choose", "cand-A1", "--seen", "0" * 64, "--by", "owner", "--written-approval", "w"), 2)
+        self.assertEqual(self.run_rule("--choose", "cand-A2", "--seen", digest, "--by", "owner", "--written-approval", "w"), 2)
+        self.assertEqual(self.run_rule("--choose", "cand-A1", "--seen", digest, "--by", "owner", "--written-approval", "choose A1"), 0)
+        self.assertEqual(self.run_rule("--choose", "cand-A1", "--seen", digest, "--by", "owner", "--written-approval", "again"), 2)
+
+    def test_decide_appends_selected_and_not_selected_citing_the_record_and_its_choice(self):
+        digest = self.tied_selection()
+        self.assertEqual(self.run_rule("--choose", "cand-B1", "--seen", digest, "--by", "owner", "--written-approval", "choose B1"), 0)
+        data = (self.root / evidence.REP_REL / "freeze/selection-tie-choice.json").read_bytes()
+        self.add_row("Selection tie", "Approved", evidence.sha256(data))
+        self.assertEqual(self.run_rule("--decide"), 0)
+        entries = candidates.of_event(candidates.entries(), "decision")
+        self.assertEqual([(entry["candidate_id"], entry["decision"]) for entry in entries], [("cand-B1", "selected"), ("cand-A1", "not selected")])
+        self.assertEqual(entries[0]["selection"]["sha256"], digest)
+        self.assertEqual(entries[0]["tie_choice"]["sha256"], evidence.sha256(data))
+        self.assertEqual(entries[0]["variant_map"]["cand-B1/n4-w32-R12-c384"], "phyco-v3/n4-w32-R12-c384")
+        self.assertEqual(self.run_rule("--decide"), 2)
+
+    def test_a_later_record_gets_entries_of_its_own(self):
+        self.choice_record()
+        self.closed(("cand-A1", 12), ("cand-B1", 10))
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.run_rule("--decide"), 0)
+        self.round_rule("cand-A1", 12, True, 18)
+        self.assertEqual(self.run_rule("--select"), 0)
+        self.assertEqual(self.run_rule("--decide"), 0)
+        entries = candidates.of_event(candidates.entries(), "decision")
+        self.assertEqual([entry["decision"] for entry in entries], ["selected", "selected"])
+        self.assertEqual(entries[-1]["variant_map"]["cand-A1/n8-w32-R18-c384"], "phyco-v3/n8-w32-R18-c384")
 
 
 class ClearLock(TempRepo):
