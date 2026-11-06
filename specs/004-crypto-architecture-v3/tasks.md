@@ -911,7 +911,7 @@ candidates are otherwise `ineligible` (R6, R7).
   `status`, `classification` and hours used, or a `projection` record's time, checked against it and
   the `lock-cleared` record that names it, exit 1 on any other; with its tests, this case among
   them, and its import test in `tests/test_records_004.py`. (FR-065; SC-017; ANA-086)
-- [ ] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
+- [X] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
   `entered-d4` entry per candidate of the set, before the first score. (FR-022, FR-041; R6)
 - [ ] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
   inputs of the D4 score with `python scripts/evidence_v3.py`: the trail bounds over r* rounds with
