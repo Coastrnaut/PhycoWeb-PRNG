@@ -2,7 +2,9 @@
 guards read, a spec with a Review & Approval table, research.md, an approved environment record and
 a protocol change log with one approved first entry, so that each test breaks exactly one thing."""
 import json
+import os
 import shutil
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -53,6 +55,15 @@ def write(root: Path, rel: str, data) -> Path:
     return path
 
 
+def remove_tree(path: str) -> None:
+    """A temporary repository, read-only git objects included, which Windows will not delete as they stand."""
+    def writable(function, name, _):
+        os.chmod(name, stat.S_IWRITE)
+        function(name)
+
+    shutil.rmtree(path, onerror=writable)
+
+
 def report_files(root: Path) -> List[str]:
     """Every file under the reports directory, relative to it."""
     rep = root / evidence.REP_REL
@@ -68,7 +79,7 @@ class TempRepo(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="phyco004-")
         self.root = Path(self.tmp)
-        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.addCleanup(remove_tree, self.tmp)
         self.previous = evidence.use_repo(self.root)
         self.addCleanup(evidence.use_repo, self.previous.root)
         patcher = mock.patch.object(evidence, "snapshot", return_value=dict(SNAPSHOT))

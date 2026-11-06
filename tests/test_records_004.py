@@ -8,6 +8,7 @@ import json
 import re
 import subprocess
 import tempfile
+import time
 import unittest
 from fractions import Fraction
 from pathlib import Path
@@ -146,6 +147,55 @@ class RecordIds(unittest.TestCase):
         for path, record in committed_records():
             if "record_id" in record:
                 self.assertTrue(evidence.check_record_id(record), path)
+
+
+class TwoWorkers(unittest.TestCase):
+    """FR-053's test: a stated test operation list with two worker counts, its outputs compared and none kept. A heavy run: it fails
+    naming the lock while another holds it, takes the lock, projects first, charges no candidate, only research R7's feature-wide row,
+    and is not evidence. Phase checkpoints leave it out, and the whole suite, with it, is T125's heavy run."""
+
+    STATEMENT = "the test compared the outputs of its stated test operation list and kept none"
+    TOTAL = 2 ** 18
+
+    def stated_subject(self, script):
+        import ir
+        phases = []
+        for colour in range(2):
+            phases.append(ir.Phase(colour, tuple(
+                ir.Mix(ir.lane(2, i, j, ir.VEIN), "add", ir.Rotl(ir.Lane(ir.lane(2, i, j, ir.PRESSURE)), 7))
+                for i, j in ir.nodes_of(2, colour))))
+            phases.append(ir.Phase(colour, tuple(
+                ir.Mix(ir.lane(2, i, j, ir.PRESSURE), "xor", ir.Rotl(ir.Lane(ir.lane(2, i, j, ir.VEIN)), 13))
+                for i, j in ir.nodes_of(2, colour))))
+        loaded = ir.load(ir.Program("stated", 2, 32, tuple(phases)))
+        return script.Subject("stated", 2, 32, 4, 64, "n2-w32-R4-c64", loaded, [], "")
+
+    def test_two_worker_counts_give_the_same_counts(self):
+        lock = evidence.REPO.heavy_lock
+        if lock.exists():
+            self.fail(f"a heavy run holds {lock}: this test is a heavy run and waits for it")
+        from tests.test_protocol_004 import evidence_script
+        script = evidence_script()
+        subject = self.stated_subject(script)
+        argv = ["tests/test_records_004.py", "TwoWorkers"]
+        started = time.monotonic()
+        jobs = script.frequency_jobs(subject, False, self.TOTAL)
+        first = script.summed(script.worker_map(script.frequency_worker, jobs[:1], 1))
+        per_job = time.monotonic() - started
+        hours = per_job * (len(jobs) + len(jobs) / 2.0 + 2.0) / 3600.0
+        evidence.write_projection(run="FR-053's test with two worker counts", row=evidence.FEATURE_ROW, inputs="the first inputs of the test",
+                                  measured_speed={"seconds_per_job": per_job}, projected_hours=hours,
+                                  time_hours=per_job / 3600.0, argv=argv)
+        evidence.guard_feature_row([hours])
+        with evidence.HeavyRunLock(evidence.command_line(argv)):
+            one = script.summed(script.worker_map(script.frequency_worker, jobs, 1))
+            two = script.summed(script.worker_map(script.frequency_worker, jobs, 2))
+        for name in one:
+            self.assertEqual(one[name].tobytes(), two[name].tobytes(), name)
+        self.assertEqual(first["forward"].shape, one["forward"].shape)
+        evidence.write_projection(run="FR-053's test with two worker counts", row=evidence.FEATURE_ROW, inputs="the test's stated inputs",
+                                  measured_speed={"seconds": time.monotonic() - started}, projected_hours=hours,
+                                  time_hours=(time.monotonic() - started) / 3600.0, statement=self.STATEMENT, argv=argv)
 
 
 class Disclaimers(unittest.TestCase):

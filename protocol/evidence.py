@@ -99,13 +99,15 @@ KIND_COMPARED = {
                    "known_result", "second_known_result", "found", "outcome"),
     "bound": ("bound_kind", "rounds", "width", "size", "bound", "method", "tool", "validation",
               "scope", "cross_check"),
+    "cross-check": ("tool", "rows", "rounds"),
     "trail": ("trail_kind", "characteristic", "weight", "rounds", "size", "width", "tool",
               "validation"),
 }
 # The part of a field that a reproduction compares, the rest of it reported only (data-model
 # section 1, "Fields compared, per kind").
 PARTLY_COMPARED = {"demonstration": {"tool": ("source_sha256",),
-                                     "cost": ("steps_per_candidate", "total_steps")}}
+                                     "cost": ("steps_per_candidate", "total_steps")},
+                   "bound": {"solver": ("mip_rel_gap", "time_limit"), "budget": ("cap_hours",)}}
 P_VALUE_TOLERANCE = 1e-6
 P_VALUE_FLOOR = 2.0 ** -1022
 
@@ -1159,7 +1161,7 @@ def guard_candidate_row(candidate: str, row: str, projected: float, reserved: fl
     """A heavy run starts only if its projection, plus the probes of every run its row still needs,
     fits the hours left in its row (research R7)."""
     left = ROW_HOURS[row] - candidate_row_used(candidate, row)
-    if projected + reserved > left:
+    if projected + reserved > left or left <= 0.0:
         raise Refused(f"{candidate}: {projected + reserved:.3f} h do not fit the {left:.3f} h left "
                       f"in its {row} row")
 
@@ -1642,6 +1644,19 @@ class Run:
         self.moves.append((target, final))
         return entry
 
+    def adopt(self, name: str, source: Path, held: Dict) -> Dict:
+        """A local-only output that a worker wrote and hashed: `held` has its `sha256`, `bytes` and `uncompressed_sha256`. It comes from
+        a deterministic command, and the record renames it to its ID as any other (research R16)."""
+        base = name.rsplit("/", 1)[-1]
+        if any(e["path"].rsplit("/", 1)[-1] == base for e in self.outputs):
+            raise ToolFailure(f"two outputs named {base}: a reproduction could not tell them apart")
+        final = f"{LOCAL_REL}/{PLACEHOLDER}/{name}"
+        entry = {"uncompressed_sha256": held["uncompressed_sha256"], "path": final, "sha256": held["sha256"], "sha256_kind": "raw",
+                 "bytes": held["bytes"], "committed": False, "deterministic": True}
+        self.outputs.append(entry)
+        self.moves.append((source, final))
+        return entry
+
     def common_fields(self) -> Dict:
         code = {rel: hash_entry(rel) for rel in self.code_files}
         record = dict(self.start)
@@ -1788,6 +1803,95 @@ def classify(kind: str, outcome: str) -> str:
     if outcome == "unvalidated":
         return "unverified hypothesis"
     return findings.get((kind, outcome), NONE)
+
+
+# -------------------------------------------------------------------------------------- verdicts
+# Each is computed from what a record commits, so that the re-check calls the same function that the
+# script which wrote the record called (cli, scripts/recheck_004.py; FR-065).
+
+
+def verdict_inverse(mismatches: Dict[str, int]) -> Tuple[str, str]:
+    return ("fail", "failed") if any(mismatches.values()) else ("pass", "held")
+
+
+def verdict_bijectivity(inputs: int, ones: int) -> Tuple[str, str]:
+    return ("pass", "held") if ones == inputs else ("fail", "failed")
+
+
+def verdict_dependency(report: Dict) -> Tuple[str, str, int]:
+    """The status, the outcome, and the largest round count at which a bit pair has no dependency. R_f and R_b are the first round
+    counts with none; a direction that reaches none within its limit leaves them unreported."""
+    rows = list(report.values())
+    largest = max((r + 1 for row in rows for r, pairs in enumerate(row["pairs_without_dependency"]) if pairs), default=0)
+    status = "pass" if all(row["first_full"] is not None for row in rows) else "inconclusive"
+    return status, "incomplete" if largest else "complete", largest
+
+
+def verdict_symmetry(fixed: Dict, turned: Dict, composed: Dict, related: Any) -> Tuple[str, str]:
+    held = any(fixed.values()) or any(turned.values()) or any(composed.values()) \
+        or (isinstance(related, dict) and any(related.values()))
+    return ("fail", "failed") if held else ("pass", "held")
+
+
+def verdict_invariant(round_counts: Dict, differences: Dict) -> Tuple[str, str, List[int]]:
+    """The status, the outcome, and each round count at which a form or a difference held."""
+    kept = sorted({int(r) for r, row in round_counts.items() if row["kept"]}
+                  | {int(r) for rows in differences.values() for r, row in rows.items() if row["unchanged"] == row["states"]})
+    above = sorted(int(r) for r, row in round_counts.items() if row["above_chance"])
+    fired = sorted(set(kept) | set(above))
+    if kept:
+        return "fail", "kept", fired
+    return ("fail", "above-chance", fired) if above else ("pass", "held", fired)
+
+
+def verdict_degree(fields: Dict) -> Tuple[str, str, List[int]]:
+    """Every round count that the rule's count puts within its limit raises R_dist, and so does the inside-out count."""
+    raised = set(fields["rounds_within_limit"]["forward"]) | set(fields["rounds_within_limit"]["inverse"])
+    if fields["inside_out"] is not None:
+        raised.add(fields["inside_out"][0])
+    return "pass", "raises" if raised else "does not raise", sorted(raised)
+
+
+def rounds_fired(rows: Sequence[Sequence[int]], low: int, high: int) -> List[int]:
+    """The round counts at which some count lies at or beyond a critical value, read from each round's least and largest count."""
+    return [r + 1 for r, (least, most) in enumerate(rows) if least <= low or most >= high]
+
+
+def frequency_rounds_fired(summaries: Dict, low: int, high: int) -> List[int]:
+    return sorted({r for directions in summaries.values() for rows in directions.values() for r in rounds_fired(rows, low, high)})
+
+
+def avalanche_rounds_fired(paths: Dict, first: Tuple[int, int], whole: Tuple[int, int]) -> List[int]:
+    return sorted({r for row in paths.values() for r in rounds_fired(row["first"], *first) + rounds_fired(row["whole"], *whole)})
+
+
+def verdict_bias(fired: Sequence[int], rounds: int) -> Tuple[str, str, List[int]]:
+    """A firing at a round count r with 2r above R raises R, and the run fails at this R; every firing stands as a finding of the
+    reduced rounds it covers (research R4; data-model section 1)."""
+    raises = [r for r in fired if 2 * r > rounds]
+    return "fail" if raises else "pass", "fired" if fired else "not-fired", raises
+
+
+def control_fired(rows: Sequence[Sequence[int]], critical: Sequence[Tuple[int, int]]) -> bool:
+    """Whether a uniform control's counts reach a critical value, each row of its least and largest count, one pair of critical
+    values for every row or one for each."""
+    pairs = list(critical) * (len(rows) if len(critical) == 1 else 1)
+    return any(least <= low or most >= high for (least, most), (low, high) in zip(rows, pairs))
+
+
+def verdict_cross_check(rows: Sequence[Dict]) -> str:
+    """Equal to each exhaustive value, and at or above each floor (research R12)."""
+    held = all(row.get("equal") is not False and row.get("above_floor") is not False for row in rows)
+    return "pass" if rows and held else "fail"
+
+
+def false_firing_chance(pairs: int, sizes: Sequence[float], call_types: int = 1) -> float:
+    """1 - 0.995^(T·N)·∏(1 - 0.005·a)^T, reported beside a firing (research R4, False firing): N the pairs of a size and a round
+    count that could raise R, and one a per size at which the avalanche test ran."""
+    rest = 0.995 ** (call_types * pairs)
+    for a in sizes:
+        rest *= (1.0 - 0.005 * a) ** call_types
+    return 1.0 - rest
 
 
 # ---------------------------------------------------------------------------------- reproduction

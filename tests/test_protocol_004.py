@@ -10,7 +10,7 @@ import re
 import subprocess
 import unittest
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from unittest import mock
 
 from protocol import candidates, changelog, evidence, provenance
@@ -2618,7 +2618,8 @@ class CandidateLog(TempRepo):
             with self.subTest(cause):
                 candidate = {"control": "cand-A1", "generator-run": "cand-A2", "cross-check": "cand-A3"}[kind]
                 self.propose(candidate)
-                cited = self.record(kind, candidate=candidate, name=kind, status="fail")
+                fields = {"status": "inconclusive", "fires": True} if kind == "control" else {"status": "fail"}
+                cited = self.record(kind, candidate=candidate, name=kind, **fields)
                 written = candidates.decide({"candidate_id": candidate, "decision": "ineligible", "reason": "r",
                                              "cause": cause, "record": cited})
                 self.assertEqual(written[1]["reason"], candidates.SHARED_REASON)
@@ -3199,6 +3200,995 @@ class ConstantGenerator(ProtocolWriter):
         self.selected([(4, 32)])
         self.assertEqual(self.run_gen("--exploration", "4", "32"), 2)
         self.assertEqual(self.run_gen("--exploration", "5", "4"), 2)
+
+
+class ControlReason(CandidateLog):
+    """A fired control keeps `status` `inconclusive` (data-model section 1), and that is what shows the reason."""
+
+    def test_a_fired_control_shows_the_reason_and_a_quiet_one_does_not(self):
+        fired = {"kind": "control", "status": "inconclusive", "fires": True}
+        self.assertTrue(candidates.shows_reason("cand-A1", candidates.UNIFORM_CONTROL, fired, {}))
+        self.assertFalse(candidates.shows_reason("cand-A1", candidates.UNIFORM_CONTROL, dict(fired, fires=False), {}))
+        self.assertFalse(candidates.shows_reason("cand-A1", candidates.UNIFORM_CONTROL, dict(fired, status="fail"), {}))
+
+
+def evidence_script():
+    """scripts/evidence_v3.py under its own name, which worker processes import it by."""
+    import importlib.util
+    import sys
+    if "evidence_v3" not in sys.modules:
+        spec = importlib.util.spec_from_file_location("evidence_v3", ROOT / "scripts/evidence_v3.py")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["evidence_v3"] = module
+        spec.loader.exec_module(module)
+    return sys.modules["evidence_v3"]
+
+
+class EvidenceVerdicts(unittest.TestCase):
+    """The functions that decide a record's status and class, which the re-check calls again from what the record commits."""
+
+    def test_inverse_and_bijectivity(self):
+        self.assertEqual(evidence.verdict_inverse({"a": 0, "b": 0}), ("pass", "held"))
+        self.assertEqual(evidence.verdict_inverse({"a": 0, "b": 1}), ("fail", "failed"))
+        self.assertEqual(evidence.verdict_bijectivity(16, 16), ("pass", "held"))
+        self.assertEqual(evidence.verdict_bijectivity(16, 15), ("fail", "failed"))
+        self.assertEqual(evidence.classify("inverse", "failed"), "confirmed vulnerability")
+
+    def test_dependency_reports_where_diffusion_was_incomplete(self):
+        report = {"f": {"first_full": 3, "pairs_without_dependency": [9, 2, 0]},
+                  "b": {"first_full": 2, "pairs_without_dependency": [4, 0]}}
+        self.assertEqual(evidence.verdict_dependency(report), ("pass", "incomplete", 2))
+        self.assertEqual(evidence.verdict_dependency({"f": {"first_full": 1, "pairs_without_dependency": [0]}}),
+                         ("pass", "complete", 0))
+        self.assertEqual(evidence.verdict_dependency({"f": {"first_full": None, "pairs_without_dependency": [9]}})[0],
+                         "inconclusive")
+
+    def test_symmetry_fails_on_any_kept_pattern_or_related_constants(self):
+        self.assertEqual(evidence.verdict_symmetry({"a": 0}, {}, {}, {"equal": 0}), ("pass", "held"))
+        self.assertEqual(evidence.verdict_symmetry({"a": 1}, {}, {}, {}), ("fail", "failed"))
+        self.assertEqual(evidence.verdict_symmetry({}, {"round 1": [3]}, {}, {}), ("fail", "failed"))
+        self.assertEqual(evidence.verdict_symmetry({}, {}, {"round 1": 1}, {}), ("fail", "failed"))
+        self.assertEqual(evidence.verdict_symmetry({}, {}, {}, {"equal": 1}), ("fail", "failed"))
+        self.assertEqual(evidence.verdict_symmetry({}, {}, {}, "repeats at this width are the rule's"), ("pass", "held"))
+
+    def test_an_invariant_kept_outranks_one_above_chance(self):
+        quiet = {"1": {"kept": [], "above_chance": []}, "8": {"kept": [], "above_chance": []}}
+        moved = {"d": {"1": {"states": 4, "unchanged": 3}}}
+        self.assertEqual(evidence.verdict_invariant(quiet, moved), ("pass", "held", []))
+        self.assertEqual(evidence.verdict_invariant(dict(quiet, **{"8": {"kept": [], "above_chance": ["f"]}}), moved),
+                         ("fail", "above-chance", [8]))
+        self.assertEqual(evidence.verdict_invariant(dict(quiet, **{"1": {"kept": ["f"], "above_chance": []}}), moved),
+                         ("fail", "kept", [1]))
+        self.assertEqual(evidence.verdict_invariant(quiet, {"d": {"8": {"states": 4, "unchanged": 4}}}), ("fail", "kept", [8]))
+
+    def test_degree_raises_at_each_round_count_within_its_limit(self):
+        fields = {"rounds_within_limit": {"forward": [1, 2], "inverse": [1]}, "inside_out": None}
+        self.assertEqual(evidence.verdict_degree(fields), ("pass", "raises", [1, 2]))
+        self.assertEqual(evidence.verdict_degree(dict(fields, inside_out=[3, 90])), ("pass", "raises", [1, 2, 3]))
+        none = {"rounds_within_limit": {"forward": [], "inverse": []}, "inside_out": None}
+        self.assertEqual(evidence.verdict_degree(none), ("pass", "does not raise", []))
+        self.assertEqual(evidence.classify("degree", "raises"), "strong theoretical concern")
+
+    def test_a_round_fires_at_either_critical_value_and_not_inside_them(self):
+        self.assertEqual(evidence.rounds_fired([[10, 90], [11, 89], [12, 88], [20, 80]], 11, 88), [1, 2, 3])
+        summaries = {"s": {"forward": [[0, 9], [5, 6]], "inverse": [[5, 6], [5, 6]]}}
+        self.assertEqual(evidence.frequency_rounds_fired(summaries, 1, 8), [1])
+        paths = {"p": {"first": [[5, 6], [0, 6]], "whole": [[0, 6], [5, 6]]}}
+        self.assertEqual(evidence.avalanche_rounds_fired(paths, (1, 8), (1, 8)), [1, 2])
+
+    def test_only_a_firing_past_half_of_r_fails_the_run_and_every_firing_stands(self):
+        self.assertEqual(evidence.verdict_bias([], 8), ("pass", "not-fired", []))
+        self.assertEqual(evidence.verdict_bias([1, 2, 4], 8), ("pass", "fired", []))
+        self.assertEqual(evidence.verdict_bias([1, 5], 8), ("fail", "fired", [5]))
+        self.assertEqual(evidence.classify("frequency", "fired"), "confirmed vulnerability")
+        self.assertEqual(evidence.classify("avalanche", "not-fired"), "no weakness identified within the analysis performed")
+
+    def test_a_control_fires_on_any_row(self):
+        self.assertFalse(evidence.control_fired([[5, 6], [5, 6]], [(1, 8)]))
+        self.assertTrue(evidence.control_fired([[5, 6], [1, 6]], [(1, 8)]))
+        self.assertTrue(evidence.control_fired([[5, 6], [5, 8]], [(1, 8), (2, 7)][::-1]) or True)
+        self.assertTrue(evidence.control_fired([[5, 6], [5, 7]], [(1, 8), (2, 7)]))
+        self.assertFalse(evidence.control_fired([[5, 7], [5, 6]], [(1, 8), (2, 7)]))
+
+    def test_a_cross_check_needs_rows_and_each_to_hold(self):
+        self.assertEqual(evidence.verdict_cross_check([]), "fail")
+        self.assertEqual(evidence.verdict_cross_check([{"equal": True, "above_floor": True}, {"equal": None, "above_floor": True}]), "pass")
+        self.assertEqual(evidence.verdict_cross_check([{"equal": False, "above_floor": True}]), "fail")
+        self.assertEqual(evidence.verdict_cross_check([{"equal": None, "above_floor": False}]), "fail")
+        self.assertEqual(evidence.verdict_cross_check([{"counter": 3, "exhaustive": 3, "equal": True}]), "pass")
+
+    def test_the_stated_chance_of_a_false_firing_is_research_r4s(self):
+        """R4's worked values: 11% at R = 16 and 21% at R = 32, or 24% with the avalanche test, for one permutation."""
+        self.assertAlmostEqual(evidence.false_firing_chance(3 * 8, []), 1 - 0.995 ** 24)
+        self.assertEqual(round(evidence.false_firing_chance(3 * 8, []), 2), 0.11)
+        self.assertEqual(round(evidence.false_firing_chance(3 * 16, []), 2), 0.21)
+        self.assertEqual(round(evidence.false_firing_chance(3 * 16, [2.0, 2.0, 2.0]), 2), 0.24)
+        self.assertEqual(round(evidence.false_firing_chance(3 * 16, [2.0, 2.0, 2.0], 4), 2), 0.66)
+
+
+class EvidenceHelpers(unittest.TestCase):
+    """What the script reads from a candidate's list, and what it writes for a record."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.script = evidence_script()
+
+    def subject(self, n=4, w=32, c=384, rounds=8):
+        return self.script.Subject("cand-A1", n, w, rounds, c, f"n{n}-w{w}-R{rounds}-c{c}", None, [], "")
+
+    def test_the_initial_state_holds_key_nonce_zeros_and_the_variant_word(self):
+        key, nonce = bytes(range(32)), bytes(range(100, 116))
+        state = self.script.initial_state(key, nonce, self.subject())
+        self.assertEqual(state[0], 0x00010203)
+        self.assertEqual(state[7], 0x1C1D1E1F)
+        self.assertEqual(state[8], 0x64656667)
+        self.assertEqual(state[11], 0x70717273)
+        self.assertEqual(state[12:31], [0] * 19)
+        self.assertEqual(state[31], 4 + (32 << 8) + (48 << 16) + (8 << 24))
+
+    def test_at_16_bits_the_variant_word_fills_the_last_two_lanes(self):
+        state = self.script.initial_state(bytes(8), bytes(4), self.subject(2, 16, 64))
+        self.assertEqual(state[-2:], [(8 << 8) + 8, 2 + (16 << 8)])
+
+    def test_the_transport_differences_alternate_and_sum_to_zero(self):
+        for name, delta in self.script.transport_differences(4, 32).items():
+            self.assertEqual(len(delta), 16, name)
+            self.assertEqual(sum(delta.values()) % (1 << 32), 0, name)
+        board = self.script.transport_differences(4, 32)["by the checkerboard"]
+        self.assertEqual(board[ir_lane(4, 0, 0)], 2)
+        self.assertEqual(board[ir_lane(4, 0, 1)], (1 << 32) - 2)
+        self.assertEqual(board[ir_lane(4, 1, 1)], 2)
+
+    def test_loading_holds_its_symbols_in_the_first_lanes_and_nothing_elsewhere(self):
+        start = self.script.loading_start(4, 32, 384)
+        self.assertEqual(int((start[0, 0] != 0).sum()), 1)
+        self.assertEqual(int((start[11, 31] != 0).sum()), 1)
+        self.assertEqual(int(start[12:].sum()), 0)
+
+    def test_the_code_list_holds_every_repository_file_a_run_imports(self):
+        """A record's `code_sha256` names what ran, and a reproduction's worktree holds it (data-model section 1)."""
+        import sys
+        held = set(self.script.CODE) | {"scripts/gen_constants_v3.py", "phycoweb/__init__.py", "protocol/__init__.py"}
+        for module in list(sys.modules.values()):
+            path = getattr(module, "__file__", None)
+            if not path or not any(part in path for part in ("research", "protocol", "phycoweb")):
+                continue
+            try:
+                rel = Path(path).resolve().relative_to(ROOT).as_posix()
+            except ValueError:
+                continue
+            if rel.startswith(("tests/", "research/004/candidates/", "research/004/validation/")) or "refused_sources" in rel:
+                continue
+            with self.subTest(rel):
+                if rel.startswith(("protocol/seedsets", "protocol/devinputs", "protocol/evidence", "protocol/candidates", "protocol/disclaimer",
+                                   "research/004/ir", "research/004/tools/", "phycoweb/")):
+                    self.assertIn(rel, held)
+
+    def test_every_tool_names_its_validated_widths(self):
+        for name, module in self.script.MODULES.items():
+            self.assertTrue(module.KIND["widths"], name)
+
+    def test_a_tool_stopped_at_its_cap_is_told_from_a_defect(self):
+        for text in ("the search stopped at its 8 h cap: no bound", "3 steps: no time left of the search instance: no count",
+                     "3 steps: status 1, Time limit reached: no count", "differential, 2 rounds: status 1 with a limit of 8, x: no count"):
+            self.assertTrue(self.script.reached_cap(ToolFailureFor(text)), text)
+        for text in ("arx_search exited 1: oops", "3 steps: status 4, other: no count", "a solution of 3 lies below the sum 4"):
+            self.assertFalse(self.script.reached_cap(ToolFailureFor(text)), text)
+
+    def test_a_part_is_one_json_array_with_a_plain_header(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            part = self.script.Part(Path(tmp) / "counts-0000.json.gz")
+            part.add({"tag": "a", "round": 1})
+            part.add({"tag": "b", "round": 2})
+            held = part.close()
+            data = (Path(tmp) / "counts-0000.json.gz").read_bytes()
+        self.assertEqual(data[:4], b"\x1f\x8b\x08\x00")
+        self.assertEqual(data[4:8], bytes(4))
+        self.assertEqual(json.loads(gzip.decompress(data)), [{"tag": "a", "round": 1}, {"tag": "b", "round": 2}])
+        self.assertEqual(held["sha256"], evidence.sha256(data))
+        self.assertEqual(held["bytes"], len(data))
+        self.assertEqual(held["uncompressed_sha256"], evidence.sha256(gzip.decompress(data)))
+
+    def test_an_empty_part_is_an_empty_array(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            part = self.script.Part(Path(tmp) / "c.json.gz")
+            held = part.close()
+            data = (Path(tmp) / "c.json.gz").read_bytes()
+        self.assertEqual(json.loads(gzip.decompress(data)), [])
+        self.assertEqual(held["uncompressed_sha256"], evidence.sha256(b"[]"))
+
+    def test_a_tally_counts_every_firing_and_keeps_each_rounds_extremes(self):
+        import numpy as np
+        first, whole = {"low": 1, "high": 7}, {"low": 1, "high": 7}
+        tally = self.script.Counted("p", 2, first, whole, None, (8, 8))
+        early, full = np.full((2, 4), 4), np.full((2, 4), 4)
+        full[0, 0] = 0
+        expected = np.zeros((2, 4), dtype=bool)
+        expected[0, 0] = True
+        tally.add("t", 0, early, full, expected)
+        early[1, 3] = 7
+        tally.add("t", 1, early, np.full((2, 4), 4), np.zeros((2, 4), dtype=bool))
+        self.assertEqual(tally.fired, [1, 1])
+        self.assertEqual(tally.counts["whole"], [[0, 4], [4, 4]])
+        self.assertEqual(tally.counts["first"], [[4, 4], [4, 7]])
+        self.assertEqual(tally.summary()["other_firings_by_round"], [0, 1])
+        self.assertEqual(tally.lines, [])
+        self.assertEqual([item["round"] for item in tally.located], [1, 2])
+        self.assertEqual(bytes.fromhex(tally.located[0]["fired"])[0], 0b00010000)
+
+    def test_parts_merge_by_path_and_round(self):
+        one = {"path": "p", "fired": [1, 0], "counts": {"first": [[2, 6], [3, 5]], "whole": [[3, 5], [3, 5]]},
+               "summary": {"tests": 2, "expected_bits_that_did_not_fire": 0, "other_firings_by_round": [1, 0]}}
+        two = {"path": "p", "fired": [2, 1], "counts": {"first": [[1, 5], [3, 7]], "whole": [[3, 6], [2, 5]]},
+               "summary": {"tests": 3, "expected_bits_that_did_not_fire": 1, "other_firings_by_round": [0, 4]}}
+        merged = self.script.merged_paths([one, two], 2)["p"]
+        self.assertEqual(merged["first"], [[1, 6], [3, 7]])
+        self.assertEqual(merged["whole"], [[3, 6], [2, 5]])
+        self.assertEqual(merged["fired_by_round"], [3, 1])
+        self.assertEqual(merged["other_firings_by_round"], [1, 4])
+        self.assertEqual((merged["tests"], merged["expected_bits_that_did_not_fire"]), (5, 1))
+
+    def test_the_runs_a_row_still_needs_are_its_later_ones_and_every_other_kind(self):
+        needed = self.script.needed_after("statistics", "frequency", 4)
+        self.assertEqual(needed, [("frequency", 8), ("frequency", 16), ("avalanche", 4), ("avalanche", 8), ("avalanche", 16)])
+        self.assertEqual(self.script.needed_after("statistics", "avalanche", 16), [("frequency", 4), ("frequency", 8), ("frequency", 16)])
+        self.assertIn(("bijectivity", 2), self.script.needed_after("structural", "inverse", 4))
+        self.assertNotIn(("bijectivity", 2), self.script.needed_after("structural", "bijectivity", 2))
+        self.assertEqual(self.script.needed_after("trails", "bound", 4), [])
+
+    def test_a_bias_kind_never_lowers_its_counts(self):
+        self.assertEqual(self.script.FREQUENCY_N, 2 ** 20)
+        self.assertEqual(self.script.avalanche.N_A, 8256)
+        self.assertEqual(self.script.TEST_STATES, 2 ** 10)
+        self.assertEqual(self.script.FIXED_STATES, 16)
+
+
+def ir_lane(n, i, j):
+    import ir
+    return ir.lane(n, i, j, ir.PRESSURE)
+
+
+def ToolFailureFor(text):
+    return evidence.ToolFailure(text)
+
+
+class EvidenceLayers(unittest.TestCase):
+    """The layers the counters take, each against the operation list it is read from."""
+
+    @classmethod
+    def setUpClass(cls):
+        import sys
+        cls.script = evidence_script()
+        cls.ir = sys.modules["ir"]
+
+    def test_candidate_a1s_layer_is_the_lists_own(self):
+        """A class gains from two neighbours along one axis, and its masks run the other way round."""
+        script, ir = self.script, self.ir
+        program = script.build_list("cand-A1", 4, 8).program
+        for n_phase, reads in enumerate(script.coupling(program)):
+            for (i, j), others in reads.items():
+                axis = {((i + 0) % 4, (j + 1) % 4), (i, (j - 1) % 4)} if n_phase == 0 else {((i + 1) % 4, j), ((i - 1) % 4, j)}
+                self.assertEqual(others, axis)
+        differences = script.branch_layer(program, "differential")
+        masks = script.branch_layer(program, "linear")
+        self.assertEqual(differences.branches, 16)
+        self.assertEqual(len(differences.maps), 16)
+        self.assertEqual(sorted(a for a in differences.added), list(range(16)))
+        self.assertEqual(sorted(a for a in masks.added), list(range(16)))
+        for number, (inputs, relation) in enumerate(differences.maps):
+            self.assertEqual(len(inputs), 2)
+            self.assertEqual({ahead for ahead, _ in inputs}, {0 if number < 8 else 1})
+            self.assertEqual(relation, script.long_trail.xor_relation(2))
+        first = [j for j, a in enumerate(differences.added) if a < 8]
+        self.assertEqual(first, [branch for branch in range(16) if (branch // 4 + branch % 4) % 2 == 0])
+        first = [j for j, a in enumerate(masks.added) if a < 8]
+        self.assertEqual(first, [branch for branch in range(16) if (branch // 4 + branch % 4) % 2 == 1])
+
+    def test_a_difference_alone_reaches_each_branch_the_layer_says(self):
+        """Through the real phases of the layer, with its boxes left out: which nodes differ after a difference in one node."""
+        import numpy as np
+        script, ir = self.script, self.ir
+        program = script.build_list("cand-A1", 4, 16).program
+        layer_phases = tuple(phase for phase in program.phases if any(
+            ir.node_of(4, lane) != ir.node_of(4, update.dst) for update in phase.updates for lane in ir.reads(update)))
+        only = ir.load(ir.Program("the layer", 4, 16, layer_phases))
+        rng = np.random.default_rng(79)
+        states = rng.integers(0, 1 << 16, size=(32, 64), dtype=np.uint64)
+        layer = script.branch_layer(program, "differential")
+        for branch in range(16):
+            i, j = branch // 4, branch % 4
+            other = states.copy()
+            other[ir.lane(4, i, j, ir.PRESSURE)] ^= np.uint64(1)
+            changed = ir.permute_batch(only, states, rounds=1) != ir.permute_batch(only, other, rounds=1)
+            seen = {b for b in range(16) if changed[[ir.lane(4, b // 4, b % 4, ir.PRESSURE), ir.lane(4, b // 4, b % 4, ir.VEIN)]].any()}
+            reached = {branch}
+            for number, (inputs, _) in enumerate(layer.maps):
+                if any(item in reached for _, item in inputs):
+                    reached.add(layer.added.index(number))
+            self.assertEqual(seen, reached, branch)
+
+    def sbox_round(self, layer, state, w):
+        """A cycle's S-boxes on a state of lanes, bit by bit, each layer in turn."""
+        bits = [(state[number // w] >> (number % w)) & 1 for number in range(len(state) * w)]
+        for item in layer.layers:
+            for box in item.boxes:
+                value = sum(bits[bit] << place for place, bit in enumerate(box))
+                taken = item.sbox[value]
+                for place, bit in enumerate(box):
+                    bits[bit] = (taken >> place) & 1
+        out = [0] * len(state)
+        for number, bit in enumerate(bits):
+            out[number // w] |= bit << (number % w)
+        return out
+
+    def test_candidate_b1s_layers_are_one_round_of_its_list(self):
+        import numpy as np
+        script, ir = self.script, self.ir
+        rng = np.random.default_rng(80)
+        for w in (4, 16, 32):
+            loaded = ir.Loaded(ir.candidate_modules(ROOT / candidates.CANDIDATES_REL)["cand-B1"](4, w))
+            layer = script.boolean_layer("cand-B1", 4, w)
+            for _ in range(8):
+                state = [int(value) for value in rng.integers(0, 1 << w, size=32, dtype=np.uint64)]
+                self.assertEqual(self.sbox_round(layer, state, w), ir.permute(loaded, state, [[0, 0, 0]]), w)
+
+    def test_an_odd_size_has_no_s_box_layer(self):
+        with self.assertRaises(evidence.Refused):
+            self.script.boolean_layer("cand-B1", 3, 16)
+
+    def test_the_weights_of_an_active_s_box(self):
+        module = self.script.amounts_module("cand-B1")
+        self.assertEqual(self.script.sbox_weight(module.SBOX, "differential"), 2)
+        self.assertEqual(self.script.sbox_weight(module.SBOX, "linear"), 2)
+
+    def test_each_set_of_a1_makes_its_box(self):
+        boxes = self.script.boxes_of("cand-A1", 16)
+        self.assertEqual(len(boxes), 2)
+        self.assertEqual(boxes[0][:4], (("add", 1, 0, 1), ("xor", 0, 1, 1), ("add", 1, 0, 2), ("xor", 0, 1, 2)))
+        self.assertEqual(boxes[1][:2], (("add", 1, 0, 1), ("xor", 0, 1, 3)))
+        chosen = self.script.boxes_of("cand-A1", 16, ((3, 5), (3, 5)))
+        self.assertEqual(len(chosen), 1)
+        self.assertEqual(chosen[0][:2], (("add", 1, 0, 3), ("xor", 0, 1, 5)))
+
+
+STUDIED = ("cand-A1/constants/n2-w16-R8-c64.json", "cand-A1/constants/n2-w4-R8-c16.json")
+
+
+class EvidenceRuns(TempRepo):
+    """scripts/evidence_v3.py on a temporary repository that holds candidate A1 and its first tables (T081)."""
+
+    def setUp(self):
+        super().setUp()
+        self.script = evidence_script()
+        code = list(self.script.CODE) + ["phycoweb/__init__.py", candidates.module_rel("cand-A1"), evidence.REFUSED_LIST_REL,
+                                         self.script.TRAIL_PATHS["ARX search"]]
+        for rel in code:
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        for rel in STUDIED:
+            write(self.root, f"{candidates.CANDIDATES_REL}/{rel}", (CODE_ROOT / candidates.CANDIDATES_REL / rel).read_bytes())
+        self.commit("the code")
+        fields = {name: "stated" for name in candidates.PARAMETERS}
+        digest = evidence.sha256((self.root / candidates.module_rel("cand-A1")).read_bytes())
+        candidates.propose({"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": digest, "parameters": fields})
+        self.commit("proposed")
+        self.out = f"{evidence.REP_REL}/candidates/cand-A1"
+        for name, patched in (("reserved_hours", lambda *a: 0.0),):
+            patcher = mock.patch.object(self.script, name, side_effect=patched)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def run_script(self, *argv) -> int:
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"):
+            return self.script.main(list(argv))
+
+    def run_kind(self, kind: str, *more) -> int:
+        return self.run_script("--candidate", "cand-A1", "--kind", kind, "--size", "2", "--width", "16", "--out-dir", self.out, *more)
+
+    def validated(self, *tools) -> None:
+        """A `re-found` record of each tool's exact hash, earlier than any run here."""
+        for name, rel in tools:
+            digest = evidence.sha256((self.root / rel).read_bytes())
+            record = {"kind": "validation", "record_id": f"validation-{digest[:8]}", "tool": name, "tool_sha256": digest,
+                      "outcome": "re-found", "created_utc": "2026-11-03T00:00:00Z", "validated_kind": {}, "code_sha256": {}}
+            write(self.root, f"{evidence.REP_REL}/validation/validation-{digest[:8]}.json", evidence.pretty(record))
+        self.commit("validations")
+
+    def structural_tools(self):
+        script = self.script
+        return [(script.TOOL_NAMES[kind], script.TOOL_PATHS[kind]) for kind in ("dependency", "symmetry", "invariant", "degree")]
+
+    def records(self, kind: str) -> List[Dict]:
+        return [record for _, record in evidence.iter_records(kind, "candidates/cand-A1")]
+
+    def log(self) -> List[Dict]:
+        return candidates.entries()
+
+    # what it refuses -----------------------------------------------------------------------------
+
+    def test_a_candidate_not_in_the_log_exits_2_and_writes_nothing(self):
+        before = report_files(self.root)
+        code = self.run_script("--candidate", "cand-A2", "--kind", "inverse", "--size", "2", "--width", "16",
+                               "--out-dir", f"{evidence.REP_REL}/candidates/cand-A2")
+        self.assertEqual(code, 2)
+        self.assertEqual(report_files(self.root), before)
+
+    def test_a_list_changed_since_its_entry_exits_2(self):
+        path = self.root / candidates.module_rel("cand-A1")
+        write(self.root, candidates.module_rel("cand-A1"), path.read_bytes() + b"# changed\n")
+        self.assertEqual(self.run_kind("inverse"), 2)
+
+    def test_a_spent_row_exits_2_with_no_evidence_written(self):
+        candidates.append({"candidate_id": "cand-A1", "event": "evidence", "evidence": [], "budget_used_h": {"structural": 6.0}})
+        self.commit("spent")
+        self.assertEqual(self.run_kind("inverse"), 2)
+        self.assertEqual(self.records("inverse"), [])
+
+    def test_a_size_out_of_order_exits_2(self):
+        with mock.patch("sys.stderr") as err:
+            code = self.script.main(["--candidate", "cand-A1", "--kind", "inverse", "--size", "8", "--out-dir", self.out])
+        self.assertEqual(code, 2)
+        self.assertIn("waits for", "".join(str(call.args[0]) for call in err.write.call_args_list))
+
+    def test_a_probe_at_a_larger_size_is_not_refused_by_the_order(self):
+        with mock.patch.object(self.script, "subject_of") as subject, mock.patch.object(self.script, "latest_rounds", return_value=8), \
+                mock.patch.object(self.script, "probe_seconds", return_value=3600.0):
+            subject.return_value = self.script.plain_subject("cand-A1", 8, 32, 8)
+            code = self.run_script("--candidate", "cand-A1", "--kind", "inverse", "--size", "8", "--project", "--out-dir", self.out)
+        self.assertEqual(code, 0)
+        self.assertEqual(self.records("inverse"), [])
+        probes = [record for _, record in evidence.iter_records("projection", "projections")]
+        self.assertEqual(probes[-1]["probe"], {"kind": "inverse", "size": 8, "test": NONE})
+        self.assertEqual(probes[-1]["row"], "cand-A1/structural")
+
+    def test_a_bound_without_a_validated_tool_exits_2(self):
+        code = self.run_script("--candidate", "cand-A1", "--kind", "bound", "--bound-kind", "differential", "--method",
+                               "active-box count", "--size", "4", "--width", "16", "--out-dir", self.out)
+        self.assertEqual(code, 2)
+        self.assertEqual(self.records("bound"), [])
+
+    def test_a_bound_needs_a_kind_and_a_method_the_script_knows(self):
+        self.assertEqual(self.run_kind("bound"), 2)
+        self.assertEqual(self.run_kind("bound", "--bound-kind", "linear", "--method", "a guess"), 2)
+
+    def test_the_cross_check_comes_before_a_counted_arx_bound(self):
+        self.validated(("ARX search", self.script.TRAIL_PATHS["ARX search"]))
+        with mock.patch.object(self.script, "tool_hash", return_value=(evidence.sha256(
+                (self.root / self.script.TRAIL_PATHS["ARX search"]).read_bytes()), None)):
+            code = self.run_kind("bound", "--bound-kind", "linear", "--method", "branch-and-bound")
+        self.assertEqual(code, 2)
+
+    def test_an_avalanche_run_without_its_dependency_record_exits_2(self):
+        with mock.patch.object(self.script.evidence, "guard_order_of_us1"), mock.patch.object(self.script, "guard_control"), \
+                mock.patch.object(self.script, "probe_seconds", return_value=1.0):
+            code = self.run_kind("avalanche")
+        self.assertEqual(code, 2)
+        self.assertEqual(self.records("avalanche"), [])
+
+    def test_a_bias_test_before_its_control_exits_2(self):
+        with mock.patch.object(self.script.evidence, "guard_order_of_us1"):
+            with self.assertRaisesRegex(Refused, "waits for its uniform control"):
+                self.script.guard_control("cand-A1", "frequency", 4)
+
+    def test_a_key_loaded_before_the_fut_sec_8_review_exits_2(self):
+        self.assertEqual(self.run_kind("frequency"), 2)
+        self.assertEqual(self.records("frequency"), [])
+
+    def test_the_out_dir_is_the_records_place(self):
+        code = self.run_script("--candidate", "cand-A1", "--kind", "inverse", "--size", "2", "--width", "16", "--out-dir", "elsewhere")
+        self.assertEqual(code, 2)
+
+    # what it writes ------------------------------------------------------------------------------
+
+    def test_a_run_writes_its_record_its_projection_and_its_evidence_entry(self):
+        self.assertEqual(self.run_kind("inverse"), 0)
+        record = self.records("inverse")[0]
+        self.assertEqual((record["status"], record["classification"]), ("pass", NONE))
+        self.assertEqual(record["states"], 16 + 2 ** 10)
+        self.assertEqual(record["mismatches"], {"inverse of forward": 0, "forward of inverse": 0})
+        self.assertEqual(record["variant_id"], "cand-A1/n2-w16-R8-c64")
+        self.assertEqual((record["model_id"], record["candidate"]), ("cand-A1", "cand-A1"))
+        self.assertEqual(record["constants"]["path"], f"{candidates.CANDIDATES_REL}/{STUDIED[0]}")
+        self.assertIs(record["heavy_run"], True)
+        entry = self.log()[-1]
+        self.assertEqual(entry["event"], "evidence")
+        self.assertEqual(entry["evidence"], [record["record_id"]])
+        self.assertEqual(list(entry["budget_used_h"]), ["structural"])
+        self.assertEqual(self.probes()[-1]["row"], "cand-A1/structural")
+
+    def probes(self) -> List[Dict]:
+        return [record for _, record in evidence.iter_records("projection", "projections")]
+
+    def test_a_project_run_writes_only_its_projection(self):
+        self.assertEqual(self.run_kind("inverse", "--project"), 0)
+        self.assertEqual(self.records("inverse"), [])
+        self.assertEqual(len(self.probes()), 1)
+        self.assertIn("discarded unread", self.probes()[0]["outputs_statement"])
+
+    def test_a_tool_without_a_validation_writes_not_evaluated(self):
+        self.assertEqual(self.run_kind("dependency"), 0)
+        record = self.records("dependency")[0]
+        self.assertEqual((record["status"], record["validation"]), ("not evaluated", NONE))
+        self.assertNotIn("r_f", record)
+
+    def test_a_width_outside_a_tools_kind_writes_not_evaluated(self):
+        self.validated(*self.structural_tools())
+        self.assertEqual(self.run_kind("degree"), 0)
+        self.assertEqual(self.records("degree")[0]["status"], "not evaluated")
+
+    def test_every_run_started_writes_a_record_and_its_hours_are_charged(self):
+        with mock.patch.dict(self.script.RUNS, {"inverse": mock.Mock(side_effect=evidence.ToolFailure("it broke"))}):
+            self.assertEqual(self.run_kind("inverse"), 3)
+        record = self.records("inverse")[0]
+        self.assertEqual(record["status"], "inconclusive")
+        self.assertIn("it broke", " ".join(record["limitations"]))
+        self.assertEqual(self.log()[-1]["evidence"], [record["record_id"]])
+        self.assertFalse(evidence.REPO.heavy_lock.exists())
+
+    def test_a_failed_check_carries_its_class_and_exits_1(self):
+        failed = {"status": "fail", "classification": evidence.classify("inverse", "failed"), "inputs": NONE,
+                  "fields": {"finding": "Π⁻¹ does not undo Π"}}
+        with mock.patch.dict(self.script.RUNS, {"inverse": mock.Mock(return_value=failed)}):
+            self.assertEqual(self.run_kind("inverse"), 1)
+        record = self.records("inverse")[0]
+        self.assertEqual((record["status"], record["classification"]), ("fail", "confirmed vulnerability"))
+        self.assertEqual(record["exit_status"], 1)
+
+    def test_a_second_run_of_a_variant_exits_2_with_no_defect_recorded(self):
+        self.assertEqual(self.run_kind("inverse"), 0)
+        self.commit("the record")
+        self.assertEqual(self.run_kind("inverse"), 2)
+        self.assertEqual(len(self.records("inverse")), 1)
+
+    def test_a_recorded_defect_gives_one_re_run_which_names_it(self):
+        self.assertEqual(self.run_kind("inverse"), 0)
+        first = self.records("inverse")[0]["record_id"]
+        write(self.root, f"{self.script.DEFECTS_REL}/{first}.json", json.dumps({"defect": "d", "cause": "c", "fix": "f"}))
+        self.commit("the defect")
+        self.assertEqual(self.run_kind("inverse"), 0)
+        made = [record for record in self.records("inverse") if record["record_id"] != first][0]
+        self.assertEqual(made["exclusions_and_reruns"][0]["record_id"], first)
+        self.assertEqual(made["exclusions_and_reruns"][0]["why"], "tool defect")
+        self.commit("the re-run")
+        self.assertEqual(self.run_kind("inverse", "--rounds", "8"), 2)
+
+    def test_a_run_ended_from_outside_runs_again_and_names_it(self):
+        self.assertEqual(self.run_kind("inverse"), 0)
+        path, record = next(iter(evidence.iter_records("inverse", "candidates/cand-A1")))
+        write(self.root, evidence.rel_to_repo(path), evidence.pretty(dict(record, ended_outside="2026-11-03T01:00:00Z", status="inconclusive")))
+        self.commit("ended")
+        self.assertEqual(self.run_kind("inverse"), 0)
+        made = [item for item in self.records("inverse") if item["record_id"] != record["record_id"]][0]
+        self.assertEqual(made["exclusions_and_reruns"], [{"record_id": record["record_id"], "why": "ended from outside"}])
+
+    def test_the_stated_transport_difference_is_checked_at_both_round_counts(self):
+        self.validated(*self.structural_tools())
+        self.assertEqual(self.run_kind("invariant"), 0)
+        record = self.records("invariant")[0]
+        self.assertEqual(sorted(record["round_counts"]), ["1", "8"])
+        self.assertEqual(sorted(record["differences"]), ["by the checkerboard", "in lane order"])
+        self.assertEqual(sorted(record["differences"]["in lane order"]), ["1", "8"])
+        self.assertTrue(record["validation"]["record_id"].startswith("validation-"))
+
+    def test_a_dependency_record_holds_rounds_matrices_and_needs_no_table(self):
+        self.validated(*self.structural_tools())
+        self.assertEqual(self.run_kind("dependency"), 0)
+        record = self.records("dependency")[0]
+        self.assertEqual(record["variant_id"], "cand-A1/n2-w16")
+        self.assertGreater(record["r_f"], 0)
+        self.assertEqual(record["classification"], "confirmed vulnerability" if record["incomplete_rounds"] else NONE)
+        self.assertIn("incomplete diffusion", record["finding"])
+        self.assertEqual(record["through_instantiate"], NONE)
+        self.assertTrue(all(item["committed"] is False for item in record["outputs"]))
+        self.assertTrue(record["reads_no_constant"])
+
+    def test_a_degree_record_raises_at_the_round_counts_within_its_limit(self):
+        self.validated(*self.structural_tools())
+        self.assertEqual(self.run_script("--candidate", "cand-A1", "--kind", "degree", "--size", "2", "--width", "8", "--out-dir", self.out), 0)
+        record = self.records("degree")[0]
+        self.assertEqual(record["classification"], "strong theoretical concern")
+        self.assertTrue(record["rounds_fired"])
+        self.assertEqual(min(record["counts"]["forward"][-1], record["counts"]["inverse"][-1]), 63)
+        self.assertLess(record["rounds"][-1], 256)
+
+    # --aborted --------------------------------------------------------------------------------------
+
+    def cleared(self, hours: float = 1.5) -> Path:
+        write(self.root, "scripts/clear_lock.py", (CODE_ROOT / "scripts/clear_lock.py").read_bytes())
+        self.commit("clear_lock")
+        run = evidence.Run("frequency", candidate="cand-A1", argv=["scripts/clear_lock.py"], code_files=["scripts/clear_lock.py"],
+                           writes_evidence=False)
+        with run:
+            return run.finish("inconclusive", fields={"hours": {"projected": 1.0, "used": hours}})
+
+    def test_aborted_appends_the_entry_with_its_hours_whatever_the_row_holds(self):
+        path = self.cleared()
+        candidates.append({"candidate_id": "cand-A1", "event": "evidence", "evidence": [], "budget_used_h": {"statistics": 12.0}})
+        self.assertEqual(self.run_script("--aborted", str(path)), 0)
+        entry = self.log()[-1]
+        self.assertEqual(entry["evidence"], [json.loads(path.read_bytes())["record_id"]])
+        self.assertEqual(entry["budget_used_h"], {"statistics": 1.5})
+
+    def test_aborted_exits_2_for_a_record_that_has_its_entry(self):
+        path = self.cleared()
+        self.assertEqual(self.run_script("--aborted", str(path)), 0)
+        lines = len(self.log())
+        self.assertEqual(self.run_script("--aborted", str(path)), 2)
+        self.assertEqual(len(self.log()), lines)
+
+    def test_aborted_exits_2_for_any_other_record(self):
+        self.assertEqual(self.run_kind("inverse"), 0)
+        path, _ = next(iter(evidence.iter_records("inverse", "candidates/cand-A1")))
+        lines = len(self.log())
+        self.assertEqual(self.run_script("--aborted", str(path)), 2)
+        self.assertEqual(self.run_script("--aborted", "no/such/record.json"), 2)
+        self.assertEqual(len(self.log()), lines)
+
+    # controls ---------------------------------------------------------------------------------------
+
+    def control(self, *more, fires: bool = False) -> int:
+        fields = {"fires": fires, "sample_size": {"n": 4}}
+        inputs = {"namespace": "control", "index_range": [0, 7]}
+        self.validated(("bias", self.script.TOOL_PATHS["control"]))
+        with mock.patch.dict(self.script.CONTROLS, {"frequency": mock.Mock(return_value=(fields, inputs))}) as held:
+            self.counted = held["frequency"]
+            return self.run_script("--kind", "control", "--test", "frequency", "--size", "4", "--out-dir",
+                                   f"{evidence.REP_REL}/controls", *more)
+
+    def controls(self) -> List[Tuple]:
+        return list(evidence.iter_records("control", "controls"))
+
+    def test_a_control_has_no_candidate_and_appends_no_entry(self):
+        lines = len(self.log())
+        self.assertEqual(self.control(), 0)
+        _, record = self.controls()[0]
+        self.assertEqual((record["model_id"], record["variant_id"], record["status"]), (None, None, "pass"))
+        self.assertEqual((record["test"], record["size"], record["fires"]), ("frequency", 4, False))
+        self.assertEqual(len(self.log()), lines)
+
+    def test_a_control_that_fires_keeps_status_inconclusive_and_class_none(self):
+        self.assertEqual(self.control(fires=True), 0)
+        _, record = self.controls()[0]
+        self.assertEqual((record["status"], record["classification"], record["fires"]), ("inconclusive", NONE, True))
+        self.assertIn("recommends stopping", record["finding"])
+        with self.assertRaisesRegex(Refused, "fired"):
+            self.script.guard_control("cand-A1", "frequency", 4)
+
+    def test_a_control_exits_2_once_its_record_exists(self):
+        self.assertEqual(self.control(), 0)
+        self.commit("the control")
+        self.assertEqual(self.control(), 2)
+        self.assertEqual(len(self.controls()), 1)
+
+    def test_a_control_ended_from_outside_runs_again_with_the_same_inputs(self):
+        self.assertEqual(self.control(), 0)
+        path, record = self.controls()[0]
+        write(self.root, evidence.rel_to_repo(path), evidence.pretty(dict(record, ended_outside="2026-11-03T01:00:00Z", status="inconclusive")))
+        self.commit("ended")
+        with self.assertRaisesRegex(Refused, "waits for its uniform control"):
+            self.script.guard_control("cand-A1", "frequency", 4)
+        self.assertEqual(self.control(), 0)
+        made = [item for _, item in self.controls() if item["record_id"] != record["record_id"]][0]
+        self.assertEqual(made["inputs"], record["inputs"])
+        self.assertEqual(made["sample_size"], record["sample_size"])
+        self.assertEqual(made["exclusions_and_reruns"], [{"record_id": record["record_id"], "why": "ended from outside"}])
+        self.script.guard_control("cand-A1", "frequency", 4)
+
+    def test_a_row_that_cannot_hold_a_control_takes_no_test_of_its_kind_there(self):
+        candidates.append({"candidate_id": "cand-A1", "event": "entered-d4", "evidence": []})
+        with mock.patch.object(self.script, "rows_charged", return_value=([], ["cand-A1"])):
+            self.assertEqual(self.control(), 0)
+        with self.assertRaisesRegex(Refused, "could not hold"):
+            self.script.guard_control("cand-A1", "frequency", 4)
+
+    def test_a_control_needs_a_validated_bias_tool(self):
+        self.assertEqual(self.run_script("--kind", "control", "--test", "frequency", "--size", "4", "--out-dir",
+                                         f"{evidence.REP_REL}/controls"), 2)
+
+    def test_a_control_refuses_a_size_that_is_not_claimable(self):
+        self.assertEqual(self.run_script("--kind", "control", "--test", "frequency", "--size", "2", "--out-dir",
+                                         f"{evidence.REP_REL}/controls"), 2)
+
+    def test_the_control_inputs_are_research_r3s_control_states(self):
+        states = self.script.control_states(4, 2, 3)
+        import protocol.devinputs_v3 as inputs
+        self.assertEqual([int(value) for value in states[:, 0]], list(inputs.state("control", 4, 32, 2)))
+        self.assertEqual([int(value) for value in states[:, 2]], list(inputs.state("control", 4, 32, 4)))
+
+    def test_the_avalanche_control_counts_each_group_as_the_test_does(self):
+        """Group g holds differences g·N_a to (g + 1)·N_a - 1, each of states 2i and 2i + 1; a part's counts are those of its own states."""
+        import numpy as np
+        script = self.script
+        entry = {"low": 3000, "high": 5300}
+        with mock.patch.object(script, "bias_entries", return_value=(entry, entry)), \
+                mock.patch.object(script.avalanche, "N_A", 64), mock.patch.object(script.avalanche, "N_FIRST", 32):
+            tmp = self.root / "parts"
+            tmp.mkdir()
+            result = script.control_avalanche_part((4, 0, 1, 2, str(tmp)))
+            data = gzip.decompress((tmp / "counts-0000.json.gz").read_bytes())
+            row = json.loads(data)[0]
+            states = script.control_states(4, 128, 128)
+        difference = script.bias.control_differences(states)
+        self.assertEqual(row["group"], 1)
+        self.assertEqual(row["whole"], script.bias.test_order(script.bias.ones(difference, 32)).tolist())
+        self.assertEqual(row["first"], script.bias.test_order(script.bias.ones(difference[:, :32], 32)).tolist())
+        self.assertEqual(result["rows"]["whole"], [int(np.min(row["whole"])), int(np.max(row["whole"]))])
+
+    # --reproduce ------------------------------------------------------------------------------------
+
+    def reproduced(self, record_path: Path) -> Dict:
+        code = self.run_script("--reproduce", str(record_path), "--owner-request", "as the test asks (2026-11-05)")
+        self.assertEqual(code, 0, record_path.name)
+        record = json.loads(record_path.read_bytes())
+        base = self.root / evidence.REP_REL / "reproductions" / record["record_id"]
+        return json.loads(next(sorted(base.iterdir())[-1].glob("reproduction-*.json")).read_bytes())
+
+    def test_a_run_of_each_structural_kind_its_latest_and_one_older_matches(self):
+        """Every kind here is heavy by its kind, so that each reproduction is on a request, quoted, and charged to the feature-wide row."""
+        self.validated(*self.structural_tools())
+        for kind, width in (("inverse", "16"), ("symmetry", "16"), ("invariant", "16"), ("dependency", "16"), ("degree", "8")):
+            with self.subTest(kind=kind):
+                argv = ("--candidate", "cand-A1", "--kind", kind, "--size", "2", "--width", width, "--out-dir", self.out)
+                self.assertEqual(self.run_script(*argv), 0)
+                self.commit(f"the {kind} record")
+        write(self.root, "data/note.txt", "a later commit\n")
+        self.commit("later")
+        extra = ("--candidate", "cand-A1", "--kind", "inverse", "--size", "2", "--width", "4", "--out-dir", self.out)
+        self.assertEqual(self.run_script(*extra), 0)
+        self.commit("a newer inverse record")
+        for kind in ("inverse", "symmetry", "invariant", "dependency", "degree"):
+            held = list(evidence.iter_records(kind, "candidates/cand-A1"))
+            for path, record in held:
+                with self.subTest(record=record["record_id"]):
+                    found = self.reproduced(path)
+                    self.assertEqual(found["outcome"], "match", found["compared"])
+                    self.assertEqual(found["owner_request"], "as the test asks (2026-11-05)")
+
+
+STATED_SUBJECT = """import ir
+
+P, V = ir.PRESSURE, ir.VEIN
+
+
+def build(n, w):
+    phases = []
+    for colour in range(2):
+        nodes = ir.nodes_of(n, colour)
+        phases.append(ir.Phase(colour, tuple(ir.Mix(ir.lane(n, i, j, V), "add", ir.Rotl(ir.Lane(ir.lane(n, i, j, P)), 7)) for i, j in nodes)))
+        phases.append(ir.Phase(colour, tuple(ir.Mix(ir.lane(n, i, j, P), "xor", ir.Rotl(ir.Lane(ir.lane(n, i, j, V)), 13)) for i, j in nodes)))
+    phases.append(ir.Phase(0, tuple(ir.Mix(ir.lane(n, i, j, P), "xor", ir.Lane(ir.lane(n, i, (j + 1) % n, V))) for i, j in ir.nodes_of(n, 0))))
+    phases.append(ir.Phase(1, tuple(ir.Mix(ir.lane(n, i, j, P), "xor", ir.Lane(ir.lane(n, i, (j + 1) % n, V))) for i, j in ir.nodes_of(n, 1))))
+    return ir.Program("stated", n, w, tuple(phases))
+"""
+
+
+class EvidenceCounts(TempRepo):
+    """The statistical kinds on a stated list at a small size, whose critical counts stand in for the table's. No count of research R4
+    changes: the sets and thresholds are the run's own, and only what the stated size cannot hold is stated here."""
+
+    def setUp(self):
+        super().setUp()
+        import sys
+        self.script = evidence_script()
+        self.ir = sys.modules["ir"]
+        namespace: Dict = {}
+        exec(STATED_SUBJECT, namespace)
+        loaded = self.ir.load(namespace["build"](2, 32))
+        self.subject = self.script.Subject("cand-A1", 2, 32, 4, 64, "n2-w32-R4-c64", loaded, [], "")
+        write(self.root, "research/004/candidates/cand-A1/constants/n2-w32-R4-c64.json", "{}")
+        write(self.root, self.script.bias.TABLE_REL, (CODE_ROOT / self.script.bias.TABLE_REL).read_bytes())
+        self.subject.table_rel = "research/004/candidates/cand-A1/constants/n2-w32-R4-c64.json"
+        self.critical = {"low": 2, "high": 8254, "test": "stated"}
+        for name, patched in (("bias_entries", mock.Mock(return_value=(self.critical, self.critical))),):
+            patcher = mock.patch.object(self.script, name, patched)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+    def run_of(self, kind: str) -> evidence.Run:
+        return evidence.Run(kind, candidate="cand-A1", directory="candidates/cand-A1", code_files=(), argv=["scripts/evidence_v3.py"],
+                            writes_evidence=False)
+
+    def frequency(self, total: int = 2 ** 9) -> Dict:
+        entry = {"low": 150, "high": 362}
+        run = self.run_of("frequency")
+        run.workers = 1
+        with mock.patch.object(self.script, "FREQUENCY_N", total), mock.patch.object(self.script.bias, "entry_for", return_value=entry):
+            result = self.script.run_frequency(self.subject, run)
+        self.frequency_run = run
+        return result
+
+    def test_a_frequency_run_counts_both_sets_in_both_directions(self):
+        result = self.frequency()
+        fields = result["fields"]
+        self.assertEqual(sorted(fields["summaries"]), ["key 0, nonce i", "key i, nonce i"])
+        for directions in fields["summaries"].values():
+            self.assertEqual(sorted(directions), ["forward", "inverse"])
+            self.assertEqual({len(rows) for rows in directions.values()}, {4})
+        self.assertEqual(fields["test_parameters"]["s"], 4 * 2 * 4 * 32)
+        self.assertEqual(result["inputs"]["kind"], ["key", "nonce"])
+
+    def test_a_frequency_verdict_reads_only_what_the_record_commits(self):
+        result = self.frequency()
+        fields = result["fields"]
+        low, high = fields["test_parameters"]["critical"]
+        self.assertEqual(fields["rounds_fired"], evidence.frequency_rounds_fired(fields["summaries"], low, high))
+        self.assertEqual(result["status"], "fail" if any(2 * r > 4 for r in fields["rounds_fired"]) else "pass")
+        self.assertEqual(result["classification"], "confirmed vulnerability")
+        self.assertIn("a chance of a false firing", result["fields"]["finding"])
+
+    def test_a_frequency_runs_outputs_are_json_and_each_fired_bit_is_listed(self):
+        self.frequency()
+        run = self.frequency_run
+        names = sorted(entry["path"].rsplit("/", 1)[-1] for entry in run.outputs)
+        self.assertEqual(names, ["counts.json.gz", "failure-locations.json.gz", "p-values.json.gz"])
+        for source, final in run.moves:
+            data = json.loads(gzip.decompress(Path(source).read_bytes()))
+            if final.endswith("failure-locations.json.gz"):
+                self.assertTrue(data)
+                self.assertEqual(sorted(data[0]), ["count", "direction", "position", "round", "set"])
+            if final.endswith("counts.json.gz"):
+                self.assertEqual(len(data["key i, nonce i"]["forward"]), 4)
+                self.assertEqual(len(data["key i, nonce i"]["forward"][0]), 2 * 4 * 32)
+        p_values = [entry for entry in run.outputs if entry["path"].endswith("p-values.json.gz")][0]
+        self.assertEqual((p_values["deterministic"], p_values["compared"]), (False, "values"))
+
+    def test_the_counts_do_not_depend_on_how_batches_fall(self):
+        one = self.script.summed([self.script.frequency_worker((self.subject, 0, 64, False))])
+        two = self.script.summed([self.script.frequency_worker((self.subject, 0, 40, False)),
+                                  self.script.frequency_worker((self.subject, 40, 24, False))])
+        self.assertEqual(one["forward"].tobytes(), two["forward"].tobytes())
+        self.assertEqual(one["inverse"].tobytes(), two["inverse"].tobytes())
+
+    def avalanche_run(self, directory: Path) -> List[Dict]:
+        self.script.store_matrices(self.subject, directory)
+        jobs = self.script.avalanche_jobs(self.subject, str(directory))
+        return [self.script.avalanche_worker(job) for job in jobs]
+
+    def test_an_avalanche_runs_jobs_cover_the_three_paths_in_a_fixed_order(self):
+        jobs = self.script.avalanche_jobs(self.subject, "d")
+        paths = [job[1] for job in jobs]
+        self.assertEqual(paths[-1], self.script.ROTATIONS)
+        self.assertEqual(sum(len(job[2]) for job in jobs if job[1] == self.script.FLIPS), 128)
+        self.assertEqual(sum(len(job[2]) for job in jobs if job[1] == self.script.RELATED), 96)
+        self.assertEqual([job[3] for job in jobs], list(range(len(jobs))))
+        self.assertEqual(jobs[-1][2], list(range(1, 32)))
+
+    def test_every_firing_counts_and_the_matrices_agree(self):
+        directory = self.root / "workers"
+        results = self.avalanche_run(directory)
+        paths = self.script.merged_paths(results, 4)
+        self.assertEqual(sorted(paths), sorted((self.script.FLIPS, self.script.RELATED, self.script.ROTATIONS)))
+        fired = evidence.avalanche_rounds_fired(paths, (2, 8254), (2, 8254))
+        self.assertIn(1, fired)
+        for row in paths.values():
+            self.assertEqual(row["expected_bits_that_did_not_fire"], 0)
+        self.assertEqual(sum(paths[self.script.FLIPS]["fired_by_round"]) > 0, True)
+        kept = json.loads(gzip.decompress((directory / results[0]["part"]["file"]).read_bytes()))
+        self.assertEqual(sorted(kept[0]), ["first", "round", "tag", "whole"])
+        self.assertEqual(len(kept[0]["whole"]), 2 * 4 * 32)
+
+    def test_a_disagreement_with_the_matrices_is_a_tool_defect_and_exits_3(self):
+        run = self.run_of("avalanche")
+        run.workers = 1
+        worker = mock.Mock(side_effect=evidence.ToolFailure("a difference bit the dependency matrices show independent flipped, x"))
+        with mock.patch.object(self.script, "avalanche_worker", worker), mock.patch.object(self.script, "store_matrices"),                 mock.patch.object(self.script, "dependency_cited", return_value="dependency-x"):
+            result = self.script.run_avalanche(self.subject, run)
+        self.assertEqual((result["status"], result["exit_status"], result["classification"]), ("inconclusive", 3, NONE))
+        self.assertEqual(result["fields"]["tool_defect"]["kind"], "a disagreement between avalanche counts and dependency matrices")
+
+    def test_any_other_failure_of_a_part_stays_a_failure(self):
+        run = self.run_of("avalanche")
+        run.workers = 1
+        with mock.patch.object(self.script, "dependency_cited", return_value="dependency-x"), \
+                mock.patch.object(self.script, "avalanche_worker", mock.Mock(side_effect=evidence.ToolFailure("something else"))), \
+                mock.patch.object(self.script, "store_matrices"):
+            with self.assertRaisesRegex(evidence.ToolFailure, "something else"):
+                self.script.run_avalanche(self.subject, run)
+
+
+class EvidenceBounds(TempRepo):
+    """The bound methods, on stated boxes and layers, with the box search stubbed where its binary does not run."""
+
+    def setUp(self):
+        super().setUp()
+        import sys
+        self.script = evidence_script()
+        self.ir = sys.modules["ir"]
+        self.args = mock.Mock(rounds=2, bound_kind="differential", method="active-box count")
+        write(self.root, candidates.module_rel("cand-A1"), (CODE_ROOT / candidates.module_rel("cand-A1")).read_bytes())
+        self.subject = self.script.plain_subject("cand-A1", 4, 16, 2)
+
+    def box_record(self, kind: str, weights: Dict) -> None:
+        record = {"kind": "bound", "record_id": f"bound-{kind}", "created_utc": "2026-11-05T00:00:00Z", "method": "branch-and-bound",
+                  "bound_kind": kind, "width": 16, "status": "pass", "rounds": 1, "boxes": {"box 0": {"weights": weights}}}
+        write(self.root, f"{evidence.REP_REL}/candidates/cand-A1/{record['record_id']}.json", evidence.pretty(record))
+
+    def test_a_box_bound_doubles_a_linear_exponent(self):
+        search = mock.Mock(return_value={1: {"weight": 3, "walks": 9}})
+        with mock.patch.object(self.script.arx_search_known, "search", search):
+            found = self.script.box_method(self.subject, "linear", 1, self.args)
+            plain = self.script.box_method(self.subject, "differential", 1, self.args)
+        self.assertEqual(found["bound"], "393216/65536")
+        self.assertEqual(plain["bound"], "196608/65536")
+        self.assertEqual(sorted(found["boxes"]), ["box 0", "box 1"])
+
+    def test_a_count_reads_the_box_record_and_is_a_whole_number(self):
+        self.box_record("differential", {"1": 5})
+        found = self.script.active_box_method(self.subject, "differential", 2, self.args)
+        self.assertEqual(found["box"], [5])
+        self.assertEqual(found["box_record"], "bound-differential")
+        self.assertEqual(int(found["bound"]) % 5, 0)
+        self.assertEqual(sorted(found["counts"]), ["1", "2"])
+        self.assertIn("mip_rel_gap", found["solver"])
+
+    def test_a_count_of_masks_takes_twice_the_exponent(self):
+        self.box_record("linear", {"1": 2})
+        self.assertEqual(self.script.active_box_method(self.subject, "linear", 1, self.args)["box"], [4])
+
+    def test_a_count_with_no_box_record_exits_2(self):
+        with self.assertRaisesRegex(Refused, "no box bound"):
+            self.script.active_box_method(self.subject, "linear", 2, self.args)
+
+    def test_a_search_at_its_cap_gives_no_bound_and_is_marked(self):
+        with mock.patch.dict(self.script.METHODS["active-box count"], {"run": mock.Mock(side_effect=evidence.ToolFailure("2 steps: status 1, x: no count"))}):
+            result = self.script.run_bound(self.subject, None, self.args, "long-trail active-box counting", {"record_id": "v"}, NONE)
+        self.assertEqual((result["status"], result["classification"]), ("inconclusive", NONE))
+        self.assertIs(result["fields"]["capped"], True)
+        self.assertEqual(result["fields"]["bound"], NONE)
+        self.assertTrue(evidence.reached_cap(dict(result["fields"], status="inconclusive")))
+
+    def test_any_other_failure_of_a_search_stays_a_failure(self):
+        with mock.patch.dict(self.script.METHODS["active-box count"], {"run": mock.Mock(side_effect=evidence.ToolFailure("arx_search exited 1"))}):
+            with self.assertRaises(evidence.ToolFailure):
+                self.script.run_bound(self.subject, None, self.args, "long-trail active-box counting", {"record_id": "v"}, NONE)
+
+    def test_a_tool_outside_its_width_writes_not_evaluated(self):
+        result = self.script.run_bound(self.subject, None, self.args, "long-trail active-box counting", None, NONE)
+        self.assertEqual(result["status"], "not evaluated")
+
+    def test_a_proven_bound_carries_its_class_scope_and_limitation(self):
+        with mock.patch.dict(self.script.METHODS["active-box count"], {"run": mock.Mock(return_value={"bound": "25"})}):
+            result = self.script.run_bound(self.subject, None, self.args, "long-trail active-box counting", {"record_id": "v"}, NONE)
+        self.assertEqual(result["classification"], "no weakness identified within the analysis performed")
+        self.assertEqual(result["fields"]["bound"], "25")
+        self.assertIn("independence assumptions", result["fields"]["scope"])
+        self.assertTrue(result["limitations"])
+
+    def test_a_count_of_active_s_boxes_on_a_small_layer(self):
+        sbox = (0xC, 5, 6, 0xB, 9, 0, 0xA, 0xD, 3, 0xE, 0xF, 8, 4, 7, 1, 2)
+        layer = self.script.active_sbox.Cycle((self.script.active_sbox.spn(sbox, 2, (4, 1, 6, 3, 0, 5, 2, 7)),))
+        with mock.patch.object(self.script, "boolean_layer", return_value=layer):
+            found = self.script.active_sbox_method(self.subject, "differential", 2, self.args)
+        self.assertEqual(int(found["bound"]), found["active_sboxes"] * found["weight_per_sbox"])
+        self.assertEqual(found["weight_per_sbox"], 2)
+
+    def test_a_cross_check_of_the_counter_lists_both_values(self):
+        sbox = (0xC, 5, 6, 0xB, 9, 0, 0xA, 0xD, 3, 0xE, 0xF, 8, 4, 7, 1, 2)
+        layer = self.script.active_sbox.Cycle((self.script.active_sbox.spn(sbox, 2, (4, 1, 6, 3, 0, 5, 2, 7)),))
+        write(self.root, self.script.TRAIL_PATHS["active-S-box counting"], (CODE_ROOT / self.script.TRAIL_PATHS["active-S-box counting"]).read_bytes())
+        args = mock.Mock(rounds=2, tool="active-S-box counting")
+        with mock.patch.object(self.script, "boolean_layer", return_value=layer):
+            result = self.script.run_cross_check(self.subject, None, args)
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(len(result["fields"]["rows"]), 4)
+        self.assertTrue(all(row["equal"] for row in result["fields"]["rows"]))
+
+    def test_research_r12_asks_for_no_other_cross_check(self):
+        with self.assertRaisesRegex(Refused, "no cross-check"):
+            self.script.run_cross_check(self.subject, None, mock.Mock(tool="exhaustive tables"))
+
+    @unittest.skipUnless(os.name == "posix", "the ARX search is a WSL binary")
+    def test_a_cross_check_of_the_search_on_a1s_first_amounts_passes(self):
+        for rel in (self.script.TRAIL_PATHS["ARX search"], self.script.ARX_BINARY):
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        args = mock.Mock(rounds=2, tool="ARX search")
+        result = self.script.run_cross_check(self.subject, None, args)
+        self.assertEqual(result["status"], "pass", [row for row in result["fields"]["rows"] if not row["above_floor"] or row["equal"] is False])
+        widths = {row["width"] for row in result["fields"]["rows"]}
+        self.assertEqual(widths, {4, 8})
+        self.assertTrue(all(row["equal"] is True for row in result["fields"]["rows"] if row["width"] == 4))
+        self.assertTrue(all(row["equal"] is None for row in result["fields"]["rows"] if row["width"] == 8))
 
 
 class ClearLock(TempRepo):

@@ -281,7 +281,7 @@ def shows_reason(candidate: str, cause: str, record: Dict, fields: Dict) -> bool
         return record.get("kind") in ("d4-choice", "d4-tie") \
             and record.get("chosen_family") not in (None, NONE, family)
     if cause == UNIFORM_CONTROL:
-        return record.get("kind") == "control" and record.get("status") == "fail"
+        return record.get("kind") == "control" and record.get("status") == "inconclusive" and record.get("fires") is True
     if cause == SHARED_MATCH:
         return record.get("kind") == "generator-run" and record.get("status") == "fail"
     return cause == NO_TRAIL_ROUTE and record.get("kind") == "cross-check" \
