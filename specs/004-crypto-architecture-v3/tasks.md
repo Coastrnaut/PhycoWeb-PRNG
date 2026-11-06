@@ -48,9 +48,9 @@ it.
 16 hex digits), the owner's commits, freeze steps (1) and (4) among them, and every row of the
 spec's Review & Approval table, which the agent writes only on the owner's explicit word for that
 row, quoted with its date in the row's notes. **heavy** marks a heavy run (FR-045): it takes
-`data/heavy-run.lock`, projects first against its budget row, never overlaps another heavy run, and
-starts only on the owner's go-ahead for that run, since the owner's word of 2026-11-01, "No heavy
-runs", stands until the owner changes it.
+`data/heavy-run.lock`, projects first against its budget row, never overlaps another heavy run and
+needs no go-ahead of its own: the owner's word of 2026-11-05, "dont wait to start any heavy runs",
+replaced the word of 2026-11-01, "No heavy runs".
 
 The agent commits locally under the owner's standing authorization (constitution 1.3.0,
 Principle IX), after each task or set of related tasks and about every 30 minutes, with no AI
@@ -377,7 +377,7 @@ or key-loading code is written here.
 
 ### Step (4): the refused list and the protocol change log
 
-- [ ] T027 Write the refused list of research R15 as `research/004/refused-constants.json`, in R15's
+- [X] T027 Write the refused list of research R15 as `research/004/refused-constants.json`, in R15's
   entry format, which `scripts/gen_constants_v3.py` will read, before the protocol change log, so
   that its SHA-256 stands in `refused_list` of each entry that fixes the constant rule
   (data-model §18), the file committed before T028: the standard polynomials of degree 64 and 128
@@ -472,9 +472,8 @@ or key-loading code is written here.
   `python -W ignore -m unittest discover -s tests -t .`, and in WSL with `wpy`: every test passes,
   or skips naming its open item, and none fails (quickstart P0); record the commands and results for
   the phase report. The suite is light until T081 adds FR-053's test with two worker counts, marked
-  heavy; from then on a run of the whole suite, or of `tests/test_records_004.py`, is a heavy run
-  and waits for the owner's go-ahead, and T125 makes that run before the final report. (FR-053,
-  FR-058; Principle V)
+  heavy; from then on a run of the whole suite, or of `tests/test_records_004.py`, is a heavy run,
+  and T125 makes that run before the final report. (FR-053, FR-058; Principle V)
 
 **Checkpoint**: the writers, the three logs, the register and the archive stand; the claim test and
 the line-ending test pass at HEAD; each platform's environment record in force reads Approved. The
@@ -1208,7 +1207,7 @@ phase ends with the constitution's phase report to the owner.
   0 disagreements, its `recheck` record under `$REP/rechecks/` naming the interpreter, the platform
   and its `pip freeze`, and saying when that environment is not one of research R1's
   (quickstart F3). (FR-065; SC-017)
-- [ ] T125 **heavy**, on the owner's go-ahead: run the whole suite under `tests/` on Windows,
+- [ ] T125 **heavy**: run the whole suite under `tests/` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and with `wpy` in WSL (quickstart P0),
   FR-053's two-worker test among it, under the heavy-run lock and projected first against
   research R7's feature-wide row, charging no candidate: every test passes, or skips naming its open
@@ -1415,5 +1414,5 @@ names:
 - Test runs at a phase's checkpoint are light: until T081 adds FR-053's two-worker test, the whole
   suite on both platforms, as T037 runs it; from then on, the phase's own test modules by their test
   classes, FR-053's two-worker test left out. A run that includes that test, the whole suite or
-  `tests/test_records_004.py` among them, is a heavy run that waits for the owner's go-ahead
-  (FR-045), and T125 is that run before the final report.
+  `tests/test_records_004.py` among them, is a heavy run (FR-045), and T125 is that run before the
+  final report.
