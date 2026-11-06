@@ -466,9 +466,13 @@ evidence_v3.py --aborted RECORD
 ```
 
 KIND is `inverse`, `bijectivity`, `dependency`, `frequency`, `avalanche`, `control`, `symmetry`,
-`invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`) or
+`invariant`, `degree`, `bound` (with `--bound-kind differential|linear --method M`),
 `cross-check` (with `--tool NAME`), the cross-check between kinds of data model §7
-on the candidate's boxes or nonlinear layer, charged to its trail row. The
+on the candidate's boxes or nonlinear layer, charged to its trail row, or `rotation-ranking`, the
+search of research R15 over the candidate's recorded space at the width of `--width`, under the
+protocol change log's ranking entry, charged to its trail row and exiting 2 until the
+cross-checks on the first amounts of that space have passed, which writes the record of data
+model §6 with the full ranking, the amounts chosen being its first entry. The
 candidate must be in the log; a `bound` needs a validated tool. Writes one record of data model §5,
 §6 or §7 (a cross-check) and its raw outputs, and for a `bound` run of a tool that
 searches Π also a `trail` record of the optimal characteristic it returns

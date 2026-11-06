@@ -1332,7 +1332,8 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     one value (ANA-076).
   - **Cross-checks between kinds.** They run on each candidate's own boxes, once per candidate and
     tool version, as the solver cross-checks of that candidate's 48 h row, each instance capped at
-    8 h (R7): for each distinct ARX-box of each ARX candidate, two checks, for every r from 1 to the
+    8 h (R7), one run of `evidence_v3.py`, all its boxes, widths and kinds together, being one
+    instance: for each distinct ARX-box of each ARX candidate, two checks, for every r from 1 to the
     largest at which the exhaustive computation finishes within its 8 h cap, before the search's
     results at w = 16 and 32 count: at w = 4 (boxes of 8 bits), the ARX search's optimal
     single-trail weight over r rounds of the box must equal that of an exhaustive search over the
