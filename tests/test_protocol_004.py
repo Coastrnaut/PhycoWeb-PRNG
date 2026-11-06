@@ -1,6 +1,7 @@
 """Feature 004: the evidence writer, the guards every script shares and the common part of
 --reproduce (T008; FR-038, FR-039, FR-040, FR-044, FR-045, FR-053, FR-061; research R7, R12, R16).
 Each guard refuses with exit 2 and writes nothing. No test here makes a heavy run."""
+import argparse
 import ast
 import datetime
 import gzip
@@ -3577,7 +3578,7 @@ class EvidenceRuns(TempRepo):
         candidates.propose({"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": digest, "parameters": fields})
         self.commit("proposed")
         self.out = f"{evidence.REP_REL}/candidates/cand-A1"
-        for name, patched in (("reserved_hours", lambda *a: 0.0),):
+        for name, patched in (("reserved_hours", lambda *a: 0.0), ("reserved_trails", lambda *a: 0.0)):
             patcher = mock.patch.object(self.script, name, side_effect=patched)
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -4251,7 +4252,8 @@ class EvidenceBounds(TempRepo):
         layer = self.script.active_sbox.Cycle((self.script.active_sbox.spn(sbox, 2, (4, 1, 6, 3, 0, 5, 2, 7)),))
         write(self.root, self.script.TRAIL_PATHS["active-S-box counting"], (CODE_ROOT / self.script.TRAIL_PATHS["active-S-box counting"]).read_bytes())
         args = mock.Mock(rounds=2, tool="active-S-box counting")
-        with mock.patch.object(self.script, "boolean_layer", return_value=layer):
+        with mock.patch.object(self.script, "boolean_layer", return_value=layer), \
+                mock.patch.object(self.script, "limited", side_effect=lambda function, job, seconds: function(job)):
             result = self.script.run_cross_check(self.subject, None, args)
         self.assertEqual(result["status"], "pass")
         self.assertEqual(len(result["fields"]["rows"]), 4)
@@ -4266,12 +4268,52 @@ class EvidenceBounds(TempRepo):
         for rel in (self.script.TRAIL_PATHS["ARX search"], self.script.ARX_BINARY):
             write(self.root, rel, (CODE_ROOT / rel).read_bytes())
         args = mock.Mock(rounds=2, tool="ARX search")
-        result = self.script.run_cross_check(self.subject, None, args)
+        run = mock.Mock(workers=8)
+        with mock.patch.object(self.script, "CROSS_WIDTHS", (4,)), mock.patch.object(self.script, "table_round_seconds", return_value=0.01):
+            result = self.script.run_cross_check(self.subject, run, args)
         self.assertEqual(result["status"], "pass", [row for row in result["fields"]["rows"] if not row["above_floor"] or row["equal"] is False])
-        widths = {row["width"] for row in result["fields"]["rows"]}
-        self.assertEqual(widths, {4, 8})
-        self.assertTrue(all(row["equal"] is True for row in result["fields"]["rows"] if row["width"] == 4))
-        self.assertTrue(all(row["equal"] is None for row in result["fields"]["rows"] if row["width"] == 8))
+        self.assertEqual({row["width"] for row in result["fields"]["rows"]}, {4})
+        self.assertEqual(result["fields"]["rounds"], 2)
+        self.assertTrue(all(row["equal"] is True for row in result["fields"]["rows"]))
+
+    @unittest.skipUnless(os.name == "posix", "the ARX search is a WSL binary")
+    def test_a_search_stopped_at_the_cap_keeps_the_rounds_it_reached(self):
+        for rel in (self.script.TRAIL_PATHS["ARX search"], self.script.ARX_BINARY):
+            write(self.root, rel, (CODE_ROOT / rel).read_bytes())
+        args = mock.Mock(rounds=None, tool="ARX search")
+        with mock.patch.object(self.script, "CROSS_SECONDS", [1.0]), mock.patch.object(self.script, "POLL_SECONDS", 0.1), \
+                mock.patch.object(self.script, "CROSS_WIDTHS", (4, 8)), mock.patch.object(self.script, "table_round_seconds", return_value=0.0), \
+                mock.patch.object(self.script, "worker_map", side_effect=lambda f, jobs, n: [
+                    {"floor": {r: 0 for r in range(1, job[3] + 1)}, "exact": None} for job in jobs]):
+            result = self.script.run_cross_check(self.subject, mock.Mock(workers=1), args)
+        self.assertGreater(result["fields"]["rounds"], 0)
+        self.assertEqual(sorted({row["r"] for row in result["fields"]["rows"]}), list(range(1, result["fields"]["rounds"] + 1)))
+
+    def test_a_climb_keeps_what_was_printed_in_order(self):
+        climb = self.script.Climb.__new__(self.script.Climb)
+        climb.weights = {1: 5, 2: 9, 4: 20}
+        self.assertEqual(climb.reached(), 2)
+
+    def test_a_limited_call_returns_or_gives_up(self):
+        self.assertEqual(self.script.limited(sorted, [3, 1, 2], 60.0), [1, 2, 3])
+        with self.assertRaisesRegex(evidence.ToolFailure, "TypeError"):
+            self.script.limited(sorted, 5, 60.0)
+
+    def test_the_counter_reaches_as_many_rounds_as_the_cap_holds(self):
+        write(self.root, self.script.TRAIL_PATHS["active-S-box counting"], b"counter")
+        rows = [{"kind": "differential", "r": 1, "counter": 4, "exhaustive": 4, "equal": True}]
+        with mock.patch.object(self.script, "limited", side_effect=[rows, None]):
+            result = self.script.run_cross_check(self.subject, None, mock.Mock(rounds=None, tool="active-S-box counting"))
+        self.assertEqual((result["status"], result["fields"]["rounds"]), ("pass", 1))
+        with mock.patch.object(self.script, "limited", return_value=None):
+            result = self.script.run_cross_check(self.subject, None, mock.Mock(rounds=None, tool="active-S-box counting"))
+        self.assertEqual((result["status"], result["fields"]["capped"]), ("inconclusive", True))
+
+    def test_a_unequal_minimum_fails_the_cross_check(self):
+        write(self.root, self.script.TRAIL_PATHS["active-S-box counting"], b"counter")
+        rows = [{"kind": "linear", "r": 1, "counter": 4, "exhaustive": 5, "equal": False}]
+        with mock.patch.object(self.script, "limited", side_effect=[rows, None]):
+            self.assertEqual(self.script.run_cross_check(self.subject, None, mock.Mock(rounds=None, tool="active-S-box counting"))["status"], "fail")
 
 
 def rule_script(name: str):
@@ -5156,6 +5198,128 @@ class CostRecord(TempRepo):
         self.assertEqual(record["variant_id"], "cand-A1/n4-w32-R10-c384")
         self.assertEqual(record["self_test"]["least_k"], 1)
         self.assertEqual(record["validation"]["record_id"], "validation-c")
+
+
+class RotationSearch(TempRepo):
+    """The rotation search of research R15 under the ranking entry (seq 520) and its record (seq 521)."""
+
+    def setUp(self):
+        super().setUp()
+        self.script = evidence_script()
+        for candidate in ("cand-A1", "cand-B1"):
+            write(self.root, candidates.module_rel(candidate), (CODE_ROOT / candidates.module_rel(candidate)).read_bytes())
+        self.subject = self.script.plain_subject("cand-A1", 4, 16, 2)
+
+    def test_the_spaces_in_tie_order_start_at_each_lists_amounts(self):
+        spaces = {candidate: self.script.space_of(candidate) for candidate in ("cand-A1", "cand-B1")}
+        self.assertEqual(len(spaces["cand-A1"]), 64 * 63)
+        self.assertEqual(spaces["cand-A1"][0], self.script.amounts_module("cand-A1").AMOUNTS)
+        self.assertEqual(spaces["cand-A1"], sorted(spaces["cand-A1"]))
+        self.assertEqual(len(spaces["cand-B1"]), 8)
+        self.assertEqual(spaces["cand-B1"][0], self.script.amounts_module("cand-B1").AMOUNTS)
+        self.assertEqual(spaces["cand-B1"][-1], (15, 1))
+
+    def test_the_ranking_puts_the_higher_measure_first_and_ties_in_their_order(self):
+        entries = [{"assignment": "a", "measure": 8}, {"assignment": "b", "measure": 12}, {"assignment": "c", "measure": None},
+                   {"assignment": "d", "measure": 12}, {"assignment": "e", "measure": None}]
+        self.assertEqual([entry["assignment"] for entry in evidence.ranked(entries)], ["b", "d", "a", "c", "e"])
+
+    def small_space(self):
+        return [((1, 1), (1, 3)), ((1, 1), (3, 1)), ((1, 3), (3, 1))]
+
+    def test_an_assignment_takes_its_weakest_box_in_each_kind(self):
+        found = {(1, 1): {"differential": 5, "linear": 4}, (1, 3): {"differential": 7, "linear": 6}, (3, 1): {"differential": 7, "linear": 6}}
+        run = mock.Mock(workers=1)
+        with mock.patch.object(self.script, "space_of", return_value=self.small_space()), \
+                mock.patch.object(self.script, "worker_map", return_value=[found[chosen] for chosen in sorted(found)]):
+            result = self.script.arx_ranking(self.subject, run)
+        best = result["entries"][0]
+        self.assertEqual(best["assignment"], [[1, 3], [3, 1]])
+        self.assertEqual(best["measure"], min(best["W_D"], best["W_L"]))
+        self.assertEqual(sorted(result["counts"]), ["differential, box 5", "differential, box 7", "linear, box 4", "linear, box 6"])
+
+    def test_a_point_whose_search_reached_its_cap_ranks_below_every_point_with_both(self):
+        found = {(1, 1): {"differential": None, "linear": 4}, (1, 3): {"differential": 7, "linear": 4}, (3, 1): {"differential": 7, "linear": 6}}
+        with mock.patch.object(self.script, "space_of", return_value=self.small_space()), \
+                mock.patch.object(self.script, "worker_map", return_value=[found[chosen] for chosen in sorted(found)]):
+            result = self.script.arx_ranking(self.subject, mock.Mock(workers=1))
+        self.assertEqual(result["entries"][0]["assignment"], [[1, 3], [3, 1]])
+        self.assertIsNone(result["entries"][1]["measure"])
+        self.assertEqual(result["entries"][2]["assignment"], [[1, 1], [3, 1]])
+
+    def test_no_point_with_both_bounds_gives_no_amounts(self):
+        run = mock.Mock(clock=0.0)
+        entries = [{"assignment": [1, 3], "W_D": None, "W_L": 4, "measure": None}]
+        with mock.patch.object(self.script, "boolean_ranking", return_value={"sets": {}, "entries": entries, "solver": {}}):
+            subject = self.script.plain_subject("cand-B1", 4, 16, 2)
+            result = self.script.run_ranking(subject, run, "cross-check-x", {"t": "v"})
+        self.assertEqual((result["status"], result["fields"]["chosen"]), ("inconclusive", NONE))
+
+    def test_a_boolean_point_is_its_count_times_the_weight(self):
+        sbox = (0xC, 5, 6, 0xB, 9, 0, 0xA, 0xD, 3, 0xE, 0xF, 8, 4, 7, 1, 2)
+        layer = self.script.active_sbox.Cycle((self.script.active_sbox.spn(sbox, 2, (4, 1, 6, 3, 0, 5, 2, 7)),))
+        with mock.patch.object(self.script, "boolean_layer", return_value=layer):
+            found = self.script.boolean_point((str(self.root), "cand-B1", 4, 16, (1, 3), "differential"))
+        self.assertEqual(found % 2, 0)
+
+    def test_the_record_states_the_rule_it_ran_under(self):
+        entries = [{"assignment": [1, 3], "W_D": 8, "W_L": 8, "measure": 8}]
+        with mock.patch.object(self.script, "boolean_ranking", return_value={"sets": {}, "entries": entries, "solver": {}}):
+            subject = self.script.plain_subject("cand-B1", 4, 16, 2)
+            result = self.script.run_ranking(subject, mock.Mock(clock=0.0), "cross-check-x", {"t": "v"})
+        fields = result["fields"]
+        self.assertEqual((fields["size"], fields["width"], fields["rounds"], fields["chosen"]), (4, 16, 2, [1, 3]))
+        self.assertIn("seq 520", fields["measure"])
+        self.assertIn("lexicographically", fields["tie_order"])
+        self.assertEqual(result["status"], "pass")
+
+    def test_the_trail_row_reserves_the_searches_it_still_needs(self):
+        with self.assertRaisesRegex(Refused, "comes first"):
+            self.script.reserved_trails("cand-A1", {})
+        for probe in self.script.later_searches("cand-A1"):
+            evidence.write_projection(run="x", row="cand-A1/trails", inputs=NONE, measured_speed=1, projected_hours=0.25, time_hours=0.0, extra={"probe": probe})
+        self.assertEqual(len(self.script.later_searches("cand-A1")), 8)
+        self.assertEqual(len(self.script.later_searches("cand-B1")), 6)
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {}), 2.0)
+        this = self.script.later_searches("cand-A1")[0]
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", this), 1.75)
+
+    def test_a_search_ended_needs_no_reservation(self):
+        for probe in self.script.later_searches("cand-A1"):
+            evidence.write_projection(run="x", row="cand-A1/trails", inputs=NONE, measured_speed=1, projected_hours=0.25, time_hours=0.0, extra={"probe": probe})
+        probe = self.script.later_searches("cand-A1")[0]
+        write(self.root, f"{evidence.REP_REL}/candidates/cand-A1/b.json", evidence.pretty(
+            {"kind": "bound", "status": "pass", "method": probe["method"], "bound_kind": probe["bound_kind"], "width": 32, "size": 4}))
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {}), 1.75)
+
+    def test_a_two_call_search_projects_its_cap_per_box(self):
+        args = argparse.Namespace(bound_kind="differential")
+        self.assertEqual(self.script.trail_seconds(self.subject, args, "ARX search", 2), 2 * 8 * 3600.0)
+
+    def test_a_count_that_the_minute_does_not_hold_is_timed_at_a_smaller_state(self):
+        args = argparse.Namespace(bound_kind="differential")
+        calls = []
+
+        def probed(subject, given, tool):
+            calls.append(subject.w)
+            if subject.w == 32:
+                raise evidence.ToolFailure("1 rounds: status 1, time limit: no count")
+
+        subject = self.script.plain_subject("cand-A1", 4, 32, 1)
+        with mock.patch.object(self.script, "probe_count", side_effect=probed):
+            self.assertLess(self.script.count_seconds(subject, args, "active-S-box counting"), 3600.0)
+        self.assertEqual(calls, [32, 8])
+
+    def test_a_ranking_run_needs_a_validated_tool(self):
+        args = mock.Mock(candidate="cand-A1", width=None, size=None, project=False, workers=1)
+        with self.assertRaisesRegex(Refused, "validated tool"):
+            with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+                self.script.run_rotation(args, ["x"], [], "trails")
+
+    def test_a_ranking_stands_at_4x4_only(self):
+        args = mock.Mock(candidate="cand-A1", width=None, size=8, project=False, workers=1)
+        with self.assertRaisesRegex(Refused, "4×4"):
+            self.script.run_rotation(args, ["x"], [], "trails")
 
 
 class ClearLock(TempRepo):

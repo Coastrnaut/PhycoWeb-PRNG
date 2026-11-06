@@ -8,8 +8,8 @@ R4, R7, R12, R13).
     evidence_v3.py --aborted RECORD
 
 KIND is inverse, bijectivity, dependency, frequency, avalanche, symmetry, invariant, degree, bound (with
---bound-kind differential|linear --method M) or cross-check (with --tool NAME). The counts are research
-R4's and R13's, and no option lowers them. Each run projects first against its budget row, takes the
+--bound-kind differential|linear --method M), cross-check (with --tool NAME) or rotation-ranking. The
+counts are research R4's and R13's, and no option lowers them. Each run projects first against its budget row, takes the
 heavy-run lock, writes one record with its raw outputs and appends an `evidence` entry to the candidate
 log, every run started writing a record, `inconclusive` if it was aborted.
 
@@ -23,9 +23,11 @@ import math
 import multiprocessing
 import os
 import shutil
+import queue
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from dataclasses import dataclass
 from fractions import Fraction
@@ -59,15 +61,15 @@ import tables  # noqa: E402
 
 SCRIPT = "scripts/evidence_v3.py"
 KINDS = ("inverse", "bijectivity", "dependency", "frequency", "avalanche", "symmetry", "invariant", "degree",
-         "bound", "cross-check")
+         "bound", "cross-check", "rotation-ranking")
 ROWS = {"inverse": "structural", "bijectivity": "structural", "dependency": "structural", "symmetry": "structural",
         "invariant": "structural", "degree": "structural", "frequency": "statistics", "avalanche": "statistics",
-        "control": "statistics", "bound": "trails", "cross-check": "trails"}
+        "control": "statistics", "bound": "trails", "cross-check": "trails", "rotation-ranking": "trails"}
 # Each row's kinds in research R7's fixed order; the trail row's runs depend on the amounts chosen.
 ROW_ORDER = {"structural": ("inverse", "bijectivity", "dependency", "symmetry", "invariant", "degree"),
              "statistics": ("frequency", "avalanche")}
 NO_TABLE = ("dependency", "degree")
-TRAIL_KINDS = ("bound", "cross-check")
+TRAIL_KINDS = ("bound", "cross-check", "rotation-ranking")
 BIAS_KINDS = ("frequency", "avalanche")
 TOOL_PATHS = {"bijectivity": "research/004/tools/bijectivity.py", "dependency": "research/004/tools/dependency.py",
               "frequency": "research/004/tools/bias.py", "avalanche": "research/004/tools/avalanche.py",
@@ -97,6 +99,14 @@ SCOPE = ("single trails under the usual independence assumptions; clustering int
 BIAS_SCOPE = "the inputs, counts and thresholds of research R4, at the round counts measured"
 NO_CONSTANT = ("the matrices read no constant value, so they cover one permutation for every call type")
 INSTANCE_HOURS = 8.0
+CROSS_WIDTHS = (4, 8)
+SEARCH_RANGE = 64
+RANK_ROUNDS = 2
+RANK_SIZE = 4
+MEASURE = "min(W_D, W_L) at the search width, at 4×4, over 2 rounds of Π (protocol change log, seq 520)"
+TIE_ORDER = "the numbers of an assignment in the order the candidate's log entry states them, first set first, lexicographically"
+POLL_SECONDS = 2.0
+CAP_MARGIN = 1.1
 WIDTH_LIMITATION = ("no exact confirmation exists at this width without a further tool: the bound stands as the solver "
                     "reports it, within its tolerances (research R12)")
 MAPPED_STATEMENT = "the states of a control are taken as research R4's states, and it reads no constant"
@@ -110,7 +120,7 @@ GROUP_CHUNK = 64
 FLIPS, RELATED, ROTATIONS = "flip set", "related keys and nonces", "rotational pairs"
 DISAGREEMENT = "the dependency matrices show independent flipped"
 PROBE_SECONDS = 60.0
-RATIO_OF_A_ROUND = 64.0
+RATIO_OF_A_ROUND = 6.0
 DEFECTS_REL = "research/004/validation/defects"
 OUTPUT_FIELDS = ("raw_counts", "p_values", "failure_locations", "solver", "budget", "hours_used")
 RUN_HERE = """
@@ -887,6 +897,7 @@ def active_sbox_method(subject: Subject, kind: str, rounds: int, args: argparse.
             "solver": dict(active_sbox.SETTINGS, statement=active_sbox.LIMITATION)}
 
 
+CROSS_SECONDS = [INSTANCE_HOURS * 3600.0]
 METHODS = {"branch-and-bound": {"tool": "ARX search", "run": box_method},
            "active-box count": {"tool": "long-trail active-box counting", "run": active_box_method},
            "active-S-box count": {"tool": "active-S-box counting", "run": active_sbox_method}}
@@ -922,49 +933,300 @@ def run_bound(subject: Subject, run: evidence.Run, args: argparse.Namespace, too
             "limitations": [WIDTH_LIMITATION] if w >= 16 else []}
 
 
-def run_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespace) -> Dict:
-    """Research R12's checks on a candidate's own boxes or layers."""
-    tool = args.tool
-    if tool == "active-S-box counting":
-        return boolean_cross_check(subject, args)
-    if tool != "ARX search":
-        raise Refused(f"research R12 asks for no cross-check of {tool}")
+class Climb:
+    """One search running on, each r's weight kept as the binary prints it, so that a search stopped at the cap keeps what it reached."""
+
+    def __init__(self, kind: str, w: int, steps: Sequence, rounds: int):
+        arguments = [arx_search_known.program(), kind, str(w), str(rounds)] + [arx_search_known.step_text(step) for step in steps]
+        self.process = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        self.weights: Dict[int, int] = {}
+        self.reader = threading.Thread(target=self.read, daemon=True)
+        self.reader.start()
+
+    def read(self) -> None:
+        for line in self.process.stdout:
+            fields = line.split()
+            if fields and fields[0] == "optimal":
+                self.weights[int(fields[1])] = int(fields[2])
+
+    def done(self) -> bool:
+        return self.process.poll() is not None
+
+    def reached(self) -> int:
+        r = 0
+        while r + 1 in self.weights:
+            r += 1
+        return r
+
+    def stop(self) -> None:
+        if not self.done():
+            self.process.kill()
+        self.process.wait()
+        self.reader.join()
+
+
+def cross_tables(job: Tuple) -> Dict:
+    """One box's exhaustive values at one width and kind, each r up to the run's: a floor, and at w = 4 the internal-trail search."""
+    w, steps, name, rounds = job
+    box = tables.box_of(steps, w)
+    floor = tables.difference_floor(box, rounds) if name == "differential" else tables.linear_floor(box, rounds)
+    exact = None
+    if w == 4:
+        exact = tables.differential_trails(steps, w, rounds) if name == "differential" else tables.linear_trails(steps, w, rounds)
+    return {"floor": floor, "exact": exact}
+
+
+def table_round_seconds(candidate: str) -> float:
+    """The widest box's slowest table over one round, which sets how much of the cap the tables need, the searches having the rest."""
+    box = tables.box_of(boxes_of(candidate, CROSS_WIDTHS[-1])[0], CROSS_WIDTHS[-1])
+    started = time.monotonic()
+    tables.linear_floor(box, 1)
+    return time.monotonic() - started
+
+
+def arx_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespace) -> Dict:
+    """Research R12's two checks on each distinct box. One run of them is one instance, within its 8 h (seq 522): the searches climb
+    together, up to the top of their range or until what is left of the cap only just holds the tables to the r they have all reached,
+    and the tables then run to that r. The search's value and the exhaustive ones stand beside each other at every r from 1."""
+    tool = "ARX search"
     source, binary = tool_hash(tool)
-    rounds = args.rounds or 2
+    cap = CROSS_SECONDS[0]
+    started = time.monotonic()
+    top = min(args.rounds or SEARCH_RANGE, SEARCH_RANGE)
+    plan = [(w, index, steps, name) for w in CROSS_WIDTHS for index, steps in enumerate(boxes_of(subject.candidate, w)) for name in long_trail.KINDS]
+    per_round = table_round_seconds(subject.candidate)
+    climbs = [Climb(name, w, steps, top) for w, _, steps, name in plan]
+    try:
+        while True:
+            reached = min(climb.reached() for climb in climbs)
+            left = cap - (time.monotonic() - started)
+            if reached >= top or all(climb.done() for climb in climbs) or left <= per_round * (reached + 1) * CAP_MARGIN:
+                break
+            time.sleep(POLL_SECONDS)
+    finally:
+        for climb in climbs:
+            climb.stop()
+    failed = [climb.process.returncode for climb in climbs if climb.process.returncode not in (0, -9, 1, 137)]
+    if failed:
+        raise ToolFailure(f"arx_search exited {failed[0]}")
+    fields = {"tool": tool, "tool_sha256": source, "binary_sha256": binary, "rounds": reached, "cap_hours": cap / 3600.0,
+              "reached": {f"box {index} at w = {w}, {name}": climb.reached() for (w, index, _, name), climb in zip(plan, climbs)}}
+    if reached < 1:
+        return {"status": "inconclusive", "classification": NONE, "inputs": NONE, "fields": dict(fields, capped=True, rows=[])}
+    held = worker_map(cross_tables, [(w, steps, name, reached) for w, _, steps, name in plan], run.workers)
     rows: List[Dict] = []
-    for w in (4, 8):
-        for index, steps in enumerate(boxes_of(subject.candidate, w)):
-            box = tables.box_of(steps, w)
-            for name, floor, exact in (
-                    ("differential", tables.difference_floor(box, rounds), tables.differential_trails(steps, w, rounds) if w == 4 else None),
-                    ("linear", tables.linear_floor(box, rounds), tables.linear_trails(steps, w, rounds) if w == 4 else None)):
-                found = arx_search_known.search(name, w, rounds, steps)
-                scale = 2 if name == "linear" else 1
-                for r in range(1, rounds + 1):
-                    weight = found[r]["weight"]
-                    rows.append({"box": index, "width": w, "kind": name, "r": r, "search": weight, "floor_units": floor[r],
-                                 "exhaustive": None if exact is None else exact[r], "equal": None if exact is None else exact[r] == weight,
-                                 "above_floor": weight * scale * tables.UNITS >= floor[r]})
-    return {"status": evidence.verdict_cross_check(rows), "classification": NONE, "inputs": NONE,
-            "fields": {"tool": tool, "tool_sha256": source, "binary_sha256": binary, "rows": rows, "rounds": rounds}}
+    for (w, index, _, name), climb, table in zip(plan, climbs, held):
+        scale = 2 if name == "linear" else 1
+        for r in range(1, reached + 1):
+            weight, exact = climb.weights[r], None if table["exact"] is None else table["exact"][r]
+            rows.append({"box": index, "width": w, "kind": name, "r": r, "search": weight, "floor_units": table["floor"][r], "exhaustive": exact,
+                         "equal": None if exact is None else exact == weight, "above_floor": weight * scale * tables.UNITS >= table["floor"][r]})
+    return {"status": evidence.verdict_cross_check(rows), "classification": NONE, "inputs": NONE, "fields": dict(fields, rows=rows)}
+
+
+def deliver(function: Callable, job: Any, out: Any) -> None:
+    try:
+        out.put(("done", function(job)))
+    except Exception as exc:  # noqa: BLE001
+        out.put(("failed", f"{type(exc).__name__}: {exc}"))
+
+
+def limited(function: Callable, job: Any, seconds: float) -> Any:
+    """A result in a process of its own, or None where it does not finish in time: the process is stopped there."""
+    context = multiprocessing.get_context("spawn" if os.name == "nt" else "fork")
+    out = context.Queue()
+    process = context.Process(target=deliver, args=(function, job, out))
+    process.start()
+    try:
+        state, value = out.get(timeout=max(0.0, seconds))
+    except queue.Empty:
+        return None
+    finally:
+        process.terminate()
+        process.join()
+    if state == "failed":
+        raise ToolFailure(value)
+    return value
+
+
+def boolean_round(job: Tuple) -> List[Dict]:
+    """One r: the counter's minimum and the exhaustive minimum, in both kinds."""
+    root, candidate, r = job
+    evidence.use_repo(Path(root))
+    layer = boolean_layer(candidate, 4, 4)
+    pairs = [(item.boxes, item.permutation) for item in layer.layers]
+    rows = []
+    for kind in long_trail.KINDS:
+        counted, exact = active_sbox.minima(layer, kind, r)[r]["count"], tables.layers_minimum(layer.layers[0].sbox, pairs, kind, r)[r]
+        rows.append({"kind": kind, "r": r, "counter": counted, "exhaustive": exact, "equal": counted == exact})
+    return rows
 
 
 def boolean_cross_check(subject: Subject, args: argparse.Namespace) -> Dict:
     """The counter's minimum over r rounds at 4×4 equals the exhaustive minimum from the candidate's own layers at w = 4, every trail
-    walked, for each r that finishes; each record lists both (research R12)."""
+    walked, for each r up to the largest that finishes within one run's 8 h (research R12; seq 522)."""
     tool = "active-S-box counting"
     source, _ = tool_hash(tool)
-    rounds = args.rounds or 1
-    layer = boolean_layer(subject.candidate, 4, 4)
-    pairs = [(item.boxes, item.permutation) for item in layer.layers]
-    rows = []
+    cap = CROSS_SECONDS[0]
+    started = time.monotonic()
+    rows: List[Dict] = []
+    r = 0
+    while r < (args.rounds or SEARCH_RANGE):
+        found = limited(boolean_round, (str(evidence.REPO.root), subject.candidate, r + 1), cap - (time.monotonic() - started))
+        if found is None:
+            break
+        rows += found
+        r += 1
+    fields = {"tool": tool, "tool_sha256": source, "rows": rows, "rounds": r, "cap_hours": cap / 3600.0}
+    if r < 1:
+        return {"status": "inconclusive", "classification": NONE, "inputs": NONE, "fields": dict(fields, capped=True)}
+    return {"status": evidence.verdict_cross_check(rows), "classification": NONE, "inputs": NONE, "fields": fields}
+
+
+def run_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespace) -> Dict:
+    """Research R12's checks on a candidate's own boxes or layers."""
+    if args.tool == "active-S-box counting":
+        return boolean_cross_check(subject, args)
+    if args.tool != "ARX search":
+        raise Refused(f"research R12 asks for no cross-check of {args.tool}")
+    return arx_cross_check(subject, run, args)
+
+
+# ------------------------------------------------------------------------------- the rotation search
+
+def is_arx(candidate: str) -> bool:
+    return hasattr(amounts_module(candidate), "box_steps")
+
+
+def space_of(candidate: str) -> List[Tuple]:
+    """Every assignment of the recorded space, in the tie order of the ranking entry (seq 520)."""
+    module = amounts_module(candidate)
+    numbers = list(module.GENERATORS)
+    if is_arx(candidate):
+        sets = [(g, h) for g in numbers for h in numbers]
+        return [(first, second) for first in sets for second in sets if first != second]
+    return [(g, numbers[(at + 1) % len(numbers)]) for at, g in enumerate(numbers)]
+
+
+def one_call(job: Tuple) -> Dict[str, Optional[int]]:
+    """One set's box over one call, in both kinds, the linear weight twice the search's exponent: None for a search at its cap."""
+    root, candidate, w, chosen = job
+    evidence.use_repo(Path(root))
+    steps = amounts_module(candidate).box_steps(0, w, (chosen,))
+    found: Dict[str, Optional[int]] = {}
     for kind in long_trail.KINDS:
-        found = active_sbox.minima(layer, kind, rounds)
-        exact = tables.layers_minimum(layer.layers[0].sbox, pairs, kind, rounds)
-        rows += [{"kind": kind, "r": r, "counter": found[r]["count"], "exhaustive": exact[r],
-                  "equal": found[r]["count"] == exact[r]} for r in range(1, rounds + 1)]
-    return {"status": evidence.verdict_cross_check(rows), "classification": NONE, "inputs": NONE,
-            "fields": {"tool": tool, "tool_sha256": source, "rows": rows, "rounds": rounds}}
+        try:
+            weight = arx_search_known.search(kind, w, 1, steps)[1]["weight"]
+        except ToolFailure as exc:
+            if not reached_cap(exc):
+                raise
+            weight = None
+        found[kind] = None if weight is None else (2 * weight if kind == "linear" else weight)
+    return found
+
+
+def arx_ranking(subject: Subject, run: evidence.Run) -> Dict:
+    """Each set's box searched over one call, and each assignment at the count of its weakest box in each kind (seq 520)."""
+    candidate, w = subject.candidate, subject.w
+    assignments = space_of(candidate)
+    sets = sorted({chosen for assignment in assignments for chosen in assignment})
+    root = str(evidence.REPO.root)
+    found = dict(zip(sets, worker_map(one_call, [(root, candidate, w, chosen) for chosen in sets], run.workers)))
+    layers = {kind: branch_layer(subject.program, kind) for kind in long_trail.KINDS}
+    counts: Dict[Tuple[str, int], Dict] = {}
+
+    def weight(kind: str, assignment: Tuple) -> Optional[int]:
+        values = [found[chosen][kind] for chosen in assignment]
+        if None in values:
+            return None
+        key = (kind, min(values))
+        if key not in counts:
+            counts[key] = long_trail.minima(layers[kind], (min(values),), RANK_ROUNDS)[RANK_ROUNDS]
+        return counts[key]["count"]
+
+    entries = []
+    for assignment in assignments:
+        w_d, w_l = weight("differential", assignment), weight("linear", assignment)
+        entries.append({"assignment": [list(chosen) for chosen in assignment], "W_D": w_d, "W_L": w_l,
+                        "measure": None if w_d is None or w_l is None else min(w_d, w_l)})
+    return {"sets": {f"{g},{h}": found[(g, h)] for g, h in sets}, "entries": evidence.ranked(entries),
+            "counts": {f"{kind}, box {value}": row for (kind, value), row in sorted(counts.items())},
+            "solver": dict(long_trail.SETTINGS, statement=long_trail.LIMITATION)}
+
+
+def boolean_point(job: Tuple) -> Optional[int]:
+    """One assignment's weight in one kind, the count over the ranking's rounds times an active S-box's weight: None at the cap."""
+    root, candidate, n, w, assignment, kind = job
+    evidence.use_repo(Path(root))
+    layer = boolean_layer(candidate, n, w, assignment)
+    try:
+        return active_sbox.minima(layer, kind, RANK_ROUNDS)[RANK_ROUNDS]["count"] * sbox_weight(layer.layers[0].sbox, kind)
+    except ToolFailure as exc:
+        if not reached_cap(exc):
+            raise
+        return None
+
+
+def boolean_ranking(subject: Subject, run: evidence.Run) -> Dict:
+    root = str(evidence.REPO.root)
+    assignments = space_of(subject.candidate)
+    jobs = [(root, subject.candidate, subject.n, subject.w, assignment, kind) for assignment in assignments for kind in long_trail.KINDS]
+    held = worker_map(boolean_point, jobs, run.workers)
+    entries = []
+    for at, assignment in enumerate(assignments):
+        w_d, w_l = held[2 * at], held[2 * at + 1]
+        entries.append({"assignment": list(assignment), "W_D": w_d, "W_L": w_l,
+                        "measure": None if w_d is None or w_l is None else min(w_d, w_l)})
+    return {"sets": {}, "entries": evidence.ranked(entries), "solver": dict(active_sbox.SETTINGS, statement=active_sbox.LIMITATION)}
+
+
+def ranking_tools(candidate: str) -> List[str]:
+    return ["ARX search", "long-trail active-box counting"] if is_arx(candidate) else ["active-S-box counting"]
+
+
+def run_ranking(subject: Subject, run: evidence.Run, cross: Any, citations: Dict) -> Dict:
+    found = arx_ranking(subject, run) if is_arx(subject.candidate) else boolean_ranking(subject, run)
+    top = found["entries"][0]
+    fields = dict(found, size=subject.n, width=subject.w, rounds=RANK_ROUNDS, measure=MEASURE, tie_order=TIE_ORDER, tool=ranking_tools(subject.candidate),
+                  validation=citations, cross_check=cross, chosen=NONE if top["measure"] is None else top["assignment"],
+                  budget={"cap_hours": INSTANCE_HOURS, "hours_used": (time.monotonic() - run.clock) / 3600.0})
+    return {"status": "pass" if top["measure"] is not None else "inconclusive", "classification": NONE, "fields": fields, "inputs": NONE}
+
+
+def run_rotation(args: argparse.Namespace, command: List[str], code: List[str], row: str) -> int:
+    """The search of research R15 over the recorded space, at the width of --width, 16 first (seq 520, 521)."""
+    candidate, n, w = args.candidate, RANK_SIZE, args.width or 16
+    if args.size not in (None, RANK_SIZE):
+        raise Refused("the ranking stands at 4×4")
+    tools = ranking_tools(candidate)
+    if tools[0] == "ARX search":
+        code = code + [TRAIL_PATHS["ARX search"], ARX_BINARY, ARX_MAKE]
+    citations = {}
+    for tool in tools:
+        source, binary = tool_hash(tool)
+        evidence.guard_trail_tools(tool, source, binary)
+        citations[tool] = evidence.validation_citation(tool, source, binary)
+        if citations[tool] is None:
+            raise Refused(f"the ranking needs a validated tool: {tool} has no re-found record of its exact hash")
+    cross = cross_check_cited(candidate, tools[0])
+    if cross == NONE and not args.project:
+        raise Refused(f"{tools[0]}'s results on {candidate} count once its cross-check has passed (research R12)")
+    subject = plain_subject(candidate, n, w, RANK_ROUNDS)
+    started = time.monotonic()
+    seconds = ranking_seconds(subject, tools, args.workers)
+    extra = {"probe": dict(probe_of("rotation-ranking", n), width=w, bound_kind=NONE, method=NONE)}
+    path = evidence.write_projection(run=f"rotation search of {candidate} at w = {w}", row=f"{candidate}/{row}", inputs=NONE,
+                                     measured_speed={"seconds_of_the_run": seconds, "workers": args.workers}, projected_hours=seconds / 3600.0,
+                                     time_hours=(time.monotonic() - started) / 3600.0, argv=command, code_files=code, extra=extra)
+    hours = seconds / 3600.0
+    if args.project:
+        print(f"{evidence.rel_to_repo(path)}: {hours:.3f} h projected")
+        return evidence.EXIT_OK
+    evidence.guard_candidate_row(candidate, row, hours, reserved_trails(candidate, extra["probe"]))
+    run = evidence.Run("rotation-ranking", candidate=candidate, model_id=candidate, variant_id=subject.variant_id, code_files=code, argv=command,
+                       heavy=True, projected_hours=hours, workers=args.workers, namespace="dev", config={"size": n, "width": w, "rounds": RANK_ROUNDS})
+    run.extra["exclusions_and_reruns"] = repeats(candidate, "rotation-ranking", lambda record: record.get("width") == w)
+    return carried_out(run, candidate, row, hours, lambda: run_ranking(subject, run, cross, citations))
 
 
 RUNS = {"inverse": run_inverse, "bijectivity": run_bijectivity, "dependency": run_dependency, "symmetry": run_symmetry,
@@ -1201,32 +1463,60 @@ def carried_out(run: evidence.Run, candidate: str, row: str, hours: float, work:
 
 
 def trail_seconds(subject: Subject, args: argparse.Namespace, tool: str, rounds: int) -> float:
-    """A timing of one instance's first round count, stopped at a minute, scaled by a stated ratio per further round; an instance
-    that the minute does not hold projects its cap."""
+    """A timing of one instance's first round, stopped at a minute, scaled by a stated ratio per further round, a search of two box
+    calls or more projecting its cap; an instance that the minute does not hold is timed at w = 8, or at the size's smallest state, and
+    scaled by the state's bits, the cap above it all."""
     cap = INSTANCE_HOURS * 3600.0
-    module, name = (arx_search_known, "INSTANCE_SECONDS") if tool == "ARX search" else (None, "")
+    if tool == "ARX search":
+        if rounds > 1:
+            return cap * len(boxes_of(subject.candidate, subject.w))
+        saved = arx_search_known.INSTANCE_SECONDS
+        arx_search_known.INSTANCE_SECONDS = PROBE_SECONDS
+        started = time.monotonic()
+        try:
+            box_bounds(subject.candidate, args.bound_kind or "differential", subject.w, 1)
+        except ToolFailure as exc:
+            if not reached_cap(exc):
+                raise
+            return cap
+        finally:
+            arx_search_known.INSTANCE_SECONDS = saved
+        return time.monotonic() - started
+    seconds = count_seconds(subject, args, tool)
+    return min(cap, seconds * RATIO_OF_A_ROUND ** (rounds - 1))
+
+
+def count_seconds(subject: Subject, args: argparse.Namespace, tool: str) -> float:
     started = time.monotonic()
     try:
-        if module is not None:
-            saved = getattr(module, name)
-            setattr(module, name, PROBE_SECONDS)
-            try:
-                for _ in boxes_of(subject.candidate, subject.w):
-                    box_bounds(subject.candidate, args.bound_kind or "differential", subject.w, 1)
-                    break
-            finally:
-                setattr(module, name, saved)
-            instances = len(boxes_of(subject.candidate, subject.w))
-        else:
-            with solver_minute(tool):
-                probe_count(subject, args, tool)
-            instances = 1
+        with solver_minute(tool):
+            probe_count(subject, args, tool)
+        return time.monotonic() - started
     except ToolFailure as exc:
         if not reached_cap(exc):
             raise
-        return cap
-    first = time.monotonic() - started
-    return min(cap, first * RATIO_OF_A_ROUND ** (rounds - 1)) * instances
+    if subject.w <= 8:
+        return INSTANCE_HOURS * 3600.0
+    smaller = plain_subject(subject.candidate, 4, 8, 1)
+    bits = (2 * subject.n ** 2 * subject.w) / (2 * 4 ** 2 * 8)
+    started = time.monotonic()
+    try:
+        with solver_minute(tool):
+            probe_count(smaller, args, tool)
+    except ToolFailure as exc:
+        if not reached_cap(exc):
+            raise
+        return INSTANCE_HOURS * 3600.0
+    return (time.monotonic() - started) * bits ** 1.7
+
+
+def ranking_seconds(subject: Subject, tools: Sequence[str], workers: int) -> float:
+    """The ranking's hours from one point's first search, each search an instance of R7's."""
+    points = len(space_of(subject.candidate))
+    args = argparse.Namespace(bound_kind="differential")
+    if tools[0] == "ARX search":
+        return trail_seconds(subject, args, tools[0], 1) * 64 * 2 / max(1, workers)
+    return count_seconds(subject, args, tools[0]) * RANK_ROUNDS * RATIO_OF_A_ROUND * points * 2 / max(1, workers)
 
 
 class solver_minute:
@@ -1251,8 +1541,43 @@ def probe_count(subject: Subject, args: argparse.Namespace, tool: str) -> None:
         active_sbox.minima(boolean_layer(subject.candidate, subject.n, subject.w), kind, 1)
 
 
+def later_searches(candidate: str) -> List[Dict]:
+    """The production-width searches the trail row still needs, each by what names its probe: the box searches and each count at every
+    claimable size, since R_bound comes from a bound computed at that size (research R7, R12)."""
+    out = []
+    methods = (("branch-and-bound", (RANK_SIZE,)), ("active-box count", evidence.CLAIMABLE_SIZES)) if is_arx(candidate) \
+        else (("active-S-box count", evidence.CLAIMABLE_SIZES),)
+    for method, sizes in methods:
+        for size in sizes:
+            for kind in long_trail.KINDS:
+                out.append(dict(probe_of("bound", size), width=32, bound_kind=kind, method=method))
+    return out
+
+
+def search_ended(candidate: str, probe: Dict) -> bool:
+    return any(record.get("method") == probe["method"] and record.get("bound_kind") == probe["bound_kind"] and record.get("width") == probe["width"]
+               and record.get("size") == probe["size"] and (record.get("status") == "pass" or evidence.reached_cap(record))
+               for _, record in evidence.iter_records("bound", f"candidates/{candidate}"))
+
+
+def reserved_trails(candidate: str, this: Dict) -> float:
+    """The probes of the searches the row still needs, this run's left out. A probe that does not exist comes first (research R7)."""
+    total = 0.0
+    held = [record for _, record in evidence.iter_records("projection", "projections") if record.get("row") == f"{candidate}/trails"]
+    for probe in later_searches(candidate):
+        if probe == this or search_ended(candidate, probe):
+            continue
+        found = [record for record in held if record.get("probe") == probe]
+        if not found:
+            raise Refused(f"the probe of {probe['method']}, {probe['bound_kind']}, at {probe['size']}×{probe['size']} and w = 32 comes first: --project writes it")
+        total += float(max(found, key=lambda record: record["created_utc"])["projected_hours"])
+    return total
+
+
 def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str], row: str) -> int:
     candidate, n, w = args.candidate, args.size or 4, args.width or 16
+    if args.kind == "rotation-ranking":
+        return run_rotation(args, command, code, row)
     if args.kind == "bound" and (not args.bound_kind or args.method not in METHODS):
         raise Refused("a bound needs --bound-kind differential|linear and a --method the script knows")
     if args.kind == "cross-check" and args.tool not in TRAIL_PATHS:
@@ -1272,12 +1597,12 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         if citation is None:
             raise Refused(f"a bound needs a validated tool: {tool} has no re-found record of its exact hash")
         cross = cross_check_cited(candidate, tool)
-        if tool in ("ARX search", "active-S-box counting") and cross == NONE:
+        if tool in ("ARX search", "active-S-box counting") and cross == NONE and not args.project:
             raise Refused(f"{tool}'s results on {candidate} count once its cross-check has passed (research R12)")
         if w not in MODULES[tool].KIND["widths"]:
             citation = None
     started = time.monotonic()
-    seconds = trail_seconds(subject, args, tool, rounds) if args.kind == "bound" else INSTANCE_HOURS * 3600.0
+    seconds = trail_seconds(subject, args, tool, rounds) if args.kind == "bound" else CROSS_SECONDS[0]
     extra = {"probe": dict(probe_of(args.kind, n), width=w, bound_kind=args.bound_kind or NONE, method=args.method or NONE)}
     path = evidence.write_projection(run=f"{args.kind} of {candidate} at {n}×{n}, w = {w}", row=f"{candidate}/{row}", inputs=NONE,
                                      measured_speed={"seconds_of_the_run": seconds}, projected_hours=seconds / 3600.0,
@@ -1286,7 +1611,7 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
     if args.project:
         print(f"{evidence.rel_to_repo(path)}: {hours:.3f} h projected")
         return evidence.EXIT_OK
-    evidence.guard_candidate_row(candidate, row, hours)
+    evidence.guard_candidate_row(candidate, row, hours, reserved_trails(candidate, extra["probe"]))
 
     def same(record: Dict) -> bool:
         if args.kind == "bound":
@@ -1294,8 +1619,9 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         return record.get("tool") == tool and record.get("tool_sha256") == source
 
     again = repeats(candidate, args.kind, same)
+    workers = min(args.workers, 2 * len(CROSS_WIDTHS) * 2) if args.kind == "cross-check" else 1
     run = evidence.Run(args.kind, candidate=candidate, model_id=candidate, variant_id=subject.variant_id, code_files=code, argv=command,
-                       heavy=True, projected_hours=hours, namespace="dev", config={"size": n, "width": w, "rounds": rounds})
+                       heavy=True, projected_hours=hours, workers=workers, namespace="dev", config={"size": n, "width": w, "rounds": rounds})
     run.extra["exclusions_and_reruns"] = again
 
     def work() -> Dict:
@@ -1496,9 +1822,12 @@ def remeasure(text: str, out: str, out_dir: str, local_dir: str, binary: str) ->
         fields, inputs = CONTROLS[config["test"]](holder, config["size"])
         result = {"status": "inconclusive" if fields["fires"] else "pass", "classification": NONE, "inputs": inputs,
                   "fields": dict(fields, test=config["test"], size=config["size"])}
+    elif kind == "rotation-ranking":
+        subject = plain_subject(candidate, config["size"], config["width"], config["rounds"])
+        result = run_ranking(subject, holder, original["cross_check"], original["validation"])
     elif kind in TRAIL_KINDS:
         args = argparse.Namespace(bound_kind=original.get("bound_kind"), method=original.get("method"), tool=original.get("tool"),
-                                  rounds=config["rounds"])
+                                  rounds=original["rounds"] if kind == "cross-check" else config["rounds"])
         subject = plain_subject(candidate, config["size"], config["width"], config["rounds"])
         result = run_cross_check(subject, holder, args) if kind == "cross-check" else run_bound(
             subject, holder, args, original["tool"], original["validation"], original["cross_check"])

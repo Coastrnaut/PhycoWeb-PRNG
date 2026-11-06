@@ -71,7 +71,7 @@ FEATURE_ROW_HOURS = 66.0
 FUT_SEC_8_ROW = "fut-sec-8"
 # Evidence kinds that a candidate's row is charged for; every other heavy run charges no candidate.
 CANDIDATE_KINDS = ("inverse", "bijectivity", "dependency", "frequency", "avalanche", "symmetry",
-                   "invariant", "degree", "bound", "trail", "cross-check", "control")
+                   "invariant", "degree", "bound", "trail", "cross-check", "rotation-ranking", "control")
 # Research R7's test of a heavy run: a kind it budgets, more than one worker, or over 10 minutes.
 BUDGETED_KINDS = CANDIDATE_KINDS + ("demonstration",)
 LIGHT_HOURS = 10.0 / 60.0
@@ -1047,7 +1047,7 @@ def result_status(status: str, validated: bool) -> str:
 
 
 def first_trail_search_started() -> bool:
-    return any(True for kind in ("bound", "trail") for _ in iter_records(kind))
+    return any(True for kind in ("bound", "trail", "rotation-ranking") for _ in iter_records(kind))
 
 
 def reached_cap(record: Dict) -> bool:
@@ -1877,6 +1877,13 @@ def control_fired(rows: Sequence[Sequence[int]], critical: Sequence[Tuple[int, i
     values for every row or one for each."""
     pairs = list(critical) * (len(rows) if len(critical) == 1 else 1)
     return any(least <= low or most >= high for (least, most), (low, high) in zip(rows, pairs))
+
+
+def ranked(entries: Sequence[Dict]) -> List[Dict]:
+    """A rotation ranking's order: the higher measure first, a point without both bounds last, ties in the stated order, the entries'
+    own order (FR-024; research R15)."""
+    order = sorted(enumerate(entries), key=lambda pair: (pair[1]["measure"] is None, -(pair[1]["measure"] or 0), pair[0]))
+    return [entry for _, entry in order]
 
 
 def verdict_cross_check(rows: Sequence[Dict]) -> str:
