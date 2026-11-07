@@ -1685,7 +1685,7 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         return record.get("tool") == tool and record.get("tool_sha256") == source
 
     again = repeats(candidate, args.kind, same)
-    workers = min(args.workers, 2 * len(CROSS_WIDTHS) * 2) if args.kind == "cross-check" else 1
+    workers = min(args.workers, 2 * len(CROSS_WIDTHS) * 2) if args.kind == "cross-check" and tool == "ARX search" else 1
     run = evidence.Run(args.kind, candidate=candidate, model_id=candidate, variant_id=subject.variant_id, code_files=code, argv=command,
                        heavy=True, projected_hours=hours, workers=workers, namespace="dev", config={"size": n, "width": w, "rounds": rounds})
     run.extra["exclusions_and_reruns"] = again
