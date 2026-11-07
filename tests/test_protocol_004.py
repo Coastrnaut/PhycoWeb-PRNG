@@ -5444,19 +5444,74 @@ class RotationSearch(TempRepo):
         args = argparse.Namespace(bound_kind="differential")
         self.assertEqual(self.script.trail_seconds(self.subject, args, "ARX search", 2), 2 * 8 * 3600.0)
 
-    def test_a_count_that_the_minute_does_not_hold_is_timed_at_a_smaller_state(self):
-        args = argparse.Namespace(bound_kind="differential")
+    def test_a_count_times_its_states_from_the_smallest_up_and_scales_the_largest_that_finished(self):
+        args = argparse.Namespace(bound_kind="linear")
+        subject = self.script.plain_subject("cand-B1", 4, 32, 1)
         calls = []
 
-        def probed(subject, given, tool):
-            calls.append(subject.w)
-            if subject.w == 32:
-                raise evidence.ToolFailure("1 rounds: status 1, time limit: no count")
+        def timed(function, job, seconds):
+            calls.append((job[2], job[3], job[4]))
+            return {4: 2.0, 8: None}[job[3]]
 
-        subject = self.script.plain_subject("cand-A1", 4, 32, 1)
-        with mock.patch.object(self.script, "probe_count", side_effect=probed):
-            self.assertLess(self.script.count_seconds(subject, args, "active-S-box counting"), 3600.0)
-        self.assertEqual(calls, [32, 8])
+        with mock.patch.object(self.script, "limited", side_effect=timed):
+            found = self.script.count_seconds(subject, args, "active-S-box counting")
+        self.assertEqual(calls, [(4, 4, "linear"), (4, 8, "linear")])
+        self.assertAlmostEqual(found, 2.0 * 8 ** self.script.BITS_EXPONENT)
+
+    def test_a_count_no_state_of_which_finished_in_the_minute_projects_the_cap(self):
+        subject = self.script.plain_subject("cand-B1", 4, 32, 1)
+        with mock.patch.object(self.script, "limited", return_value=None):
+            found = self.script.count_seconds(subject, argparse.Namespace(bound_kind="linear"), "active-S-box counting")
+        self.assertEqual(found, 8 * 3600.0)
+
+    def test_a_probe_holds_a_minute_in_all(self):
+        """Research R7: at most 60 s, which the solver's own limit does not hold."""
+        subject = self.script.plain_subject("cand-B1", 4, 32, 1)
+        clock, given = [0.0], []
+
+        def timed(function, job, seconds):
+            given.append(seconds)
+            clock[0] += 50.0
+            return 1.0
+
+        with mock.patch.object(self.script, "limited", side_effect=timed), mock.patch.object(self.script.time, "monotonic", side_effect=lambda: clock[0]):
+            found = self.script.count_seconds(subject, argparse.Namespace(bound_kind="linear"), "active-S-box counting")
+        self.assertEqual(given, [60.0, 10.0])
+        self.assertAlmostEqual(found, 1.0 * 4 ** self.script.BITS_EXPONENT)
+
+    def test_a_state_at_a_run_s_own_size_is_not_timed_twice(self):
+        subject = self.script.plain_subject("cand-B1", 4, 8, 1)
+        calls = []
+
+        def timed(function, job, seconds):
+            calls.append((job[2], job[3]))
+            return 3.0
+
+        with mock.patch.object(self.script, "limited", side_effect=timed):
+            found = self.script.count_seconds(subject, argparse.Namespace(bound_kind="linear"), "active-S-box counting")
+        self.assertEqual(calls, [(4, 4), (4, 8)])
+        self.assertAlmostEqual(found, 3.0)
+
+    def test_a_count_probe_discards_what_it_found(self):
+        with mock.patch.object(self.script.active_sbox, "minima", return_value={1: {"count": 5}}) as found, \
+                mock.patch.object(self.script, "boolean_layer", return_value="the layer") as layer:
+            seconds = self.script.count_probe((str(self.root), "cand-B1", 4, 8, "linear"))
+        layer.assert_called_once_with("cand-B1", 4, 8)
+        found.assert_called_once_with("the layer", "linear", 1)
+        self.assertIsInstance(seconds, float)
+
+    def test_a_box_search_shares_the_minute_among_its_boxes(self):
+        seen = []
+
+        def bounds(candidate, kind, w, rounds):
+            seen.append(self.script.arx_search_known.INSTANCE_SECONDS)
+            return {}
+
+        saved = self.script.arx_search_known.INSTANCE_SECONDS
+        with mock.patch.object(self.script, "box_bounds", side_effect=bounds):
+            self.script.trail_seconds(self.subject, argparse.Namespace(bound_kind="differential"), "ARX search", 1)
+        self.assertEqual(seen, [30.0])
+        self.assertEqual(self.script.arx_search_known.INSTANCE_SECONDS, saved)
 
     def test_a_ranking_run_needs_a_validated_tool(self):
         args = mock.Mock(candidate="cand-A1", width=None, size=None, project=False, workers=1)

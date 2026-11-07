@@ -122,6 +122,8 @@ FLIPS, RELATED, ROTATIONS = "flip set", "related keys and nonces", "rotational p
 DISAGREEMENT = "the dependency matrices show independent flipped"
 PROBE_SECONDS = 60.0
 RATIO_OF_A_ROUND = 6.0
+BITS_EXPONENT = 1.7
+SMALLEST_STATES = ((4, 4), (4, 8))
 DEFECTS_REL = "research/004/validation/defects"
 OUTPUT_FIELDS = ("raw_counts", "p_values", "failure_locations", "solver", "budget", "hours_used")
 RUN_HERE = """
@@ -1480,15 +1482,16 @@ def carried_out(run: evidence.Run, candidate: str, row: str, hours: float, work:
 
 
 def trail_seconds(subject: Subject, args: argparse.Namespace, tool: str, rounds: int) -> float:
-    """A timing of one instance's first round, stopped at a minute, scaled by a stated ratio per further round, a search of two box
-    calls or more projecting its cap; an instance that the minute does not hold is timed at w = 8, or at the size's smallest state, and
-    scaled by the state's bits, the cap above it all."""
+    """A timing of one instance's first round within a minute in all (research R7), scaled by a stated ratio per further round, a search
+    of two box calls or more projecting its cap, and the cap above it all. A box search shares the minute among its boxes, and a count
+    is count_seconds's."""
     cap = INSTANCE_HOURS * 3600.0
     if tool == "ARX search":
+        boxes = len(boxes_of(subject.candidate, subject.w))
         if rounds > 1:
-            return cap * len(boxes_of(subject.candidate, subject.w))
+            return cap * boxes
         saved = arx_search_known.INSTANCE_SECONDS
-        arx_search_known.INSTANCE_SECONDS = PROBE_SECONDS
+        arx_search_known.INSTANCE_SECONDS = PROBE_SECONDS / boxes
         started = time.monotonic()
         try:
             box_bounds(subject.candidate, args.bound_kind or "differential", subject.w, 1)
@@ -1503,28 +1506,44 @@ def trail_seconds(subject: Subject, args: argparse.Namespace, tool: str, rounds:
     return min(cap, seconds * RATIO_OF_A_ROUND ** (rounds - 1))
 
 
+def state_bits(n: int, w: int) -> int:
+    return 2 * n * n * w
+
+
+def count_probe(job: Tuple) -> float:
+    """One r = 1 count of a candidate's own layers, in a process of its own, timed there. What it found is discarded unread."""
+    root, candidate, n, w, kind = job
+    evidence.use_repo(Path(root))
+    started = time.monotonic()
+    active_sbox.minima(boolean_layer(candidate, n, w), kind, 1)
+    return time.monotonic() - started
+
+
 def count_seconds(subject: Subject, args: argparse.Namespace, tool: str) -> float:
+    """A minute in all (research R7), which the solver's own limit does not hold, so that an S-box count's states are timed from the
+    smallest up, each in what is left of the minute and stopped there. The largest that finished is scaled by the state's bits, and
+    the cap stands where none did."""
     started = time.monotonic()
-    try:
-        with solver_minute(tool):
-            probe_count(subject, args, tool)
+    if tool != "active-S-box counting":
+        try:
+            with solver_minute(tool):
+                probe_count(subject, args, tool)
+        except ToolFailure as exc:
+            if not reached_cap(exc):
+                raise
+            return INSTANCE_HOURS * 3600.0
         return time.monotonic() - started
-    except ToolFailure as exc:
-        if not reached_cap(exc):
-            raise
-    if subject.w <= 8:
+    timed = None
+    for n, w in sorted(set(SMALLEST_STATES) | {(subject.n, subject.w)}, key=lambda state: state_bits(*state)):
+        left = PROBE_SECONDS - (time.monotonic() - started)
+        seconds = limited(count_probe, (str(evidence.REPO.root), subject.candidate, n, w, args.bound_kind or "differential"), left) \
+            if left > 0 else None
+        if seconds is None:
+            break
+        timed = seconds, state_bits(n, w)
+    if timed is None:
         return INSTANCE_HOURS * 3600.0
-    smaller = plain_subject(subject.candidate, 4, 8, 1)
-    bits = (2 * subject.n ** 2 * subject.w) / (2 * 4 ** 2 * 8)
-    started = time.monotonic()
-    try:
-        with solver_minute(tool):
-            probe_count(smaller, args, tool)
-    except ToolFailure as exc:
-        if not reached_cap(exc):
-            raise
-        return INSTANCE_HOURS * 3600.0
-    return (time.monotonic() - started) * bits ** 1.7
+    return timed[0] * (state_bits(subject.n, subject.w) / timed[1]) ** BITS_EXPONENT
 
 
 def ranking_seconds(subject: Subject, tools: Sequence[str], workers: int) -> float:
@@ -1540,7 +1559,7 @@ class solver_minute:
     """The solver's limit held at a minute for a probe of one instance."""
 
     def __init__(self, tool: str):
-        self.module = long_trail if tool == "long-trail active-box counting" else active_sbox
+        self.module = long_trail
 
     def __enter__(self) -> None:
         self.saved = dict(self.module.SETTINGS)
@@ -1551,11 +1570,8 @@ class solver_minute:
 
 
 def probe_count(subject: Subject, args: argparse.Namespace, tool: str) -> None:
-    kind = args.bound_kind or "differential"
     if tool == "long-trail active-box counting":
-        long_trail.minima(branch_layer(subject.program, kind), (1,), 1)
-    elif tool == "active-S-box counting":
-        active_sbox.minima(boolean_layer(subject.candidate, subject.n, subject.w), kind, 1)
+        long_trail.minima(branch_layer(subject.program, args.bound_kind or "differential"), (1,), 1)
 
 
 def later_searches(candidate: str) -> List[Dict]:
