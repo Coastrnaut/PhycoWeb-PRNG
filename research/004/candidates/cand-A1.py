@@ -118,6 +118,24 @@ def layer_phase(n, w, colour):
     return ir.Phase(colour, tuple(updates))
 
 
+def key_path(n, w):
+    """The nodes whose lanes hold key bits, along one row and back along the next, each step between
+    direct neighbours (spec FR-025)."""
+    nodes = (256 // w + 1) // 2
+    return [(i, n - 1 - j if i % 2 else j) for i, j in (divmod(node, n) for node in range(nodes))]
+
+
+def declarations(n, w):
+    """What spec FR-025 and FR-027 read from the list. A box's addition takes one phase and its XOR
+    the next, so that no stage holds two serial carry chains, and the layer adds nothing."""
+    classes = ir.colours(n)
+    return {"stages": {"phases": classes * (2 * STEPS + 1),
+                       "chains_per_phase": [1, 0] * (STEPS * classes) + [0] * classes},
+            "key_path": [list(node) for node in key_path(n, w)],
+            "semantics": {"width": w, "signedness": "unsigned", "wrap": "modulo 2^w",
+                          "shift": "logical, left", "rotation": "left, bit i to bit (i + k) mod w"}}
+
+
 def build(n, w):
     classes = range(ir.colours(n))
     phases = [phase for colour in classes for phase in box_phases(n, w, colour)]
