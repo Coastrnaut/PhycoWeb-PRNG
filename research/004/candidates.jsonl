@@ -5,3 +5,4 @@
 {"candidate_id": "cand-A1", "date_utc": "2026-11-06T03:13:28Z", "event": "entered-d4", "family": "ARX", "prev_sha256": "832d48766f797af6af8d4622d331516c55ffe2bf9acaf21987bf86d284494cf8", "seq": 4}
 {"candidate_id": "cand-B1", "date_utc": "2026-11-06T03:13:28Z", "event": "entered-d4", "family": "Boolean", "prev_sha256": "53084cc2fa1a9a2d69e3d1ee8fd921d8965687338bc1d09848b1d4d234264469", "seq": 5}
 {"budget_used_h": {"trails": 7.693315018496109}, "candidate_id": "cand-A1", "date_utc": "2026-11-06T19:32:04Z", "event": "evidence", "evidence": ["cross-check-20261106T193204Z-46423ca5"], "prev_sha256": "6b5fd60a90e7abb07ec8e3209d5d743c721242365443deda1467cfeaeaf10bcd", "seq": 6}
+{"budget_used_h": {"trails": 0.009523726116944463}, "candidate_id": "cand-A1", "date_utc": "2026-11-07T10:40:22Z", "event": "evidence", "evidence": ["rotation-ranking-20261107T104022Z-fa29e059"], "prev_sha256": "54c890afba1d504a19ce3fb1a866d1c9d6ccb0f4a79517c7ad5f08b4db72da67", "seq": 7}
