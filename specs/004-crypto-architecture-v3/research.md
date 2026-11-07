@@ -685,6 +685,17 @@ and applied, and R19.1's downloads were approved, all on 2026-11-01.
     sends one family on wherever either has reduced-width evidence, never both. D4 is not computable
     only where no candidate of either family has both bounds at the same number of rounds, at least
     2, at 16 or at 8 ("Neither family scored", below; ANA-082; ANA-084).
+  - **How far the searches go.** r* is as large as the searches reach, so they climb, and nobody
+    picks where they stop. At 4×4, at each width this rule reaches, each entered candidate's bounds
+    are searched at r = 2, 3, 4 and so on, one search per kind and r, each a search instance of R7
+    under its 8 h cap. A candidate's climb ends at the first r at which a search of either kind
+    reaches its cap or its trail row refuses it, the refusal written in that search's `projection`
+    record. Every candidate searches r = 2; beyond it, an r that no candidate of the other family
+    can still reach is not searched, since it could not be common. A candidate's reduced-width
+    outcome is final only once its climb has ended or has reached the last r it could share, and
+    `d4_choice.py` exits 2 until then. An ARX candidate's box bounds in the score are the protocol
+    change log's ranking entry's, over one call of each box, a chain of two calls costing twice
+    one call, so that the score and the ranking read one measure (Rotation amounts, below).
   - **Score**: with W_D and W_L the −log₂ of the bounds on the best differential trail
     probability and on the best linear trail's squared correlation over r* rounds, and L the
     LUTs per node and round of R5 at that width:
