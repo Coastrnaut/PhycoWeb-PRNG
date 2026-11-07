@@ -914,10 +914,11 @@ candidates are otherwise `ineligible` (R6, R7).
 - [X] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
   `entered-d4` entry per candidate of the set, before the first score. (FR-022, FR-041; R6)
 - [ ] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
-  inputs of the D4 score with `python scripts/evidence_v3.py`: the trail bounds over r* rounds with
-  the validated trail tools and the cross-checks between kinds, the first trail search fixing the
-  trail tools, and the cost from `research/004/tools/costmodel.py`; each heavy run **heavy**,
-  projected first. (FR-022, FR-038, FR-039; R5, R6, R7, R12)
+  inputs of the D4 score with `python scripts/evidence_v3.py`: the cross-checks between kinds on the
+  first amounts of the candidate's space, the rotation search of R15, and the trail bounds over r*
+  rounds, climbing from r = 2 as R6 states, with the validated trail tools, the first trail search
+  fixing the trail tools, and the cost from `research/004/tools/costmodel.py`; each heavy run
+  **heavy**, projected first. (FR-022, FR-024, FR-038, FR-039; R5, R6, R7, R12, R15)
 - [ ] T089 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
   $REP/d4/choice.json` once (quickstart E4); after an exact tie, `--tie` writes `$REP/d4/tie.json`
   once both values of R at 4×4 exist. (FR-022; R6)
@@ -1308,7 +1309,7 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-021: T051, T078, T092, T095
 - FR-022: T073, T074, T078, T079, T083, T084, T087, T088, T089, T090, T095
 - FR-023: T010, T012, T027, T054, T077, T080, T095, T097
-- FR-024: T054, T077, T080, T095, T097
+- FR-024: T054, T077, T080, T088, T095, T097
 - FR-025: T095
 - FR-026: T073, T074, T095
 - FR-027: T095

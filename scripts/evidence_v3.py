@@ -103,6 +103,7 @@ CROSS_WIDTHS = (4, 8)
 SEARCH_RANGE = 64
 RANK_ROUNDS = 2
 RANK_SIZE = 4
+PRODUCTION_WIDTH = 32
 MEASURE = "min(W_D, W_L) at the search width, at 4×4, over 2 rounds of Π (protocol change log, seq 520)"
 TIE_ORDER = "the numbers of an assignment in the order the candidate's log entry states them, first set first, lexicographically"
 POLL_SECONDS = 2.0
@@ -903,14 +904,28 @@ METHODS = {"branch-and-bound": {"tool": "ARX search", "run": box_method},
            "active-S-box count": {"tool": "active-S-box counting", "run": active_sbox_method}}
 
 
-def cross_check_cited(candidate: str, tool: str) -> Any:
-    """A bound from the ARX search or the active-S-box counter cites the cross-check of that
-    candidate and that tool's exact hash (data-model section 6)."""
+def plain(value: Any) -> Any:
+    """Amounts as a record holds them, in lists."""
+    return json.loads(json.dumps(value))
+
+
+def amounts_checked(record: Dict, candidate: str) -> Any:
+    """The amounts a cross-check ran on. A record with no `amounts` ran before the field existed, on the first of its candidate's space."""
+    return record.get("amounts", plain(space_of(candidate)[0]))
+
+
+def cross_check_cited(candidate: str, tool: str, width: int) -> Any:
+    """A bound from the ARX search or the active-S-box counter cites the cross-check of that candidate and that tool's exact hash. A
+    production-width search needs the cross-check of the amounts it runs on, and a reduced-width search comes before they are chosen
+    (data-model section 6; research R7)."""
     if tool not in ("ARX search", "active-S-box counting"):
         return NONE
     source, _ = tool_hash(tool)
     held = [record for _, record in evidence.iter_records("cross-check", f"candidates/{candidate}")
             if record.get("tool") == tool and record.get("tool_sha256") == source and record.get("status") == "pass"]
+    if width == PRODUCTION_WIDTH:
+        stated = plain(amounts_module(candidate).AMOUNTS)
+        held = [record for record in held if amounts_checked(record, candidate) == stated]
     return max(held, key=lambda record: record["created_utc"])["record_id"] if held else NONE
 
 
@@ -1010,6 +1025,7 @@ def arx_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespac
     if failed:
         raise ToolFailure(f"arx_search exited {failed[0]}")
     fields = {"tool": tool, "tool_sha256": source, "binary_sha256": binary, "rounds": reached, "cap_hours": cap / 3600.0,
+              "amounts": plain(amounts_module(subject.candidate).AMOUNTS),
               "reached": {f"box {index} at w = {w}, {name}": climb.reached() for (w, index, _, name), climb in zip(plan, climbs)}}
     if reached < 1:
         return {"status": "inconclusive", "classification": NONE, "inputs": NONE, "fields": dict(fields, capped=True, rows=[])}
@@ -1077,7 +1093,8 @@ def boolean_cross_check(subject: Subject, args: argparse.Namespace) -> Dict:
             break
         rows += found
         r += 1
-    fields = {"tool": tool, "tool_sha256": source, "rows": rows, "rounds": r, "cap_hours": cap / 3600.0}
+    fields = {"tool": tool, "tool_sha256": source, "rows": rows, "rounds": r, "cap_hours": cap / 3600.0,
+              "amounts": plain(amounts_module(subject.candidate).AMOUNTS)}
     if r < 1:
         return {"status": "inconclusive", "classification": NONE, "inputs": NONE, "fields": dict(fields, capped=True)}
     return {"status": evidence.verdict_cross_check(rows), "classification": NONE, "inputs": NONE, "fields": fields}
@@ -1208,7 +1225,7 @@ def run_rotation(args: argparse.Namespace, command: List[str], code: List[str], 
         citations[tool] = evidence.validation_citation(tool, source, binary)
         if citations[tool] is None:
             raise Refused(f"the ranking needs a validated tool: {tool} has no re-found record of its exact hash")
-    cross = cross_check_cited(candidate, tools[0])
+    cross = cross_check_cited(candidate, tools[0], w)
     if cross == NONE and not args.project:
         raise Refused(f"{tools[0]}'s results on {candidate} count once its cross-check has passed (research R12)")
     subject = plain_subject(candidate, n, w, RANK_ROUNDS)
@@ -1560,8 +1577,22 @@ def search_ended(candidate: str, probe: Dict) -> bool:
                for _, record in evidence.iter_records("bound", f"candidates/{candidate}"))
 
 
+def chosen_cross_checked(candidate: str) -> bool:
+    """Whether the cross-check of the chosen amounts stands. Before a ranking names them it cannot, and where the ranking keeps the first
+    amounts the first cross-check is that one (research R7)."""
+    rankings = [record for _, record in evidence.iter_records("rotation-ranking", f"candidates/{candidate}") if record.get("status") == "pass"]
+    if not rankings:
+        return False
+    chosen = max(rankings, key=lambda record: record["created_utc"])["chosen"]
+    tool = ranking_tools(candidate)[0]
+    source, _ = tool_hash(tool)
+    return any(record.get("tool") == tool and record.get("tool_sha256") == source and record.get("status") == "pass"
+               and amounts_checked(record, candidate) == chosen for _, record in evidence.iter_records("cross-check", f"candidates/{candidate}"))
+
+
 def reserved_trails(candidate: str, this: Dict) -> float:
-    """The probes of the searches the row still needs, this run's left out. A probe that does not exist comes first (research R7)."""
+    """The probes of the searches the row still needs, this run's left out, and the cap of the cross-check of the chosen amounts until it
+    stands. A probe that does not exist comes first (research R7)."""
     total = 0.0
     held = [record for _, record in evidence.iter_records("projection", "projections") if record.get("row") == f"{candidate}/trails"]
     for probe in later_searches(candidate):
@@ -1571,7 +1602,20 @@ def reserved_trails(candidate: str, this: Dict) -> float:
         if not found:
             raise Refused(f"the probe of {probe['method']}, {probe['bound_kind']}, at {probe['size']}×{probe['size']} and w = 32 comes first: --project writes it")
         total += float(max(found, key=lambda record: record["created_utc"])["projected_hours"])
+    if this.get("kind") != "cross-check" and not chosen_cross_checked(candidate):
+        total += INSTANCE_HOURS
     return total
+
+
+def row_refusal(candidate: str, row: str, hours: float, probe: Dict) -> Optional[str]:
+    """Why the row refuses a search, or None. A climb ends at such a refusal, so the search's projection record holds it (research R6); a
+    probe that does not exist yet is no refusal of the row, and it raises."""
+    reserved = reserved_trails(candidate, probe)
+    try:
+        evidence.guard_candidate_row(candidate, row, hours, reserved)
+    except Refused as exc:
+        return str(exc)
+    return None
 
 
 def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str], row: str) -> int:
@@ -1587,6 +1631,8 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
     if tool == "ARX search":
         code = code + [TRAIL_PATHS[tool], ARX_BINARY, ARX_MAKE]
     rounds = args.rounds or 1
+    if args.method == "branch-and-bound" and w != PRODUCTION_WIDTH and rounds != 1:
+        raise Refused("at a reduced width a box's bound is over one call, the ranking's measure (research R6)")
     subject = plain_subject(candidate, n, w, rounds)
     search = {"bound_kind": args.bound_kind, "rounds": rounds, "width": w, "size": n}
     source, binary = tool_hash(tool)
@@ -1596,22 +1642,26 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         citation = evidence.validation_citation(tool, source, binary)
         if citation is None:
             raise Refused(f"a bound needs a validated tool: {tool} has no re-found record of its exact hash")
-        cross = cross_check_cited(candidate, tool)
+        cross = cross_check_cited(candidate, tool, w)
         if tool in ("ARX search", "active-S-box counting") and cross == NONE and not args.project:
             raise Refused(f"{tool}'s results on {candidate} count once its cross-check has passed (research R12)")
         if w not in MODULES[tool].KIND["widths"]:
             citation = None
     started = time.monotonic()
     seconds = trail_seconds(subject, args, tool, rounds) if args.kind == "bound" else CROSS_SECONDS[0]
-    extra = {"probe": dict(probe_of(args.kind, n), width=w, bound_kind=args.bound_kind or NONE, method=args.method or NONE)}
-    path = evidence.write_projection(run=f"{args.kind} of {candidate} at {n}×{n}, w = {w}", row=f"{candidate}/{row}", inputs=NONE,
-                                     measured_speed={"seconds_of_the_run": seconds}, projected_hours=seconds / 3600.0,
-                                     time_hours=(time.monotonic() - started) / 3600.0, argv=command, code_files=code, extra=extra)
     hours = seconds / 3600.0
+    extra = {"probe": dict(probe_of(args.kind, n), width=w, bound_kind=args.bound_kind or NONE, method=args.method or NONE), "rounds": rounds}
+    refused = None if args.project else row_refusal(candidate, row, hours, extra["probe"])
+    if refused is not None:
+        extra["refused"] = refused
+    path = evidence.write_projection(run=f"{args.kind} of {candidate} at {n}×{n}, w = {w}", row=f"{candidate}/{row}", inputs=NONE,
+                                     measured_speed={"seconds_of_the_run": seconds}, projected_hours=hours,
+                                     time_hours=(time.monotonic() - started) / 3600.0, argv=command, code_files=code, extra=extra)
     if args.project:
         print(f"{evidence.rel_to_repo(path)}: {hours:.3f} h projected")
         return evidence.EXIT_OK
-    evidence.guard_candidate_row(candidate, row, hours, reserved_trails(candidate, extra["probe"]))
+    if refused is not None:
+        raise Refused(refused)
 
     def same(record: Dict) -> bool:
         if args.kind == "bound":

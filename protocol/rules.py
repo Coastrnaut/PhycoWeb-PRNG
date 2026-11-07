@@ -96,6 +96,42 @@ def rounds_with_both(table: Dict[str, Dict[int, Tuple[Fraction, str]]]) -> Set[i
     return {r for r in set(table["differential"]) & set(table["linear"]) if r >= LEAST_ROUNDS}
 
 
+def climb_end(candidate: str, width: int) -> Optional[int]:
+    """The r at which a candidate's climb ended at a width: the first at which a search of either kind reached its cap or its trail row
+    refused it (research R6, "How far the searches go")."""
+    ended = [record["rounds"] for record in held("bound", f"candidates/{candidate}")
+             if record.get("width") == width and record.get("size") == SIZE and record.get("method") in METHODS and evidence.reached_cap(record)]
+    for record in held("projection", "projections"):
+        probe = record.get("probe") or {}
+        if record.get("refused") and record.get("row") == f"{candidate}/trails" and probe.get("width") == width \
+                and probe.get("size") == SIZE and probe.get("method") in METHODS:
+            ended.append(record["rounds"])
+    return min(ended) if ended else None
+
+
+def climbs_owed(tables: Dict[str, Dict], ends: Dict[str, Optional[int]], families: Dict[str, str], closed: Sequence[str] = ()) -> List[str]:
+    """What the climbs of research R6 still owe at one width. A family's top, the most it can still share, is known once each of its
+    candidates has ended; nobody owes an r above the lowest top, every candidate owes r = 2, and until a family has a top everyone climbs
+    on. A candidate with a closing decision owes nothing."""
+    reach = {candidate: max(rounds_with_both(table), default=LEAST_ROUNDS - 1) for candidate, table in tables.items()}
+    tops = []
+    for family in FAMILIES:
+        own = [candidate for candidate in tables if families[candidate] == family]
+        if own and all(ends[candidate] is not None or candidate in closed for candidate in own):
+            tops.append(max(reach[candidate] if candidate in closed else ends[candidate] - 1 for candidate in own))
+    active = [candidate for candidate in sorted(tables) if candidate not in closed]
+    if not tops:
+        return [f"{candidate} has both bounds up to r = {reach[candidate]}, and no family's climb has ended" for candidate in active
+                if ends[candidate] is None]
+    last = max(min(tops), LEAST_ROUNDS)
+    owed = []
+    for candidate in active:
+        wanted = last if ends[candidate] is None else min(last, ends[candidate] - 1)
+        if reach[candidate] < wanted:
+            owed.append(f"{candidate} has both bounds up to r = {reach[candidate]}, and r = {wanted} is wanted")
+    return owed
+
+
 def family_rounds(tables: Dict[str, Dict], families: Dict[str, str], family: str) -> Set[int]:
     out: Set[int] = set()
     for candidate, table in tables.items():

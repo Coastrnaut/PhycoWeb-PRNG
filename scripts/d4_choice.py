@@ -19,7 +19,7 @@ import sys
 import tempfile
 from fractions import Fraction
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 for place in (str(ROOT), str(ROOT / "research/004"), str(ROOT / "research/004/tools")):
@@ -28,9 +28,9 @@ for place in (str(ROOT), str(ROOT / "research/004"), str(ROOT / "research/004/to
 
 from protocol import candidates, evidence  # noqa: E402
 from protocol.evidence import NONE, Refused, ToolFailure  # noqa: E402
-from protocol.rules import (FAMILIES, KINDS, LEAST_ROUNDS, METHODS, SIZE, WIDTHS, bounds_of, cross_checked, decide,  # noqa: E402,F401
-                            family_rounds, higher, locate, outcome_of, representatives_of, rounds_with_both, scored_rows, weight_at,
-                            weight_pair)
+from protocol.rules import (FAMILIES, KINDS, LEAST_ROUNDS, METHODS, SIZE, WIDTHS, bounds_of, climb_end, climbs_owed,  # noqa: E402,F401
+                            cross_checked, decide, family_rounds, higher, locate, outcome_of, representatives_of, rounds_with_both,
+                            scored_rows, weight_at, weight_pair)
 
 import costmodel  # noqa: E402
 import ir  # noqa: E402
@@ -83,6 +83,18 @@ def guard_outcomes(outcomes: Dict, needed: Sequence[int]) -> None:
         raise Refused("no final reduced-width outcome yet: " + ", ".join(missing))
 
 
+def guard_climbs(entered: Sequence[str], families: Dict[str, str], log: Sequence[Dict], width: Any) -> None:
+    """An outcome is final only once the candidate's climb has ended or has reached the last r it could share (research R6)."""
+    closed = [candidate for candidate in entered if {"ineligible", "rejected"} & set(candidates.decisions(log, candidate))]
+    owed = []
+    for at in ((16,) if width == 16 else WIDTHS):
+        tables = {candidate: bounds_of(candidate, at) for candidate in entered}
+        ends = {candidate: climb_end(candidate, at) for candidate in entered}
+        owed += [f"at w = {at}, {item}" for item in climbs_owed(tables, ends, families, closed)]
+    if owed:
+        raise Refused("no final reduced-width outcome yet: " + "; ".join(owed))
+
+
 def fields_of(entered: Dict[str, int], families: Dict[str, str], log: Sequence[Dict]) -> Dict:
     by_width, outcomes = measured(sorted(entered), log)
     guard_outcomes(outcomes, (16,))
@@ -103,6 +115,7 @@ def write_choice(command: List[str]) -> int:
         raise Refused(f"{DIRECTORY}/{CHOICE} exists, and it is written once")
     entered, families, log = entered_set()
     fields = fields_of(entered, families, log)
+    guard_climbs(sorted(entered), families, log, fields["width"])
     run = evidence.Run("d4-choice", directory=DIRECTORY, file_name=CHOICE, code_files=CODE, argv=command)
     with run:
         path = run.finish("pass", fields=fields)

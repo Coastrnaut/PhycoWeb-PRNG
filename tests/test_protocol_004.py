@@ -3819,6 +3819,29 @@ class EvidenceRuns(TempRepo):
         path = evidence.find_record(record["record_id"])[0]
         self.assertEqual(self.reproduced(path)["outcome"], "match")
 
+    def test_a_search_its_row_refuses_leaves_the_refusal_in_its_projection(self):
+        """A climb ends at the refusal, so the refusal has a record (research R6)."""
+        tool = "long-trail active-box counting"
+        self.validated((tool, self.script.TRAIL_PATHS[tool]))
+        with mock.patch.object(self.script, "trail_seconds", return_value=8 * 3600.0), \
+                mock.patch.object(self.script, "reserved_trails", return_value=41.0):
+            code = self.run_kind("bound", "--bound-kind", "differential", "--method", "active-box count", "--rounds", "3")
+        self.assertEqual(code, 2)
+        probe = [record for _, record in evidence.iter_records("projection", "projections")][-1]
+        self.assertEqual(probe["rounds"], 3)
+        self.assertIn("do not fit", probe["refused"])
+        self.assertEqual(self.records("bound"), [])
+
+    def test_a_probe_alone_holds_no_refusal(self):
+        tool = "long-trail active-box counting"
+        self.validated((tool, self.script.TRAIL_PATHS[tool]))
+        with mock.patch.object(self.script, "trail_seconds", return_value=8 * 3600.0), \
+                mock.patch.object(self.script, "reserved_trails", return_value=41.0):
+            code = self.run_kind("bound", "--bound-kind", "differential", "--method", "active-box count", "--rounds", "3", "--project")
+        self.assertEqual(code, 0)
+        probe = [record for _, record in evidence.iter_records("projection", "projections")][-1]
+        self.assertNotIn("refused", probe)
+
     def test_a_search_that_reached_its_cap_is_refused_again(self):
         tool = "long-trail active-box counting"
         self.validated((tool, self.script.TRAIL_PATHS[tool]))
@@ -4378,6 +4401,48 @@ class D4Rule(unittest.TestCase):
         at_16 = {"cand-A1": self.table(r2=(10, 10)), "cand-B1": self.table(r3=(9, 9))}
         self.assertEqual(self.d4.locate(self.widths(at_16), self.FAMILIES), (16, 3, "chosen by default", "Boolean"))
 
+    def owed(self, tables, ends, closed=()):
+        return self.d4.climbs_owed(tables, ends, self.FAMILIES, closed)
+
+    def test_while_no_climb_has_ended_every_candidate_climbs_on(self):
+        tables = {"cand-A1": self.table(r2=(1, 1)), "cand-B1": self.table(r2=(1, 1))}
+        self.assertEqual(len(self.owed(tables, {"cand-A1": None, "cand-B1": None})), 2)
+
+    def test_nobody_owes_an_r_the_other_family_could_not_share(self):
+        tables = {"cand-A1": self.table(r2=(1, 1)), "cand-B1": self.table(r2=(1, 1))}
+        self.assertEqual(self.owed(tables, {"cand-A1": None, "cand-B1": 3}), [])
+
+    def test_a_candidate_climbs_as_far_as_the_other_family_can_share(self):
+        tables = {"cand-A1": self.table(r2=(1, 1)), "cand-B1": self.table(r2=(1, 1), r3=(1, 1))}
+        owed = self.owed(tables, {"cand-A1": None, "cand-B1": 4})
+        self.assertEqual(len(owed), 1)
+        self.assertIn("cand-A1", owed[0])
+
+    def test_every_candidate_searches_two_rounds_whatever_the_other_family_reached(self):
+        tables = {"cand-A1": self.table(), "cand-B1": self.table()}
+        owed = self.owed(tables, {"cand-A1": None, "cand-B1": 2})
+        self.assertEqual(len(owed), 1)
+        self.assertIn("cand-A1", owed[0])
+        self.assertEqual(self.owed({"cand-A1": self.table(r2=(1, 1)), "cand-B1": self.table()}, {"cand-A1": None, "cand-B1": 2}), [])
+
+    def test_a_climb_with_a_kind_left_short_of_its_end_owes_that_kind(self):
+        tables = {"cand-A1": self.table(r2=(1, 1), r3=(1, 1)), "cand-B1": self.table(r2=(1, 1), r3=(1, None))}
+        owed = self.owed(tables, {"cand-A1": 5, "cand-B1": 4})
+        self.assertEqual(len(owed), 1)
+        self.assertIn("cand-B1", owed[0])
+
+    def test_a_family_with_a_candidate_climbing_has_no_top_yet(self):
+        tables = {"cand-A1": self.table(r2=(1, 1)), "cand-A2": self.table(r2=(1, 1)), "cand-B1": self.table(r2=(1, 1), r3=(1, 1), r4=(1, 1))}
+        owed = self.owed(tables, {"cand-A1": 3, "cand-A2": None, "cand-B1": None})
+        self.assertEqual(sorted(item.split()[0] for item in owed), ["cand-A2", "cand-B1"])
+        owed = self.owed(tables, {"cand-A1": 3, "cand-A2": None, "cand-B1": 5})
+        self.assertEqual(len(owed), 1)
+        self.assertIn("cand-A2", owed[0])
+
+    def test_a_candidate_with_a_closing_decision_owes_nothing(self):
+        tables = {"cand-A1": self.table(r2=(1, 1)), "cand-B1": self.table()}
+        self.assertEqual(self.owed(tables, {"cand-A1": 3, "cand-B1": None}, closed=("cand-B1",)), [])
+
     def test_the_score_compares_exactly(self):
         self.assertEqual(self.d4.higher((Fraction(3), Fraction(7)), (Fraction(3, 2), Fraction(7, 2))), 0)
         self.assertEqual(self.d4.higher((Fraction(65537, 65536), Fraction(1)), (Fraction(1), Fraction(1))), 1)
@@ -4473,6 +4538,11 @@ class RuleRecords(TempRepo):
         self.enter()
         self.counted("cand-A1", 16, {"differential": {1: 5, 2: a[0]}, "linear": {1: 4, 2: a[1]}})
         self.counted("cand-B1", 16, {"differential": {1: 4, 2: b[0]}, "linear": {1: 4, 2: b[1]}})
+        self.climb_ended("cand-B1", 3)
+
+    def climb_ended(self, candidate: str, r: int, width: int = 16) -> None:
+        self.record("bound", candidate, method="active-S-box count", bound_kind="linear", width=width, size=4, rounds=r, status="inconclusive",
+                    capped=True)
 
 
 class D4Script(RuleRecords):
@@ -4500,6 +4570,31 @@ class D4Script(RuleRecords):
 
     def luts(self, candidate: str):
         return self.d4.lists_at([candidate])[16][candidate]
+
+    def test_a_climb_that_has_not_ended_exits_2_and_writes_nothing(self):
+        """Research R6, "How far the searches go": where the searches stop is nobody's choice."""
+        self.enter()
+        self.counted("cand-A1", 16, {"differential": {2: 24}, "linear": {2: 24}})
+        self.counted("cand-B1", 16, {"differential": {2: 10}, "linear": {2: 10}})
+        self.assertEqual(self.choice(), 2)
+        self.assertFalse((self.root / evidence.REP_REL / "d4/choice.json").exists())
+
+    def test_a_refusal_ends_a_climb_as_a_cap_does(self):
+        self.enter()
+        self.counted("cand-A1", 16, {"differential": {2: 24}, "linear": {2: 24}})
+        self.counted("cand-B1", 16, {"differential": {2: 10}, "linear": {2: 10}})
+        probe = {"kind": "bound", "size": 4, "test": NONE, "width": 16, "bound_kind": "linear", "method": "active-S-box count"}
+        evidence.write_projection(run="x", row="cand-B1/trails", inputs=NONE, measured_speed=1, projected_hours=8.0, time_hours=0.0,
+                                  extra={"probe": probe, "rounds": 3, "refused": "8.000 h do not fit"})
+        self.assertEqual(self.d4.climb_end("cand-B1", 16), 3)
+        self.assertEqual(self.choice(), 0)
+
+    def test_a_climb_ends_at_the_first_r_of_either_kind_at_its_own_width(self):
+        self.climb_ended("cand-B1", 4)
+        self.climb_ended("cand-B1", 3)
+        self.assertEqual(self.d4.climb_end("cand-B1", 16), 3)
+        self.assertIsNone(self.d4.climb_end("cand-B1", 8))
+        self.assertIsNone(self.d4.climb_end("cand-A1", 16))
 
     def test_a_second_run_exits_2(self):
         """Quickstart E4."""
@@ -5276,21 +5371,74 @@ class RotationSearch(TempRepo):
     def test_the_trail_row_reserves_the_searches_it_still_needs(self):
         with self.assertRaisesRegex(Refused, "comes first"):
             self.script.reserved_trails("cand-A1", {})
-        for probe in self.script.later_searches("cand-A1"):
-            evidence.write_projection(run="x", row="cand-A1/trails", inputs=NONE, measured_speed=1, projected_hours=0.25, time_hours=0.0, extra={"probe": probe})
+        self.probes()
         self.assertEqual(len(self.script.later_searches("cand-A1")), 8)
         self.assertEqual(len(self.script.later_searches("cand-B1")), 6)
-        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {}), 2.0)
-        this = self.script.later_searches("cand-A1")[0]
-        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", this), 1.75)
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", self.A_CROSS_CHECK), 2.0)
+        this = dict(self.script.later_searches("cand-A1")[0], kind="cross-check")
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", this), 2.0)
 
-    def test_a_search_ended_needs_no_reservation(self):
+    A_CROSS_CHECK = {"kind": "cross-check"}
+
+    def probes(self) -> None:
         for probe in self.script.later_searches("cand-A1"):
             evidence.write_projection(run="x", row="cand-A1/trails", inputs=NONE, measured_speed=1, projected_hours=0.25, time_hours=0.0, extra={"probe": probe})
+
+    def checked(self, amounts=None, name: str = "cross-check-a") -> None:
+        fields = {"kind": "cross-check", "record_id": name, "created_utc": "2026-11-05T00:00:00Z", "status": "pass", "tool": "ARX search",
+                  "tool_sha256": "0" * 64, "candidate": "cand-A1"}
+        if amounts is not None:
+            fields["amounts"] = amounts
+        write(self.root, f"{evidence.REP_REL}/candidates/cand-A1/{name}.json", evidence.pretty(fields))
+
+    def ranked_at(self, chosen) -> None:
+        write(self.root, f"{evidence.REP_REL}/candidates/cand-A1/rotation-ranking-a.json", evidence.pretty(
+            {"kind": "rotation-ranking", "record_id": "rotation-ranking-a", "created_utc": "2026-11-05T00:00:00Z", "status": "pass", "chosen": chosen}))
+
+    def test_a_production_width_search_needs_the_cross_check_of_its_own_amounts(self):
+        """Data-model section 6: the first amounts' cross-check serves the searches before the choice, and only them."""
+        self.checked([[1, 3], [3, 1]])
+        with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+            self.assertEqual(self.script.cross_check_cited("cand-A1", "ARX search", 32), NONE)
+            self.assertEqual(self.script.cross_check_cited("cand-A1", "ARX search", 16), "cross-check-a")
+        self.checked([[1, 1], [1, 3]], "cross-check-b")
+        with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+            self.assertEqual(self.script.cross_check_cited("cand-A1", "ARX search", 32), "cross-check-b")
+
+    def test_a_cross_check_with_no_amounts_ran_on_the_first_of_the_space(self):
+        self.checked()
+        with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+            self.assertEqual(self.script.cross_check_cited("cand-A1", "ARX search", 32), "cross-check-a")
+
+    def test_the_row_holds_a_cap_for_the_cross_check_of_the_chosen_amounts(self):
+        self.probes()
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {"kind": "rotation-ranking"}), 10.0)
+        self.ranked_at([[1, 3], [3, 1]])
+        self.checked()
+        with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+            self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {"kind": "bound"}), 10.0)
+            self.checked([[1, 3], [3, 1]], "cross-check-b")
+            self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {"kind": "bound"}), 2.0)
+
+    def test_a_ranking_that_keeps_the_first_amounts_needs_no_second_cross_check(self):
+        self.probes()
+        self.ranked_at([[1, 1], [1, 3]])
+        self.checked()
+        with mock.patch.object(self.script, "tool_hash", return_value=("0" * 64, None)):
+            self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {"kind": "bound"}), 2.0)
+
+    def test_a_box_bound_at_a_reduced_width_is_over_one_call(self):
+        """Research R6: the score and the ranking read one measure."""
+        args = mock.Mock(candidate="cand-A1", size=4, width=16, kind="bound", project=False, bound_kind="linear", method="branch-and-bound", rounds=2)
+        with self.assertRaisesRegex(Refused, "one call"):
+            self.script.run_trail_kind(args, ["x"], [], "trails")
+
+    def test_a_search_ended_needs_no_reservation(self):
+        self.probes()
         probe = self.script.later_searches("cand-A1")[0]
         write(self.root, f"{evidence.REP_REL}/candidates/cand-A1/b.json", evidence.pretty(
             {"kind": "bound", "status": "pass", "method": probe["method"], "bound_kind": probe["bound_kind"], "width": 32, "size": 4}))
-        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", {}), 1.75)
+        self.assertAlmostEqual(self.script.reserved_trails("cand-A1", self.A_CROSS_CHECK), 1.75)
 
     def test_a_two_call_search_projects_its_cap_per_box(self):
         args = argparse.Namespace(bound_kind="differential")
