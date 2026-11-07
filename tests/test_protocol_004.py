@@ -4866,12 +4866,13 @@ class RoundRule(RuleRecords):
         self.assertFalse(self.rule.stages_item(wrong, "cand-A1", 4)["met"])
         self.assertFalse(self.rule.stages_item(None, "cand-A1", 4)["met"])
 
-    def test_cand_a1_declares_what_fr_025_and_fr_027_read(self):
-        for size in (4, 8, 16):
-            declared = self.rule.declarations_of("cand-A1", size)
-            self.assertTrue(self.rule.stages_item(declared, "cand-A1", size)["met"])
-            self.assertTrue(self.rule.key_path_item(declared, size)["met"])
-            self.assertTrue(self.rule.semantics_item(declared)["met"])
+    def test_each_candidate_declares_what_fr_025_and_fr_027_read(self):
+        for candidate in ("cand-A1", "cand-B1"):
+            for size in (4, 8, 16):
+                declared = self.rule.declarations_of(candidate, size)
+                self.assertTrue(self.rule.stages_item(declared, candidate, size)["met"], (candidate, size))
+                self.assertTrue(self.rule.key_path_item(declared, size)["met"], (candidate, size))
+                self.assertTrue(self.rule.semantics_item(declared)["met"], (candidate, size))
 
     def test_semantics_are_read_from_the_declaration(self):
         whole = {"semantics": dict.fromkeys(("width", "signedness", "wrap", "shift", "rotation"), "stated")}

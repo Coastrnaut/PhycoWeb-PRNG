@@ -100,6 +100,23 @@ def update(n, w, i, j, t, colour, step):
     return ir.Mix(ir.lane(n, i, j, own), "xor", expr)
 
 
+def key_path(n, w):
+    """The nodes whose lanes hold key bits, along one row and back along the next, each step between
+    direct neighbours (spec FR-025)."""
+    nodes = (256 // w + 1) // 2
+    return [(i, n - 1 - j if i % 2 else j) for i, j in (divmod(node, n) for node in range(nodes))]
+
+
+def declarations(n, w):
+    """What spec FR-025 and FR-027 read from the list. Its operations are bitwise, so that no stage
+    holds a carry chain, no word wraps and no word shifts."""
+    phases = 2 * len(PARTNERS) * ir.colours(n)
+    return {"stages": {"phases": phases, "chains_per_phase": [0] * phases},
+            "key_path": [list(node) for node in key_path(n, w)],
+            "semantics": {"width": w, "signedness": "unsigned", "wrap": "none: no addition",
+                          "shift": "none", "rotation": "left, bit i to bit (i + k) mod w"}}
+
+
 def build(n, w):
     phases = []
     for t in range(len(PARTNERS)):
