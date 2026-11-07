@@ -3068,8 +3068,12 @@
         "FUT-SEC-9": "expected: met by specification; the functionality class an open item"
       },
       "history": [],
-      "in_progress": "none",
-      "updated": "2026-11-03"
+      "in_progress": {
+        "level": "L2",
+        "start": "2026-11-07",
+        "status": "not reached"
+      },
+      "updated": "2026-11-07"
     }
   }
 }
