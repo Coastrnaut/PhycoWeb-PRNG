@@ -913,13 +913,13 @@ candidates are otherwise `ineligible` (R6, R7).
   them, and its import test in `tests/test_records_004.py`. (FR-065; SC-017; ANA-086)
 - [X] T087 [US4] Record the entered set with `python scripts/candidate_log.py enter`, one
   `entered-d4` entry per candidate of the set, before the first score. (FR-022, FR-041; R6)
-- [ ] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
+- [X] T088 [US4] For each entered candidate, at 4×4 and at the widest reduced width, compute the
   inputs of the D4 score with `python scripts/evidence_v3.py`: the cross-checks between kinds on the
   first amounts of the candidate's space, the rotation search of R15, and the trail bounds over r*
   rounds, climbing from r = 2 as R6 states, with the validated trail tools, the first trail search
   fixing the trail tools, and the cost from `research/004/tools/costmodel.py`; each heavy run
   **heavy**, projected first. (FR-022, FR-024, FR-038, FR-039; R5, R6, R7, R12, R15)
-- [ ] T089 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
+- [X] T089 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
   $REP/d4/choice.json` once (quickstart E4); after an exact tie, `--tie` writes `$REP/d4/tie.json`
   once both values of R at 4×4 exist. (FR-022; R6)
 - [ ] T090 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
