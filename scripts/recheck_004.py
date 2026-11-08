@@ -209,6 +209,16 @@ def check_bound(record: Dict, v: ModuleType) -> Dict:
             "classification": v.classify("bound", "established") if held else NONE}
 
 
+def check_rotation_ranking(record: Dict, v: ModuleType) -> Dict:
+    """The ranking again from the record's own entries: each measure the smaller of its two weights, the higher measure first, a tie in
+    the stated order of the assignments, and the amounts chosen its first entry (research R15)."""
+    entries = record["entries"]
+    measured = all(Fraction(str(entry["measure"])) == min(Fraction(str(entry["W_D"])), Fraction(str(entry["W_L"]))) for entry in entries)
+    ranked = sorted(entries, key=lambda entry: (-Fraction(str(entry["measure"])), entry["assignment"]))
+    return {"status": "pass" if measured and ranked == entries else "fail", "classification": NONE,
+            "chosen": ranked[0]["assignment"] if ranked else NONE}
+
+
 def check_generator_run(record: Dict, v: ModuleType) -> Dict:
     checks = record.get("checks") or {}
     held = all(checks.get(name, True) for name in ("relations_hold", "symmetry_holds")) and not checks.get("refused_matches")
@@ -261,7 +271,8 @@ CHECKS: Dict[str, Callable[[Dict, ModuleType], Dict]] = {
     "demonstration": check_demonstration, "validation": check_validation, "cross-check": check_cross_check, "inverse": check_inverse,
     "bijectivity": check_bijectivity, "dependency": check_dependency, "frequency": check_frequency, "avalanche": check_avalanche,
     "control": check_control, "symmetry": check_symmetry, "invariant": check_invariant, "degree": check_degree, "bound": check_bound,
-    "generator-run": check_generator_run, "round-rule": check_round_rule, "selection": check_selection, "d4-choice": check_d4_choice}
+    "generator-run": check_generator_run, "round-rule": check_round_rule, "selection": check_selection, "d4-choice": check_d4_choice,
+    "rotation-ranking": check_rotation_ranking}
 NOT_READ_HERE = ("the operation-list items of eligibility, which `round_rule.py --reproduce` recomputes",)
 
 

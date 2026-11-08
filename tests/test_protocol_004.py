@@ -5168,6 +5168,20 @@ class Recheck(TempRepo):
         record = self.record("bound", status="inconclusive", capped=True, bound=NONE, method="active-box count", rounds=2)
         self.assertEqual(self.found(record), [])
 
+    def test_a_ranking_again_from_its_own_entries(self):
+        entries = [{"W_D": 24, "W_L": 16, "assignment": [[1, 1], [1, 3]], "measure": 16},
+                   {"W_D": 16, "W_L": 20, "assignment": [[1, 1], [1, 5]], "measure": 16},
+                   {"W_D": "786432/65536", "W_L": 8, "assignment": [[1, 3], [1, 1]], "measure": 8}]
+        record = self.record("rotation-ranking", entries=entries, chosen=[[1, 1], [1, 3]])
+        self.assertEqual(self.found(record), [])
+        self.assertEqual([item["field"] for item in self.found(dict(record, chosen=[[1, 1], [1, 5]]))], ["chosen"])
+        swapped = [entries[1], entries[0], entries[2]]
+        self.assertEqual([item["field"] for item in self.found(dict(record, entries=swapped))], ["status"])
+        self.assertEqual([item["field"] for item in self.found(dict(record, entries=swapped, chosen=[[1, 1], [1, 5]]))],
+                         ["status", "chosen"])
+        wrong = [dict(entries[0], measure=24)] + entries[1:]
+        self.assertIn("status", {item["field"] for item in self.found(dict(record, entries=wrong))})
+
     def test_the_d4_arithmetic_again(self):
         candidates.propose({"candidate_id": "cand-A1", "family": "ARX", "oplist_sha256": self.module("cand-A1"), "parameters": self.parameters()})
         candidates.propose({"candidate_id": "cand-B1", "family": "Boolean", "oplist_sha256": self.module("cand-B1"), "parameters": self.parameters()})
