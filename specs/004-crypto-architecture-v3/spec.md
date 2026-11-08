@@ -3890,7 +3890,15 @@ design, never a value of the rule (FR-032).
   below 2⁻¹²⁸, from bounds (FR-038) that hold at the production width and that size. If it is
   not established, the size cannot be frozen. Before selection, R_bound at each claimable size comes
   from a bound computed at that size; a proof that carries a bound to a larger size is written for
-  the selected candidate only and serves as a check beside the computed bounds (FR-038).
+  the selected candidate only and serves as a check beside the computed bounds (FR-038). The
+  searches at the production width climb as research R6's do at the reduced widths, so that nobody
+  picks where they stop: at each claimable size each candidate's bounds are searched at r = 2, 3, 4
+  and so on, one search per kind and r, each a search instance of research R7 under its 8 h cap, an
+  ARX candidate's box bounds over one call of each box, a chain of t calls costing t times one
+  call. The climb at a size ends at the first r at which both bounds lie below 2⁻¹²⁸, which is
+  R_bound there, or at the first search of either kind that reaches its cap or that its trail row
+  refuses, the refusal written in that search's `projection` record, which leaves the candidate
+  without R_bound at that size.
 - R_dist: the largest number of rounds of Π or Π⁻¹ for which this feature's evidence shows a
   distinguisher costing less than 2¹²⁸ evaluations of Π or Π⁻¹ (FR-004): incomplete diffusion,
   a bias that meets the bias rule below, a probabilistic invariant (FR-037), a trail of Π found with
