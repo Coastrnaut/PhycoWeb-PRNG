@@ -927,7 +927,7 @@ candidates are otherwise `ineligible` (R6, R7).
   then set and commit the row "D4 tie" in `specs/004-crypto-architecture-v3/spec.md`; where a
   tie-break decides it, the row reads "Not needed", naming `d4/tie.json` and its tie-break. (FR-022;
   R6; PRO-074)
-- [ ] T091 [US4] Before any candidate's first frequency or avalanche run at a size, run the uniform
+- [X] T091 [US4] Before any candidate's first frequency or avalanche run at a size, run the uniform
   controls there, `python scripts/evidence_v3.py --kind control --test frequency --size N --project
   --out-dir $REP/controls` and then the run, and the same for `avalanche`, each **heavy**; a control
   that fires makes that size's bias evidence inconclusive for every candidate, and the feature
