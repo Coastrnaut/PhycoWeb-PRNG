@@ -1,0 +1,190 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {
+    "phycoweb/lut.py": {
+      "kind": "raw",
+      "sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3"
+    },
+    "phycoweb/model_v2.py": {
+      "kind": "raw",
+      "sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec"
+    },
+    "protocol/candidates.py": {
+      "kind": "raw",
+      "sha256": "b24351a94e8ec995cd05e83dd68d5df6e80a231e58fccbb8db7ad5b546fe7837"
+    },
+    "protocol/changelog.py": {
+      "kind": "raw",
+      "sha256": "61800879e65a7fa35859b64606ac3d5b743bdae20f6a726b82d885140eeafee5"
+    },
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "4fb63b0479818e3b2fab21b949df30e9db59032f7613605667379a8057defe87"
+    },
+    "protocol/seedsets.py": {
+      "kind": "raw",
+      "sha256": "0471cb7bd009500a885f3a2228dae9b637469ab5b44bc51ae0dee4e1a228c057"
+    },
+    "research/004/candidates/cand-A1.py": {
+      "kind": "raw",
+      "sha256": "803246da893a24b60ef9585ffa8180005d6dfb8f35c714ca2bd9d5e69ad4fb8e"
+    },
+    "research/004/ir.py": {
+      "kind": "raw",
+      "sha256": "118566f4faf3ad8dd9a00e7e7593ce2087d572a78cf46142beee6631f288a311"
+    },
+    "research/004/tools/avalanche.py": {
+      "kind": "raw",
+      "sha256": "5cfc9c7f6655111809d248f35c99b1625e7dfee4797a341869c1c181afea15f3"
+    },
+    "research/004/tools/bias.py": {
+      "kind": "raw",
+      "sha256": "e882f0303098daa9572fb7feadef941b34aeeeee7e005fc50ae3ea998333a9b4"
+    },
+    "research/004/tools/bijectivity.py": {
+      "kind": "raw",
+      "sha256": "4238c48a3e4fd1109ea2b97acbd09ba728d5055d18933e000fa89cfa754058fb"
+    },
+    "research/004/tools/critical_counts.json": {
+      "kind": "raw",
+      "sha256": "97f12d95ff8601c7a3c9bcdbe21bdd51322f8243234698fd73ac0dd7496d8a4a"
+    },
+    "research/004/tools/degree.py": {
+      "kind": "raw",
+      "sha256": "6d6f21f8378a5a210032e833e01854793bab109247e8d9e0cb05a4ec8640836a"
+    },
+    "research/004/tools/dependency.py": {
+      "kind": "raw",
+      "sha256": "b781d4a9ae4f6258ade31c6bc36a340665f277a3cb4c52d1c4f3b6fc771e6950"
+    },
+    "research/004/tools/invariants.py": {
+      "kind": "raw",
+      "sha256": "f3b28f3ac299be5f51ae7c29dd0004e9e92fb43997d8ee32da0d4e489e1b04e1"
+    },
+    "research/004/tools/symmetry.py": {
+      "kind": "raw",
+      "sha256": "6ba7dad9bfb34f8cec356d1b3cc3d33d15b3f2d5a58d99af8a5840dfd60ead00"
+    },
+    "research/004/tools/trails/active_sbox.py": {
+      "kind": "raw",
+      "sha256": "7364120c62a4436dce8241677d7a3cb8fa6f2afbdfb22771c7623df9ec55df01"
+    },
+    "research/004/tools/trails/arx_search_known.py": {
+      "kind": "raw",
+      "sha256": "572b7241ce0c2b2aa4016068b197379ec99a2df45ac869e0ffa110b94de9cc9e"
+    },
+    "research/004/tools/trails/long_trail.py": {
+      "kind": "raw",
+      "sha256": "202c79da4a063cd62ecacd39ac76787dbe3e878c96caaf6f1926689ef81e434e"
+    },
+    "research/004/tools/trails/tables.py": {
+      "kind": "raw",
+      "sha256": "aa2b060fd7153d2b0ade6b45a8f55825ed9f55ccb7c5d392c1e28f06faa5863f"
+    },
+    "research/security/step-probes.json": {
+      "kind": "lf-normalized",
+      "sha256": "4f5070b4bd58c22020e641ceb59452e9a9cf1bd83dec58469a692d3d93f1a76e"
+    },
+    "research/security/step_probes.py": {
+      "kind": "raw",
+      "sha256": "a33f4e6fef09a96859a0ebc7aae285f01dbdec9fd4343adc36d0477b4dc81f23"
+    },
+    "research/security/vein-class-census.json": {
+      "kind": "lf-normalized",
+      "sha256": "4773063d5ce7eec1a07832509c31caaea3768fc8d5a108c66db2c1d47df6f9d3"
+    },
+    "scripts/evidence_v3.py": {
+      "kind": "raw",
+      "sha256": "9d5fceceb9ae6a9721a95156f6de5f0e8a80cc9b8b2817b4999aa8ffdf8d5384"
+    },
+    "scripts/gen_constants_v3.py": {
+      "kind": "raw",
+      "sha256": "9ee514c4bb2e1c82a0aee17acbff272e5135b1dde91d1dd6bda276c009290b04"
+    }
+  },
+  "command": "/home/coast/.venvs/phycoweb/bin/python scripts/evidence_v3.py --candidate cand-A1 --kind bound --bound-kind differential --method 'active-box count' --size 8 --width 32 --rounds 4 --out-dir reports/004-crypto-architecture-v3/candidates/cand-A1",
+  "config": {
+    "cwd": "/mnt/c/GIT/PhycoWeb-PRNG",
+    "repository_root": "/mnt/c/GIT/PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-08T20:07:40Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "b62ba9e505df5ce9a10bb084b125386e061231c2e6d85f824b47b77c6d71585c",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-wsl.json",
+    "sha256": "77c5e021619083273826dcd435e9e1227620595ffc0bbc220791cd066251beff",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "git_dirty": false,
+  "git_head": "7f5c5262842a2c24dc8860ee39be0bd7d229acfd",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "projection",
+  "limitations": [],
+  "measured_speed": {
+    "seconds_of_the_run": 0.9268629121652339
+  },
+  "model_id": null,
+  "outputs": [],
+  "outputs_statement": "its outputs other than timing were discarded unread",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "none",
+    "logical_cpus": 32,
+    "ram": "33505370112 bytes",
+    "system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "probe": {
+    "bound_kind": "differential",
+    "kind": "bound",
+    "method": "active-box count",
+    "size": 8,
+    "test": "none",
+    "width": 32
+  },
+  "projected_hours": 0.0002574619200458983,
+  "protocol_line_sha256": "9414ed6aaad7851c77edebb96b60cde7a302b6089d6012bc101059aaf3723b3d",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 524,
+  "record_id": "projection-20261108T200740Z-d16d5059",
+  "research_sha256": "614afc499c5941ccb5284ca1baafbe0055f011b6dde1bf816127884e2c66da0a",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "rounds": 4,
+  "row": "cand-A1/trails",
+  "run": "bound of cand-A1 at 8×8, w = 32",
+  "spec_sha256": "becf4501dc40f2c81502e26d6dba73a353e8fd13dceabac4c98ff86c8dcb71bf",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "time_hours": 0.0003353530783334059,
+  "variant_id": null,
+  "versions": {
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "numpy": "2.5.4",
+    "python": "3.14.4",
+    "scipy": "1.18.1"
+  }
+}
