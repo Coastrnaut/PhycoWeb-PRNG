@@ -922,7 +922,7 @@ candidates are otherwise `ineligible` (R6, R7).
 - [X] T089 [US4] Run `python scripts/d4_choice.py --log research/004/candidates.jsonl --out
   $REP/d4/choice.json` once (quickstart E4); after an exact tie, `--tie` writes `$REP/d4/tie.json`
   once both values of R at 4×4 exist. (FR-022; R6)
-- [ ] T090 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
+- [X] T090 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
   `python scripts/d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json`,
   then set and commit the row "D4 tie" in `specs/004-crypto-architecture-v3/spec.md`; where a
   tie-break decides it, the row reads "Not needed", naming `d4/tie.json` and its tie-break. (FR-022;
