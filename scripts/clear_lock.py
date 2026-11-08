@@ -28,6 +28,9 @@ OUTSIDE = ("a reboot, a power loss or an update ended the run; its partial outpu
            "unread and it gave no result")
 DIED = ("the run died holding the lock; its partial outputs were discarded unread, and its hours "
         "used are the most it can have used, since nothing else shows when it died")
+# What the record of a dead run states of itself, which no field of its description replaces.
+OWN_FIELDS = ("record_id", "kind", "status", "classification", "exit_status", "assertions",
+              "limitations", "outputs", "inputs", "model_id", "variant_id")
 
 
 def partial_of(lock: Dict) -> Optional[Path]:
@@ -55,7 +58,9 @@ def hours_and_end(lock: Dict, created: str) -> Tuple[float, str]:
 
 
 def write_dead_run(lock: Dict, partial: Path, argv: List[str]) -> Tuple[Path, Dict]:
-    """The `inconclusive` record that every started run writes."""
+    """The `inconclusive` record that every started run writes, with the fields its description
+    gives that the readers of its kind find a record by, such as a control's test and size and the
+    rows it charges (research R7, "Runs ended from outside")."""
     described = json.loads((partial / evidence.RUN_FILE).read_bytes().decode("utf-8"))
     created = evidence.utc_now()
     used, ended = hours_and_end(lock, created)
@@ -78,12 +83,14 @@ def write_dead_run(lock: Dict, partial: Path, argv: List[str]) -> Tuple[Path, Di
                        threads=described.get("threads", 1), argv=argv, code_files=CODE,
                        writes_evidence=False, heavy=False)
     run.heavy = False
+    fields = {name: value for name, value in (described.get("fields") or {}).items()
+              if name not in OWN_FIELDS}
+    fields.update({"created_utc": created, "ended_outside": ended, "heavy_run": True,
+                   "command": lock["command"],
+                   "hours": {"projected": described.get("projected_hours"), "used": used}})
     with run:
         path = run.finish("inconclusive", exit_status=evidence.EXIT_TOOL, limitations=[statement],
-                          fields={"created_utc": created, "ended_outside": ended, "heavy_run": True,
-                                  "command": lock["command"],
-                                  "hours": {"projected": described.get("projected_hours"),
-                                            "used": used}})
+                          fields=fields)
     return path, described
 
 

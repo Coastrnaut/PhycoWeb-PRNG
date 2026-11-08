@@ -3947,6 +3947,45 @@ class EvidenceRuns(TempRepo):
         self.assertEqual(made["exclusions_and_reruns"], [{"record_id": record["record_id"], "why": "ended from outside"}])
         self.script.guard_control("cand-A1", "frequency", 4)
 
+    def test_a_control_that_a_reboot_ended_is_found_named_and_charged_as_its_record_says(self):
+        """The record clear_lock.py writes for a control that died holding the lock holds its test, size and rows, so that no test
+        of its kind starts before it runs again, the run made again names it, and a row it spared is charged nothing (research
+        R7, "Runs ended from outside"; cli contract)."""
+        from scripts import clear_lock
+        left = {}
+
+        def dies(run, n):
+            left["lock"] = json.loads(evidence.REPO.heavy_lock.read_bytes())
+            left["description"] = (run.tmp / evidence.RUN_FILE).read_bytes()
+            left["partial"] = run.tmp.name
+            raise Refused("the machine restarts")
+
+        self.validated(("bias", self.script.TOOL_PATHS["control"]))
+        with mock.patch.dict(self.script.CONTROLS, {"frequency": dies}), \
+                mock.patch.object(self.script, "rows_charged", return_value=(["cand-A2"], ["cand-A1"])):
+            self.assertEqual(self.run_script("--kind", "control", "--test", "frequency", "--size", "4", "--out-dir",
+                                             f"{evidence.REP_REL}/controls"), 2)
+        self.assertEqual(self.controls(), [])
+        now = datetime.datetime.now(datetime.timezone.utc)
+        lock = dict(left["lock"], start="gone", time=(now - datetime.timedelta(hours=2)).strftime("%Y-%m-%dT%H:%M:%SZ"))
+        write(self.root, evidence.HEAVY_LOCK_REL, evidence.canonical(lock))
+        write(self.root / evidence.PARTIAL_REL / left["partial"], evidence.RUN_FILE, left["description"])
+        boot = (now - datetime.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with mock.patch.object(evidence, "boot_time", return_value=boot), mock.patch("builtins.print"):
+            self.assertEqual(clear_lock.main([evidence.HEAVY_LOCK_REL]), 0)
+        (_, dead), = self.controls()
+        self.assertEqual((dead["ended_outside"], dead["status"]), (boot, "inconclusive"))
+        self.assertEqual((dead["test"], dead["size"], dead["charged"], dead["not_charged"]), ("frequency", 4, ["cand-A2"], ["cand-A1"]))
+        self.assertEqual(evidence.control_hours("cand-A1"), 0.0)
+        self.assertAlmostEqual(evidence.control_hours("cand-A2"), 1.0)
+        self.commit("cleared")
+        with self.assertRaisesRegex(Refused, "waits for its uniform control"):
+            self.script.guard_control("cand-A2", "frequency", 4)
+        self.assertEqual(self.control(), 0)
+        made = [item for _, item in self.controls() if item["record_id"] != dead["record_id"]][0]
+        self.assertEqual(made["exclusions_and_reruns"], [{"record_id": dead["record_id"], "why": "ended from outside"}])
+        self.script.guard_control("cand-A2", "frequency", 4)
+
     def test_a_row_that_cannot_hold_a_control_takes_no_test_of_its_kind_there(self):
         candidates.append({"candidate_id": "cand-A1", "event": "entered-d4", "evidence": []})
         with mock.patch.object(self.script, "rows_charged", return_value=([], ["cand-A1"])):
@@ -5602,6 +5641,20 @@ class ClearLock(TempRepo):
         self.assertEqual(dead["ended_outside"], boot)
         self.assertAlmostEqual(dead["hours"]["used"], evidence.hours_between(content["time"], boot))
         self.assertTrue([s for s in dead["limitations"] if "discarded unread" in s])
+
+    def test_a_dead_run_holds_the_fields_its_description_gives_and_states_itself(self):
+        self.stale({"kind": "control", "directory": "controls", "model_id": None, "variant_id": None,
+                    "candidate": None, "config": {"size": 4, "test": "frequency"}, "inputs": NONE,
+                    "projected_hours": 1.0, "workers": 1, "threads": 1,
+                    "fields": {"test": "frequency", "size": 4, "not_charged": ["cand-A1"],
+                               "status": "pass", "exit_status": 0, "created_utc": "2020-01-01T00:00:00Z"}})
+        self.assertEqual(self.clear(), 0)
+        dead = self.records("control")[0]
+        self.assertEqual((dead["test"], dead["size"], dead["not_charged"]), ("frequency", 4, ["cand-A1"]))
+        self.assertEqual((dead["status"], dead["exit_status"]), ("inconclusive", evidence.EXIT_TOOL))
+        self.assertNotEqual(dead["created_utc"], "2020-01-01T00:00:00Z")
+        self.assertAlmostEqual(dead["hours"]["used"], evidence.hours_between(
+            self.records("lock-cleared")[0]["lock"]["time"], dead["created_utc"]))
 
     def test_fr_053s_test_gets_its_closing_projection(self):
         self.stale({"kind": "projection", "run": "FR-053's test", "row": evidence.FEATURE_ROW,

@@ -1725,10 +1725,13 @@ def control_directory() -> str:
 
 
 def control_held(test: str, size: int) -> Optional[Dict]:
-    """The latest record of a control, which a run ended from outside leaves to be made again."""
+    """The latest record of a control, which a run ended from outside leaves to be made again: the one that no run made again names,
+    the latest of those, since a run made again names the record it makes again (research R7)."""
     held = [record for _, record in evidence.iter_records("control", control_directory())
             if record.get("test") == test and record.get("size") == size]
-    return max(held, key=lambda record: record["created_utc"]) if held else None
+    named = {item.get("record_id") for record in held for item in record.get("exclusions_and_reruns") or ()}
+    standing = [record for record in held if record["record_id"] not in named] or held
+    return max(standing, key=lambda record: record["created_utc"]) if standing else None
 
 
 def control_states(n: int, first: int, count: int) -> np.ndarray:
@@ -1859,8 +1862,10 @@ def run_control(args: argparse.Namespace, command: List[str]) -> int:
         print(f"{evidence.rel_to_repo(path)}: {hours:.3f} h projected")
         return evidence.EXIT_OK
     charged, spared = rows_charged(hours)
+    # A control that dies holding the lock is found, named and charged as a finished one is (research R7, "Runs ended from outside").
+    found_by = {"test": test, "size": n, "not_charged": spared, "charged": charged, "exclusions_and_reruns": again}
     run = evidence.Run("control", directory=control_directory(), code_files=CODE, argv=command, heavy=True, projected_hours=hours,
-                       workers=args.workers, namespace="control", config={"size": n, "test": test})
+                       workers=args.workers, namespace="control", config={"size": n, "test": test}, described=found_by)
     with run:
         run.begin(hours)
         fields, inputs = CONTROLS[test](run, n)

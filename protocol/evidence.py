@@ -1491,7 +1491,9 @@ class Run:
     name the data model states, written once, or with `fixed` kept under that name with versions/.
     What a record cites is read when the run starts. A run that is no evidence run, such as the
     records of scripts/clear_lock.py and scripts/owner_record.py, passes writes_evidence=False.
-    `environment` holds a re-check's own environment, which is exempt from the guard.
+    `environment` holds a re-check's own environment, which is exempt from the guard. `described`
+    holds fields that the run's record holds and that its readers find it by, known at its start,
+    which the record scripts/clear_lock.py writes for it, if it dies holding the lock, holds too.
     """
 
     def __init__(self, kind: str, *, candidate: Optional[str] = None,
@@ -1505,7 +1507,7 @@ class Run:
                  fixed: bool = False, original: Optional[str] = None, n: Optional[int] = None,
                  namespace: Optional[str] = None, writes_evidence: bool = True,
                  cited: Iterable[str] = (), analyst: str = ANALYST,
-                 environment: Optional[Dict] = None):
+                 environment: Optional[Dict] = None, described: Optional[Dict] = None):
         self.kind = kind
         self.candidate = candidate
         self.model_id = model_id
@@ -1529,6 +1531,7 @@ class Run:
         self.cited = list(cited)
         self.analyst = analyst
         self.own_environment = environment
+        self.described = dict(described or {})
         self.outputs: List[Dict] = []
         self.moves: List[Tuple[Path, str]] = []
         self.extra: Dict[str, Any] = {}
@@ -1573,11 +1576,13 @@ class Run:
         return self
 
     def description(self) -> Dict:
-        """What scripts/clear_lock.py needs for this run's record if it dies holding the lock."""
+        """What scripts/clear_lock.py needs for this run's record if it dies holding the lock,
+        `fields` among it, so that the readers of its kind find that record as they find a
+        finished one (research R7, "Runs ended from outside")."""
         return {"kind": self.kind, "candidate": self.candidate, "model_id": self.model_id,
                 "variant_id": self.variant_id, "directory": self.directory, "config": self.config,
                 "inputs": self.inputs, "projected_hours": self.projected_hours,
-                "workers": self.workers, "threads": self.threads}
+                "workers": self.workers, "threads": self.threads, "fields": self.described}
 
     def read_citations(self) -> None:
         """What the record cites, as it stands when the run starts; the copies come with the
