@@ -1,0 +1,474 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "charged": [
+    "cand-A1",
+    "cand-B1"
+  ],
+  "classification": "none",
+  "code_sha256": {
+    "phycoweb/lut.py": {
+      "kind": "raw",
+      "sha256": "387a99edefac0e9d38e97f7e84b24d19d6d96dfdcbd14f3866bf01940a49b5c3"
+    },
+    "phycoweb/model_v2.py": {
+      "kind": "raw",
+      "sha256": "1260142d1205f5d7340cf3f82ed557bbe9dc7bb5de370e668688964d01f1c2ec"
+    },
+    "protocol/candidates.py": {
+      "kind": "raw",
+      "sha256": "b24351a94e8ec995cd05e83dd68d5df6e80a231e58fccbb8db7ad5b546fe7837"
+    },
+    "protocol/changelog.py": {
+      "kind": "raw",
+      "sha256": "61800879e65a7fa35859b64606ac3d5b743bdae20f6a726b82d885140eeafee5"
+    },
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "4fb63b0479818e3b2fab21b949df30e9db59032f7613605667379a8057defe87"
+    },
+    "protocol/seedsets.py": {
+      "kind": "raw",
+      "sha256": "0471cb7bd009500a885f3a2228dae9b637469ab5b44bc51ae0dee4e1a228c057"
+    },
+    "research/004/ir.py": {
+      "kind": "raw",
+      "sha256": "118566f4faf3ad8dd9a00e7e7593ce2087d572a78cf46142beee6631f288a311"
+    },
+    "research/004/tools/avalanche.py": {
+      "kind": "raw",
+      "sha256": "5cfc9c7f6655111809d248f35c99b1625e7dfee4797a341869c1c181afea15f3"
+    },
+    "research/004/tools/bias.py": {
+      "kind": "raw",
+      "sha256": "e882f0303098daa9572fb7feadef941b34aeeeee7e005fc50ae3ea998333a9b4"
+    },
+    "research/004/tools/bijectivity.py": {
+      "kind": "raw",
+      "sha256": "4238c48a3e4fd1109ea2b97acbd09ba728d5055d18933e000fa89cfa754058fb"
+    },
+    "research/004/tools/critical_counts.json": {
+      "kind": "raw",
+      "sha256": "97f12d95ff8601c7a3c9bcdbe21bdd51322f8243234698fd73ac0dd7496d8a4a"
+    },
+    "research/004/tools/degree.py": {
+      "kind": "raw",
+      "sha256": "6d6f21f8378a5a210032e833e01854793bab109247e8d9e0cb05a4ec8640836a"
+    },
+    "research/004/tools/dependency.py": {
+      "kind": "raw",
+      "sha256": "b781d4a9ae4f6258ade31c6bc36a340665f277a3cb4c52d1c4f3b6fc771e6950"
+    },
+    "research/004/tools/invariants.py": {
+      "kind": "raw",
+      "sha256": "f3b28f3ac299be5f51ae7c29dd0004e9e92fb43997d8ee32da0d4e489e1b04e1"
+    },
+    "research/004/tools/symmetry.py": {
+      "kind": "raw",
+      "sha256": "6ba7dad9bfb34f8cec356d1b3cc3d33d15b3f2d5a58d99af8a5840dfd60ead00"
+    },
+    "research/004/tools/trails/active_sbox.py": {
+      "kind": "raw",
+      "sha256": "7364120c62a4436dce8241677d7a3cb8fa6f2afbdfb22771c7623df9ec55df01"
+    },
+    "research/004/tools/trails/arx_search_known.py": {
+      "kind": "raw",
+      "sha256": "572b7241ce0c2b2aa4016068b197379ec99a2df45ac869e0ffa110b94de9cc9e"
+    },
+    "research/004/tools/trails/long_trail.py": {
+      "kind": "raw",
+      "sha256": "202c79da4a063cd62ecacd39ac76787dbe3e878c96caaf6f1926689ef81e434e"
+    },
+    "research/004/tools/trails/tables.py": {
+      "kind": "raw",
+      "sha256": "aa2b060fd7153d2b0ade6b45a8f55825ed9f55ccb7c5d392c1e28f06faa5863f"
+    },
+    "research/security/step-probes.json": {
+      "kind": "lf-normalized",
+      "sha256": "4f5070b4bd58c22020e641ceb59452e9a9cf1bd83dec58469a692d3d93f1a76e"
+    },
+    "research/security/step_probes.py": {
+      "kind": "raw",
+      "sha256": "a33f4e6fef09a96859a0ebc7aae285f01dbdec9fd4343adc36d0477b4dc81f23"
+    },
+    "research/security/vein-class-census.json": {
+      "kind": "lf-normalized",
+      "sha256": "4773063d5ce7eec1a07832509c31caaea3768fc8d5a108c66db2c1d47df6f9d3"
+    },
+    "scripts/evidence_v3.py": {
+      "kind": "raw",
+      "sha256": "9d5fceceb9ae6a9721a95156f6de5f0e8a80cc9b8b2817b4999aa8ffdf8d5384"
+    },
+    "scripts/gen_constants_v3.py": {
+      "kind": "raw",
+      "sha256": "9ee514c4bb2e1c82a0aee17acbff272e5135b1dde91d1dd6bda276c009290b04"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/evidence_v3.py --kind control --test avalanche --size 8 --out-dir reports/004-crypto-architecture-v3/controls",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG",
+    "size": 8,
+    "test": "avalanche"
+  },
+  "created_utc": "2026-11-08T11:46:24Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [
+    "reports/004-crypto-architecture-v3/controls/control-20261108T114526Z-1f9e508b.json",
+    "reports/004-crypto-architecture-v3/controls/control-20261108T114526Z-1f9e508b/counts.json.gz",
+    "reports/004-crypto-architecture-v3/controls/control-20261108T114526Z-1f9e508b/failure-locations.json.gz",
+    "reports/004-crypto-architecture-v3/controls/control-20261108T114526Z-1f9e508b/p-values.json.gz",
+    "reports/004-crypto-architecture-v3/projections/projection-20261108T114515Z-ae961c80.json",
+    "reports/004-crypto-architecture-v3/projections/projection-20261108T114529Z-87ab4823.json"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exclusions_and_reruns": [],
+  "exit_status": 0,
+  "failure_locations": {
+    "path": "reports/004-crypto-architecture-v3/controls/control-20261108T114624Z-b6ce8dea/failure-locations.json.gz",
+    "sha256": "64406e753d82e11c6bd63d1d04bb6aa083eefa0a46949bbfce994d556b989f0f",
+    "sha256_kind": "raw"
+  },
+  "finding": "none",
+  "fires": false,
+  "git_dirty": true,
+  "git_head": "b5e3acb42423cfb5d919d778d88d441ed72ec9b0",
+  "heavy_run": true,
+  "hours": {
+    "projected": 0.008304374999677748,
+    "used": 0.0151216666666672
+  },
+  "inputs": {
+    "index_range": [
+      0,
+      15306623
+    ],
+    "kind": "state",
+    "n": 8,
+    "namespace": "control",
+    "w": 32
+  },
+  "kind": "control",
+  "limitations": [],
+  "model_id": null,
+  "not_charged": [],
+  "outputs": [
+    {
+      "bytes": 712040,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0000.json.gz",
+      "sha256": "8931ff88c310ce5c6f9370ae062c394f406ae8b1deaa1b9f1fd5df3b82d73c0c",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "9bcdfb2de85c846fbce1b6bf34bf4f23f48f942ffceaa181ef00bb65bead797e"
+    },
+    {
+      "bytes": 712035,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0001.json.gz",
+      "sha256": "38159323508b34273f7638249127969c66f5e9b7e01831ffa5177fe2baf729b0",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "2a54babaf817691a46746e98fe54f4c5e546521e9450b8b9a4f5785196462392"
+    },
+    {
+      "bytes": 712289,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0002.json.gz",
+      "sha256": "2cd3f67b372b169843db9568f384f2e4ba1ca3b3a69c4c104bf3bed8ac3857eb",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "d7b4dfdc79eb63e8e648dd67e736a689d581461ee989d5d8bb07ddbe5d122098"
+    },
+    {
+      "bytes": 712231,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0003.json.gz",
+      "sha256": "a9c4e4666a6bed08b6f76606af90101ed73c118911e2ce47733d90859a16f010",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "e4a43e8a55ad10214fd9503a07e7492e09a3a582887a2ab668041e43e5f9630a"
+    },
+    {
+      "bytes": 712367,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0004.json.gz",
+      "sha256": "b5c82648e2ae4677b3a0e6727ddd0ed6b70012234b7a440b061fb3496d03da0d",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "0ba9ba46a161db7ece722cfa8c60e687ee4e34f8aab24665522f4fcbe33c9992"
+    },
+    {
+      "bytes": 712135,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0005.json.gz",
+      "sha256": "6a51a9179189b2020800bf71b62d68ce01d90d2f55e5e92b467c984f920a7ef1",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "74dd0afaa660098d96c8d747c1467e20750511277068c243b24111269a3b6d79"
+    },
+    {
+      "bytes": 712429,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0006.json.gz",
+      "sha256": "bf3b4fe947d64bd3e08f887b28a3cd1e662de5270fa9511fdfde42cd3c879e2c",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "b647a80125fd83f6787226a0025cfc59a451cf0ed062924ade7530b311608fdf"
+    },
+    {
+      "bytes": 712493,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0007.json.gz",
+      "sha256": "7a5f446d1e0a2f9da1eab98d743aceecc547edfae096f10a7b8f1b52090053d2",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "868adfcfcd9ce519002258093ea63db9bd4f00e12096309673797e56789526aa"
+    },
+    {
+      "bytes": 712171,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0008.json.gz",
+      "sha256": "17ba324e6ee2f00c1bac3822e11916901c7094dd533f5e66f19858525587ec0f",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "f8e453ac511c1707ebf09bf2e950d4793444f91f2b56c7d50d2402c3f8f4e243"
+    },
+    {
+      "bytes": 712574,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0009.json.gz",
+      "sha256": "644dfdeb154c2fbf0588b8a2d0de798f331b870d1160da4f02774f2a80b5a272",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "dbc868cba6b170bb549f9a38436fdce6db2f7b01c5e27f5f84fb6cdc7099600a"
+    },
+    {
+      "bytes": 711874,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0010.json.gz",
+      "sha256": "4a0e15f43c4826bcb4e87406dede12d87c37a2efef981bc68423f3c0ebb1f2f4",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "a7a79138bf2053ba382c561bb5504cdfce5df30b1bf4fd935aea935e3e12326b"
+    },
+    {
+      "bytes": 712143,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0011.json.gz",
+      "sha256": "81951ced4b2e8cd8a9677fa059f0dd83520fe2f0800b5c99a91c87ad73506502",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "0a3da4211cb3814b08a53abb572797d55ba585684316a500ec2b77c6d511521d"
+    },
+    {
+      "bytes": 712033,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0012.json.gz",
+      "sha256": "b05accecb54d613c717da48dd0ff1ebbe7b5192d27e6d110e46a93e4dc6f6ac5",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "85dea1fed1da57222c35b6734bb7f3fece1bbc7f96e9912f45147a91a545335c"
+    },
+    {
+      "bytes": 712267,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0013.json.gz",
+      "sha256": "ce84dc35b4c751e582535ebadad147c3582cc7e6cf06edc91cf831cbaa5e2805",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "fcb3f3a83dfafda2a826617b79fb965d93f59a6ce0287b76629802ae16cd4666"
+    },
+    {
+      "bytes": 345501,
+      "committed": false,
+      "deterministic": true,
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0014.json.gz",
+      "sha256": "eb299581004558c34e43ecebb5a6d641ccbfe8fdba4640c791023e35b9e16017",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "466998cacf4f7f12a7c0c763b5aa659c2681d79bbe53d9d7eb3a6c348b031d95"
+    },
+    {
+      "bytes": 42,
+      "committed": true,
+      "compared": "values",
+      "deterministic": false,
+      "path": "reports/004-crypto-architecture-v3/controls/control-20261108T114624Z-b6ce8dea/p-values.json.gz",
+      "sha256": "c58a7ecb5e67a291b0d317008a214d9cebce1f9d9e126ec8edfdfcdff16f389e",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "8d71ed051ac6a5c4c92fb597504d037505faa85f233d711f0d59b710f066d4b7"
+    },
+    {
+      "bytes": 22,
+      "committed": true,
+      "deterministic": true,
+      "path": "reports/004-crypto-architecture-v3/controls/control-20261108T114624Z-b6ce8dea/failure-locations.json.gz",
+      "sha256": "64406e753d82e11c6bd63d1d04bb6aa083eefa0a46949bbfce994d556b989f0f",
+      "sha256_kind": "raw",
+      "uncompressed_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "p_values": {
+    "path": "reports/004-crypto-architecture-v3/controls/control-20261108T114624Z-b6ce8dea/p-values.json.gz",
+    "sha256": "c58a7ecb5e67a291b0d317008a214d9cebce1f9d9e126ec8edfdfcdff16f389e",
+    "sha256_kind": "raw"
+  },
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 30
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "2bdcd2952c56b408c46649fe89b7ab23e6abe38f74d59234dd34de8650b2c5d2",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 523,
+  "raw_counts": [
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0000.json.gz",
+      "sha256": "8931ff88c310ce5c6f9370ae062c394f406ae8b1deaa1b9f1fd5df3b82d73c0c",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0001.json.gz",
+      "sha256": "38159323508b34273f7638249127969c66f5e9b7e01831ffa5177fe2baf729b0",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0002.json.gz",
+      "sha256": "2cd3f67b372b169843db9568f384f2e4ba1ca3b3a69c4c104bf3bed8ac3857eb",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0003.json.gz",
+      "sha256": "a9c4e4666a6bed08b6f76606af90101ed73c118911e2ce47733d90859a16f010",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0004.json.gz",
+      "sha256": "b5c82648e2ae4677b3a0e6727ddd0ed6b70012234b7a440b061fb3496d03da0d",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0005.json.gz",
+      "sha256": "6a51a9179189b2020800bf71b62d68ce01d90d2f55e5e92b467c984f920a7ef1",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0006.json.gz",
+      "sha256": "bf3b4fe947d64bd3e08f887b28a3cd1e662de5270fa9511fdfde42cd3c879e2c",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0007.json.gz",
+      "sha256": "7a5f446d1e0a2f9da1eab98d743aceecc547edfae096f10a7b8f1b52090053d2",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0008.json.gz",
+      "sha256": "17ba324e6ee2f00c1bac3822e11916901c7094dd533f5e66f19858525587ec0f",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0009.json.gz",
+      "sha256": "644dfdeb154c2fbf0588b8a2d0de798f331b870d1160da4f02774f2a80b5a272",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0010.json.gz",
+      "sha256": "4a0e15f43c4826bcb4e87406dede12d87c37a2efef981bc68423f3c0ebb1f2f4",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0011.json.gz",
+      "sha256": "81951ced4b2e8cd8a9677fa059f0dd83520fe2f0800b5c99a91c87ad73506502",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0012.json.gz",
+      "sha256": "b05accecb54d613c717da48dd0ff1ebbe7b5192d27e6d110e46a93e4dc6f6ac5",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0013.json.gz",
+      "sha256": "ce84dc35b4c751e582535ebadad147c3582cc7e6cf06edc91cf831cbaa5e2805",
+      "sha256_kind": "raw"
+    },
+    {
+      "path": "data/local/004/control-20261108T114624Z-b6ce8dea/counts-0014.json.gz",
+      "sha256": "eb299581004558c34e43ecebb5a6d641ccbfe8fdba4640c791023e35b9e16017",
+      "sha256_kind": "raw"
+    }
+  ],
+  "record_id": "control-20261108T114624Z-b6ce8dea",
+  "research_sha256": "614afc499c5941ccb5284ca1baafbe0055f011b6dde1bf816127884e2c66da0a",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "sample_size": {
+    "groups": 927,
+    "n_a": 8256,
+    "n_first": 8192
+  },
+  "size": 8,
+  "spec_sha256": "77122dc34d256b03668426672c23ada3a34b5eef1f01b8b8faa235642c95f3a8",
+  "spec_sha256_kind": "raw",
+  "statement": "the states of a control are taken as research R4's states, and it reads no constant",
+  "status": "pass",
+  "summaries": {
+    "first": [
+      3864,
+      4326
+    ],
+    "whole": [
+      3894,
+      4356
+    ]
+  },
+  "test": "avalanche",
+  "test_parameters": {
+    "critical_first": [
+      3784,
+      4408
+    ],
+    "critical_whole": [
+      3815,
+      4441
+    ],
+    "s_a": 6021120,
+    "threshold": "0.005/(128·S_A)"
+  },
+  "validation": {
+    "record_id": "validation-20261105T022216Z-7c547560",
+    "sha256": "911df8483fc53986ae222cfab355f288b70aa1cdb33ddca12daa8a7fb66a60a1",
+    "sha256_kind": "raw"
+  },
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
