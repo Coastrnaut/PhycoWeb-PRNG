@@ -345,10 +345,10 @@
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: a bound, a solver's result or a theorem is its object, or the line quotes the rule's list of forms or a published title; the design, the generator or a security property never is; names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | In progress: spec and plan approved 2026-11-01 |",
+        "text": "| 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Stopped at the selection on 2026-11-09, no candidate eligible; the final report (`reports/004-crypto-architecture-v3/phase-report.md`) recommends stopping, option C of section 21, and the owner's final result review decides |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
