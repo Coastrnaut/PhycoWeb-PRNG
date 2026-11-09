@@ -948,7 +948,7 @@ candidates are otherwise `ineligible` (R6, R7).
   and the new constant table's checks at the new variant before the bias tests are extended (R7,
   "After a rise of R"); then run `--close`, `--select` (exit 1 for a stop) and `--decide`
   (quickstart E5). (FR-028, FR-041; SC-005, SC-008; R7)
-- [ ] T094 [US4] ⛔ **Selection tie** (**Owner**), only where eligible candidates tie: run `python
+- [X] T094 [US4] ⛔ **Selection tie** (**Owner**), only where eligible candidates tie: run `python
   scripts/round_rule.py --choose ID --seen SHA256 --by NAME`, which writes
   `$REP/freeze/selection-tie-choice.json`, then set and commit the row "Selection tie" in
   `specs/004-crypto-architecture-v3/spec.md`, or "Selection tie <k>" for a later selection record;
