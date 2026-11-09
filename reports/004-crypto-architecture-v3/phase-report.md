@@ -458,3 +458,35 @@ ending it at that same commit.
 This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to
 generate secrets; use an established cryptographic random-number generator for keys, nonces,
 tokens and salts. Passing statistical tests does not show cryptographic security.
+
+## Addendum (2026-11-09, after the Final result review)
+
+The Final result review approved this report and its recommendation on 2026-11-09, in the row
+"Final result review" (a06f75f), whose commit ended FR-043's window. It approved the report as it
+stood at commit 61eb70f, SHA-256 `ab4ed3a844fdf113ebdc5eac7e68becff9922dec73d83305ca9e8fc3307e2902`;
+nothing above this addendum has changed since. After the review, on the owner's instruction of
+2026-11-09 to complete and mark every task unattended:
+
+- **T086 is done** (1996d9e). `scripts/recheck_004.py` now recomputes a `trail` record's weight
+  from its rational, and its class from its tool: a trail that a validated tool found is a finding of
+  the rounds it covers, and one from a tool not yet validated an unverified hypothesis, `blocked`.
+  The weight's function, `trail_weight_log2`, is in `protocol/evidence.py`, for a trail writer and
+  the re-check to share. Four tests cover it in `tests/test_protocol_004.py`. With it, the part of
+  FR-065 and SC-017 that section 4 names as open is written, though no `trail` record exists for it
+  to read.
+- **The tasks the stop skipped are marked** (c6943d1), each with its reason, as feature 002's T056
+  is marked. T092 is marked done in part and the rest not applicable: its structural checks and bias
+  tests were skipped at Phase 5's checkpoint, and no run was made for them. T095 to T120 are marked
+  not applicable, since a stop skips Phases 6 to 8. Every task of `tasks.md` is now marked.
+- **Five rows read Not needed** (2a2f89a), each naming the selection record: "Second transcription
+  go-ahead", "Security-target review", "Owner design review", "External design review" and "Design
+  freeze". The row "L1 recorded" stays as it stands, since the level it records was never reached,
+  and the claim register keeps `phyco-v3` at L0.
+- **security.md 2.17** (06e81f3) records the review's decision on roadmap stage 5a.1. The claim
+  register's entry for that line follows its text, an entry added after the last gate.
+
+No result, verdict, finding or recommendation of this report changes.
+
+This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to
+generate secrets; use an established cryptographic random-number generator for keys, nonces,
+tokens and salts. Passing statistical tests does not show cryptographic security.
