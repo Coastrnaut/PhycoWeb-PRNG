@@ -1,0 +1,88 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {},
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' python -W ignore -m unittest discover -s tests -t .",
+  "config": {
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-09T13:03:32Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33c9de0bd94087e2f08c1e852da3b45ca2fee233b6533c69264ee000e432f4d1",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-windows.json",
+    "sha256": "32c51628ad55d3866f0b0be9d92fd9f77926dadb2c4eb0da221f7fa8d6cb0147",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "git_dirty": false,
+  "git_head": "dc1665cd0caf774dcf921acd81e7cddc270e9846",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "the committed repository at HEAD",
+  "kind": "projection",
+  "limitations": [],
+  "measured_speed": {
+    "measured on 2026-11-09, per module": {
+      "tests.test_claims, 83 tests": {
+        "windows_s": 61.1
+      },
+      "tests.test_costmodel, 35 tests": {
+        "windows_s": 0.1,
+        "wsl_s": 0.1
+      },
+      "tests.test_protocol_004, 745 tests": {
+        "windows_s": 590.6,
+        "wsl_s": 130.4
+      },
+      "tests.test_refused_sources, 49 tests": {
+        "windows_s": 1.3,
+        "wsl_s": 1.2
+      }
+    },
+    "not measured on 2026-11-09": "tests.test_tools_004, tests.test_records_004 and the modules of features 001 to 003, allowed for in the projection"
+  },
+  "model_id": null,
+  "outputs": [],
+  "outputs_statement": "the suite writes no evidence of its own; the commands and results go to the final report, and any record a test writes, FR-053's two-worker test's projection among them, is committed with them",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "projected_hours": 1.5,
+  "protocol_line_sha256": "9414ed6aaad7851c77edebb96b60cde7a302b6089d6012bc101059aaf3723b3d",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 524,
+  "record_id": "projection-20261109T130332Z-95d26c03",
+  "research_sha256": "614afc499c5941ccb5284ca1baafbe0055f011b6dde1bf816127884e2c66da0a",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "row": "feature-wide",
+  "run": "the whole suite under tests/, on Windows and in WSL with wpy (T125; quickstart P0), FR-053's two-worker test among it",
+  "spec_sha256": "a2eee11d0943e641f5a419ea62c0a42c3193a9764e06b0c7f724755510260378",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "time_hours": 0.0,
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
