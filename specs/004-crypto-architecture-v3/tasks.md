@@ -1196,10 +1196,10 @@ phase ends with the constitution's phase report to the owner.
 **Purpose**: inside FR-043's window, so the agent writes each file and the owner commits it
 (SEC-084).
 
-- [ ] T121 Update `README.md`, CRLF kept: the status of `phyco-v3` with FR-051's sentence on it
+- [X] T121 Update `README.md`, CRLF kept: the status of `phyco-v3` with FR-051's sentence on it
   beside the line on the seed, and the documentation drift of checklist group F corrected. (FR-051,
   FR-069; SC-018; SEC-086)
-- [ ] T122 Append an addendum to `reports/002-core-dynamics-redesign/phase-report.md`, after
+- [X] T122 Append an addendum to `reports/002-core-dynamics-redesign/phase-report.md`, after
   checking that no freeze record of features 002 and 003 hashes it, stating that S13 contradicts its
   "invertible-looking ARX" and pointing to `phyco-v3`'s evidence. (FR-051; SC-012)
 - [ ] T123 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
