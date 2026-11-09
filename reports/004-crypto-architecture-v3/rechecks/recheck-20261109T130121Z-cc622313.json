@@ -1,0 +1,208 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {
+    "protocol/candidates.py": {
+      "kind": "raw",
+      "sha256": "b24351a94e8ec995cd05e83dd68d5df6e80a231e58fccbb8db7ad5b546fe7837"
+    },
+    "protocol/devinputs_v3.py": {
+      "kind": "raw",
+      "sha256": "28ae0e16ae188994f2a63d5bf1887595514efc2040b18da7ac91cfa654fe9387"
+    },
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "7b59309843c5e79efa04b40126988569fb6c541f6f9ff66c29279ecf9a41d6f8"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "4fb63b0479818e3b2fab21b949df30e9db59032f7613605667379a8057defe87"
+    },
+    "protocol/rules.py": {
+      "kind": "raw",
+      "sha256": "5cb7fee4e57136531108f7478d4a68ec8cc72fa1743a0dd24b0b5eb7d1291821"
+    },
+    "scripts/recheck_004.py": {
+      "kind": "raw",
+      "sha256": "d018d672ce8364c6bc7636c6d0ab2be1abb73ce852988a6ebf1d8e60cfd91714"
+    }
+  },
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' scripts/recheck_004.py",
+  "config": {
+    "cwd": "C:\\Users\\rpanc\\AppData\\Local\\Temp\\claude\\6e747bf0f58e4c0a\\f261c2c6-e141-4c83-b06d-b388a98231b6\\scratchpad\\recheck-clone",
+    "repository_root": "C:\\Users\\rpanc\\AppData\\Local\\Temp\\claude\\6e747bf0f58e4c0a\\f261c2c6-e141-4c83-b06d-b388a98231b6\\scratchpad\\recheck-clone"
+  },
+  "created_utc": "2026-11-09T13:01:21Z",
+  "decisions_checked": 4,
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [],
+  "disagreements": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "interpreter": "3.10.11",
+    "pip_freeze": [
+      "exceptiongroup==1.3.1",
+      "hypothesis==6.168.5",
+      "nistrng==1.2.3",
+      "numpy==2.2.6",
+      "pip==26.2.2",
+      "scipy==1.15.3",
+      "sortedcontainers==2.4.0",
+      "sp80022suite==0.0.8",
+      "typing_extensions==4.16.0"
+    ],
+    "platform": "Windows-10-10.0.26300-SP0"
+  },
+  "environment_of_the_run": {
+    "interpreter": "3.10.11",
+    "pip_freeze": [
+      "exceptiongroup==1.3.1",
+      "hypothesis==6.168.5",
+      "nistrng==1.2.3",
+      "numpy==2.2.6",
+      "pip==26.2.2",
+      "scipy==1.15.3",
+      "sortedcontainers==2.4.0",
+      "sp80022suite==0.0.8",
+      "typing_extensions==4.16.0"
+    ],
+    "platform": "Windows-10-10.0.26300-SP0"
+  },
+  "exit_status": 0,
+  "git_dirty": false,
+  "git_head": "23c552011ff15703cc0f773ba7b61ed15895321c",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "recheck",
+  "limitations": [],
+  "model_id": null,
+  "not_read_here": [
+    "the operation-list items of eligibility, which `round_rule.py --reproduce` recomputes"
+  ],
+  "outputs": [],
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "protocol_line_sha256": "9414ed6aaad7851c77edebb96b60cde7a302b6089d6012bc101059aaf3723b3d",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 524,
+  "record_id": "recheck-20261109T130121Z-cc622313",
+  "research_sha256": "614afc499c5941ccb5284ca1baafbe0055f011b6dde1bf816127884e2c66da0a",
+  "research_sha256_kind": "raw",
+  "results": {
+    "avalanche": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "bijectivity": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "bound": {
+      "checked": 90,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "control": {
+      "checked": 6,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "cross-check": {
+      "checked": 2,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "d4-choice": {
+      "checked": 1,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "degree": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "demonstration": {
+      "checked": 1,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "dependency": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "frequency": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "generator-run": {
+      "checked": 8,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "invariant": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "inverse": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "rotation-ranking": {
+      "checked": 2,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "round-rule": {
+      "checked": 2,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "selection": {
+      "checked": 1,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "symmetry": {
+      "checked": 0,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    },
+    "validation": {
+      "checked": 47,
+      "disagreements": 0,
+      "rederived_from_outputs": 0
+    }
+  },
+  "review_status": "pending",
+  "reviewer": "pending",
+  "spec_sha256": "a2eee11d0943e641f5a419ea62c0a42c3193a9764e06b0c7f724755510260378",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
