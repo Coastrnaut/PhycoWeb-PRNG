@@ -1204,7 +1204,7 @@ phase ends with the constitution's phase report to the owner.
   "invertible-looking ARX" and pointing to `phyco-v3`'s evidence. (FR-051; SC-012)
 - [ ] T123 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
   over the final documents: 0 findings (quickstart F4). (FR-050, FR-069; SC-015, SC-018; SEC-081)
-- [ ] T124 Run `python scripts/recheck_004.py` in a fresh clone, on a machine of the owner's choice:
+- [X] T124 Run `python scripts/recheck_004.py` in a fresh clone, on a machine of the owner's choice:
   0 disagreements, its `recheck` record under `$REP/rechecks/` naming the interpreter, the platform
   and its `pip freeze`, and saying when that environment is not one of research R1's
   (quickstart F3). (FR-065; SC-017)
