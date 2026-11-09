@@ -15,6 +15,7 @@ import datetime
 import gzip
 import hashlib
 import json
+import math
 import os
 import platform as platform_module
 import re
@@ -26,6 +27,7 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass, field
+from fractions import Fraction
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
@@ -1900,6 +1902,14 @@ def verdict_cross_check(rows: Sequence[Dict]) -> str:
 def trail_weight(record: Dict) -> float:
     """A `trail` record's weight, the -log2 of its exact probability or squared correlation (data-model section 6)."""
     return float(record["weight_log2"])
+
+
+def trail_weight_log2(weight: str) -> float:
+    """The -log2 of a `trail` record's `weight`, the rational "p/q" string of its exact probability or squared correlation, which
+    the record holds beside it as `weight_log2`: the writer of a trail record and the re-check call this one function (data-model
+    section 6; FR-065)."""
+    value = Fraction(weight)
+    return math.log2(value.denominator) - math.log2(value.numerator)
 
 
 def false_firing_chance(pairs: int, sizes: Sequence[float], call_types: int = 1) -> float:

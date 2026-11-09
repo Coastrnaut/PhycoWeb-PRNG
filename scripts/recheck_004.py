@@ -4,15 +4,15 @@
     recheck_004.py [--kind KIND]
     recheck_004.py --reproduce RECORD
 
-Recomputes each record's verdict from what it commits and compares it with the recorded one, with the verdict functions of the record's
-own `git_head`, taken from a separate worktree, and lists the rules in force where a later stricter change applies. Where a local-only
-output is present it also re-derives the committed summary from it. It writes a `recheck` record naming the interpreter, the platform and
-its `pip freeze`, and exits 1 on any disagreement, each listed. It imports only the standard library and protocol/, runs in any
-environment, and makes no run of any tool.
+Recomputes each record's verdict from what it commits, a `trail` record's weight and class among them, and compares it with the
+recorded one, with the verdict functions of the record's own `git_head`, taken from a separate worktree, and lists the rules in force
+where a later stricter change applies. Where a local-only output is present it also re-derives the committed summary from it. It writes
+a `recheck` record naming the interpreter, the platform and its `pip freeze`, and exits 1 on any disagreement, each listed. It imports
+only the standard library and protocol/, runs in any environment, and makes no run of any tool.
 
 A record that clear_lock.py wrote holds no saved output: its status, class and hours are checked against the `lock-cleared` record that
-names it. Every decision and `replacement` state of the candidate log is recomputed too, with the cause its cited record shows. The operation-list items of eligibility need the interpreter, so they are read as recorded and `--reproduce` of the record
-recomputes them.
+names it. Every decision and `replacement` state of the candidate log is recomputed too, with the cause its cited record shows. The
+operation-list items of eligibility need the interpreter, so they are read as recorded and `--reproduce` of the record recomputes them.
 
 This script makes no security claim.
 """
@@ -209,6 +209,19 @@ def check_bound(record: Dict, v: ModuleType) -> Dict:
             "classification": v.classify("bound", "established") if held else NONE}
 
 
+def check_trail(record: Dict, v: ModuleType) -> Dict:
+    """The weight again from its rational, and the class from the tool: a trail that a validated tool found is a finding of the
+    rounds it covers, and one from a tool not yet validated an unverified hypothesis, `blocked` until a validated tool or the
+    validated exact models settle it (data-model sections 1, 5 and 6)."""
+    found: Dict[str, Any] = {"weight_log2": function(v, "trail_weight_log2")(record["weight"])}
+    validation = record.get("validation")
+    if isinstance(validation, dict) and validation.get("record_id"):
+        found["classification"] = v.classify("trail", "found")
+    else:
+        found.update(status="blocked", classification=v.classify("trail", "unvalidated"))
+    return found
+
+
 def check_rotation_ranking(record: Dict, v: ModuleType) -> Dict:
     """The ranking again from the record's own entries: each measure the smaller of its two weights, the higher measure first, a tie in
     the stated order of the assignments, and the amounts chosen its first entry (research R15)."""
@@ -271,6 +284,7 @@ CHECKS: Dict[str, Callable[[Dict, ModuleType], Dict]] = {
     "demonstration": check_demonstration, "validation": check_validation, "cross-check": check_cross_check, "inverse": check_inverse,
     "bijectivity": check_bijectivity, "dependency": check_dependency, "frequency": check_frequency, "avalanche": check_avalanche,
     "control": check_control, "symmetry": check_symmetry, "invariant": check_invariant, "degree": check_degree, "bound": check_bound,
+    "trail": check_trail,
     "generator-run": check_generator_run, "round-rule": check_round_rule, "selection": check_selection, "d4-choice": check_d4_choice,
     "rotation-ranking": check_rotation_ranking}
 NOT_READ_HERE = ("the operation-list items of eligibility, which `round_rule.py --reproduce` recomputes",)

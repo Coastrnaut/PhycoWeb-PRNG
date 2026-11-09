@@ -5170,6 +5170,44 @@ class Recheck(TempRepo):
         record = self.record("bound", status="inconclusive", capped=True, bound=NONE, method="active-box count", rounds=2)
         self.assertEqual(self.found(record), [])
 
+    def trail(self, **fields) -> Dict:
+        body = {"trail_kind": "differential", "characteristic": [[1, 0], [0, 1], [1, 1]], "weight": "3/1024",
+                "weight_log2": evidence.trail_weight_log2("3/1024"), "rounds": 2, "size": 4, "width": 32, "tool": "ARX search",
+                "validation": {"record_id": "validation-1", "sha256": "0" * 64, "sha256_kind": "raw"},
+                "classification": evidence.classify("trail", "found")}
+        body.update(fields)
+        return self.record("trail", **body)
+
+    def test_a_trails_weight_is_minus_log2_of_its_rational(self):
+        self.assertEqual(evidence.trail_weight_log2("1/1024"), 10.0)
+        self.assertEqual(evidence.trail_weight_log2("2/8"), 2.0)
+        self.assertEqual(evidence.trail_weight_log2("6/4096"), evidence.trail_weight_log2("3/2048"))
+        self.assertGreater(evidence.trail_weight_log2("3/1024"), 8.0)
+        self.assertLess(evidence.trail_weight_log2("3/1024"), 9.0)
+
+    def test_a_trail_found_by_a_validated_tool_is_a_finding_with_its_weight_again(self):
+        record = self.trail()
+        self.assertEqual(self.found(record), [])
+        self.assertEqual([item["field"] for item in self.found(dict(record, weight_log2=8.0))], ["weight_log2"])
+        self.assertEqual([item["field"] for item in self.found(dict(record, weight="1/1024"))], ["weight_log2"])
+        self.assertEqual([item["field"] for item in self.found(dict(record, classification=NONE))], ["classification"])
+
+    def test_a_trail_from_a_tool_not_yet_validated_is_blocked_as_an_unverified_hypothesis(self):
+        record = self.trail(validation=NONE, status="blocked", classification=evidence.classify("trail", "unvalidated"))
+        self.assertEqual(record["classification"], "unverified hypothesis")
+        self.assertEqual(self.found(record), [])
+        self.assertEqual({item["field"] for item in self.found(dict(record, status="pass", classification="confirmed vulnerability"))},
+                         {"status", "classification"})
+
+    def test_a_clear_run_reads_the_trail_records_too(self):
+        self.trail()
+        self.commit("the record")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
+            self.assertEqual(self.script.main(["--kind", "trail"]), 0)
+        record = [item for _, item in evidence.iter_records("recheck", "rechecks")][0]
+        self.assertEqual(record["results"]["trail"]["checked"], 1)
+        self.assertEqual(record["disagreements"], [])
+
     def test_a_ranking_again_from_its_own_entries(self):
         entries = [{"W_D": 24, "W_L": 16, "assignment": [[1, 1], [1, 3]], "measure": 16},
                    {"W_D": 16, "W_L": 20, "assignment": [[1, 1], [1, 5]], "measure": 16},
