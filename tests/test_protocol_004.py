@@ -3349,22 +3349,26 @@ class EvidenceHelpers(unittest.TestCase):
         self.assertEqual(int(start[12:].sum()), 0)
 
     def test_the_code_list_holds_every_repository_file_a_run_imports(self):
-        """A record's `code_sha256` names what ran, and a reproduction's worktree holds it (data-model section 1). The modules are this
-        process's, which other classes' tests share: the cost model, which d4_choice.py and round_rule.py import and list in their own
-        code, and which a class before this one loads, is no module of a run of this script, which never names it."""
-        import sys
-        self.assertNotIn("costmodel", (ROOT / "scripts/evidence_v3.py").read_text(encoding="utf-8"))
+        """A record's `code_sha256` names what ran, and a reproduction's worktree holds it (data-model section 1). The modules are those
+        of a fresh interpreter that has loaded this script as a run does, every repository module of a run being imported at the top of
+        a file; this process's own modules would add those that other test modules load, which a run of this script never imports."""
+        probe = ("import importlib.util, json, sys\n"
+                 "spec = importlib.util.spec_from_file_location('evidence_v3', 'scripts/evidence_v3.py')\n"
+                 "module = importlib.util.module_from_spec(spec)\n"
+                 "sys.modules['evidence_v3'] = module\n"
+                 "spec.loader.exec_module(module)\n"
+                 "print(json.dumps(sorted({getattr(item, '__file__', None) or '' for item in list(sys.modules.values())})))\n")
+        done = subprocess.run([sys.executable, "-X", "utf8", "-c", probe], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(done.returncode, 0, done.stderr[-800:])
         held = set(self.script.CODE) | {"scripts/gen_constants_v3.py", "phycoweb/__init__.py", "protocol/__init__.py"}
-        for module in list(sys.modules.values()):
-            path = getattr(module, "__file__", None)
+        for path in json.loads(done.stdout):
             if not path or not any(part in path for part in ("research", "protocol", "phycoweb")):
                 continue
             try:
                 rel = Path(path).resolve().relative_to(ROOT).as_posix()
             except ValueError:
                 continue
-            if rel.startswith(("tests/", "research/004/candidates/", "research/004/validation/")) or "refused_sources" in rel \
-                    or rel == "research/004/tools/costmodel.py":
+            if rel.startswith(("tests/", "research/004/candidates/", "research/004/validation/")) or "refused_sources" in rel:
                 continue
             with self.subTest(rel):
                 if rel.startswith(("protocol/seedsets", "protocol/devinputs", "protocol/evidence", "protocol/candidates", "protocol/disclaimer",
@@ -4004,12 +4008,6 @@ class EvidenceRuns(TempRepo):
     def test_a_control_refuses_a_size_that_is_not_claimable(self):
         self.assertEqual(self.run_script("--kind", "control", "--test", "frequency", "--size", "2", "--out-dir",
                                          f"{evidence.REP_REL}/controls"), 2)
-
-    def test_the_control_inputs_are_research_r3s_control_states(self):
-        states = self.script.control_states(4, 2, 3)
-        import protocol.devinputs_v3 as inputs
-        self.assertEqual([int(value) for value in states[:, 0]], list(inputs.state("control", 4, 32, 2)))
-        self.assertEqual([int(value) for value in states[:, 2]], list(inputs.state("control", 4, 32, 4)))
 
     def test_the_avalanche_control_counts_each_group_as_the_test_does(self):
         """Group g holds differences g·N_a to (g + 1)·N_a - 1, each of states 2i and 2i + 1; a part's counts are those of its own states."""

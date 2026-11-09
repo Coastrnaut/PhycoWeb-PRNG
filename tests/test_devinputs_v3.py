@@ -280,6 +280,22 @@ class ScriptExits(unittest.TestCase):
         self.assertEqual(self.guarded(denied), evidence.EXIT_TOOL)
 
 
+class ControlStates(unittest.TestCase):
+    """The evidence tool's uniform-control states are research R3's control states, as this module derives them. The check lives with
+    the module's own tests, the only code beside the module that may call a derivation (TheModule's guard)."""
+
+    def test_the_control_inputs_are_research_r3s_control_states(self):
+        import importlib.util
+        if "evidence_v3" not in sys.modules:
+            spec = importlib.util.spec_from_file_location("evidence_v3", ROOT / "scripts/evidence_v3.py")
+            module = importlib.util.module_from_spec(spec)
+            sys.modules["evidence_v3"] = module
+            spec.loader.exec_module(module)
+        states = sys.modules["evidence_v3"].control_states(4, 2, 3)
+        self.assertEqual([int(value) for value in states[:, 0]], list(d.state("control", 4, 32, 2)))
+        self.assertEqual([int(value) for value in states[:, 2]], list(d.state("control", 4, 32, 4)))
+
+
 class TheModule(unittest.TestCase):
 
     def tree(self) -> ast.Module:
