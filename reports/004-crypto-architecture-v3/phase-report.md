@@ -122,7 +122,7 @@ need a selected candidate, so the stop leaves it open.
 | FR-048 | The redesign checklist's dispositions and evidence | Met | section 6 |
 | FR-049 | FUT-SEC-1 to FUT-SEC-9 traced | Met | section 5, FUT-SEC-7 and FUT-SEC-5's analysis kept open |
 | FR-050 | The design-form disclaimer on every document | Met | `scripts/check_claims.py`: 0 findings over the final documents (T020, T123) |
-| FR-051 | security.md's `phyco-v3` section and README | Partly met | README states `phyco-v3`'s status (T121), the feature-002 addendum (T122); security.md's new version (T112) not reached, there being no design to describe |
+| FR-051 | security.md's `phyco-v3` section and README | Partly met | README (T121), the feature-002 addendum (T122) and security.md 2.16 (T130) state the stop; FR-051's full security.md version (T112) not reached, there being no design to describe |
 | FR-052 | This report | Met | this report; the owner's review is T127 |
 | FR-053 | Every record reproducible, hashes and line endings pinned | Met | T003 to T042; the records' `code_sha256` and the line-ending tests in the whole suite (T125) |
 | FR-054 | Edge states and constructed-state vectors | Not reached | T095, T101 |
@@ -165,30 +165,32 @@ need a selected candidate, so the stop leaves it open.
 ## 5. Security Policy traceability as it stands
 
 The spec's table gives each requirement's expected status at the end of a feature that freezes a
-design. With the stop, the statuses that rest on a frozen design document or model are not
-reached; the requirements themselves stand specified for any later attempt.
+design, in the terms it defines: met by specification, met by evidence, met by statement, done, and
+partly met with each open clause named. This table gives each status at the end of this feature in
+those terms, and "not met" where none applies, with what is open and why (SC-002). The
+requirements themselves stand specified for any later attempt.
 
 | Requirement | Expected (spec) | At the end of this feature |
 |-------------|-----------------|----------------------------|
-| FUT-SEC-1 Key entropy | Met by specification | Specified (FR-005, FR-006, FR-010); not reached in a frozen document |
-| FUT-SEC-2 Reachable secret state | Met by specification at every claimable size | Specified (FR-009, FR-015, FR-017); not reached in a frozen document |
-| FUT-SEC-3 Stream separation | Met by specification | Specified (FR-006, FR-014); not reached in a frozen document |
-| FUT-SEC-4 Reseeding | Met by statement (D7) | Met by statement: D7 seeks no property that needs reseeding |
-| FUT-SEC-5 Initialization analysis | Partly by specification and evidence; the analysis open for feature 005 | Key loading specified (FR-013, FR-014); the diffusion and first-order measurements (FR-029) not run; the analysis open for feature 005 |
-| FUT-SEC-6 Output limit | Met by specification | Specified (FR-007); its tool's first run (T107) not reached |
-| FUT-SEC-7 Re-validation | Partly met; the statistical programme open for feature 007 | Open: no model ID, vectors or freeze exist; the statistical programme open for feature 007 |
+| FUT-SEC-1 Key entropy | Met by specification | Not met: the section of `design.md` exists (FR-005, FR-006, FR-010), but the security-target review that would accept it was not reached |
+| FUT-SEC-2 Reachable secret state | Met by specification at every claimable size | Not met, as FUT-SEC-1 (FR-009, FR-015, FR-017) |
+| FUT-SEC-3 Stream separation | Met by specification | Not met, as FUT-SEC-1 (FR-006, FR-014) |
+| FUT-SEC-4 Reseeding | Met by statement (D7) | Met by statement: it applies only to a property that D7 does not seek |
+| FUT-SEC-5 Initialization analysis | Met in part by specification and by evidence; the analysis open for feature 005 | Not met: key loading is specified in the chapter "Mode" (FR-013, FR-014) but not accepted at a review, and the diffusion through instantiation and the first-order measurements (FR-029) were not run; the analysis beyond first order open for feature 005 (FR-049) |
+| FUT-SEC-6 Output limit | Met by specification | Not met: the limits are stated (FR-007), but neither their tool's first run (T107) nor the review was reached |
+| FUT-SEC-7 Re-validation | Partly met; the statistical programme open for feature 007 | Not met: no model ID, vectors or freeze exist; the statistical programme open for feature 007 |
 | FUT-SEC-8 Demonstration first | Done | Done: the demonstration record and its review (FR-001 to FR-003; SC-001) |
-| FUT-SEC-9 Certification route | Met by specification; the class an open item | Named in `design.md` (FR-011); the security-target review not reached, the functionality class open |
-| FUT-GRID-1 Parameterised size | Partly met | The candidates' operation lists take n and w as generics (FR-018); no model |
-| FUT-GRID-2 Key fills the state at every size | Met at every claimable size | Specified (FR-009, FR-017); not reached in a model |
-| FUT-GRID-3 Spread across the grid | Met by evidence | Not reached: R_f and R_b were not measured at w = 32 (FR-029) |
-| FUT-GRID-4 Per-node constants by rule | Met by evidence | The constant generator and the refused list stand (FR-023); no frozen constants |
-| FUT-GRID-5 Validation per size | Vectors met; statistics open for 007 | Not reached: no vectors |
-| FUT-HW-1 Generic VHDL | Specified; RTL open for 006 | Not reached in a design document; RTL open for feature 006 |
-| FUT-HW-2 Efficient on the Arty A7-100T | Designed for; results open for 008 | The cost model only (FR-026); open for features 006 and 008 |
-| FUT-HW-3 Performance on the board | Open for 006 and 008 | Open for features 006 and 008 |
+| FUT-SEC-9 Certification route | Met by specification; the class an open item | Not met: the route is named in `design.md` (FR-011), but its review was not reached; the functionality class open |
+| FUT-GRID-1 Parameterised size | Partly met | Not met: no model; the candidates' operation lists take n and w as generics (FR-018) |
+| FUT-GRID-2 Key fills the state at every size | Met at every claimable size | Not met: no keyed variant exists (FR-009, FR-017) |
+| FUT-GRID-3 Spread across the grid | Met by evidence | Not met: R_f and R_b were not measured at w = 32 (FR-029) |
+| FUT-GRID-4 Per-node constants by rule | Met by evidence | Not met: the constant generator and the refused list stand (FR-023), but no constants were frozen and no candidate's symmetry checks ran at w = 32 |
+| FUT-GRID-5 Validation per size | Vectors met; statistics open for 007 | Not met: no vectors; the statistics per size open for feature 007, and the order of sizes in section 14 |
+| FUT-HW-1 Generic VHDL | Specified; RTL open for 006 | Not met: no chapter "Hardware structure"; RTL open for feature 006 |
+| FUT-HW-2 Efficient on the Arty A7-100T | Designed for; results open for 008 | Not met: the cost model only (FR-026); open for features 006 and 008 |
+| FUT-HW-3 Performance on the board | Open for 006 and 008 | Open for features 006 and 008, with the measurements named in section 14 |
 | FUT-HW-4 Equivalence and statistics from hardware output | Open for 008 | Open for feature 008 |
-| FUT-HW-5 Hardware security tests | Specified | Not reached: the chapter "Hardware structure" is not written (FR-020, FR-025, FR-059) |
+| FUT-HW-5 Hardware security tests | Specified | Not met: the chapter "Hardware structure" is not written (FR-020, FR-025, FR-059) |
 
 ## 6. Redesign checklist (`seed-entropy-bound.md` §5.3), with the evidence of each item covered
 
@@ -348,8 +350,8 @@ Phase 9's other runs:
   exit 3 before any check, its worktrees past Windows' 260-character path limit; the second clone
   set `core.longpaths` for itself alone.
 - T123, over the final documents, this report among them: `python -X utf8 scripts/check_claims.py`,
-  0 findings on Windows and in WSL, listing the two allow-list entries added since the last gate
-  (section 14); `python -X utf8 -W ignore -m unittest tests.test_claims`, 83 tests OK on Windows (49.8 s) and in WSL (26.6 s).
+  0 findings on Windows and in WSL, listing the allow-list entries added since the last gate, two
+  then and three since T130 (section 14); `python -X utf8 -W ignore -m unittest tests.test_claims`, 83 tests OK on Windows (49.8 s) and in WSL (26.6 s).
 
 At the end of Phase 5 (2026-11-09):
 
@@ -368,8 +370,33 @@ through without it holding.
   searched Π itself, every bound method used giving a bound); T092 (the structural and bias runs of
   a candidate at w = 32, never made); T095 to T120 (Phases 6 to 8, which need a selected
   candidate); T127, the owner's Final result review.
-- **Two allow-list entries wait for the next gate**, T127: the claims check lists them at each run as
-  entries added since the last gate's approval. One passes the design document's sentence that the
+- **The gaps, each with its feature**, as security.md §22 rows 5a.2 to 5a.6 name them (FR-052).
+  Each waits for a design that a later specification selects and freezes; none can start from this
+  feature's results.
+  - Feature 005 (row 5a.2): internal cryptanalysis with validated tools (security.md §12.5), the
+    best-attack register (§12.6), the reduced-round battery sweep and the margin; with it
+    FUT-SEC-5's analysis beyond first order, related-key and related-IV attacks, weak-key classes
+    and key-dependent effects (FR-049).
+  - Feature 006 (row 5a.3): an independent C implementation and generic VHDL with equivalence
+    evidence, the RTL validated in simulation at 4×4 before 8×8 and 16×16 (FUT-GRID-5; FR-036), and
+    the RTL start gate.
+  - Feature 007 (row 5a.4): statistical re-validation on unused held-out key sets per supported
+    size (FUT-SEC-7), carrying FR-040 in its checkable form: the held-out keys are derived from data
+    that does not exist until the later of `phyco-v3`'s design freeze and feature 007's protocol
+    freeze, for example SHA-256 over feature 007's protocol freeze record with a public string;
+    feature 007 states the derivation, and a test re-derives it.
+  - Feature 008 (row 5a.5): hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4
+    first and then each larger claimable size that fits the XC7A100T, in order, a size that does not
+    fit staying covered by feature 006's simulation (FUT-GRID-5); and each measurement FUT-HW-3 asks
+    for: words per second by on-chip counters at the achieved clock, per claimable size that fits,
+    compared with the C stream, and power through the board's VCCINT current sensor and the XADC,
+    beside Vivado's estimate. This feature supplied not even the implied throughput, the design
+    document's figures (FR-026) not being reached.
+  - Feature 009 (row 5a.6): the review package, independent review, a public analysis period if
+    the owner authorizes it, and the claim decision.
+- **Three allow-list entries wait for the next gate**, T127: the claims check lists them at each run
+  as entries added since the last gate's approval. The third follows security.md's roadmap line
+  for stage 5a.1, whose status T130 brought up to the stop. One passes the design document's sentence that the
   property FUT-SEC-4's reseeding serves is not sought (D7); the other passes research R9's line on
   the mode's theorems, a line that a rewrap moved. Each holds its reason in `protocol/claims.json`,
   and the owner's decision at T127 covers them.
@@ -413,7 +440,7 @@ claim. `phyco-v2`'s seed bound, confirmed here, keeps every released model at L0
 `phyco-v3` stays at L0 with no claim. As FR-052 asks, this report states that, with FUT-SEC-7
 (feature 007) and FUT-SEC-5's analysis (feature 005) open and the claim levels two to five of
 security.md §15 not reached (features 005 to 009), no claim, evaluation or certification may follow
-from this feature. The levels are written out in words here, where FR-052 gives their short names,
+from this feature alone. The levels are written out in words here, where FR-052 gives their short names,
 because the claim test reads a short name above a model's register level as a claim.
 
 ## 16. Recommendation
