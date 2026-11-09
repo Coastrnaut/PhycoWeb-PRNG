@@ -943,7 +943,7 @@ candidates are otherwise `ineligible` (R6, R7).
   related-nonce set and the rotational pairs, N_a = 8,256, from the R the earlier kinds give and
   extended to every later rise of R; each heavy run **heavy**, projected first (quickstart E1 to
   E3). (FR-019, FR-021, FR-029, FR-037, FR-038; SC-004, SC-005, SC-008; R4, R7, R12, R13)
-- [ ] T093 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
+- [X] T093 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
   stands at every claimable size; after a rise of R, repeat the inverse tests, the invariant checks
   and the new constant table's checks at the new variant before the bias tests are extended (R7,
   "After a rise of R"); then run `--close`, `--select` (exit 1 for a stop) and `--decide`
