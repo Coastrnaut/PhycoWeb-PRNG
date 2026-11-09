@@ -13,7 +13,7 @@ import sys
 import unittest
 from fractions import Fraction
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from unittest import mock
 
 from protocol import candidates, changelog, evidence, provenance
@@ -5261,6 +5261,63 @@ class Recheck(TempRepo):
     def test_a_replaced_list_that_changed_is_a_disagreement(self):
         write(self.root, evidence.SUPERSEDED_REL, json.dumps({"0" * 64: "research/004/candidates/cand-A1/superseded/x.py"}))
         self.assertEqual(self.script.logs_checked()[0]["field"], "superseded")
+
+    def round_rule(self, met: bool) -> Dict:
+        return self.record("round-rule", candidate="cand-A1", sizes={"4": {"eligible": {"FR-022 bounds": {"met": met}}}})
+
+    def decided(self, record: Dict, decision: str = "ineligible", state: Optional[Dict] = None, digest: Optional[str] = None) -> Dict:
+        """A decision written as the log holds it, past the writer's guards, with the `replacement` entry it brought."""
+        entry = candidates.append({"candidate_id": "cand-A1", "family": "ARX", "event": "decision", "decision": decision, "reason": "r",
+                                   "cause": candidates.ITEM, "record": {"record_id": record["record_id"],
+                                                                        "sha256": digest or evidence.sha256(evidence.pretty(record))}})
+        if decision == "ineligible":
+            return candidates.append(dict(state or {"state": "pending"}, candidate_id="cand-A1", family="ARX", event="replacement",
+                                          decision_seq=entry["seq"]))
+        return entry
+
+    def closing(self, target: Dict, reason: str = candidates.OWNER_DECLINED, **fields) -> Dict:
+        return candidates.append(dict(fields, candidate_id="cand-A1", family="ARX", event="replacement", state="closed",
+                                      closes=target["seq"], reason=reason))
+
+    def test_each_decision_and_the_replacement_state_it_brought_again(self):
+        fails = self.round_rule(False)
+        self.decided(fails)
+        self.assertEqual(self.script.decisions_checked(), (1, []))
+        self.decided(self.round_rule(True))
+        self.decided(fails, state={"state": "closed", "reason": candidates.SHARED_REASON})
+        self.decided(fails, digest="0" * 64)
+        checked, found = self.script.decisions_checked()
+        self.assertEqual(checked, 4)
+        self.assertEqual([item["field"] for item in found], ["cause", "replacement", "record"])
+        self.assertEqual(found[1]["recomputed"], {"state": "pending"})
+
+    def test_an_eligible_decision_cites_a_round_rule_record_with_every_item_met(self):
+        self.decided(self.round_rule(True), decision="eligible")
+        self.assertEqual(self.script.decisions_checked(), (1, []))
+        self.decided(self.round_rule(False), decision="eligible")
+        self.assertEqual([item["field"] for item in self.script.decisions_checked()[1]], ["decision"])
+
+    def test_a_closing_entry_closes_a_pending_one_once_for_a_reason_the_log_shows(self):
+        fails = self.round_rule(False)
+        first = self.decided(fails)
+        self.closing(first, owner_word=WORD)
+        self.assertEqual(self.script.decisions_checked(), (2, []))
+        again = self.closing(first, owner_word=WORD)
+        unstated = self.closing(self.decided(fails), reason="R is high")
+        unworded = self.closing(self.decided(fails))
+        full = self.closing(self.decided(fails), reason=candidates.FULL)
+        checked, found = self.script.decisions_checked()
+        self.assertEqual(checked, 9)
+        self.assertEqual([item["record_id"] for item in found], [f"candidate log seq {entry['seq']}" for entry in (again, unstated, unworded, full)])
+        self.assertEqual({item["field"] for item in found}, {"reason"})
+
+    def test_a_recheck_record_holds_the_decisions_it_checked(self):
+        self.decided(self.round_rule(False))
+        self.commit("the log")
+        with mock.patch("builtins.print"), mock.patch("sys.stderr"), mock.patch.object(evidence, "pip_freeze", return_value=[]):
+            self.assertEqual(self.script.main(["--kind", "inverse"]), 0)
+        record = [item for _, item in evidence.iter_records("recheck", "rechecks")][0]
+        self.assertEqual((record["decisions_checked"], record["disagreements"]), (1, []))
 
     def test_a_reproduction_of_a_recheck_runs_anywhere_and_matches(self):
         self.record("inverse", mismatches={"a": 0})

@@ -11,7 +11,7 @@ its `pip freeze`, and exits 1 on any disagreement, each listed. It imports only 
 environment, and makes no run of any tool.
 
 A record that clear_lock.py wrote holds no saved output: its status, class and hours are checked against the `lock-cleared` record that
-names it. The operation-list items of eligibility need the interpreter, so they are read as recorded and `--reproduce` of the record
+names it. Every decision and `replacement` state of the candidate log is recomputed too, with the cause its cited record shows. The operation-list items of eligibility need the interpreter, so they are read as recorded and `--reproduce` of the record
 recomputes them.
 
 This script makes no security claim.
@@ -351,9 +351,69 @@ def logs_checked() -> List[Dict]:
     return out
 
 
+def decisions_checked() -> Tuple[int, List[Dict]]:
+    """Every decision and `replacement` state again (data-model section 3; ANA-088): a `rejected` or `ineligible` decision's cited
+    record, by ID and SHA-256, shows its cause, and the entry it brought holds the state the rules' classification gives; an `eligible`
+    one cites the candidate's round-rule record with every item met; a closing entry closes a pending one once, for a stated reason that
+    the log and the records show. Each is read against the whole log, which only grows, and the candidate's rows, which no run charges
+    after its closing decision."""
+    log = candidates.entries()
+    found: List[Dict] = []
+
+    def disagree(entry: Dict, field: str, recorded: Any, recomputed: Any) -> None:
+        found.append({"record_id": f"candidate log seq {entry['seq']}", "field": field, "recorded": recorded, "recomputed": recomputed})
+
+    replacements = candidates.of_event(log, "replacement")
+    brought = {entry["decision_seq"]: entry for entry in replacements if "decision_seq" in entry}
+    decided = [entry for entry in candidates.of_event(log, "decision") if entry["decision"] in candidates.SHOWN_BY_THE_REASON + ("eligible",)]
+    for entry in decided:
+        candidate = entry["candidate_id"]
+        try:
+            record = candidates.cited_record(entry)
+        except Refused as exc:
+            disagree(entry, "record", entry.get("record"), str(exc))
+            continue
+        if entry["decision"] == "eligible":
+            if record.get("kind") != "round-rule" or record.get("candidate") != candidate or candidates.failed_items(record):
+                disagree(entry, "decision", "eligible", f"{record['record_id']} is no round-rule record of {candidate} with every item met")
+            continue
+        cause = entry.get("cause")
+        if not candidates.shows_reason(candidate, cause, record, entry):
+            disagree(entry, "cause", cause, f"{record['record_id']} does not show it")
+            continue
+        state = candidates.replacement_state(cause, entry, record)
+        logged = brought.get(entry["seq"])
+        held = None if logged is None else {name: logged[name] for name in ("state", "reason") if name in logged}
+        if held != state:
+            disagree(entry, "replacement", held, state)
+    pending = {entry["seq"]: entry for entry in replacements if entry.get("state") == "pending"}
+    closings = [entry for entry in replacements if "closes" in entry]
+    closed: set = set()
+    for entry in closings:
+        target = pending.get(entry["closes"])
+        try:
+            if target is None or entry["closes"] in closed or target["candidate_id"] != entry["candidate_id"]:
+                raise Refused(f"seq {entry['closes']} is no pending replacement entry of {entry['candidate_id']} that this entry alone closes")
+            closed.add(entry["closes"])
+            reason = entry.get("reason")
+            if reason not in candidates.CLOSE_REASONS:
+                raise Refused(f"the stated reasons are {candidates.CLOSE_REASONS}")
+            if reason == candidates.FULL and len(candidates.proposed_ids(log, target["family"])) < candidates.MOST_PER_FAMILY:
+                raise Refused(f"{target['family']} has fewer than {candidates.MOST_PER_FAMILY} candidates")
+            if reason == candidates.BUDGET_SPENT:
+                candidates.guard_budget_spent(entry, target)
+            if reason == candidates.OWNER_DECLINED:
+                candidates.guard_owner_word(entry, "a replacement closed for the owner's decline")
+        except Refused as exc:
+            disagree(entry, "reason", entry.get("reason"), str(exc))
+    return len(decided) + len(closings), found
+
+
 def run_checks(kinds: Tuple[str, ...]) -> Dict:
     verdicts = Verdicts()
     results, found = {}, logs_checked()
+    decided, held = decisions_checked()
+    found += held
     try:
         for kind in kinds:
             results[kind], held = check_kind(kind, verdicts)
@@ -363,7 +423,7 @@ def run_checks(kinds: Tuple[str, ...]) -> Dict:
     for record in records_of("projection"):
         if cleared_by_the_lock_script(record):
             found += check_cleared(record)
-    return {"results": results, "disagreements": found, "not_read_here": list(NOT_READ_HERE)}
+    return {"results": results, "decisions_checked": decided, "disagreements": found, "not_read_here": list(NOT_READ_HERE)}
 
 
 def own_environment() -> Dict:
