@@ -117,6 +117,22 @@ class CodeHashes(unittest.TestCase):
                                  f"{name}: {path} at {head}")
 
 
+class RecheckImports(unittest.TestCase):
+    """FR-065; T086: the re-check, and the rules module it reads, import only the standard library and protocol/, so that it runs on a
+    fresh clone in any environment."""
+
+    def test_the_recheck_imports_only_the_standard_library_and_protocol(self):
+        import ast
+        import sys
+        allowed = set(sys.stdlib_module_names) | {"protocol"}
+        for rel in ("scripts/recheck_004.py", "protocol/rules.py"):
+            for node in ast.walk(ast.parse((ROOT / rel).read_text(encoding="utf-8"))):
+                names = [alias.name for alias in node.names] if isinstance(node, ast.Import) else \
+                    [node.module] if isinstance(node, ast.ImportFrom) and node.module else []
+                for name in names:
+                    self.assertIn(name.split(".")[0], allowed, f"{rel}: {name}")
+
+
 class GzipHeaders(unittest.TestCase):
     """Research R16: every committed .gz file is written by gzip.compress(data, 9, mtime=0)."""
 
