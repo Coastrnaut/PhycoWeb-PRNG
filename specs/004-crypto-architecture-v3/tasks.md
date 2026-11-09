@@ -1417,3 +1417,25 @@ names:
   classes, FR-053's two-worker test left out. A run that includes that test, the whole suite or
   `tests/test_records_004.py` among them, is a heavy run (FR-045), and T125 is that run before the
   final report.
+
+## Phase 10: Convergence
+
+- [ ] T128 Amend `reports/004-crypto-architecture-v3/phase-report.md` as FR-052 asks: state that no
+  claim, evaluation or certification may follow from this feature alone, and list each gap with its
+  feature as security.md §22 rows 5a.2 to 5a.6 name them; among its open items, carry FR-040's
+  requirement on held-out keys in its checkable form, FUT-GRID-5's validation of 4×4 first for
+  features 006 and 008 (in simulation before 8×8 and 16×16, and on the board before each larger
+  claimable size that fits the XC7A100T; FR-036), and each measurement FUT-HW-3 asks of feature 008
+  (words per second by on-chip counters at the achieved clock, per claimable size that fits,
+  compared with the C stream; power through the board's VCCINT current sensor and the XADC, beside
+  Vivado's estimate) per FR-052 (partial)
+- [ ] T129 In the same report's section 5, restate each requirement's status in the terms the spec's
+  table "Security Policy traceability" defines (met by specification, met by evidence, met by
+  statement, done, or partly met with each open clause named with its feature), and as not met,
+  with what is open and why, where none applies per SC-002 (partial)
+- [ ] T130 Write a version of `security.md` of its own, CRLF kept, with its history entry, in which
+  section 1.1's row and section 15's line for `phyco-v3` and roadmap stage 5a.1 state that feature
+  004 stopped at the selection with no eligible candidate
+  (`reports/004-crypto-architecture-v3/freeze/selection.json` and the final report), `phyco-v3`
+  staying at L0 with no claim and with no model, the constitution version 1.3.0 kept wherever 2.13
+  names it, per FR-051 (partial)
