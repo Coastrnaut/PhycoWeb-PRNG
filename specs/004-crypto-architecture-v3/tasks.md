@@ -1202,7 +1202,7 @@ phase ends with the constitution's phase report to the owner.
 - [X] T122 Append an addendum to `reports/002-core-dynamics-redesign/phase-report.md`, after
   checking that no freeze record of features 002 and 003 hashes it, stating that S13 contradicts its
   "invertible-looking ARX" and pointing to `phyco-v3`'s evidence. (FR-051; SC-012)
-- [ ] T123 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
+- [X] T123 Run `python scripts/check_claims.py` and `python -W ignore -m unittest tests.test_claims`
   over the final documents: 0 findings (quickstart F4). (FR-050, FR-069; SC-015, SC-018; SEC-081)
 - [X] T124 Run `python scripts/recheck_004.py` in a fresh clone, on a machine of the owner's choice:
   0 disagreements, its `recheck` record under `$REP/rechecks/` naming the interpreter, the platform
@@ -1215,7 +1215,7 @@ phase ends with the constitution's phase report to the owner.
   item, and none fails; any record it writes stays in the working tree for the owner's commit
   (FR-043), and the commands and results go to the final report. (FR-045, FR-053, FR-058;
   Principle V)
-- [ ] T126 Write the final report `$REP/phase-report.md` with `DESIGN_DISCLAIMER`, as the
+- [X] T126 Write the final report `$REP/phase-report.md` with `DESIGN_DISCLAIMER`, as the
   constitution's Phase Completion Reporting asks: every FR and SC with its evidence or listed as
   open; FUT-SEC-1 to FUT-SEC-9 with the statuses of the spec's table, FUT-SEC-7 open for feature
   007, and the FUT-GRID and FUT-HW rows; the evidence of every redesign-checklist item this feature
