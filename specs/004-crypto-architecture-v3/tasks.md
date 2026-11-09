@@ -903,7 +903,7 @@ candidates are otherwise `ineligible` (R6, R7).
   `--decide`; `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`, with
   eligibility, selection and the stop rule as the spec's "Pre-registered Design Protocol" states.
   (FR-028, FR-041, FR-043; SC-005, SC-008; R6, R7)
-- [ ] T086 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
+- [X] T086 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
   (contracts/cli.md; R16), standard library and `protocol/` only, which recomputes every verdict of
   FR-065 from committed files, the `trail` records' weights and classifications among them, and
   writes a `recheck` record naming the interpreter, the platform and its `pip freeze`; a record that
@@ -932,7 +932,7 @@ candidates are otherwise `ineligible` (R6, R7).
   --out-dir $REP/controls` and then the run, and the same for `avalanche`, each **heavy**; a control
   that fires makes that size's bias evidence inconclusive for every candidate, and the feature
   recommends stopping. (FR-037; R4, R7; ANA-074)
-- [ ] T092 [US4] For each candidate of the chosen family, at 4×4, then 8×8, then 16×16, with `python
+- [X] T092 (done in part, the rest not applicable: the production-width trail-bound climbs ran, each size's climb ending with R_bound or at its first capped or refused search, as the round-rule records show; neither candidate reached R at every size, both were ineligible and the selection stopped (`freeze/selection.json`), so the structural checks and the bias tests were skipped at Phase 5's checkpoint) [US4] For each candidate of the chosen family, at 4×4, then 8×8, then 16×16, with `python
   scripts/evidence_v3.py --candidate ID --kind KIND --size N --out-dir $REP/candidates/<ID>`: the
   differential and linear trail bounds at the production width, with the cross-checks between kinds;
   then the structural checks, the inverse on the 16 vector inputs and 2¹⁰ test states at every
@@ -970,7 +970,7 @@ vectors, each reproduced on Windows and in WSL (FR-018 to FR-036, FR-054 to FR-0
 its `generator-check` record; every reduced variant and every request beyond a limit is refused
 (SC-010).
 
-- [ ] T095 [US3] Complete `specs/004-crypto-architecture-v3/design.md` for the selected candidate,
+- [X] T095 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Complete `specs/004-crypto-architecture-v3/design.md` for the selected candidate,
   its chapters after "Security target" and "Mode" in FR-034's order: "Permutation", with its
   sections "Variant table", "Inverse" and "Network questions"; "Hardware structure", with its
   section "Self-test" and its table of k; "Replaced mechanisms", which shows how each failed
@@ -982,7 +982,7 @@ its `generator-check` record; every reduced variant and every request beyond a l
   figure, the output bits per call and per round and the throughput implied at 200 MHz; each section
   entered in `$REP/provenance.jsonl` as it is drafted. (FR-017 to FR-032, FR-034, FR-054, FR-055,
   FR-059; R5, R11, R14, R15)
-- [ ] T096 [P] [US3] Write `tests/test_model_v3.py` (contracts/model-v3-api.md, "Tests that hold the
+- [X] T096 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [P] [US3] Write `tests/test_model_v3.py` (contracts/model-v3-api.md, "Tests that hold the
   model to this contract"): FR-058's list, minimum, maximum and boundary values, all-zero and
   all-one keys and nonces, single-bit keys, overflow and truncation, shift and rotation boundaries,
   reset, zeroization and repeated instantiation, long runs with the 2²⁰-word digest and invalid
@@ -993,11 +993,11 @@ its `generator-check` record; every reduced variant and every request beyond a l
   no analysis dependency; `phyco-v3` reproducing the selected candidate's outputs through the
   `selected` entry's variant map; property tests with Hypothesis; and `test_generator_selftest`
   (REP-086). (FR-033, FR-035, FR-058, FR-059; SC-010; R17)
-- [ ] T097 [US3] Run `python scripts/gen_constants_v3.py`, which writes `phycoweb/constants_v3.py`
+- [X] T097 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Run `python scripts/gen_constants_v3.py`, which writes `phycoweb/constants_v3.py`
   with its GENERATED header for every supported (n, w) at its final R; then `--check` on Windows and
   with `wpy` in WSL, each writing a `generator-check` record with verdict `match` under
   `$REP/generator-checks/` (quickstart M1). (FR-023, FR-024; SC-006, SC-009; R15)
-- [ ] T098 [US3] Write `phycoweb/model_v3.py` from the design document (contracts/model-v3-api.md;
+- [X] T098 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Write `phycoweb/model_v3.py` from the design document (contracts/model-v3-api.md;
   R17): standard library only, its source parsing under Python 3.8's grammar, integer-only and
   branch-free on data, `MODEL_ID = "phyco-v3"` with `PRODUCTION_VARIANTS`, `parse_variant` and
   `is_production`; `pi`, `pi_inv` and `pi_trace`, research-only; `Generator(variant_id, key)` with
@@ -1005,7 +1005,7 @@ its `generator-check` record; every reduced variant and every request beyond a l
   self-test imported only in its constructor, every limit with its counter and every refusal of the
   contract; `ResearchDuplex` for the keyed reduced variants; marked model-only, RTL-pending.
   (FR-013, FR-015, FR-020, FR-033, FR-035, FR-055, FR-059; SC-010; R9, R14, R17)
-- [ ] T099 [P] [US3] Write `tests/test_vectors_v3.py` (data-model §11; R8): Π and Π⁻¹ known-answer
+- [X] T099 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [P] [US3] Write `tests/test_vectors_v3.py` (data-model §11; R8): Π and Π⁻¹ known-answer
   tests at every supported size and every reduced variant used as evidence, 16 inputs with 4 traced
   phase by phase; the mode at every claimable size with 2 development keys × 10,000 words in
   requests that cycle through the stated lengths; the SHA-256 digest of 2²⁰ words over their 4·2²⁰
@@ -1015,7 +1015,7 @@ its `generator-check` record; every reduced variant and every request beyond a l
   (REP-096); and each file's k against the least k computed again from the model's run and against
   the design document's table of k, equal unless a named structure with its reason raised it
   (REP-097). (FR-036, FR-059; SC-009; R8; HW-095, REP-096, REP-097)
-- [ ] T100 [US3] Write `scripts/gen_vectors_v3.py [--check] [--variant ID ...]` with
+- [X] T100 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Write `scripts/gen_vectors_v3.py [--check] [--variant ID ...]` with
   `--reproduce RECORD` (contracts/cli.md; R8) and run it into `vectors/phyco-v3/`, writing in the
   same run, from a `ResearchDuplex` object of its own run through the self-test's call sequence
   alone, each request with its forget call (REP-096), each claimable size's and each keyed research
@@ -1026,14 +1026,14 @@ its `generator-check` record; every reduced variant and every request beyond a l
   (GENERATED) copied from those files, each vector file in at most an hour and the model's speed
   measured and recorded; then `--check` on Windows and with `wpy` in WSL, each writing a
   `generator-check` record (quickstart M2). (FR-036, FR-059; SC-009; R8; HW-095, REP-096, REP-097)
-- [ ] T101 [US3] Write `scripts/gen_constructed_v3.py [--check]` with `--reproduce RECORD`
+- [X] T101 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Write `scripts/gen_constructed_v3.py [--check]` with `--reproduce RECORD`
   (contracts/cli.md): a constructed-state vector for every edge state the design document lists,
   from chosen states and from development keys, all-zero and all-one lanes, every addition driven to
   a carry out of its top bit and every shift and rotation at its boundary among them, into
   `vectors/phyco-v3/`; run it, then `--check` on Windows and with `wpy` in WSL, the pair of
   `generator-check` records also showing that `Generator`'s self-test passed on each platform
   (quickstart M3). (FR-054, FR-056; SC-009, SC-016; REP-086)
-- [ ] T102 [US3] Run `tests/test_model_v3.py` and `tests/test_vectors_v3.py`, `python -W ignore -m
+- [X] T102 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Run `tests/test_model_v3.py` and `tests/test_vectors_v3.py`, `python -W ignore -m
   unittest tests.test_model_v3 tests.test_vectors_v3`, on Windows and with `wpy` in WSL
   (quickstart M5), and record the commands and results. No expected value is ever edited to make a
   test pass: a disagreement goes back to the design document or the model as a finding. (FR-035,
@@ -1051,20 +1051,20 @@ separate session, agreeing with the model step by step (FR-057).
 
 **Independent Test**: quickstart X1 and X2.
 
-- [ ] T103 [US3] ⛔ **Second transcription go-ahead** (**Owner**): the row "Second transcription
+- [X] T103 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] ⛔ **Second transcription go-ahead** (**Owner**): the row "Second transcription
   go-ahead" in `specs/004-crypto-architecture-v3/spec.md` set to Approved and committed before the
   separate session starts; the agent lists the approval commits and the allow-list entries added
   since the last gate. (FR-057; Principle VIII)
-- [ ] T104 [P] [US3] Write `tests/test_v3_transcription.py`: `phycoweb/model_v3.py` and
+- [X] T104 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [P] [US3] Write `tests/test_v3_transcription.py`: `phycoweb/model_v3.py` and
   `tests/v3_reference.py` agree after every phase of every round on the committed vectors, for Π,
   Π⁻¹ and the mode, with the common-mode caveat of security.md §10.2 beside the result
   (quickstart X1); and the provenance test: the go-ahead row reads Approved at HEAD with a date no
   later than the first provenance entry of `tests/v3_reference.py`, and the two files come from
   different sessions (quickstart X2). (FR-057, FR-067; SC-016)
-- [ ] T105 [US3] In a separate session that has not read `phycoweb/model_v3.py` and imports no code
+- [X] T105 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] In a separate session that has not read `phycoweb/model_v3.py` and imports no code
   from it, write `tests/v3_reference.py` from the design document alone, with its entries in
   `$REP/provenance.jsonl` naming that session. (FR-057, FR-064, FR-067; R17)
-- [ ] T106 [US3] Run `tests/test_v3_transcription.py`,
+- [X] T106 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US3] Run `tests/test_v3_transcription.py`,
   `python -W ignore -m unittest tests.test_v3_transcription`, on both platforms; a disagreement is
   reported against the design document, corrected as a new version of it and compared again, never
   by editing either side to agree. (FR-056, FR-057; SC-016)
@@ -1084,14 +1084,14 @@ FR-063).
 package against §14; compare the candidate log with the model's variant IDs; recompute the freeze
 hashes and the baseline manifest; run the claim-register test.
 
-- [ ] T107 [US2] Once the design document holds the three tables the script reads, the "Variant
+- [X] T107 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US2] Once the design document holds the three tables the script reads, the "Variant
   table" with every variant's R from T093 (T095) and the mode chapter's "Layout" and "Limits", run
   `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json` (quickstart T1 and T2)
   and commit both files; in the same commit, write `phyco-v3`'s `bound` in `protocol/claims.json`
   from the profile, "at most <bound_bits> bits" per claimable size by its variant ID, with the
   profile's path and SHA-256, and its `evidence`, the profile and `limits.json`. (FR-007, FR-010,
   FR-069; SC-003; SEC-089)
-- [ ] T108 [US2] Prepare the security-target review in `specs/004-crypto-architecture-v3/design.md`,
+- [X] T108 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US2] Prepare the security-target review in `specs/004-crypto-architecture-v3/design.md`,
   `rationale.md` and `$REP/security-target/`: cite the selected candidate's records of FR-029's
   diffusion through instantiation and of research R4's first-order related-key and related-nonce
   differences; confirm or change FR-011's functionality class in the design document once the AIS
@@ -1102,13 +1102,13 @@ hashes and the baseline manifest; run the claim-register test.
   SHA-256 of each of the four chapters, from its heading line to the next heading of the same or a
   higher level, and of `parameters.json` and `limits.json`, with the design document's "Version:
   0.<k>". (FR-011, FR-012, FR-029; RAT-086; SEC-075)
-- [ ] T109 [US2] ⛔ **Security-target review** (**Owner**), in
+- [X] T109 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US2] ⛔ **Security-target review** (**Owner**), in
   `specs/004-crypto-architecture-v3/spec.md`'s Review & Approval table: the row names the set by
   SHA-256 with the version read and is committed by the owner; the agent lists the approval commits
   and the allow-list entries added since the last gate. A decline ends in a revised chapter,
   reviewed in "Security-target review <k>", its security-target parameters changing only in their
   stricter direction, or a stop. (FR-012, FR-043, FR-044; SEC-075; Principle VIII)
-- [ ] T110 [US2] ⛔ **L1 recorded** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
+- [X] T110 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US2] ⛔ **L1 recorded** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
   Review & Approval table: set the row "L1 recorded" once the FUT-SEC-8 result review and the
   security-target review both read Approved, naming both rows by family and k with what each
   reviewed by path and SHA-256, the row reading "blocked" and naming the missing paper while a
@@ -1116,19 +1116,19 @@ hashes and the baseline manifest; run the claim-register test.
   the owner's commit, changes `phyco-v3`'s entry in `protocol/claims.json`, its §15 line and its
   §1.1 row in `security.md` to the level the rows give, with `python scripts/check_claims.py`
   reporting 0 findings. (FR-012, FR-069; SEC-076, SEC-079, SEC-081, SEC-095)
-- [ ] T111 [US5] Write the rest of `specs/004-crypto-architecture-v3/rationale.md`, its chapters in
+- [X] T111 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Write the rest of `specs/004-crypto-architecture-v3/rationale.md`, its chapters in
   FR-034's order, "Components", "Nonlinearity", "Diffusion", "Constants", "Margin" and "Attack
   classes", then "Network questions" and "Alternatives", each statement with one of FR-062's seven
   labels: every rationale item of security.md §8, the hardware structures of plan.md's Complexity
   Tracking with their functional need, and every candidate considered with the reason it was kept or
   dropped. (FR-030, FR-034, FR-062; SC-013; RAT-084)
-- [ ] T112 [US5] Write the version of `security.md` that FR-051 asks for, CRLF kept, with its
+- [X] T112 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Write the version of `security.md` that FR-051 asks for, CRLF kept, with its
   history entry: `phyco-v3`'s own section, a table of structural facts, the best-attack register
   rows of its first bounds and the lessons table that links S1 to S15 to the rules or parts of the
   design that answer them, each with its evidence; the §1.1 row of phase 1 and the fixed sentence in
   both blocks kept; and what feature 005's cryptanalysis instructions need. (FR-051, FR-066;
   SEC-095)
-- [ ] T113 [P] [US5] Write the freeze tests in `tests/test_protocol_004.py`:
+- [X] T113 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [P] [US5] Write the freeze tests in `tests/test_protocol_004.py`:
   `scripts/design_freeze.py create` exits 2 before the owner design review (quickstart F1), on every
   condition of its section in contracts/cli.md, a change to `rationale.md` or to the reviewed set
   after its review among them (RAT-083), unless HEAD is the owner's commit of step (1), and while
@@ -1136,7 +1136,7 @@ hashes and the baseline manifest; run the claim-register test.
   first 16 hex digits of `draft_sha256` at an interactive terminal; `validate` exits 2 while
   `freeze_status` is `draft` and 1 if anything but the approval fields changed. (FR-043; PRO-070,
   PRO-073; REP-092, REP-093)
-- [ ] T114 [US5] Write `protocol/design_freeze.py`, with create, approve and validate as functions,
+- [X] T114 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Write `protocol/design_freeze.py`, with create, approve and validate as functions,
   and `scripts/design_freeze.py`, the command that calls it (contracts/cli.md; data-model §13): the
   record holds the design document's version 1.0 with `reviewed_version`, `rationale.md`, the
   selected operation list, `research/004/ir.py` with its tools, the verdict scripts,
@@ -1144,13 +1144,13 @@ hashes and the baseline manifest; run the claim-register test.
   imports, listed from the scripts' imports with `research/004/` loaded by path, every evidence
   record behind R by ID and SHA-256, and the last `seq` and line SHA-256 of the three logs. (FR-043;
   REP-091, REP-092)
-- [ ] T115 [US5] Write `protocol/review_package.py` and `scripts/review_package.py [--check]` with
+- [X] T115 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Write `protocol/review_package.py` and `scripts/review_package.py [--check]` with
   `--reproduce RECORD` (contracts/cli.md; data-model §16), and assemble `$REP/review-package/` with
   its `MANIFEST.json`: the spec, the design document and the rationale with exact revisions, the
   model source and vectors, the evidence records, the threat model, the security target marked as
   targets, and the known limitations and open questions, every item of security.md §14 by the files
   of its group; `--check` fails an item with no file. (FR-063; SC-020; RAT-089, REP-085)
-- [ ] T116 [US5] ⛔ **Owner design review** (**Owner**), in
+- [X] T116 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] ⛔ **Owner design review** (**Owner**), in
   `specs/004-crypto-architecture-v3/spec.md`'s Review & Approval table: the design document, the
   rationale, the candidate log and the evidence; "no security statement rests on the mapping"
   recorded among its items; the row naming `rationale.md` by path and SHA-256 beside the design
@@ -1160,19 +1160,19 @@ hashes and the baseline manifest; run the claim-register test.
   `python scripts/candidate_log.py outcome FILE` after the row's commit. From the commit that
   records the approval, the agent commits no file of this feature (FR-043). (FR-043, FR-064; SC-013;
   ANA-083, RAT-083; SEC-084)
-- [ ] T117 [US5] Right after the commit that records the owner design review's approval, write its
+- [X] T117 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Right after the commit that records the owner design review's approval, write its
   review entries in `$REP/provenance.jsonl` with `python scripts/provenance.py review FILE`, one per
   AI-drafted section, `rationale.md`'s chapters "Security target" and "Mode" among them, and the
   `review-outcome` entry with `python scripts/candidate_log.py outcome FILE`, leaving them in the
   working tree for the owner's commit of step (1), before the owner sets any row for that step.
   (FR-043, FR-067; PRO-075; RAT-082, RAT-086)
-- [ ] T118 [US5] ⛔ **External design review** (**Owner**), arranged by the owner where possible,
+- [X] T118 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] ⛔ **External design review** (**Owner**), arranged by the owner where possible,
   from `$REP/review-package/`; its row "External design review" in
   `specs/004-crypto-architecture-v3/spec.md` reads done, naming the package's manifest by SHA-256,
   or "not arranged", naming the latest selection record by path and SHA-256; no AI session is
   recorded as an independent or external reviewer. (FR-043, FR-063, FR-064; SC-013, SC-020; SEC-077,
   SEC-078)
-- [ ] T119 [US5] Run the five freeze steps (contracts/cli.md; quickstart F2): (1) **Owner**: commit
+- [X] T119 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] Run the five freeze steps (contracts/cli.md; quickstart F2): (1) **Owner**: commit
   the feature files, the owner's next commit after the one that records the owner design review's
   approval, with the review entries and step (1)'s rows; (2) the agent runs
   `python scripts/design_freeze.py create` on a clean tree with that commit as HEAD, writing
@@ -1182,7 +1182,7 @@ hashes and the baseline manifest; run the claim-register test.
   "Environment record <n>" or "Log repair <n>" on its own between the approval and step (1), the
   owner design review is held again in "Owner design review <k>" first. (FR-043; SC-013; PRO-070,
   PRO-072, REP-092, REP-093)
-- [ ] T120 [US5] ⛔ **Design freeze** (**Owner**): the row "Design freeze" in
+- [X] T120 (not applicable: the selection stopped with no candidate eligible (`freeze/selection.json`), and a stop skips Phases 6 to 8) [US5] ⛔ **Design freeze** (**Owner**): the row "Design freeze" in
   `specs/004-crypto-architecture-v3/spec.md` names the approved freeze record by path and SHA-256
   and its `owner_commit`, set and committed by the owner. (FR-043; Principle VIII)
 
