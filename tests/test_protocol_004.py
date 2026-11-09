@@ -3349,8 +3349,11 @@ class EvidenceHelpers(unittest.TestCase):
         self.assertEqual(int(start[12:].sum()), 0)
 
     def test_the_code_list_holds_every_repository_file_a_run_imports(self):
-        """A record's `code_sha256` names what ran, and a reproduction's worktree holds it (data-model section 1)."""
+        """A record's `code_sha256` names what ran, and a reproduction's worktree holds it (data-model section 1). The modules are this
+        process's, which other classes' tests share: the cost model, which d4_choice.py and round_rule.py import and list in their own
+        code, and which a class before this one loads, is no module of a run of this script, which never names it."""
         import sys
+        self.assertNotIn("costmodel", (ROOT / "scripts/evidence_v3.py").read_text(encoding="utf-8"))
         held = set(self.script.CODE) | {"scripts/gen_constants_v3.py", "phycoweb/__init__.py", "protocol/__init__.py"}
         for module in list(sys.modules.values()):
             path = getattr(module, "__file__", None)
@@ -3360,7 +3363,8 @@ class EvidenceHelpers(unittest.TestCase):
                 rel = Path(path).resolve().relative_to(ROOT).as_posix()
             except ValueError:
                 continue
-            if rel.startswith(("tests/", "research/004/candidates/", "research/004/validation/")) or "refused_sources" in rel:
+            if rel.startswith(("tests/", "research/004/candidates/", "research/004/validation/")) or "refused_sources" in rel \
+                    or rel == "research/004/tools/costmodel.py":
                 continue
             with self.subTest(rel):
                 if rel.startswith(("protocol/seedsets", "protocol/devinputs", "protocol/evidence", "protocol/candidates", "protocol/disclaimer",
