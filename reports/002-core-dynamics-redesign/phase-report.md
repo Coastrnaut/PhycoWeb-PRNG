@@ -169,3 +169,21 @@ approved cryptographic use.**
   core redesign.
 - The derivation and the conditional future feature requirements FUT-SEC-1 to FUT-SEC-9 are in
   `research/security/seed-entropy-bound.md`, summarized in `security.md` §20.1.
+
+## Addendum (2026-11-09, feature 004)
+
+Section 7 calls the step function "invertible-looking ARX". Finding S13 of `security.md`
+contradicts it: the step is not one-to-one, so distinct states merge. The vein decay
+D − (D >> 4) maps 16m + 15 and 16m + 16 to the same value, and when all four veins are in class 1,
+adding (2, −2, 2, −2) to the pressures leaves every transport sum unchanged
+(`research/security/step-probes.json`). The merged states differ only locally, so the merging is
+no evidence of backtracking resistance either.
+
+Feature 004 answered it by asking of `phyco-v3` a keyless permutation of the whole state, invertible
+by construction (`specs/004-crypto-architecture-v3/spec.md`, FR-018 and FR-019), and analysed two
+candidates for it. Neither ended eligible, and the selection stopped with no candidate
+(`reports/004-crypto-architecture-v3/freeze/selection.json`), so no `phyco-v3` model exists. The
+evidence is under `reports/004-crypto-architecture-v3/`, and the final report is
+`reports/004-crypto-architecture-v3/phase-report.md`.
+
+No result, verdict or open issue of feature 002 changes.
