@@ -1227,7 +1227,7 @@ phase ends with the constitution's phase report to the owner.
   and the RTL; and the recommendation, to go on to feature 005 or to stop, a stop ending FR-043's
   window at the same commit. (FR-041, FR-047, FR-048, FR-049, FR-052, FR-060, FR-062, FR-064,
   FR-066; SC-002, SC-014, SC-019, SC-020)
-- [ ] T127 ⛔ **Final result review** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
+- [X] T127 ⛔ **Final result review** (**Owner**), in `specs/004-crypto-architecture-v3/spec.md`'s
   Review & Approval table: the owner's commit that records the decision, with the spec's Status
   line, ends FR-043's window; the standing authorization covers this feature's files again from the
   next commit, for the features that follow. (FR-043, FR-052; PRO-080; Principle VIII)
