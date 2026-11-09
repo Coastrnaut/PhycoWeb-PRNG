@@ -1,0 +1,76 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {},
+  "command": "/home/coast/.venvs/phycoweb/bin/python tests/test_records_004.py TwoWorkers",
+  "config": {
+    "cwd": "/mnt/c/GIT/PhycoWeb-PRNG",
+    "repository_root": "/mnt/c/GIT/PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-09T14:06:48Z",
+  "design_sha256": "60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b",
+  "design_sha256_kind": "raw",
+  "design_version": "0.4",
+  "dirty_paths": [
+    "reports/004-crypto-architecture-v3/projections/projection-20261109T135031Z-e89e6a73.json",
+    "reports/004-crypto-architecture-v3/projections/projection-20261109T135036Z-f6671f6a.json",
+    "reports/004-crypto-architecture-v3/projections/projection-20261109T140644Z-c6f6b2e5.json"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v3` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "b62ba9e505df5ce9a10bb084b125386e061231c2e6d85f824b47b77c6d71585c",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/004-crypto-architecture-v3/environment-wsl.json",
+    "sha256": "77c5e021619083273826dcd435e9e1227620595ffc0bbc220791cd066251beff",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "git_dirty": true,
+  "git_head": "bd477342225beac446ef787af657e82f4364b2f4",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "the test's stated inputs",
+  "kind": "projection",
+  "limitations": [],
+  "measured_speed": {
+    "seconds": 4.275812879001023
+  },
+  "model_id": null,
+  "outputs": [],
+  "outputs_statement": "the test compared the outputs of its stated test operation list and kept none",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "none",
+    "logical_cpus": 32,
+    "ram": "33505370112 bytes",
+    "system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "projected_hours": 0.00034377527778916477,
+  "protocol_line_sha256": "9414ed6aaad7851c77edebb96b60cde7a302b6089d6012bc101059aaf3723b3d",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 524,
+  "record_id": "projection-20261109T140648Z-aa9367f3",
+  "research_sha256": "614afc499c5941ccb5284ca1baafbe0055f011b6dde1bf816127884e2c66da0a",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "row": "feature-wide",
+  "run": "FR-053's test with two worker counts",
+  "spec_sha256": "a2eee11d0943e641f5a419ea62c0a42c3193a9764e06b0c7f724755510260378",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "time_hours": 0.0011877261499992325,
+  "variant_id": null,
+  "versions": {
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "numpy": "2.5.4",
+    "python": "3.14.4",
+    "scipy": "1.18.1"
+  }
+}
