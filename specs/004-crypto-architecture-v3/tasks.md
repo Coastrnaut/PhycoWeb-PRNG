@@ -1208,7 +1208,7 @@ phase ends with the constitution's phase report to the owner.
   0 disagreements, its `recheck` record under `$REP/rechecks/` naming the interpreter, the platform
   and its `pip freeze`, and saying when that environment is not one of research R1's
   (quickstart F3). (FR-065; SC-017)
-- [ ] T125 **heavy**: run the whole suite under `tests/` on Windows,
+- [X] T125 **heavy**: run the whole suite under `tests/` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and with `wpy` in WSL (quickstart P0),
   FR-053's two-worker test among it, under the heavy-run lock and projected first against
   research R7's feature-wide row, charging no candidate: every test passes, or skips naming its open
