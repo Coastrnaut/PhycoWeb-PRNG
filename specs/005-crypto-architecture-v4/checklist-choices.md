@@ -397,6 +397,8 @@ report's finding ID.
 
 ### Rows that change the protocol (analysis remediation 1)
 
+The batch's two commits are 8382f1b (its choices) and d8e5d1f (its changes applied).
+
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule.
 
