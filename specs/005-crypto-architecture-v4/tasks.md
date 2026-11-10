@@ -166,7 +166,9 @@ feature before T009 (FR-003).
   text that opens the spec; any other value makes every script exit 2; `data/heavy-run.lock` and
   `data/log-append.lock` stay one lock for both features; a writer exits 2, writing nothing, for a
   record whose path and `feature` disagree or whose path lies under another feature's paths; every
-  record written under `005` holds `feature` `"005"` and `config.PHYCOWEB_FEATURE`, and a record
+  record written under `005` holds `feature` `"005"` and `config.PHYCOWEB_FEATURE`, and every record
+  and log entry written under it holds the model ID `phyco-v4`, variant IDs `phyco-v4/…` and
+  candidate IDs `v4-A<k>` and `v4-B<k>`, the candidate log refusing a `cand-` ID, and a record
   without the field reads as feature 004's; a record that cites the spec, research or design
   document copies the version it cites under `$REP/spec-versions/`, `$REP/research-versions/` or
   `$REP/design-versions/`; the development-input loader under `005` gives `phycoweb-005/` inputs and
@@ -189,12 +191,16 @@ feature before T009 (FR-003).
   `protocol/disclaimer.py` gains feature 005's constant, the disclaimer naming `phyco-v4` word for
   word; `protocol/candidates.py`, `protocol/changelog.py`, `protocol/provenance.py`,
   `protocol/devinputs_v3.py` and every script of feature 004's contract read their paths through it,
-  none keeping a literal feature-004 path for a write; and each record states its feature. Feature
-  004's default keeps its paths, verdicts and re-check unchanged (T008). Under `005` the rows' hours
-  come by family from the projection table or the approved option, and the validation lookup reads
-  both features' validation records (research R14). No tool file whose exact hash a validation
-  record matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001, FR-002,
-  FR-003, FR-026, FR-028; SC-007; R9, R14)
+  none keeping a literal feature-004 path for a write, nor, for this feature, a literal feature-004
+  model ID, variant prefix, candidate-ID pattern or candidate directory, those of
+  `protocol/candidates.py` (`CANDIDATE_ID`), `scripts/gen_constants_v3.py` (`model_id` and its
+  tables' names), `scripts/round_rule.py` (its variant IDs) and `research/004/ir.py` (its candidate
+  directory and file pattern) among them; and each record states its feature. Feature 004's default
+  keeps its paths, verdicts and re-check unchanged (T008). Under `005` the rows' hours come by
+  family from the projection table or the approved option, and the validation lookup reads both
+  features' validation records (research R14). No tool file whose exact hash a validation record
+  matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001, FR-002, FR-003,
+  FR-026, FR-028; SC-007; R9, R14)
 - [ ] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
   (contracts/cli.md, "`scripts/recheck_004.py` for feature 005"), and write FR-003's test in
   `tests/test_protocol_005.py`: with the setting unset, `python scripts/recheck_004.py --no-record`
@@ -550,11 +556,11 @@ feature-004 tool changed").
   (`research/004/tools/trails/arx_search_known.py`) it finds the optimum weights and round-boundary
   states that feature 004's tool finds, and each step's printed input and output give that step's
   exact weight, the weights summing to the trail's; then validate it with
-  `python scripts/validate_tool.py` on those known results under this feature's paths, **heavy**
-  where its run is, before its first counted use. Validate the same way each tool whose hash differs
-  (T038), a tool that Phase 5 changes later and one written for additions of committed constants
-  (FR-016), each before its first counted use, the evidence runner refusing it meanwhile. (FR-003,
-  FR-016, FR-019; SC-005; R7, R14)
+  `python scripts/validate_tool.py`, which reads a tool under `research/005/tools/` beside feature
+  004's, on those known results under this feature's paths, **heavy** where its run is, before its
+  first counted use. Validate the same way each tool whose hash differs (T038), a tool that Phase 5
+  changes later and one written for additions of committed constants (FR-016), each before its first
+  counted use, the evidence runner refusing it meanwhile. (FR-003, FR-016, FR-019; SC-005; R7, R14)
 
 **Checkpoint**: every tool of Phase 5 holds a validation record of its exact hash. The phase ends
 with the constitution's phase report to the owner.
