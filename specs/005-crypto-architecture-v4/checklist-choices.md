@@ -471,3 +471,16 @@ rule.
 | Row | Rule | Direction | Why |
 |-----|------|-----------|-----|
 | AR4-H1 | The budget in the 16×16-first order (FR-018, FR-022; research R12; the contract's `round_rule.py`) | settled | FR-018's MUST read over feature 004's probes of every later search; the recorded needs held back, as FR-018 and FR-022 name them |
+
+## Analysis remediation 5 (fifth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 4 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the one finding of the report on 7c92090.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR5-M2 | Feature 004's model ID, variant prefix, candidate IDs and directories in the shared code | Tasks T006, T007 and T039: every record and log entry written under `005` holds `phyco-v4`, variant IDs `phyco-v4/…` and candidate IDs `v4-A<k>` and `v4-B<k>`, the candidate log refusing a `cand-` ID; no shared code keeps a literal feature-004 model ID, variant prefix, candidate-ID pattern or candidate directory for this feature, those of `protocol/candidates.py` (`CANDIDATE_ID`), `scripts/gen_constants_v3.py`, `scripts/round_rule.py` and `research/004/ir.py` among them; `scripts/validate_tool.py` reads a tool under `research/005/tools/` | B: paths only, as now. C: no change | tasks T006, T007, T039 |
+
+### Rows that change the protocol (analysis remediation 5)
+
+None: the batch's one row clarifies tasks and changes no rule.
