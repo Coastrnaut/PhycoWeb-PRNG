@@ -46,6 +46,12 @@ renumbered hardware stages and the order of sizes
 
 - [x] CHK013 Is FR-001's statement that 5×5 to 7×7 and 9×9 to 15×15 are "supported variants, permutation-only and outside every claim" consistent with feature 004's FR-018, under which every other n from 2 to 16 is for exploration only, from a table written for that (n, w), never frozen and never evidence, while the size profile lists keyed variants only at the claimable sizes, 2×2 and a supported 3×3? [Conflict, Spec §FR-001, feature-004 FR-018, feature-004 data-model §10]
 
+## Round 3 (second re-run, after round 2's changes)
+
+- [ ] CHK014 Is "R_max = 64 bounds the round rule's R at R_max + Δ = 66" (D5, FR-017, FR-022) consistent with the inherited round rule, R = max(2·R_dist, R_bound + Δ, 2·max(R_f, R_b)), whose other two terms R_max does not bound (2·R_dist reaching past 66 where a trail or a bias firing lies at r above 33, below an R_bound from sums), so that the largest constant table, ROM, vector and cost figure the tools hold are fixed for every R the rule can give? [Conflict, Spec §D5, FR-017, FR-022, inherited round rule]
+- [ ] CHK015 Does security.md §22 row 5a.3's "in features 004 and 005's order of sizes" say which of feature 005's two orders it means (FR-014: trail bounds at 16×16 first; vectors and statistical evaluation at 4×4 first, as FUT-GRID-5 asks), the RTL's validation following the second? [Ambiguity, security.md §22 row 5a.3, Spec §FR-014, FR-027]
+- [ ] CHK016 Is it said which candidates get FR-022's throughput figures and ROM size, a candidate decided `ineligible` at 16×16 having no R at any size (FR-018), so that its `cost` records (inherited FR-026: one per size from its operation list, P and R) are either written at a stated R or not written? [Coverage, Edge Case, Spec §FR-022, FR-018, feature-004 FR-026]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
@@ -55,6 +61,8 @@ renumbered hardware stages and the order of sizes
   item, CHK013; no clarifying questions, as in round 1.
 - Round 2, verified 2026-11-09: after the round's changes (checklist-choices.md, round 2), each new item was
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
+- Round 3, 2026-11-09: re-run over the complete documents after round 2's changes (904185a, 1e3ffd0);
+  3 new items, CHK014 to CHK016; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
