@@ -502,3 +502,18 @@ The batch's two commits are ec6edf7 (its choices) and 01b4c43 (its changes appli
 
 None: the batch's one row restates in the contract rules that the spec, research and data model already fix, and
 changes no rule.
+
+## Analysis remediation 7 (seventh /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 6 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the three findings of the report on 3f876e4.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR7-L1 | How the place check keys the contract's sections | Task T001: each contract section keyed by its heading's code span, as feature 004's tool keys it, a renamed heading reading as one place removed and one added, since the contract holds two sections of `scripts/evidence_v3.py` | B: merge the two sections. C: no change | tasks T001 |
+| AR7-L2 | Which rows come from `plan-projections.json` | The contract's `evidence_v3.py` bound and trail runs and tasks T006 and T007: a candidate's rows come by its family from `$REP/projection-table.json`, and the feature-wide row from that table or, before it exists, from `plan-projections.json`'s approved option | B: no change | contract; tasks T006, T007 |
+| AR7-L3 | The claim test's per-model register checks in the contract | The contract's `check_claims.py` adds that each model's `history`, `bound` and `evidence` are checked against its own feature's files (task T016) | B: no change | contract |
+
+### Rows that change the protocol (analysis remediation 7)
+
+None: the batch's rows clarify wording and change no rule.
