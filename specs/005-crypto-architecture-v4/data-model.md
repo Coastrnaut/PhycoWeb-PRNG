@@ -83,7 +83,7 @@ squared correlation above 2⁻¹²⁸, `confirmed vulnerability` of the rounds i
 - A `decision` entry `ineligible` may hold the cause `"no R_bound at 16×16"`, with the record that ends the climb there (a
   capped or refused search's record, or the last `split` record below weight 128 at R_max), and the size order's statement
   that no hour was charged at 8×8 or 4×4.
-- The candidate limit and the replacement rule read the limit the plan approval fixes (three per family under option A).
+- The candidate limit and the replacement rule read the limit the plan approval fixes (three per family).
 
 ## 6. The selection-bias statement (FR-024)
 

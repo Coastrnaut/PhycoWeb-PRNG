@@ -21,8 +21,8 @@ differ, this plan applies. The work runs in this order, each step needing the on
    005 gets its own environment records, three hash-chained logs, the disclaimer naming `phyco-v4`, the claim test's coverage
    (FR-026) and the re-check of `split` bounds and trail characteristics (FR-016, FR-020).
 2. **Probes before any candidate** (R5): the runs feature 004 never made on the reference designs, cand-A1 and cand-B1, are
-   probed as `projection` records charged to the feature-wide row, and complete the projection table; its values only fall
-   from this plan's (FR-005, FR-009).
+   probed, each up to 4 h, as `projection` records charged to the feature-wide row, and complete the projection table; its
+   values only fall from this plan's (FR-005, FR-009).
 3. **The security target first** (User Story 2): the design document's chapters "Security target" and "Mode" start from
    feature 004's Version 0.4; the ⛔ security-target review comes before any candidate is proposed, and "L1 recorded" follows
    (FR-010 to FR-013; R8).
@@ -43,12 +43,12 @@ reads and never writes, into `research/005/plan-projections.json`, committed wit
 | Item | Value fixed here | Research | Stricter means |
 |------|------------------|----------|----------------|
 | Calibration (FR-004) | From feature 004's 90 bound searches paired with their projections: measured over projected runs from 0.00021 to 2274 (median 0.10); 27 projections were feature 004's 8 h cap, no estimate, and 26 read below 0.001 h, the clock's tick. Factor F = max(1, the largest ratio over the 37 pairs projected at 0.001 h or more and below the cap): active-box count 1.000 at 4×4, 7.447 at 8×8, 2274 at 16×16 (its capped run's ratio, a lower bound); active-S-box count 1.000 at 4×4; branch-and-bound 1.006 at 4×4. Other kinds, from records holding their own projected and used hours: control 3.867, validation 1.186, cross-check 1.000, demonstration 1.000, rotation ranking 1.000 | R1 | the factors do not change |
-| Projected needs (FR-005) | A search feature 004 made: its measured hours, or this plan's cap where it ended at its cap; one feature 004 projected but did not make: its projection times F, or the cap where that projection was feature 004's cap or the product is not below this cap; one it neither made nor projected: the cap. Other kinds never run at w = 32: provisional needs per candidate of 6 h (structural checks) and 12 h (frequency and avalanche tests), until the probes replace them | R2, R5 | needs only fall after the probes |
+| Projected needs (FR-005) | A search feature 004 made: its measured hours, or this plan's cap where it ended at its cap; one feature 004 projected but did not make: its projection times F, or the cap where that projection was feature 004's cap or the product is not below this cap; one it neither made nor projected: the cap. Other kinds never run at w = 32: provisional needs per candidate of 12 h (structural checks) and 24 h (frequency and avalanche tests), twice feature 004's rows, until the probes replace them | R2, R5 | needs only fall after the probes |
 | Listed climbs (FR-005) | Per reference design, size and kind, r = 1, 2, … in order, ending after the first search projected to reach its cap (FR-015), at the first r whose bound, searched or summed, has weight above 128, or at R_max = 64 | R2 | no change |
-| Caps (FR-006) | 4 h at 4×4, 4 h at 8×8, 12 h at 16×16, for each kind; each at least twice the longest listed search projected to finish under it (floors 2.17 h, 0.17 h and 0.34 h) | R3 | caps only fall |
+| Caps (FR-006) | 8 h at 4×4, 24 h at 8×8, 48 h at 16×16, for each kind (option E, the owner's extension at the plan approval); each at least twice the longest listed search projected to finish under it (floors 2.17 h, 18.61 h and 0.34 h) | R3 | caps only fall |
 | Thread count (FR-007) | 1 for every search, recorded in every record | R4 | does not change |
-| Rows (FR-005, FR-008) | Per candidate, from its family's reference design, each at least twice the projected needs it holds: an ARX candidate 87.5 h (trail searches 51.5 h, structural checks 12 h, bias tests 24 h), a Boolean candidate 118.8 h (trail searches 82.8 h, structural 12 h, bias 24 h); the feature-wide row 82 h (probes 30 h, two whole-suite runs per platform 2 h, reproductions and re-checks 9 h, doubled) | R3 | rows only fall |
-| Candidate limit and ceiling (FR-008) | Three evaluated candidates per family, as inherited; the rows of six candidates and the feature-wide row sum to 700.9 h, within the ceiling of 720 h | R3 | both only fall |
+| Rows (FR-005, FR-008) | Per candidate, from its family's reference design, each at least twice the projected needs it holds: an ARX candidate 267.5 h (trail searches 195.5 h, structural checks 24 h, bias tests 48 h), a Boolean candidate 425.3 h (trail searches 353.3 h, structural 24 h, bias 48 h); the feature-wide row 102 h (probes 40 h, two whole-suite runs per platform 2 h, reproductions and re-checks 9 h, doubled) | R3 | rows only fall |
+| Candidate limit and ceiling (FR-008) | Three evaluated candidates per family, as inherited; the rows of six candidates and the feature-wide row sum to 2,180.4 h, and the ceiling is 2,200 h, raised from D7's 720 h by the owner at the plan approval, as FR-008 provides | R3 | both only fall |
 | Margin and R_max (D5, D7) | Margin 2; R_max = 64 | R2, R3 | the margin only rises; R_max only falls |
 | Order at a size (FR-015) | r ascending, the linear search then the differential search at each r, each kind's climb independent; a capped or refused search ends that kind's searches at that size | R12 | no change |
 | Formats (FR-016, FR-019) | The `split` bound record and the trail characteristic at every nonlinear operation, as data-model §2 and §3 state | R6, R7 | fields only added |
@@ -56,11 +56,14 @@ reads and never writes, into `research/005/plan-projections.json`, committed wit
 
 ### Choices for owner review
 
-The planner took the first option of each, the recommended one. The owner's plan approval decides each.
+The planner took the first option of each, the recommended one. At the plan approval of 2026-11-09 the owner took the
+recommended option of the last four and, for the first, asked to "extend run limits even more to ensure we find a good
+candidate also": option E (research R3) replaces option A, with the probe limit raised from 1 h to 4 h and the provisional
+structural and bias needs doubled.
 
 | Choice | Options | Research |
 |--------|---------|----------|
-| FR-008's case: with feature 004's caps, 8 h at every size, the rows of six candidates come to 736.6 h, above the ceiling, and the 8 h cap at 8×8 fails FR-006 (B1's calibrated projection at r = 1 there, 5.95 h, needs a cap of at least 11.9 h) | **A (recommended): caps 4, 4 and 12 h; three per family; 700.9 h, within 720 h.** B: caps 8, 20 and 20 h; two per family; 843.6 h, the ceiling raised. C: caps 4, 4 and 24 h; three per family; 988.9 h, the ceiling raised | R3 |
+| FR-008's case: with feature 004's caps, 8 h at every size, the rows of six candidates come to 736.6 h, above the ceiling, and the 8 h cap at 8×8 fails FR-006 (B1's calibrated projection at r = 1 there, 5.95 h, needs a cap of at least 11.9 h) | **A (recommended): caps 4, 4 and 12 h; three per family; 700.9 h, within 720 h.** B: caps 8, 20 and 20 h; two per family; 843.6 h, the ceiling raised. C: caps 4, 4 and 24 h; three per family; 988.9 h, the ceiling raised. **E (decided by the owner): caps 8, 24 and 48 h; three per family; 2,180.4 h, the ceiling raised to 2,200 h** | R3 |
 | Thread count | **1 (recommended): the calibration holds only one-thread runs, and scipy's HiGHS interface sets no thread count.** Alternatives, each a tool change validated again before use: the MILP split by first-round activity over worker processes; a solver that runs threads, named only as candidates (OR-Tools CP-SAT, HiGHS through `highspy`), each a download needing the owner's permission for that file | R4 |
 | Probes for runs feature 004 made | **Cite feature 004's record (recommended): the same tool on the same operation list, size, width, kind and r, on the same machine, at one thread, needs no second run.** Alternative: probe every listed run again | R5 |
 | Rows per family | **A candidate's rows from its family's reference design (recommended).** Alternative: every candidate's rows at the larger of the two | R3 |
@@ -86,14 +89,14 @@ feature 005's tests in `tests/test_protocol_005.py` and beside the modules they 
 **Project Type**: a research protocol of command-line scripts, records and logs, with a reference model after a selection.
 
 **Performance Goals**: every search within its cap (FR-006); every heavy run within its row and all of them within the
-ceiling (FR-008); the throughput goal of feature 004's research R5 reported, deciding nothing.
+ceiling of 2,200 h (FR-008); the throughput goal of feature 004's research R5 reported, deciding nothing.
 
 **Constraints**: one heavy run at a time, projected first (inherited FR-045); one thread per search (FR-007); feature 004's
 records, logs and documents read-only (FR-003); every download needs the owner's permission for that file, with its name,
 source, size and licence.
 
 **Scale/Scope**: three claimable sizes, 4×4, 8×8 and 16×16 at w = 32, with the research sizes 2×2 and 3×3; at most three
-evaluated candidates per family; heavy runs within 720 h.
+evaluated candidates per family; heavy runs within 2,200 h.
 
 ## Constitution Check
 

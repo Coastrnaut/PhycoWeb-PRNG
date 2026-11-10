@@ -2744,6 +2744,512 @@
    },
    "sum_of_rows_h": 988.9
   },
+  "E (the owner's extension)": {
+   "candidates_per_family": 3,
+   "caps_h": {
+    "16x16": 48.0,
+    "4x4": 8.0,
+    "8x8": 24.0
+   },
+   "climbs": {
+    "cand-A1 16x16 differential": {
+     "cap_h": 48.0,
+     "need_h": 48.1163,
+     "r_bound_by_searches_and_sums": 6,
+     "searches": [
+      {
+       "need_h": 0.0,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T193955Z-aa642b20"
+      },
+      {
+       "need_h": 0.0008771645902776173,
+       "r": 2,
+       "source": "bound-20261108T204625Z-110cbe9a"
+      },
+      {
+       "need_h": 0.019585647814999954,
+       "r": 3,
+       "source": "bound-20261108T204913Z-3ff63902"
+      },
+      {
+       "need_h": 0.09584820243916713,
+       "r": 4,
+       "source": "bound-20261108T210554Z-7972d041"
+      },
+      {
+       "need_h": 48.0,
+       "note": "neither made nor projected in feature 004: reaches this cap",
+       "r": 5
+      }
+     ]
+    },
+    "cand-A1 16x16 linear": {
+     "cap_h": 48.0,
+     "need_h": 48.1837,
+     "r_bound_by_searches_and_sums": 8,
+     "searches": [
+      {
+       "need_h": 0.0,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T183354Z-d13e7453"
+      },
+      {
+       "need_h": 0.0014013302261110363,
+       "r": 2,
+       "source": "bound-20261108T204557Z-96b3ef64"
+      },
+      {
+       "need_h": 0.01344936674694433,
+       "r": 3,
+       "source": "bound-20261108T204738Z-17a9afd4"
+      },
+      {
+       "need_h": 0.16881180763138876,
+       "r": 4,
+       "source": "bound-20261108T205945Z-0f7591b1"
+      },
+      {
+       "need_h": 48.0,
+       "note": "ended at feature 004's cap: reaches this cap",
+       "r": 5,
+       "source": "bound-20261109T051632Z-d69901f4"
+      }
+     ]
+    },
+    "cand-A1 4x4 differential": {
+     "cap_h": 8.0,
+     "need_h": 1.0931,
+     "r_bound_by_searches_and_sums": 11,
+     "searches": [
+      {
+       "need_h": 1.0849652374816667,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T193955Z-aa642b20"
+      },
+      {
+       "need_h": 5.7483028333535915e-05,
+       "r": 2,
+       "source": "bound-20261108T194056Z-3a93e496"
+      },
+      {
+       "need_h": 0.00020540219500010911,
+       "r": 3,
+       "source": "bound-20261108T194203Z-e2a42304"
+      },
+      {
+       "need_h": 0.00018881769333322358,
+       "r": 4,
+       "source": "bound-20261108T194300Z-9ae9c66c"
+      },
+      {
+       "need_h": 0.00020146228972205588,
+       "r": 5,
+       "source": "bound-20261108T194356Z-3e38d60f"
+      },
+      {
+       "need_h": 0.0007037993888889105,
+       "r": 6,
+       "source": "bound-20261108T194458Z-a32bcfcd"
+      },
+      {
+       "need_h": 0.0007430731811109581,
+       "r": 7,
+       "source": "bound-20261108T194601Z-310613a3"
+      },
+      {
+       "need_h": 0.0007780323063889227,
+       "r": 8,
+       "source": "bound-20261108T194707Z-dec8de75"
+      },
+      {
+       "need_h": 0.001218488145555562,
+       "r": 9,
+       "source": "bound-20261108T194820Z-5753dc79"
+      },
+      {
+       "need_h": 0.001713603772222238,
+       "r": 10,
+       "source": "bound-20261108T194936Z-ac50bd91"
+      },
+      {
+       "need_h": 0.002295821075277773,
+       "r": 11,
+       "source": "bound-20261108T195058Z-d5f0b0d0",
+       "weight_above_128": "132"
+      }
+     ]
+    },
+    "cand-A1 4x4 linear": {
+     "cap_h": 8.0,
+     "need_h": 0.0651,
+     "r_bound_by_searches_and_sums": 17,
+     "searches": [
+      {
+       "need_h": 9.576902500000193e-06,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T183354Z-d13e7453"
+      },
+      {
+       "need_h": 4.2270261388921426e-05,
+       "r": 2,
+       "source": "bound-20261108T194025Z-ba442616"
+      },
+      {
+       "need_h": 0.00018357536027780144,
+       "r": 3,
+       "source": "bound-20261108T194130Z-b5b1e74f"
+      },
+      {
+       "need_h": 0.00017818188138891047,
+       "r": 4,
+       "source": "bound-20261108T194234Z-9c3604fc"
+      },
+      {
+       "need_h": 0.00018057632555559797,
+       "r": 5,
+       "source": "bound-20261108T194327Z-1decfa56"
+      },
+      {
+       "need_h": 0.0002394447352778823,
+       "r": 6,
+       "source": "bound-20261108T194425Z-35a685dc"
+      },
+      {
+       "need_h": 0.0002906166355554281,
+       "r": 7,
+       "source": "bound-20261108T194528Z-624d595f"
+      },
+      {
+       "need_h": 0.000357153170555446,
+       "r": 8,
+       "source": "bound-20261108T194634Z-2753ac69"
+      },
+      {
+       "need_h": 0.002206257662777868,
+       "r": 9,
+       "source": "bound-20261108T194746Z-365ba94c"
+      },
+      {
+       "need_h": 0.0027395337877778223,
+       "r": 10,
+       "source": "bound-20261108T194901Z-30d86f43"
+      },
+      {
+       "need_h": 0.0034013040622221523,
+       "r": 11,
+       "source": "bound-20261108T195021Z-51fd8528"
+      },
+      {
+       "need_h": 0.004216206457500044,
+       "r": 12,
+       "source": "bound-20261108T195142Z-370b9968"
+      },
+      {
+       "need_h": 0.004885552539999985,
+       "r": 13,
+       "source": "bound-20261108T195309Z-0bf55066"
+      },
+      {
+       "need_h": 0.009490776893888879,
+       "r": 14,
+       "source": "bound-20261108T195456Z-17156f4e"
+      },
+      {
+       "need_h": 0.010740180623611196,
+       "r": 15,
+       "source": "bound-20261108T195654Z-8d940428"
+      },
+      {
+       "need_h": 0.012089786019722245,
+       "r": 16,
+       "source": "bound-20261108T195900Z-e538bed4"
+      },
+      {
+       "need_h": 0.013893870245555667,
+       "r": 17,
+       "source": "bound-20261108T200120Z-6dcfc944",
+       "weight_above_128": "136"
+      }
+     ]
+    },
+    "cand-A1 8x8 differential": {
+     "cap_h": 24.0,
+     "need_h": 0.0991,
+     "r_bound_by_searches_and_sums": 6,
+     "searches": [
+      {
+       "need_h": 0.0,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T193955Z-aa642b20"
+      },
+      {
+       "need_h": 0.0003093537816668383,
+       "r": 2,
+       "source": "bound-20261108T200509Z-5c23f886"
+      },
+      {
+       "need_h": 0.0015236320969446145,
+       "r": 3,
+       "source": "bound-20261108T200626Z-1d8383df"
+      },
+      {
+       "need_h": 0.005293574720555575,
+       "r": 4,
+       "source": "bound-20261108T200804Z-a9407382"
+      },
+      {
+       "need_h": 0.00947807807833341,
+       "r": 5,
+       "source": "bound-20261108T201034Z-4dd41bbe"
+      },
+      {
+       "need_h": 0.08248933944583314,
+       "r": 6,
+       "source": "bound-20261108T201758Z-71d7c1e5",
+       "weight_above_128": "144"
+      }
+     ]
+    },
+    "cand-A1 8x8 linear": {
+     "cap_h": 24.0,
+     "need_h": 0.1797,
+     "r_bound_by_searches_and_sums": 9,
+     "searches": [
+      {
+       "need_h": 0.0,
+       "note": "the box's own bound over one call, searched once at 4×4 and read at every size",
+       "r": 1,
+       "source": "bound-20261108T183354Z-d13e7453"
+      },
+      {
+       "need_h": 0.0002251747102779215,
+       "r": 2,
+       "source": "bound-20261108T200437Z-4dede4c8"
+      },
+      {
+       "need_h": 0.00191737588805558,
+       "r": 3,
+       "source": "bound-20261108T200547Z-04ff5c6e"
+      },
+      {
+       "need_h": 0.005729603223333521,
+       "r": 4,
+       "source": "bound-20261108T200715Z-ee079de6"
+      },
+      {
+       "need_h": 0.015347654294999858,
+       "r": 5,
+       "source": "bound-20261108T200929Z-dab9ba49"
+      },
+      {
+       "need_h": 0.024260875053333218,
+       "r": 6,
+       "source": "bound-20261108T201232Z-2c36a55a"
+      },
+      {
+       "need_h": 0.041270697850555586,
+       "r": 7,
+       "source": "bound-20261108T202056Z-a8665edb"
+      },
+      {
+       "need_h": 0.041694698333055585,
+       "r": 8,
+       "source": "bound-20261108T203006Z-9cc5de58"
+      },
+      {
+       "need_h": 0.04927555235944434,
+       "r": 9,
+       "source": "bound-20261108T203907Z-97b5fa47",
+       "weight_above_128": "144"
+      }
+     ]
+    },
+    "cand-B1 16x16 differential": {
+     "cap_h": 48.0,
+     "need_h": 48.0,
+     "r_bound_by_searches_and_sums": null,
+     "searches": [
+      {
+       "need_h": 48.0,
+       "note": "feature 004 projected 5.207 h, factor 2.27e+03: reaches this cap",
+       "r": 1
+      }
+     ]
+    },
+    "cand-B1 16x16 linear": {
+     "cap_h": 48.0,
+     "need_h": 48.0,
+     "r_bound_by_searches_and_sums": null,
+     "searches": [
+      {
+       "need_h": 48.0,
+       "note": "feature 004 projected 8.000 h, factor 2.27e+03: reaches this cap",
+       "r": 1
+      }
+     ]
+    },
+    "cand-B1 4x4 differential": {
+     "cap_h": 8.0,
+     "need_h": 8.9205,
+     "r_bound_by_searches_and_sums": 17,
+     "searches": [
+      {
+       "need_h": 0.08906678397717037,
+       "note": "feature 004 projected 0.089 h, factor 1",
+       "r": 1
+      },
+      {
+       "need_h": 0.0649827777777783,
+       "r": 2,
+       "source": "bound-20261108T145133Z-ac7eeb22"
+      },
+      {
+       "need_h": 0.11266472222222243,
+       "r": 3,
+       "source": "bound-20261108T150354Z-df0cd36c"
+      },
+      {
+       "need_h": 0.6538022222222227,
+       "r": 4,
+       "source": "bound-20261108T155112Z-7e80b003"
+      },
+      {
+       "need_h": 8.0,
+       "note": "neither made nor projected in feature 004: reaches this cap",
+       "r": 5
+      }
+     ]
+    },
+    "cand-B1 4x4 linear": {
+     "cap_h": 8.0,
+     "need_h": 8.4702,
+     "r_bound_by_searches_and_sums": 17,
+     "searches": [
+      {
+       "need_h": 0.27046798756818075,
+       "note": "feature 004 projected 0.270 h, factor 1",
+       "r": 1
+      },
+      {
+       "need_h": 0.04948777777777852,
+       "r": 2,
+       "source": "bound-20261108T144527Z-fc78e861"
+      },
+      {
+       "need_h": 0.054956666666667944,
+       "r": 3,
+       "source": "bound-20261108T145601Z-811bfa13"
+      },
+      {
+       "need_h": 0.0953255555555572,
+       "r": 4,
+       "source": "bound-20261108T151047Z-0688a4d1"
+      },
+      {
+       "need_h": 8.0,
+       "note": "feature 004 projected 8.000 h, factor 1: reaches this cap",
+       "r": 5
+      }
+     ]
+    },
+    "cand-B1 8x8 differential": {
+     "cap_h": 24.0,
+     "need_h": 29.9535,
+     "r_bound_by_searches_and_sums": null,
+     "searches": [
+      {
+       "need_h": 5.953452003521548,
+       "note": "feature 004 projected 0.799 h, factor 7.45",
+       "r": 1
+      },
+      {
+       "need_h": 24.0,
+       "note": "neither made nor projected in feature 004: reaches this cap",
+       "r": 2
+      }
+     ]
+    },
+    "cand-B1 8x8 linear": {
+     "cap_h": 24.0,
+     "need_h": 33.3029,
+     "r_bound_by_searches_and_sums": null,
+     "searches": [
+      {
+       "need_h": 9.302902640957251,
+       "note": "feature 004 projected 1.249 h, factor 7.45",
+       "r": 1
+      },
+      {
+       "need_h": 24.0,
+       "note": "neither made nor projected in feature 004: reaches this cap",
+       "r": 2
+      }
+     ]
+    }
+   },
+   "feature_wide_row_h": 102.0,
+   "fits_ceiling": false,
+   "fr006": {
+    "16x16 differential": {
+     "cap_h": 48.0,
+     "floor_h": 0.1917,
+     "holds": true,
+     "longest_finishing_h": 0.0958
+    },
+    "16x16 linear": {
+     "cap_h": 48.0,
+     "floor_h": 0.3376,
+     "holds": true,
+     "longest_finishing_h": 0.1688
+    },
+    "4x4 differential": {
+     "cap_h": 8.0,
+     "floor_h": 2.1699,
+     "holds": true,
+     "longest_finishing_h": 1.085
+    },
+    "4x4 linear": {
+     "cap_h": 8.0,
+     "floor_h": 0.5409,
+     "holds": true,
+     "longest_finishing_h": 0.2705
+    },
+    "8x8 differential": {
+     "cap_h": 24.0,
+     "floor_h": 11.9069,
+     "holds": true,
+     "longest_finishing_h": 5.9535
+    },
+    "8x8 linear": {
+     "cap_h": 24.0,
+     "floor_h": 18.6058,
+     "holds": true,
+     "longest_finishing_h": 9.3029
+    }
+   },
+   "fr006_holds": true,
+   "rows": {
+    "ARX": {
+     "bias_need_h": 24.0,
+     "row_h": 267.5,
+     "structural_need_h": 12.0,
+     "trails_need_h": 97.737
+    },
+    "Boolean": {
+     "bias_need_h": 24.0,
+     "row_h": 425.3,
+     "structural_need_h": 12.0,
+     "trails_need_h": 176.647
+    }
+   },
+   "sum_of_rows_h": 2180.4
+  },
   "feature 004's caps": {
    "candidates_per_family": 3,
    "caps_h": {

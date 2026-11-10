@@ -40,6 +40,11 @@ SIZES = (16, 8, 4)
 KINDS = ("linear", "differential")
 REFERENCE = {"cand-A1": "ARX", "cand-B1": "Boolean"}
 OPTIONS = {
+    # the owner's choice at the plan approval of 2026-11-09: "extend run limits even more to ensure we find a good candidate also"
+    "E (the owner's extension)": {"caps": {16: 48.0, 8: 24.0, 4: 8.0}, "per_family": 3,
+                                  "provisional": {"structural": 12.0, "bias": 24.0},
+                                  "feature_wide": {"probes": 40.0, "two whole-suite runs per platform": 2.0,
+                                                   "reproductions and re-checks": 9.0}},
     "A (recommended)": {"caps": {16: 12.0, 8: 4.0, 4: 4.0}, "per_family": 3},
     "B": {"caps": {16: 20.0, 8: 20.0, 4: 8.0}, "per_family": 2},
     "C": {"caps": {16: 24.0, 8: 4.0, 4: 4.0}, "per_family": 3},
@@ -201,13 +206,15 @@ def climbs(projections, bounds, factors, caps):
 
 def rows_for(table, option):
     caps, per_family = option["caps"], option["per_family"]
+    provisional = option.get("provisional", PROVISIONAL)
+    feature_wide = option.get("feature_wide", FEATURE_WIDE_NEED)
     out = {}
     for cand, family in REFERENCE.items():
         trails = sum(v["need_h"] for k, v in table.items() if k.startswith(cand + " "))
-        need = trails + sum(PROVISIONAL.values())
-        out[family] = {"trails_need_h": round(trails, 3), "structural_need_h": PROVISIONAL["structural"],
-                       "bias_need_h": PROVISIONAL["bias"], "row_h": round(MARGIN * need, 1)}
-    wide = round(MARGIN * sum(FEATURE_WIDE_NEED.values()), 1)
+        need = trails + sum(provisional.values())
+        out[family] = {"trails_need_h": round(trails, 3), "structural_need_h": provisional["structural"],
+                       "bias_need_h": provisional["bias"], "row_h": round(MARGIN * need, 1)}
+    wide = round(MARGIN * sum(feature_wide.values()), 1)
     total = round(per_family * sum(v["row_h"] for v in out.values()) + wide, 1)
     # FR-006: each cap at least the margin times the longest listed search projected to finish under it
     fr006 = {}

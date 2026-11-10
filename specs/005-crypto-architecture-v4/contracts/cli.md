@@ -38,7 +38,7 @@ the table records it; the run is refused when it comes (inherited ANA-078).
 
 ### `scripts/evidence_v3.py … --probe`
 
-A probe for the projection table (research R5): the run itself, up to 1 h, written as a `projection` record charged to the
+A probe for the projection table (research R5): the run itself, up to 4 h, written as a `projection` record charged to the
 feature-wide row, its outputs other than timing discarded unread. It records `finished` with the hours taken, or
 `reached the probe limit`, which the table reads as reaching the run's cap. Exits 2 once any `proposed` entry exists.
 

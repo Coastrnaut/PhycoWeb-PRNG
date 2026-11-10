@@ -72,14 +72,18 @@ held in `research/005/plan-projections.json`.
 
 ## R3. Caps, rows, the ceiling and FR-008's case (FR-005, FR-006, FR-008) — protocol
 
-- **Decision (option A, recommended)**: caps of 4 h at 4×4, 4 h at 8×8 and 12 h at 16×16, for each kind; rows per candidate
-  from its family's reference design, each at least twice its projected needs: ARX 87.5 h, Boolean 118.8 h, the provisional
-  structural (6 h) and bias (12 h) needs included and doubled; the feature-wide row 82 h; three evaluated candidates per
-  family, as inherited; 700.9 h in all, within the ceiling of 720 h.
+- **Decision (option E, the owner's at the plan approval of 2026-11-09)**: caps of 8 h at 4×4, 24 h at 8×8 and 48 h at
+  16×16, for each kind; rows per candidate from its family's reference design, each at least twice its projected needs: ARX
+  267.5 h, Boolean 425.3 h, the provisional structural (12 h) and bias (24 h) needs included and doubled; the feature-wide row
+  102 h, holding probes of up to 4 h each (R5); three evaluated candidates per family, as inherited; 2,180.4 h in all, and the
+  ceiling raised from D7's 720 h to 2,200 h, as FR-008 lets the owner raise it at the plan approval. The planner had
+  recommended option A, 700.9 h within 720 h; the owner asked to "extend run limits even more to ensure we find a good
+  candidate also".
 - **FR-006's floors**: a cap must be at least twice the longest listed search projected to finish under it. At 8×8, B1's
   calibrated projections at r = 1, 5.95 h and 9.30 h, allow a cap below 5.95 h, under which both are projected to reach it,
   or a cap of 18.6 h or more; feature 004's 8 h lies between and fails FR-006. Under option A the floors are 2.17 h at 4×4,
-  0.17 h at 8×8 and 0.34 h at 16×16.
+  0.17 h at 8×8 and 0.34 h at 16×16; under option E, where B1's two searches at 8×8 and r = 1 are projected to finish under
+  the 24 h cap, they are 2.17 h, 18.61 h and 0.34 h.
 - **The options** (plan, "Choices for owner review"):
 
   | Option | Caps 4×4, 8×8, 16×16 | Per family | ARX row | Boolean row | Sum | Within 720 h |
@@ -88,11 +92,15 @@ held in `research/005/plan-projections.json`.
   | B | 8, 20, 20 h | 2 | 119.5 h | 261.3 h | 843.6 h | no |
   | C | 4, 4, 24 h | 3 | 135.5 h | 166.8 h | 988.9 h | no |
   | Feature 004's caps | 8, 8, 8 h | 3 | 71.5 h | 146.7 h | 736.6 h | no, and FR-006 fails at 8×8 |
+  | E (the owner's) | 8, 24, 48 h | 3 | 267.5 h | 425.3 h | 2,180.4 h | the ceiling raised to 2,200 h |
 
-- **Rationale**: every search feature 004 finished at 4×4 and 8×8 at w = 32 took at most 1.085 h, so 4 h holds each more
-  than 3.6 times over; 12 h at 16×16, half as much again as feature 004's cap, is where both its candidates ended or were projected
-  to end. Under FR-016 a capped search costs exactly its cap and ends no climb, so a larger cap buys a stronger searched bound,
-  not eligibility. Option A keeps both the candidate limit and the ceiling the spec approved.
+- **Rationale**: every search feature 004 finished at 4×4 and 8×8 at w = 32 took at most 1.085 h, so option A's 4 h held
+  each more than 3.6 times over and kept both the candidate limit and the ceiling the spec approved. Option E gives each size
+  more room where feature 004 ran out or never ran: 8 h at 4×4, over seven times the longest search that finished there; 24 h
+  at 8×8, above the floor that B1's projections set; 48 h at 16×16, six times feature 004's cap, where both its candidates
+  ended or were projected to end. Under FR-016 a capped search costs exactly its cap and ends no climb, so a larger cap buys a
+  stronger searched bound, and for a design whose first searches at a size are slow, any bound at all. Since every limit may
+  only fall after the plan approval (FR-009), a generous start can still be lowered later, never raised.
 - **Alternatives considered**: options B and C, which need the ceiling raised; rows at the larger family's size for every
   candidate (rejected: 794.8 h, above the ceiling, for no projected need).
 
@@ -113,13 +121,14 @@ held in `research/005/plan-projections.json`.
   neither made nor ran to its cap is probed on the reference design's committed operation list, as a `projection` record
   charged to the feature-wide row: B1's searches at 8×8 and 16×16, A1's differential search at 16×16 and r = 5, and one
   structural check and one frequency and avalanche measurement per size and design at w = 32. A probe is the run itself, up to
-  1 h; a run that finishes gives its hours, and one that does not is projected to reach its cap. A run feature 004 made is not
+  4 h (option E; 1 h under option A); a run that finishes gives its hours, and one that does not is projected to reach its
+  cap. A run feature 004 made is not
   probed again: its record, the same tool on the same operation list, size, width, kind and r, on the same machine at one
   thread, is the measurement, cited in the table by record ID. `projection_table.py` then writes the final table from the
   plan's rules and the probes; each value is the smaller of the plan's and the probes', so that every value only falls, and a
   probe that shows a need above its row is reported before any candidate, its run refused when it comes (inherited ANA-078).
 - **Rationale**: the probes measure what feature 004 never ran at w = 32, the structural and bias kinds above all, and an
-  upper limit of 1 h keeps them inside the feature-wide row.
+  upper limit of 4 h lets more of them finish while keeping them inside the feature-wide row's 40 h of probes.
 - **Alternatives considered**: probing every listed run again (rejected: it repeats feature 004's measurements on the same
   machine); 60-second probes extrapolated by feature 004's formula (rejected by R1).
 
