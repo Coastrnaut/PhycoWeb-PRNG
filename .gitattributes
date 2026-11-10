@@ -29,6 +29,8 @@ specs/004-crypto-architecture-v3/**/*.md text eol=lf
 vectors/phyco-v3/** text eol=lf
 # Feature 005: its documents are LF too, since its records will hold their hashes, as feature 004's do.
 specs/005-crypto-architecture-v4/**/*.md text eol=lf
+reports/005-crypto-architecture-v4/** text eol=lf
+research/005/** text eol=lf
 # Local-only outputs stay as written: git ignores them, and committed records hold their hashes.
 data/local/** -text
 *.mk text eol=lf
