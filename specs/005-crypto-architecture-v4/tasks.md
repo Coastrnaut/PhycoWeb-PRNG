@@ -271,12 +271,18 @@ feature before T009 (FR-003).
   reads Approved and the rows and hashes it rests on hold at HEAD, and L0 otherwise; `phyco-v4`'s
   `fut_sec` holds the expected statuses that FR-030 carries, the later stages named by security.md
   §22's numbers since 2.18; the copies under `spec-versions/`, `research-versions/` and
-  `design-versions/` read as the documents they copy (FR-001); each model's `in_progress` counts its
-  own feature's searched `pass` bound records citing a validation record, a `split` record never
-  counted (data-model §2), `phyco-v4`'s reading `none` until this feature's first such record; the
-  code paths scanned gain `research/005/`; and a generated checklist line that a rule flags passes
-  only through an allow-list entry giving FR-026's reason.
-  Feature 004's rules and findings are unchanged. (FR-001, FR-013, FR-026, FR-030; SC-007; R10)
+  `design-versions/` read as the documents they copy (FR-001); each model's `history`, `bound` and
+  `evidence` are checked against its own feature's files, `phyco-v4`'s `bound` from this feature's
+  size profile by variant ID, placeholders included (FR-011), its `evidence` the two security-target
+  files and, at L1, feature 004's demonstration record and the files the two review rows name
+  (FR-013), and its `history` from this spec's rows "L1 recorded"; each feature's design document is
+  held to the rule of its chapter "Slime-mould mapping"; each model's `in_progress` counts its own
+  feature's searched `pass` bound records citing a validation record, a `split` record never counted
+  (data-model §2), `phyco-v4`'s reading `none` until this feature's first such record; the code
+  paths scanned gain `research/005/`; and a generated checklist line that a rule flags passes only
+  through an allow-list entry giving FR-026's reason.
+  Feature 004's rules and findings are unchanged. (FR-001, FR-011, FR-013, FR-026, FR-030; SC-007;
+  R10)
 - [ ] T017 Extend `scripts/check_claims.py` until T016 passes, and give `phyco-v4`'s entry in
   `protocol/claims.json` its `fut_sec`: the statuses of feature 004's table "Security Policy
   traceability" read for `phyco-v4`, FUT-SEC-8 met by feature 004's demonstration and its review,
@@ -1045,7 +1051,7 @@ Every functional requirement and success criterion, with the tasks that cite it 
 - FR-008: T021, T085
 - FR-009: T022, T024–T027
 - FR-010: T030–T033, T036, T057
-- FR-011: T028–T031, T034–T036, T046, T069
+- FR-011: T016, T028–T031, T034–T036, T046, T069
 - FR-012: T032, T035, T069, T070, T077
 - FR-013: T016, T037, T069, T071
 - FR-014: T040–T043, T049, T051, T053
