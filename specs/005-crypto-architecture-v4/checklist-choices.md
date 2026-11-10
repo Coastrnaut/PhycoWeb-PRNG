@@ -162,3 +162,45 @@ direction (`stricter`) or settles an open case by its most conservative reading 
 | PRO-013 | Probes beyond their share (FR-005) | stricter | such a probe refused |
 | PRO-015 | A probe above its row (FR-009) | stricter | reported, and only stricter answers allowed |
 | REP-012 | The calibration's inputs (FR-004) | settled | the records the plan read, fixed |
+
+## Round 2 (first re-run, 2026-11-09)
+
+**Answered in advance**, as round 1 was: the owner's instruction of 2026-11-09 takes option A of every row.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| SEC-017 | FR-010's bound and its derivation | FR-010 states the bound as the least of feature 004's generic bounds: k/2 = 128 bits from single-target quantum search on the key, the capacity's c/2 being 192 bits | B: name the size profile only. C: no change | spec FR-010 |
+| SEC-018 | FR-026's "next step" | The step is plan phase 2's probes, which wait until every finding is fixed or allow-listed | B: the row "L1 recorded". C: no change | spec FR-026 |
+| SEC-019 | Generated checklist lines the claim test flags | FR-026: such a line is never rewritten; it gets an allow-list entry with its reason (it names a parameter, a file or a rule, and no property of a design) | B: rewrite the line. C: no change | spec FR-026 |
+| SEC-020 | The security target's files with placeholders | FR-011: where a number will stand the files hold the strings `<R4>`, `<R8>` and `<R16>`, and the size profile's check reads a placeholder as not yet known, checking every other figure | B: no files before R. C: no change | spec FR-011 |
+| RAT-014 | An unchanged re-entered design | FR-023: it is a candidate of this feature, its permutation and constants equal to feature 004's, and its design rationale says so; the inherited rule on new candidates governs changes within this feature | B: refuse unchanged re-entry. C: no change | spec FR-023 |
+| RAT-015 | Selection over R from sums or searches | FR-022: the selection rule reads R as established, whatever its route, with no adjustment for a sum's weaker bound | B: an adjustment. C: no change | spec FR-022 |
+| ANA-018 | Size-independent searches against 16×16 first | FR-014: a search that does not depend on the size runs before every size's climb | B: after the 16×16 climb. C: no change | spec FR-014 |
+| ANA-019 | Their hours against FR-018 | FR-018: a size-independent search's hours count at no size; they are charged to the trail row before the 16×16 climb | B: count them at 4×4. C: no change | spec FR-018 |
+| ANA-020 | R_bound between whole cycles | FR-016: for layers in turn the climb counts whole cycles, searches and sums at each whole number of cycles, and R_bound is the smallest such number of rounds whose bounds lie below 2⁻¹²⁸ | B: searches at every r, sums at whole cycles. C: no change | spec FR-016 |
+| ANA-021 | Bitwise Boolean functions | FR-019: a bitwise Boolean function inside an invertible update (feature 004's four-update NOR network among them) is recorded as one S-box per bit position, its table the update's truth table over its input bits | B: no trail record for them. C: no change | spec FR-019 |
+| ANA-022 | FR-004's records at 99e6994 and the script | FR-004: plan phase 1 changes `plan_projections.py` to read feature 004's records at 99e6994, its output unchanged, which `--check` shows; the records added since are FR-053's projections, which the calibration does not read | B: leave the script as approved. C: no change | spec FR-004; plan phase 1 |
+| PRO-016 | Changes outside a checklist round | FR-031: such a change is listed in `checklist-choices.md` in a section of its own for its batch, with its direction, in place of "or beside the change" | B: in the commit message. C: no change | spec FR-031 |
+| PRO-017 | Row families for later rounds | The notes: each later round has a row "Checklist choices, round <k>", and each batch of analysis-loop changes a row "Analysis remediation <k>", set by the agent on the owner's advance approval of 2026-11-09, quoting it | B: one row for every round. C: no change | spec Review & Approval notes |
+| PRO-018 | When two rows read Not needed | "Readings set aside" reads Not needed at the tasks approval when no listed change sets a reading aside; "Place check" when every change was listed with its row before it was applied | B: keep them pending. C: no change | spec Review & Approval |
+| PRO-019 | D13's alternative after the plan approval | FR-009: the owner may lower the candidate limit, a stricter change; D13's alternative removes an eligibility requirement, is not stricter, and is out of reach after the plan approval | B: allow it as a set-aside reading. C: no change | spec FR-009 |
+| HW-013 | The other sizes | FR-001: every other n from 2 to 16 is for exploration only, as feature 004's FR-018 has it: a table written for that (n, w), never frozen and never evidence; keyed variants only at the claimable sizes, 2×2 and a supported 3×3 | B: keep "supported variants". C: no change | spec FR-001 |
+| REP-014 | Round 1's row and its files | The row names `protocol/claims.json` beside security.md 2.19 | B: no change | spec Review & Approval |
+| REP-015 | Provenance of shared files | FR-031: feature 005's provenance log also covers the files both features share (security.md, `protocol/claims.json`, `.gitattributes`, README) from their first change by this feature, feature 004's log keeping its last entries for them | B: shared files without provenance. C: no change | spec FR-031 |
+
+### Rows that change the protocol (round 2)
+
+Written with the rows, before they are applied; none sets a reading aside.
+
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| SEC-018 | The claim test's first scan (FR-026) | stricter | a step waits on it |
+| SEC-020 | The security target's files (FR-011) | settled | the form the old text left open |
+| ANA-018, ANA-019 | Size-independent searches (FR-014, FR-018) | settled | their place and hours, which the old text left open |
+| ANA-020 | Whole cycles (FR-016) | settled | R_bound only at whole cycles, the most conservative reading |
+| ANA-021 | Bitwise Boolean functions (FR-019) | settled | recorded as the S-boxes the validated tool already counts |
+| ANA-022 | The calibration's inputs (FR-004) | settled | the script follows the requirement, its output unchanged |
+| PRO-016, REP-015 | Listing and provenance (FR-031) | stricter | records added |
+| PRO-019 | Answers to a probe above its row (FR-009) | stricter | a loosening option removed |
+| HW-013 | The other sizes (FR-001) | settled | the inherited text as written |
+| RAT-015 | Selection (FR-022) | settled | the inherited rule unchanged |
