@@ -100,7 +100,8 @@ itself. No task of phases 1 to 9 starts before T004.
   commits are <choices> (its choices) and <apply> (its changes applied).", "batch's" for such a
   section, and its rows from the table `| Row | Rule | Direction | Why |`, the places of each row
   being the FR items, the research sections, the data-model sections and the contract's script
-  sections, each keyed by its script's name, that its Rule cell names; each place's text read as
+  sections, each keyed by its heading's code span as feature 004's tool keys it, a renamed heading
+  reading as one place removed and one added, that its Rule cell names; each place's text read as
   feature 004's tool reads it, with the spec's bullets under "Pre-registered Design Protocol: the
   changed rules" in place of the protocol's paragraphs, the plan's table "Values this plan fixes
   before first use", and `quickstart.md` and `research/005/plan-projections.json`, each whole,
@@ -176,15 +177,15 @@ feature before T009 (FR-003).
   manifest is read as feature 004's, checked against that manifest's SHA-256 before it is read
   (FR-001); under `005` every reader of a row's hours (`guard_candidate_row` and the feature-wide
   row's guard in `protocol/evidence.py`, `left_in_row` and `spent_is_shared` in
-  `protocol/candidates.py`, `scripts/evidence_v3.py`) takes the row by the candidate's family from
-  `$REP/projection-table.json`, or from `plan-projections.json`'s approved option before the table
-  exists, feature 004's `ROW_HOURS` and `FEATURE_ROW_HOURS` staying its own; under `005` the
-  validation lookup reads feature 004's validation records beside this feature's, a tool matched by
-  its exact hash (`tool_sha256`, and a C tool's binary), so that feature 004's validations stay in
-  force for the uses they cover (research R14); and the guard on instantiation code reads feature
-  004's row "FUT-SEC-8 result review" and its demonstration record at HEAD, from feature 004's spec
-  and paths, under either setting (FR-030). (FR-001, FR-002, FR-003, FR-026, FR-028, FR-030; SC-007;
-  R9, R14)
+  `protocol/candidates.py`, `scripts/evidence_v3.py`) takes a candidate's row by its family from
+  `$REP/projection-table.json`, and the feature-wide row from that table or, before it exists, from
+  `plan-projections.json`'s approved option, feature 004's `ROW_HOURS` and `FEATURE_ROW_HOURS`
+  staying its own; under `005` the validation lookup reads feature 004's validation records beside
+  this feature's, a tool matched by its exact hash (`tool_sha256`, and a C tool's binary), so that
+  feature 004's validations stay in force for the uses they cover (research R14); and the guard on
+  instantiation code reads feature 004's row "FUT-SEC-8 result review" and its demonstration record
+  at HEAD, from feature 004's spec and paths, under either setting (FR-030). (FR-001, FR-002,
+  FR-003, FR-026, FR-028, FR-030; SC-007; R9, R14)
 - [ ] T007 Make the feature a parameter of the shared code (research R9) until T006 passes:
   `protocol/evidence.py` reads `PHYCOWEB_FEATURE` once, `004` by default, and selects from it the
   paths, the model ID, the candidate IDs, the development-input namespace and the disclaimer;
@@ -196,11 +197,11 @@ feature before T009 (FR-003).
   `protocol/candidates.py` (`CANDIDATE_ID`), `scripts/gen_constants_v3.py` (`model_id` and its
   tables' names), `scripts/round_rule.py` (its variant IDs) and `research/004/ir.py` (its candidate
   directory and file pattern) among them; and each record states its feature. Feature 004's default
-  keeps its paths, verdicts and re-check unchanged (T008). Under `005` the rows' hours come by
-  family from the projection table or the approved option, and the validation lookup reads both
-  features' validation records (research R14). No tool file whose exact hash a validation record
-  matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001, FR-002, FR-003,
-  FR-026, FR-028; SC-007; R9, R14)
+  keeps its paths, verdicts and re-check unchanged (T008). Under `005` a candidate's rows come by
+  family from the projection table, and the feature-wide row from it or, before it exists, from the
+  approved option, and the validation lookup reads both features' validation records (research R14).
+  No tool file whose exact hash a validation record matches, its `tool_sha256` and a C tool's
+  binary, changes here (T038). (FR-001, FR-002, FR-003, FR-026, FR-028; SC-007; R9, R14)
 - [ ] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
   (contracts/cli.md, "`scripts/recheck_004.py` for feature 005"), and write FR-003's test in
   `tests/test_protocol_005.py`: with the setting unset, `python scripts/recheck_004.py --no-record`

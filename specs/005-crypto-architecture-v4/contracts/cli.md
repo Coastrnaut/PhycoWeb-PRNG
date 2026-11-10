@@ -85,16 +85,16 @@ for spec FR-003's test of feature 004's re-check and quickstart V2.
 ### `scripts/check_claims.py`
 
 Covers `phyco-v4` and feature 005's documents and reports beside feature 004's, reading each feature's gate rows from its own
-spec (FR-026; research R10).
+spec and checking each model's `history`, `bound` and `evidence` against its own feature's files (FR-026; research R10).
 
 ### `scripts/evidence_v3.py` bound and trail runs
 
-With `PHYCOWEB_FEATURE=005` a bound search runs in spec FR-014's order, 16×16, then 8×8, then 4×4, and is refused at 8×8 or
-4×4 before the candidate's 16×16 climb has ended; a structural or bias run keeps 4×4, 8×8, 16×16. An ARX design's searches
-run on research R7's companion alone, and each `trail` record holds data-model §3's characteristic at every nonlinear
-operation. Caps and rows come by the candidate's family from `$REP/projection-table.json`, or from `plan-projections.json`'s
-approved option before it exists, and the trail row holds back the table's needs of the sizes not yet climbed (research
-R12). Each record's `parallelism` states its threads and workers (research R4).
+With `PHYCOWEB_FEATURE=005` a bound search runs in spec FR-014's order, 16×16, then 8×8, then 4×4, and is refused at 8×8 or 4×4
+before the candidate's 16×16 climb has ended; a structural or bias run keeps 4×4, 8×8, 16×16. An ARX design's searches run on
+research R7's companion alone, and each `trail` record holds data-model §3's characteristic at every nonlinear operation. Caps
+and a candidate's rows come by its family from `$REP/projection-table.json`, the feature-wide row from that table or, before it
+exists, from `plan-projections.json`'s approved option, and the trail row holds back the table's needs of the sizes not yet
+climbed (research R12). Each record's `parallelism` states its threads and workers (research R4).
 
 ### `scripts/mode_limits_v3.py --out`
 
