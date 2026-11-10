@@ -42,11 +42,20 @@ guards, the Review & Approval rows and gates, the protocol change log and the fe
 - [x] CHK014 Are requirements defined for an owner's ⛔ decision that FR-043's window (inherited) reserves to the owner's own commit, now that the owner's written word is recorded and committed by the agent, as in feature 004 from 2026-11-05? [Coverage, Spec §Review & Approval notes, inherited FR-043]
 - [x] CHK015 Is the case covered where a probe shows a need above its row: the run refused when it comes, as research R5 says, and does the spec say whether the owner is told before any candidate and what the owner may do then? [Coverage, Exception Flow, Plan research R5, Spec §FR-009]
 
+## Round 2 (first re-run, after round 1's changes)
+
+- [ ] CHK016 Is it defined where a change made outside a checklist round (for instance an edit in the analysis loop that follows the tasks) is listed with its direction, FR-031 naming `checklist-choices.md`'s lists "or beside the change"? [Clarity, Spec §FR-031]
+- [ ] CHK017 Do the notes under the Review & Approval table name the row families that later rounds and loops need ("Checklist choices, round <k>", and a row for each batch of analysis-loop changes), with who sets them and on what word? [Completeness, Spec §Review & Approval, FR-031]
+- [ ] CHK018 Is it stated when the rows "Readings set aside" and "Place check" read "Not needed" (no change sets a reading aside; every change was listed with its row before it was applied), so that the tasks approval can close them? [Clarity, Spec §Review & Approval]
+- [ ] CHK019 Is FR-009's statement that taking D13's alternative is "a stricter change" consistent with the inherited direction of eligibility ("eligibility items are only added"), D13's alternative removing the requirement of R_bound and every item at 16×16 for eligibility? [Conflict, Spec §FR-009, FR-008, D13, inherited "Eligibility and selection"]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
   clarifying questions, the owner's instruction of 2026-11-09 asking for a loop without human interaction and the input
   naming every focus area; depth standard, audience the reviewer.
+- Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); four new
+  items, CHK016 to CHK019; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
