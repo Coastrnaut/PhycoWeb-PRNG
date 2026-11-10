@@ -1450,7 +1450,7 @@ names:
   apply ANA-086's 2⁻¹²⁸ threshold; no `trail` record exists, the stop leaves none to come, and
   data-model §6's characteristic, the difference or mask after every round, does not fix the
   differences inside a round with more than one nonlinear layer, per FR-065 (partial)
-- [ ] T132 Run `python scripts/recheck_004.py` again in a fresh clone at HEAD, since 1996d9e changed
+- [X] T132 Run `python scripts/recheck_004.py` again in a fresh clone at HEAD, since 1996d9e changed
   `scripts/recheck_004.py` and `protocol/evidence.py` after T124's run
   (`recheck-20261109T130121Z-cc622313`, at 23c5520): 0 disagreements, its `recheck` record under
   `reports/004-crypto-architecture-v3/rechecks/` committed, per SC-017 (partial)
