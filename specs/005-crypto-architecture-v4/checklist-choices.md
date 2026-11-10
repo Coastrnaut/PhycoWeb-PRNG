@@ -450,3 +450,22 @@ analysis loop takes the recommended edit of the one finding of the report on 2b5
 The batch's two commits are 8d91f6b (its choices) and 3cb08f8 (its changes applied).
 
 None: the batch's one row clarifies a task and changes no rule.
+
+## Analysis remediation 4 (fourth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 3 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of both findings of the report on 5f0d566.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR4-H1 | The hours a trail row holds back for the sizes not yet climbed | Research R12: in the 16×16-first order a candidate's trail row holds back, for the sizes not yet climbed, the projection table's needs of those sizes' listed runs for its family's reference design, the recorded need FR-018 and FR-022 name, never a probe at those sizes before the decision at 16×16, since feature 004's runner wants a `--project` probe of every later search at every size and charges each probe's time to the row; each search is still projected first at its own size; the contract's `round_rule.py` and tasks T042 and T043 follow | B: no hours held back at 16×16. C: no change | research R12; contract; tasks T042, T043 |
+| AR4-M1 | The rows' hours under `PHYCOWEB_FEATURE=005` | Tasks T006, T007 and T043: every reader of a row's hours (`guard_candidate_row`, the feature-wide row's guard, `left_in_row` and `spent_is_shared` in `protocol/candidates.py`, `scripts/evidence_v3.py`) takes the row by the candidate's family from `$REP/projection-table.json`, or from `plan-projections.json`'s approved option before the table exists, feature 004's constants `ROW_HOURS` and `FEATURE_ROW_HOURS` staying its own | B: the constants changed to this feature's values. C: no change | tasks T006, T007, T043 |
+
+### Rows that change the protocol (analysis remediation 4)
+
+Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
+rule.
+
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| AR4-H1 | The budget in the 16×16-first order (FR-018, FR-022; research R12; the contract's `round_rule.py`) | settled | FR-018's MUST read over feature 004's probes of every later search; the recorded needs held back, as FR-018 and FR-022 name them |
