@@ -365,3 +365,45 @@ rule.
 |-----|------|-----------|-----|
 | RAT-031 | The candidate log's fields (FR-023) | settled | one value fixed |
 | ANA-037 | Constant-dependent bounds (FR-016) | stricter | no bound resting on repetition for such designs |
+
+## Analysis remediation 1 (first /speckit-analyze run after /speckit-tasks, 2026-11-10)
+
+**Answered in advance**: the owner's instruction of 2026-11-09 for the analysis loop, "suggest edits for all issues,
+make the changes, commit, then rerun speckit-analyze skill. run this process in a loop until speckit analyze finds no new
+issues", takes the recommended edit of every finding of the report on d5acd08. Item IDs are the batch's number and the
+report's finding ID.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR1-I1 | The trail characteristic at every addition, and the tool that writes it | Research R7 and the plan name a companion of feature 004's ARX search under `research/005/tools/`, a copy whose trail output adds the state after every step of every round, since feature 004's `arx_search.c` prints only the states at round boundaries and its check modes read a round of one addition; the companion is validated on the ARX search's known results before its first counted use (inherited FR-039), feature 004's tool staying unchanged (FR-003); plan phase 4 validates it, and tasks T038, T039 and T043 follow | B: change feature 004's `arx_search.c` in place. C: no change | research R7; plan Technical Context, Project Structure, Plan Phases; tasks T038, T039, T043 |
+| AR1-I2 | Feature 004's validation records under `PHYCOWEB_FEATURE=005` | Tasks T006 and T007: under `005` the validation lookup reads feature 004's validation records beside this feature's (research R14), a tool matched by its exact hash, `tool_sha256` and a C tool's binary, as `protocol/evidence.py` matches it; the sentence of T007 and T043 on hashes restated so, since the records' `code_sha256` names `protocol/evidence.py` | B: validate every tool again under this feature. C: no change | tasks T006, T007, T043 |
+| AR1-I3 | The re-check's reading of an operation list | Tasks T019 and T020: a standard-library reader of the forms of `research/004/ir.py` under `protocol/`, so that the re-check keeps the inherited rule that it imports only the standard library and `protocol/` and runs in any environment, `ir` importing numpy; T019 compares its evaluation with `ir`'s on the reference designs | B: the re-check imports `ir` and numpy. C: no change | tasks T019, T020 |
+| AR1-I4 | An exact D4 tie under the 16×16-first order | FR-022: while an exact D4 tie waits, the two representatives' production-width climbs run in FR-014's order, 16×16 first, and only as far as R at 4×4 needs; `--tie` decides once both have R at 4×4 or one is `ineligible`, a decision at 16×16 under FR-018 included; the contract and T049 follow | B: the inherited order for the tie, 4×4 first. C: no change | spec FR-022; contract; tasks T049 |
+| AR1-I5 | Research R13's rotation search against FR-023 | Research R13 restates FR-023: an unchanged re-entered design keeps the amounts feature 004's ranking chose at width 16, its ranking record cited as a prior result; where inherited research R6's rule fixes this feature's D4 width at 8, its amounts are searched again at 8, and amounts that come out otherwise make it a variant (`relation` `derived`) | B: FR-023 follows R13. C: no change | research R13 |
+| AR1-I6 | The spelling of `candidate_log.py propose` | The contract writes `propose FILE` with `--derived-from PATH:SHA256`, `--relation` `derived` or `starting-point` and `--changes TEXT`, FILE holding the entry's fields as inherited, as the script and tasks T028 and T046 have it | B: `propose ID`, the script changed. C: no change | contract |
+| AR1-U1 | The round count of the structural and bias probes | Research R5: each structural check and each frequency and avalanche measurement of the probes runs at R = 66 rounds, R_max + Δ, the largest R_bound + Δ the climb allows, so that a probe that finishes bounds the run at every R up to it; the contract's `--probe` and task T025 follow | B: at each design's feature-004 R where one exists. C: no change | research R5; contract; tasks T025 |
+| AR1-U2 | The security target's files before the variant table exists | Research R8: until the chapter "Permutation" holds its variant table, `mode_limits_v3.py` read for this feature takes the variant rows from the chapter "Security target"'s parameter table, R as the placeholders, so that the files rest on the reviewed chapters alone; tasks T030 to T032 follow, the chapters after "Mode" reading "Not drafted yet" at Version 0.5 | B: a section "Variant table" in "Permutation" at Version 0.5. C: no change | research R8; tasks T030, T031, T032 |
+| AR1-U3 | The register's `in_progress` and the code the claim test scans | Tasks T016 and T017: each model's `in_progress` counts its own feature's searched `pass` bound records citing a validation record, a `split` record never counted (data-model §2); the code paths gain `research/005/`, read from this feature's first commit; task T048 sets `phyco-v4`'s `in_progress` with this feature's first counted trail-bound record | B: count every `pass` bound record. C: no change | tasks T016, T017, T048 |
+| AR1-U4 | The selection-bias statement's generator | The contract gains `research/005/selection_bias.py [--check]`, and the plan's structure names it | B: a mode of `round_rule.py`. C: no change | contract; plan Project Structure |
+| AR1-U5 | A probe's row before the projection table exists | Task T023: before `$REP/projection-table.json` exists, the runner reads the feature-wide row and the probes' 40 h share of it from `plan-projections.json`'s approved option | B: no guard before the table. C: no change | tasks T023 |
+| AR1-U6 | The thread count in every record | Tasks T042 and T053: every record states its thread or worker count (FR-007), each structural and bias run at the count its record states | B: searches only. C: no change | tasks T042, T053 |
+| AR1-G1 | Constant-adding designs' bounds, and a sum whose part falls | Tasks T040 and T019: a design holding an addition of a committed constant covers each call type's permutation in its bounds (FR-016); a `split` record stands only while both its parts stand (spec, Edge Cases) | B: left to the implementation. C: no change | tasks T019, T040 |
+| AR1-G2 | The sections that hold each R_bound's route | Tasks T057 and T072: the chapters test also requires the section "Round counts" in "Permutation" and the routes in `rationale.md`'s chapter "Margin" (FR-025) | B: no test. C: no change | tasks T057, T072 |
+| AR1-I7 | The [P] marks | No [P] on T028, T030, T040, T042 and T044, which write one test file; [P] on T023 and T024; the parallel section restated | B: separate test modules. C: no change | tasks |
+| AR1-I8 | The Requirement Coverage lists | Regenerated from the tasks' citations | B: no change | tasks |
+| AR1-I9 | The success criterion each task serves | Each task that serves a success criterion cites it: T006, T007, T023, T031 to T033, T039, T043, T048 to T050, T055, T065, T070 and T078 | B: FR only. C: no change | tasks |
+| AR1-I10 | A probe that reaches its limit | The contract: a search probe reads as reaching its cap, a structural or bias probe as keeping its kind's provisional need (research R5) | B: no change | contract |
+| AR1-I11 | Where the three logs stand | Data-model §1 and the plan's structure: the protocol change log and the candidate log under `research/005/`, the provenance log under `reports/005-crypto-architecture-v4/` (research R9) | B: no change | data-model §1; plan Project Structure |
+
+### Rows that change the protocol (analysis remediation 1)
+
+Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
+rule.
+
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| AR1-I1 | Trail records (FR-019; research R7) | settled | the format the rule asks for, written by a validated tool; feature 004's tool unchanged |
+| AR1-I4 | The D4 choice (FR-022; the contract's `d4_choice.py`) | settled | FR-018's MUST and FR-022's order for the production width kept for the tied representatives |
+| AR1-I5 | Re-entered designs (FR-023; research R13) | settled | research R13 read as FR-023 states it, the amounts searched again where the width is 8 |
+| AR1-U1 | The probes (FR-005; research R5; the contract's `evidence_v3.py … --probe`) | settled | the largest R the climb allows, so that a finished probe bounds every run up to it |
+| AR1-U2 | The security target's files (FR-011; research R8) | settled | the files computed from the reviewed chapters alone; the review's scope unchanged |
