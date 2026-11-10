@@ -42,8 +42,8 @@ trails, the baseline documents, line endings, and the reproduction of every comm
 
 ## Round 2 (first re-run, after round 1's changes)
 
-- [ ] CHK014 Does the row "Checklist choices, round 1" name every file the round changed, `protocol/claims.json` among them (its allow-list entry for roadmap row 5a.3 followed the line's new text, aedcabd), so that the row and the commit agree? [Consistency, Traceability, Spec §Review & Approval]
-- [ ] CHK015 Is the provenance of the files both features share (security.md, `protocol/claims.json`, `.gitattributes`, README) defined once feature 005 changes them, FR-003 keeping feature 004's provenance log as it ended and FR-031 starting a log "of this feature's hand-written documents" that may not cover shared files? [Gap, Spec §FR-003, FR-031]
+- [x] CHK014 Does the row "Checklist choices, round 1" name every file the round changed, `protocol/claims.json` among them (its allow-list entry for roadmap row 5a.3 followed the line's new text, aedcabd), so that the row and the commit agree? [Consistency, Traceability, Spec §Review & Approval]
+- [x] CHK015 Is the provenance of the files both features share (security.md, `protocol/claims.json`, `.gitattributes`, README) defined once feature 005 changes them, FR-003 keeping feature 004's provenance log as it ended and FR-031 starting a log "of this feature's hand-written documents" that may not cover shared files? [Gap, Spec §FR-003, FR-031]
 
 ## Notes
 
@@ -52,6 +52,8 @@ trails, the baseline documents, line endings, and the reproduction of every comm
   naming every focus area; depth standard, audience the reviewer.
 - Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); two new
   items, CHK014 and CHK015; no clarifying questions, as in round 1.
+- Round 2, verified 2026-11-09: after the round's changes (checklist-choices.md, round 2), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

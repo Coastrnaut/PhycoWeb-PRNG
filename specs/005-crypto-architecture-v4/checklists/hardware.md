@@ -44,7 +44,7 @@ renumbered hardware stages and the order of sizes
 
 ## Round 2 (first re-run, after round 1's changes)
 
-- [ ] CHK013 Is FR-001's statement that 5×5 to 7×7 and 9×9 to 15×15 are "supported variants, permutation-only and outside every claim" consistent with feature 004's FR-018, under which every other n from 2 to 16 is for exploration only, from a table written for that (n, w), never frozen and never evidence, while the size profile lists keyed variants only at the claimable sizes, 2×2 and a supported 3×3? [Conflict, Spec §FR-001, feature-004 FR-018, feature-004 data-model §10]
+- [x] CHK013 Is FR-001's statement that 5×5 to 7×7 and 9×9 to 15×15 are "supported variants, permutation-only and outside every claim" consistent with feature 004's FR-018, under which every other n from 2 to 16 is for exploration only, from a table written for that (n, w), never frozen and never evidence, while the size profile lists keyed variants only at the claimable sizes, 2×2 and a supported 3×3? [Conflict, Spec §FR-001, feature-004 FR-018, feature-004 data-model §10]
 
 ## Notes
 
@@ -53,6 +53,8 @@ renumbered hardware stages and the order of sizes
   naming every focus area; depth standard, audience the reviewer.
 - Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); one new
   item, CHK013; no clarifying questions, as in round 1.
+- Round 2, verified 2026-11-09: after the round's changes (checklist-choices.md, round 2), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

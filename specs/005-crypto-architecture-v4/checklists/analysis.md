@@ -49,11 +49,11 @@ these change
 
 ## Round 2 (first re-run, after round 1's changes)
 
-- [ ] CHK018 Is FR-014's "16×16 first" consistent with FR-015's rule that a search independent of the size, such as an ARX box over one call, "runs first", and does FR-014 say that such searches precede every size's climb? [Consistency, Spec §FR-014, FR-015]
-- [ ] CHK019 Does FR-018's "before any of its production-width hours at 8×8 or 4×4 are charged" say whether a size-independent search, run under the 4×4 cap and charged to the trail row (FR-015), counts as an hour at 4×4? [Conflict, Spec §FR-015, FR-018]
-- [ ] CHK020 Is it stated how R_bound is read at a round count that is not a whole number of cycles, for a design with layers in turn whose sums join only whole cycles (FR-016): searched bounds at every r, sums only at whole cycles, or R_bound counted in cycles? [Clarity, Spec §FR-016, FR-017]
-- [ ] CHK021 Is a bitwise Boolean function inside an invertible update, such as feature 004's four-update NOR network that the active-S-box tool counts as S-boxes, covered by FR-019's "one S-box applied to its input bits", with the S-box's table defined from the operation list? [Clarity, Spec §FR-019, FR-020, feature-004 `active_sbox.py`]
-- [ ] CHK022 Is FR-004's "reads feature 004's records as committed at 99e6994" consistent with `plan_projections.py` as the plan approval named it (SHA-256 22d56204…), which reads the working tree, and does the spec or plan say when the script follows the requirement? [Consistency, Spec §FR-004, Review & Approval "Plan approval", research/005/plan_projections.py]
+- [x] CHK018 Is FR-014's "16×16 first" consistent with FR-015's rule that a search independent of the size, such as an ARX box over one call, "runs first", and does FR-014 say that such searches precede every size's climb? [Consistency, Spec §FR-014, FR-015]
+- [x] CHK019 Does FR-018's "before any of its production-width hours at 8×8 or 4×4 are charged" say whether a size-independent search, run under the 4×4 cap and charged to the trail row (FR-015), counts as an hour at 4×4? [Conflict, Spec §FR-015, FR-018]
+- [x] CHK020 Is it stated how R_bound is read at a round count that is not a whole number of cycles, for a design with layers in turn whose sums join only whole cycles (FR-016): searched bounds at every r, sums only at whole cycles, or R_bound counted in cycles? [Clarity, Spec §FR-016, FR-017]
+- [x] CHK021 Is a bitwise Boolean function inside an invertible update, such as feature 004's four-update NOR network that the active-S-box tool counts as S-boxes, covered by FR-019's "one S-box applied to its input bits", with the S-box's table defined from the operation list? [Clarity, Spec §FR-019, FR-020, feature-004 `active_sbox.py`]
+- [x] CHK022 Is FR-004's "reads feature 004's records as committed at 99e6994" consistent with `plan_projections.py` as the plan approval named it (SHA-256 22d56204…), which reads the working tree, and does the spec or plan say when the script follows the requirement? [Consistency, Spec §FR-004, Review & Approval "Plan approval", research/005/plan_projections.py]
 
 ## Notes
 
@@ -62,6 +62,8 @@ these change
   naming every focus area; depth standard, audience the reviewer.
 - Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); five new
   items, CHK018 to CHK022; no clarifying questions, as in round 1.
+- Round 2, verified 2026-11-09: after the round's changes (checklist-choices.md, round 2), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
