@@ -85,8 +85,10 @@ correlation above 2⁻¹²⁸, `confirmed vulnerability` of the rounds it covers
   family, size and kind, each listed run with `need_h`, its source (a feature-004 run or a probe by `record_id`, path and
   SHA-256 over the committed bytes, kind `raw`, or `cap`), and the value fixed, the plan's values being those of the option
   `plan-projections.json` names as `approved_option`; per candidate row, the value the plan fixed and the value that holds, the
-  smaller of the plan's and the probes'; the caps; the sum against the ceiling; `plan_projections_sha256` with
-  `plan_projections_sha256_kind` `raw`. It holds numbers, record IDs and fixed field names and no prose (spec FR-024).
+  smaller of the plan's and the probes', a structural or bias need being the smaller of the provisional need and the sum over
+  the sizes of each finished probe's hours and each other size's equal share (research R5); the caps; the sum against the
+  ceiling; `plan_projections_sha256` with `plan_projections_sha256_kind` `raw`. It holds numbers, record IDs and fixed field
+  names and no prose (spec FR-024).
   Classification `none`.
 
 ## 5. The candidate log (FR-011, FR-018, FR-023)

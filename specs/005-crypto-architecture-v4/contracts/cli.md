@@ -53,11 +53,12 @@ FR-016) and continues by sums until both kinds' weights exceed 128 or r reaches 
 search runs at one thread, under its size's cap from the projection table, and is refused when its projection does not fit
 its row.
 
-### `scripts/candidate_log.py propose ID --derived-from PATH:SHA256`
+### `scripts/candidate_log.py propose ID --derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]`
 
 Exits 2 while the row "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names (FR-011), and
 while `$REP/projection-table.json` does not exist (research R5), for every `proposed` entry. `--derived-from` names a
-feature-004 operation list by path and SHA-256 (FR-023); without it, `derived_from` reads `none`.
+feature-004 operation list by path and SHA-256 (FR-023), and `--relation` and `--changes` write data-model §5's `relation` and
+`changes`, `changes` reading `none` for `derived`; without `--derived-from`, `derived_from` reads `none`.
 
 ### `scripts/recheck_004.py` for feature 005
 

@@ -137,6 +137,8 @@ item, "you have my approval of all suggestions to continue without human interac
 
 ### Rows that change the protocol (round 1)
 
+The round's two commits are 2808b55 (its choices) and aedcabd (its changes applied).
+
 Written with the rows, before they are applied. Each is, under every reading of the old text, in its rule's stricter
 direction (`stricter`) or settles an open case by its most conservative reading (`settled`); none sets aside a reading.
 
@@ -189,6 +191,8 @@ direction (`stricter`) or settles an open case by its most conservative reading 
 | REP-015 | Provenance of shared files | FR-031: feature 005's provenance log also covers the files both features share (security.md, `protocol/claims.json`, `.gitattributes`, README) from their first change by this feature, feature 004's log keeping its last entries for them | B: shared files without provenance. C: no change | spec FR-031 |
 
 ### Rows that change the protocol (round 2)
+
+The round's two commits are 63f4003 (its choices) and 904185a (its changes applied).
 
 Written with the rows, before they are applied; none sets a reading aside.
 
@@ -269,6 +273,8 @@ Written with the rows, before they are applied; none sets a reading aside.
 | REP-020 | Kinds of the new hashes | Data-model §2 and §4: each part's `sha256` and `plan_projections_sha256` are of the committed bytes, kind `raw`, with `sha256_kind` and `plan_projections_sha256_kind` beside them, as feature 004's records hold | B: no kind field. C: no change | data-model §2, §4 |
 
 ### Rows that change the protocol (round 3)
+
+The round's two commits are 2cf3687 (its choices) and 936f586 (its changes applied).
 
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule. The round also reads round 1's ANA-005 and ANA-006 as `settled` (PRO-025).

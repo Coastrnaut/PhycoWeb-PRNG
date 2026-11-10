@@ -9,7 +9,7 @@
 **Created**: 2026-11-09
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
-approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 3
+approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 4
 answered in advance and applied (2026-11-09)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
@@ -131,6 +131,7 @@ frozen file stay as they are.
 | Checklist choices, round 1 ([checklist-choices.md](./checklist-choices.md): the 86 items of the six first-run checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09, with the instruction to loop the checklists until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.19) with its allow-list entry in `protocol/claims.json`, and `.gitattributes`; no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 2 ([checklist-choices.md](./checklist-choices.md): the 18 items of the first re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec and plan.md; two rows correct round 1's text (FR-009's D13 alternative, FR-001's other sizes); no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 3 ([checklist-choices.md](./checklist-choices.md): the 56 items of the second re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.20) with its allow-list entries in `protocol/claims.json`, and `research/005/plan_projections.py` with `plan-projections.json`; research R8 and R13, data-model §4 and §5 and the contract also restate rows they follow beyond the rows' "Where" (PRO-024, RAT-018 to RAT-020, SEC-035), places the place check names; no row sets a reading aside. Written and committed by the agent on that word |
+| Checklist choices, round 4 ([checklist-choices.md](./checklist-choices.md): the 14 items of the third re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, research R5, data-model §4, the contract, `checklist-choices.md`'s lists (each naming its round's two commits) and security.md (2.21) with its allow-list entry in `protocol/claims.json`; PRO-029's tool is feature 004's adapted to this feature's paths and to its lists' table form, which feature 004's tool does not read; no row sets a reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |
@@ -156,11 +157,18 @@ approval to the final result review, the owner's written word, recorded and comm
 quoting it, stands in place of the owner's commit, as in feature 004 from 2026-11-05. Each later
 checklist round has a row "Checklist choices, round <k>", and each batch of the analysis loop's
 changes a row "Analysis remediation <k>", set by the agent on the owner's advance approval of
-2026-11-09, quoting it. "Readings set aside" reads Not needed at the tasks approval when no listed
-change sets a reading aside, and "Place check" is made at the tasks approval: a comparison of every
-edit since the plan approval with the rows that made it, its file named by SHA-256 and each place
-that no row made listed for the owner's decision; it reads Not needed only where no edit was made
-since the plan approval.
+2026-11-09, quoting it. A change made after the tasks approval and before any result is set in a row
+"Protocol change <k>" that the owner approves in writing, the agent recording the owner's words,
+before the change takes effect; a claim-test finding answered by an allow-list entry alone needs no
+row, the entry being reviewed at the next ⛔ gate as inherited FR-069 has it. "Readings set aside"
+reads Not needed at the tasks approval when no listed change sets a reading aside, and "Place check"
+is made at the tasks approval: a comparison of every edit since the plan approval with the rows that
+made it, its file named by SHA-256 and each place that no row made listed for the owner's decision;
+it reads Not needed only where no edit was made since the plan approval. The comparison is made by
+`research/005/place_check.py`, feature 004's tool adapted to this feature's paths and to its lists'
+table form, written before the tasks approval as feature 004's was before its own (2392150), its
+file `research/005/place-check.json`; each list "Rows that change the protocol" names its round's
+two commits, the choices commit and the apply commit.
 
 ## Decisions Taken as Defaults
 
@@ -353,9 +361,9 @@ transcription agreeing at every step of every committed vector, and the freeze r
   its feature-004 records are cited as prior results, never as its evidence, and every kind of
   evidence runs again here.
 - **The security-target review changes a parameter**: a change found needed there is made only in
-  the stricter direction, a larger key, nonce or capacity and none below FR-010's, as a change to
-  FR-010 listed under FR-031 before the review's approval and before any candidate is proposed; the
-  output limits are then recomputed.
+  the stricter direction, a larger capacity, the key and the nonce staying as FR-010 states them, as
+  a change to FR-010 listed under FR-031 before the review's approval and before any candidate is
+  proposed; the output limits are then recomputed.
 - **Rows that turn out short**: a row only falls; a run that does not fit is refused, and the
   candidate is `ineligible` for that cause, classed shared or its own as feature 004 classes it
   (inherited ANA-078). The margin is there to prevent it, not to excuse it.
@@ -388,6 +396,7 @@ transcription agreeing at every step of every committed vector, and the freeze r
   | `quickstart.md` | `ed2ca406e19bc96f0b22e6200b20c054a34c0be9b0e57b8627ada5f25047b2d4` |
   | `contracts/cli.md` | `2d0f3aff4081185b6c6160edb8d67f3ecdb1f8b8d48c87a9df296648eabec9a5` |
   | `contracts/model-v3-api.md` | `5a988a0f5fe325909dabc952fc9bd9083cae40b64ded2cfb7ea211bd4a6dc17f` |
+
   The later features of the inherited text are read as security.md §22 numbers them since its
   version 2.18: feature 005 as the cryptanalysis stage, row 5a.2, now feature 006; feature 006 as
   row 5a.3, now feature 007; feature 007 as row 5a.4, now feature 008; feature 008 as row 5a.5, now
@@ -425,7 +434,14 @@ transcription agreeing at every step of every committed vector, and the freeze r
   No run of this feature writes under feature 004's paths: once the setting exists, the whole suite
   and every script run for this feature with `PHYCOWEB_FEATURE=005`, and the test of feature 004's
   re-check above and quickstart V2 run `scripts/recheck_004.py --no-record`, which prints its result
-  and writes nothing.
+  and writes nothing; that test compares the result after the change with T132's committed record,
+  the result before it
+  (`reports/004-crypto-architecture-v3/rechecks/recheck-20261110T010625Z-454c1890.json`, SHA-256
+  `d53424fb529ab2254825c107a2f066dab702f46e66c0ef176787b5d5f6526f21`: 160 records, 0 disagreements).
+  Each test that reads feature 004's committed records pins feature 004 for those reads, and every
+  test that writes a record writes under the active feature's paths, feature 004's FR-053 test among
+  them, so that a whole-suite run with `PHYCOWEB_FEATURE=005` checks feature 004's records as before
+  and writes nothing under its paths; plan phase 1's change makes the tests so.
 
 **Every run planned before any candidate (User Story 1)**
 
@@ -436,8 +452,8 @@ transcription agreeing at every step of every committed vector, and the freeze r
   MUST be committed with the plan. It reads feature 004's records as committed at 99e6994, so that a
   later record never changes it, and `research/005/plan_projections.py --check` MUST pass on both
   platforms. Plan phase 1 changes `plan_projections.py` to read those records at 99e6994, its output
-  unchanged, which `--check` shows; the records added since are FR-053's projections, which the
-  calibration does not read.
+  unchanged, which `--check` shows; the records added since are feature 004's FR-053 projections,
+  which the calibration does not read.
 - **FR-005**: Before any candidate is proposed, the plan MUST give a projection table: for every
   kind of evidence the rules require of one candidate, at every claimable size and the production
   width, the projected need of each run, from probes on feature 004's committed operation lists of
@@ -491,14 +507,17 @@ transcription agreeing at every step of every committed vector, and the freeze r
   way, the two files sharing their version (inherited FR-034); the list of changes, each with its
   reason, stands in `rationale.md`'s chapters "Security target" and "Mode", each in a section
   "Changes from Version 0.4", so that the design document's header and chapters keep their fixed
-  form. The document is Version 0.5, continuing feature 004's numbering, and each later change makes
-  a new version. `phyco-v4`'s key holds 256 bits of entropy, its secret state reachable from the key
-  is the capacity, 384 bits at every claimable size, and the bound these place on any level is the
-  least of feature 004's generic bounds, k/2 = 128 bits from single-target quantum search on the
-  key, the capacity's c/2 being 192 bits: the size profile's 128 bits at every claimable size, a
-  target and a ceiling, not a claim (constitution, Security Policy). A parameter change that the
-  security-target review finds needed is made only in the stricter direction, a larger key, nonce or
-  capacity and none below these values (Edge Cases).
+  form, each value there cited by the design document's chapter and section, as inherited FR-034 has
+  `rationale.md` cite every value. The document is Version 0.5, continuing feature 004's numbering,
+  and each later change makes a new version. `phyco-v4`'s key holds 256 bits of entropy, its secret
+  state reachable from the key is the capacity, 384 bits at every claimable size, and the bound
+  these place on any level is the least of feature 004's generic bounds, k/2 = 128 bits from
+  single-target quantum search on the key, the capacity's c/2 being 192 bits: the size profile's 128
+  bits at every claimable size, a target and a ceiling, not a claim (constitution, Security Policy).
+  A parameter change that the security-target review finds needed is made only in the stricter
+  direction: the inherited rule gives a claimable size's key k = min(c, 256) bits and its nonce k/2,
+  so the key and the nonce stay at 256 and 128 bits, and the one parameter such a change may raise
+  is the capacity, the rate falling and the output limits recomputed (Edge Cases).
 - **FR-011**: The security-target review (⛔) MUST be held before the first candidate is proposed.
   Its row names the version and SHA-256 of the design document's chapters and of `rationale.md`'s
   chapters of those names, with the security target's files, written before the review with R as
@@ -539,9 +558,10 @@ transcription agreeing at every step of every committed vector, and the freeze r
   Each change of level is made in the commit that changes the rows or files it rests on, with the
   register's `claim_level` and `history`, security.md §1.1 and §15, and a security.md version with
   its history entry: when an "L1 recorded <k>" reads Approved, and back to L0 in the commit that
-  writes R into the reviewed chapters. While "L1 recorded" reads Approved, the register's `evidence`
-  for `phyco-v4` lists feature 004's demonstration record (FR-030) by path and SHA-256, with the
-  files the two review rows name.
+  writes R into the reviewed chapters. While the register gives `phyco-v4` the level those rows rest
+  on, its `evidence` lists feature 004's demonstration record (FR-030) by path and SHA-256, with the
+  files the two review rows name, as inherited FR-069 has it, and the commit that returns the level
+  to L0 drops them.
 
 **The climb (User Story 3)**
 
@@ -575,15 +595,19 @@ transcription agreeing at every step of every committed vector, and the freeze r
   a cycle being the shortest run of rounds after which the round structure repeats, constants aside
   (one round for feature 004's designs, whose layers in turn `active_sbox.py` takes as one round's
   `Cycle`), each span starting at a cycle's first round; a design whose rounds repeat in no such
-  cycle takes no sum. An established bound is a searched bound of status `pass` from a validated
-  tool that passed its cross-check on the candidate, or a `split` record whose parts are
-  established, never a capped, refused or blocked record. A sum may join parts from different
-  methods (an ARX box's bound over one call with active-box counts), each part established and of
-  the same candidate, kind, size and width. Every `split` record states feature 004's scope
-  statement word for word, and it is a bound record for every inherited eligibility item. Where a
-  cycle spans more than one round, the climb counts whole cycles: searches and sums at each whole
-  number of cycles, and R_bound is the smallest whole number of cycles, counted in rounds, at which
-  both kinds' bounds lie below 2⁻¹²⁸; R and Δ count rounds.
+  cycle, or that holds an addition of a committed constant, whose parts' bounds depend on the
+  constants of the rounds they cover, takes no sum. Inherited FR-023's "the trail bounds and the
+  dependency matrices read no constant value" holds for designs without such additions, and a design
+  with them covers each call type's permutation in its bounds, as in its other constant-dependent
+  evidence. An established bound is a searched bound of status `pass` from a validated tool that
+  passed its cross-check on the candidate, or a `split` record whose parts are established, never a
+  capped, refused or blocked record. A sum may join parts from different methods (an ARX box's bound
+  over one call with active-box counts), each part established and of the same candidate, kind, size
+  and width. Every `split` record states feature 004's scope statement word for word, and it is a
+  bound record for every inherited eligibility item. Where a cycle spans more than one round, the
+  climb counts whole cycles: searches and sums at each whole number of cycles, and R_bound is the
+  smallest whole number of cycles, counted in rounds, at which both kinds' bounds lie below 2⁻¹²⁸; R
+  and Δ count rounds.
 - **FR-017**: R_bound at a size MUST be the smallest r at which both kinds' established bounds lie
   below 2⁻¹²⁸. The climb continues by sums after the searches end, up to R_max = 64 (D5); where no
   r up to R_max qualifies, the candidate has no R_bound at that size.
@@ -602,15 +626,16 @@ transcription agreeing at every step of every committed vector, and the freeze r
 - **FR-019**: A trail record MUST hold the difference or mask at the input and output of every
   nonlinear operation of every round, and the state at every round boundary, so that its weight
   follows by exact integer arithmetic from the characteristic and the candidate's committed
-  operation list alone (D9). The data model fixes the format before the first trail search. A
-  nonlinear operation is one modular addition or subtraction on w-bit words, one addition or
-  subtraction of a committed constant, or one S-box applied to its input bits; an S-box layer is
-  recorded S-box by S-box. A bitwise Boolean function is recorded as the S-boxes the validated tool
-  counts: where updates in turn form one invertible map per bit position, that map, recorded before
-  its first update and after its last (feature 004's four-update NOR network: one 4-bit S-box per
-  bit position, table 9 c 3 0 2 5 4 7 6 1 a b 8 d e f); inside one update, its function F per bit
-  position, the table F's truth table over the bits it reads, an addition or subtraction that
-  follows F being its own operation.
+  operation list alone, with, where the list holds an addition of a committed constant, the
+  committed constant table, which the record names by SHA-256 (D9). The data model fixes the format
+  before the first trail search. A nonlinear operation is one modular addition or subtraction on
+  w-bit words, one addition or subtraction of a committed constant, or one S-box applied to its
+  input bits; an S-box layer is recorded S-box by S-box. A bitwise Boolean function is recorded as
+  the S-boxes the validated tool counts: where updates in turn form one invertible map per bit
+  position, that map, recorded before its first update and after its last (feature 004's four-update
+  NOR network: one 4-bit S-box per bit position, table 9 c 3 0 2 5 4 7 6 1 a b 8 d e f); inside one
+  update, its function F per bit position, the table F's truth table over the bits it reads, an
+  addition or subtraction that follows F being its own operation.
 - **FR-020**: The re-check MUST recompute every `split` bound from its parts, and every trail's
   weight as an exact rational, with every transition checked. A trail with probability or squared
   correlation above 2⁻¹²⁸ is classed a confirmed vulnerability of the rounds it covers and enters
@@ -644,25 +669,28 @@ transcription agreeing at every step of every committed vector, and the freeze r
   R as established, whatever its route, with no adjustment for a sum's weaker bound.
 - **FR-023**: A feature-004 design entered again (D1) MUST be a new candidate with a new ID, counted
   as evaluated from its first entry; its feature-004 records are cited as prior results, never as
-  its evidence, and every kind of evidence runs again under this protocol. The inherited constant
-  rule holds no ID, so an unchanged design at an unchanged variant receives feature 004's constants
-  exactly. A design is derived from a feature-004 design when its operation list is that design's,
-  unchanged or changed only as a variant or a fix in the inherited sense; a structural change makes
-  a new design, whose `derived_from` still names its starting point, with the change listed. D4
-  scores a re-entered design here like any other, feature 004's D4 record cited as a prior result
-  only, and the design meets every inherited hardware rule. An unchanged re-entered design is a
-  candidate of this feature, its permutation and constants equal to feature 004's, and its
-  `proposed` entry says so, `rationale.md` too where it is selected, and the selection-bias
-  statement for each; the inherited rule on what makes a new candidate governs changes within this
-  feature.
+  its evidence, and every kind of evidence about the design runs again under this protocol. The
+  inherited constant rule holds no ID, so an unchanged design at an unchanged variant receives
+  feature 004's constants exactly. A design is derived from a feature-004 design when its operation
+  list is that design's, unchanged or changed only as a variant or a fix in the inherited sense; a
+  structural change makes a new design, whose `derived_from` still names its starting point, with
+  the change listed. D4 scores a re-entered design here like any other, feature 004's D4 record
+  cited as a prior result only, and the design meets every inherited hardware rule. An unchanged
+  re-entered design is a candidate of this feature, its permutation and constants equal to feature
+  004's, and its `proposed` entry says so, `rationale.md` too where it is selected, and the
+  selection-bias statement for each; the inherited rule on what makes a new candidate governs
+  changes within this feature.
   This feature's candidates read the constant rule as research R15 fixed it at 99e6994 and the
   refused list `research/005/refused-constants.json`, created in plan phase 1 as a byte copy of
   feature 004's `research/004/refused-constants.json` at 99e6994 (66 entries, SHA-256
   `cdbcb8031d1de839dacd71abcabdec38869fa6b102c6e86f10cfea2eb52a8a95`), growing only by this
-  feature's stricter changes. An unchanged re-entered design keeps the rotation amounts feature
-  004's ranking chose, part of its committed operation list; its rotation search is not run again,
-  the ranking record cited as a prior result, and a design whose amounts are searched again is a
-  variant where they change, entered with its own `derived_from`.
+  feature's stricter changes. The rotation ranking chose a design's amounts and is part of the
+  design, not evidence about it: an unchanged re-entered design keeps the amounts feature 004's
+  ranking chose at width 16, part of its committed operation list, its ranking record cited as a
+  prior result; where inherited research R6's rule fixes this feature's D4 width at 8, inherited
+  FR-024 searches its amounts again at 8, as for every entered candidate, and amounts that come out
+  otherwise make it a variant (`relation` `derived`), its permutation and constants no longer
+  feature 004's.
 - **FR-024**: The final report and the design rationale MUST state the selection bias over every
   design considered in features 004 and 005, by family and with each design's outcome: B1 and A1
   `ineligible`, B2 and A2 proposed and declined, never evaluated, feature 004's D4 record and its
@@ -716,10 +744,11 @@ transcription agreeing at every step of every committed vector, and the freeze r
   A later version, 2.19, gives §5's note on T11 `phyco-v4` beside `phyco-v3`, §1.1's cells for
   `phyco-v4` a 256-bit key and a 128-bit nonce as targets and its state "not specified until the
   selection", and row 5a.3 "features 004 and 005's order of sizes".
-  Row 5a.1b's status follows this feature's gates, each in a security.md version of its own, as 2.10
-  recorded feature 004's plan approval; version 2.20 records the plan approval and the checklist
-  rounds, with row 5a.3 naming the order of sizes that features 004 and 005 keep for vectors and
-  statistical evaluation. The versions that record a change of `phyco-v4`'s level (FR-013) form a
+  Row 5a.1b's status names the gates this feature has passed and the next one, never the checklist
+  rounds, each gate in a security.md version of its own, as 2.10 recorded feature 004's plan
+  approval; version 2.20 recorded the plan approval, with row 5a.3 naming the order of sizes that
+  features 004 and 005 keep for vectors and statistical evaluation, and version 2.21 drops the
+  rounds from the row. The versions that record a change of `phyco-v4`'s level (FR-013) form a
   family of their own.
 - **FR-028**: Development inputs only, derived as in feature 004 under the namespace
   `phycoweb-005/`; no held-out set exists in this feature (inherited FR-040).
@@ -779,8 +808,8 @@ its rule's stricter direction or settles an open case by its most conservative r
   candidate limit only fall, the margin only rises, and the thread count does not change.
 - **Trail records**: FR-019, FR-020. *Stricter means*: no change.
 - **The security target's place**: FR-011, FR-012. *Stricter means*: no change.
-- **The security target's parameters**: FR-010. *Stricter means*: the key, nonce and capacity only
-  grow.
+- **The security target's parameters**: FR-010. *Stricter means*: the capacity only grows; the key
+  and the nonce do not change.
 - **Selection bias**: FR-024. *Stricter means*: designs counted are only added.
 
 ### Key Entities

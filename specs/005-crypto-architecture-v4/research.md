@@ -126,11 +126,14 @@ held in `research/005/plan-projections.json`.
   structural check or a frequency and avalanche measurement that does not keeps the plan's provisional need for its kind (12 h
   and 24 h per candidate). "One structural check" is one run of every structural kind that inherited FR-037 asks at that size
   (the inverse tests, the dependency matrices, the symmetry and invariant checks), each kind's hours in the probe's record, and
-  a probe lowers the provisional need only by the kinds it covers. A run feature 004 made is not probed again: its record, the
-  same tool on the same operation list, size, width, kind and r, on the same machine at one thread, is the measurement, cited in
-  the table by record ID. `projection_table.py` then writes the final table from the plan's rules and the probes; each value is
-  the smaller of the plan's and the probes', so that every value only falls, and a probe that shows a need above its row is
-  reported before any candidate, its run refused when it comes (inherited ANA-078).
+  a probe lowers the provisional need only by the kinds it covers. The provisional needs are split equally over the three
+  claimable sizes (4 h structural and 8 h bias per size): a probe that finishes at a size gives that size its hours, a size
+  whose probe did not finish keeps its share, and a candidate's need is the smaller of the provisional need and that sum. A run
+  feature 004 made is not probed again: its record, the same tool on the same operation list, size, width, kind and r, on the
+  same machine at one thread, is the measurement, cited in the table by record ID. `projection_table.py` then writes the final
+  table from the plan's rules and the probes; each value is the smaller of the plan's and the probes', so that every value only
+  falls, and a probe that shows a need above its row is reported before any candidate, its run refused when it comes (inherited
+  ANA-078).
 - **Rationale**: the probes measure what feature 004 never ran at w = 32, the structural and bias kinds above all, and an
   upper limit of 4 h lets more of them finish while keeping them inside the feature-wide row's 40 h of probes.
 - **Alternatives considered**: probing every listed run again (rejected: it repeats feature 004's measurements on the same
