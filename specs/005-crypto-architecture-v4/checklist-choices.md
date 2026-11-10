@@ -519,3 +519,17 @@ analysis loop takes the recommended edit of the three findings of the report on 
 The batch's two commits are 77d994d (its choices) and 360d5c2 (its changes applied).
 
 None: the batch's rows clarify wording and change no rule.
+
+## Analysis remediation 8 (eighth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 7 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the two findings of the report on 49efc40.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR8-L4 | Two bare citations of feature 004's FR-053 | Tasks T009 and the Notes write "feature 004's FR-053 two-worker test", as FR-001 cites an inherited requirement | B: no change | tasks T009, Notes |
+| AR8-L5 | The name D4 for two things | FR-001 gains one sentence: "the D4 choice", "D4 tie", `d4_choice.py` and the `d4` records keep feature 004's D4, the nonlinearity choice rule, by its records' and script's names, and this spec's D4 is the decision so numbered in its table | B: renumber this spec's decisions. C: no change | spec FR-001 |
+
+### Rows that change the protocol (analysis remediation 8)
+
+None: the batch's rows clarify a citation and a name and change no rule.
