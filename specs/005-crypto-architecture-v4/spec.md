@@ -10,7 +10,7 @@
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
 approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 5
-answered in advance and applied (2026-11-09); analysis remediations 1 to 9 applied (2026-11-10)
+answered in advance and applied (2026-11-09); analysis remediations 1 to 10 applied (2026-11-10)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
 004 stopped and offered a new spec that budgets for the 16×16 bounds from the start:
@@ -142,6 +142,7 @@ frozen file stay as they are.
 | Analysis remediation 7 ([checklist-choices.md](./checklist-choices.md): the 3 findings of the seventh `/speckit-analyze` run, on 3f876e4) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of every row (FR-031). Applied the same day to the contract and tasks.md; no row changes a rule or sets a reading aside. Written and committed by the agent on that word |
 | Analysis remediation 8 ([checklist-choices.md](./checklist-choices.md): the 2 findings of the eighth `/speckit-analyze` run, on 49efc40) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of every row (FR-031). Applied the same day to this spec (FR-001) and tasks.md; no row changes a rule or sets a reading aside. Written and committed by the agent on that word |
 | Analysis remediation 9 ([checklist-choices.md](./checklist-choices.md): the one finding of the ninth `/speckit-analyze` run, on 25772a7) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of the row (FR-031). Applied the same day to this spec (FR-001); the row changes no rule and sets no reading aside. Written and committed by the agent on that word |
+| Analysis remediation 10 ([checklist-choices.md](./checklist-choices.md): the one finding of the tenth `/speckit-analyze` run, on 74b37bc) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of the row (FR-031). Applied the same day to quickstart.md and tasks.md; the row changes no rule and sets no reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |

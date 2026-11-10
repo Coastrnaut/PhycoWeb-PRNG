@@ -440,7 +440,7 @@ recorded" (FR-010 to FR-013, FR-027; R8).
 **Independent Test**: the review row, the chapters' SHA-256 and the order of the commits: the
 review's approval commit precedes the candidate log's first `proposed` entry (SC-002); quickstart
 V4: `scripts/candidate_log.py propose` exits 2 while the row is pending, and appends once it reads
-Approved at HEAD with the chapters' SHA-256.
+Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exists (FR-011).
 
 - [ ] T028 [US2] Write the candidate log's tests for this feature in
   `tests/test_protocol_005.py` (quickstart V4; data-model §5; contracts/cli.md,

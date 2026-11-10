@@ -22,8 +22,9 @@ P0). Heavy runs are projected first and run one at a time.
 feature-wide row; then `python scripts/projection_table.py` writes `$REP/projection-table.json`, and `--check` exits 0. Every
 value in it is at most the plan's (spec SC-001).
 
-**V4. The security target first.** With the row "Security-target review" still pending, `candidate_log.py propose` exits 2;
-once the row reads Approved at HEAD with the chapters' SHA-256, it appends the entry (SC-002).
+**V4. The security target first.** With the row "Security-target review" still pending, `candidate_log.py propose` exits 2; once
+the row reads Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exists (spec FR-011), it appends the
+entry (SC-002).
 
 ## During the climbs
 
