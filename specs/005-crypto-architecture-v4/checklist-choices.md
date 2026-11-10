@@ -409,3 +409,27 @@ rule.
 | AR1-I5 | Re-entered designs (FR-023; research R13) | settled | research R13 read as FR-023 states it, the amounts searched again where the width is 8 |
 | AR1-U1 | The probes (FR-005; research R5; the contract's `evidence_v3.py … --probe`) | settled | the largest R the climb allows, so that a finished probe bounds every run up to it |
 | AR1-U2 | The security target's files (FR-011; research R8) | settled | the files computed from the reviewed chapters alone; the review's scope unchanged |
+
+## Analysis remediation 2 (second /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediation 1 was: the owner's instruction of 2026-11-09 for the analysis loop
+takes the recommended edit of every finding of the report on 13a02be.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR2-I12 | Which tool runs this feature's ARX searches | Research R7: this feature's ARX searches run on the companion alone, its search feature 004's unchanged but for its output, so that no search runs twice, projected with the factor research R1 gives a tool with no pair at a size; tasks T043 and T051 follow | B: feature 004's tool for the bounds and the companion again for each trail. C: no change | research R7; tasks T043, T051 |
+| AR2-I13 | One thread for every heavy run, against research R4 | The tasks' header and Phase 5's rules: a search at one thread (FR-007), the uniform controls, the bias tests and the rotation search at their workers (research R4), each record's `parallelism` stating it; T042 names the field; T022 notes that a bias probe at one thread, as FR-005 has every probe, gives an upper figure for the bias tests' workers | B: one thread for every run. C: no change | tasks header, Phase 5 rules, T022, T042 |
+| AR2-U7 | The whole-suite run's row before the projection table exists | Task T021: the feature-wide row read from `plan-projections.json`'s approved option, as T023 reads it for the probes | B: no change | tasks T021 |
+| AR2-A1 | The code the claim test scans for this feature | Task T016: the code paths gain `research/005/`, the phrase "read from this feature's first commit" removed, the test's base already covering this feature's files | B: name a656bcf's parent as a second base. C: no change | tasks T016 |
+| AR2-I14 | Phase 3's heavy runs | The dependencies: Phase 3 has no heavy run | B: no change | tasks, Dependencies |
+| AR2-I15 | Where the companion's tests stand | The tasks' paragraphs "Prerequisites" and "Tests" and the plan's "Testing" line name `tests/test_tools_005.py` and, for the tasks, the analysis loop's batches | B: no change | tasks header; plan Technical Context |
+| AR2-I16 | Implementation Strategy item 3's second line | Indented as the other items | B: no change | tasks, Implementation Strategy |
+
+### Rows that change the protocol (analysis remediation 2)
+
+Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
+rule.
+
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| AR2-I12 | Trail records and the ARX searches (FR-019; research R7) | settled | the searches and their trails from one validated tool, so that no search runs twice; research R1's rule for a tool with no pair applied as written |
