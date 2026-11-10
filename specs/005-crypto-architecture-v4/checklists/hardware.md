@@ -42,11 +42,17 @@ renumbered hardware stages and the order of sizes
 
 - [x] CHK012 Is the assumption that RTL stays out of scope while the design must still meet the hardware rules recorded with the features that take the RTL and the board (now 007 and 009 under D12), so that their specs can rely on this feature's design document? [Assumption, Spec §Context "Out of scope", security.md §22]
 
+## Round 2 (first re-run, after round 1's changes)
+
+- [ ] CHK013 Is FR-001's statement that 5×5 to 7×7 and 9×9 to 15×15 are "supported variants, permutation-only and outside every claim" consistent with feature 004's FR-018, under which every other n from 2 to 16 is for exploration only, from a table written for that (n, w), never frozen and never evidence, while the size profile lists keyed variants only at the claimable sizes, 2×2 and a supported 3×3? [Conflict, Spec §FR-001, feature-004 FR-018, feature-004 data-model §10]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
   clarifying questions, the owner's instruction of 2026-11-09 asking for a loop without human interaction and the input
   naming every focus area; depth standard, audience the reviewer.
+- Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); one new
+  item, CHK013; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
