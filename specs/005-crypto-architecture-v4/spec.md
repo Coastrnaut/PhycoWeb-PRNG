@@ -8,8 +8,8 @@
 
 **Created**: 2026-11-09
 
-**Status**: Draft (2026-11-09), written by the agent at the owner's request; spec approval pending
-(Principle VIII)
+**Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
+pending
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
 004 stopped and offered a new spec that budgets for the 16×16 bounds from the start:
@@ -123,7 +123,7 @@ frozen file stay as they are.
 
 | Gate | Reviewer | Date | Decision | Notes |
 |------|----------|------|----------|-------|
-| Spec approval (scope, the changes from feature 004's protocol, decisions D1–D14, the security.md and register changes of FR-027) | _pending_ | _pending_ | _pending_ | Approves this spec as the protocol's text. From approval the protocol may only become stricter, every change entered in the protocol change log before any result it affects (inherited FR-044). Records the owner's decision on each of D1–D14 |
+| Spec approval (scope, the changes from feature 004's protocol, decisions D1–D14, the security.md and register changes of FR-027) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Approves this spec as the protocol's text. From approval the protocol may only become stricter, every change entered in the protocol change log before any result it affects (inherited FR-044). Records the owner's decision on each of D1–D14. Approved by the owner in writing, in the words "spec approved with all recommended defaults, set the row and commit", 2026-11-09: D1–D14 confirmed as their defaults, with the security.md and register changes of FR-027, which security.md 2.18 and `protocol/claims.json` make in the commit after this one. The spec approved is this file as of a656bcf, SHA-256 `bb62fef653ad25665e6670333e9447d5bc26f7bd5b421fbcf26f28af35c31a11`; this commit changes only this row, the Status line, and the decisions' introduction and Status column. Written and committed by the agent on the owner's word |
 | Plan approval | _pending_ | _pending_ | _pending_ | The plan fixes, before any candidate is proposed, the calibration, the projection table, the caps, the thread count, the rows and the margin (FR-004 to FR-009); from approval they belong to the protocol |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
 | Security-target review (`phyco-v4`: the design document's chapters "Security target" and "Mode", before any candidate is proposed) | _pending_ | _pending_ | _pending_ | Names the chapters' version and SHA-256 (FR-011). The candidate log refuses a first `proposed` entry until this row reads Approved at HEAD |
@@ -147,26 +147,27 @@ gives one in writing for it.
 
 ## Decisions Taken as Defaults
 
-The agent took a default for each decision below, so that every requirement is definite. Each is
-the owner's to confirm or change at spec approval, and a later change is made in this spec before
-any result it affects.
+The agent took a default for each decision below, so that every requirement is definite. Each was
+the owner's to confirm or change at spec approval, and on 2026-11-09 the owner confirmed all
+fourteen as written ("spec approved with all recommended defaults"). A later change is made in this
+spec before any result it affects.
 
 | ID | Decision | Choice (default) | Alternative | Used in | Status |
 |----|----------|------------------|-------------|---------|--------|
-| D1 | Model and candidate IDs | `phyco-v4`; candidates `v4-A<k>` (ARX) and `v4-B<k>` (Boolean). A feature-004 design may be entered again as a new candidate, with a new ID, counted as evaluated and in the selection bias | New designs only, feature-004 designs excluded | FR-002, FR-023 | Proposed |
-| D2 | Baseline protocol | Feature 004's documents at commit 99e6994, named by SHA-256, with this spec's changes | A self-contained spec that restates every rule | FR-001 | Proposed |
-| D3 | Security target and mode | Feature 004's chapters of Version 0.4, unchanged: a 128-bit target strength, a 256-bit key, a 128-bit nonce, c = 384 at every claimable size, the keyed duplex, a target advantage of 2⁻⁶⁴ | Revised before the review, for example a smaller capacity for a higher rate | FR-010 | Proposed |
-| D4 | When the security target is reviewed | Before the first candidate is proposed; the candidate-dependent items at the owner design review | After the selection, as in feature 004 | FR-011, FR-012 | Proposed |
-| D5 | The climb past a capped search | Sums of shorter spans continue it; searches of a kind at a size end at the first cap or refusal; the climb starts at r = 1; R_max = 64 | Feature 004's rule: the climb ends at the first cap | FR-015 to FR-017 | Proposed |
-| D6 | Order of sizes for the bounds | 16×16, then 8×8, then 4×4; every other kind keeps 4×4 first | 4×4 first for every kind, as in feature 004 | FR-014, FR-018 | Proposed |
-| D7 | Budgets | Fixed in the plan from calibrated projections, every row holding at least twice its projected need, within a ceiling of 720 h of heavy runs for the whole feature | Feature 004's values: per candidate 48 h of trail searches at 8 h each, 6 h of structural checks and 12 h of bias tests, with a feature-wide row of 66 h | FR-004 to FR-009 | Proposed |
-| D8 | Thread count | Fixed once in the plan from the calibration, the same for every search, recorded in every record | One thread, as in feature 004 | FR-007 | Proposed |
-| D9 | Trail records | The characteristic at every nonlinear operation; a trail at or below 2⁻¹²⁸ classed `none` | Feature 004's characteristic, the difference or mask after every round | FR-019, FR-020 | Proposed |
-| D10 | Selection bias | Counts feature 004's B1 and A1, the declined proposals B2 and A2, its D4 record and its stop, with every design of this feature | The evaluated candidates of both features only | FR-024 | Proposed |
-| D11 | A proof that carries a bound to a larger size | A check beside the computed bounds, for the selected candidate only, as in feature 004 | A source of R_bound above 8×8, with acceptance rules fixed at spec approval | FR-021 | Proposed |
-| D12 | Roadmap numbering | This feature takes stage 5a.1's place for `phyco-v4`; the features of stages 5a.2 to 5a.6 become 006 to 010 | Those features keep their numbers, and row 5a.1 names this feature beside feature 004 | FR-027 | Proposed |
-| D13 | Claimable sizes | 4×4, 8×8 and 16×16, each needing R_bound and every eligibility item, as in feature 004 | 16×16 claimable only where its R_bound and every item are established, otherwise a research size outside every claim | FR-022 | Proposed |
-| D14 | Families | Both; D4 chooses the family as in feature 004, the other analysed at the production width only if the chosen one ends with no eligible candidate | Both analysed at the production width, in the order of their D4 scores | FR-022 | Proposed |
+| D1 | Model and candidate IDs | `phyco-v4`; candidates `v4-A<k>` (ARX) and `v4-B<k>` (Boolean). A feature-004 design may be entered again as a new candidate, with a new ID, counted as evaluated and in the selection bias | New designs only, feature-004 designs excluded | FR-002, FR-023 | Confirmed 2026-11-09 |
+| D2 | Baseline protocol | Feature 004's documents at commit 99e6994, named by SHA-256, with this spec's changes | A self-contained spec that restates every rule | FR-001 | Confirmed 2026-11-09 |
+| D3 | Security target and mode | Feature 004's chapters of Version 0.4, unchanged: a 128-bit target strength, a 256-bit key, a 128-bit nonce, c = 384 at every claimable size, the keyed duplex, a target advantage of 2⁻⁶⁴ | Revised before the review, for example a smaller capacity for a higher rate | FR-010 | Confirmed 2026-11-09 |
+| D4 | When the security target is reviewed | Before the first candidate is proposed; the candidate-dependent items at the owner design review | After the selection, as in feature 004 | FR-011, FR-012 | Confirmed 2026-11-09 |
+| D5 | The climb past a capped search | Sums of shorter spans continue it; searches of a kind at a size end at the first cap or refusal; the climb starts at r = 1; R_max = 64 | Feature 004's rule: the climb ends at the first cap | FR-015 to FR-017 | Confirmed 2026-11-09 |
+| D6 | Order of sizes for the bounds | 16×16, then 8×8, then 4×4; every other kind keeps 4×4 first | 4×4 first for every kind, as in feature 004 | FR-014, FR-018 | Confirmed 2026-11-09 |
+| D7 | Budgets | Fixed in the plan from calibrated projections, every row holding at least twice its projected need, within a ceiling of 720 h of heavy runs for the whole feature | Feature 004's values: per candidate 48 h of trail searches at 8 h each, 6 h of structural checks and 12 h of bias tests, with a feature-wide row of 66 h | FR-004 to FR-009 | Confirmed 2026-11-09 |
+| D8 | Thread count | Fixed once in the plan from the calibration, the same for every search, recorded in every record | One thread, as in feature 004 | FR-007 | Confirmed 2026-11-09 |
+| D9 | Trail records | The characteristic at every nonlinear operation; a trail at or below 2⁻¹²⁸ classed `none` | Feature 004's characteristic, the difference or mask after every round | FR-019, FR-020 | Confirmed 2026-11-09 |
+| D10 | Selection bias | Counts feature 004's B1 and A1, the declined proposals B2 and A2, its D4 record and its stop, with every design of this feature | The evaluated candidates of both features only | FR-024 | Confirmed 2026-11-09 |
+| D11 | A proof that carries a bound to a larger size | A check beside the computed bounds, for the selected candidate only, as in feature 004 | A source of R_bound above 8×8, with acceptance rules fixed at spec approval | FR-021 | Confirmed 2026-11-09 |
+| D12 | Roadmap numbering | This feature takes stage 5a.1's place for `phyco-v4`; the features of stages 5a.2 to 5a.6 become 006 to 010 | Those features keep their numbers, and row 5a.1 names this feature beside feature 004 | FR-027 | Confirmed 2026-11-09 |
+| D13 | Claimable sizes | 4×4, 8×8 and 16×16, each needing R_bound and every eligibility item, as in feature 004 | 16×16 claimable only where its R_bound and every item are established, otherwise a research size outside every claim | FR-022 | Confirmed 2026-11-09 |
+| D14 | Families | Both; D4 chooses the family as in feature 004, the other analysed at the production width only if the chosen one ends with no eligible candidate | Both analysed at the production width, in the order of their D4 scores | FR-022 | Confirmed 2026-11-09 |
 
 ## User Scenarios & Testing *(mandatory)*
 
