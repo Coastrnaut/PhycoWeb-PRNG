@@ -49,6 +49,17 @@ guards, the Review & Approval rows and gates, the protocol change log and the fe
 - [x] CHK018 Is it stated when the rows "Readings set aside" and "Place check" read "Not needed" (no change sets a reading aside; every change was listed with its row before it was applied), so that the tasks approval can close them? [Clarity, Spec §Review & Approval]
 - [x] CHK019 Is FR-009's statement that taking D13's alternative is "a stricter change" consistent with the inherited direction of eligibility ("eligibility items are only added"), D13's alternative removing the requirement of R_bound and every item at 16×16 for eligibility? [Conflict, Spec §FR-009, FR-008, D13, inherited "Eligibility and selection"]
 
+## Round 3 (second re-run, after round 2's changes)
+
+- [ ] CHK020 Is FR-031's "every change ... MUST be listed with its direction" consistent with `checklist-choices.md`'s "How to answer", under which a round's list "Rows that change the protocol" names only the rows that touch a rule, "every other row" clarifying text and changing no rule: is a clarification listed, and with which direction? [Conflict, Spec §FR-031, checklist-choices.md "How to answer"]
+- [ ] CHK021 Can "Place check" read Not needed "when every change was listed with its row before it was applied" without the comparison of edits with rows that the row exists to make, that comparison being how an edit that no row made is found (feature 004's `place_check.py`)? [Measurability, Spec §Review & Approval notes, "Place check"]
+- [ ] CHK022 Does FR-009 say how its one answer to a probe above its row, a lowered candidate limit, deals with a row that still cannot hold the run (rows being per candidate and never raised), for instance a family's limit lowered to zero with D4 and D14 then choosing among the families that hold candidates, and how SC-001's "every row holds at least twice the projected need of its runs" then reads? [Clarity, Coverage, Spec §FR-009, SC-001, D14, FR-022, Edge Cases "Rows that turn out short"]
+- [ ] CHK023 Does the plan approval row name data-model.md, contracts/cli.md and quickstart.md by SHA-256, as it names plan.md and research.md, and does the protocol change log's first entry name the approved spec and plan documents beside FR-001's baseline documents and `plan-projections.json`, so that the texts every later entry changes are fixed by hash in the log itself? [Completeness, Traceability, Spec §FR-031, Review & Approval "Spec approval" and "Plan approval"]
+- [ ] CHK024 Do FR-011, data-model §5 and the contract state the candidate log's guard alike, data-model §5 naming only the security-target review's row while FR-011 and the contract also require the projection table, and FR-011 guarding "a first `proposed` entry" while the other two refuse every `propose`? [Consistency, Spec §FR-011, data-model §5, contracts/cli.md `candidate_log.py propose`]
+- [ ] CHK025 Is "Trail records ... Stricter means: no change" (the changed rules) consistent with the directions recorded for FR-019 and FR-020 (round 1's ANA-005 and ANA-006 `stricter`, round 2's ANA-021 `settled`) and with the plan's "fields only added" for the formats, a rule whose stricter direction is no change admitting no stricter change? [Conflict, Spec §"Pre-registered Design Protocol: the changed rules", FR-019, FR-020, Plan "Values this plan fixes", checklist-choices.md rounds 1 and 2]
+- [ ] CHK026 Is a reading set aside by a change made after the tasks approval and before any result (the claim test's first-scan fixes before plan phase 2, FR-026) given a place and a time to be decided, FR-031 deciding readings set aside only in the row "Readings set aside" at the tasks approval? [Gap, Spec §FR-031, FR-026, Review & Approval "Readings set aside"]
+- [ ] CHK027 Is the order of the probes and the security-target review consistent between FR-005 ("before or after the security-target review") and the plan, whose Summary runs the probes (step 2) before the security target (step 3), "each step needing the one before it", and whose phases follow that order? [Consistency, Spec §FR-005, Plan Summary, Plan Phases]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
@@ -58,6 +69,8 @@ guards, the Review & Approval rows and gates, the protocol change log and the fe
   items, CHK016 to CHK019; no clarifying questions, as in round 1.
 - Round 2, verified 2026-11-09: after the round's changes (checklist-choices.md, round 2), each new item was
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
+- Round 3, 2026-11-09: re-run over the complete documents after round 2's changes (904185a, 1e3ffd0);
+  8 new items, CHK020 to CHK027; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
