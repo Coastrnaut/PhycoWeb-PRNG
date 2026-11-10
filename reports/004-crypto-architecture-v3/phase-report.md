@@ -467,13 +467,18 @@ stood at commit 61eb70f, SHA-256 `ab4ed3a844fdf113ebdc5eac7e68becff9922dec73d833
 nothing above this addendum has changed since. After the review, on the owner's instruction of
 2026-11-09 to complete and mark every task unattended:
 
-- **T086 is done** (1996d9e). `scripts/recheck_004.py` now recomputes a `trail` record's weight
-  from its rational, and its class from its tool: a trail that a validated tool found is a finding of
-  the rounds it covers, and one from a tool not yet validated an unverified hypothesis, `blocked`.
-  The weight's function, `trail_weight_log2`, is in `protocol/evidence.py`, for a trail writer and
-  the re-check to share. Four tests cover it in `tests/test_protocol_004.py`. With it, the part of
-  FR-065 and SC-017 that section 4 names as open is written, though no `trail` record exists for it
-  to read.
+- **T086 is done in part** (1996d9e; T131 corrected this line, which first read "T086 is done").
+  `scripts/recheck_004.py` now recomputes a `trail` record's −log₂ weight from its rational, and its
+  class from its tool: a trail that a validated tool found is a finding of the rounds it covers, and
+  one from a tool not yet validated an unverified hypothesis, `blocked`. The weight's function,
+  `trail_weight_log2`, is in `protocol/evidence.py`, for a trail writer and the re-check to share,
+  and four tests cover it in `tests/test_protocol_004.py`. It does not recompute the weight from the
+  committed characteristic and operation list by exact integer arithmetic, round by round, nor apply
+  the 2⁻¹²⁸ threshold, as FR-065 asks under ANA-086. That rest is not applicable: no `trail` record
+  exists, the stop leaves none to come, and data-model §6's characteristic, the difference or mask
+  after every round, does not fix the differences inside a round with more than one nonlinear layer,
+  as in A1's four-step boxes. So the part of FR-065 and SC-017 that sections 4 and 14 name as open
+  stays open, with no record for it to read.
 - **The tasks the stop skipped are marked** (c6943d1), each with its reason, as feature 002's T056
   is marked. T092 is marked done in part and the rest not applicable: its structural checks and bias
   tests were skipped at Phase 5's checkpoint, and no run was made for them. T095 to T120 are marked

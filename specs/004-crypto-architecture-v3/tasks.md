@@ -903,7 +903,7 @@ candidates are otherwise `ineligible` (R6, R7).
   `--decide`; `--choose ID --seen SHA256 --by NAME`, the owner's; and `--reproduce RECORD`, with
   eligibility, selection and the stop rule as the spec's "Pre-registered Design Protocol" states.
   (FR-028, FR-041, FR-043; SC-005, SC-008; R6, R7)
-- [X] T086 [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
+- [X] T086 (done in part, the rest not applicable: the re-check recomputes every verdict of the committed records, and its `trail` branch recomputes a trail's −log₂ weight from its committed rational and its class from its tool's validation (1996d9e); the weight's recomputation from the committed characteristic and operation list by exact integer arithmetic, round by round, and ANA-086's 2⁻¹²⁸ threshold were not written, since no `trail` record exists, the stop leaves none to come, and data-model §6's characteristic, the difference or mask after every round, does not fix the differences inside a round with more than one nonlinear layer; T131) [US4] Write `scripts/recheck_004.py [--kind KIND]` and `--reproduce RECORD`
   (contracts/cli.md; R16), standard library and `protocol/` only, which recomputes every verdict of
   FR-065 from committed files, the `trail` records' weights and classifications among them, and
   writes a `recheck` record naming the interpreter, the platform and its `pip freeze`; a record that
@@ -1442,7 +1442,7 @@ names:
 
 ## Phase 11: Convergence
 
-- [ ] T131 Mark T086 in `specs/004-crypto-architecture-v3/tasks.md` as done in part, the rest not
+- [X] T131 Mark T086 in `specs/004-crypto-architecture-v3/tasks.md` as done in part, the rest not
   applicable, and correct the final report addendum's line on T086 to match:
   `scripts/recheck_004.py`'s `check_trail` recomputes a trail's −log₂ weight from its committed
   rational and its class from its tool's validation, but does not recompute the weight from the
