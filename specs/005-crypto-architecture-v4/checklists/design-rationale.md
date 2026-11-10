@@ -17,31 +17,31 @@ the candidate IDs and the D4 choice
 
 ## Requirement Completeness
 
-- [ ] CHK001 Does the spec say which constants a feature-004 design entered again receives, given that the inherited constant rule reads one fixed stream, seeded with `PhycoWeb`, in the order call type, round, food node, with no model or candidate ID in it, so that an unchanged design gets feature 004's constants exactly, while research R13 speaks of "new constants from the inherited rule"? [Completeness, Conflict, Spec §FR-023, Plan research R13, feature-004 research R15]
-- [ ] CHK002 Is the design rationale (`rationale.md`) required to record, per claimable size and kind, how R_bound was reached (the searched records up to the first cap, then the `split` records and their parts), beside the final report's statement of the sums (FR-029)? [Gap, Spec §FR-016, FR-025, FR-029]
-- [ ] CHK003 Is the version of this feature's design document fixed in the spec (research R8 says Version 0.5), with the rule for later versions, as FR-010 names only feature 004's Version 0.4 as the starting text? [Completeness, Traceability, Spec §FR-010, Plan research R8]
-- [ ] CHK004 Is the reason for R_max = 64 recorded, with what it bounds (the round rule's R, the constant tables, the vectors and the cost model's figures for R up to R_max + Δ)? [Gap, Spec §FR-017, D5]
+- [x] CHK001 Does the spec say which constants a feature-004 design entered again receives, given that the inherited constant rule reads one fixed stream, seeded with `PhycoWeb`, in the order call type, round, food node, with no model or candidate ID in it, so that an unchanged design gets feature 004's constants exactly, while research R13 speaks of "new constants from the inherited rule"? [Completeness, Conflict, Spec §FR-023, Plan research R13, feature-004 research R15]
+- [x] CHK002 Is the design rationale (`rationale.md`) required to record, per claimable size and kind, how R_bound was reached (the searched records up to the first cap, then the `split` records and their parts), beside the final report's statement of the sums (FR-029)? [Gap, Spec §FR-016, FR-025, FR-029]
+- [x] CHK003 Is the version of this feature's design document fixed in the spec (research R8 says Version 0.5), with the rule for later versions, as FR-010 names only feature 004's Version 0.4 as the starting text? [Completeness, Traceability, Spec §FR-010, Plan research R8]
+- [x] CHK004 Is the reason for R_max = 64 recorded, with what it bounds (the round rule's R, the constant tables, the vectors and the cost model's figures for R up to R_max + Δ)? [Gap, Spec §FR-017, D5]
 
 ## Requirement Clarity
 
-- [ ] CHK005 Is FR-001's rule that feature 004's Review & Approval rows are read "as this spec's" clear about which rows it means: the gate families and their reading rules, or also rows that record feature 004's own past acts (the downloads, the environment records, the tool acquisition), which this feature's table does not repeat? [Ambiguity, Spec §FR-001, Review & Approval notes]
-- [ ] CHK006 Is it clear what makes a design "derived from" a feature-004 design (FR-023) as against a new design: an unchanged operation list only, or also one changed by a variant or a fix in the inherited sense, and is `derived_from` required in each case? [Clarity, Spec §FR-023, data-model §5]
-- [ ] CHK007 Is the selection-bias statement's effect stated: whether it changes any threshold, rule or decision, or only reports, and if only reports, is that said? [Clarity, Spec §FR-024]
+- [x] CHK005 Is FR-001's rule that feature 004's Review & Approval rows are read "as this spec's" clear about which rows it means: the gate families and their reading rules, or also rows that record feature 004's own past acts (the downloads, the environment records, the tool acquisition), which this feature's table does not repeat? [Ambiguity, Spec §FR-001, Review & Approval notes]
+- [x] CHK006 Is it clear what makes a design "derived from" a feature-004 design (FR-023) as against a new design: an unchanged operation list only, or also one changed by a variant or a fix in the inherited sense, and is `derived_from` required in each case? [Clarity, Spec §FR-023, data-model §5]
+- [x] CHK007 Is the selection-bias statement's effect stated: whether it changes any threshold, rule or decision, or only reports, and if only reports, is that said? [Clarity, Spec §FR-024]
 
 ## Requirement Consistency
 
-- [ ] CHK008 Is the reason why FUT-GRID-5's order ("validate an intermediate size such as 4×4 before 16×16") does not bind the bound climbs recorded in the spec, where FR-014 runs them at 16×16 first and cites FUT-GRID-5 only for the other kinds? [Consistency, Spec §FR-014, security.md §20.1 FUT-GRID-5]
-- [ ] CHK009 Is D14's choice of keeping feature 004's family order (D4 first, the other family only after the chosen one ends with no eligible candidate) reconsidered or confirmed in the light of the plan's projections, under which a Boolean design like B1 ends at its first 16×16 search (research R2)? [Consistency, Spec §D14, Plan research R2]
-- [ ] CHK010 Are the candidate IDs `v4-A<k>` and `v4-B<k>` covered by the claim test's model words, which recognise `cand-A<k>` and `cand-B<k>` and the model IDs only? [Consistency, Spec §FR-002, FR-026, feature-004 `check_claims.py`]
+- [x] CHK008 Is the reason why FUT-GRID-5's order ("validate an intermediate size such as 4×4 before 16×16") does not bind the bound climbs recorded in the spec, where FR-014 runs them at 16×16 first and cites FUT-GRID-5 only for the other kinds? [Consistency, Spec §FR-014, security.md §20.1 FUT-GRID-5]
+- [x] CHK009 Is D14's choice of keeping feature 004's family order (D4 first, the other family only after the chosen one ends with no eligible candidate) reconsidered or confirmed in the light of the plan's projections, under which a Boolean design like B1 ends at its first 16×16 search (research R2)? [Consistency, Spec §D14, Plan research R2]
+- [x] CHK010 Are the candidate IDs `v4-A<k>` and `v4-B<k>` covered by the claim test's model words, which recognise `cand-A<k>` and `cand-B<k>` and the model IDs only? [Consistency, Spec §FR-002, FR-026, feature-004 `check_claims.py`]
 
 ## Scenario Coverage
 
-- [ ] CHK011 Are requirements defined for a candidate whose R_bound at some size comes only from sums, in how the design document and the review package present that bound beside searched ones, so that a reader can tell a searched bound from a sum? [Coverage, Spec §FR-016, FR-025]
-- [ ] CHK012 Is the case covered where D4's reduced-width scores rank a re-entered feature-004 design against new designs, with feature 004's D4 record cited only as a prior result? [Coverage, Spec §FR-022, FR-023]
+- [x] CHK011 Are requirements defined for a candidate whose R_bound at some size comes only from sums, in how the design document and the review package present that bound beside searched ones, so that a reader can tell a searched bound from a sum? [Coverage, Spec §FR-016, FR-025]
+- [x] CHK012 Is the case covered where D4's reduced-width scores rank a re-entered feature-004 design against new designs, with feature 004's D4 record cited only as a prior result? [Coverage, Spec §FR-022, FR-023]
 
 ## Dependencies and Assumptions
 
-- [ ] CHK013 Is the assumption that every inherited design rule (the torus, the two lanes, neighbour-only data flow, the operation list, the replaced mechanisms and the slime-mould mapping's one sentence) applies unchanged to `phyco-v4` stated in the spec, or only implied by FR-001? [Assumption, Spec §FR-001, FR-025]
+- [x] CHK013 Is the assumption that every inherited design rule (the torus, the two lanes, neighbour-only data flow, the operation list, the replaced mechanisms and the slime-mould mapping's one sentence) applies unchanged to `phyco-v4` stated in the spec, or only implied by FR-001? [Assumption, Spec §FR-001, FR-025]
 
 ## Notes
 
@@ -50,3 +50,6 @@ the candidate IDs and the D4 choice
   naming every focus area; depth standard, audience the reviewer.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
+- Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
+  the agent checked each item against the text that resolves it, as the owner's loop instruction of 2026-11-09
+  asks, and ticked each that holds; the evidence of each is the passage its row's "Where" names.

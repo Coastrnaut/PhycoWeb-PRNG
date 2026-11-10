@@ -17,28 +17,28 @@ trails, the baseline documents, line endings, and the reproduction of every comm
 
 ## Requirement Completeness
 
-- [ ] CHK001 Does FR-003 ("feature 004's records … read-only") account for feature 004's FR-053 test, which writes projection records and a spec version under feature 004's paths whenever the whole suite runs (as at cd85f71, 1996d9e and 33c4f1a), so that this feature's whole-suite runs either write under feature 005's paths or are stated as the exception? [Gap, Conflict, Spec §FR-003, inherited FR-053]
-- [ ] CHK002 Is a record required to hold the feature setting it was written under (in its `config` or `command`), so that a reproduction runs with the same setting and a reader can tell which feature's rules made it? [Gap, data-model §1, Plan research R9]
-- [ ] CHK003 Are the spec, research and design versions that feature 005's records cite required to be copied under feature 005's paths (`spec-versions/`, `research-versions/`, `design-versions/`), as feature 004's were, with the claim test reading them as the documents they copy? [Completeness, Spec §FR-001, inherited R16]
-- [ ] CHK004 Is the provenance log of this feature's hand-written documents required from a stated point, with entries for the documents written before it exists (the spec, the plan's documents and these checklists)? [Gap, inherited FR-064, Plan phase 1]
-- [ ] CHK005 Are the line-ending rules for the paths this feature will write later (for example `vectors/phyco-v4/`) required before their first file, as `.gitattributes` holds them for feature 004's paths? [Gap, `.gitattributes`, Plan "Project Structure"]
+- [x] CHK001 Does FR-003 ("feature 004's records … read-only") account for feature 004's FR-053 test, which writes projection records and a spec version under feature 004's paths whenever the whole suite runs (as at cd85f71, 1996d9e and 33c4f1a), so that this feature's whole-suite runs either write under feature 005's paths or are stated as the exception? [Gap, Conflict, Spec §FR-003, inherited FR-053]
+- [x] CHK002 Is a record required to hold the feature setting it was written under (in its `config` or `command`), so that a reproduction runs with the same setting and a reader can tell which feature's rules made it? [Gap, data-model §1, Plan research R9]
+- [x] CHK003 Are the spec, research and design versions that feature 005's records cite required to be copied under feature 005's paths (`spec-versions/`, `research-versions/`, `design-versions/`), as feature 004's were, with the claim test reading them as the documents they copy? [Completeness, Spec §FR-001, inherited R16]
+- [x] CHK004 Is the provenance log of this feature's hand-written documents required from a stated point, with entries for the documents written before it exists (the spec, the plan's documents and these checklists)? [Gap, inherited FR-064, Plan phase 1]
+- [x] CHK005 Are the line-ending rules for the paths this feature will write later (for example `vectors/phyco-v4/`) required before their first file, as `.gitattributes` holds them for feature 004's paths? [Gap, `.gitattributes`, Plan "Project Structure"]
 
 ## Requirement Clarity
 
-- [ ] CHK006 Is it clear whether feature 005 needs environment records of its own when the environment is the one feature 004's records 3 and 4 describe, each with a row of this table, and what "a change brings a new environment record" means for this feature's first runs? [Clarity, Spec §Assumptions, Review & Approval notes]
-- [ ] CHK007 Is the kind of SHA-256 in FR-001's table stated (the committed blob's bytes, LF), as feature 004's records state `sha256_kind`, so that the hashes reproduce on a checkout of either platform? [Clarity, Spec §FR-001]
-- [ ] CHK008 Is it stated that the projection table is reproduced from its committed probe records and `plan-projections.json` (`projection_table.py --check`), never by running the probes again, the probes being timings of one machine? [Clarity, data-model §4, contracts/cli.md]
+- [x] CHK006 Is it clear whether feature 005 needs environment records of its own when the environment is the one feature 004's records 3 and 4 describe, each with a row of this table, and what "a change brings a new environment record" means for this feature's first runs? [Clarity, Spec §Assumptions, Review & Approval notes]
+- [x] CHK007 Is the kind of SHA-256 in FR-001's table stated (the committed blob's bytes, LF), as feature 004's records state `sha256_kind`, so that the hashes reproduce on a checkout of either platform? [Clarity, Spec §FR-001]
+- [x] CHK008 Is it stated that the projection table is reproduced from its committed probe records and `plan-projections.json` (`projection_table.py --check`), never by running the probes again, the probes being timings of one machine? [Clarity, data-model §4, contracts/cli.md]
 
 ## Requirement Consistency
 
-- [ ] CHK009 Is the requirement that `plan_projections.py --check` pass on both platforms stated in the spec or plan, where quickstart V1 states it and FR-004 asks only that the calibration and the records it reads be committed? [Consistency, Spec §FR-004, quickstart V1]
-- [ ] CHK010 Is `plan-projections.json`, named by SHA-256 in the plan approval row, also named in the protocol change log's first entry beside the baseline documents, so that the log alone fixes every value the plan took from it? [Consistency, Traceability, Spec §FR-001, Review & Approval "Plan approval"]
+- [x] CHK009 Is the requirement that `plan_projections.py --check` pass on both platforms stated in the spec or plan, where quickstart V1 states it and FR-004 asks only that the calibration and the records it reads be committed? [Consistency, Spec §FR-004, quickstart V1]
+- [x] CHK010 Is `plan-projections.json`, named by SHA-256 in the plan approval row, also named in the protocol change log's first entry beside the baseline documents, so that the log alone fixes every value the plan took from it? [Consistency, Traceability, Spec §FR-001, Review & Approval "Plan approval"]
 
 ## Scenario Coverage
 
-- [ ] CHK011 Are requirements defined for reproducing a `split` record and a trail record on a fresh clone with no local-only outputs, every part, characteristic and operation list being committed (SC-005)? [Coverage, Spec §SC-005, data-model §2, §3]
-- [ ] CHK012 Is the reproduction of `plan-projections.json` defined when feature 004's committed records change in a way FR-003 forbids, or when a later whole-suite run adds feature-004 records it might read, so that a `--check` difference has one meaning? [Coverage, Edge Case, Spec §FR-003, FR-004]
-- [ ] CHK013 Is it stated which of this feature's committed results a reproduction re-runs (light kinds, by their scripts' `--reproduce`) and which it only re-checks (heavy runs, probes, owner records), as feature 004's R16 lists them? [Coverage, inherited R16, Spec §FR-001]
+- [x] CHK011 Are requirements defined for reproducing a `split` record and a trail record on a fresh clone with no local-only outputs, every part, characteristic and operation list being committed (SC-005)? [Coverage, Spec §SC-005, data-model §2, §3]
+- [x] CHK012 Is the reproduction of `plan-projections.json` defined when feature 004's committed records change in a way FR-003 forbids, or when a later whole-suite run adds feature-004 records it might read, so that a `--check` difference has one meaning? [Coverage, Edge Case, Spec §FR-003, FR-004]
+- [x] CHK013 Is it stated which of this feature's committed results a reproduction re-runs (light kinds, by their scripts' `--reproduce`) and which it only re-checks (heavy runs, probes, owner records), as feature 004's R16 lists them? [Coverage, inherited R16, Spec §FR-001]
 
 ## Notes
 
@@ -47,3 +47,6 @@ trails, the baseline documents, line endings, and the reproduction of every comm
   naming every focus area; depth standard, audience the reviewer.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
+- Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
+  the agent checked each item against the text that resolves it, as the owner's loop instruction of 2026-11-09
+  asks, and ticked each that holds; the evidence of each is the passage its row's "Where" names.

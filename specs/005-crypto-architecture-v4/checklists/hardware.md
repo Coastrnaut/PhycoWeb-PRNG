@@ -17,30 +17,30 @@ renumbered hardware stages and the order of sizes
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5 carried for `phyco-v4` as traced requirements, as feature 004's table "Security Policy traceability" carried them, FR-030 naming FUT-SEC-1 to FUT-SEC-9 only? [Gap, Spec §FR-030, feature-004 "Security Policy traceability"]
-- [ ] CHK002 Are the throughput figures (feature 004's FR-026: words per second at the target clock, cycles per call) and the goal of 10⁸ words per second at 200 MHz required for every candidate at its R, including an R that comes from sums and may reach R_max + Δ = 66? [Coverage, Spec §FR-017, FR-022, feature-004 research R5]
-- [ ] CHK003 Is the size of the constants' ROM at each food node addressed for R up to R_max + Δ, the constant table growing with R (inherited rule: constants held in a ROM at each food node)? [Gap, Spec §FR-017, feature-004 plan "Constants held in a ROM at each food node"]
+- [x] CHK001 Are FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5 carried for `phyco-v4` as traced requirements, as feature 004's table "Security Policy traceability" carried them, FR-030 naming FUT-SEC-1 to FUT-SEC-9 only? [Gap, Spec §FR-030, feature-004 "Security Policy traceability"]
+- [x] CHK002 Are the throughput figures (feature 004's FR-026: words per second at the target clock, cycles per call) and the goal of 10⁸ words per second at 200 MHz required for every candidate at its R, including an R that comes from sums and may reach R_max + Δ = 66? [Coverage, Spec §FR-017, FR-022, feature-004 research R5]
+- [x] CHK003 Is the size of the constants' ROM at each food node addressed for R up to R_max + Δ, the constant table growing with R (inherited rule: constants held in a ROM at each food node)? [Gap, Spec §FR-017, feature-004 plan "Constants held in a ROM at each food node"]
 
 ## Requirement Clarity
 
-- [ ] CHK004 Is it stated that a candidate whose R puts the throughput goal out of reach stays eligible, the goal being reported and deciding nothing, as in feature 004? [Clarity, feature-004 research R5, Spec §FR-022]
-- [ ] CHK005 Is the status of the supported sizes other than 2×2, 3×3, 4×4, 8×8 and 16×16 stated for `phyco-v4` (feature 004's variant table adding "every other supported variant"), neither claimable nor research in the parameter table? [Clarity, feature-004 design.md "Parameter table", Spec §D13]
-- [ ] CHK006 Is FUT-GRID-3's measured warm-up (every state bit depending on every key and nonce bit) tied to FR-012's open item on instantiation's diffusion margin, so that the security-target review and the owner design review read the same measurement? [Clarity, Traceability, Spec §FR-012, security.md §20.1 FUT-GRID-3]
+- [x] CHK004 Is it stated that a candidate whose R puts the throughput goal out of reach stays eligible, the goal being reported and deciding nothing, as in feature 004? [Clarity, feature-004 research R5, Spec §FR-022]
+- [x] CHK005 Is the status of the supported sizes other than 2×2, 3×3, 4×4, 8×8 and 16×16 stated for `phyco-v4` (feature 004's variant table adding "every other supported variant"), neither claimable nor research in the parameter table? [Clarity, feature-004 design.md "Parameter table", Spec §D13]
+- [x] CHK006 Is FUT-GRID-3's measured warm-up (every state bit depending on every key and nonce bit) tied to FR-012's open item on instantiation's diffusion margin, so that the security-target review and the owner design review read the same measurement? [Clarity, Traceability, Spec §FR-012, security.md §20.1 FUT-GRID-3]
 
 ## Requirement Consistency
 
-- [ ] CHK007 Is FR-014's 16×16-first order of the bound climbs consistent with the hardware order that security.md §22 keeps (RTL and the board at 4×4 first, then each larger claimable size), and does the spec say that the two orders govern different work? [Consistency, Spec §FR-014, security.md §22 rows 5a.3 and 5a.5]
-- [ ] CHK008 Do security.md §22's renumbered rows keep their cross-references right: row 5a.3 still says "in feature 004's order of sizes", where the order of sizes for vectors and statistics is now this feature's too, and row 5a.5 names feature 007's simulation? [Consistency, security.md §22, Spec §FR-027, D12]
-- [ ] CHK009 Is D13's requirement of R_bound and every item at 16×16 consistent with the assumption that whether 16×16 fits the XC7A100T is a question for the hardware feature, and is the case of a claimable size that does not fit the board stated (covered by the implementation feature's simulation alone)? [Consistency, Spec §D13, Assumptions, security.md §22 row 5a.5]
+- [x] CHK007 Is FR-014's 16×16-first order of the bound climbs consistent with the hardware order that security.md §22 keeps (RTL and the board at 4×4 first, then each larger claimable size), and does the spec say that the two orders govern different work? [Consistency, Spec §FR-014, security.md §22 rows 5a.3 and 5a.5]
+- [x] CHK008 Do security.md §22's renumbered rows keep their cross-references right: row 5a.3 still says "in feature 004's order of sizes", where the order of sizes for vectors and statistics is now this feature's too, and row 5a.5 names feature 007's simulation? [Consistency, security.md §22, Spec §FR-027, D12]
+- [x] CHK009 Is D13's requirement of R_bound and every item at 16×16 consistent with the assumption that whether 16×16 fits the XC7A100T is a question for the hardware feature, and is the case of a claimable size that does not fit the board stated (covered by the implementation feature's simulation alone)? [Consistency, Spec §D13, Assumptions, security.md §22 row 5a.5]
 
 ## Scenario Coverage
 
-- [ ] CHK010 Are the inherited hardware rules (fixed operations, no data-dependent control or shift amounts, at most one or two carry chains per pipeline stage, neighbour-only data flow with at most four channels per node and phase) stated to bind every design of this feature, a re-entered feature-004 design included? [Coverage, Spec §FR-001, FR-022, FR-023]
-- [ ] CHK011 Is the cost model of the D4 choice (LUTs per node and round, no fusion) stated to score this feature's candidates unchanged, with its stricter direction (no change after the first score) kept? [Coverage, Spec §FR-022, feature-004 plan "Operation-count cost model"]
+- [x] CHK010 Are the inherited hardware rules (fixed operations, no data-dependent control or shift amounts, at most one or two carry chains per pipeline stage, neighbour-only data flow with at most four channels per node and phase) stated to bind every design of this feature, a re-entered feature-004 design included? [Coverage, Spec §FR-001, FR-022, FR-023]
+- [x] CHK011 Is the cost model of the D4 choice (LUTs per node and round, no fusion) stated to score this feature's candidates unchanged, with its stricter direction (no change after the first score) kept? [Coverage, Spec §FR-022, feature-004 plan "Operation-count cost model"]
 
 ## Dependencies and Assumptions
 
-- [ ] CHK012 Is the assumption that RTL stays out of scope while the design must still meet the hardware rules recorded with the features that take the RTL and the board (now 007 and 009 under D12), so that their specs can rely on this feature's design document? [Assumption, Spec §Context "Out of scope", security.md §22]
+- [x] CHK012 Is the assumption that RTL stays out of scope while the design must still meet the hardware rules recorded with the features that take the RTL and the board (now 007 and 009 under D12), so that their specs can rely on this feature's design document? [Assumption, Spec §Context "Out of scope", security.md §22]
 
 ## Notes
 
@@ -49,3 +49,6 @@ renumbered hardware stages and the order of sizes
   naming every focus area; depth standard, audience the reviewer.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
+- Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
+  the agent checked each item against the text that resolves it, as the owner's loop instruction of 2026-11-09
+  asks, and ticked each that holds; the evidence of each is the passage its row's "Where" names.

@@ -16,34 +16,34 @@ disclaimer, the claim test's coverage, the inherited threat model, and the scope
 
 ## Requirement Completeness
 
-- [ ] CHK001 Does the spec state `phyco-v4`'s key entropy in bits, its secret state reachable from the key and the upper bound these place on any security level in its own words, as the Security Policy requires of every new model's specification, rather than only through FR-001's reading of feature 004's text? [Completeness, Constitution Security Policy, Spec §FR-001, D3]
-- [ ] CHK002 Is every candidate-dependent item of the security target listed under FR-012, including the round counts that the parameter table holds as `<R4>`, `<R8>` and `<R16>` until the variant table holds every R? [Completeness, Spec §FR-012, feature-004 design.md "Security target"]
-- [ ] CHK003 Does the spec say what the security-target review row names for "the security target's files" (FR-011) when `parameters.json` and `limits.json` are written only once every R is known, after the selection? [Gap, Conflict, Spec §FR-011, Plan research R8]
-- [ ] CHK004 Is the register's entry for `phyco-v4` required to carry the expected FUT-SEC-1 to FUT-SEC-9 statuses (`fut_sec`) that `phyco-v3`'s entry carries, and is it said when and by which step they are written? [Gap, Spec §FR-030, `protocol/claims.json`]
-- [ ] CHK005 Is the exact text of the disclaimer naming `phyco-v4` fixed (word for word, with the module that holds it), so that "the disclaimer naming `phyco-v4`" in FR-026 has one reading? [Completeness, Spec §FR-026]
-- [ ] CHK006 Does the spec require security.md §5 to adopt T6 to T11 for `phyco-v4`, its T11 note naming only `phyco-v3` ("Feature 004 adopts T11 for `phyco-v3` only as single-target key search")? [Gap, security.md §5, Spec §FR-001]
+- [x] CHK001 Does the spec state `phyco-v4`'s key entropy in bits, its secret state reachable from the key and the upper bound these place on any security level in its own words, as the Security Policy requires of every new model's specification, rather than only through FR-001's reading of feature 004's text? [Completeness, Constitution Security Policy, Spec §FR-001, D3]
+- [x] CHK002 Is every candidate-dependent item of the security target listed under FR-012, including the round counts that the parameter table holds as `<R4>`, `<R8>` and `<R16>` until the variant table holds every R? [Completeness, Spec §FR-012, feature-004 design.md "Security target"]
+- [x] CHK003 Does the spec say what the security-target review row names for "the security target's files" (FR-011) when `parameters.json` and `limits.json` are written only once every R is known, after the selection? [Gap, Conflict, Spec §FR-011, Plan research R8]
+- [x] CHK004 Is the register's entry for `phyco-v4` required to carry the expected FUT-SEC-1 to FUT-SEC-9 statuses (`fut_sec`) that `phyco-v3`'s entry carries, and is it said when and by which step they are written? [Gap, Spec §FR-030, `protocol/claims.json`]
+- [x] CHK005 Is the exact text of the disclaimer naming `phyco-v4` fixed (word for word, with the module that holds it), so that "the disclaimer naming `phyco-v4`" in FR-026 has one reading? [Completeness, Spec §FR-026]
+- [x] CHK006 Does the spec require security.md §5 to adopt T6 to T11 for `phyco-v4`, its T11 note naming only `phyco-v3` ("Feature 004 adopts T11 for `phyco-v3` only as single-target key search")? [Gap, security.md §5, Spec §FR-001]
 
 ## Requirement Clarity
 
-- [ ] CHK007 Is it clear how "L1 recorded" for `phyco-v4` is set while the reviewed chapters still hold R as placeholders, and what becomes of L1 when the chapters change after the selection fills them in, given that a review row whose named hashes no longer match HEAD gives L0? [Clarity, Spec §FR-013, feature-004 `check_claims.py` expected_level]
-- [ ] CHK008 Is "feature 004's FUT-SEC-8 result review row (ffb1425)" defined as a row of feature 004's table read by this feature's level rule, and is it said how the claim test reads a row of another feature's table? [Clarity, Dependency, Spec §FR-013, Plan research R10]
-- [ ] CHK009 Are the inherited documents' references to the later features ("feature 005" 18 times, "feature 007" 14 times and "feature 008" 28 times in feature 004's spec alone) given a reading under D12's renumbering, FR-001's reading rules naming paths, IDs and namespaces but no feature numbers? [Ambiguity, Conflict, Spec §FR-001, D12]
+- [x] CHK007 Is it clear how "L1 recorded" for `phyco-v4` is set while the reviewed chapters still hold R as placeholders, and what becomes of L1 when the chapters change after the selection fills them in, given that a review row whose named hashes no longer match HEAD gives L0? [Clarity, Spec §FR-013, feature-004 `check_claims.py` expected_level]
+- [x] CHK008 Is "feature 004's FUT-SEC-8 result review row (ffb1425)" defined as a row of feature 004's table read by this feature's level rule, and is it said how the claim test reads a row of another feature's table? [Clarity, Dependency, Spec §FR-013, Plan research R10]
+- [x] CHK009 Are the inherited documents' references to the later features ("feature 005" 18 times, "feature 007" 14 times and "feature 008" 28 times in feature 004's spec alone) given a reading under D12's renumbering, FR-001's reading rules naming paths, IDs and namespaces but no feature numbers? [Ambiguity, Conflict, Spec §FR-001, D12]
 
 ## Requirement Consistency
 
-- [ ] CHK010 Is FR-020's class `none` for a trail at or below 2⁻¹²⁸ consistent with the inherited data model's row "a trail found by a validated tool: confirmed vulnerability" and with security.md §9.1's classes, and does the spec say that FR-020 replaces that row? [Consistency, Spec §FR-020, data-model §3, feature-004 data-model §1]
-- [ ] CHK011 Are security.md §1.1's cells for `phyco-v4`, "not specified yet" for its state and key, consistent with D3's 256-bit key, 128-bit nonce and c = 384, and does the spec say when those cells change? [Consistency, security.md §1.1, Spec §D3, FR-027]
-- [ ] CHK012 Do FR-026 and the plan agree on the order that makes the claim test cover `phyco-v4` before "L1 recorded" can be set, given that the test reads every model but `phyco-v3` at L0 ("every other model stays at L0 in this feature")? [Consistency, Spec §FR-013, FR-026, Plan phases 1 and 3]
+- [x] CHK010 Is FR-020's class `none` for a trail at or below 2⁻¹²⁸ consistent with the inherited data model's row "a trail found by a validated tool: confirmed vulnerability" and with security.md §9.1's classes, and does the spec say that FR-020 replaces that row? [Consistency, Spec §FR-020, data-model §3, feature-004 data-model §1]
+- [x] CHK011 Are security.md §1.1's cells for `phyco-v4`, "not specified yet" for its state and key, consistent with D3's 256-bit key, 128-bit nonce and c = 384, and does the spec say when those cells change? [Consistency, security.md §1.1, Spec §D3, FR-027]
+- [x] CHK012 Do FR-026 and the plan agree on the order that makes the claim test cover `phyco-v4` before "L1 recorded" can be set, given that the test reads every model but `phyco-v3` at L0 ("every other model stays at L0 in this feature")? [Consistency, Spec §FR-013, FR-026, Plan phases 1 and 3]
 
 ## Scenario and Edge Case Coverage
 
-- [ ] CHK013 Are requirements defined for the case where the owner design review finds one of FR-012's open items fails (an instantiation margin below its rule, a first-order difference that fires), including what happens to "L1 recorded" and to the security target? [Coverage, Exception Flow, Spec §FR-012, FR-013]
-- [ ] CHK014 Is the period before the claim test covers this feature addressed, during which this feature's documents and checklists are written but not scanned, for instance by a scan of every one of them once the extension lands? [Gap, Spec §FR-026, Assumptions]
+- [x] CHK013 Are requirements defined for the case where the owner design review finds one of FR-012's open items fails (an instantiation margin below its rule, a first-order difference that fires), including what happens to "L1 recorded" and to the security target? [Coverage, Exception Flow, Spec §FR-012, FR-013]
+- [x] CHK014 Is the period before the claim test covers this feature addressed, during which this feature's documents and checklists are written but not scanned, for instance by a scan of every one of them once the extension lands? [Gap, Spec §FR-026, Assumptions]
 
 ## Non-Functional and Wording
 
-- [ ] CHK015 Are the scope statements that FR-016 asks of every `split` record, single trails under the usual independence assumptions with clustering and key-dependent effects open, required word for word as feature 004's bounds state them, so that a sum never reads as a stronger result than its parts? [Clarity, Spec §FR-016, data-model §2]
-- [ ] CHK016 Is it specified that the selection-bias statement, the projection table and the final report's account of feature 004's candidates (for example "A1's committed 16×16 bounds already lie below 2⁻¹²⁸") keep to bound wording and state no property of any design, under the claim test's rules? [Clarity, Spec §FR-024, FR-029, Context]
+- [x] CHK015 Are the scope statements that FR-016 asks of every `split` record, single trails under the usual independence assumptions with clustering and key-dependent effects open, required word for word as feature 004's bounds state them, so that a sum never reads as a stronger result than its parts? [Clarity, Spec §FR-016, data-model §2]
+- [x] CHK016 Is it specified that the selection-bias statement, the projection table and the final report's account of feature 004's candidates (for example "A1's committed 16×16 bounds already lie below 2⁻¹²⁸") keep to bound wording and state no property of any design, under the claim test's rules? [Clarity, Spec §FR-024, FR-029, Context]
 
 ## Notes
 
@@ -52,3 +52,6 @@ disclaimer, the claim test's coverage, the inherited threat model, and the scope
   naming every focus area; depth standard, audience the reviewer.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
+- Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
+  the agent checked each item against the text that resolves it, as the owner's loop instruction of 2026-11-09
+  asks, and ticked each that holds; the evidence of each is the passage its row's "Where" names.
