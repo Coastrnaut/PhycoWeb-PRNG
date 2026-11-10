@@ -98,8 +98,9 @@ correlation above 2⁻¹²⁸, `confirmed vulnerability` of the rounds it covers
   (spec FR-011).
 - A `proposed` entry gains `derived_from`: `none`, or `{feature: "004", candidate, oplist_path, oplist_sha256, relation,
   changes}` for a design that names a feature-004 design: `relation` `derived` (unchanged, or changed only as a variant or a
-  fix) or `starting point` (a structural change), `changes` the structural changes listed, `none` for `derived` (spec FR-023;
-  research R13). The entry of an unchanged re-entered design states that its permutation and constants equal feature 004's.
+  fix) or `starting-point` (a structural change, the contract's spelling), `changes` the structural changes listed, `none` for
+  `derived` (spec FR-023; research R13). The entry of an unchanged re-entered design states that its permutation and constants
+  equal feature 004's.
 - A `decision` entry `ineligible` may hold the cause `"no R_bound at 16×16"`, with the record that ends the climb there (a
   capped or refused search's record, or the last `split` record below weight 128 at R_max), and the size order's statement
   that no hour was charged at 8×8 or 4×4.

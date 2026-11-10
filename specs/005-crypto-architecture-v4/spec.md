@@ -9,7 +9,7 @@
 **Created**: 2026-11-09
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
-approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 4
+approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 5
 answered in advance and applied (2026-11-09)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
@@ -132,6 +132,7 @@ frozen file stay as they are.
 | Checklist choices, round 2 ([checklist-choices.md](./checklist-choices.md): the 18 items of the first re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec and plan.md; two rows correct round 1's text (FR-009's D13 alternative, FR-001's other sizes); no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 3 ([checklist-choices.md](./checklist-choices.md): the 56 items of the second re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.20) with its allow-list entries in `protocol/claims.json`, and `research/005/plan_projections.py` with `plan-projections.json`; research R8 and R13, data-model §4 and §5 and the contract also restate rows they follow beyond the rows' "Where" (PRO-024, RAT-018 to RAT-020, SEC-035), places the place check names; no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 4 ([checklist-choices.md](./checklist-choices.md): the 14 items of the third re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, research R5, data-model §4, the contract, `checklist-choices.md`'s lists (each naming its round's two commits) and security.md (2.21) with its allow-list entry in `protocol/claims.json`; PRO-029's tool is feature 004's adapted to this feature's paths and to its lists' table form, which feature 004's tool does not read; no row sets a reading aside. Written and committed by the agent on that word |
+| Checklist choices, round 5 ([checklist-choices.md](./checklist-choices.md): the 2 items of the fourth re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec and data-model §5; no row sets a reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |
@@ -596,18 +597,22 @@ transcription agreeing at every step of every committed vector, and the freeze r
   (one round for feature 004's designs, whose layers in turn `active_sbox.py` takes as one round's
   `Cycle`), each span starting at a cycle's first round; a design whose rounds repeat in no such
   cycle, or that holds an addition of a committed constant, whose parts' bounds depend on the
-  constants of the rounds they cover, takes no sum. Inherited FR-023's "the trail bounds and the
-  dependency matrices read no constant value" holds for designs without such additions, and a design
-  with them covers each call type's permutation in its bounds, as in its other constant-dependent
-  evidence. An established bound is a searched bound of status `pass` from a validated tool that
-  passed its cross-check on the candidate, or a `split` record whose parts are established, never a
-  capped, refused or blocked record. A sum may join parts from different methods (an ARX box's bound
-  over one call with active-box counts), each part established and of the same candidate, kind, size
-  and width. Every `split` record states feature 004's scope statement word for word, and it is a
-  bound record for every inherited eligibility item. Where a cycle spans more than one round, the
-  climb counts whole cycles: searches and sums at each whole number of cycles, and R_bound is the
-  smallest whole number of cycles, counted in rounds, at which both kinds' bounds lie below 2⁻¹²⁸; R
-  and Δ count rounds.
+  constants of the rounds they cover, takes no sum. A design holding such an addition takes no other
+  bound that rests on the repetition either: no floor taken from shorter spans inside a search (the
+  floors of Matsui's lemma in `active_sbox.py` and `long_trail.py`) and no active-box count
+  multiplied by one box's bound over one call; its bounds come only from searches that model each
+  round's constants, by a tool validated for such additions (inherited FR-039). Inherited FR-023's
+  "the trail bounds and the dependency matrices read no constant value" holds for designs without
+  such additions, and a design with them covers each call type's permutation in its bounds, as in
+  its other constant-dependent evidence. An established bound is a searched bound of status `pass`
+  from a validated tool that passed its cross-check on the candidate, or a `split` record whose
+  parts are established, never a capped, refused or blocked record. A sum may join parts from
+  different methods (an ARX box's bound over one call with active-box counts), each part established
+  and of the same candidate, kind, size and width. Every `split` record states feature 004's scope
+  statement word for word, and it is a bound record for every inherited eligibility item. Where a
+  cycle spans more than one round, the climb counts whole cycles: searches and sums at each whole
+  number of cycles, and R_bound is the smallest whole number of cycles, counted in rounds, at which
+  both kinds' bounds lie below 2⁻¹²⁸; R and Δ count rounds.
 - **FR-017**: R_bound at a size MUST be the smallest r at which both kinds' established bounds lie
   below 2⁻¹²⁸. The climb continues by sums after the searches end, up to R_max = 64 (D5); where no
   r up to R_max qualifies, the candidate has no R_bound at that size.
