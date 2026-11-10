@@ -489,6 +489,17 @@ nothing above this addendum has changed since. After the review, on the owner's 
   and the claim register keeps `phyco-v3` at L0.
 - **security.md 2.17** (06e81f3) records the review's decision on roadmap stage 5a.1. The claim
   register's entry for that line follows its text, an entry added after the last gate.
+- **The whole suite ran again after T086's change** (33c4f1a; T133): `python -X utf8 -W ignore -m
+  unittest discover -s tests -t .` at d007c8c, projected first in research R7's feature-wide row
+  (projection-20261109T205332Z-6777c1b3, 1.0 h). On Windows, Python 3.10.11: 1929 tests, OK, 71
+  skipped, 1023.0 s. In WSL, the same command with `~/.venvs/phycoweb/bin/python` (`wpy`, quickstart
+  P0), Python 3.14.4: 1929 tests, OK, 8 skipped, 691.6 s. The 1929 are T125's 1925 and T086's four
+  trail tests, and the skip counts are T125's; none fails.
+- **The re-check ran again in a fresh clone** (e814d5a; T132), since 1996d9e changed
+  `scripts/recheck_004.py` and `protocol/evidence.py` after T124's run: `python -X utf8
+  scripts/recheck_004.py` in a fresh clone of dfceae8, on Windows, Python 3.10.11, record
+  `recheck-20261110T010625Z-454c1890`: 160 records and the candidate log's 4 decision entries, 0
+  disagreements, 401 s.
 
 No result, verdict, finding or recommendation of this report changes.
 
