@@ -10,7 +10,7 @@
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
 approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 5
-answered in advance and applied (2026-11-09); analysis remediations 1 to 7 applied (2026-11-10)
+answered in advance and applied (2026-11-09); analysis remediations 1 to 8 applied (2026-11-10)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
 004 stopped and offered a new spec that budgets for the 16×16 bounds from the start:
@@ -140,6 +140,7 @@ frozen file stay as they are.
 | Analysis remediation 5 ([checklist-choices.md](./checklist-choices.md): the one finding of the fifth `/speckit-analyze` run, on 7c92090) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of the row (FR-031). Applied the same day to tasks.md; the row changes no rule and sets no reading aside. Written and committed by the agent on that word |
 | Analysis remediation 6 ([checklist-choices.md](./checklist-choices.md): the one finding of the sixth `/speckit-analyze` run, on b5a23af) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of the row (FR-031). Applied the same day to the contract; the row changes no rule and sets no reading aside. Written and committed by the agent on that word |
 | Analysis remediation 7 ([checklist-choices.md](./checklist-choices.md): the 3 findings of the seventh `/speckit-analyze` run, on 3f876e4) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of every row (FR-031). Applied the same day to the contract and tasks.md; no row changes a rule or sets a reading aside. Written and committed by the agent on that word |
+| Analysis remediation 8 ([checklist-choices.md](./checklist-choices.md): the 2 findings of the eighth `/speckit-analyze` run, on 49efc40) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the same instruction as Analysis remediation 1, which takes option A of every row (FR-031). Applied the same day to this spec (FR-001) and tasks.md; no row changes a rule or sets a reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |
@@ -392,8 +393,11 @@ transcription agreeing at every step of every committed vector, and the freeze r
   where this spec changes it, by number. A bare FR-<n> in this feature's documents is this spec's;
   an inherited requirement is cited as "inherited FR-<n>" or "feature 004's FR-<n>", an inherited
   text's own FR-<n> reads as feature 004's, and "by number" means that this spec names the inherited
-  requirement it changes. The protocol change log's first entry names these documents by their
-  SHA-256, each of the committed blob's bytes, LF, kind `raw`, before any result exists.
+  requirement it changes. "The D4 choice", "D4 tie", `d4_choice.py` and the `d4` records keep
+  feature 004's D4, the nonlinearity choice rule, by its records' and script's names; this spec's D4
+  is the decision so numbered in its table. The protocol change log's first entry names these
+  documents by their SHA-256, each of the committed blob's bytes, LF, kind `raw`, before any result
+  exists.
 
   | Document under `specs/004-crypto-architecture-v3/` | SHA-256 at 99e6994 |
   |----------------------------------------------------|--------------------|

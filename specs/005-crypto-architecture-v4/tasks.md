@@ -216,8 +216,8 @@ feature before T009 (FR-003).
   module of `tests/` that reads them; every test that writes a record writes under the active
   feature's paths, feature 004's FR-053 test among them; and a test in `tests/test_protocol_005.py`
   shows that the modules run with `PHYCOWEB_FEATURE=005` write nothing under feature 004's paths.
-  Run the changed modules by their test classes on Windows and with `wpy` in WSL, FR-053's
-  two-worker test left out. (FR-003; SC-005)
+  Run the changed modules by their test classes on Windows and with `wpy` in WSL, feature 004's
+  FR-053 two-worker test left out. (FR-003; SC-005)
 
 ### Step (2): this feature's environment records
 
@@ -1143,8 +1143,8 @@ numbering of the later features:
   before it takes effect, entered with `python scripts/protocol_change.py propose FILE`; a
   claim-test finding answered by an allow-list entry alone needs no row (spec notes; FR-031).
 - Test runs at a phase's checkpoint are light: the phase's own test modules by their test classes,
-  FR-053's two-worker test left out; a run that includes that test is a heavy run, and T021 and
-  T085 are those runs.
+  feature 004's FR-053 two-worker test left out; a run that includes that test is a heavy run, and
+  T021 and T085 are those runs.
 - A reproduction uses its original's thread count (FR-007); the probes and the projection table are
   re-checked, never re-run (FR-001); a run whose measured hours miss its projection is reported with
   both figures, no decision already made changes, and the calibration is not refitted (spec, Edge
