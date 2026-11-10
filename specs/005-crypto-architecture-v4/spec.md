@@ -9,8 +9,8 @@
 **Created**: 2026-11-09
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
-approved (2026-11-09), with the run limits extended (option E); checklist choices of round 1 answered
-in advance and applied (2026-11-09)
+approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 and 2
+answered in advance and applied (2026-11-09)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
 004 stopped and offered a new spec that budgets for the 16×16 bounds from the start:
@@ -128,7 +128,8 @@ frozen file stay as they are.
 | Spec approval (scope, the changes from feature 004's protocol, decisions D1–D14, the security.md and register changes of FR-027) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Approves this spec as the protocol's text. From approval the protocol may only become stricter, every change entered in the protocol change log before any result it affects (inherited FR-044). Records the owner's decision on each of D1–D14. Approved by the owner in writing, in the words "spec approved with all recommended defaults, set the row and commit", 2026-11-09: D1–D14 confirmed as their defaults, with the security.md and register changes of FR-027, which security.md 2.18 and `protocol/claims.json` make in the commit after this one. The spec approved is this file as of a656bcf, SHA-256 `bb62fef653ad25665e6670333e9447d5bc26f7bd5b421fbcf26f28af35c31a11`; this commit changes only this row, the Status line, and the decisions' introduction and Status column. Written and committed by the agent on the owner's word |
 | Plan approval | Coastrnaut (repository owner) | 2026-11-09 | Approved | The plan fixes, before any candidate is proposed, the calibration, the projection table, the caps, the thread count, the rows and the margin (FR-004 to FR-009); from approval they belong to the protocol. Approved by the owner in writing, in the words "plan approved with all recommended options, set the row and commit" and "extend run limits even more to ensure we find a good candidate also", 2026-11-09: choices 2 to 5 of the plan's "Choices for owner review" as recommended (one thread for every search; feature 004's records cited where they measured a run; rows per family from its reference design; the feature as a parameter of the protocol modules), and choice 1 as option E, the owner's extension: caps of 8 h at 4×4, 24 h at 8×8 and 48 h at 16×16, probes of up to 4 h, rows of 267.5 h per ARX candidate, 425.3 h per Boolean candidate and 102 h feature-wide, three evaluated candidates per family, and the ceiling raised from D7's 720 h to 2,200 h, as FR-008 lets the owner raise it at the plan approval. The plan approved is the plan's documents as of 74dd867: `plan.md`, SHA-256 `5f3300b82e9ad6fa1e3e7e64a58bbf3ecdd32a60abe3860f1c13dc54d081a873`; `research.md`, SHA-256 `799896741ce4ecd1f06f51a191998ed493a65b437b89c3dfd5302cb7dc2fa33c`; `data-model.md`, `contracts/cli.md` and `quickstart.md`; with `research/005/plan-projections.json`, SHA-256 `80b5182c2fd3e0d390b82858e58477d119f737d8b666551dac13128a48a5f489`, from `research/005/plan_projections.py`, SHA-256 `22d562040f03a50fafc6fb8cfb7a8da5818014f285954f70bb547a40bf09ea0a`. Written and committed by the agent on the owner's word |
 | Tasks approval | _pending_ | _pending_ | _pending_ | |
-| Checklist choices, round 1 ([checklist-choices.md](./checklist-choices.md): the 86 items of the six first-run checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09, with the instruction to loop the checklists until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.19) and `.gitattributes`; no row sets a reading aside. Written and committed by the agent on that word |
+| Checklist choices, round 1 ([checklist-choices.md](./checklist-choices.md): the 86 items of the six first-run checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09, with the instruction to loop the checklists until a re-run finds no new item: "you have my approval of all suggestions to continue without human interaction", which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.19) with its allow-list entry in `protocol/claims.json`, and `.gitattributes`; no row sets a reading aside. Written and committed by the agent on that word |
+| Checklist choices, round 2 ([checklist-choices.md](./checklist-choices.md): the 18 items of the first re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec and plan.md; two rows correct round 1's text (FR-009's D13 alternative, FR-001's other sizes); no row sets a reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |
@@ -149,9 +150,14 @@ row with a number for each later selection record or review), and how each is se
 each row and commits it, or gives the decision in writing, which the agent then writes and commits,
 quoting the owner's words with their date, as in feature 004 from 2026-11-05. The agent stops at
 every gate of this table (Principle VIII); no standing authorization covers a gate unless the owner
-gives one in writing for it. Inside inherited FR-043's window, from the owner design review's approval
-to the final result review, the owner's written word, recorded and committed by the agent quoting it,
-stands in place of the owner's commit, as in feature 004 from 2026-11-05.
+gives one in writing for it. Inside inherited FR-043's window, from the owner design review's
+approval to the final result review, the owner's written word, recorded and committed by the agent
+quoting it, stands in place of the owner's commit, as in feature 004 from 2026-11-05. Each later
+checklist round has a row "Checklist choices, round <k>", and each batch of the analysis loop's
+changes a row "Analysis remediation <k>", set by the agent on the owner's advance approval of
+2026-11-09, quoting it. "Readings set aside" reads Not needed at the tasks approval when no listed
+change sets a reading aside, and "Place check" when every change was listed with its row before it
+was applied.
 
 ## Decisions Taken as Defaults
 
@@ -386,9 +392,10 @@ transcription agreeing at every step of every committed vector, and the freeze r
   an n×n torus, two w-bit lanes per node, neighbour-only data flow with at most four channels per
   node and phase, an operation list of invertible updates, fixed operations with no data-dependent
   control or shift amounts, at most one or two carry chains per pipeline stage, constants in a ROM
-  at each food node, the replaced mechanisms and the slime-mould mapping's one sentence. The sizes
-  5×5 to 7×7 and 9×9 to 15×15 are supported variants, permutation-only and outside every claim, as
-  feature 004's variant table lists them.
+  at each food node, the replaced mechanisms and the slime-mould mapping's one sentence. Every other
+  n from 2 to 16 (5×5 to 7×7 and 9×9 to 15×15) is for exploration only, as feature 004's FR-018 has
+  it: a table written for that (n, w), never frozen and never evidence; the size profile lists keyed
+  variants only at the claimable sizes, 2×2 and a supported 3×3.
 
   The spec, research and design versions that this feature's records cite are copied under its paths
   (`spec-versions/`, `research-versions/`, `design-versions/`), and the claim test reads each copy
@@ -406,12 +413,14 @@ transcription agreeing at every step of every committed vector, and the freeze r
 **Every run planned before any candidate (User Story 1)**
 
 - **FR-004**: The plan MUST derive, from feature 004's committed `projection` records and the
-  measured hours of the runs they projected, a calibration per kind of evidence, and for the bound searches per tool and size with research R1's
-  transfer rule, the ratio of measured to projected time, and apply it to every projection of this
-  feature. The calibration
-  and the records it reads MUST be committed with the plan.
-  It reads feature 004's records as committed at 99e6994, so that a later record never changes it,
-  and `research/005/plan_projections.py --check` MUST pass on both platforms.
+  measured hours of the runs they projected, a calibration per kind of evidence, and for the bound
+  searches per tool and size with research R1's transfer rule, the ratio of measured to projected
+  time, and apply it to every projection of this feature. The calibration and the records it reads
+  MUST be committed with the plan. It reads feature 004's records as committed at 99e6994, so that a
+  later record never changes it, and `research/005/plan_projections.py --check` MUST pass on both
+  platforms. Plan phase 1 changes `plan_projections.py` to read those records at 99e6994, its output
+  unchanged, which `--check` shows; the records added since are FR-053's projections, which the
+  calibration does not read.
 - **FR-005**: Before any candidate is proposed, the plan MUST give a projection table: for every
   kind of evidence the rules require of one candidate, at every claimable size and the production
   width, the projected need of each run, from probes on feature 004's committed operation lists of
@@ -440,28 +449,32 @@ transcription agreeing at every step of every committed vector, and the freeze r
   decides at plan approval, before any candidate is proposed, by raising the ceiling, lowering the
   candidate limit or taking D13's alternative.
 - **FR-009**: From plan approval, the calibration and the thread count MUST NOT change, and the
-  caps, the rows, the ceiling and the candidate limit MUST only fall (inherited FR-044).
-  The plan approval fixed the values of option E, which the owner chose before the approval was
-  recorded (research R3). A clarification of the calibration's rule that leaves every factor as
-  computed is no change. A probe that shows a need above its row is reported before the first
-  `proposed` entry; the owner may then lower the candidate limit or take D13's alternative, each a
-  stricter change, and no row is raised.
+  caps, the rows, the ceiling and the candidate limit MUST only fall (inherited FR-044). The plan
+  approval fixed the values of option E, which the owner chose before the approval was recorded
+  (research R3). A clarification of the calibration's rule that leaves every factor as computed is
+  no change. A probe that shows a need above its row is reported before the first `proposed` entry;
+  the owner may then lower the candidate limit, a stricter change; D13's alternative removes an
+  eligibility requirement, is not stricter, and is out of reach after the plan approval; no row is
+  raised.
 
 **The security target first (User Story 2)**
 
-- **FR-010**: The chapters "Security target" and "Mode" of this feature's design document MUST
-  start from feature 004's `design.md`, Version 0.4 (SHA-256
+- **FR-010**: The chapters "Security target" and "Mode" of this feature's design document MUST start
+  from feature 004's `design.md`, Version 0.4 (SHA-256
   `60a9c9496792c7f3ca98ddb4df3e2c481c8c4b8059780ab2f29044e53cbd9e9b`), read with `phyco-v4` for
-  `phyco-v3` (D3), and list every change with its reason.
-  The document is Version 0.5, continuing feature 004's numbering, and each later change makes a new
-  version. `phyco-v4`'s key holds 256 bits of entropy, its secret state reachable from the key is
-  the capacity, 384 bits at every claimable size, and the bound these place on any level is the size
-  profile's 128 bits at every claimable size, a target and a ceiling, not a claim (constitution,
-  Security Policy).
+  `phyco-v3` (D3), and list every change with its reason. The document is Version 0.5, continuing
+  feature 004's numbering, and each later change makes a new version. `phyco-v4`'s key holds 256
+  bits of entropy, its secret state reachable from the key is the capacity, 384 bits at every
+  claimable size, and the bound these place on any level is the least of feature 004's generic
+  bounds, k/2 = 128 bits from single-target quantum search on the key, the capacity's c/2 being 192
+  bits: the size profile's 128 bits at every claimable size, a target and a ceiling, not a claim
+  (constitution, Security Policy).
 - **FR-011**: The security-target review (⛔) MUST be held before the first candidate is proposed.
   Its row names the chapters' version and their SHA-256, with the security target's files, written
-  before the review with R as `<R4>`, `<R8>` and `<R16>`, and the candidate log MUST refuse a first
-  `proposed` entry until the row reads Approved at HEAD and the projection table exists (FR-005).
+  before the review with R as `<R4>`, `<R8>` and `<R16>` (the strings stand where a number will, and
+  the size profile's check reads a placeholder as not yet known, checking every other figure), and
+  the candidate log MUST refuse a first `proposed` entry until the row reads Approved at HEAD and
+  the projection table exists (FR-005).
 - **FR-012**: Every item of the security target that depends on a selected design MUST be listed in
   the chapter as open and checked at the owner design review: the round counts that the parameter
   table holds as `<R4>`, `<R8>` and `<R16>`, with every figure computed from them; the margin of
@@ -487,10 +500,10 @@ transcription agreeing at every step of every committed vector, and the freeze r
 
 - **FR-014**: At the production width, each candidate's trail-bound climbs MUST run at 16×16 first,
   then 8×8, then 4×4 (D6). Every other kind of evidence keeps feature 004's order, 4×4, then 8×8,
-  then 16×16 (FUT-GRID-5).
-  FUT-GRID-5's order governs vectors and statistical evaluation per size, which keep 4×4 first, as
-  the hardware features' RTL and board do; trail bounds analyse the permutation, not a size's
-  validation, and run where their cost is highest first.
+  then 16×16 (FUT-GRID-5). FUT-GRID-5's order governs vectors and statistical evaluation per size,
+  which keep 4×4 first, as the hardware features' RTL and board do; trail bounds analyse the
+  permutation, not a size's validation, and run where their cost is highest first. A search that
+  does not depend on the size (FR-015) runs before every size's climb.
 - **FR-015**: At each claimable size, the climb MUST start at r = 1, with one search per kind and r,
   each within its size's cap. The first search of a kind that reaches its cap, or that its row
   refuses, MUST end that kind's searches at that size; the refusal is written in the search's
@@ -499,23 +512,24 @@ transcription agreeing at every step of every committed vector, and the freeze r
   not depend on the size, such as that box search, runs first, under the 4×4 cap, charged to the
   candidate's trail row, and its bound is read at every size.
 - **FR-016**: At every r, a kind's established bound at a size MUST be the larger of its searched
-  bound, where one exists, and the largest sum W(r₁) + W(r₂) over r₁ + r₂ = r, r₁ and r₂ at least
-  1, of that kind's established bounds at that size, sums included, so that every split of r into
+  bound, where one exists, and the largest sum W(r₁) + W(r₂) over r₁ + r₂ = r, r₁ and r₂ at least 1,
+  of that kind's established bounds at that size, sums included, so that every split of r into
   shorter spans counts; W(r) is a bound's weight, the −log₂ of the probability or squared
   correlation it bounds, so that a bound lies below 2⁻¹²⁸ where its weight exceeds 128. A sum is
   written as a `bound` record with method `split`, citing its two parts by record ID and SHA-256,
   computed by code in exact arithmetic, with the scope every bound states: single trails under the
   usual independence assumptions, clustering into differentials and linear hulls and key-dependent
-  effects open for the cryptanalysis feature. A sum never cites an `inconclusive` record.
-  A sum rests on each part bounding every trail over any span of its length: the round structure
-  repeats from round to round, constants aside, or, for layers in turn, the parts count whole
-  cycles; a design whose rounds differ otherwise takes no sum. An established bound is a searched
-  bound of status `pass` from a validated tool that passed its cross-check on the candidate, or a
-  `split` record whose parts are established, never a capped, refused or blocked record. A sum may
-  join parts from different methods (an ARX box's bound over one call with active-box counts), each
-  part established and of the same candidate, kind, size and width. Every `split` record states
-  feature 004's scope statement word for word, and it is a bound record for every inherited
-  eligibility item.
+  effects open for the cryptanalysis feature. A sum never cites an `inconclusive` record. A sum
+  rests on each part bounding every trail over any span of its length: the round structure repeats
+  from round to round, constants aside, or, for layers in turn, the parts count whole cycles; a
+  design whose rounds differ otherwise takes no sum. An established bound is a searched bound of
+  status `pass` from a validated tool that passed its cross-check on the candidate, or a `split`
+  record whose parts are established, never a capped, refused or blocked record. A sum may join
+  parts from different methods (an ARX box's bound over one call with active-box counts), each part
+  established and of the same candidate, kind, size and width. Every `split` record states feature
+  004's scope statement word for word, and it is a bound record for every inherited eligibility
+  item. For layers in turn the climb counts whole cycles: searches and sums at each whole number of
+  cycles, and R_bound is the smallest such number of rounds whose bounds lie below 2⁻¹²⁸.
 - **FR-017**: R_bound at a size MUST be the smallest r at which both kinds' established bounds lie
   below 2⁻¹²⁸. The climb continues by sums after the searches end, up to R_max = 64 (D5); where no
   r up to R_max qualifies, the candidate has no R_bound at that size.
@@ -524,17 +538,20 @@ transcription agreeing at every step of every committed vector, and the freeze r
   later search; R follows the round rule.
 - **FR-018**: A candidate without R_bound at 16×16 MUST be decided `ineligible` before any of its
   production-width hours at 8×8 or 4×4 are charged. A replacement may then be entered under the
-  inherited stop rule.
-  The decision comes as soon as either kind's established bounds at 16×16 cannot pass weight 128 by
-  R_max; a search of the other kind then running stops, its record `inconclusive` and its hours
-  charged. The cause is the candidate's own, a replacement being possible, unless it is a row that
-  cannot hold the run at its recorded need, which is shared, as inherited (ANA-078).
+  inherited stop rule. The decision comes as soon as either kind's established bounds at 16×16
+  cannot pass weight 128 by R_max; a search of the other kind then running stops, its record
+  `inconclusive` and its hours charged. The cause is the candidate's own, a replacement being
+  possible, unless it is a row that cannot hold the run at its recorded need, which is shared, as
+  inherited (ANA-078). A size-independent search's hours count at no size: they are charged to the
+  trail row before the 16×16 climb.
 - **FR-019**: A trail record MUST hold the difference or mask at the input and output of every
   nonlinear operation of every round, and the state at every round boundary, so that its weight
   follows by exact integer arithmetic from the characteristic and the candidate's committed
-  operation list alone (D9). The data model fixes the format before the first trail search.
-  A nonlinear operation is one modular addition or subtraction on w-bit words, or one S-box applied
-  to its input bits; an S-box layer is recorded S-box by S-box.
+  operation list alone (D9). The data model fixes the format before the first trail search. A
+  nonlinear operation is one modular addition or subtraction on w-bit words, or one S-box applied to
+  its input bits; an S-box layer is recorded S-box by S-box. A bitwise Boolean function inside an
+  invertible update (feature 004's four-update NOR network among them) is recorded as one S-box per
+  bit position, its table the update's truth table over its input bits.
 - **FR-020**: The re-check MUST recompute every `split` bound from its parts, and every trail's
   weight as an exact rational, with every transition checked. A trail with probability or squared
   correlation above 2⁻¹²⁸ is classed a confirmed vulnerability of the rounds it covers and enters
@@ -559,16 +576,20 @@ transcription agreeing at every step of every committed vector, and the freeze r
   that row holds the recorded need of each run the rules require at every size. Feature 004's FR-026
   figures, with the goal of 10⁸ words per second, and the constants' ROM size per food node are
   reported for each candidate at its R, up to R_max + Δ; a candidate whose R puts the goal out of
-  reach stays eligible.
-- **FR-023**: A feature-004 design entered again (D1) MUST be a new candidate with a new ID,
-  counted as evaluated from its first entry; its feature-004 records are cited as prior results,
-  never as its evidence, and every kind of evidence runs again under this protocol.
-  The inherited constant rule holds no ID, so an unchanged design at an unchanged variant receives
-  feature 004's constants exactly. A design is derived from a feature-004 design when its operation
-  list is that design's, unchanged or changed only as a variant or a fix in the inherited sense; a
-  structural change makes a new design, whose `derived_from` still names its starting point, with
-  the change listed. D4 scores a re-entered design here like any other, feature 004's D4 record
-  cited as a prior result only, and the design meets every inherited hardware rule.
+  reach stays eligible. The selection rule reads R as established, whatever its route, with no
+  adjustment for a sum's weaker bound.
+- **FR-023**: A feature-004 design entered again (D1) MUST be a new candidate with a new ID, counted
+  as evaluated from its first entry; its feature-004 records are cited as prior results, never as
+  its evidence, and every kind of evidence runs again under this protocol. The inherited constant
+  rule holds no ID, so an unchanged design at an unchanged variant receives feature 004's constants
+  exactly. A design is derived from a feature-004 design when its operation list is that design's,
+  unchanged or changed only as a variant or a fix in the inherited sense; a structural change makes
+  a new design, whose `derived_from` still names its starting point, with the change listed. D4
+  scores a re-entered design here like any other, feature 004's D4 record cited as a prior result
+  only, and the design meets every inherited hardware rule. An unchanged re-entered design is a
+  candidate of this feature, its permutation and constants equal to feature 004's, and its design
+  rationale says so; the inherited rule on what makes a new candidate governs changes within this
+  feature.
 - **FR-024**: The final report and the design rationale MUST state the selection bias over every
   design considered in features 004 and 005, by family and with each design's outcome: B1 and A1
   `ineligible`, B2 and A2 proposed and declined, never evaluated, feature 004's D4 record and its
@@ -592,10 +613,13 @@ transcription agreeing at every step of every committed vector, and the freeze r
 
 - **FR-026**: Every hand-written document of this feature MUST carry the disclaimer naming
   `phyco-v4` that opens this spec, word for word, held in `protocol/disclaimer.py` as feature 005's
-  constant. The claim test MUST cover this feature's documents, its reports and `phyco-v4` with feature
-  004's rules, `v4-A<k>` and `v4-B<k>` among its model words, from plan phase 1, before "L1 recorded"
-  can be set; once it does, it scans every document of this feature written before it, the checklists
-  and `checklist-choices.md` included, each finding fixed or allow-listed before the next step.
+  constant. The claim test MUST cover this feature's documents, its reports and `phyco-v4` with
+  feature 004's rules, `v4-A<k>` and `v4-B<k>` among its model words, from plan phase 1, before "L1
+  recorded" can be set; once it does, it scans every document of this feature written before it, the
+  checklists and `checklist-choices.md` included, each finding fixed or allow-listed before plan
+  phase 2's probes start. A generated checklist line that the claim test flags is never rewritten:
+  it gets an allow-list entry with its reason, the line naming a parameter, a file or a rule and no
+  property of a design.
 - **FR-027**: The spec approval MUST bring a new version of security.md, with its history entry: a
   row for `phyco-v4` in §1.1 and its line in §15's register, L0 with no claim and not for secrets;
   §15's L1 gate naming this spec's FR-013 beside feature 004's FR-012; and §22 with this feature in
@@ -621,19 +645,22 @@ transcription agreeing at every step of every committed vector, and the freeze r
   written with the claim test's extension in plan phase 1.
 - **FR-031**: Every change to this spec, the plan or their documents after the plan approval and
   before any result MUST be listed with its direction (stricter, settled, or a reading set aside) in
-  `checklist-choices.md`'s lists "Rows that change the protocol", or beside the change, and entered
-  in feature 005's protocol change log after its first entry, before any result; a reading set aside
-  is decided in the row "Readings set aside" at the tasks approval. The protocol change log is
-  created in plan phase 1, after the tasks approval and before any evidence run, its first entry
-  naming FR-001's baseline documents and `research/005/plan-projections.json` by SHA-256; the
-  provenance log of this feature's hand-written documents starts in the same phase, its first
-  entries covering the documents written before it.
+  `checklist-choices.md`'s lists "Rows that change the protocol", a change outside a checklist round
+  in a section of its own for its batch, and entered in feature 005's protocol change log after its
+  first entry, before any result; a reading set aside is decided in the row "Readings set aside" at
+  the tasks approval. The protocol change log is created in plan phase 1, after the tasks approval
+  and before any evidence run, its first entry naming FR-001's baseline documents and
+  `research/005/plan-projections.json` by SHA-256; the provenance log of this feature's hand-written
+  documents starts in the same phase, its first entries covering the documents written before it.
+  Feature 005's provenance log also covers the files both features share (security.md,
+  `protocol/claims.json`, `.gitattributes`, README) from their first change by this feature, feature
+  004's log keeping its last entries for them.
 
 ### Pre-registered Design Protocol: the changed rules
 
 The inherited protocol applies except for these rules, each fixed at spec approval and afterwards
-only stricter (inherited FR-044): every later change, under every reading of the old text, lies in its
-rule's stricter direction or settles an open case by its most conservative reading, as
+only stricter (inherited FR-044): every later change, under every reading of the old text, lies in
+its rule's stricter direction or settles an open case by its most conservative reading, as
 `checklist-choices.md`'s "How to answer" states, and is recorded as FR-031 asks.
 
 - **The climb (round rule's R_bound)**: FR-014 to FR-018. *Stricter means*: R_max only falls.
