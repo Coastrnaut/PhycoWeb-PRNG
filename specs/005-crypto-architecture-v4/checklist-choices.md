@@ -562,4 +562,6 @@ analysis loop takes the recommended edit of the one finding of the report on 74b
 
 ### Rows that change the protocol (analysis remediation 10)
 
+The batch's two commits are 5e5ea24 (its choices) and 62e68f2 (its changes applied).
+
 None: the batch's one row restates a guard the spec already fixes and changes no rule.
