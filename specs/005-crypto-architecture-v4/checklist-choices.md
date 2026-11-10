@@ -550,3 +550,16 @@ analysis loop takes the recommended edit of the one finding of the report on 257
 The batch's two commits are 6d6ecd4 (its choices) and 059bdac (its changes applied).
 
 None: the batch's one row clarifies a name and changes no rule.
+
+## Analysis remediation 10 (tenth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 9 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the one finding of the report on 74b37bc.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR10-L7 | The candidate log guard's second condition in quickstart V4 | Quickstart V4 and the tasks' Phase 3 "Independent Test" add that `propose` appends only once `$REP/projection-table.json` also exists, as FR-011, data-model §5, the contract and task T028 have it | B: no change | quickstart V4; tasks Phase 3 |
+
+### Rows that change the protocol (analysis remediation 10)
+
+None: the batch's one row restates a guard the spec already fixes and changes no rule.
