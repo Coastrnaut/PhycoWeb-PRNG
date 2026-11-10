@@ -45,11 +45,20 @@ disclaimer, the claim test's coverage, the inherited threat model, and the scope
 - [x] CHK015 Are the scope statements that FR-016 asks of every `split` record, single trails under the usual independence assumptions with clustering and key-dependent effects open, required word for word as feature 004's bounds state them, so that a sum never reads as a stronger result than its parts? [Clarity, Spec §FR-016, data-model §2]
 - [x] CHK016 Is it specified that the selection-bias statement, the projection table and the final report's account of feature 004's candidates (for example "A1's committed 16×16 bounds already lie below 2⁻¹²⁸") keep to bound wording and state no property of any design, under the claim test's rules? [Clarity, Spec §FR-024, FR-029, Context]
 
+## Round 2 (first re-run, after round 1's changes)
+
+- [ ] CHK017 Is FR-010's bound stated with its derivation, the least of feature 004's generic bounds, k/2 = 128 bits from single-target quantum search on the key against c/2 = 192 bits from the capacity, so that "the bound these place on any level" is not read as coming from the reachable state? [Clarity, Spec §FR-010, feature-004 design.md "Generic bounds"]
+- [ ] CHK018 Is "before the next step" in FR-026 defined, naming the step that waits until the scan's findings are fixed or allow-listed (plan phase 2's probes, or the row "L1 recorded")? [Clarity, Spec §FR-026]
+- [ ] CHK019 Is the treatment of generated checklist lines that the claim test flags stated (security CHK011, for one, holds "256-bit" beside "security.md" with no "target"), given that the checklist command never rewrites a generated item: an allow-list entry with its reason, the item unchanged? [Gap, Spec §FR-026]
+- [ ] CHK020 Is the form of the security target's files with R as placeholders defined, feature 004's `parameters.json` and `limits.json` holding numbers, and is the size profile's check said to accept the placeholders before every R is known? [Gap, Spec §FR-011, FR-012, feature-004 data-model §10]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
   clarifying questions, the owner's instruction of 2026-11-09 asking for a loop without human interaction and the input
   naming every focus area; depth standard, audience the reviewer.
+- Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); four new
+  items, CHK017 to CHK020; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
