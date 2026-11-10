@@ -535,3 +535,16 @@ analysis loop takes the recommended edit of the two findings of the report on 49
 The batch's two commits are 0dabd2c (its choices) and 2c68e46 (its changes applied).
 
 None: the batch's rows clarify a citation and a name and change no rule.
+
+## Analysis remediation 9 (ninth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 8 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the one finding of the report on 25772a7.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR9-L6 | The bare D4 of the families' choice | FR-001's sentence reads: wherever D4 names a choice, a score, a record, a width or a tie of the families' choice it is feature 004's D4, the nonlinearity choice rule, as are the names "the D4 choice", "D4 tie", `d4_choice.py` and the `d4` records; elsewhere, as in research R8, D4 is this spec's decision so numbered in its table | B: rename every bare use. C: no change | spec FR-001 |
+
+### Rows that change the protocol (analysis remediation 9)
+
+None: the batch's one row clarifies a name and changes no rule.
