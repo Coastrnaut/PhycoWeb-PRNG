@@ -83,8 +83,9 @@ search under `research/005/tools/`; no new download is planned.
 **Storage**: committed JSON records and hash-chained JSON-lines logs under `reports/005-crypto-architecture-v4/` and
 `research/005/`, as feature 004's data model states them for its paths; local-only outputs under `data/local/005/`.
 
-**Testing**: `python -W ignore -m unittest discover -s tests -t .` on both platforms (feature 004's quickstart P0), with
-feature 005's tests in `tests/test_protocol_005.py` and beside the modules they test.
+**Testing**: `python -W ignore -m unittest discover -s tests -t .` on both platforms (feature 004's quickstart P0), with feature
+005's tests in `tests/test_protocol_005.py`, `tests/test_tools_005.py` for research R7's companion, and beside the modules they
+test.
 
 **Target Platform**: the machine of feature 004's research R1: Windows 11 and WSL, 32 logical processors, 68 GB of memory.
 

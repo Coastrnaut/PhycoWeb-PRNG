@@ -164,7 +164,8 @@ held in `research/005/plan-projections.json`.
   addition, so a round of several additions gets no characteristic from it: a companion under `research/005/tools/`, a copy of
   that tool whose trail output adds the state after every step of every round, writes the trails, validated as a tool of its own
   on the ARX search's known results before its first counted use (inherited FR-039, R12); feature 004's tool and its records
-  stay unchanged (spec FR-003).
+  stay unchanged (spec FR-003). This feature's ARX searches run on the companion alone, its search feature 004's unchanged but
+  for its output, so that no search runs twice; it is projected with the factor R1 gives a tool with no pair at a size.
 - **Rationale**: a difference held only after each round cannot fix the differences between two nonlinear layers of one round
   (feature 004, T131); held at every operation, the weight follows from the record alone.
 - **Alternatives considered**: feature 004's per-round format (rejected by D9).

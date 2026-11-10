@@ -16,7 +16,9 @@ defaults), plan.md (plan approval of 2026-11-09, afc6769, with the run limits ex
 the plan's documents as of 74dd867), research.md (R1–R14), data-model.md, contracts/cli.md,
 quickstart.md and `research/005/plan-projections.json`, with checklist-choices.md and the six
 checklists, whose choices of rounds 1 to 5 were answered in advance on the owner's instruction of
-2026-11-09 and applied; round 6 found no new item (ade430c), which ended the checklist loop.
+2026-11-09 and applied; round 6 found no new item (ade430c), which ended the checklist loop. The
+`/speckit-analyze` loop's batches, "Analysis remediation <k>", stand in checklist-choices.md, each
+with its row in the spec's Review & Approval table.
 Feature 004's documents at 99e6994, as FR-001 names them, are the baseline: where this list and an
 inherited text differ, this feature's documents apply, and an inherited requirement is cited as
 "inherited FR-<n>" (FR-001).
@@ -24,9 +26,10 @@ inherited text differ, this feature's documents apply, and an inherited requirem
 **Tests**: included. Principle II asks for a bit-accurate reference model with reproducible
 automated tests and committed golden vectors, Principle IV forbids weakening an acceptance criterion
 to obtain a passing result, and FR-025 carries feature 004's tests of the model, its vectors and its
-freeze for `phyco-v4`. This feature's own tests go to `tests/test_protocol_005.py`, beside the tests
-of each changed module (plan, Technical Context); within each group, tests come before the code
-they test. Property tests use Hypothesis with the deterministic profile of inherited research R17.
+freeze for `phyco-v4`. This feature's own tests go to `tests/test_protocol_005.py`, those of
+research R7's companion to `tests/test_tools_005.py`, beside the tests of each changed module (plan,
+Technical Context); within each group, tests come before the code they test. Property tests use
+Hypothesis with the deterministic profile of inherited research R17.
 
 **Organization**: phase k of this list is plan phase k ("Plan Phases"), so a reference to a plan
 phase in the spec, the contract or the quickstart reads the same here; Phase 0 holds the steps
@@ -50,11 +53,13 @@ as the contract reads `model_v3` as `model_v4`: `phycoweb/model_v4.py`, `phycowe
 Review & Approval table but those the spec's notes give the agent ("Checklist choices, round <k>"
 and "Analysis remediation <k>", set on the owner's advance approval of 2026-11-09). Where the owner
 gives a decision in writing, the agent writes and commits its row, quoting the owner's words with
-their date, and performs an approval step only on the owner's written word for that step, the
-record quoting it, as in feature 004 from 2026-11-05. **heavy** marks a heavy run (inherited
-FR-045): it takes `data/heavy-run.lock`, the one lock of both features, projects first against its
-row, runs at one thread (FR-007), never overlaps another heavy run and needs no go-ahead of its own,
-by the owner's word of 2026-11-05, "dont wait to start any heavy runs".
+their date, and performs an approval step only on the owner's written word for that step, the record
+quoting it, as in feature 004 from 2026-11-05. **heavy** marks a heavy run (inherited FR-045): it
+takes `data/heavy-run.lock`, the one lock of both features, projects first against its row, runs a
+search at one thread (FR-007) and the uniform controls, the bias tests and the rotation search at
+their workers (research R4), each record's `parallelism` stating it, never overlaps another heavy
+run and needs no go-ahead of its own, by the owner's word of 2026-11-05, "dont wait to start any
+heavy runs".
 
 The agent commits locally under the owner's standing authorization (constitution, Principle IX),
 after each task or set of related tasks and about every 30 minutes, with no co-author line naming
@@ -269,8 +274,8 @@ feature before T009 (FR-003).
   `design-versions/` read as the documents they copy (FR-001); each model's `in_progress` counts its
   own feature's searched `pass` bound records citing a validation record, a `split` record never
   counted (data-model §2), `phyco-v4`'s reading `none` until this feature's first such record; the
-  code paths scanned gain `research/005/`, read from this feature's first commit; and a generated
-  checklist line that a rule flags passes only through an allow-list entry giving FR-026's reason.
+  code paths scanned gain `research/005/`; and a generated checklist line that a rule flags passes
+  only through an allow-list entry giving FR-026's reason.
   Feature 004's rules and findings are unchanged. (FR-001, FR-013, FR-026, FR-030; SC-007; R10)
 - [ ] T017 Extend `scripts/check_claims.py` until T016 passes, and give `phyco-v4`'s entry in
   `protocol/claims.json` its `fut_sec`: the statuses of feature 004's table "Security Policy
@@ -318,8 +323,9 @@ feature before T009 (FR-003).
 - [ ] T021 **heavy**: after T015, run the whole suite with `PHYCOWEB_FEATURE=005` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and with `wpy` in WSL, under the heavy-run
   lock, projected first against the feature-wide row's share for whole-suite runs (two per platform,
-  plan, "Values this plan fixes before first use"): every test passes, or skips naming its open
-  item, none fails, and nothing is written under feature 004's paths; record the commands and
+  plan, "Values this plan fixes before first use"), the row read from `plan-projections.json`'s
+  approved option, the projection table not existing yet: every test passes, or skips naming its
+  open item, none fails, and nothing is written under feature 004's paths; record the commands and
   results for the phase report. (FR-003, FR-008; SC-008; Principle V)
 
 **Checkpoint**: the setting stands with feature 004's re-check unchanged; this feature's
@@ -349,16 +355,17 @@ that hold candidates (SC-001).
   than timing discarded unread; a probe that would take the probes past their 40 h share is refused,
   its run keeping the plan's projection (FR-005); before `$REP/projection-table.json` exists, the
   row and the 40 h share are read from `plan-projections.json`'s approved option; a structural or
-  bias probe runs at R = 66 rounds (research R5); `projection_table.py` exits 2 once any `proposed`
-  entry exists, when `plan-projections.json` fails its `--check`, or when a listed probe record is
-  missing; each value is the smaller of the approved option's and the probes', never raised; a
-  search probe that reached the limit reads as its search reaching its cap; a structural or bias
-  need is the smaller of the provisional need (12 h and 24 h per candidate) and the sum over the
-  sizes of each finished probe's hours and each other size's equal share (4 h and 8 h), a probe
-  lowering it only by the kinds it covers (research R5); the table holds numbers, record IDs and
-  fixed field names and no prose (FR-024), with `plan_projections_sha256` and its kind `raw`;
-  `--check` recomputes it and exits 1 on a difference; a probe that shows a need above its row is
-  printed and recorded. (FR-005, FR-009, FR-024; SC-001)
+  bias probe runs at R = 66 rounds (research R5); every probe runs at one thread, as FR-005 has it,
+  a bias probe's hours thereby an upper figure for the bias tests' workers (research R4);
+  `projection_table.py` exits 2 once any `proposed` entry exists, when `plan-projections.json` fails
+  its `--check`, or when a listed probe record is missing; each value is the smaller of the approved
+  option's and the probes', never raised; a search probe that reached the limit reads as its search
+  reaching its cap; a structural or bias need is the smaller of the provisional need (12 h and 24 h
+  per candidate) and the sum over the sizes of each finished probe's hours and each other size's
+  equal share (4 h and 8 h), a probe lowering it only by the kinds it covers (research R5); the
+  table holds numbers, record IDs and fixed field names and no prose (FR-024), with
+  `plan_projections_sha256` and its kind `raw`; `--check` recomputes it and exits 1 on a difference;
+  a probe that shows a need above its row is printed and recorded. (FR-005, FR-009, FR-024; SC-001)
 - [ ] T023 [P] [US1] Add `--probe` to `scripts/evidence_v3.py` (contracts/cli.md; research R5) until
   T022's probe tests pass: the run itself on a reference design's committed operation list,
   `research/004/candidates/cand-A1.py` or `cand-B1.py`, read and never written, up to 4 h, written
@@ -555,12 +562,13 @@ re-check recomputes every sum, every trail's weight and R_bound at each size (SC
 every candidate without R_bound at 16×16 decided with no hour at 8×8 or 4×4 (SC-004); the
 selection-bias statement checked against both features' candidate logs (SC-006).
 
-**Rules**: one heavy run at a time, each projected first, at one thread (FR-007), within its size's
+**Rules**: one heavy run at a time, each projected first, a search at one thread (FR-007) and the
+controls, the bias tests and the rotation search at their workers (research R4), within its size's
 cap and its candidate's row as `$REP/projection-table.json` fixes them, at most the plan's (caps of
 8 h at 4×4, 24 h at 8×8 and 48 h at 16×16; an ARX candidate's row 267.5 h, a Boolean candidate's
 425.3 h), all heavy runs within the ceiling of 2,200 h (FR-008); at most three evaluated candidates
-per family; D4 chooses the family, the other analysed at the production width only if the chosen
-one ends with no eligible candidate (D14).
+per family; D4 chooses the family, the other analysed at the production width only if the chosen one
+ends with no eligible candidate (D14).
 
 - [ ] T040 [US3] Write the round rule's tests for this feature in `tests/test_protocol_005.py`
   (quickstart V5, V6; contracts/cli.md, "`scripts/round_rule.py --candidate ID`"; data-model §2): at
@@ -605,17 +613,18 @@ one ends with no eligible candidate (D14).
   the constant table by SHA-256; an operation list holding any other nonlinear operation gets no
   trail search, the candidate `blocked` for that cause (FR-020); under `005` the runner refuses a
   bound search at 8×8 or 4×4 before the candidate's 16×16 climb has ended, and a structural or bias
-  run out of the order 4×4, 8×8, 16×16; every search records thread count 1 and its size's cap from
-  the projection table, and every other record states its thread or worker count (FR-007); a search
-  whose projection does not fit its row is refused, the refusal in its `projection` record. (FR-006,
-  FR-007, FR-014, FR-015, FR-019, FR-020; SC-005)
-- [ ] T043 [US3] Change `scripts/evidence_v3.py` for this feature until T042 passes: the trail
-  record's characteristic from the output of T039's companion and the candidate's committed
-  operation list, its class by FR-020, the order of sizes per kind, the caps and rows from
-  `$REP/projection-table.json`, and the thread count; no tool file whose exact hash a validation
-  record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that would reach
-  one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014, FR-019,
-  FR-020; SC-005; R7)
+  run out of the order 4×4, 8×8, 16×16; every search records one thread in `parallelism` and its
+  size's cap from the projection table, and every other record its workers in `parallelism` (FR-007;
+  research R4); a search whose projection does not fit its row is refused, the refusal in its
+  `projection` record. (FR-006, FR-007, FR-014, FR-015, FR-019, FR-020; SC-005)
+- [ ] T043 [US3] Change `scripts/evidence_v3.py` for this feature until T042 passes: the ARX
+  searches run on T039's companion alone, each trail record's characteristic from its output and the
+  candidate's committed operation list, its projections with the factor research R1 gives a tool
+  with no pair (research R7); each trail's class by FR-020, the order of sizes per kind, the caps
+  and rows from `$REP/projection-table.json`, and the thread count; no tool file whose exact hash a
+  validation record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that
+  would reach one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014,
+  FR-019, FR-020; SC-005; R7)
 - [ ] T044 [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
   (data-model §6; quickstart V9): from the candidate logs of both features, one row per design with
   `feature`, `id`, `family`, `outcome` (`ineligible`, `proposed and declined`, `selected`,
@@ -669,15 +678,15 @@ one ends with no eligible candidate (D14).
   needed, naming `d4/tie.json` and its tie-break. (FR-022; SC-010; Principle VIII)
 - [ ] T051 [US3] **heavy**: for the chosen family's candidates in turn, run the production-width
   trail-bound climbs with `python scripts/round_rule.py --candidate ID`, which drives
-  `scripts/evidence_v3.py` (quickstart V5 to V7): a size-independent search first; then at 16×16, r
-  from 1, the linear search then the differential at each r, each within the 16×16 cap and the
-  candidate's trail row, the `split` records written after each r, until both kinds' weights exceed
-  128 or r reaches 64; a candidate without R_bound at 16×16 decided `ineligible` at once with the
-  cause `no R_bound at 16×16` and no hour at 8×8 or 4×4, a replacement then entered by T046 under
-  the inherited stop rule, within its family's limit and while its family's row holds the recorded
-  need of each run the rules require at every size; then 8×8 and 4×4 the same way under their caps;
-  every trail recorded at every nonlinear operation. (FR-014, FR-015, FR-016, FR-017, FR-018,
-  FR-019, FR-022; SC-003, SC-004, SC-008)
+  `scripts/evidence_v3.py`, an ARX design's searches on T039's companion (quickstart V5 to V7): a
+  size-independent search first; then at 16×16, r from 1, the linear search then the differential at
+  each r, each within the 16×16 cap and the candidate's trail row, the `split` records written after
+  each r, until both kinds' weights exceed 128 or r reaches 64; a candidate without R_bound at 16×16
+  decided `ineligible` at once with the cause `no R_bound at 16×16` and no hour at 8×8 or 4×4, a
+  replacement then entered by T046 under the inherited stop rule, within its family's limit and
+  while its family's row holds the recorded need of each run the rules require at every size; then
+  8×8 and 4×4 the same way under their caps; every trail recorded at every nonlinear operation.
+  (FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-022; SC-003, SC-004, SC-008)
 - [ ] T052 [US4] **heavy**: before any candidate's first frequency or avalanche run at a size, run
   the uniform controls there with
   `python scripts/evidence_v3.py --kind control --test frequency --size N --out-dir $REP/controls`,
@@ -692,8 +701,8 @@ one ends with no eligible candidate (D14).
   `degree` records last; then the frequency test on both input sets, N = 2²⁰ through Π and Π⁻¹, and
   the avalanche test on the flip set, the related-key and related-nonce set and the rotational
   pairs, N_a = 8,256, as inherited; each kind at 4×4, then 8×8, then 16×16, within its row,
-  projected first, at the thread or worker count its record states (FR-007). (FR-007, FR-014,
-  FR-022; SC-008)
+  projected first, at the thread or worker count research R4 gives its kind, stated in its record's
+  `parallelism` (FR-007). (FR-007, FR-014, FR-022; SC-008)
 - [ ] T054 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
   stands at every claimable size, R by the round rule with every input cited, a table for a larger R
   generated and checked as inherited FR-023 asks of every rise; after a rise of R, repeat the
@@ -987,8 +996,7 @@ commits on the owner's written word (spec notes).
 - **Phase 2 (US1)** needs Phase 1, T015 and T018 above all (no probe before the protocol change log
   and the claim test's first scan): T022 → T023 ∥ T024 → T025 → T026 → T027.
 - **Phase 3 (US2)** needs Phase 1 (T017 before T037) and may run before, beside or after Phase 2,
-  having one heavy run at most; T028 → T029, T030 → T031 → T032 → T033 → T034 → T035 → T036 →
-  T037.
+  having no heavy run; T028 → T029, T030 → T031 → T032 → T033 → T034 → T035 → T036 → T037.
 - **Phase 4** needs Phase 1; T038 → T039.
 - **Phase 5** needs Phases 2, 3 and 4: no `proposed` entry before T026 and T036 (FR-011); T040 →
   T041, T042 → T043 and T044 → T045 before T046; T046 → T047 → T048 → T049 (→ T050) → T051, the
@@ -1017,7 +1025,7 @@ commits on the owner's written word (spec notes).
    candidate exists.
 2. **Security target first** (Phase 3): the target reviewed before any candidate, L1 recorded.
 3. **Tools** (Phase 4): every counted tool's validation in force for its exact hash, and the ARX
-search's companion of research R7 validated.
+   search's companion of research R7 validated.
 4. **Candidates and evidence** (Phase 5): the climbs at 16×16 first, continued by sums; R by the
    round rule; a selection or a stop, a stop being a valid outcome, reported with what was reached.
 5. **Model, vectors and transcription** (Phases 6 and 7).
