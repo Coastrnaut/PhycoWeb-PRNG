@@ -463,6 +463,8 @@ analysis loop takes the recommended edit of both findings of the report on 5f0d5
 
 ### Rows that change the protocol (analysis remediation 4)
 
+The batch's two commits are 3cc4d8b (its choices) and 6bf28fe (its changes applied).
+
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule.
 
