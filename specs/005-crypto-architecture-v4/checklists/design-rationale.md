@@ -43,11 +43,18 @@ the candidate IDs and the D4 choice
 
 - [x] CHK013 Is the assumption that every inherited design rule (the torus, the two lanes, neighbour-only data flow, the operation list, the replaced mechanisms and the slime-mould mapping's one sentence) applies unchanged to `phyco-v4` stated in the spec, or only implied by FR-001? [Assumption, Spec §FR-001, FR-025]
 
+## Round 2 (first re-run, after round 1's changes)
+
+- [ ] CHK014 Is it stated that a feature-004 design entered again unchanged is a candidate of this feature although its permutation, constants included, equals feature 004's, and that its design rationale says so, the inherited rule on what makes a new candidate speaking only of changes within one feature? [Clarity, Spec §FR-023, inherited stop rule]
+- [ ] CHK015 Does the spec state that the selection rule (the smallest R at 4×4) reads R as established whatever its route, so that a candidate whose R_bound rests on sums is compared on its larger R without any adjustment? [Clarity, Spec §FR-016, FR-022]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
   clarifying questions, the owner's instruction of 2026-11-09 asking for a loop without human interaction and the input
   naming every focus area; depth standard, audience the reviewer.
+- Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); two new
+  items, CHK014 and CHK015; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
