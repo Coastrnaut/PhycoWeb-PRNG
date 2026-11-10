@@ -69,6 +69,10 @@ the candidate IDs and the D4 choice
 - [x] CHK029 Does the contract's `candidate_log.py propose ID --derived-from PATH:SHA256` carry data-model §5's `relation` and `changes`, the command naming only the operation list? [Consistency, contracts/cli.md, data-model §5, Spec §FR-023]
 - [x] CHK030 Does FR-004's "the records added since are FR-053's projections" follow FR-001's reading rule, under which a bare FR-<n> in this feature's documents is this spec's, this spec having no FR-053? [Consistency, Spec §FR-004, FR-001]
 
+## Round 5 (fourth re-run, after round 4's changes)
+
+- [ ] CHK031 Does the contract's `--relation derived|starting-point` name the value that data-model §5 writes in `relation` (`starting point`, with a space), so that the record's value has one spelling and the selection-bias statement reads it as written? [Consistency, contracts/cli.md, data-model §5, §6]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
@@ -86,6 +90,8 @@ the candidate IDs and the D4 choice
   4 new items, CHK027 to CHK030; no clarifying questions, as in round 1.
 - Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
+- Round 5, 2026-11-09: re-run over the complete documents after round 4's changes (ea2e924, 32e7338);
+  one new item, CHK031; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
