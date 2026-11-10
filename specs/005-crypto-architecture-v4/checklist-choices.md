@@ -344,3 +344,22 @@ rule.
 | ANA-036 | Non-search needs (FR-005) | settled | a need lowered only by finished runs, size by size |
 | PRO-029, PRO-030 | The place check and changes after the tasks approval (notes, FR-031) | stricter | a tool and its commits fixed; an approval required |
 | REP-021, REP-022 | Runs under the setting (FR-003) | stricter | no writes under feature 004's paths; the comparison fixed |
+
+## Round 5 (fourth re-run, 2026-11-09)
+
+**Answered in advance**, as rounds 1 to 4 were: the owner's instruction of 2026-11-09 takes option A of every row.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| RAT-031 | One spelling of `starting-point` | Data-model §5 writes the value as `starting-point`, the contract's spelling, so that the record and the command read one value and the selection-bias statement shows it as written | B: the contract maps `starting-point` to `starting point`. C: no change | data-model §5 |
+| ANA-037 | Repetition inside a search for designs that add constants | FR-016: a design holding an addition of a committed constant takes no bound that rests on the repetition: no sum, no floor taken from shorter spans inside a search (the floors of Matsui's lemma in `active_sbox.py` and `long_trail.py`) and no active-box count multiplied by one box's bound over one call; its bounds come only from searches that model each round's constants, by a tool validated for such additions (inherited FR-039) | B: floors and counts where the spans' constants coincide. C: no change | spec FR-016 |
+
+### Rows that change the protocol (round 5)
+
+Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
+rule.
+
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| RAT-031 | The candidate log's fields (FR-023) | settled | one value fixed |
+| ANA-037 | Constant-dependent bounds (FR-016) | stricter | no bound resting on repetition for such designs |
