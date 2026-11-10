@@ -64,10 +64,10 @@ the candidate IDs and the D4 choice
 
 ## Round 4 (third re-run, after round 3's changes)
 
-- [ ] CHK027 Is FR-023's "its rotation search is not run again" consistent with its "every kind of evidence runs again under this protocol", the rotation ranking being an inherited record kind whose searches are trail searches charged to the candidate's row (inherited FR-024), and with inherited FR-024's rule that every entered candidate's amounts are searched again at 8 where research R6's rule fixes the D4 width at 8, feature 004's D4 record having been made at 16? [Conflict, Spec §FR-023, feature-004 FR-024, feature-004 D4 record]
-- [ ] CHK028 Can `rationale.md`'s sections "Changes from Version 0.4" (FR-010) list a change of a parameter with its values, inherited FR-034 failing any line of `rationale.md` that writes k, s, c, r, R, u, ε or N with a value outside a citation of the design document or of a record? [Conflict, Spec §FR-010, Edge Cases, feature-004 FR-034]
-- [ ] CHK029 Does the contract's `candidate_log.py propose ID --derived-from PATH:SHA256` carry data-model §5's `relation` and `changes`, the command naming only the operation list? [Consistency, contracts/cli.md, data-model §5, Spec §FR-023]
-- [ ] CHK030 Does FR-004's "the records added since are FR-053's projections" follow FR-001's reading rule, under which a bare FR-<n> in this feature's documents is this spec's, this spec having no FR-053? [Consistency, Spec §FR-004, FR-001]
+- [x] CHK027 Is FR-023's "its rotation search is not run again" consistent with its "every kind of evidence runs again under this protocol", the rotation ranking being an inherited record kind whose searches are trail searches charged to the candidate's row (inherited FR-024), and with inherited FR-024's rule that every entered candidate's amounts are searched again at 8 where research R6's rule fixes the D4 width at 8, feature 004's D4 record having been made at 16? [Conflict, Spec §FR-023, feature-004 FR-024, feature-004 D4 record]
+- [x] CHK028 Can `rationale.md`'s sections "Changes from Version 0.4" (FR-010) list a change of a parameter with its values, inherited FR-034 failing any line of `rationale.md` that writes k, s, c, r, R, u, ε or N with a value outside a citation of the design document or of a record? [Conflict, Spec §FR-010, Edge Cases, feature-004 FR-034]
+- [x] CHK029 Does the contract's `candidate_log.py propose ID --derived-from PATH:SHA256` carry data-model §5's `relation` and `changes`, the command naming only the operation list? [Consistency, contracts/cli.md, data-model §5, Spec §FR-023]
+- [x] CHK030 Does FR-004's "the records added since are FR-053's projections" follow FR-001's reading rule, under which a bare FR-<n> in this feature's documents is this spec's, this spec having no FR-053? [Consistency, Spec §FR-004, FR-001]
 
 ## Notes
 
@@ -84,6 +84,8 @@ the candidate IDs and the D4 choice
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
   4 new items, CHK027 to CHK030; no clarifying questions, as in round 1.
+- Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

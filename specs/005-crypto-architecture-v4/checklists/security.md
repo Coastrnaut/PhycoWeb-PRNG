@@ -74,9 +74,9 @@ disclaimer, the claim test's coverage, the inherited threat model, and the scope
 
 ## Round 4 (third re-run, after round 3's changes)
 
-- [ ] CHK038 Is "a larger key, nonce or capacity" (FR-010, the edge case "The security-target review changes a parameter" and the changed rules) consistent with the inherited rule that a keyed variant's key has k = min(c, 256) bits and its nonce k/2 (feature 004's design document, "Target parameters"), under which neither the key nor the nonce of a claimable size can grow and only the capacity can? [Conflict, Spec §FR-010, Edge Cases, "the changed rules", feature-004 design.md "Target parameters"]
-- [ ] CHK039 Does security.md §22 row 5a.1b's status ("checklist rounds 1 to 3 answered in advance and applied") stay true as later rounds are applied, FR-027 making the row follow this feature's gates, which the checklist rounds are not? [Consistency, security.md §22 row 5a.1b, Spec §FR-027]
-- [ ] CHK040 Is FR-013's "While "L1 recorded" reads Approved, the register's evidence for `phyco-v4` lists feature 004's demonstration record" consistent with inherited FR-069, under which that record is evidence only while the register gives the level those rows rest on, the level reading L0 once R fills the reviewed chapters although "L1 recorded" still reads Approved? [Consistency, Spec §FR-013, FR-011, feature-004 FR-069]
+- [x] CHK038 Is "a larger key, nonce or capacity" (FR-010, the edge case "The security-target review changes a parameter" and the changed rules) consistent with the inherited rule that a keyed variant's key has k = min(c, 256) bits and its nonce k/2 (feature 004's design document, "Target parameters"), under which neither the key nor the nonce of a claimable size can grow and only the capacity can? [Conflict, Spec §FR-010, Edge Cases, "the changed rules", feature-004 design.md "Target parameters"]
+- [x] CHK039 Does security.md §22 row 5a.1b's status ("checklist rounds 1 to 3 answered in advance and applied") stay true as later rounds are applied, FR-027 making the row follow this feature's gates, which the checklist rounds are not? [Consistency, security.md §22 row 5a.1b, Spec §FR-027]
+- [x] CHK040 Is FR-013's "While "L1 recorded" reads Approved, the register's evidence for `phyco-v4` lists feature 004's demonstration record" consistent with inherited FR-069, under which that record is evidence only while the register gives the level those rows rest on, the level reading L0 once R fills the reviewed chapters although "L1 recorded" still reads Approved? [Consistency, Spec §FR-013, FR-011, feature-004 FR-069]
 
 ## Notes
 
@@ -93,6 +93,8 @@ disclaimer, the claim test's coverage, the inherited threat model, and the scope
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
   3 new items, CHK038 to CHK040; no clarifying questions, as in round 1.
+- Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

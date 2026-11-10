@@ -330,6 +330,8 @@ rule. The round also reads round 1's ANA-005 and ANA-006 as `settled` (PRO-025).
 
 ### Rows that change the protocol (round 4)
 
+The round's two commits are a8a7023 (its choices) and ea2e924 (its changes applied).
+
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule.
 

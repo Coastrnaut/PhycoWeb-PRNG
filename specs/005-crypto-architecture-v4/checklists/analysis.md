@@ -72,8 +72,8 @@ these change
 
 ## Round 4 (third re-run, after round 3's changes)
 
-- [ ] CHK035 Are FR-019's "its weight follows ... from the characteristic and the candidate's committed operation list alone", FR-016's "constants aside" for the repetition a sum rests on, and inherited FR-023's "the trail bounds and the dependency matrices read no constant value" consistent with FR-020's weight for an addition of a committed constant, which depends on that constant's value, so that a design with such additions has bounds and trail weights that differ from round to round and per call type's stream? [Conflict, Spec §FR-016, FR-019, FR-020, feature-004 FR-023]
-- [ ] CHK036 Is it said how research R5's per-size probe hours combine with the plan's per-candidate provisional needs (12 h structural, 24 h bias for all three sizes together), a structural or bias probe at one size finishing while another's does not keep its kind's provisional need? [Clarity, Plan research R5, data-model §4, Spec §FR-005]
+- [x] CHK035 Are FR-019's "its weight follows ... from the characteristic and the candidate's committed operation list alone", FR-016's "constants aside" for the repetition a sum rests on, and inherited FR-023's "the trail bounds and the dependency matrices read no constant value" consistent with FR-020's weight for an addition of a committed constant, which depends on that constant's value, so that a design with such additions has bounds and trail weights that differ from round to round and per call type's stream? [Conflict, Spec §FR-016, FR-019, FR-020, feature-004 FR-023]
+- [x] CHK036 Is it said how research R5's per-size probe hours combine with the plan's per-candidate provisional needs (12 h structural, 24 h bias for all three sizes together), a structural or bias probe at one size finishing while another's does not keep its kind's provisional need? [Clarity, Plan research R5, data-model §4, Spec §FR-005]
 
 ## Notes
 
@@ -90,6 +90,8 @@ these change
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
   2 new items, CHK035 to CHK036; no clarifying questions, as in round 1.
+- Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

@@ -62,9 +62,9 @@ guards, the Review & Approval rows and gates, the protocol change log and the fe
 
 ## Round 4 (third re-run, after round 3's changes)
 
-- [ ] CHK028 Does FR-001's text that follows its table of baseline documents stand as a paragraph of its own, the reading of the later features' numbers and of feature 004's Review & Approval rows following the table's last row with no blank line, so that a Markdown renderer takes it as one more row of the table? [Clarity, Spec §FR-001]
-- [ ] CHK029 Is the place check's comparison defined now that the notes make it a step of the tasks approval: its tool, feature 004's `research/004/place_check.py` read for this feature (FR-001's path rule placing it at `research/005/place_check.py`, which does not exist), and the commits it compares, that tool reading each list's heading for its round's two commits by hash, which this feature's lists "Rows that change the protocol" do not name? [Gap, Spec §Review & Approval notes, "Place check", FR-001, feature-004 `research/004/place_check.py`]
-- [ ] CHK030 Is the approval of a change made after the tasks approval and before any result defined, such as the claim test's first-scan fixes before plan phase 2 (FR-026), the notes giving rows only to checklist rounds and to batches of the analysis loop under the owner's advance approval of 2026-11-09? [Gap, Spec §Review & Approval notes, FR-026, FR-031]
+- [x] CHK028 Does FR-001's text that follows its table of baseline documents stand as a paragraph of its own, the reading of the later features' numbers and of feature 004's Review & Approval rows following the table's last row with no blank line, so that a Markdown renderer takes it as one more row of the table? [Clarity, Spec §FR-001]
+- [x] CHK029 Is the place check's comparison defined now that the notes make it a step of the tasks approval: its tool, feature 004's `research/004/place_check.py` read for this feature (FR-001's path rule placing it at `research/005/place_check.py`, which does not exist), and the commits it compares, that tool reading each list's heading for its round's two commits by hash, which this feature's lists "Rows that change the protocol" do not name? [Gap, Spec §Review & Approval notes, "Place check", FR-001, feature-004 `research/004/place_check.py`]
+- [x] CHK030 Is the approval of a change made after the tasks approval and before any result defined, such as the claim test's first-scan fixes before plan phase 2 (FR-026), the notes giving rows only to checklist rounds and to batches of the analysis loop under the owner's advance approval of 2026-11-09? [Gap, Spec §Review & Approval notes, FR-026, FR-031]
 
 ## Notes
 
@@ -83,6 +83,8 @@ guards, the Review & Approval rows and gates, the protocol change log and the fe
   log's first entry; the plan approval row stays the record of the approval, naming them by commit.
 - Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
   3 new items, CHK028 to CHK030; no clarifying questions, as in round 1.
+- Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

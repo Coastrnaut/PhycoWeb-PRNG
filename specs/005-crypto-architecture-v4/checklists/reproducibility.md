@@ -55,8 +55,8 @@ trails, the baseline documents, line endings, and the reproduction of every comm
 
 ## Round 4 (third re-run, after round 3's changes)
 
-- [ ] CHK021 Is it said how the whole suite's tests of feature 004 run when the suite runs with `PHYCOWEB_FEATURE=005` (FR-003), several of them reaching feature 004's records through the setting's paths (`tests/test_records_004.py`, `tests/test_protocol_004.py`, `tests/test_tools_004.py`, `tests/test_claims.py`), so that each test pins the feature it checks, reads feature 004's records where it checks them and writes nothing under feature 004's paths? [Gap, Spec §FR-003, Plan research R9, "Testing"]
-- [ ] CHK022 Does FR-003 say what its test's run "before the change" is, `scripts/recheck_004.py --no-record` arriving with the feature setting in plan phase 1, for instance T132's committed record as feature 004's result before the change, so that the comparison writes nothing and still has two sides? [Clarity, Spec §FR-003, quickstart V2, contracts/cli.md]
+- [x] CHK021 Is it said how the whole suite's tests of feature 004 run when the suite runs with `PHYCOWEB_FEATURE=005` (FR-003), several of them reaching feature 004's records through the setting's paths (`tests/test_records_004.py`, `tests/test_protocol_004.py`, `tests/test_tools_004.py`, `tests/test_claims.py`), so that each test pins the feature it checks, reads feature 004's records where it checks them and writes nothing under feature 004's paths? [Gap, Spec §FR-003, Plan research R9, "Testing"]
+- [x] CHK022 Does FR-003 say what its test's run "before the change" is, `scripts/recheck_004.py --no-record` arriving with the feature setting in plan phase 1, for instance T132's committed record as feature 004's result before the change, so that the comparison writes nothing and still has two sides? [Clarity, Spec §FR-003, quickstart V2, contracts/cli.md]
 
 ## Notes
 
@@ -73,6 +73,8 @@ trails, the baseline documents, line endings, and the reproduction of every comm
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
   2 new items, CHK021 to CHK022; no clarifying questions, as in round 1.
+- Round 4, verified 2026-11-09: after the round's changes (checklist-choices.md, round 4), each new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
