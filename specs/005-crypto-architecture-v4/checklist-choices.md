@@ -427,6 +427,8 @@ takes the recommended edit of every finding of the report on 13a02be.
 
 ### Rows that change the protocol (analysis remediation 2)
 
+The batch's two commits are 7c230d1 (its choices) and 8947e05 (its changes applied).
+
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule.
 
