@@ -435,3 +435,16 @@ rule.
 | Row | Rule | Direction | Why |
 |-----|------|-----------|-----|
 | AR2-I12 | Trail records and the ARX searches (FR-019; research R7) | settled | the searches and their trails from one validated tool, so that no search runs twice; research R1's rule for a tool with no pair applied as written |
+
+## Analysis remediation 3 (third /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 and 2 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the one finding of the report on 2b52ddc.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR3-G3 | The claim test's register checks for each model | Task T016: each model's `history`, `bound` and `evidence` checked against its own feature's files, `phyco-v4`'s `bound` from this feature's size profile by variant ID, placeholders included (FR-011), its `evidence` the two security-target files and, at L1, feature 004's demonstration record and the files the two review rows name (FR-013), its `history` from this spec's rows "L1 recorded"; each feature's design document held to the mapping chapter's rule | B: the checks for `phyco-v3` alone, as now. C: no change | tasks T016 |
+
+### Rows that change the protocol (analysis remediation 3)
+
+None: the batch's one row clarifies a task and changes no rule.
