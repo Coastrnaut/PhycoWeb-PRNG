@@ -69,6 +69,8 @@ renumbered hardware stages and the order of sizes
   no new item; no clarifying questions, as in round 1.
 - Round 5, 2026-11-09: re-run over the complete documents after round 4's changes (ea2e924, 32e7338);
   no new item; no clarifying questions, as in round 1.
+- Round 6, 2026-11-09: re-run over the complete documents after round 5's changes (50aaef1, 333bb9f);
+  no new item; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
