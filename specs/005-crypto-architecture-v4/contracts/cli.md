@@ -87,6 +87,34 @@ for spec FR-003's test of feature 004's re-check and quickstart V2.
 Covers `phyco-v4` and feature 005's documents and reports beside feature 004's, reading each feature's gate rows from its own
 spec (FR-026; research R10).
 
+### `scripts/evidence_v3.py` bound and trail runs
+
+With `PHYCOWEB_FEATURE=005` a bound search runs in spec FR-014's order, 16×16, then 8×8, then 4×4, and is refused at 8×8 or
+4×4 before the candidate's 16×16 climb has ended; a structural or bias run keeps 4×4, 8×8, 16×16. An ARX design's searches
+run on research R7's companion alone, and each `trail` record holds data-model §3's characteristic at every nonlinear
+operation. Caps and rows come by the candidate's family from `$REP/projection-table.json`, or from `plan-projections.json`'s
+approved option before it exists, and the trail row holds back the table's needs of the sizes not yet climbed (research
+R12). Each record's `parallelism` states its threads and workers (research R4).
+
+### `scripts/mode_limits_v3.py --out`
+
+With `PHYCOWEB_FEATURE=005` it reads this feature's design document, takes the variant rows from the chapter "Security
+target"'s parameter table until the chapter "Permutation" holds its variant table, and reads a placeholder R (`<R4>`,
+`<R8>`, `<R16>`) as not yet known, writing it where a figure depends on R and computing every other figure (research R8;
+spec FR-011).
+
+### `scripts/protocol_change.py create`
+
+With `PHYCOWEB_FEATURE=005` it reads `research/005/place-check.json`, this feature's rows "Place check" and "Readings set
+aside", and the lists of `checklist-choices.md` in their table form, rounds and batches alike, and writes the first entry
+that spec FR-031 names, then one entry per listed row in order. `propose FILE` writes a later entry for a row "Protocol
+change <k>" or "Readings set aside <k>".
+
+### `scripts/validate_tool.py`
+
+With `PHYCOWEB_FEATURE=005` it also reads a tool under `research/005/tools/`, research R7's companion among them, and
+writes its records and any defect note under this feature's paths.
+
 ## Unchanged
 
 Every other script and mode of feature 004's contract applies as written for this feature: the environment and owner records,
