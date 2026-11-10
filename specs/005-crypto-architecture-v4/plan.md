@@ -14,7 +14,8 @@ decisions D1–D14 as their defaults (b1b79d8); security.md 2.18 and the registe
 
 Feature 005 runs feature 004's plan, which the spec's FR-001 makes its baseline (`plan.md` at 99e6994, SHA-256
 `665c793450918805ed7e5b86873b1b5195cbc9d86f99ad94f7bbbdfd665f2c95`), and this plan states only what changes. Where the two
-differ, this plan applies. The work runs in this order, each step needing the one before it:
+differ, this plan applies. The work runs in this order, each step needing the one before it, except that steps 2 and 3, the
+probes and the security target, run in either order, each after step 1 and both before step 4 (spec FR-005):
 
 1. **Machinery for feature 005** (research R9): the record writers, guards and logs take the feature as a parameter, so that
    feature 005 writes under its own paths and feature 004's verdicts, records and re-check stay as they are (FR-003). Feature
@@ -51,7 +52,7 @@ reads and never writes, into `research/005/plan-projections.json`, committed wit
 | Candidate limit and ceiling (FR-008) | Three evaluated candidates per family, as inherited; the rows of six candidates and the feature-wide row sum to 2,180.4 h, and the ceiling is 2,200 h, raised from D7's 720 h by the owner at the plan approval, as FR-008 provides | R3 | both only fall |
 | Margin and R_max (D5, D7) | Margin 2; R_max = 64 | R2, R3 | the margin only rises; R_max only falls |
 | Order at a size (FR-015) | r ascending, the linear search then the differential search at each r, each kind's climb independent; a capped or refused search ends that kind's searches at that size | R12 | no change |
-| Formats (FR-016, FR-019) | The `split` bound record and the trail characteristic at every nonlinear operation, as data-model §2 and §3 state | R6, R7 | fields only added |
+| Formats (FR-016, FR-019) | The `split` bound record and the trail characteristic at every nonlinear operation, as data-model §2 and §3 state | R6, R7 | fields only added, each settling a case the format left open (spec, the changed rules) |
 | Development inputs (FR-028) | Feature 004's derivation under the namespace `phycoweb-005/`, every other namespace refused | inherited R3 | the derivation does not change |
 
 ### Choices for owner review
@@ -156,8 +157,8 @@ paths beside feature 004's, which no step writes.
 |-------|------|-----------|
 | 0 | Plan approval (⛔); the `/speckit-checklist` runs; tasks and their approval (⛔) | the tasks approved |
 | 1 | Machinery (R9), environment records with their rows, the three logs, the claim test's coverage with `phyco-v4`'s `fut_sec` in the register, the re-check of sums and trails, and `plan_projections.py` reading feature 004's records at 99e6994 | the protocol change log's first entry, naming the baseline documents and `plan-projections.json` by SHA-256 (FR-001, FR-031) |
-| 2 | Probes and the final projection table (R5) | the table committed before any candidate |
-| 3 | The security target first (R8): chapters, ⛔ review, "L1 recorded" | the review Approved |
+| 2 | Probes and the final projection table (R5), in either order with phase 3 (spec FR-005) | the table committed before any candidate |
+| 3 | The security target first (R8): chapters, ⛔ review, "L1 recorded"; in either order with phase 2 | the review Approved |
 | 4 | Tool validation where a tool changed (inherited R12), none planned | each changed tool validated |
 | 5 | Candidates and evidence (R6, R7, R11 to R13): entry, D4, climbs 16×16 first, structural and bias tests, round rule, selection or a stop | a selection record |
 | 6–8 | Model, vectors, transcription, reviews and freeze (inherited) | `phyco-v4` frozen, or not reached after a stop |

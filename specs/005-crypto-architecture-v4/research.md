@@ -52,16 +52,17 @@ held in `research/005/plan-projections.json`.
   it. For cand-A1, r = 1 is the box's own bound over one call, searched once at 4×4 in 1.085 h (differential) and read at
   every size. The table lists each design's searches per size and kind from r = 1, ending after the first search projected to
   reach its cap (FR-015), at the first r whose bound, searched or summed by FR-016, has weight above 128, or at R_max = 64.
-- **What it gives under the recommended caps** (R3, option A):
+- **What it gives under option E**, the caps the plan approval fixed (R3), with option A's need, the planner's recommendation,
+  after each:
 
   | Design and size | Linear: need, R_bound | Differential: need, R_bound |
   |-----------------|-----------------------|-----------------------------|
-  | cand-A1 16×16 | 12.184 h (r = 2 to 4 measured, r = 5 at the cap); 8 by sums | 12.116 h (r = 5 never made, at the cap); 6 by sums |
-  | cand-A1 8×8 | 0.180 h; 9 | 0.099 h; 6 |
-  | cand-A1 4×4 | 0.065 h; 17 | 1.093 h; 11 |
-  | cand-B1 16×16 | 12 h (r = 1 at the cap); none | 12 h (r = 1 at the cap); none |
-  | cand-B1 8×8 | 4 h (r = 1 at the cap); none | 4 h (r = 1 at the cap); none |
-  | cand-B1 4×4 | 4.470 h (r = 5 at the cap); 17 by sums | 4.920 h (r = 5 at the cap); 17 by sums |
+  | cand-A1 16×16 | 48.184 h (r = 2 to 4 measured, r = 5 at the cap); 8 by sums. Option A: 12.184 h | 48.116 h (r = 5 never made, at the cap); 6 by sums. Option A: 12.116 h |
+  | cand-A1 8×8 | 0.180 h; 9. Option A: the same | 0.099 h; 6. Option A: the same |
+  | cand-A1 4×4 | 0.065 h; 17. Option A: the same | 1.093 h; 11. Option A: the same |
+  | cand-B1 16×16 | 48 h (r = 1 at the cap); none. Option A: 12 h | 48 h (r = 1 at the cap); none. Option A: 12 h |
+  | cand-B1 8×8 | 33.303 h (r = 1 projected to finish in 9.303 h, r = 2 at the cap); none. Option A: 4 h, r = 1 at the cap | 29.953 h (r = 1 projected to finish in 5.953 h, r = 2 at the cap); none. Option A: 4 h, r = 1 at the cap |
+  | cand-B1 4×4 | 8.470 h (r = 5 at the cap); 17 by sums. Option A: 4.470 h | 8.921 h (r = 5 at the cap); 17 by sums. Option A: 4.920 h |
 
   An ARX design like A1 is projected to have R_bound at every claimable size; a Boolean design like B1 is projected to end at
   16×16, at its first search, which the order of R12 makes the cheapest place to end.
@@ -118,15 +119,18 @@ held in `research/005/plan-projections.json`.
 ## R5. Probes before any candidate (FR-005, FR-009) — protocol
 
 - **Decision**: after plan phase 1 and before the candidate log's first `proposed` entry, each listed run that feature 004
-  neither made nor ran to its cap is probed on the reference design's committed operation list, as a `projection` record
-  charged to the feature-wide row: B1's searches at 8×8 and 16×16, A1's differential search at 16×16 and r = 5, and one
-  structural check and one frequency and avalanche measurement per size and design at w = 32. A probe is the run itself, up to
-  4 h (option E; 1 h under option A); a run that finishes gives its hours, and one that does not is projected to reach its
-  cap. A run feature 004 made is not
-  probed again: its record, the same tool on the same operation list, size, width, kind and r, on the same machine at one
-  thread, is the measurement, cited in the table by record ID. `projection_table.py` then writes the final table from the
-  plan's rules and the probes; each value is the smaller of the plan's and the probes', so that every value only falls, and a
-  probe that shows a need above its row is reported before any candidate, its run refused when it comes (inherited ANA-078).
+  neither made nor ran to its cap is probed on the reference design's committed operation list, as a `projection` record charged
+  to the feature-wide row: B1's searches at 8×8 and 16×16, A1's differential search at 16×16 and r = 5, and one structural check
+  and one frequency and avalanche measurement per size and design at w = 32. A probe is the run itself, up to 4 h (option E; 1 h
+  under option A); a run that finishes gives its hours, a bound search that does not is projected to reach its cap, and a
+  structural check or a frequency and avalanche measurement that does not keeps the plan's provisional need for its kind (12 h
+  and 24 h per candidate). "One structural check" is one run of every structural kind that inherited FR-037 asks at that size
+  (the inverse tests, the dependency matrices, the symmetry and invariant checks), each kind's hours in the probe's record, and
+  a probe lowers the provisional need only by the kinds it covers. A run feature 004 made is not probed again: its record, the
+  same tool on the same operation list, size, width, kind and r, on the same machine at one thread, is the measurement, cited in
+  the table by record ID. `projection_table.py` then writes the final table from the plan's rules and the probes; each value is
+  the smaller of the plan's and the probes', so that every value only falls, and a probe that shows a need above its row is
+  reported before any candidate, its run refused when it comes (inherited ANA-078).
 - **Rationale**: the probes measure what feature 004 never ran at w = 32, the structural and bias kinds above all, and an
   upper limit of 4 h lets more of them finish while keeping them inside the feature-wide row's 40 h of probes.
 - **Alternatives considered**: probing every listed run again (rejected: it repeats feature 004's measurements on the same
@@ -158,13 +162,14 @@ held in `research/005/plan-projections.json`.
 
 ## R8. The security target first (FR-010 to FR-013) — protocol
 
-- **Decision**: plan phase 3 copies the chapters "Security target" and "Mode" of feature 004's `design.md`, Version 0.4,
-  into `specs/005-crypto-architecture-v4/design.md` as Version 0.5 with `phyco-v4` for `phyco-v3`, listing each change; the
-  security target's files are written by `mode_limits_v3.py` read for this feature, before the review with R as `<R4>`,
-  `<R8>` and `<R16>`, and again once every R is known, when "Security-target review 2" reviews the round counts and the open
-  items. The row "Security-target review" names
-  the chapters' SHA-256 and the files'; `candidate_log.py propose` exits 2 while that row does not read Approved at HEAD. The
-  open items of FR-012 are listed under a heading of their own in the chapter, and the owner design review's row names them.
+- **Decision**: plan phase 3 copies the chapters "Security target" and "Mode" of feature 004's `design.md` and `rationale.md`,
+  Version 0.4, into this feature's `design.md` and `rationale.md` as Version 0.5 with `phyco-v4` for `phyco-v3`, listing each
+  change in `rationale.md` (spec FR-010); the security target's files are written by `mode_limits_v3.py` read for this feature,
+  before the review with R as `<R4>`, `<R8>` and `<R16>`, and again once every R is known, when the family's next row,
+  "Security-target review <k>", reviews the round counts, the figures computed from them and the open items (spec FR-012). The
+  row "Security-target review" names both documents' chapters' SHA-256 and the files'; `candidate_log.py propose` exits 2 while
+  that row does not read Approved at HEAD or the projection table does not exist, for every `proposed` entry. The open items of
+  FR-012 are listed under a heading of their own in the chapter, and the owner design review's row names them.
   "L1 recorded" names this review's row and feature 004's FUT-SEC-8 result review row (ffb1425).
 - **Rationale**: no candidate's result can reach the target before it is reviewed, and the review's row is a guard, not a
   note.
@@ -204,11 +209,12 @@ held in `research/005/plan-projections.json`.
 
 ## R12. The order and the decision at 16×16 (FR-014, FR-015, FR-018) — protocol
 
-- **Decision**: per candidate, the production-width climbs run at 16×16, then 8×8, then 4×4; at each size r ascends from 1,
-  the linear search before the differential at each r, as feature 004 ran them. A kind whose first search at 16×16 is capped
-  or refused has no established bound there, and `round_rule.py` decides the candidate `ineligible` at once, its other kind's
-  searches at 16×16 included, no hour charged at 8×8 or 4×4; so does a kind whose sums do not pass weight 128 by R_max, as
-  soon as the sums show it. The structural checks and bias tests keep 4×4, 8×8, 16×16.
+- **Decision**: per candidate, the production-width climbs run at 16×16, then 8×8, then 4×4; at each size r ascends from 1, the
+  linear search before the differential at each r, as feature 004 ran them. A kind whose first search at 16×16 is capped or
+  refused, with no size-independent bound read there (spec FR-015), has no established bound there, and `round_rule.py` decides
+  the candidate `ineligible` at once, its other kind's searches at 16×16 included, no hour charged at 8×8 or 4×4; so does a kind
+  whose sums do not pass weight 128 by R_max, as soon as the sums show it. The structural checks and bias tests keep 4×4, 8×8,
+  16×16.
 - **Rationale**: the size that stopped feature 004 decides first, at the least cost.
 - **Alternatives considered**: 4×4 first for every kind (rejected by D6).
 
@@ -217,8 +223,9 @@ held in `research/005/plan-projections.json`.
 - **Decision**: a feature-004 design may be proposed as `v4-A<k>` or `v4-B<k>`, its `proposed` entry naming the feature-004
   candidate and operation list it derives from by path and SHA-256; it counts as evaluated, runs every kind of evidence again
   under this protocol with the constants the inherited rule gives, which for an unchanged design at an unchanged variant are
-  feature 004's exactly, the rule reading one fixed stream and holding no ID, and cites its feature-004 records only as
-  prior results.
+  feature 004's exactly, the rule reading one fixed stream and holding no ID, and cites its feature-004 records only as prior
+  results. Its rotation amounts are those feature 004's ranking chose, its rotation search not run again, and the refused list
+  it is checked against is this feature's byte copy of feature 004's (spec FR-023).
 - **Rationale**: feature 004's records were made under another protocol and another model ID, and FR-023 keeps them out of
   this feature's evidence.
 - **Alternatives considered**: new designs only (rejected by D1).

@@ -13,10 +13,10 @@ finding or a failed check, 2 refused by a guard, 3 a tool failure.
 
 ## The feature setting
 
-Every script of feature 004 runs for this feature with `PHYCOWEB_FEATURE=005` in its environment, and for feature 004 without
-it (research R9). A script exits 2 when the setting names no known feature, when a record's path and its `feature` field
-disagree, or when it would write under another feature's paths. Feature 004's records, logs and documents are never written
-(spec FR-003).
+Every script of feature 004 runs for this feature with `PHYCOWEB_FEATURE=005` in its environment, and for feature 004 without it
+(research R9). A script exits 2 when the setting names no known feature, when a record's path and its `feature` field disagree,
+or when it would write under another feature's paths. Feature 004's records, logs and documents are never written, and no run of
+this feature writes under feature 004's paths (spec FR-003).
 
 ## New
 
@@ -28,8 +28,9 @@ no record of this feature and writes no record.
 
 ### `scripts/projection_table.py [--check]`
 
-After the probes and before the candidate log's first `proposed` entry, writes `$REP/projection-table.json` (data-model §4):
-the plan's values, each lowered to the probes' value where a probe shows less, never raised; each row and cap with its source.
+After the probes and before the candidate log's first `proposed` entry, writes `$REP/projection-table.json` (data-model §4): the
+values of the option `plan-projections.json` names as `approved_option`, each lowered to the probes' value where a probe shows
+less, never raised; each row and cap with its source.
 Exits 2 once any `proposed` entry exists, when `plan-projections.json` fails its `--check`, or when a listed probe record is
 missing. `--check` recomputes the table and exits 1 on a difference. A probe that shows a need above its row is printed, and
 the table records it; the run is refused when it comes (inherited ANA-078).
@@ -54,15 +55,16 @@ its row.
 
 ### `scripts/candidate_log.py propose ID --derived-from PATH:SHA256`
 
-Exits 2 while the row "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names (FR-011),
-and while `$REP/projection-table.json` does not exist (research R5). `--derived-from` names a feature-004 operation list by
-path and SHA-256 (FR-023); without it, `derived_from` reads `none`.
+Exits 2 while the row "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names (FR-011), and
+while `$REP/projection-table.json` does not exist (research R5), for every `proposed` entry. `--derived-from` names a
+feature-004 operation list by path and SHA-256 (FR-023); without it, `derived_from` reads `none`.
 
 ### `scripts/recheck_004.py` for feature 005
 
 With `PHYCOWEB_FEATURE=005`, it also recomputes every `split` bound from its two parts, and every trail's weight, transitions
 and classification from its characteristic and the candidate's committed operation list (FR-020); a disagreement is a tool
-defect that blocks the candidate. Its `recheck` record names the feature.
+defect that blocks the candidate. Its `recheck` record names the feature. `--no-record` prints the result and writes nothing,
+for spec FR-003's test of feature 004's re-check and quickstart V2.
 
 ### `scripts/check_claims.py`
 

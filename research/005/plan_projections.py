@@ -17,12 +17,15 @@ difference. The rules are research R1 to R3 of specs/005-crypto-architecture-v4/
 - The listed climb (R2): per reference design, size and kind, r = 1, 2, ... in order, ending after the first search projected to
   reach the cap (FR-015), at the first r whose bound, searched or summed (FR-016), has weight above 128 (FR-017), or at R_max.
 - Rows (R3): each row at least the margin times the sum of the projected needs it holds (FR-005), with the caps and the candidate
-  limit of the option given, checked against the ceiling (FR-008).
+  limit of the option given, checked against the option's ceiling (FR-008): 2,200 h for option E, the ceiling the owner raised at
+  the plan approval of 2026-11-09, which `approved_option` names, and D7's 720 h for the others.
+- Each calibration pair cites its projection and its run by record ID, path and SHA-256 over the committed bytes (kind raw).
 
 This script makes no security claim.
 """
 import argparse
 import glob
+import hashlib
 import json
 import statistics
 import sys
@@ -44,7 +47,8 @@ OPTIONS = {
     "E (the owner's extension)": {"caps": {16: 48.0, 8: 24.0, 4: 8.0}, "per_family": 3,
                                   "provisional": {"structural": 12.0, "bias": 24.0},
                                   "feature_wide": {"probes": 40.0, "two whole-suite runs per platform": 2.0,
-                                                   "reproductions and re-checks": 9.0}},
+                                                   "reproductions and re-checks": 9.0},
+                                  "ceiling": 2200.0},
     "A (recommended)": {"caps": {16: 12.0, 8: 4.0, 4: 4.0}, "per_family": 3},
     "B": {"caps": {16: 20.0, 8: 20.0, 4: 8.0}, "per_family": 2},
     "C": {"caps": {16: 24.0, 8: 4.0, 4: 4.0}, "per_family": 3},
@@ -54,6 +58,8 @@ OPTIONS = {
 # FR-005 replace them before any candidate is proposed (R3).
 PROVISIONAL = {"structural": 6.0, "bias": 12.0}
 FEATURE_WIDE_NEED = {"probes": 30.0, "two whole-suite runs per platform": 2.0, "reproductions and re-checks": 9.0}
+# The option the plan approval of 2026-11-09 fixed (spec, Review & Approval, "Plan approval").
+APPROVED = "E (the owner's extension)"
 
 
 def load(pattern):
@@ -63,6 +69,11 @@ def load(pattern):
         record["_path"] = Path(path).relative_to(ROOT).as_posix()
         out.append(record)
     return out
+
+
+def sha256_of(rel):
+    """SHA-256 over a committed file's bytes, kind raw."""
+    return hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
 
 
 def candidate_of(record):
@@ -96,7 +107,9 @@ def calibration(projections, bounds):
         pairs.append({"tool": probe.get("method"), "size": probe.get("size"), "width": probe.get("width"), "candidate": cand,
                       "kind": probe.get("bound_kind"), "rounds": p.get("rounds"), "projected_h": p["projected_hours"],
                       "measured_h": run["budget"]["hours_used"], "capped": run["status"] != "pass",
-                      "projection": p["record_id"], "run": run["record_id"]})
+                      "projection": p["record_id"], "run": run["record_id"],
+                      "projection_path": p["_path"], "projection_sha256": sha256_of(p["_path"]),
+                      "run_path": run["_path"], "run_sha256": sha256_of(run["_path"]), "sha256_kind": "raw"})
     usable = [q for q in pairs if 0.001 <= q["projected_h"] < CAP_004]
     factors = {}
     for q in usable:
@@ -208,6 +221,7 @@ def rows_for(table, option):
     caps, per_family = option["caps"], option["per_family"]
     provisional = option.get("provisional", PROVISIONAL)
     feature_wide = option.get("feature_wide", FEATURE_WIDE_NEED)
+    ceiling = option.get("ceiling", CEILING)
     out = {}
     for cand, family in REFERENCE.items():
         trails = sum(v["need_h"] for k, v in table.items() if k.startswith(cand + " "))
@@ -225,7 +239,8 @@ def rows_for(table, option):
             fr006[f"{size}x{size} {kind}"] = {"longest_finishing_h": round(longest, 4), "floor_h": round(MARGIN * longest, 4),
                                               "cap_h": caps[size], "holds": caps[size] >= MARGIN * longest}
     return {"caps_h": {f"{n}x{n}": c for n, c in caps.items()}, "candidates_per_family": per_family, "rows": out,
-            "feature_wide_row_h": wide, "sum_of_rows_h": total, "fits_ceiling": total <= CEILING,
+            "ceiling_h": ceiling, "provisional_needs_h": provisional, "feature_wide_needs_h": feature_wide,
+            "feature_wide_row_h": wide, "sum_of_rows_h": total, "fits_ceiling": total <= ceiling,
             "fr006": fr006, "fr006_holds": all(v["holds"] for v in fr006.values())}
 
 
@@ -237,8 +252,7 @@ def compute():
         table = climbs(projections, bounds, factors, option["caps"])
         options[name] = {"climbs": table, **rows_for(table, option)}
     return {"note": "computed by research/005/plan_projections.py from feature 004's committed records; no security claim",
-            "margin": MARGIN, "ceiling_h": CEILING, "r_max": R_MAX, "provisional_needs_h": PROVISIONAL,
-            "feature_wide_needs_h": FEATURE_WIDE_NEED,
+            "approved_option": APPROVED, "ceiling_h": OPTIONS[APPROVED]["ceiling"], "margin": MARGIN, "r_max": R_MAX,
             "calibration": {"summary": summary, "factors": factors, "pairs": pairs, "other_kinds": kind_calibration()},
             "options": options}
 

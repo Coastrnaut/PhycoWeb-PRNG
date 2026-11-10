@@ -14,8 +14,9 @@ P0). Heavy runs are projected first and run one at a time.
 **V1. The plan's numbers reproduce.** `python -X utf8 research/005/plan_projections.py --check` prints
 "plan-projections.json matches" and exits 0, on both platforms.
 
-**V2. Feature 004 is untouched.** `PHYCOWEB_FEATURE` unset, `python scripts/recheck_004.py` in a fresh clone gives 0
-disagreements, as T132's record did, and `python scripts/check_claims.py` gives 0 findings.
+**V2. Feature 004 is untouched.** `PHYCOWEB_FEATURE` unset, `python scripts/recheck_004.py --no-record` in a fresh clone prints
+0 disagreements, as T132's record did, and writes nothing under feature 004's paths (spec FR-003);
+`python scripts/check_claims.py` gives 0 findings.
 
 **V3. The probes and the table.** Each probe of research R5 runs with `--probe`, writing a `projection` record charged to the
 feature-wide row; then `python scripts/projection_table.py` writes `$REP/projection-table.json`, and `--check` exits 0. Every
@@ -30,8 +31,9 @@ once the row reads Approved at HEAD with the chapters' SHA-256, it appends the e
 `round_rule.py` writes no further search of that kind at that size and writes `split` records for the larger r, each citing
 two parts; the re-check recomputes each sum (SC-003, SC-005).
 
-**V6. 16×16 decides first.** On a test operation list whose first linear search at 16×16 reaches its cap, the candidate is
-decided `ineligible` with the cause `no R_bound at 16×16`, and its rows show no hour charged at 8×8 or 4×4 (SC-004).
+**V6. 16×16 decides first.** On a test operation list with no size-independent search, whose first linear search at 16×16
+reaches its cap, the candidate is decided `ineligible` with the cause `no R_bound at 16×16`, and its rows show no hour charged
+at 8×8 or 4×4 (SC-004).
 
 **V7. Trails recompute.** A test `trail` record with every nonlinear operation recorded re-checks to its weight; changing one
 operation's output makes the re-check report a disagreement; a weight at or below 2⁻¹²⁸ classes the trail `none` (SC-005).
