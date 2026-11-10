@@ -483,4 +483,6 @@ analysis loop takes the recommended edit of the one finding of the report on 7c9
 
 ### Rows that change the protocol (analysis remediation 5)
 
+The batch's two commits are 73be9bb (its choices) and 8cbfeab (its changes applied).
+
 None: the batch's one row clarifies tasks and changes no rule.
