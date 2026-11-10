@@ -486,3 +486,17 @@ analysis loop takes the recommended edit of the one finding of the report on 7c9
 The batch's two commits are 73be9bb (its choices) and 8cbfeab (its changes applied).
 
 None: the batch's one row clarifies tasks and changes no rule.
+
+## Analysis remediation 6 (sixth /speckit-analyze run, 2026-11-10)
+
+**Answered in advance**, as Analysis remediations 1 to 5 were: the owner's instruction of 2026-11-09 for the
+analysis loop takes the recommended edit of the one finding of the report on b5a23af.
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| AR6-C1 | The contract's modes that this feature's tasks change | The contract gains a section under "Changed" for each mode the tasks change and the contract left to "applies as written": `scripts/protocol_change.py create` (FR-031's first entry, this feature's lists in their table form and its batches; T013), `scripts/mode_limits_v3.py --out` (R as placeholders, the parameter table until the variant table exists; research R8; T031), `scripts/evidence_v3.py`'s bound and trail runs (the order of sizes per kind, the ARX searches on research R7's companion, data-model §3's trail record, the rows by family and the hours held back; research R7, R12; T042, T043) and `scripts/validate_tool.py` (a tool under `research/005/tools/`; T039), each restating the rule it follows | B: leave them to the tasks. C: no change | contract |
+
+### Rows that change the protocol (analysis remediation 6)
+
+None: the batch's one row restates in the contract rules that the spec, research and data model already fix, and
+changes no rule.
