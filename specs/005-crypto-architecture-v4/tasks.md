@@ -172,12 +172,17 @@ feature before T009 (FR-003).
   `$REP/design-versions/`; the development-input loader under `005` gives `phycoweb-005/` inputs and
   refuses every other namespace, `phycoweb-004/` included; a file of feature 004's downloads
   manifest is read as feature 004's, checked against that manifest's SHA-256 before it is read
-  (FR-001); under `005` the validation lookup reads feature 004's validation records beside this
-  feature's, a tool matched by its exact hash (`tool_sha256`, and a C tool's binary), so that
-  feature 004's validations stay in force for the uses they cover (research R14); and the guard on
-  instantiation code reads feature 004's row "FUT-SEC-8 result review" and its demonstration record
-  at HEAD, from feature 004's spec and paths, under either setting (FR-030). (FR-001, FR-002,
-  FR-003, FR-026, FR-028, FR-030; SC-007; R9, R14)
+  (FR-001); under `005` every reader of a row's hours (`guard_candidate_row` and the feature-wide
+  row's guard in `protocol/evidence.py`, `left_in_row` and `spent_is_shared` in
+  `protocol/candidates.py`, `scripts/evidence_v3.py`) takes the row by the candidate's family from
+  `$REP/projection-table.json`, or from `plan-projections.json`'s approved option before the table
+  exists, feature 004's `ROW_HOURS` and `FEATURE_ROW_HOURS` staying its own; under `005` the
+  validation lookup reads feature 004's validation records beside this feature's, a tool matched by
+  its exact hash (`tool_sha256`, and a C tool's binary), so that feature 004's validations stay in
+  force for the uses they cover (research R14); and the guard on instantiation code reads feature
+  004's row "FUT-SEC-8 result review" and its demonstration record at HEAD, from feature 004's spec
+  and paths, under either setting (FR-030). (FR-001, FR-002, FR-003, FR-026, FR-028, FR-030; SC-007;
+  R9, R14)
 - [ ] T007 Make the feature a parameter of the shared code (research R9) until T006 passes:
   `protocol/evidence.py` reads `PHYCOWEB_FEATURE` once, `004` by default, and selects from it the
   paths, the model ID, the candidate IDs, the development-input namespace and the disclaimer;
@@ -185,10 +190,11 @@ feature before T009 (FR-003).
   word; `protocol/candidates.py`, `protocol/changelog.py`, `protocol/provenance.py`,
   `protocol/devinputs_v3.py` and every script of feature 004's contract read their paths through it,
   none keeping a literal feature-004 path for a write; and each record states its feature. Feature
-  004's default keeps its paths, verdicts and re-check unchanged (T008). Under `005` the validation
-  lookup reads both features' validation records (research R14). No tool file whose exact hash a
-  validation record matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001,
-  FR-002, FR-003, FR-026, FR-028; SC-007; R9, R14)
+  004's default keeps its paths, verdicts and re-check unchanged (T008). Under `005` the rows' hours
+  come by family from the projection table or the approved option, and the validation lookup reads
+  both features' validation records (research R14). No tool file whose exact hash a validation
+  record matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001, FR-002,
+  FR-003, FR-026, FR-028; SC-007; R9, R14)
 - [ ] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
   (contracts/cli.md, "`scripts/recheck_004.py` for feature 005"), and write FR-003's test in
   `tests/test_protocol_005.py`: with the setting unset, `python scripts/recheck_004.py --no-record`
@@ -622,15 +628,19 @@ ends with no eligible candidate (D14).
   run out of the order 4×4, 8×8, 16×16; every search records one thread in `parallelism` and its
   size's cap from the projection table, and every other record its workers in `parallelism` (FR-007;
   research R4); a search whose projection does not fit its row is refused, the refusal in its
-  `projection` record. (FR-006, FR-007, FR-014, FR-015, FR-019, FR-020; SC-005)
+  `projection` record; and the trail row holds back, for the sizes not yet climbed, the projection
+  table's needs of those sizes' listed runs, no probe running at 8×8 or 4×4 before the decision at
+  16×16 (research R12). (FR-006, FR-007, FR-014, FR-015, FR-019, FR-020; SC-005)
 - [ ] T043 [US3] Change `scripts/evidence_v3.py` for this feature until T042 passes: the ARX
   searches run on T039's companion alone, each trail record's characteristic from its output and the
   candidate's committed operation list, its projections with the factor research R1 gives a tool
   with no pair (research R7); each trail's class by FR-020, the order of sizes per kind, the caps
-  and rows from `$REP/projection-table.json`, and the thread count; no tool file whose exact hash a
-  validation record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that
-  would reach one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014,
-  FR-019, FR-020; SC-005; R7)
+  and rows from `$REP/projection-table.json`, the hours held back for the sizes not yet climbed read
+  from that table in place of feature 004's probes of every later search (`reserved_trails`,
+  `later_searches`; research R12), and the thread count; no tool file whose exact hash a validation
+  record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that would reach
+  one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014, FR-019,
+  FR-020; SC-005; R7)
 - [ ] T044 [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
   (data-model §6; quickstart V9): from the candidate logs of both features, one row per design with
   `feature`, `id`, `family`, `outcome` (`ineligible`, `proposed and declined`, `selected`,

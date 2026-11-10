@@ -53,13 +53,13 @@ frequency and avalanche measurement as keeping its kind's provisional need (rese
 
 ### `scripts/round_rule.py --candidate ID`
 
-At the production width the climbs run at 16×16, then 8×8, then 4×4 (spec FR-014); at a size r ascends from 1, the linear
-search before the differential at each r, each kind independent; the first capped or refused search of a kind ends that kind's
-searches at that size (FR-015). After each r it writes the `split` record where a sum is the established bound (data-model §2;
-FR-016) and continues by sums until both kinds' weights exceed 128 or r reaches 64 (FR-017). A candidate with no R_bound at
-16×16 is decided `ineligible` at once, with the cause `no R_bound at 16×16` (FR-018), and no search runs at 8×8 or 4×4. Every
-search runs at one thread, under its size's cap from the projection table, and is refused when its projection does not fit
-its row.
+At the production width the climbs run at 16×16, then 8×8, then 4×4 (spec FR-014); at a size r ascends from 1, the linear search
+before the differential at each r, each kind independent; the first capped or refused search of a kind ends that kind's searches
+at that size (FR-015). After each r it writes the `split` record where a sum is the established bound (data-model §2; FR-016)
+and continues by sums until both kinds' weights exceed 128 or r reaches 64 (FR-017). A candidate with no R_bound at 16×16 is
+decided `ineligible` at once, with the cause `no R_bound at 16×16` (FR-018), and no search runs at 8×8 or 4×4. Every search runs
+at one thread, under its size's cap from the projection table, and is refused when its projection, with the projection table's
+needs of the sizes not yet climbed held back (research R12), does not fit its row.
 
 ### `scripts/d4_choice.py --tie`
 

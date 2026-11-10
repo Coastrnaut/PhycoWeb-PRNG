@@ -227,7 +227,11 @@ held in `research/005/plan-projections.json`.
   refused, with no size-independent bound read there (spec FR-015), has no established bound there, and `round_rule.py` decides
   the candidate `ineligible` at once, its other kind's searches at 16×16 included, no hour charged at 8×8 or 4×4; so does a kind
   whose sums do not pass weight 128 by R_max, as soon as the sums show it. The structural checks and bias tests keep 4×4, 8×8,
-  16×16.
+  16×16. Feature 004's runner holds back, before each search, the projections of every later search at every claimable size,
+  each a `--project` probe whose time it charges to the candidate's trail row; in this order a candidate's trail row holds back
+  instead, for the sizes not yet climbed, the projection table's needs of those sizes' listed runs for its family's reference
+  design, the recorded need that spec FR-018 and FR-022 name, and no probe runs at 8×8 or 4×4 before the decision at 16×16; each
+  search is still projected first at its own size.
 - **Rationale**: the size that stopped feature 004 decides first, at the least cost.
 - **Alternatives considered**: 4×4 first for every kind (rejected by D6).
 
