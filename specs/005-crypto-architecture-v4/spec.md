@@ -10,7 +10,7 @@
 
 **Status**: Spec approved by the owner (2026-11-09), with decisions D1–D14 as their defaults; plan
 approved (2026-11-09), with the run limits extended (option E); checklist choices of rounds 1 to 5
-answered in advance and applied (2026-11-09)
+answered in advance and applied (2026-11-09); analysis remediation 1 applied (2026-11-10)
 
 **Input**: User description (verbatim), given on 2026-11-09 after the agent explained why feature
 004 stopped and offered a new spec that budgets for the 16×16 bounds from the start:
@@ -133,6 +133,7 @@ frozen file stay as they are.
 | Checklist choices, round 3 ([checklist-choices.md](./checklist-choices.md): the 56 items of the second re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, the plan's documents, security.md (2.20) with its allow-list entries in `protocol/claims.json`, and `research/005/plan_projections.py` with `plan-projections.json`; research R8 and R13, data-model §4 and §5 and the contract also restate rows they follow beyond the rows' "Where" (PRO-024, RAT-018 to RAT-020, SEC-035), places the place check names; no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 4 ([checklist-choices.md](./checklist-choices.md): the 14 items of the third re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec, research R5, data-model §4, the contract, `checklist-choices.md`'s lists (each naming its round's two commits) and security.md (2.21) with its allow-list entry in `protocol/claims.json`; PRO-029's tool is feature 004's adapted to this feature's paths and to its lists' table form, which feature 004's tool does not read; no row sets a reading aside. Written and committed by the agent on that word |
 | Checklist choices, round 5 ([checklist-choices.md](./checklist-choices.md): the 2 items of the fourth re-run of the six checklists) | Coastrnaut (repository owner) | 2026-11-09 | Approved | Answered in advance on 2026-11-09 by the same instruction as round 1, which takes option A of every row and approves the round's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec and data-model §5; no row sets a reading aside. Written and committed by the agent on that word |
+| Analysis remediation 1 ([checklist-choices.md](./checklist-choices.md): the 19 findings of the first `/speckit-analyze` run after `/speckit-tasks`, on d5acd08) | Coastrnaut (repository owner) | 2026-11-10 | Approved | Answered in advance on 2026-11-09 by the owner's instruction for the analysis loop, "suggest edits for all issues, make the changes, commit, then rerun speckit-analyze skill. run this process in a loop until speckit analyze finds no new issues", which takes option A of every row and approves the batch's list "Rows that change the protocol", written with its rows before they were applied (FR-031). Applied the same day to this spec (FR-022), plan.md, research R5, R7, R8 and R13, data-model §1, the contract and tasks.md; no row sets a reading aside. Written and committed by the agent on that word |
 | Readings set aside (FR-031: each change whose direction sets a reading of the old text aside, decided at the tasks approval) | _pending_ | _pending_ | _pending_ | Lists each such change with the case under which the old text fails and the owner's decision, entry by entry; none so far |
 | Place check (a comparison of the edits with the rows that made them, where one is made) | _pending_ | _pending_ | _pending_ | Names the comparison's file by SHA-256 and confirms each place an edit changed that no row made |
 | Tool acquisition (each download: name, source, size, licence) | _pending_ | _pending_ | _pending_ | No download is planned; a file needs a row of its own, "Download <n>", before it is fetched |
@@ -664,7 +665,10 @@ transcription agreeing at every step of every committed vector, and the freeze r
   rule, eligibility, selection and the stop rule MUST apply as inherited, with R_bound from FR-016
   and FR-017, the budgets of FR-005 to FR-009, the claimable sizes of D13 and the families of D14.
   Every reduced-width score of the D4 choice comes before the first production-width search, the
-  16×16-first order being the production width's. D4's cost model scores this feature's candidates
+  16×16-first order being the production width's. While an exact D4 tie waits, the two
+  representatives' production-width climbs run in that order, 16×16 first, and only as far as R at
+  4×4 needs; the tie-break reads R at 4×4 once both have it, or `ineligible` once either is decided
+  so, a decision at 16×16 under FR-018 included. D4's cost model scores this feature's candidates
   unchanged, its direction kept. A replacement takes its family's row, the budget allowing it while
   that row holds the recorded need of each run the rules require at every size. Feature 004's FR-026
   figures, with the goal of 10⁸ words per second, and the constants' ROM size per food node are

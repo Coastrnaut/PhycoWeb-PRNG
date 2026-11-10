@@ -14,7 +14,7 @@ document states only the changes. Fields are only added: a record valid under fe
 | Feature 004 | Feature 005 |
 |-------------|-------------|
 | `reports/004-crypto-architecture-v3/` (`$REP`) | `reports/005-crypto-architecture-v4/` |
-| `research/004/` (the three logs, `candidates/<id>/`) | `research/005/` |
+| `research/004/` (the protocol change log, the candidate log, `candidates/<id>/`; the provenance log stands under `$REP`) | `research/005/` |
 | `specs/004-crypto-architecture-v3/` (spec, research, design) | `specs/005-crypto-architecture-v4/` |
 | `data/local/004/` | `data/local/005/` |
 | development inputs `phycoweb-004/…` | `phycoweb-005/…` |

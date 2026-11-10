@@ -90,19 +90,20 @@ itself. No task of phases 1 to 9 starts before T004.
   (2392150) adapted to this feature's paths and to its lists' table form (spec, notes under the
   Review & Approval table; PRO-029): `FEATURE` `specs/005-crypto-architecture-v4/`, the plan
   approval's commit `afc6769`, the output `research/005/place-check.json`; each list read from its
-  heading `### Rows that change the protocol (round <k>)`, or from the same heading of a section of
-  its own outside a round ("Analysis remediation <k>", FR-031), its two commits from the sentence
-  "The round's two commits are <choices> (its choices) and <apply> (its changes applied).", and its
-  rows from the table `| Row | Rule | Direction | Why |`, the places of each row being the FR items,
-  the research sections, the data-model sections and the contract's script sections that its Rule
-  cell names; each place's text read as feature 004's tool reads it, with the spec's bullets under
-  "Pre-registered Design Protocol: the changed rules" in place of the protocol's paragraphs, the
-  plan's table "Values this plan fixes before first use", and `quickstart.md` and
-  `research/005/plan-projections.json`, each whole, beside them; standard library only, with the
-  exit statuses of feature 004's tool. Check it on rounds 1 to 5: it finds each list's two commits
-  and the places each row's Rule names, and records as changed by an edit that no row made the
-  places of round 3 that the row "Checklist choices, round 3" names beyond its rows' "Where"
-  (research R8 and R13, data-model §4 and §5, the contract). (FR-031; spec notes; PRO-029)
+  heading `### Rows that change the protocol (round <k>)`, or `(analysis remediation <k>)` for a
+  section of its own outside a round (FR-031), its two commits from the sentence "The round's two
+  commits are <choices> (its choices) and <apply> (its changes applied).", "batch's" for such a
+  section, and its rows from the table `| Row | Rule | Direction | Why |`, the places of each row
+  being the FR items, the research sections, the data-model sections and the contract's script
+  sections, each keyed by its script's name, that its Rule cell names; each place's text read as
+  feature 004's tool reads it, with the spec's bullets under "Pre-registered Design Protocol: the
+  changed rules" in place of the protocol's paragraphs, the plan's table "Values this plan fixes
+  before first use", and `quickstart.md` and `research/005/plan-projections.json`, each whole,
+  beside them; standard library only, with the exit statuses of feature 004's tool. Check it on
+  rounds 1 to 5: it finds each list's two commits and the places each row's Rule names, and records
+  as changed by an edit that no row made the places of round 3 that the row "Checklist choices,
+  round 3" names beyond its rows' "Where" (research R8 and R13, data-model §4 and §5, the contract).
+  (FR-031; spec notes; PRO-029)
 - [ ] T002 Once this file and every change of the `/speckit-analyze` loop are committed, run
   `python research/005/place_check.py --to HEAD`, which writes `research/005/place-check.json` over
   the commits from `afc6769` to HEAD; compare its places with the lists "Rows that change the
@@ -166,9 +167,12 @@ feature before T009 (FR-003).
   `$REP/design-versions/`; the development-input loader under `005` gives `phycoweb-005/` inputs and
   refuses every other namespace, `phycoweb-004/` included; a file of feature 004's downloads
   manifest is read as feature 004's, checked against that manifest's SHA-256 before it is read
-  (FR-001); and the guard on instantiation code reads feature 004's row "FUT-SEC-8 result review"
-  and its demonstration record at HEAD, from feature 004's spec and paths, under either setting
-  (FR-030). (FR-001, FR-002, FR-003, FR-026, FR-028, FR-030; R9)
+  (FR-001); under `005` the validation lookup reads feature 004's validation records beside this
+  feature's, a tool matched by its exact hash (`tool_sha256`, and a C tool's binary), so that
+  feature 004's validations stay in force for the uses they cover (research R14); and the guard on
+  instantiation code reads feature 004's row "FUT-SEC-8 result review" and its demonstration record
+  at HEAD, from feature 004's spec and paths, under either setting (FR-030). (FR-001, FR-002,
+  FR-003, FR-026, FR-028, FR-030; SC-007; R9, R14)
 - [ ] T007 Make the feature a parameter of the shared code (research R9) until T006 passes:
   `protocol/evidence.py` reads `PHYCOWEB_FEATURE` once, `004` by default, and selects from it the
   paths, the model ID, the candidate IDs, the development-input namespace and the disclaimer;
@@ -176,8 +180,10 @@ feature before T009 (FR-003).
   word; `protocol/candidates.py`, `protocol/changelog.py`, `protocol/provenance.py`,
   `protocol/devinputs_v3.py` and every script of feature 004's contract read their paths through it,
   none keeping a literal feature-004 path for a write; and each record states its feature. Feature
-  004's default keeps its paths, verdicts and re-check unchanged (T008). No file that a validation
-  record names by hash changes here (T038). (FR-001, FR-002, FR-003, FR-026, FR-028; R9)
+  004's default keeps its paths, verdicts and re-check unchanged (T008). Under `005` the validation
+  lookup reads both features' validation records (research R14). No tool file whose exact hash a
+  validation record matches, its `tool_sha256` and a C tool's binary, changes here (T038). (FR-001,
+  FR-002, FR-003, FR-026, FR-028; SC-007; R9, R14)
 - [ ] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
   (contracts/cli.md, "`scripts/recheck_004.py` for feature 005"), and write FR-003's test in
   `tests/test_protocol_005.py`: with the setting unset, `python scripts/recheck_004.py --no-record`
@@ -260,9 +266,12 @@ feature before T009 (FR-003).
   reads Approved and the rows and hashes it rests on hold at HEAD, and L0 otherwise; `phyco-v4`'s
   `fut_sec` holds the expected statuses that FR-030 carries, the later stages named by security.md
   §22's numbers since 2.18; the copies under `spec-versions/`, `research-versions/` and
-  `design-versions/` read as the documents they copy (FR-001); and a generated checklist line that a
-  rule flags passes only through an allow-list entry giving FR-026's reason. Feature 004's rules and
-  findings are unchanged. (FR-001, FR-013, FR-026, FR-030; SC-007; R10)
+  `design-versions/` read as the documents they copy (FR-001); each model's `in_progress` counts its
+  own feature's searched `pass` bound records citing a validation record, a `split` record never
+  counted (data-model §2), `phyco-v4`'s reading `none` until this feature's first such record; the
+  code paths scanned gain `research/005/`, read from this feature's first commit; and a generated
+  checklist line that a rule flags passes only through an allow-list entry giving FR-026's reason.
+  Feature 004's rules and findings are unchanged. (FR-001, FR-013, FR-026, FR-030; SC-007; R10)
 - [ ] T017 Extend `scripts/check_claims.py` until T016 passes, and give `phyco-v4`'s entry in
   `protocol/claims.json` its `fut_sec`: the statuses of feature 004's table "Security Policy
   traceability" read for `phyco-v4`, FUT-SEC-8 met by feature 004's demonstration and its review,
@@ -283,21 +292,26 @@ feature before T009 (FR-003).
   record (data-model §2) recomputed from its two parts' committed bytes, as an exact rational sum,
   r₁ + r₂ = r, each part `pass` and established, of the same candidate, kind, size and width, never
   `inconclusive`, with its `alternatives` and the larger of the sum and `searched` checked; a part
-  whose SHA-256 differs, or that is not established, gives a disagreement; for a trail record
-  (data-model §3), the exact differential probability and squared correlation of a two-input
-  addition or subtraction modulo 2^w, of an addition of a committed constant by the carry's
-  two-state automaton over the bits of c, and of an S-box from its table, each equal to an
-  exhaustive count at w = 8 over stated inputs, outputs and constants; masks passed through the
-  transpose of each linear step; the product as `"p/q"` with its −log₂; the class by the 2⁻¹²⁸
-  threshold, above it `confirmed vulnerability` of the rounds it covers, at or below it `none`; a
-  test trail with every nonlinear operation recorded re-checks to its weight, and changing one
-  operation's output gives a disagreement. (FR-016, FR-019, FR-020; SC-005)
+  whose SHA-256 differs, or that is not established, gives a disagreement, and so does a part that
+  no longer stands, a tool defect recorded against it, a sum standing only while both its parts
+  stand (spec, Edge Cases); for a trail record (data-model §3), the exact differential probability
+  and squared correlation of a two-input addition or subtraction modulo 2^w, of an addition of a
+  committed constant by the carry's two-state automaton over the bits of c, and of an S-box from its
+  table, each equal to an exhaustive count at w = 8 over stated inputs, outputs and constants; masks
+  passed through the transpose of each linear step; the product as `"p/q"` with its −log₂; the class
+  by the 2⁻¹²⁸ threshold, above it `confirmed vulnerability` of the rounds it covers, at or below it
+  `none`; a test trail with every nonlinear operation recorded re-checks to its weight, and changing
+  one operation's output gives a disagreement; and the operation list is read by a standard-library
+  reader of the forms of `research/004/ir.py` under `protocol/`, its evaluation of each linear step
+  equal to `ir`'s on the reference designs' committed lists. (FR-016, FR-019, FR-020; SC-005)
 - [ ] T020 Extend `scripts/recheck_004.py` for this feature (contracts/cli.md) until T019 passes:
   under `005` it recomputes every `split` bound from its two parts, and every trail's weight,
-  transitions and class from its characteristic, the candidate's committed operation list, read
-  through `research/004/ir.py`, and, where the list holds an addition of a committed constant, the
-  constant table the record names by SHA-256; its `recheck` record names the feature; a disagreement
-  is a tool defect that blocks the candidate (inherited FR-065). (FR-016, FR-019, FR-020; SC-005)
+  transitions and class from its characteristic, the candidate's committed operation list, read by
+  T019's standard-library reader and never through `research/004/ir.py` or numpy, so that the
+  re-check imports only the standard library and `protocol/` and runs in any environment, as
+  inherited, and, where the list holds an addition of a committed constant, the constant table the
+  record names by SHA-256; its `recheck` record names the feature; a disagreement is a tool defect
+  that blocks the candidate (inherited FR-065). (FR-016, FR-019, FR-020; SC-005)
 
 ### Step (6): the phase's closing run
 
@@ -333,7 +347,9 @@ that hold candidates (SC-001).
   entry exists; it writes a `projection` record charged to the feature-wide row, at one thread,
   holding `finished` with the hours taken or `reached the probe limit` at 4 h, its outputs other
   than timing discarded unread; a probe that would take the probes past their 40 h share is refused,
-  its run keeping the plan's projection (FR-005); `projection_table.py` exits 2 once any `proposed`
+  its run keeping the plan's projection (FR-005); before `$REP/projection-table.json` exists, the
+  row and the 40 h share are read from `plan-projections.json`'s approved option; a structural or
+  bias probe runs at R = 66 rounds (research R5); `projection_table.py` exits 2 once any `proposed`
   entry exists, when `plan-projections.json` fails its `--check`, or when a listed probe record is
   missing; each value is the smaller of the approved option's and the probes', never raised; a
   search probe that reached the limit reads as its search reaching its cap; a structural or bias
@@ -343,13 +359,15 @@ that hold candidates (SC-001).
   fixed field names and no prose (FR-024), with `plan_projections_sha256` and its kind `raw`;
   `--check` recomputes it and exits 1 on a difference; a probe that shows a need above its row is
   printed and recorded. (FR-005, FR-009, FR-024; SC-001)
-- [ ] T023 [US1] Add `--probe` to `scripts/evidence_v3.py` (contracts/cli.md; research R5) until
+- [ ] T023 [P] [US1] Add `--probe` to `scripts/evidence_v3.py` (contracts/cli.md; research R5) until
   T022's probe tests pass: the run itself on a reference design's committed operation list,
   `research/004/candidates/cand-A1.py` or `cand-B1.py`, read and never written, up to 4 h, written
-  as a `projection` record charged to the feature-wide row at one thread; the guard that refuses an
-  operation list without a `proposed` entry reads, for a probe, feature 004's candidate log, where
-  both reference designs hold theirs. (FR-005, FR-007; R5)
-- [ ] T024 [US1] Write `scripts/projection_table.py [--check]` (contracts/cli.md; data-model §4)
+  as a `projection` record charged to the feature-wide row at one thread, the row and the probes' 40
+  h share read from `plan-projections.json`'s approved option while the projection table does not
+  exist; the guard that refuses an operation list without a `proposed` entry reads, for a probe,
+  feature 004's candidate log, where both reference designs hold theirs. (FR-005, FR-007; SC-001;
+  R5)
+- [ ] T024 [P] [US1] Write `scripts/projection_table.py [--check]` (contracts/cli.md; data-model §4)
   until T022 passes: per family, size and kind, each listed run with `need_h`, its source (a
   feature-004 run or a probe, by `record_id`, path and SHA-256 over the committed bytes, kind `raw`,
   or `cap`) and the value fixed, from the option `plan-projections.json` names as
@@ -359,14 +377,15 @@ that hold candidates (SC-001).
   against the feature-wide row's 40 h share of probes, a probe being refused once it would pass that
   share: one structural check (one run of every structural kind that inherited FR-037 asks at that
   size, each kind's hours in the record) and one frequency and avalanche measurement per claimable
-  size and reference design at w = 32, at 4×4, then 8×8, then 16×16, first, as the kinds feature 004
-  never ran at that width (research R5's rationale); then each listed search of
-  `plan-projections.json`'s approved option that feature 004 neither made nor ran to its cap (B1's
-  searches at 8×8 and 16×16, A1's differential search at 16×16 and r = 5), at 16×16, then 8×8, each
-  climb in its listed order; each with `python scripts/evidence_v3.py --probe` and the run's design,
-  kind, size and r, into `$REP/projections/`. A run feature 004 made is cited, not probed (plan,
-  "Choices for owner review"). No order raises a value: a refused probe keeps the plan's need.
-  (FR-005, FR-007, FR-009; SC-001, SC-008; R5)
+  size and reference design at w = 32, each at R = 66 rounds, R_max + Δ (research R5), at 4×4, then
+  8×8, then 16×16, first, as the kinds feature 004 never ran at that width (research R5's
+  rationale); then each listed search of `plan-projections.json`'s approved option that feature 004
+  neither made nor ran to its cap (B1's searches at 8×8 and 16×16, A1's differential search at 16×16
+  and r = 5), at 16×16, then 8×8, each climb in its listed order; each with
+  `python scripts/evidence_v3.py --probe` and the run's design, kind, size and r, into
+  `$REP/projections/`. A run feature 004 made is cited, not probed (plan, "Choices for owner
+  review"). No order raises a value: a refused probe keeps the plan's need. (FR-005, FR-007, FR-009;
+  SC-001, SC-008; R5)
 - [ ] T026 [US1] Run `python scripts/projection_table.py`, which writes
   `$REP/projection-table.json`, then `--check` on Windows and with `wpy` in WSL, exit 0 (quickstart
   V3); commit the table before any `proposed` entry; report to the owner, before the first
@@ -397,7 +416,7 @@ review's approval commit precedes the candidate log's first `proposed` entry (SC
 V4: `scripts/candidate_log.py propose` exits 2 while the row is pending, and appends once it reads
 Approved at HEAD with the chapters' SHA-256.
 
-- [ ] T028 [P] [US2] Write the candidate log's tests for this feature in
+- [ ] T028 [US2] Write the candidate log's tests for this feature in
   `tests/test_protocol_005.py` (quickstart V4; data-model §5; contracts/cli.md,
   "`scripts/candidate_log.py propose …`"): `propose` exits 2, appending nothing, while the row
   "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names, or
@@ -409,25 +428,28 @@ Approved at HEAD with the chapters' SHA-256.
   (FR-011, FR-022, FR-023; SC-002)
 - [ ] T029 [US2] Extend `protocol/candidates.py` and `scripts/candidate_log.py` until T028 passes
   (contracts/cli.md; data-model §5). (FR-011, FR-022, FR-023; SC-002)
-- [ ] T030 [P] [US2] Write the security target's tests for this feature in
-  `tests/test_protocol_005.py`, running feature 004's tests of its chapters and security-target
-  files from `tests/test_records_004.py` with the feature as their parameter: each document's header
-  (its title, the design-form disclaimer naming `phyco-v4` and one line "Version: 0.5"), the two
-  version lines equal; the chapters in inherited FR-034's order, each once, those after "Mode"
-  reading "Not drafted yet" but for the section "Variant table" of "Permutation";
-  `$REP/security-target/parameters.json` and `limits.json` with feature 004's fields, a placeholder
-  R (`<R4>`, `<R8>`, `<R16>`) read as not yet known and every other figure checked; the chapter's
-  parameter table and output limits restating the files; `rationale.md`'s chapters "Security
-  target" and "Mode" each with a section "Changes from Version 0.4", every change with its reason,
-  each value there cited by the design document's chapter and section (FR-010); and `phyco-v4`'s
-  register `bound` holding the profile's `bound_bits` by variant ID, placeholders included, with its
-  `evidence` naming both files (FR-011). (FR-010, FR-011, FR-026; SC-007)
+- [ ] T030 [US2] Write the security target's tests for this feature in `tests/test_protocol_005.py`,
+  running feature 004's tests of its chapters and security-target files from
+  `tests/test_records_004.py` with the feature as their parameter: each document's header (its
+  title, the design-form disclaimer naming `phyco-v4` and one line "Version: 0.5"), the two version
+  lines equal; the chapters in inherited FR-034's order, each once, those after "Mode" reading "Not
+  drafted yet"; `$REP/security-target/parameters.json` and `limits.json` with feature 004's fields,
+  computed from the chapter "Security target"'s parameter table while "Permutation" holds no variant
+  table (research R8), a placeholder R (`<R4>`, `<R8>`, `<R16>`) read as not yet known and every
+  other figure checked; the chapter's parameter table and output limits restating the files;
+  `rationale.md`'s chapters "Security target" and "Mode" each with a section "Changes from Version
+  0.4", every change with its reason, each value there cited by the design document's chapter and
+  section (FR-010); and `phyco-v4`'s register `bound` holding the profile's `bound_bits` by variant
+  ID, placeholders included, with its `evidence` naming both files (FR-011). (FR-010, FR-011,
+  FR-026; SC-007)
 - [ ] T031 [US2] Make `scripts/mode_limits_v3.py` read for this feature (research R8) until T030's
-  file tests pass: under `005` it reads `specs/005-crypto-architecture-v4/design.md`, takes a
-  placeholder R as not yet known, computes every figure that does not depend on R and writes the
-  placeholder where one does, and writes `$REP/security-target/parameters.json` and `limits.json`;
-  a theorem stays `unverified` until its paper is read, feature 004's `fetched` entries read as
-  FR-001 states; feature 004's mode is unchanged. (FR-001, FR-010, FR-011; R8)
+  file tests pass: under `005` it reads `specs/005-crypto-architecture-v4/design.md`, taking the
+  variant rows from the chapter "Security target"'s parameter table until the chapter "Permutation"
+  holds its variant table (research R8), takes a placeholder R as not yet known, computes every
+  figure that does not depend on R and writes the placeholder where one does, and writes
+  `$REP/security-target/parameters.json` and `limits.json`; a theorem stays `unverified` until its
+  paper is read, feature 004's `fetched` entries read as FR-001 states; feature 004's mode is
+  unchanged. (FR-001, FR-010, FR-011; SC-007; R8)
 - [ ] T032 [US2] Write `specs/005-crypto-architecture-v4/design.md`, Version 0.5 (FR-010; research
   R8): its header (the title "phyco-v4: design document", the design-form disclaimer naming
   `phyco-v4`, "Version: 0.5"); the chapters "Security target" and "Mode" copied from feature 004's
@@ -440,10 +462,10 @@ Approved at HEAD with the chapters' SHA-256.
   round counts `<R4>`, `<R8>` and `<R16>` with every figure computed from them, the margin of
   instantiation's diffusion over R_f, the first-order related-key and related-nonce differences, and
   the functionality class, which moves there from Version 0.4's "here at the security-target
-  review"; the chapter "Permutation" holding only its section "Variant table", feature 004's
-  parameter-table rows read with `phyco-v4` and R as the placeholders, the rest "Not drafted yet"
-  until Phase 6; each section entered in `$REP/provenance.jsonl` as it is drafted. (FR-010, FR-012,
-  FR-026; R8)
+  review"; the chapter "Security target"'s parameter table with R as the placeholders, from which
+  the security target's files are computed (research R8); the chapters after "Mode" reading "Not
+  drafted yet" until Phase 6; each section entered in `$REP/provenance.jsonl` as it is drafted.
+  (FR-010, FR-012, FR-026; SC-002, SC-007; R8)
 - [ ] T033 [US2] Write `specs/005-crypto-architecture-v4/rationale.md`, Version 0.5: its header (the
   title, the design-form disclaimer naming `phyco-v4`, "Version: 0.5"); its chapters "Security
   target" and "Mode" copied from feature 004's `rationale.md`, Version 0.4, its SHA-256 as FR-010
@@ -451,7 +473,7 @@ Approved at HEAD with the chapters' SHA-256.
   labels, and in each a section "Changes from Version 0.4" listing every change made in both
   documents' chapters with its reason, each value cited by the design document's chapter and
   section; the later chapters "Not drafted yet"; each section entered in the provenance log.
-  (FR-010, FR-026; R8)
+  (FR-010, FR-026; SC-002, SC-007; R8)
 - [ ] T034 [US2] Run `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json`,
   which writes `parameters.json` beside it with R as the placeholders; in the same commit, write
   `phyco-v4`'s `bound` in `protocol/claims.json` from the profile's `bound_bits` by variant ID,
@@ -487,11 +509,13 @@ candidate log's guard open. The phase ends with the constitution's phase report 
 
 ---
 
-## Phase 4: Tool Validation where a tool changed (plan phase 4)
+## Phase 4: Tool Validation where a tool changed or is new (plan phase 4)
 
 **Goal**: every tool whose results count holds a validation record of its exact hash (inherited
-FR-039; research R14 on inherited R12); no tool change is planned, and a tool that changes is
-validated again before its first counted use (spec, Edge Cases, "A feature-004 tool changed").
+FR-039; research R14 on inherited R12): the ARX search's companion of research R7, which writes the
+state at every addition (FR-019), written and validated, feature 004's tools unchanged (FR-003),
+and any tool that changes validated again before its first counted use (spec, Edge Cases, "A
+feature-004 tool changed").
 
 - [ ] T038 For each tool of feature 004's validation records that Phase 5 uses, the trail tools,
   the structural and bias tools and the cost model among them, compare its exact hash at HEAD with
@@ -499,12 +523,19 @@ validated again before its first counted use (spec, Edge Cases, "A feature-004 t
   ID, the result and whether its validation covers additions of committed constants (FR-016);
   feature 004's records stay in force for the uses they cover while the hash is unchanged. (FR-016,
   FR-022; R14)
-- [ ] T039 For each tool whose hash differs (T038), validate it again with
-  `python scripts/validate_tool.py` on its known results, under this feature's paths, **heavy**
-  where its run is, before its first counted use; a tool that Phase 5 changes later, or one written
-  for additions of committed constants (FR-016), is validated the same way before its first counted
-  use, the evidence runner refusing it meanwhile; where no tool's hash differs, this task is marked
-  not applicable, naming T038's list. (FR-016, FR-019; R14)
+- [ ] T039 Write research R7's companion of the ARX search,
+  `research/005/tools/trails/arx_search_ops.c` with its build file, a copy of feature 004's
+  `research/004/tools/trails/arx_search.c` whose trail output adds the state after every step of
+  every round, feature 004's tool unchanged (FR-003), with its tests first in
+  `tests/test_tools_005.py`: on the ARX search's known results
+  (`research/004/tools/trails/arx_search_known.py`) it finds the optimum weights and round-boundary
+  states that feature 004's tool finds, and each step's printed input and output give that step's
+  exact weight, the weights summing to the trail's; then validate it with
+  `python scripts/validate_tool.py` on those known results under this feature's paths, **heavy**
+  where its run is, before its first counted use. Validate the same way each tool whose hash differs
+  (T038), a tool that Phase 5 changes later and one written for additions of committed constants
+  (FR-016), each before its first counted use, the evidence runner refusing it meanwhile. (FR-003,
+  FR-016, FR-019; SC-005; R7, R14)
 
 **Checkpoint**: every tool of Phase 5 holds a validation record of its exact hash. The phase ends
 with the constitution's phase report to the owner.
@@ -531,7 +562,7 @@ cap and its candidate's row as `$REP/projection-table.json` fixes them, at most 
 per family; D4 chooses the family, the other analysed at the production width only if the chosen
 one ends with no eligible candidate (D14).
 
-- [ ] T040 [P] [US3] Write the round rule's tests for this feature in `tests/test_protocol_005.py`
+- [ ] T040 [US3] Write the round rule's tests for this feature in `tests/test_protocol_005.py`
   (quickstart V5, V6; contracts/cli.md, "`scripts/round_rule.py --candidate ID`"; data-model §2): at
   the production width the climbs run at 16×16, then 8×8, then 4×4; a size-independent search, such
   as an ARX box's bound over one call, runs first under the 4×4 cap, charged to the trail row, its
@@ -548,41 +579,44 @@ one ends with no eligible candidate (D14).
   the first r whose established bound has weight above 128, with no search of that kind at that r or
   beyond, and continues by sums after its searches end, up to R_max = 64; a design whose rounds
   repeat in no cycle, or that holds an addition of a committed constant, takes no sum and no other
-  bound resting on the repetition; where a cycle spans more than one round, searches and sums come
-  at whole cycles; R_bound is the smallest r at which both kinds' bounds have weight above 128,
-  never lowered by a later search; on a test operation list with no size-independent search, whose
-  first linear search at 16×16 reaches a tiny cap, the candidate is decided `ineligible` with the
-  cause `no R_bound at 16×16`, the record that ends the climb and the statement that no hour was
-  charged at 8×8 or 4×4 (quickstart V6); the decision comes as soon as either kind's established
-  bounds at 16×16 cannot pass weight 128 by R_max, a running search of the other kind then stopped,
-  its record `inconclusive` and its hours charged; R = max(2·R_dist, R_bound + Δ, 2·max(R_f, R_b)),
-  Δ = 2; and `round-rule.json` names, per size and kind, the record that sets R_bound, searched or
-  `split`, the last searched record and the r of the first capped or refused search. (FR-014,
-  FR-015, FR-016, FR-017, FR-018, FR-022; SC-003, SC-004)
+  bound resting on the repetition, and a design holding such an addition has each call type's
+  permutation covered by its bounds, each round's constants modelled (FR-016); where a cycle spans
+  more than one round, searches and sums come at whole cycles; R_bound is the smallest r at which
+  both kinds' bounds have weight above 128, never lowered by a later search; on a test operation
+  list with no size-independent search, whose first linear search at 16×16 reaches a tiny cap, the
+  candidate is decided `ineligible` with the cause `no R_bound at 16×16`, the record that ends the
+  climb and the statement that no hour was charged at 8×8 or 4×4 (quickstart V6); the decision comes
+  as soon as either kind's established bounds at 16×16 cannot pass weight 128 by R_max, a running
+  search of the other kind then stopped, its record `inconclusive` and its hours charged; R =
+  max(2·R_dist, R_bound + Δ, 2·max(R_f, R_b)), Δ = 2; and `round-rule.json` names, per size and
+  kind, the record that sets R_bound, searched or `split`, the last searched record and the r of the
+  first capped or refused search. (FR-014, FR-015, FR-016, FR-017, FR-018, FR-022; SC-003, SC-004)
 - [ ] T041 [US3] Change `scripts/round_rule.py` for this feature (contracts/cli.md; data-model §2;
   research R6, R12) until T040 passes; feature 004's mode keeps its rule. (FR-014, FR-015, FR-016,
   FR-017, FR-018; SC-003, SC-004)
-- [ ] T042 [P] [US3] Write the trail record's and the evidence runner's tests in
+- [ ] T042 [US3] Write the trail record's and the evidence runner's tests in
   `tests/test_protocol_005.py` (data-model §3; quickstart V7): a `trail` record that
   `scripts/evidence_v3.py` writes under `005` holds the characteristic at every nonlinear operation
-  of every round, `round`, `state_in`, `operations` with `{op_index, position, inputs, output,
-  weight}` in the operation list's order, and `state_out`, with `weight` at the top as `"p/q"` and
-  its −log₂; a bitwise Boolean function recorded as the S-boxes the validated tool counts (feature
-  004's four-update NOR network as one 4-bit S-box per bit position, table 9 c 3 0 2 5 4 7 6 1 a b 8
-  d e f); an addition of a committed constant naming the constant table by SHA-256; an operation
-  list holding any other nonlinear operation gets no trail search, the candidate `blocked` for that
-  cause (FR-020); under `005` the runner refuses a bound search at 8×8 or 4×4 before the candidate's
-  16×16 climb has ended, and a structural or bias run out of the order 4×4, 8×8, 16×16; every
-  search records thread count 1 and its size's cap from the projection table; a search whose
-  projection does not fit its row is refused, the refusal in its `projection` record. (FR-006,
+  of every round, `round`, `state_in`, `operations` with
+  `{op_index, position, inputs, output, weight}` in the operation list's order, and `state_out`,
+  with `weight` at the top as `"p/q"` and its −log₂; a bitwise Boolean function recorded as the
+  S-boxes the validated tool counts (feature 004's four-update NOR network as one 4-bit S-box per
+  bit position, table 9 c 3 0 2 5 4 7 6 1 a b 8 d e f); an addition of a committed constant naming
+  the constant table by SHA-256; an operation list holding any other nonlinear operation gets no
+  trail search, the candidate `blocked` for that cause (FR-020); under `005` the runner refuses a
+  bound search at 8×8 or 4×4 before the candidate's 16×16 climb has ended, and a structural or bias
+  run out of the order 4×4, 8×8, 16×16; every search records thread count 1 and its size's cap from
+  the projection table, and every other record states its thread or worker count (FR-007); a search
+  whose projection does not fit its row is refused, the refusal in its `projection` record. (FR-006,
   FR-007, FR-014, FR-015, FR-019, FR-020; SC-005)
 - [ ] T043 [US3] Change `scripts/evidence_v3.py` for this feature until T042 passes: the trail
-  record's characteristic from the tool's output and the candidate's committed operation list, its
-  class by FR-020, the order of sizes per kind, the caps and rows from `$REP/projection-table.json`,
-  and the thread count; no file that a validation record names by hash changes here, and a change
-  that would reach one goes through T039 before the tool's first counted use. (FR-006, FR-007,
-  FR-014, FR-019, FR-020; R7)
-- [ ] T044 [P] [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
+  record's characteristic from the output of T039's companion and the candidate's committed
+  operation list, its class by FR-020, the order of sizes per kind, the caps and rows from
+  `$REP/projection-table.json`, and the thread count; no tool file whose exact hash a validation
+  record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that would reach
+  one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014, FR-019,
+  FR-020; SC-005; R7)
+- [ ] T044 [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
   (data-model §6; quickstart V9): from the candidate logs of both features, one row per design with
   `feature`, `id`, `family`, `outcome` (`ineligible`, `proposed and declined`, `selected`,
   `not selected`, `withdrawn`, `rejected`), the decision's log entry (feature and `seq`) and
@@ -590,10 +624,10 @@ one ends with no eligible candidate (D14).
   and declined (entries 49 and 109); feature 004's D4 record and selection record by path and
   SHA-256; the bias rule's family-wise rate over this feature's tests, feature 004 having run none
   at w = 32; and no line that the claim test flags. (FR-024; SC-006; R11)
-- [ ] T045 [US4] Write `research/005/selection_bias.py [--check]` until T044 passes: it generates
-  the statement as a Markdown table from `research/004/candidates.jsonl` and
-  `research/005/candidates.jsonl`, reading both and writing neither, and `--check` compares a
-  document's table with its output, exit 1 on a difference. (FR-024; SC-006; R11)
+- [ ] T045 [US4] Write `research/005/selection_bias.py [--check FILE]` (contracts/cli.md) until T044
+  passes: it generates the statement as a Markdown table from `research/004/candidates.jsonl` and
+  `research/005/candidates.jsonl`, reading both and writing neither, and `--check FILE` compares the
+  table FILE holds with its output, exit 1 on a difference. (FR-024; SC-006; R11)
 - [ ] T046 [US3] Write each candidate as an operation list of invertible updates with its reference
   outputs under `research/005/candidates/`, `v4-A<k>.py` (ARX) or `v4-B<k>.py` (Boolean), meeting
   every inherited design rule FR-001 lists, a new design or a feature-004 design entered again under
@@ -617,15 +651,22 @@ one ends with no eligible candidate (D14).
   re-entered design keeping feature 004's amounts at width 16, searched again at 8 where R6's rule
   fixes that width, FR-023), the trail bounds over r* rounds with the validated trail tools, and the
   cost from `research/004/tools/costmodel.py`, every reduced-width score before the first
-  production-width search; each run projected first. (FR-022, FR-023)
-- [ ] T049 [US4] Run `python scripts/d4_choice.py --log research/005/candidates.jsonl --out
-  $REP/d4/choice.json` once; after an exact tie, `--tie` writes `$REP/d4/tie.json` as feature 004's
-  contract states, D4's cost model scoring this feature's candidates unchanged, its direction kept.
-  (FR-022)
+  production-width search; each run projected first. In the commit that holds this feature's first
+  counted trail-bound record, set `phyco-v4`'s `in_progress` in `protocol/claims.json` to L2, not
+  reached, from that record's date, as the register's rule has it (T016);
+  `python -X utf8 scripts/check_claims.py` reports 0 findings. (FR-022, FR-023, FR-026; SC-007,
+  SC-010)
+- [ ] T049 [US4] Run
+  `python scripts/d4_choice.py --log research/005/candidates.jsonl --out $REP/d4/choice.json` once;
+  after an exact tie, the two representatives go on at the production width in FR-014's order, 16×16
+  first, and only as far as R at 4×4 needs, and `--tie` writes `$REP/d4/tie.json` once both have R
+  at 4×4 or one is `ineligible`, a decision at 16×16 included (FR-022; contracts/cli.md); D4's cost
+  model scores this feature's candidates unchanged, its direction kept. (FR-014, FR-018, FR-022;
+  SC-010)
 - [ ] T050 [US4] ⛔ **D4 tie** (**Owner**), only where the tie-breaks reach the owner's choice: run
   `python scripts/d4_choice.py --choose ID --seen SHA256 --by NAME --out $REP/d4/tie-choice.json`,
   then set and commit the row "D4 tie" in the spec; where a tie-break decides it, the row reads Not
-  needed, naming `d4/tie.json` and its tie-break. (FR-022; Principle VIII)
+  needed, naming `d4/tie.json` and its tie-break. (FR-022; SC-010; Principle VIII)
 - [ ] T051 [US3] **heavy**: for the chosen family's candidates in turn, run the production-width
   trail-bound climbs with `python scripts/round_rule.py --candidate ID`, which drives
   `scripts/evidence_v3.py` (quickstart V5 to V7): a size-independent search first; then at 16×16, r
@@ -638,10 +679,11 @@ one ends with no eligible candidate (D14).
   every trail recorded at every nonlinear operation. (FR-014, FR-015, FR-016, FR-017, FR-018,
   FR-019, FR-022; SC-003, SC-004, SC-008)
 - [ ] T052 [US4] **heavy**: before any candidate's first frequency or avalanche run at a size, run
-  the uniform controls there with `python scripts/evidence_v3.py --kind control --test frequency
-  --size N --out-dir $REP/controls`, first with `--project` and then the run, and the same with
-  `--test avalanche`; a control that fires makes that size's bias evidence inconclusive for every
-  candidate, and the feature recommends stopping. (FR-022; SC-008)
+  the uniform controls there with
+  `python scripts/evidence_v3.py --kind control --test frequency --size N --out-dir $REP/controls`,
+  first with `--project` and then the run, and the same with `--test avalanche`; a control that
+  fires makes that size's bias evidence inconclusive for every candidate, and the feature recommends
+  stopping. (FR-022; SC-008)
 - [ ] T053 [US4] **heavy**: for each candidate with R_bound at every claimable size, run with
   `python scripts/evidence_v3.py --candidate ID --kind KIND --size N --out-dir $REP/candidates/<ID>`
   the structural checks, the inverse on the 16 vector inputs and 2¹⁰ test states at every supported
@@ -650,7 +692,8 @@ one ends with no eligible candidate (D14).
   `degree` records last; then the frequency test on both input sets, N = 2²⁰ through Π and Π⁻¹, and
   the avalanche test on the flip set, the related-key and related-nonce set and the rotational
   pairs, N_a = 8,256, as inherited; each kind at 4×4, then 8×8, then 16×16, within its row,
-  projected first. (FR-014, FR-022; SC-008)
+  projected first, at the thread or worker count its record states (FR-007). (FR-007, FR-014,
+  FR-022; SC-008)
 - [ ] T054 [US4] Run `python scripts/round_rule.py --candidate ID` per candidate once its evidence
   stands at every claimable size, R by the round rule with every input cited, a table for a larger R
   generated and checked as inherited FR-023 asks of every rise; after a rise of R, repeat the
@@ -665,7 +708,7 @@ one ends with no eligible candidate (D14).
   `python scripts/round_rule.py --choose ID --seen SHA256 --by NAME`, which writes
   `$REP/freeze/selection-tie-choice.json`, then set and commit the row "Selection tie" in the spec,
   or "Selection tie <k>" for a later selection record; otherwise the row reads Not needed. (FR-022;
-  Principle VIII)
+  SC-010; Principle VIII)
 - [ ] T056 [US4] Generate the selection-bias statement with `research/005/selection_bias.py` over
   both features' candidate logs as they stand after T054, for the final report and, where a
   candidate is selected, for `rationale.md`; and run `python scripts/recheck_004.py --no-record`
@@ -701,7 +744,8 @@ vectors, each reproduced on Windows and in WSL, as feature 004's requirements as
   comparison semantics, the update order, every data-flow direction, the edge states, the colour
   schedule, the reduced variants and the production parameter sets, the constant rule's values and
   every inherited hardware rule with its figure; each section entered in `$REP/provenance.jsonl` as
-  it is drafted. (FR-010, FR-025, FR-026; SC-010)
+  it is drafted; the chapters test (T030) extended to require every section named here, "Round
+  counts" among them (FR-025). (FR-010, FR-025, FR-026; SC-010)
 - [ ] T058 [P] [US5] Write `tests/test_model_v4.py` from feature 004's model contract read for
   `model_v4` ("Tests that hold the model to this contract"): inherited FR-058's list, minimum,
   maximum and boundary values, all-zero and all-one keys and nonces, single-bit keys, overflow and
@@ -762,7 +806,7 @@ caveat beside it (SC-010).
 
 - [ ] T065 [US5] ⛔ **Second transcription go-ahead** (**Owner**): the row "Second transcription
   go-ahead" in the spec set to Approved and committed before the separate session starts; the agent
-  lists the approval commits and the allow-list entries added since the last gate. (FR-025;
+  lists the approval commits and the allow-list entries added since the last gate. (FR-025; SC-010;
   Principle VIII)
 - [ ] T066 [P] [US5] Write `tests/test_v4_transcription.py`: `phycoweb/model_v4.py` and
   `tests/v4_reference.py` agree after every phase of every round on the committed vectors, for Π,
@@ -805,10 +849,10 @@ recomputed; the claim test's register checks pass (SC-007, SC-010).
   design's records; mark each theorem `verified` once its paper is read, as inherited; compute the
   set the later review names, as T035 computed it; `python -X utf8 scripts/check_claims.py` reports
   0 findings. (FR-011, FR-012, FR-013, FR-027; SC-007)
-- [ ] T070 [US2] ⛔ **Security-target review <k>** (**Owner**), k the family's next number, after
-  the selection and before the owner design review: the round counts, the figures computed from
-  them and the open items as the chapters then state them, the row naming T069's set by SHA-256 with
-  the version read; a decline ends as T036 states. (FR-012; Principle VIII)
+- [ ] T070 [US2] ⛔ **Security-target review <k>** (**Owner**), k the family's next number, after the
+  selection and before the owner design review: the round counts, the figures computed from them and
+  the open items as the chapters then state them, the row naming T069's set by SHA-256 with the
+  version read; a decline ends as T036 states. (FR-012; SC-007, SC-010; Principle VIII)
 - [ ] T071 [US2] ⛔ **L1 recorded <k>** (**Owner**), once T070's row reads Approved: the row names
   it and feature 004's row "FUT-SEC-8 result review", each with what it reviewed by path and
   SHA-256; in the same commit the agent sets `phyco-v4`'s level, `history` and `evidence` in
@@ -824,8 +868,9 @@ recomputed; the claim test's register checks pass (SC-007, SC-010).
   proof that carries a bound to a larger size, where one is written, standing as a check beside the
   computed bounds (FR-021); the selection-bias statement of T056 (FR-024); for an unchanged
   re-entered design, the statement that its permutation and constants equal feature 004's (FR-023);
-  and every candidate considered with the reason it was kept or dropped. (FR-021, FR-023, FR-024,
-  FR-025, FR-026; SC-006)
+  and every candidate considered with the reason it was kept or dropped; the chapters test (T030)
+  extended to require the routes in "Margin", each `split` bound with its "argument" (FR-025).
+  (FR-021, FR-023, FR-024, FR-025, FR-026; SC-006)
 - [ ] T073 [US5] Write the version of security.md that inherited FR-051 asks for, CRLF kept, with
   its history entry: `phyco-v4`'s own section, a table of structural facts, the best-attack register
   rows of its first bounds, each R_bound's route among them, and the lessons table, each with its
@@ -866,7 +911,7 @@ recomputed; the claim test's register checks pass (SC-007, SC-010).
   review entries in `$REP/provenance.jsonl` with `python scripts/provenance.py review FILE`, one per
   AI-drafted section, `rationale.md`'s chapters "Security target" and "Mode" among them, and the
   `review-outcome` entry with `python scripts/candidate_log.py outcome FILE`, for the owner's commit
-  of step (1). (FR-025, FR-031)
+  of step (1). (FR-025, FR-031; SC-010)
 - [ ] T079 [US5] ⛔ **External design review** (**Owner**), arranged by the owner where possible,
   from `$REP/review-package/`: its row reads done, naming the package's manifest by SHA-256, or "not
   arranged", naming the latest selection record by path and SHA-256; no AI session is recorded as an
@@ -896,10 +941,11 @@ commits on the owner's written word (spec notes).
 
 - [ ] T082 Update `README.md`, CRLF kept, with its line on `phyco-v4` at the end of the feature: its
   status, frozen or stopped, and that it makes no claim (FR-027; inherited FR-051). (FR-027; SC-007)
-- [ ] T083 Run `python -X utf8 scripts/check_claims.py` and `python -W ignore -m unittest
-  tests.test_claims` over the final documents: 0 findings, every hand-written document of this
-  feature carrying the disclaimer naming `phyco-v4`, and security.md §1.1, §15 and the register
-  agreeing on `phyco-v4`'s level, the one its rows give. (FR-026, FR-027; SC-007)
+- [ ] T083 Run `python -X utf8 scripts/check_claims.py` and
+  `python -W ignore -m unittest tests.test_claims` over the final documents: 0 findings, every
+  hand-written document of this feature carrying the disclaimer naming `phyco-v4`, and security.md
+  §1.1, §15 and the register agreeing on `phyco-v4`'s level, the one its rows give. (FR-026, FR-027;
+  SC-007)
 - [ ] T084 In a fresh clone, run `python scripts/recheck_004.py` under `005`: 0 disagreements, 100%
   of the `split` bounds and of the trail weights, transitions and classes recomputed, its `recheck`
   record under `$REP/rechecks/` naming the interpreter, the platform and its `pip freeze`; run
@@ -956,9 +1002,9 @@ commits on the owner's written word (spec notes).
 
 - Phase 1: T011 ∥ T012; the test tasks share `tests/test_protocol_005.py` and run in turn.
 - Phase 2: T023 ∥ T024 as code; the probes still run one at a time.
-- Phase 3: T028 ∥ T030 as drafting, both in `tests/test_protocol_005.py`, appended in turn; Phase
-  3's drafting (T032, T033) beside Phase 2's probes, which hold the heavy-run lock.
-- Phase 5: T040 ∥ T042 ∥ T044 as drafting, appended to `tests/test_protocol_005.py` in turn; the
+- Phase 3: its drafting (T032, T033) beside Phase 2's probes, which hold the heavy-run lock; its
+  test tasks (T028, T030) share `tests/test_protocol_005.py` and run in turn.
+- Phase 5: its test tasks (T040, T042, T044) share `tests/test_protocol_005.py` and run in turn; the
   candidates' modules may be drafted side by side, their `proposed` entries appended in turn under
   the log's lock.
 - Phase 6: T058 ∥ T061; Phase 7: T066 beside T067, which runs in its own session.
@@ -970,7 +1016,8 @@ commits on the owner's written word (spec notes).
    the rules require of one candidate planned and probed at every claimable size before any
    candidate exists.
 2. **Security target first** (Phase 3): the target reviewed before any candidate, L1 recorded.
-3. **Tools** (Phase 4): every counted tool's validation in force for its exact hash.
+3. **Tools** (Phase 4): every counted tool's validation in force for its exact hash, and the ARX
+search's companion of research R7 validated.
 4. **Candidates and evidence** (Phase 5): the climbs at 16×16 first, continued by sums; R by the
    round rule; a selection or a stop, a stop being a valid outcome, reported with what was reached.
 5. **Model, vectors and transcription** (Phases 6 and 7).
@@ -982,45 +1029,45 @@ Every functional requirement and success criterion, with the tasks that cite it 
 
 - FR-001: T006, T007, T013, T015, T016, T031, T046, T084
 - FR-002: T006, T007, T046
-- FR-003: T006, T007, T008, T009, T010, T021, T084, T085
+- FR-003: T006–T010, T021, T039, T084, T085
 - FR-004: T012
-- FR-005: T015, T022, T023, T024, T025, T026
+- FR-005: T015, T022–T026
 - FR-006: T042, T043
-- FR-007: T010, T023, T025, T042, T043
+- FR-007: T010, T023, T025, T042, T043, T053
 - FR-008: T021, T085
-- FR-009: T022, T024, T025, T026, T027
-- FR-010: T030, T031, T032, T033, T036, T057
-- FR-011: T028, T029, T030, T031, T034, T035, T036, T046, T069
+- FR-009: T022, T024–T027
+- FR-010: T030–T033, T036, T057
+- FR-011: T028–T031, T034–T036, T046, T069
 - FR-012: T032, T035, T069, T070, T077
 - FR-013: T016, T037, T069, T071
-- FR-014: T040, T041, T042, T043, T051, T053
-- FR-015: T040, T041, T042, T051
-- FR-016: T019, T020, T038, T039, T040, T041, T051
+- FR-014: T040–T043, T049, T051, T053
+- FR-015: T040–T042, T051
+- FR-016: T019, T020, T038–T041, T051
 - FR-017: T040, T041, T051, T054
-- FR-018: T040, T041, T051
+- FR-018: T040, T041, T049, T051
 - FR-019: T019, T020, T039, T042, T043, T051
 - FR-020: T019, T020, T042, T043, T056, T084
 - FR-021: T072
-- FR-022: T028, T029, T038, T040, T046, T047, T048, T049, T050, T051, T052, T053, T054, T055
-- FR-023: T011, T028, T029, T046, T047, T048, T059, T072
+- FR-022: T028, T029, T038, T040, T046–T055
+- FR-023: T011, T028, T029, T046–T048, T059, T072
 - FR-024: T022, T024, T044, T045, T056, T072, T086
-- FR-025: T057–T081 (US5's tasks and the reviews of Phase 8)
-- FR-026: T006, T007, T016, T017, T018, T030, T032, T033, T057, T072, T083
-- FR-027: T005, T036, T037, T069, T071, T073, T077, T081, T082, T083, T087
+- FR-025: T057–T068, T072–T081
+- FR-026: T003, T006, T007, T016–T018, T030, T032, T033, T048, T057, T072, T083
+- FR-027: T005, T036, T037, T069, T071, T073, T077, T081–T083, T087
 - FR-028: T006, T007
 - FR-029: T086, T087
 - FR-030: T006, T016, T017, T037, T071, T086
-- FR-031: T001, T002, T003, T004, T013, T014, T015, T027, T036, T078
-- SC-001: T012, T022, T024, T025, T026, T027
-- SC-002: T028, T029, T035, T036, T046
+- FR-031: T001–T004, T013–T015, T027, T036, T078
+- SC-001: T012, T022–T027
+- SC-002: T028, T029, T032, T033, T035, T036, T046
 - SC-003: T040, T041, T051, T054
 - SC-004: T040, T041, T051
-- SC-005: T008, T009, T019, T020, T042, T056, T084
+- SC-005: T008, T009, T019, T020, T039, T042, T043, T056, T084
 - SC-006: T044, T045, T056, T072, T086
-- SC-007: T005, T016, T017, T018, T030, T034, T037, T069, T071, T073, T082, T083
-- SC-008: T021, T025, T051, T052, T053, T085, T086
+- SC-007: T005–T007, T016–T018, T030–T034, T037, T048, T069–T071, T073, T082, T083
+- SC-008: T021, T025, T051–T053, T085, T086
 - SC-009: T086
-- SC-010: T054, T057–T081, T086, T087
+- SC-010: T048–T050, T054, T055, T057–T068, T070, T074–T081, T086, T087
 
 ## Security Policy traceability
 

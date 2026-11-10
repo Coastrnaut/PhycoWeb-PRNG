@@ -77,7 +77,8 @@ them; C99 for any tool too slow in Python (gcc 15.2.0 in WSL); the model `phycow
 Python 3.8 grammar, after a selection.
 
 **Primary Dependencies**: numpy 2.2.6 and scipy 1.15.3 (HiGHS through `scipy.optimize.milp`) for analysis only, never imported
-by the model; feature 004's validated tools under `research/004/tools/`, unchanged; no new download is planned.
+by the model; feature 004's validated tools under `research/004/tools/`, unchanged, with research R7's companion of the ARX
+search under `research/005/tools/`; no new download is planned.
 
 **Storage**: committed JSON records and hash-chained JSON-lines logs under `reports/005-crypto-architecture-v4/` and
 `research/005/`, as feature 004's data model states them for its paths; local-only outputs under `data/local/005/`.
@@ -141,9 +142,11 @@ specs/005-crypto-architecture-v4/
 ```text
 protocol/             # the feature as a parameter of evidence.py and its writers (R9); claims.json holds phyco-v4
 scripts/              # feature 004's scripts taking the feature; round_rule.py with sums and the 16×16-first order
-research/005/         # plan_projections.py, plan-projections.json, the three logs, candidates/<id>/ operation lists
-reports/005-crypto-architecture-v4/   # environment records, projections/, candidates/, rechecks/, freeze/, the final report
-tests/                # test_protocol_005.py and the tests beside each changed module
+research/005/         # plan_projections.py, place_check.py, selection_bias.py and their files, refused-constants.json,
+                      # tools/ (research R7), the protocol change log, the candidate log, candidates/<id>/
+reports/005-crypto-architecture-v4/   # environment records, provenance.jsonl, projections/, candidates/, rechecks/,
+                                      # freeze/, the final report
+tests/                # test_protocol_005.py, test_tools_005.py and the tests beside each changed module
 phycoweb/model_v4.py  # after a selection only
 vectors/phyco-v4/     # after a selection only
 ```
@@ -159,7 +162,7 @@ paths beside feature 004's, which no step writes.
 | 1 | Machinery (R9), environment records with their rows, the three logs, the claim test's coverage with `phyco-v4`'s `fut_sec` in the register, the re-check of sums and trails, and `plan_projections.py` reading feature 004's records at 99e6994 | the protocol change log's first entry, naming the baseline documents and `plan-projections.json` by SHA-256 (FR-001, FR-031) |
 | 2 | Probes and the final projection table (R5), in either order with phase 3 (spec FR-005) | the table committed before any candidate |
 | 3 | The security target first (R8): chapters, ⛔ review, "L1 recorded"; in either order with phase 2 | the review Approved |
-| 4 | Tool validation where a tool changed (inherited R12), none planned | each changed tool validated |
+| 4 | Tool validation where a tool changed or is new (inherited R12): research R7's companion of the ARX search, which writes the state at every addition; feature 004's tools unchanged | each changed or new tool validated |
 | 5 | Candidates and evidence (R6, R7, R11 to R13): entry, D4, climbs 16×16 first, structural and bias tests, round rule, selection or a stop | a selection record |
 | 6–8 | Model, vectors, transcription, reviews and freeze (inherited) | `phyco-v4` frozen, or not reached after a stop |
 | 9 | Final report (FR-029), ⛔ final result review | the owner's decision |

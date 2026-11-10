@@ -35,13 +35,21 @@ Exits 2 once any `proposed` entry exists, when `plan-projections.json` fails its
 missing. `--check` recomputes the table and exits 1 on a difference. A probe that shows a need above its row is printed, and
 the table records it; the run is refused when it comes (inherited ANA-078).
 
+### `research/005/selection_bias.py [--check FILE]`
+
+Generates the selection-bias statement (data-model §6; spec FR-024) as a Markdown table from
+`research/004/candidates.jsonl` and `research/005/candidates.jsonl`, reading both and writing neither, and prints it.
+`--check FILE` compares the table that FILE holds with the one it generates and exits 1 on a difference. It writes no record.
+
 ## Changed
 
 ### `scripts/evidence_v3.py … --probe`
 
 A probe for the projection table (research R5): the run itself, up to 4 h, written as a `projection` record charged to the
 feature-wide row, its outputs other than timing discarded unread. It records `finished` with the hours taken, or
-`reached the probe limit`, which the table reads as reaching the run's cap. Exits 2 once any `proposed` entry exists.
+`reached the probe limit`, which the table reads, for a bound search, as reaching its cap, and for a structural check or a
+frequency and avalanche measurement as keeping its kind's provisional need (research R5). A structural or bias probe runs at
+`--rounds 66`, R_max + Δ (research R5). Exits 2 once any `proposed` entry exists.
 
 ### `scripts/round_rule.py --candidate ID`
 
@@ -53,12 +61,19 @@ FR-016) and continues by sums until both kinds' weights exceed 128 or r reaches 
 search runs at one thread, under its size's cap from the projection table, and is refused when its projection does not fit
 its row.
 
-### `scripts/candidate_log.py propose ID --derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]`
+### `scripts/d4_choice.py --tie`
+
+An exact tie sends the two representatives on at the production width in spec FR-014's order, 16×16 first, and only as
+far as R at 4×4 needs; `--tie` writes `tie.json` once both have R at 4×4 or one of them is `ineligible`, a decision at
+16×16 under FR-018 included (spec FR-022). Every other part of feature 004's tie rule applies as written.
+
+### `scripts/candidate_log.py propose FILE [--derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]]`
 
 Exits 2 while the row "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names (FR-011), and
 while `$REP/projection-table.json` does not exist (research R5), for every `proposed` entry. `--derived-from` names a
 feature-004 operation list by path and SHA-256 (FR-023), and `--relation` and `--changes` write data-model §5's `relation` and
-`changes`, `changes` reading `none` for `derived`; without `--derived-from`, `derived_from` reads `none`.
+`changes`, `changes` reading `none` for `derived`; without `--derived-from`, `derived_from` reads `none`. FILE holds the entry's
+other fields, as feature 004's contract has it.
 
 ### `scripts/recheck_004.py` for feature 005
 

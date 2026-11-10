@@ -124,16 +124,17 @@ held in `research/005/plan-projections.json`.
   and one frequency and avalanche measurement per size and design at w = 32. A probe is the run itself, up to 4 h (option E; 1 h
   under option A); a run that finishes gives its hours, a bound search that does not is projected to reach its cap, and a
   structural check or a frequency and avalanche measurement that does not keeps the plan's provisional need for its kind (12 h
-  and 24 h per candidate). "One structural check" is one run of every structural kind that inherited FR-037 asks at that size
-  (the inverse tests, the dependency matrices, the symmetry and invariant checks), each kind's hours in the probe's record, and
-  a probe lowers the provisional need only by the kinds it covers. The provisional needs are split equally over the three
-  claimable sizes (4 h structural and 8 h bias per size): a probe that finishes at a size gives that size its hours, a size
-  whose probe did not finish keeps its share, and a candidate's need is the smaller of the provisional need and that sum. A run
-  feature 004 made is not probed again: its record, the same tool on the same operation list, size, width, kind and r, on the
-  same machine at one thread, is the measurement, cited in the table by record ID. `projection_table.py` then writes the final
-  table from the plan's rules and the probes; each value is the smaller of the plan's and the probes', so that every value only
-  falls, and a probe that shows a need above its row is reported before any candidate, its run refused when it comes (inherited
-  ANA-078).
+  and 24 h per candidate). A structural check or a frequency and avalanche measurement runs at R = 66 rounds, R_max + Δ, the
+  largest R_bound + Δ that the climb allows, so that a probe that finishes bounds the run at every R up to it. "One structural
+  check" is one run of every structural kind that inherited FR-037 asks at that size (the inverse tests, the dependency
+  matrices, the symmetry and invariant checks), each kind's hours in the probe's record, and a probe lowers the provisional need
+  only by the kinds it covers. The provisional needs are split equally over the three claimable sizes (4 h structural and 8 h
+  bias per size): a probe that finishes at a size gives that size its hours, a size whose probe did not finish keeps its share,
+  and a candidate's need is the smaller of the provisional need and that sum. A run feature 004 made is not probed again: its
+  record, the same tool on the same operation list, size, width, kind and r, on the same machine at one thread, is the
+  measurement, cited in the table by record ID. `projection_table.py` then writes the final table from the plan's rules and the
+  probes; each value is the smaller of the plan's and the probes', so that every value only falls, and a probe that shows a need
+  above its row is reported before any candidate, its run refused when it comes (inherited ANA-078).
 - **Rationale**: the probes measure what feature 004 never ran at w = 32, the structural and bias kinds above all, and an
   upper limit of 4 h lets more of them finish while keeping them inside the feature-wide row's 40 h of probes.
 - **Alternatives considered**: probing every listed run again (rejected: it repeats feature 004's measurements on the same
@@ -153,12 +154,17 @@ held in `research/005/plan-projections.json`.
 
 ## R7. Trail characteristics at every nonlinear operation (FR-019, FR-020) — protocol
 
-- **Decision**: a `trail` record holds, for every round, the state's difference or mask at the round's boundary and at the
-  input and output of each nonlinear operation in the order of the candidate's operation list (data-model §3). The re-check
-  recomputes the weight as the product of each operation's exact transition probability or squared correlation (for a
-  modular addition the exact differential probability and linear correlation of its inputs and output; for an S-box its table
-  entry), checks every linear step between recorded points by evaluating it, and classes the trail by the 2⁻¹²⁸ threshold:
-  above it a confirmed vulnerability of the rounds it covers, at or below it `none`.
+- **Decision**: a `trail` record holds, for every round, the state's difference or mask at the round's boundary and at the input
+  and output of each nonlinear operation in the order of the candidate's operation list (data-model §3). The re-check recomputes
+  the weight as the product of each operation's exact transition probability or squared correlation (for a modular addition the
+  exact differential probability and linear correlation of its inputs and output; for an S-box its table entry), checks every
+  linear step between recorded points by evaluating it, and classes the trail by the 2⁻¹²⁸ threshold: above it a confirmed
+  vulnerability of the rounds it covers, at or below it `none`. Feature 004's ARX search,
+  `research/004/tools/trails/arx_search.c`, prints only the states at round boundaries, and its check modes read a round of one
+  addition, so a round of several additions gets no characteristic from it: a companion under `research/005/tools/`, a copy of
+  that tool whose trail output adds the state after every step of every round, writes the trails, validated as a tool of its own
+  on the ARX search's known results before its first counted use (inherited FR-039, R12); feature 004's tool and its records
+  stay unchanged (spec FR-003).
 - **Rationale**: a difference held only after each round cannot fix the differences between two nonlinear layers of one round
   (feature 004, T131); held at every operation, the weight follows from the record alone.
 - **Alternatives considered**: feature 004's per-round format (rejected by D9).
@@ -169,10 +175,13 @@ held in `research/005/plan-projections.json`.
   Version 0.4, into this feature's `design.md` and `rationale.md` as Version 0.5 with `phyco-v4` for `phyco-v3`, listing each
   change in `rationale.md` (spec FR-010); the security target's files are written by `mode_limits_v3.py` read for this feature,
   before the review with R as `<R4>`, `<R8>` and `<R16>`, and again once every R is known, when the family's next row,
-  "Security-target review <k>", reviews the round counts, the figures computed from them and the open items (spec FR-012). The
-  row "Security-target review" names both documents' chapters' SHA-256 and the files'; `candidate_log.py propose` exits 2 while
-  that row does not read Approved at HEAD or the projection table does not exist, for every `proposed` entry. The open items of
-  FR-012 are listed under a heading of their own in the chapter, and the owner design review's row names them.
+  "Security-target review <k>", reviews the round counts, the figures computed from them and the open items (spec FR-012). Until
+  the chapter "Permutation" holds its variant table, the script takes the variant rows from the chapter "Security target"'s
+  parameter table, R as the placeholders, so that the files rest on the reviewed chapters alone; once the variant table exists
+  (plan phase 6), it reads that table, as inherited. The row "Security-target review" names both documents' chapters' SHA-256
+  and the files'; `candidate_log.py propose` exits 2 while that row does not read Approved at HEAD or the projection table does
+  not exist, for every `proposed` entry. The open items of FR-012 are listed under a heading of their own in the chapter, and
+  the owner design review's row names them.
   "L1 recorded" names this review's row and feature 004's FUT-SEC-8 result review row (ffb1425).
 - **Rationale**: no candidate's result can reach the target before it is reviewed, and the review's row is a guard, not a
   note.
@@ -227,8 +236,10 @@ held in `research/005/plan-projections.json`.
   candidate and operation list it derives from by path and SHA-256; it counts as evaluated, runs every kind of evidence again
   under this protocol with the constants the inherited rule gives, which for an unchanged design at an unchanged variant are
   feature 004's exactly, the rule reading one fixed stream and holding no ID, and cites its feature-004 records only as prior
-  results. Its rotation amounts are those feature 004's ranking chose, its rotation search not run again, and the refused list
-  it is checked against is this feature's byte copy of feature 004's (spec FR-023).
+  results. Its rotation amounts are those feature 004's ranking chose at width 16, its ranking record cited as a prior result;
+  where inherited research R6's rule fixes this feature's D4 width at 8, its amounts are searched again at 8, and amounts that
+  come out otherwise make it a variant (`relation` `derived`), its permutation and constants no longer feature 004's; the
+  refused list it is checked against is this feature's byte copy of feature 004's (spec FR-023).
 - **Rationale**: feature 004's records were made under another protocol and another model ID, and FR-023 keeps them out of
   this feature's evidence.
 - **Alternatives considered**: new designs only (rejected by D1).
