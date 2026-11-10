@@ -71,7 +71,7 @@ the candidate IDs and the D4 choice
 
 ## Round 5 (fourth re-run, after round 4's changes)
 
-- [ ] CHK031 Does the contract's `--relation derived|starting-point` name the value that data-model §5 writes in `relation` (`starting point`, with a space), so that the record's value has one spelling and the selection-bias statement reads it as written? [Consistency, contracts/cli.md, data-model §5, §6]
+- [x] CHK031 Does the contract's `--relation derived|starting-point` name the value that data-model §5 writes in `relation` (`starting point`, with a space), so that the record's value has one spelling and the selection-bias statement reads it as written? [Consistency, contracts/cli.md, data-model §5, §6]
 
 ## Notes
 
@@ -92,6 +92,8 @@ the candidate IDs and the D4 choice
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 5, 2026-11-09: re-run over the complete documents after round 4's changes (ea2e924, 32e7338);
   one new item, CHK031; no clarifying questions, as in round 1.
+- Round 5, verified 2026-11-09: after the round's changes (checklist-choices.md, round 5), the new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),

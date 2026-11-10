@@ -356,6 +356,8 @@ rule.
 
 ### Rows that change the protocol (round 5)
 
+The round's two commits are 51536bf (its choices) and 50aaef1 (its changes applied).
+
 Written with the rows, before they are applied; none sets a reading aside. Every other row clarifies text and changes no
 rule.
 

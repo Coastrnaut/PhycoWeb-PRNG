@@ -77,7 +77,7 @@ these change
 
 ## Round 5 (fourth re-run, after round 4's changes)
 
-- [ ] CHK037 Does FR-016's rule that a design holding an addition of a committed constant takes no sum also govern the bounds that rest on the same repetition inside a search: the floors that the validated tools take from shorter spans (Matsui's lemma in `active_sbox.py` and `long_trail.py`), and an active-box count multiplied by one box's bound over one call, which assumes that every round's box has that bound whatever its constants? [Consistency, Spec §FR-015, FR-016, inherited FR-038, feature-004 `active_sbox.py`, `long_trail.py`]
+- [x] CHK037 Does FR-016's rule that a design holding an addition of a committed constant takes no sum also govern the bounds that rest on the same repetition inside a search: the floors that the validated tools take from shorter spans (Matsui's lemma in `active_sbox.py` and `long_trail.py`), and an active-box count multiplied by one box's bound over one call, which assumes that every round's box has that bound whatever its constants? [Consistency, Spec §FR-015, FR-016, inherited FR-038, feature-004 `active_sbox.py`, `long_trail.py`]
 
 ## Notes
 
@@ -98,6 +98,8 @@ these change
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Round 5, 2026-11-09: re-run over the complete documents after round 4's changes (ea2e924, 32e7338);
   one new item, CHK037; no clarifying questions, as in round 1.
+- Round 5, verified 2026-11-09: after the round's changes (checklist-choices.md, round 5), the new item was
+  checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
