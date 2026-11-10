@@ -352,31 +352,31 @@
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.2 | Feature 005: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |",
+        "text": "| 5a.2 | Feature 006: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.3 | Feature 006: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |",
+        "text": "| 5a.3 | Feature 007: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.4 | Feature 007: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v3`'s design freeze and feature 007's protocol freeze, for example SHA-256 over feature 007's protocol freeze record with a public string; feature 007 states the derivation, and a test re-derives it (feature-004 FR-040) | Not started |",
+        "text": "| 5a.4 | Feature 008: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v4`'s design freeze and feature 008's protocol freeze, for example SHA-256 over feature 008's protocol freeze record with a public string; feature 008 states the derivation, and a test re-derives it (feature-004 FR-040, which feature 005 inherits) | Not started |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.6 | Feature 009: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |",
+        "text": "| 5a.6 | Feature 010: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
@@ -443,10 +443,10 @@
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
-        "date": "2026-11-03",
+        "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | FUT-SEC-8 result review and security-target review (feature-004 FR-012) |",
+        "text": "| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | FUT-SEC-8 result review and security-target review (feature-004 FR-012; feature-005 FR-013) |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
@@ -2940,6 +2940,20 @@
         "reason": "A requirement's text: says that it is not sought, not available or conditional, or defines the term; no text implies it (D7)",
         "text": "  call; prediction resistance not sought, D7); the security target's parameters, s = 128, a 256-bit",
         "writer": "Claude Code, model claude-opus-5-5"
+      },
+      {
+        "date": "2026-11-09",
+        "path": "security.md",
+        "reason": "The policy: a bound, a solver's result or a theorem is its object, or the line quotes the rule's list of forms or a published title; the design, the generator or a security property never is; names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
+        "text": "| 5a.1b | Feature 005: stage 5a.1 again, for a new model ID, `phyco-v4`, under its own pre-registered protocol (row 5a; feature 004's stop rule): every run planned at 16×16 before any candidate, the security target reviewed first, and a bound climb continued past a capped search by sums of shorter spans; then the deliverables of stage 5a.1 (L1, start of L2) | Spec approved by the owner on 2026-11-09, with decisions D1–D14 as their defaults; plan not started |",
+        "writer": "Claude Code, model claude-opus-5-5"
+      },
+      {
+        "date": "2026-11-09",
+        "path": "security.md",
+        "reason": "The policy: a bound, a solver's result or a theorem is its object, or the line quotes the rule's list of forms or a published title; the design, the generator or a security property never is; names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
+        "text": "| 2.18 | 2026-11-09 | Recorded the owner's approval of the feature-005 spec on 2026-11-09, with its decisions D1–D14 as their defaults (feature 005, FR-027): `phyco-v4`, the model ID of feature 005's second design round, gains its row in section 1.1 and its line in section 15's register, L0 with no claim and not for secrets, and its entry in `protocol/claims.json`; section 15's L1 gate names feature 005's FR-013 beside feature 004's FR-012; roadmap row 5a.1b gives feature 005 stage 5a.1's place for `phyco-v4`, and the features of rows 5a.2 to 5a.6 become 006 to 010 (D12), section 5's note on T11 naming the cryptanalysis stage by its row. No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model |",
+        "writer": "Claude Code, model claude-opus-5-5"
       }
     ],
     "phrases": [
@@ -3074,6 +3088,15 @@
         "status": "not reached"
       },
       "updated": "2026-11-07"
+    },
+    "phyco-v4": {
+      "bound": "none",
+      "claim": "no claim",
+      "claim_level": "L0",
+      "evidence": [],
+      "history": [],
+      "in_progress": "none",
+      "updated": "2026-11-09"
     }
   }
 }

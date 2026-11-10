@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.17 (2026-11-09). The change history is in section 25.
+- **Document:** `security.md`, version 2.18 (2026-11-09). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -32,6 +32,7 @@
 | `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | L0; no claim | negative control |
 | `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). Passed the pre-registered PractRand/TestU01 attempt 1 (0 of 70 runs failing, `heldout-1` battery set; feature 003, section 11.4) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
 | `phyco-v3` | none yet: the design of feature 004, [`spec.md`](specs/004-crypto-architecture-v3/spec.md) | not specified yet | a key, not a seed; not specified yet | none | none | L0; no claim | feature 004 stopped at the selection, no candidate eligible; no model exists |
+| `phyco-v4` | none yet: the design of feature 005, [`spec.md`](specs/005-crypto-architecture-v4/spec.md) | not specified yet | a key, not a seed; not specified yet | none | none | L0; no claim | feature 005's spec approved on 2026-11-09, a second design round after feature 004's stop; no model exists |
 
 ### 1.2 What is and is not established for `phyco-v2`
 
@@ -293,7 +294,8 @@ one does not apply. Feature 004 adopts T11 for `phyco-v3` only as single-target 
 which a 256-bit key meets with equality and no margin at s = 128, since its 128-bit target is a
 classical one; multi-target quantum key search, quantum attacks on the capacity through queries to
 the public permutation and every other quantum generic attack are excluded for that reason and left
-open for feature 005 (feature-004 FR-008).
+open for the cryptanalysis stage, roadmap row 5a.2, which feature 004's documents call feature 005
+and which is feature 006 since version 2.18 (feature-004 FR-008).
 
 **Generic results** that hold for `phyco-v2` as specified (no experiment needed):
 
@@ -1113,7 +1115,7 @@ qualified), because "substantial cryptanalysis" could not be checked.
 | Level | Name | Evidence required | Gate |
 |-------|------|-------------------|------|
 | L0 | Research candidate | specification; no claim | — |
-| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | FUT-SEC-8 result review and security-target review (feature-004 FR-012) |
+| L1 | Security target specified | security target, threat model, mode, parameters and generic bounds; FUT-SEC-1 to FUT-SEC-6 met by specification; FUT-SEC-8 done; certification route named (FUT-SEC-9) | FUT-SEC-8 result review and security-target review (feature-004 FR-012; feature-005 FR-013) |
 | L2 | Internally analysed | design rationale (section 8); structural proofs; proven trail bounds; an internal attack campaign with validated tools (section 12.5); a reduced-round statistical margin | design freeze; result review |
 | L3 | Statistically re-validated | the complete statistical programme on unused held-out key sets, per supported size (FUT-SEC-7) | battery freeze; result review |
 | L4 | Implementations verified | an implementation from outside the project; VHDL equivalent to the model (FUT-HW-1, FUT-HW-4) | RTL start (Principle VIII gate 2) |
@@ -1135,6 +1137,9 @@ only after L1–L4 have recorded evidence.
 - `phyco-v3`: L0; no claim. Feature 004 stopped at the selection on 2026-11-09, no candidate eligible, and no model
   exists. Its level
   follows the spec's Review & Approval rows and `protocol/claims.json`, which the claim test checks.
+- `phyco-v4`: L0; no claim. Feature 005, a second design round after feature 004's stop, had its spec
+  approved on 2026-11-09; no model exists, and like every model it must not be used to generate
+  secrets. Its level follows feature 005's Review & Approval rows and `protocol/claims.json`.
 
 **Rules for every level:**
 
@@ -1571,13 +1576,14 @@ No option is assumed secure.
 | 3 | Redesign the core dynamics; reference model and vectors | Done (feature 002, phyco-v2) |
 | 4 | Statistical validation: SP 800-22, calibration, PractRand, TestU01 | SP 800-22 done (002); calibration done (003); battery attempt 1 PASS (003, reviewed 2026-11-01) |
 | 5 | Threat model and security-claims spec; structural analysis (seed bound, invertibility, cycles) | Next (sections 5, 9.2, 12.3) |
-| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–009 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; approved by the owner on 2026-11-01, with the strategy note and the 2.7 to 2.9 changes, when the feature-004 spec was approved. Its requirements are binding (constitution 1.2.0, section 20.1) |
+| 5a | Only if a cryptographic claim or certification is pursued: a key-interface redesign meeting FUT-SEC-1 to FUT-SEC-9 and the grid-scaling and hardware requirements FUT-GRID-1 to FUT-GRID-5 and FUT-HW-1 to FUT-HW-5, as a new design with a new model ID (Option A2, section 21), in features 004–010 below. An attack on the full design at any point sends the work back to 004 with a new model ID, or stops it (Option C) | Conditional; approved by the owner on 2026-11-01, with the strategy note and the 2.7 to 2.9 changes, when the feature-004 spec was approved. Its requirements are binding (constitution 1.2.0, section 20.1) |
 | 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Stopped at the selection on 2026-11-09, no candidate eligible; the final report (`reports/004-crypto-architecture-v3/phase-report.md`) recommends stopping, option C of section 21, and the owner's final result review approved it on 2026-11-09 |
-| 5a.2 | Feature 005: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
-| 5a.3 | Feature 006: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |
-| 5a.4 | Feature 007: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v3`'s design freeze and feature 007's protocol freeze, for example SHA-256 over feature 007's protocol freeze record with a public string; feature 007 states the derivation, and a test re-derives it (feature-004 FR-040) | Not started |
-| 5a.5 | Feature 008: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-GRID-5, FUT-HW-2); a size that does not fit is listed in feature 008's spec with its reason and stays covered by feature 006's simulation; may run alongside 007 | Not started |
-| 5a.6 | Feature 009: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |
+| 5a.1b | Feature 005: stage 5a.1 again, for a new model ID, `phyco-v4`, under its own pre-registered protocol (row 5a; feature 004's stop rule): every run planned at 16×16 before any candidate, the security target reviewed first, and a bound climb continued past a capped search by sums of shorter spans; then the deliverables of stage 5a.1 (L1, start of L2) | Spec approved by the owner on 2026-11-09, with decisions D1–D14 as their defaults; plan not started |
+| 5a.2 | Feature 006: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
+| 5a.3 | Feature 007: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |
+| 5a.4 | Feature 008: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v4`'s design freeze and feature 008's protocol freeze, for example SHA-256 over feature 008's protocol freeze record with a public string; feature 008 states the derivation, and a test re-derives it (feature-004 FR-040, which feature 005 inherits) | Not started |
+| 5a.5 | Feature 009: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-GRID-5, FUT-HW-2); a size that does not fit is listed in feature 009's spec with its reason and stays covered by feature 007's simulation; may run alongside 008 | Not started |
+| 5a.6 | Feature 010: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |
 | 6 | Cryptanalysis: state recovery, related seeds, rotational, algebraic, distinguishers | Not started |
 | 7 | RTL: VHDL, differential tests, synthesis, side channels | Not started (O1) |
 | 8 | Independent review, reproduction, qualification decision | Not started |
@@ -1664,6 +1670,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.15 | 2026-11-04 | The best-attack register's row for exhaustive seed search cites the FUT-SEC-8 demonstration record by ID and SHA-256, the search tool's validation record (feature 004, FR-003; sections 12.5 and 12.6). The owner's FUT-SEC-8 result review follows. No requirement, level or finding changed |
 | 2.16 | 2026-11-09 | Recorded that feature 004 stopped at the selection with no eligible candidate (`reports/004-crypto-architecture-v3/freeze/selection.json`): section 1.1's row and section 15's line for `phyco-v3`, and roadmap stage 5a.1, say so, and the final report recommends stopping (section 21, option C). No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model (feature 004, FR-051, FR-052) |
 | 2.17 | 2026-11-09 | Recorded the owner's final result review of feature 004, which approved the final report and its recommendation to stop on 2026-11-09: roadmap stage 5a.1 says so. No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model (feature 004, T127) |
+| 2.18 | 2026-11-09 | Recorded the owner's approval of the feature-005 spec on 2026-11-09, with its decisions D1–D14 as their defaults (feature 005, FR-027): `phyco-v4`, the model ID of feature 005's second design round, gains its row in section 1.1 and its line in section 15's register, L0 with no claim and not for secrets, and its entry in `protocol/claims.json`; section 15's L1 gate names feature 005's FR-013 beside feature 004's FR-012; roadmap row 5a.1b gives feature 005 stage 5a.1's place for `phyco-v4`, and the features of rows 5a.2 to 5a.6 become 006 to 010 (D12), section 5's note on T11 naming the cryptanalysis stage by its row. No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model |
 
 > Passing statistical batteries does not show cryptographic security. PhycoWeb-PRNG, every model
 > included, must not be used to generate secrets. Use an established cryptographic RNG for keys,
