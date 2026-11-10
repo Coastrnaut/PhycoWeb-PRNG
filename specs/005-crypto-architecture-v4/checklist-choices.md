@@ -498,5 +498,7 @@ analysis loop takes the recommended edit of the one finding of the report on b5a
 
 ### Rows that change the protocol (analysis remediation 6)
 
+The batch's two commits are ec6edf7 (its choices) and 01b4c43 (its changes applied).
+
 None: the batch's one row restates in the contract rules that the spec, research and data model already fix, and
 changes no rule.
