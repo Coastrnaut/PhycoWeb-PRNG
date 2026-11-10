@@ -1439,3 +1439,22 @@ names:
   (`reports/004-crypto-architecture-v3/freeze/selection.json` and the final report), `phyco-v3`
   staying at L0 with no claim and with no model, the constitution version 1.3.0 kept wherever 2.13
   names it, per FR-051 (partial)
+
+## Phase 11: Convergence
+
+- [ ] T131 Mark T086 in `specs/004-crypto-architecture-v3/tasks.md` as done in part, the rest not
+  applicable, and correct the final report addendum's line on T086 to match:
+  `scripts/recheck_004.py`'s `check_trail` recomputes a trail's −log₂ weight from its committed
+  rational and its class from its tool's validation, but does not recompute the weight from the
+  committed characteristic and operation list by exact integer arithmetic, round by round, nor
+  apply ANA-086's 2⁻¹²⁸ threshold; no `trail` record exists, the stop leaves none to come, and
+  data-model §6's characteristic, the difference or mask after every round, does not fix the
+  differences inside a round with more than one nonlinear layer, per FR-065 (partial)
+- [ ] T132 Run `python scripts/recheck_004.py` again in a fresh clone at HEAD, since 1996d9e changed
+  `scripts/recheck_004.py` and `protocol/evidence.py` after T124's run
+  (`recheck-20261109T130121Z-cc622313`, at 23c5520): 0 disagreements, its `recheck` record under
+  `reports/004-crypto-architecture-v3/rechecks/` committed, per SC-017 (partial)
+- [ ] T133 Add to the final report's addendum, `reports/004-crypto-architecture-v3/phase-report.md`,
+  the closing whole-suite run after 1996d9e (Windows: 1929 tests, OK, 71 skipped, 1023.0 s; WSL:
+  1929 tests, OK, 8 skipped, 691.6 s; 33c4f1a) and T132's re-check, each with its exact command,
+  per FR-052 (partial)
