@@ -40,11 +40,18 @@ trails, the baseline documents, line endings, and the reproduction of every comm
 - [x] CHK012 Is the reproduction of `plan-projections.json` defined when feature 004's committed records change in a way FR-003 forbids, or when a later whole-suite run adds feature-004 records it might read, so that a `--check` difference has one meaning? [Coverage, Edge Case, Spec §FR-003, FR-004]
 - [x] CHK013 Is it stated which of this feature's committed results a reproduction re-runs (light kinds, by their scripts' `--reproduce`) and which it only re-checks (heavy runs, probes, owner records), as feature 004's R16 lists them? [Coverage, inherited R16, Spec §FR-001]
 
+## Round 2 (first re-run, after round 1's changes)
+
+- [ ] CHK014 Does the row "Checklist choices, round 1" name every file the round changed, `protocol/claims.json` among them (its allow-list entry for roadmap row 5a.3 followed the line's new text, aedcabd), so that the row and the commit agree? [Consistency, Traceability, Spec §Review & Approval]
+- [ ] CHK015 Is the provenance of the files both features share (security.md, `protocol/claims.json`, `.gitattributes`, README) defined once feature 005 changes them, FR-003 keeping feature 004's provenance log as it ended and FR-031 starting a log "of this feature's hand-written documents" that may not cover shared files? [Gap, Spec §FR-003, FR-031]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
   clarifying questions, the owner's instruction of 2026-11-09 asking for a loop without human interaction and the input
   naming every focus area; depth standard, audience the reviewer.
+- Round 2, 2026-11-09: re-run over the complete documents after round 1's changes (aedcabd, 7c5ab0b); two new
+  items, CHK014 and CHK015; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
