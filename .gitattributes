@@ -27,6 +27,7 @@ research/004/** text eol=lf
 protocol/*.json text eol=lf
 specs/004-crypto-architecture-v3/**/*.md text eol=lf
 vectors/phyco-v3/** text eol=lf
+vectors/phyco-v4/** text eol=lf
 # Feature 005: its documents are LF too, since its records will hold their hashes, as feature 004's do.
 specs/005-crypto-architecture-v4/**/*.md text eol=lf
 reports/005-crypto-architecture-v4/** text eol=lf

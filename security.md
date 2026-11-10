@@ -1,6 +1,6 @@
 # PhycoWeb-PRNG Security Policy and Cryptographic Validation Strategy
 
-- **Document:** `security.md`, version 2.18 (2026-11-09). The change history is in section 25.
+- **Document:** `security.md`, version 2.19 (2026-11-09). The change history is in section 25.
 - **Project:** PhycoWeb-PRNG.
 - **Purpose:** This document does three things:
   - states the security policy for the generator;
@@ -32,7 +32,7 @@
 | `lut-v1` | `phycoweb/model.py` (feature 001) | 144 bits: P and D 4 × 16 bits each, two 8-bit phases | 4 × 16 bits | Fails SP 800-22 (11 of 15 families, feature-002 attempt 1). Fails PractRand and TestU01 (feature 003, section 11.5) | none. The output exposes the low 8 bits of every vein value | L0; no claim | negative control |
 | `phyco-v2` | `phycoweb/model_v2.py`, [`design.md`](specs/002-core-dynamics-redesign/design.md) 1.0 (feature 002) | 272 bits, of which the 16 phase bits are public | 4 × 16 bits = **64 bits** | Passed the pre-registered SP 800-22 attempt 1 (15 of 15 families, `heldout-1`). Passed the pre-registered PractRand/TestU01 attempt 1 (0 of 70 runs failing, `heldout-1` battery set; feature 003, section 11.4) | none | L0; no claim. It cannot reach L1 as specified: the 64-bit seed is below FUT-SEC-1 (S1–S3) | research candidate |
 | `phyco-v3` | none yet: the design of feature 004, [`spec.md`](specs/004-crypto-architecture-v3/spec.md) | not specified yet | a key, not a seed; not specified yet | none | none | L0; no claim | feature 004 stopped at the selection, no candidate eligible; no model exists |
-| `phyco-v4` | none yet: the design of feature 005, [`spec.md`](specs/005-crypto-architecture-v4/spec.md) | not specified yet | a key, not a seed; not specified yet | none | none | L0; no claim | feature 005's spec approved on 2026-11-09, a second design round after feature 004's stop; no model exists |
+| `phyco-v4` | none yet: the design of feature 005, [`spec.md`](specs/005-crypto-architecture-v4/spec.md) | not specified until the selection | a 256-bit key and a 128-bit nonce, as targets (feature 005, D3) | none | none | L0; no claim | feature 005's spec approved on 2026-11-09, a second design round after feature 004's stop; no model exists |
 
 ### 1.2 What is and is not established for `phyco-v2`
 
@@ -290,8 +290,9 @@ No such claim exists or is planned for the current design, which is bounded at 6
 
 T6–T11 were added in version 2.7 for a keyed design, which does not exist yet: `phyco-v2` has no
 key, nonce or reseed input. A spec that introduces a key interface adopts them, or states why
-one does not apply. Feature 004 adopts T11 for `phyco-v3` only as single-target key search, k/2 ≥ s,
-which a 256-bit key meets with equality and no margin at s = 128, since its 128-bit target is a
+one does not apply. Feature 004 adopts T11 for `phyco-v3`, and feature 005 for `phyco-v4`, only as
+single-target key search, k/2 ≥ s, which a 256-bit key meets with equality and no margin at
+s = 128, since its 128-bit target is a
 classical one; multi-target quantum key search, quantum attacks on the capacity through queries to
 the public permutation and every other quantum generic attack are excluded for that reason and left
 open for the cryptanalysis stage, roadmap row 5a.2, which feature 004's documents call feature 005
@@ -1580,7 +1581,7 @@ No option is assumed secure.
 | 5a.1 | Feature 004: the FUT-SEC-8 demonstration (stage 5's seed bound); security target and threat model; mode; the permutation and its inverse; reduced variants; design rationale; reference model and vectors; first proven bounds; owner design review and ⛔ design freeze (L1, start of L2) | Stopped at the selection on 2026-11-09, no candidate eligible; the final report (`reports/004-crypto-architecture-v3/phase-report.md`) recommends stopping, option C of section 21, and the owner's final result review approved it on 2026-11-09 |
 | 5a.1b | Feature 005: stage 5a.1 again, for a new model ID, `phyco-v4`, under its own pre-registered protocol (row 5a; feature 004's stop rule): every run planned at 16×16 before any candidate, the security target reviewed first, and a bound climb continued past a capped search by sums of shorter spans; then the deliverables of stage 5a.1 (L1, start of L2) | Spec approved by the owner on 2026-11-09, with decisions D1–D14 as their defaults; plan not started |
 | 5a.2 | Feature 006: internal cryptanalysis with validated tools (section 12.5); best-attack register (section 12.6); reduced-round battery sweep; margin (L2) | Not started |
-| 5a.3 | Feature 007: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in feature 004's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |
+| 5a.3 | Feature 007: an independent C implementation and generic VHDL, with equivalence evidence; the RTL validated at 4×4 before 8×8 and 16×16, in features 004 and 005's order of sizes (FUT-GRID-5); ⛔ RTL start (L4) | Not started |
 | 5a.4 | Feature 008: statistical re-validation on unused held-out key sets per supported size (FUT-SEC-7; L3). The held-out keys are derived from data that does not exist until the later of `phyco-v4`'s design freeze and feature 008's protocol freeze, for example SHA-256 over feature 008's protocol freeze record with a public string; feature 008 states the derivation, and a test re-derives it (feature-004 FR-040, which feature 005 inherits) | Not started |
 | 5a.5 | Feature 009: hardware validation on the Arty A7-100T (FUT-HW-2 to FUT-HW-5), at 4×4 first, then each larger claimable size that fits the XC7A100T, in order, the largest that fits last (FUT-GRID-5, FUT-HW-2); a size that does not fit is listed in feature 009's spec with its reason and stays covered by feature 007's simulation; may run alongside 008 | Not started |
 | 5a.6 | Feature 010: review package, independent review, a public analysis period if the owner authorizes it, and the ⛔ claim decision (L5, L6) | Not started |
@@ -1671,6 +1672,7 @@ cryptographically secure PRNG, until both of the following hold:
 | 2.16 | 2026-11-09 | Recorded that feature 004 stopped at the selection with no eligible candidate (`reports/004-crypto-architecture-v3/freeze/selection.json`): section 1.1's row and section 15's line for `phyco-v3`, and roadmap stage 5a.1, say so, and the final report recommends stopping (section 21, option C). No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model (feature 004, FR-051, FR-052) |
 | 2.17 | 2026-11-09 | Recorded the owner's final result review of feature 004, which approved the final report and its recommendation to stop on 2026-11-09: roadmap stage 5a.1 says so. No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model (feature 004, T127) |
 | 2.18 | 2026-11-09 | Recorded the owner's approval of the feature-005 spec on 2026-11-09, with its decisions D1–D14 as their defaults (feature 005, FR-027): `phyco-v4`, the model ID of feature 005's second design round, gains its row in section 1.1 and its line in section 15's register, L0 with no claim and not for secrets, and its entry in `protocol/claims.json`; section 15's L1 gate names feature 005's FR-013 beside feature 004's FR-012; roadmap row 5a.1b gives feature 005 stage 5a.1's place for `phyco-v4`, and the features of rows 5a.2 to 5a.6 become 006 to 010 (D12), section 5's note on T11 naming the cryptanalysis stage by its row. No requirement, level or finding changes; `phyco-v3` stays at L0 with no claim and no model |
+| 2.19 | 2026-11-09 | Applied the first checklist round of feature 005, its FR-027 as changed: section 5's note on T11 names `phyco-v4` beside `phyco-v3`; section 1.1's row for `phyco-v4` gives a 256-bit key and a 128-bit nonce as targets and its state as not specified until the selection; roadmap row 5a.3 refers to features 004 and 005's order of sizes. No requirement, level or finding changes; `phyco-v4` stays at L0 with no claim |
 
 > Passing statistical batteries does not show cryptographic security. PhycoWeb-PRNG, every model
 > included, must not be used to generate secrets. Use an established cryptographic RNG for keys,

@@ -155,7 +155,7 @@ paths beside feature 004's, which no step writes.
 | Phase | Work | Ends with |
 |-------|------|-----------|
 | 0 | Plan approval (⛔); the `/speckit-checklist` runs; tasks and their approval (⛔) | the tasks approved |
-| 1 | Machinery (R9), environment records with their rows, the three logs, the claim test's coverage, the re-check of sums and trails | the protocol change log's first entry, naming the baseline documents by SHA-256 (FR-001) |
+| 1 | Machinery (R9), environment records with their rows, the three logs, the claim test's coverage with `phyco-v4`'s `fut_sec` in the register, the re-check of sums and trails | the protocol change log's first entry, naming the baseline documents and `plan-projections.json` by SHA-256 (FR-001, FR-031) |
 | 2 | Probes and the final projection table (R5) | the table committed before any candidate |
 | 3 | The security target first (R8): chapters, ⛔ review, "L1 recorded" | the review Approved |
 | 4 | Tool validation where a tool changed (inherited R12), none planned | each changed tool validated |

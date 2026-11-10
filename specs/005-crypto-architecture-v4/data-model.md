@@ -20,7 +20,8 @@ document states only the changes. Fields are only added: a record valid under fe
 | development inputs `phycoweb-004/…` | `phycoweb-005/…` |
 | candidate IDs `cand-A<k>`, `cand-B<k>` | `v4-A<k>`, `v4-B<k>` |
 
-Every record of this feature holds `feature`: `"005"`. A record without the field is feature 004's. The writers take the
+Every record of this feature holds `feature`: `"005"`, and its `config` holds the setting it was written under,
+`PHYCOWEB_FEATURE`. A record without the field is feature 004's. The writers take the
 feature from the setting `PHYCOWEB_FEATURE` (research R9) and refuse to write a record whose path and `feature` disagree.
 
 ## 2. The `split` bound record (FR-016, FR-017)
@@ -42,7 +43,8 @@ A record of kind `bound` with `method`: `"split"`, at `candidates/<id>/<record_i
 
 Classification `no weakness identified within the analysis performed`, with its scope (feature 004's table). A `split` record
 is written only where it is the established bound at r, that is where no searched bound exists at r or the sum exceeds it.
-`round-rule.json` names, per size and kind, the record that sets R_bound, searched or `split`.
+`round-rule.json` names, per size and kind, the record that sets R_bound, searched or `split`, the last searched record,
+and the r of the first capped or refused search, so that SC-003 is decided from the records alone.
 
 ## 3. The trail record's characteristic (FR-019, FR-020)
 
@@ -54,6 +56,11 @@ A `trail` record's `characteristic` is a list with one entry per round, each:
 | `state_in` | str | the state's difference or mask at the round's start, as hexadecimal words in the operation list's word order |
 | `operations` | list | one entry per nonlinear operation of the round, in the operation list's order: `{op_index, inputs, output, weight}`, the operation's index in the committed operation list, its input differences or masks, its output difference or mask, and the transition's exact weight as a rational |
 | `state_out` | str | the state's difference or mask at the round's end |
+
+A nonlinear operation is one modular addition or subtraction of two w-bit words, or one S-box applied to its input bits,
+an S-box layer being recorded S-box by S-box. An operation list holding any other nonlinear operation gets no trail record
+until this section defines its weight. Masks pass the linear steps between recorded points through the transpose of each
+step's map, differences through the map itself.
 
 `weight` at the top of the record stays the product over every operation, as a rational `"p/q"` (feature 004's model), with
 its −log₂. The re-check recomputes each operation's weight from its inputs and output (for a modular addition the exact

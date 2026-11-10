@@ -160,7 +160,9 @@ held in `research/005/plan-projections.json`.
 
 - **Decision**: plan phase 3 copies the chapters "Security target" and "Mode" of feature 004's `design.md`, Version 0.4,
   into `specs/005-crypto-architecture-v4/design.md` as Version 0.5 with `phyco-v4` for `phyco-v3`, listing each change; the
-  security target's files are written by `mode_limits_v3.py` read for this feature. The row "Security-target review" names
+  security target's files are written by `mode_limits_v3.py` read for this feature, before the review with R as `<R4>`,
+  `<R8>` and `<R16>`, and again once every R is known, when "Security-target review 2" reviews the round counts and the open
+  items. The row "Security-target review" names
   the chapters' SHA-256 and the files'; `candidate_log.py propose` exits 2 while that row does not read Approved at HEAD. The
   open items of FR-012 are listed under a heading of their own in the chapter, and the owner design review's row names them.
   "L1 recorded" names this review's row and feature 004's FUT-SEC-8 result review row (ffb1425).
@@ -214,7 +216,9 @@ held in `research/005/plan-projections.json`.
 
 - **Decision**: a feature-004 design may be proposed as `v4-A<k>` or `v4-B<k>`, its `proposed` entry naming the feature-004
   candidate and operation list it derives from by path and SHA-256; it counts as evaluated, runs every kind of evidence again
-  under this protocol with new constants from the inherited rule, and cites its feature-004 records only as prior results.
+  under this protocol with the constants the inherited rule gives, which for an unchanged design at an unchanged variant are
+  feature 004's exactly, the rule reading one fixed stream and holding no ID, and cites its feature-004 records only as
+  prior results.
 - **Rationale**: feature 004's records were made under another protocol and another model ID, and FR-023 keeps them out of
   this feature's evidence.
 - **Alternatives considered**: new designs only (rejected by D1).
