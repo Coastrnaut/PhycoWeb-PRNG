@@ -53,6 +53,11 @@ trails, the baseline documents, line endings, and the reproduction of every comm
 - [x] CHK019 Do `plan-projections.json`'s pairs and the projection table's sources cite feature 004's records by path and SHA-256, data-model §4 naming only record IDs, as records cite one another in feature 004's model, so that a reproduction from committed files can tell that the cited record is the one measured? [Consistency, Traceability, data-model §4, Plan research R1, R5, feature-004 data-model §1]
 - [x] CHK020 Do data-model §2 and §4 state the kind of each SHA-256 they add (a `split` record's parts; the projection table's `plan_projections_sha256`), `raw` over the committed bytes or `canonical`, feature 004's records holding a kind beside every hash? [Clarity, data-model §2, §4, Spec §FR-001, feature-004 data-model §1]
 
+## Round 4 (third re-run, after round 3's changes)
+
+- [ ] CHK021 Is it said how the whole suite's tests of feature 004 run when the suite runs with `PHYCOWEB_FEATURE=005` (FR-003), several of them reaching feature 004's records through the setting's paths (`tests/test_records_004.py`, `tests/test_protocol_004.py`, `tests/test_tools_004.py`, `tests/test_claims.py`), so that each test pins the feature it checks, reads feature 004's records where it checks them and writes nothing under feature 004's paths? [Gap, Spec §FR-003, Plan research R9, "Testing"]
+- [ ] CHK022 Does FR-003 say what its test's run "before the change" is, `scripts/recheck_004.py --no-record` arriving with the feature setting in plan phase 1, for instance T132's committed record as feature 004's result before the change, so that the comparison writes nothing and still has two sides? [Clarity, Spec §FR-003, quickstart V2, contracts/cli.md]
+
 ## Notes
 
 - First run, 2026-11-09, for feature 005, after the spec approval (b1b79d8) and the plan approval (afc6769); no
@@ -66,6 +71,8 @@ trails, the baseline documents, line endings, and the reproduction of every comm
   5 new items, CHK016 to CHK020; no clarifying questions, as in round 1.
 - Round 3, verified 2026-11-09: after the round's changes (checklist-choices.md, round 3), each new item was
   checked against the passage that resolves it and ticked, the evidence being the passage its row's "Where" names.
+- Round 4, 2026-11-09: re-run over the complete documents after round 3's changes (936f586, dec265a);
+  2 new items, CHK021 to CHK022; no clarifying questions, as in round 1.
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied.
 - `/speckit-implement` reads checklist checkbox state as a gate and must not modify markers.
 - Round 1, verified 2026-11-09: after the round's changes (checklist-choices.md, round 1, option A of every row),
