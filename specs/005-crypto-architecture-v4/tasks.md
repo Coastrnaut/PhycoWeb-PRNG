@@ -353,13 +353,16 @@ feature before T009 (FR-003).
 
 ### Step (6): the phase's closing run
 
-- [ ] T021 **heavy**: after T015, run the whole suite with `PHYCOWEB_FEATURE=005` on Windows,
+- [X] T021 **heavy**: after T015, run the whole suite with `PHYCOWEB_FEATURE=005` on Windows,
   `python -W ignore -m unittest discover -s tests -t .`, and with `wpy` in WSL, under the heavy-run
   lock, projected first against the feature-wide row's share for whole-suite runs (two per platform,
   plan, "Values this plan fixes before first use"), the row read from `plan-projections.json`'s
   approved option, the projection table not existing yet: every test passes, or skips naming its
   open item, none fails, and nothing is written under feature 004's paths; record the commands and
   results for the phase report. (FR-003, FR-008; SC-008; Principle V)
+  Done 2026-11-12 at 48c4bb9, projected at 1.0 h (projection-20261112T210115Z-438bed6f): Windows, 2021
+  tests, OK, 71 skipped, 1876.0 s; WSL with `wpy`, 2021 tests, OK, 8 skipped, 3689.3 s; 1.546 h in all,
+  above the projection and within the 2 h share, of which 0.454 h is left for a later whole-suite run.
 
 **Checkpoint**: the setting stands with feature 004's re-check unchanged; this feature's
 environment records read Approved; the protocol change log holds its first entries, naming the

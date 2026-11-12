@@ -1,0 +1,75 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {},
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' tests/test_records_004.py TwoWorkers",
+  "config": {
+    "PHYCOWEB_FEATURE": "005",
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-12T21:25:34Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [
+    "reports/005-crypto-architecture-v4/projections/projection-20261112T212530Z-eddc6a16.json"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v4` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "f587a4c6242bcf4c8c54dca507d355c39a0f576c66540e97ac38917273ffc015",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/005-crypto-architecture-v4/environment-windows.json",
+    "sha256": "2de000d88ddfa05e7615d5805dd7bb77ce02da26fe157f451010fcc2ee29b6a1",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "feature": "005",
+  "git_dirty": true,
+  "git_head": "48c4bb9560f5181c9897749f2f742f5b3983a680",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "the test's stated inputs",
+  "kind": "projection",
+  "limitations": [],
+  "measured_speed": {
+    "seconds": 4.405999999988126
+  },
+  "model_id": null,
+  "outputs": [],
+  "outputs_statement": "the test compared the outputs of its stated test operation list and kept none",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "projected_hours": 0.0012488888889007892,
+  "protocol_line_sha256": "a62df30ba1490305bf34a1e6831079bea15b9e20237409f290922bea005092e7",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 114,
+  "record_id": "projection-20261112T212534Z-870fdcd4",
+  "research_sha256": "fb537ec00ce9dbe5fecfd4a5bd4b6aa501ab42b16937b1a78cc2fff176f1e1c1",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "row": "feature-wide",
+  "run": "FR-053's test with two worker counts",
+  "spec_sha256": "36abbd764236d8c474f7df6a99d5347d86dc12113aaab327455784dff1024f81",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "time_hours": 0.0012238888888855904,
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
