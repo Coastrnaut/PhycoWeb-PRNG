@@ -116,7 +116,11 @@ itself. No task of phases 1 to 9 starts before T004.
   that no row made the places of round 3 that the row "Checklist choices, round 3" names beyond its
   rows' "Where" (research R8 and R13, data-model §4 and §5, the contract). (FR-031; spec notes;
   PRO-029)
-- [ ] T002 Once this file and every change of the `/speckit-analyze` loop are committed, run
+- [X] T002 (done: run at 671f34d and committed alone in ac5724e, SHA-256
+  `db8b2701848d82d2116b4a0947c72d94fa8d1463056f7a1c6979a53517f88712`; no commit outside the pairs
+  changed a place, and one place inside them was changed by an edit that no row of its round names,
+  research R13 in round 3, 936f586, listed for the owner with its proposed answer) Once this file
+  and every change of the `/speckit-analyze` loop are committed, run
   `python research/005/place_check.py --to HEAD`, which writes `research/005/place-check.json` over
   the commits from `afc6769` to HEAD; compare its places with the lists "Rows that change the
   protocol" in `specs/005-crypto-architecture-v4/checklist-choices.md`; list for the owner every
@@ -124,12 +128,13 @@ itself. No task of phases 1 to 9 starts before T004.
   answer (an entry of its own, or no change of rule, with the reason); and commit the file alone. A
   later commit that changes a place before the protocol change log exists needs the comparison
   again, confirmed in "Place check <k>". (FR-031; spec notes)
-- [ ] T003 Prepare the tasks approval in the agent's report: the approval commits since the plan
-  approval (the rows "Checklist choices, round 1" to "round 5" and each "Analysis remediation <k>"),
-  the allow-list entries added to `protocol/claims.json` since the last gate, those of security.md
-  2.19 to 2.21 among them, the ticks the agent set in the six checklists on the owner's advance
-  approval of 2026-11-09, the readings set aside (none in rounds 1 to 5), and T002's places with
-  their proposed answers. (FR-026, FR-031; Principle VIII)
+- [X] T003 (done: the summary stands in the agent's report of 2026-11-12) Prepare the tasks approval
+  in the agent's report: the approval commits since the plan approval (the rows "Checklist choices,
+  round 1" to "round 5" and each "Analysis remediation <k>"), the allow-list entries added to
+  `protocol/claims.json` since the last gate, those of security.md 2.19 to 2.21 among them, the
+  ticks the agent set in the six checklists on the owner's advance approval of 2026-11-09, the
+  readings set aside (none in rounds 1 to 5), and T002's places with their proposed answers.
+  (FR-026, FR-031; Principle VIII)
 - [ ] T004 ⛔ **Tasks approval** (**Owner**), in `specs/005-crypto-architecture-v4/spec.md`'s Review
   & Approval table: review this list with the `/speckit-analyze` findings and their remediation;
   review the ticks in the six checklists, unticking any item not accepted; confirm each list "Rows
