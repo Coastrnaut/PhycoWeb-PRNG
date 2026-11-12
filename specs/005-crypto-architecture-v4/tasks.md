@@ -235,7 +235,7 @@ feature before T009 (FR-003).
 
 ### Step (2): this feature's environment records
 
-- [ ] T010 **Owner**: write this feature's environment records with
+- [X] T010 **Owner**: write this feature's environment records with
   `python scripts/owner_record.py environment --platform windows --by NAME` on Windows and
   `wpy scripts/owner_record.py environment --platform wsl --by NAME` in WSL, into
   `$REP/environment-windows.json` and `$REP/environment-wsl.json`, even where the environment
