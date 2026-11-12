@@ -281,7 +281,7 @@ feature before T009 (FR-003).
   whole: security.md (from 2.18), `protocol/claims.json`, `.gitattributes`, and the shared code with
   its tests (research R9), feature 004's log keeping its last entries for them; each entry with the
   tool and model, the date, the task ID and its review status. (FR-031)
-- [ ] T015 After T004, run `python scripts/protocol_change.py check` and report its places beside
+- [X] T015 After T004, run `python scripts/protocol_change.py check` and report its places beside
   the confirmed rows; then **Owner**: run `python scripts/protocol_change.py create`, which writes
   the first entries of `research/005/protocol-changes.jsonl` (T013), and approve its entries at the
   approval step; the agent then commits the log. No evidence run, a probe included, starts before
