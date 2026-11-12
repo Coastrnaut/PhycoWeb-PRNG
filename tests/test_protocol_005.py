@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import unittest
+from fractions import Fraction
 from pathlib import Path
 from unittest import mock
 
@@ -1787,6 +1788,166 @@ class TheSelectionBiasStatement(unittest.TestCase):
         self.assertNotIn("write_bytes", source)
         self.assertNotIn("write_text", source)
         self.assertNotIn('open(', source)
+
+
+# ----------------------------------------------------------------------------------- the climb
+
+class TheClimb(TempRepo005):
+    """Spec FR-014 to FR-018; data-model section 2; quickstart V5, V6: the step that comes next, from the records."""
+
+    def setUp(self):
+        super().setUp()
+        from protocol import climb
+        self.climb = climb
+        self.clock = 0
+
+    def stamp(self) -> str:
+        self.clock += 1
+        return f"2026-12-01T00:{self.clock // 60:02d}:{self.clock % 60:02d}Z"
+
+    def put(self, candidate: str, **fields) -> dict:
+        record = dict({"kind": "bound", "width": 32, "status": "pass", "created_utc": self.stamp(),
+                       "record_id": f"bound-{self.clock:04d}"}, **fields)
+        write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/{record['record_id']}.json", evidence.pretty(record))
+        return record
+
+    def box(self, candidate: str = "v4-A1", **fields) -> None:
+        for kind in self.climb.KINDS:
+            self.put(candidate, method="branch-and-bound", size=4, bound_kind=kind, rounds=1, **fields)
+
+    def count(self, size: int, kind: str, r: int, weights, candidate: str = "v4-A1", **fields) -> dict:
+        method = self.climb.COUNT_METHODS[evidence.family_of(candidate)]
+        counts = {str(i + 1): {"count": weight, "status": 0, "sum_of": [1, 1]} for i, weight in enumerate(weights)}
+        extra = {"weight_per_sbox": 1} if method == "active-S-box count" else {}
+        return self.put(candidate, method=method, size=size, bound_kind=kind, rounds=r, counts=counts, **extra, **fields)
+
+    def split(self, step: dict, candidate: str = "v4-A1") -> dict:
+        fields = self.climb.split_fields(step, ["0" * 64, "1" * 64], "scope")
+        return self.put(candidate, **fields)
+
+    def step(self, candidate: str = "v4-A1") -> dict:
+        return self.climb.next_step(candidate)
+
+    def named(self, step: dict):
+        return tuple(step.get(key) for key in ("step", "size", "bound_kind", "rounds"))
+
+    def test_an_arx_candidates_size_independent_search_comes_first(self):
+        self.assertEqual(self.named(self.step()), ("box", 4, "linear", 1))
+        self.put("v4-A1", method="branch-and-bound", size=4, bound_kind="linear", rounds=1)
+        self.assertEqual(self.named(self.step()), ("box", 4, "differential", 1))
+        self.put("v4-A1", method="branch-and-bound", size=4, bound_kind="differential", rounds=1)
+        self.assertEqual(self.named(self.step()), ("search", 16, "linear", 1))
+        self.assertEqual(self.named(self.step("v4-B1")), ("search", 16, "linear", 1))
+
+    def test_at_16x16_first_r_ascends_and_linear_comes_before_differential(self):
+        self.box()
+        self.count(16, "linear", 1, [20])
+        self.assertEqual(self.named(self.step()), ("search", 16, "differential", 1))
+        self.count(16, "differential", 1, [30])
+        self.assertEqual(self.named(self.step()), ("search", 16, "linear", 2))
+        self.assertEqual(self.step()["method"], "active-box count")
+
+    def test_a_kinds_climb_ends_at_its_first_weight_above_128_and_the_next_size_follows(self):
+        self.box()
+        self.count(16, "linear", 1, [129])
+        self.count(16, "differential", 1, [100])
+        self.assertEqual(self.named(self.step()), ("search", 16, "differential", 2))
+        self.count(16, "differential", 2, [100, 200])
+        self.assertEqual(self.named(self.step()), ("search", 8, "linear", 1))
+        self.assertEqual(self.climb.r_bound("v4-A1", 16)[0], 2)
+        for size in (8, 4):
+            for kind in self.climb.KINDS:
+                self.count(size, kind, 1, [130])
+        self.assertEqual(self.step(), {"step": "done", "reached": "R_bound at every claimable size"})
+        self.assertEqual([self.climb.r_bound("v4-A1", size)[0] for size in (16, 8, 4)], [2, 1, 1])
+
+    def test_a_capped_search_ends_the_searches_and_the_climb_goes_on_by_sums(self):
+        self.box()
+        for r, weights in ((1, [10]), (2, [10, 24]), (3, [10, 24, 36]), (4, [10, 24, 36, 50])):
+            self.count(16, "linear", r, weights)
+            self.count(16, "differential", r, [40 * (i + 1) for i in range(r)])
+        capped = self.count(16, "linear", 5, [], status="inconclusive", capped=True)
+        step = self.step()
+        self.assertEqual(self.named(step), ("split", 16, "linear", 5))
+        self.assertEqual((step["bound"], step["alternatives"], step["searched"]), ("60", 2, "none"))
+        self.assertEqual([(part[2], str(part[1])) for part in step["parts"]], [(1, "10"), (4, "50")])
+        record = self.split(step)
+        self.assertEqual((record["tool"], record["validation"], record["budget"]),
+                         ("none", "none", {"cap_hours": "none", "hours_used": 0}))
+        self.assertEqual([part["rounds"] for part in record["parts"]], [1, 4])
+        seen = []
+        while True:
+            step = self.step()
+            if step["step"] != "split":
+                break
+            seen.append((step["rounds"], step["bound"]))
+            self.split(step)
+        self.assertEqual(seen[0], (6, "74"))
+        self.assertGreater(Fraction(seen[-1][1]), 128)
+        self.assertTrue(all(Fraction(bound) <= 128 for _, bound in seen[:-1]))
+        self.assertEqual(self.named(step), ("search", 8, "linear", 1))
+        r, detail = self.climb.r_bound("v4-A1", 16)
+        self.assertEqual(r, seen[-1][0])
+        self.assertEqual((detail["linear"]["method"], detail["linear"]["first_capped_or_refused_r"],
+                          detail["linear"]["last_searched_record"]), ("split", 5, capped["record_id"]))
+        self.assertEqual((detail["differential"]["r"], detail["differential"]["method"]), (4, "active-box count"))
+
+    def test_a_sum_that_exceeds_the_searched_bound_is_written_beside_it(self):
+        self.box()
+        self.count(16, "linear", 1, [50])
+        self.count(16, "differential", 1, [129])
+        self.count(16, "linear", 2, [50, 90])
+        step = self.step()
+        self.assertEqual((self.named(step), step["bound"], step["searched"]), (("split", 16, "linear", 2), "100", "90"))
+        self.split(step)
+        self.assertEqual(self.named(self.step()), ("search", 16, "linear", 3))
+
+    def test_a_refused_search_ends_the_kind_as_a_capped_one_does(self):
+        self.box()
+        self.count(16, "linear", 1, [70])
+        self.count(16, "differential", 1, [129])
+        evidence.write_projection(run="bound", row="v4-A1/trails", inputs="none", measured_speed={}, projected_hours=50.0,
+                                  time_hours=0.0, extra={"probe": {"kind": "bound", "size": 16, "width": 32,
+                                                                    "bound_kind": "linear", "method": "active-box count"},
+                                                         "rounds": 2, "refused": "the row cannot hold it"})
+        step = self.step()
+        self.assertEqual((self.named(step), step["bound"]), (("split", 16, "linear", 2), "140"))
+
+    def test_no_established_bound_at_16x16_decides_the_candidate_at_once(self):
+        capped = self.count(16, "linear", 1, [], candidate="v4-B1", status="inconclusive", capped=True)
+        step = self.step("v4-B1")
+        self.assertEqual((step["step"], step["cause"], step["record"], step["size"]),
+                         ("ineligible", "no R_bound at 16×16", capped["record_id"], 16))
+        self.assertIn("no hour was charged at 8×8 or 4×4", step["statement"])
+
+    def test_bounds_that_sums_cannot_carry_past_128_decide_it_too(self):
+        self.count(16, "linear", 1, [1], candidate="v4-B1")
+        self.count(16, "differential", 1, [129], candidate="v4-B1")
+        capped = self.count(16, "linear", 2, [], candidate="v4-B1", status="inconclusive", capped=True)
+        step = self.step("v4-B1")
+        self.assertEqual((step["step"], step["cause"], step["record"]), ("ineligible", "no R_bound at 16×16", capped["record_id"]))
+
+    def test_a_capped_box_search_ends_that_kind_at_every_size(self):
+        self.put("v4-A1", method="branch-and-bound", size=4, bound_kind="linear", rounds=1, status="inconclusive", capped=True)
+        self.put("v4-A1", method="branch-and-bound", size=4, bound_kind="differential", rounds=1)
+        step = self.step()
+        self.assertEqual((step["step"], step["cause"], step["bound_kind"]), ("ineligible", "no R_bound at 16×16", "linear"))
+
+    def test_a_capped_search_at_a_smaller_size_stops_the_climb_there_with_no_decision(self):
+        self.box()
+        for kind in self.climb.KINDS:
+            self.count(16, kind, 1, [130])
+        self.count(8, "linear", 1, [], status="inconclusive", capped=True)
+        self.count(8, "differential", 1, [130])
+        self.assertEqual(self.step(), {"step": "done", "reached": "no R_bound at 8×8 by r = 64"})
+        self.assertEqual(self.climb.r_bound("v4-A1", 8)[0], None)
+
+    def test_a_record_that_does_not_count_gives_no_bound(self):
+        self.box()
+        record = self.count(16, "linear", 1, [130])
+        self.assertEqual(self.climb.next_step("v4-A1", counted=lambda r: False)["rounds"], 1)
+        self.assertEqual(self.named(self.climb.next_step("v4-A1", counted=lambda r: r["record_id"] == record["record_id"])),
+                         ("search", 16, "differential", 1))
 
 
 if __name__ == "__main__":
