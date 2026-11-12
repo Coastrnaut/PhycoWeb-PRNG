@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Feature 004: the round rule, eligibility and selection (spec "Pre-registered Design Protocol"; data-model section 9).
 
-    round_rule.py --candidate ID           writes candidates/<ID>/round-rule.json
+    round_rule.py --candidate ID           writes candidates/<ID>/round-rule.json; under PHYCOWEB_FEATURE=005 it first
+                                           drives the candidate's production-width climb (protocol/climb.py)
     round_rule.py --close                  writes the candidate log's set-closed entry
     round_rule.py --select                 writes freeze/selection.json, later selection-<k>.json
     round_rule.py --decide                 appends the latest selection record's decision entries
@@ -27,10 +28,10 @@ for place in (str(ROOT), str(ROOT / "scripts"), str(ROOT / "research/004"), str(
     if place not in sys.path:
         sys.path.insert(0, place)
 
-from protocol import candidates, evidence  # noqa: E402
+from protocol import candidates, climb, evidence  # noqa: E402
 from protocol.evidence import NONE, Refused, ToolFailure  # noqa: E402
 from protocol.rules import (CALLS_BEFORE_OUTPUT, CONTROLLED, DELTA, TARGET_WEIGHT, WIDTH, bias_item, bound_weights, control_of,  # noqa: E402,F401
-                            diffusion_item, item, latest, pairs_and_avalanche, passed, r_bound_of, r_dist_of, r_f_and_b, records_at,
+                            cross_checked, diffusion_item, item, latest, pairs_and_avalanche, passed, r_bound_of, r_dist_of, r_f_and_b, records_at,
                             round_count, row_met, structural_items, unresolved)
 
 import d4_choice  # noqa: E402
@@ -150,6 +151,91 @@ def size_row(candidate: str, size: int, previous: Optional[Dict]) -> Dict:
     return row
 
 
+# ------------------------------------------------------------------ feature 005: the climb, driven
+
+def search_command(candidate: str, step: Dict) -> List[str]:
+    return [sys.executable, "-X", "utf8", str(evidence.REPO.path("scripts/evidence_v3.py")), "--candidate", candidate,
+            "--kind", "bound", "--bound-kind", step["bound_kind"], "--method", step["method"], "--size", str(step["size"]),
+            "--width", str(climb.WIDTH), "--rounds", str(step["rounds"]),
+            "--out-dir", f"{evidence.REP_REL}/candidates/{candidate}"]
+
+
+def run_search(candidate: str, step: Dict) -> int:
+    """One search, in a process of its own, which projects it, takes the lock and writes its record."""
+    done = subprocess.run(search_command(candidate, step), cwd=evidence.REPO.root)
+    return done.returncode
+
+
+def write_split(candidate: str, step: Dict, command: List[str]) -> Path:
+    """A `split` bound record: the sum of two established bounds, each part cited by record ID and SHA-256."""
+    digests = []
+    for record, _, _ in step["parts"]:
+        found = evidence.find_record(record["record_id"])
+        if found is None:
+            raise Refused(f"no record {record['record_id']}")
+        digests.append(evidence.sha256(found[0].read_bytes()))
+    import evidence_v3
+    fields = dict(climb.split_fields(step, digests, evidence_v3.SCOPE), candidate=candidate)
+    run = evidence.Run("bound", candidate=candidate, model_id=candidate, variant_id=f"{candidate}/n{step['size']}-w{climb.WIDTH}",
+                       code_files=CODE + ["protocol/climb.py", candidates.module_rel(candidate)], argv=command,
+                       config={"size": step["size"], "width": climb.WIDTH, "rounds": step["rounds"]})
+    with run:
+        path = run.finish("pass", classification=evidence.classify("bound", "established"), fields=fields)
+    candidates.append({"candidate_id": candidate, "event": "evidence", "evidence": [json.loads(path.read_bytes())["record_id"]],
+                       "budget_used_h": {"trails": 0.0}})
+    return path
+
+
+def decide_no_r_bound(candidate: str, step: Dict) -> None:
+    """The decision `ineligible` with the cause `no R_bound at 16×16`, the record that ends the climb there and the
+    statement that no hour was charged at 8×8 or 4×4 (feature 005, FR-018; data-model section 5)."""
+    found = evidence.find_record(step["record"]) if step["record"] != NONE else None
+    if found is None:
+        raise Refused(f"the climb of {candidate} ended at 16×16 with no record to cite")
+    candidates.decide({"candidate_id": candidate, "decision": "ineligible", "cause": step["cause"],
+                       "reason": f"{step['cause']}: the {step['bound_kind']} climb cannot pass weight {climb.TARGET_WEIGHT} by "
+                                 f"r = {climb.R_MAX}",
+                       "record": {"record_id": step["record"], "sha256": evidence.sha256(found[0].read_bytes())},
+                       "statement": step["statement"]})
+
+
+def drive_climb(candidate: str, command: List[str], search=run_search) -> Dict:
+    """Step by step until the climb is done or the candidate is decided: each search in its own process, each sum a
+    record of this one. A step that leaves the records as they were stops the climb with its cause."""
+    counted = lambda record: cross_checked(candidate, record)  # noqa: E731
+    made: List[Dict] = []
+    while True:
+        if set(evidence.candidate_decisions(candidate)) & set(evidence.CLOSING_DECISIONS):
+            return {"steps": made, "ended": "the candidate has its final decision"}
+        step = climb.next_step(candidate, counted)
+        name = {key: step.get(key) for key in ("step", "size", "bound_kind", "rounds", "method") if key in step}
+        if step["step"] == "done":
+            return {"steps": made, "ended": step["reached"]}
+        if step["step"] == "ineligible":
+            decide_no_r_bound(candidate, step)
+            made.append(dict(name, cause=step["cause"], record=step["record"]))
+            return {"steps": made, "ended": step["cause"]}
+        if step["step"] == "split":
+            path = write_split(candidate, step, command)
+            made.append(dict(name, record=json.loads(path.read_bytes())["record_id"]))
+            continue
+        code = search(candidate, step)
+        made.append(dict(name, exit_status=code))
+        again = climb.next_step(candidate, counted)
+        if {key: again.get(key) for key in name} == name:
+            raise Refused(f"the search {name} exited {code} and left no record that moves the climb: its own message says why")
+
+
+def climb_fields(candidate: str) -> Dict:
+    """Per size, R_bound with, per kind, the record that sets it, searched or `split`, the last searched record and the
+    r of the first capped or refused search, so that SC-003 is decided from the records alone (data-model section 2)."""
+    out = {}
+    for size in climb.SIZES:
+        r, detail = climb.r_bound(candidate, size, lambda record: cross_checked(candidate, record))
+        out[str(size)] = {"R_bound": r if r is not None else NONE, "kinds": detail}
+    return {"order": list(climb.SIZES), "r_max": climb.R_MAX, "sizes": out}
+
+
 def round_rule_path(candidate: str) -> Path:
     return evidence.REPO.rep / "candidates" / candidate / "round-rule.json"
 
@@ -169,9 +255,16 @@ def write_round_rule(args: argparse.Namespace, command: List[str]) -> int:
     candidate = args.candidate
     if not candidates.of_event(candidates.entries(), "proposed", candidate):
         raise Refused(f"{candidate} is not in the candidate log")
+    code = list(CODE)
+    driven = None
+    if evidence.FEATURE != "004":
+        code.append("protocol/climb.py")
+        driven = drive_climb(candidate, command)
     fields = fields_of(candidate, read_round_rule(candidate))
+    if driven is not None:
+        fields["climb"] = dict(climb_fields(candidate), ended=driven["ended"])
     run = evidence.Run("round-rule", candidate=candidate, model_id=candidate, directory=f"candidates/{candidate}", file_name="round-rule.json",
-                       fixed=True, code_files=CODE + [candidates.module_rel(candidate)], argv=command)
+                       fixed=True, code_files=code + [candidates.module_rel(candidate)], argv=command)
     with run:
         path = run.finish("pass", fields=fields)
     print(f"{evidence.rel_to_repo(path)}: R = {[row['R'] for row in fields['sizes'].values()]}")

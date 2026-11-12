@@ -238,7 +238,13 @@ def bound_weights(candidate: str, size: int) -> Dict[str, Dict[int, Tuple[Any, s
 
 
 def r_bound_of(candidate: str, size: int) -> Tuple[Optional[int], List[str]]:
-    """The smallest r at which both bounds lie below 2⁻¹²⁸: both weights above 128, from bounds computed at that size (FR-038)."""
+    """The smallest r at which both bounds lie below 2⁻¹²⁸: both weights above 128, from bounds computed at that size (FR-038).
+    Under feature 005 each kind's bound is the established one, searched or `split`, and a kind whose climb ended at its
+    first weight above 128 keeps that bound at every larger r (feature 005, FR-016, FR-017; protocol/climb.py)."""
+    if evidence.FEATURE != "004":
+        from protocol import climb
+        r, detail = climb.r_bound(candidate, size, lambda record: cross_checked(candidate, record))
+        return r, sorted({row["record"] for row in detail.values() if row["record"] != NONE}) if r is not None else []
     weights = bound_weights(candidate, size)
     for r in sorted(set(weights["differential"]) & set(weights["linear"])):
         pair = (weights["differential"][r], weights["linear"][r])
