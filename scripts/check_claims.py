@@ -1,4 +1,6 @@
-"""Feature 004: the claim test, FR-069 as written (contracts/cli.md; data-model section 15).
+"""Features 004 and 005: the claim test, FR-069 as written (contracts/cli.md; data-model section
+15), and feature 005's FR-026: one run reads both features, each with its own documents, reports,
+rows, disclaimer and model, `phyco-v3` and `phyco-v4`.
 
     check_claims.py
 
@@ -23,22 +25,27 @@ import re
 import subprocess
 import sys
 import tokenize
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Set, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from protocol import evidence  # noqa: E402
-from protocol.disclaimer import DESIGN_DISCLAIMER  # noqa: E402
+from protocol.disclaimer import DESIGN_DISCLAIMER  # noqa: E402,F401
 
 REGISTER_REL = "protocol/claims.json"
-FEATURE_REL = evidence.FEATURE_REL
+# Each feature's own model: the one model its rows can raise above L0.
+FEATURE_MODELS = {name: f["model_id"] for name, f in evidence.FEATURES.items()}
+FUT_SEC_FEATURE = "004"
 FIXED_SENTENCE = "PhycoWeb-PRNG, every model included, must not be used to generate secrets."
 FEATURE_BASE = "801c6d7^"
-CODE_PATHS = ("phycoweb/", "protocol/", "scripts/", "research/004/", "tests/", "fast/seed_search.c")
-MODEL_IDS = ("float-v0", "lut-v1", "phyco-v2", "phyco-v3")
+CODE_PATHS = ("phycoweb/", "protocol/", "scripts/", "research/004/", "research/005/", "tests/",
+              "fast/seed_search.c")
+MODEL_IDS = ("float-v0", "lut-v1", "phyco-v2", "phyco-v3", "phyco-v4")
+FUT_SEC_KEYS = tuple(f"FUT-SEC-{k}" for k in range(1, 10))
 LEVELS = ("L0", "L1", "L2", "L3", "L4", "L5", "L6")
 GATE_ROWS = ("Spec approval", "Plan approval", "Tasks approval", "FUT-SEC-8 result review",
              "Security-target review", "Owner design review", "Design freeze",
@@ -47,8 +54,24 @@ QUOTING_FILES = ("checklists/", "checklist-choices.md")
 MAPPING_HEADING = "Slime-mould mapping"
 MAPPING_SENTENCE = "The slime-mould mapping contributes no security property."
 # Copies that a record cites read as the document they copy, so one entry passes the line in both.
-VERSION_DIRS = {"spec-versions": evidence.SPEC_REL, "research-versions": evidence.RESEARCH_REL,
-                "design-versions": evidence.DESIGN_REL}
+VERSION_DIRS = {"spec-versions": "spec.md", "research-versions": "research.md",
+                "design-versions": "design.md"}
+
+
+@contextmanager
+def feature(name: str) -> Iterator[None]:
+    """The checks inside read the named feature's paths, rows, model and disclaimer."""
+    previous = evidence.set_feature(name)
+    try:
+        yield
+    finally:
+        evidence.set_feature(previous)
+
+
+def features_present() -> List[str]:
+    """The features whose spec exists in the working tree, in their order."""
+    return [name for name, f in sorted(evidence.FEATURES.items())
+            if evidence.REPO.path(f["spec"] + "/spec.md").exists()]
 
 
 def words(*forms: str) -> "re.Pattern[str]":
@@ -77,7 +100,8 @@ STANDARD_WORD = words("comply", "complies", "complied", "complying", "compliant"
                       "conformant", "approve", "approves", "approved", "approving", "approval")
 STANDARD_NAME = re.compile(r"\bSP\s*800\b|\bFIPS\b|\bAIS\b|\bISO\b|\bNIST\b|\bBSI\b|\bRFC\s*\d")
 DRBG = words("DRBG", "DRBGs")
-MODEL_WORD = re.compile(r"(?<![^\W_])(?:phyco-v\d|float-v0|lut-v1|cand-[AB]\d)(?![^\W_])|"
+MODEL_WORD = re.compile(r"(?<![^\W_])(?:phyco-v\d|float-v0|lut-v1|cand-[AB]\d|v4-[AB]\d)"
+                        r"(?![^\W_])|"
                         r"\bthe (?:model|generator|design)\b", re.I)
 FIPS_140 = re.compile(r"\bFIPS\s*140\b")
 SELF_TEST = words("self-test", "self-tests")
@@ -104,7 +128,8 @@ CLAIM_WORD = words("secure", "securely", "security levels?", "cryptographic secu
                    "claims", "claimed", "claiming")
 NEGATED = ("no claim", "do not show cryptographic security", "does not show cryptographic security")
 README_READ = re.compile(r"security levels?|strength|claim|(?<![^\W_])L[0-6](?![^\W_])", re.I)
-MODEL_ID = re.compile(r"(?<![^\W_])(float-v0|lut-v1|phyco-v2|phyco-v3)(/[\w-]+)?(?![^\W_])")
+MODEL_ID = re.compile(r"(?<![^\W_])(float-v0|lut-v1|phyco-v2|phyco-v3|phyco-v4)(/[\w-]+)?"
+                      r"(?![^\W_])")
 BOUND_VALUE = re.compile(r"(?<![\d.,])(\d[\d,]*)(?:\s+|-)bits?\b")
 SUPERSCRIPT = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
 AT_MOST = re.compile(r"^at most (\d+) bits$")
@@ -253,9 +278,11 @@ def mask_quotes(line: str) -> str:
 
 def allow_path(rel: str) -> str:
     parts = rel.split("/")
+    owner = next((f for f in evidence.FEATURES.values() if rel.startswith(f["rep"] + "/")),
+                 evidence.FEATURES[evidence.FEATURE])
     for directory, document in VERSION_DIRS.items():
         if directory in parts:
-            return document
+            return owner["spec"] + "/" + document
     return rel
 
 
@@ -405,13 +432,26 @@ def hash_holds(path: str, chapter: Optional[str], digest: str) -> bool:
     return evidence.citation_holds(path, digest, chapter or evidence.NONE)
 
 
+def fut_sec_rows(rows: Sequence[evidence.Row]) -> List[evidence.Row]:
+    """The table that holds the row "FUT-SEC-8 result review": feature 004's spec at HEAD, for
+    feature 004 its own rows and for a later feature read from there (feature 005, FR-013)."""
+    if evidence.FEATURE == FUT_SEC_FEATURE:
+        return list(rows)
+    return evidence.head_table(evidence.FEATURES[FUT_SEC_FEATURE]["spec"] + "/spec.md")
+
+
+def review_rows(rows: Sequence[evidence.Row]) -> List[Optional[evidence.Row]]:
+    """The highest-k row of each review family that the first level rests on."""
+    return [evidence.family_row("FUT-SEC-8 result review", fut_sec_rows(rows)),
+            evidence.family_row("Security-target review", list(rows))]
+
+
 def expected_level(rows: Sequence[evidence.Row]) -> str:
     """The first level while the "L1 recorded" row with the highest k reads Approved and names the
     highest-k row of each review family, both Approved, and every hash those rows name matches the
     file at HEAD, and the lowest otherwise."""
     recorded = evidence.family_row("L1 recorded", list(rows))
-    reviews = [evidence.family_row(name, list(rows))
-               for name in ("FUT-SEC-8 result review", "Security-target review")]
+    reviews = review_rows(rows)
     if recorded is None or recorded.decision != "Approved" or None in reviews:
         return "L0"
     for review in reviews:
@@ -423,9 +463,11 @@ def expected_level(rows: Sequence[evidence.Row]) -> str:
 
 
 def counted_bounds() -> List[Dict]:
-    """The counted trail-bound records at HEAD: `pass`, each citing its validation."""
+    """The counted trail-bound records of the feature in force at HEAD: searched, `pass`, each
+    citing its validation; a `split` record is never counted (feature 005, data-model section 2)."""
     return [record for path, record in evidence.iter_records("bound")
             if record.get("status") == "pass" and record.get("validation")
+            and record.get("method") != "split"
             and evidence.show(evidence.rel_to_repo(path)) is not None]
 
 
@@ -489,8 +531,7 @@ def check_evidence(entry: Dict, level: str, rows: Sequence[evidence.Row]) -> Ite
         latest = evidence.latest_demonstration()
         if latest is not None:
             wanted.add(evidence.rel_to_repo(latest[0]))
-        for name in ("FUT-SEC-8 result review", "Security-target review"):
-            row = evidence.family_row(name, list(rows))
+        for row in review_rows(rows):
             wanted.update(path for path, _, _ in named_hashes(row.notes if row else ""))
     held = {item["path"]: item for item in entry["evidence"]}
     for rel in sorted(wanted - set(held)):
@@ -498,6 +539,27 @@ def check_evidence(entry: Dict, level: str, rows: Sequence[evidence.Row]) -> Ite
     for rel, item in held.items():
         if not evidence.citation_holds(rel, item["sha256"]):
             yield f"evidence names another SHA-256 of {rel}"
+
+
+def check_fut_sec(entry: Dict) -> Iterable[str]:
+    """`phyco-v4`'s expected statuses of FUT-SEC-1 to FUT-SEC-9 (feature 005, FR-030): FUT-SEC-8 met
+    by feature 004's demonstration, FUT-SEC-7 open for feature 008, the analysis feature 006."""
+    held = entry.get("fut_sec")
+    if not isinstance(held, dict) or tuple(sorted(held)) != FUT_SEC_KEYS:
+        yield "fut_sec does not hold FUT-SEC-1 to FUT-SEC-9"
+        return
+    for key in FUT_SEC_KEYS:
+        if not str(held[key]).startswith("expected: "):
+            yield f"fut_sec: {key} is not an expected status"
+    if "feature 004's demonstration" not in held["FUT-SEC-8"]:
+        yield "fut_sec: FUT-SEC-8 does not name feature 004's demonstration"
+    if "open for feature 008" not in held["FUT-SEC-7"]:
+        yield "fut_sec: FUT-SEC-7 is not open for feature 008"
+    if "feature 006" not in held["FUT-SEC-5"]:
+        yield "fut_sec: FUT-SEC-5 does not name the analysis feature 006"
+    for key in FUT_SEC_KEYS:
+        if key != "FUT-SEC-8" and re.search("feature 00[579]", str(held[key])):
+            yield f"fut_sec: {key} names a stage by another number than security.md section 22's"
 
 
 def check_register(register: Dict) -> List[Finding]:
@@ -513,19 +575,31 @@ def check_register(register: Dict) -> List[Finding]:
     for model, entry in models.items():
         if entry["claim_level"] not in LEVELS:
             add(f"{model}: claim_level {entry['claim_level']} is outside L0 to L6")
-        elif model != "phyco-v3" and entry["claim_level"] != "L0":
+        elif model not in FEATURE_MODELS.values() and entry["claim_level"] != "L0":
             add(f"{model}: every other model stays at L0 in this feature")
-    rows = evidence.head_table()
-    entry = models.get("phyco-v3")
-    if entry is None:
-        return out
-    level = expected_level(rows)
-    if entry["claim_level"] != level:
-        add(f"phyco-v3 reads {entry['claim_level']}, and the rows give {level}")
-    for check in (check_in_progress(entry), check_history(entry, rows, level), check_bound(entry),
-                  check_evidence(entry, level, rows)):
-        for text in check:
-            add(text)
+    present = features_present()
+    for name, model in sorted(FEATURE_MODELS.items()):
+        entry = models.get(model)
+        if entry is None:
+            continue
+        # Feature 004's findings read as they always did; a later feature's name its model.
+        lead = "" if name == FUT_SEC_FEATURE else f"{model}: "
+        if name not in present:
+            if entry["claim_level"] != "L0":
+                add(f"{model} reads {entry['claim_level']}, and its feature has no spec")
+            continue
+        with feature(name):
+            rows = evidence.head_table()
+            level = expected_level(rows)
+            if entry["claim_level"] != level:
+                add(f"{model} reads {entry['claim_level']}, and the rows give {level}")
+            checks = [check_in_progress(entry), check_history(entry, rows, level),
+                      check_bound(entry), check_evidence(entry, level, rows)]
+            if name != FUT_SEC_FEATURE:
+                checks.append(check_fut_sec(entry))
+            for check in checks:
+                for text in list(check):
+                    add(lead + text)
     return out
 
 
@@ -583,7 +657,7 @@ def check_readme(register: Dict, lines: Sequence[str], block: Set[int]) -> List[
 
 def markdown_files() -> List[str]:
     out = []
-    for base in (FEATURE_REL, evidence.REP_REL):
+    for base in (evidence.FEATURE_REL, evidence.REP_REL):
         root = evidence.REPO.path(base)
         if root.exists():
             out.extend(evidence.rel_to_repo(p) for p in sorted(root.rglob("*.md")))
@@ -591,11 +665,11 @@ def markdown_files() -> List[str]:
 
 
 def check_design_disclaimer(rel: str, lines: Sequence[str]) -> List[Finding]:
-    """Every hand-written document carries the design-form disclaimer under its title."""
+    """Every hand-written document carries its feature's design-form disclaimer under its title."""
     blocks = block_quotes(lines)
     if blocks:
         text = " ".join(strip_quote(lines[number]) for number in blocks[0])
-        if text == DESIGN_DISCLAIMER:
+        if text == evidence.FEATURE_DISCLAIMER:
             return []
     return [Finding(rel, 1, "the document does not carry the design-form disclaimer", "")]
 
@@ -689,31 +763,37 @@ def run_checks(register: Dict) -> List[Finding]:
     findings.extend(check_section_15(register, security))
     findings.extend(check_readme(register, readme, block_lines["README.md"]))
     findings.extend(check_entries(register, block_lines))
-    for rel in markdown_files():
-        lines = read_lines(rel)
-        findings.extend(check_design_disclaimer(rel, lines))
-        findings.extend(scan_lines(rel, list(range(len(lines))), lines, register))
+    present = features_present()
+    for name in present:
+        with feature(name):
+            for rel in markdown_files():
+                lines = read_lines(rel)
+                findings.extend(check_design_disclaimer(rel, lines))
+                findings.extend(scan_lines(rel, list(range(len(lines))), lines, register))
     for rel in ("README.md", "security.md"):
         lines = read_lines(rel)
         quoted = " ".join(strip_quote(line) for line in lines if line.startswith(">"))
-        if DESIGN_DISCLAIMER in quoted:
+        if any(f["disclaimer"] in quoted for f in evidence.FEATURES.values()):
             findings.append(Finding(rel, 1, "it keeps its own blocks and carries no copy", ""))
         skip = block_lines[rel]
         kept = [n for n in range(len(lines)) if n not in skip]
         findings.extend(scan_lines(rel, kept, [lines[n] for n in kept], register))
     for rel in code_files():
         findings.extend(scan_code(rel, register))
-    findings.extend(mapping_findings(register))
+    for name in present:
+        with feature(name):
+            findings.extend(mapping_findings(register))
     return findings
 
 
 def last_gate_commit() -> Optional[str]:
     """The newest commit that records a gate's approval in the spec's table."""
     best: List[Tuple[int, str]] = []
+    specs = [evidence.FEATURES[name]["spec"] + "/spec.md" for name in features_present()]
     for name in GATE_ROWS:
         pattern = f"-G^\\| {re.escape(name)}.*\\| Approved"
         found = evidence.git("log", "-1", "--format=%ct %H", pattern, "--",
-                             evidence.SPEC_REL).decode("ascii").split()
+                             *specs).decode("ascii").split()
         if found:
             best.append((int(found[0]), found[1]))
     return max(best)[1] if best else None

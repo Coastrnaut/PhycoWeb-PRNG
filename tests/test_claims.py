@@ -1,4 +1,5 @@
-"""Feature 004: the claim test, every case FR-069 names (FR-050, FR-068, FR-069; SC-015, SC-018).
+"""Feature 004: the claim test, every case FR-069 names (FR-050, FR-068, FR-069; SC-015, SC-018),
+and feature 005's extension of it (its FR-026, FR-011, FR-013, FR-030; research R10).
 
 The register against README, security.md's sections 1.1 and 15 and the three disclaimer blocks; the
 register against the Review & Approval rows and the files at HEAD; every wording rule, on sample
@@ -10,7 +11,7 @@ from typing import Dict, List
 from unittest import mock
 
 from protocol import evidence
-from protocol.disclaimer import DESIGN_DISCLAIMER
+from protocol.disclaimer import DESIGN_DISCLAIMER, DESIGN_DISCLAIMER_005
 from protocol.evidence import NONE
 from scripts import check_claims as cc
 from tests.support_004 import SPEC_HEAD, SPEC_TAIL, TempRepo, write
@@ -47,6 +48,7 @@ SECURITY = f"""# Policy
 | `lut-v1` | b | L0; no claim | r |
 | `phyco-v2` | c | L0; no claim. More words | r |
 | `phyco-v3` | none yet | L0; no claim | r |
+| `phyco-v4` | none yet | L0; no claim | r |
 
 ### 1.2 Next
 
@@ -54,6 +56,7 @@ SECURITY = f"""# Policy
 - `lut-v1`: L0; no claim. Rejected.
 - `phyco-v2`: L0; no claim. Words.
 - `phyco-v3`: L0; no claim. In progress.
+- `phyco-v4`: L0; no claim. In progress.
 
 > {cc.FIXED_SENTENCE} Use an established cryptographic RNG.
 """
@@ -63,13 +66,23 @@ def phrase(text: str) -> Dict:
     return {"phrase": text, "reason": "a test", "writer": "w", "date": "d"}
 
 
+def fut_sec_005() -> Dict:
+    """`phyco-v4`'s expected statuses, as feature 005's FR-030 carries them."""
+    held = {f"FUT-SEC-{k}": "expected: met by specification" for k in range(1, 10)}
+    held["FUT-SEC-5"] = "expected: met by specification; open for the analysis feature 006"
+    held["FUT-SEC-7"] = "expected: partly met; open for feature 008"
+    held["FUT-SEC-8"] = "expected: done, met by feature 004's demonstration and its review"
+    return held
+
+
 def new_register() -> Dict:
     def entry(bound: str) -> Dict:
         return {"claim_level": "L0", "in_progress": NONE, "claim": "no claim", "bound": bound,
                 "evidence": [], "updated": "2026-11-03", "history": []}
 
     return {"models": {"float-v0": entry("at most 64 bits"), "lut-v1": entry("at most 64 bits"),
-                       "phyco-v2": entry("at most 64 bits"), "phyco-v3": entry(NONE)},
+                       "phyco-v2": entry("at most 64 bits"), "phyco-v3": entry(NONE),
+                       "phyco-v4": dict(entry(NONE), fut_sec=fut_sec_005())},
             "allow_list": {"phrases": [phrase(DISCLAIMER_PHRASE)], "lines": []}}
 
 
@@ -508,6 +521,274 @@ class MappingChapter(ClaimRepo):
     def test_a_chapter_with_none_of_the_words(self):
         self.design("Pressure lanes stand for nodes, and vein lanes for tubes.\n")
         self.assertEqual(cc.mapping_findings(self.register), [])
+
+
+SPEC_005 = "specs/005-crypto-architecture-v4/spec.md"
+REP_005 = "reports/005-crypto-architecture-v4"
+BLOCK_005 = f"> {DESIGN_DISCLAIMER_005}\n\n"
+
+
+class Feature005(ClaimRepo):
+    """Feature 005's FR-026 and research R10: one run reads both features, each with its own
+    documents, reports, rows, disclaimer and model."""
+
+    REVIEWS = ("FUT-SEC-8 result review", "Security-target review")
+
+    def setUp(self):
+        super().setUp()
+        self.rows_005: List[str] = []
+        self.write_spec_005()
+        self.commit("feature 005's spec")
+
+    def write_spec_005(self) -> None:
+        write(self.root, SPEC_005, "# Spec\n\n" + BLOCK_005 + SPEC_HEAD
+              + "".join(line + "\n" for line in self.rows_005) + SPEC_TAIL)
+
+    def add_row_005(self, name: str, decision: str, notes: str) -> None:
+        self.rows_005.append(f"| {name} | owner | 2026-11-12 | {decision} | {notes} |")
+        self.write_spec_005()
+        self.commit(f"feature 005's row {name}")
+
+    def note(self, text: str, block: str = BLOCK_005, rel: str = "note.md") -> None:
+        write(self.root, f"specs/005-crypto-architecture-v4/{rel}", "# Note\n\n" + block + text + "\n")
+
+    def reviewed(self) -> str:
+        """Feature 004's FUT-SEC-8 result review in its spec; this feature's security-target review
+        and "L1 recorded" in its own, each naming a committed file by its SHA-256."""
+        write(self.root, "docs/reviewed.md", "# Reviewed\n")
+        self.commit("the reviewed file")
+        digest = evidence.sha256(b"# Reviewed\n")
+        self.add_row(self.REVIEWS[0], "Approved", f"`docs/reviewed.md` {digest}")
+        self.add_row_005(self.REVIEWS[1], "Approved", f"`docs/reviewed.md` {digest}")
+        self.add_row_005("L1 recorded", "Approved", " and ".join(self.REVIEWS))
+        return digest
+
+    def level_one(self, digest: str) -> None:
+        entry = self.register["models"]["phyco-v4"]
+        entry["claim_level"] = "L1"
+        entry["evidence"] = [{"path": "docs/reviewed.md", "sha256": digest}]
+        self.set_file("security.md", "| `phyco-v4` | none yet | L0; no claim |",
+                      "| `phyco-v4` | none yet | L1; no claim |")
+        self.set_file("security.md", "- `phyco-v4`: L0; no claim.", "- `phyco-v4`: L1; no claim.")
+
+    # ------------------------------------------------------------------ documents and wording
+
+    def test_both_features_agree(self):
+        self.assert_clean()
+        self.assertEqual(cc.features_present(), ["004", "005"])
+        self.assertEqual(evidence.FEATURE, "004")
+
+    def test_a_document_of_this_feature_is_scanned(self):
+        self.note("The output is random.")
+        self.assert_flagged("random: The output is random.")
+
+    def test_it_carries_the_disclaimer_naming_phyco_v4(self):
+        self.note("Words.")
+        self.assert_clean()
+        self.note("Words.", block="")
+        self.assert_flagged("does not carry the design-form disclaimer")
+        self.note("Words.", block=BLOCK)
+        self.assert_flagged("does not carry the design-form disclaimer")
+        self.note("Words.", block=BLOCK_005.replace("phyco-v4", "phyco-v5"))
+        self.assert_flagged("does not carry the design-form disclaimer")
+
+    def test_feature_004s_documents_keep_their_own(self):
+        write(self.root, FEATURE_DOC, "# Note\n\n" + BLOCK_005 + "Words.\n")
+        self.assert_flagged("does not carry the design-form disclaimer")
+
+    def test_a_report_of_this_feature_is_scanned(self):
+        write(self.root, f"{REP_005}/phase-report.md", "# Report\n\n" + BLOCK_005 + "It is secure.\n")
+        self.assert_flagged("secure: It is secure.")
+
+    def test_the_two_documents_carry_no_copy_of_this_features_form(self):
+        self.set_file("README.md", "Some text.", f"> {DESIGN_DISCLAIMER_005}")
+        self.assert_flagged("carries no copy")
+
+    def test_the_model_words(self):
+        for word in ("phyco-v4", "v4-A1", "v4-B2"):
+            self.assertIn("DRBG beside a model", flags(f"A DRBG is not what {word} is."), word)
+        self.assertEqual(flags("A DRBG is another thing than v4-C1."), [])
+
+    def test_the_level_rule_reads_phyco_v4s_entry(self):
+        register = new_register()
+        self.assertIn("a level above claim_level: L1", flags("`phyco-v4` stands at L1.", register))
+        register["models"]["phyco-v4"]["claim_level"] = "L1"
+        self.assertEqual(flags("`phyco-v4` stands at L1.", register), [])
+        self.assertIn("a level above claim_level: L1",
+                      flags("`phyco-v3` and `phyco-v4` stand at L1.", register))
+
+    def test_a_copy_of_a_cited_version_reads_as_this_features_document(self):
+        line = "A random line."
+        write(self.root, f"{REP_005}/spec-versions/abc.md", "# Spec\n\n" + BLOCK_005 + line + "\n")
+        self.assert_flagged("random: A random line.")
+        self.register["allow_list"]["lines"].append(
+            {"path": SPEC_005, "text": line, "reason": "a test", "writer": "w", "date": "d"})
+        self.assert_clean()
+        self.register["allow_list"]["lines"][-1]["path"] = evidence.SPEC_REL
+        self.assert_flagged("random: A random line.")
+
+    def test_a_generated_checklist_line_passes_only_through_its_entry(self):
+        line = "- [x] CHK001 Is the level L1 stated for a rule? [Clarity]"
+        self.note(line, rel="checklists/security.md")
+        self.assert_flagged("a level above claim_level: L1")
+        self.register["allow_list"]["lines"].append(
+            {"path": "specs/005-crypto-architecture-v4/checklists/security.md", "text": line,
+             "reason": "a checklist question naming a rule", "writer": "w", "date": "d"})
+        self.assert_clean()
+
+    def test_the_code_paths_gain_research_005(self):
+        self.assertIn("research/005/", cc.CODE_PATHS)
+        self.assertIn("research/004/", cc.CODE_PATHS)
+
+    def test_each_features_mapping_chapter_is_held_to_its_rule(self):
+        text = "# Design\n\n" + BLOCK_005 + "## Slime-mould mapping\n\nIt adds strength.\n\n## Next\n"
+        write(self.root, "specs/005-crypto-architecture-v4/design.md", text)
+        self.assert_flagged("a word of FR-030's list in the mapping chapter")
+
+    def test_the_entries_since_the_last_gate_read_both_specs(self):
+        self.add_row_005("Tasks approval", "Approved", "words")
+        self.assertEqual(cc.last_gate_commit(), self.run_git("rev-parse", "HEAD").strip())
+
+    # ----------------------------------------------------------------------- the register
+
+    def test_an_entry_for_phyco_v4(self):
+        del self.register["models"]["phyco-v4"]
+        self.assert_flagged("no entry for phyco-v4")
+
+    def test_every_other_model_stays_at_l0(self):
+        self.register["models"]["phyco-v2"]["claim_level"] = "L1"
+        self.assert_flagged("phyco-v2: every other model stays at L0")
+
+    def test_a_register_above_the_rows(self):
+        self.register["models"]["phyco-v4"]["claim_level"] = "L1"
+        self.assert_flagged("phyco-v4 reads L1, and the rows give L0")
+
+    def test_l1_rests_on_feature_004s_row_and_this_features_rows(self):
+        self.reviewed()
+        self.assert_flagged("phyco-v4 reads L0, and the rows give L1")
+        self.assertEqual([r for r in self.rules() if "phyco-v3 reads" in r], [])
+
+    def test_a_register_at_the_rows(self):
+        self.level_one(self.reviewed())
+        self.assertEqual([r for r in self.rules() if "the rows give" in r], [])
+
+    def test_feature_004s_review_is_read_from_feature_004s_spec(self):
+        write(self.root, "docs/reviewed.md", "# Reviewed\n")
+        self.commit("the reviewed file")
+        digest = evidence.sha256(b"# Reviewed\n")
+        for name in self.REVIEWS:
+            self.add_row_005(name, "Approved", f"`docs/reviewed.md` {digest}")
+        self.add_row_005("L1 recorded", "Approved", " and ".join(self.REVIEWS))
+        with cc.feature("005"):
+            self.assertEqual(cc.expected_level(evidence.head_table()), "L0")
+
+    def test_feature_004s_rows_alone_give_phyco_v4_nothing(self):
+        write(self.root, "docs/reviewed.md", "# Reviewed\n")
+        self.commit("the reviewed file")
+        digest = evidence.sha256(b"# Reviewed\n")
+        for name in self.REVIEWS:
+            self.add_row(name, "Approved", f"`docs/reviewed.md` {digest}")
+        self.add_row("L1 recorded", "Approved", " and ".join(self.REVIEWS))
+        self.assert_flagged("phyco-v3 reads L0, and the rows give L1")
+        self.assertEqual([r for r in self.rules() if "phyco-v4 reads" in r], [])
+
+    def test_a_reviewed_file_changed_at_head_returns_l0_and_asks_history(self):
+        self.level_one(self.reviewed())
+        write(self.root, "docs/reviewed.md", "# Changed\n")
+        self.commit("changed")
+        self.assert_flagged("phyco-v4 reads L1, and the rows give L0")
+        self.register["models"]["phyco-v4"]["claim_level"] = "L0"
+        self.assert_flagged("phyco-v4: history lacks the L1 of L1 recorded")
+
+    def test_at_l1_the_evidence_names_what_the_two_rows_name(self):
+        self.level_one(self.reviewed())
+        self.register["models"]["phyco-v4"]["evidence"] = []
+        self.assert_flagged("phyco-v4: evidence lacks docs/reviewed.md")
+
+    def test_fut_sec_holds_the_expected_statuses(self):
+        entry = self.register["models"]["phyco-v4"]
+        del entry["fut_sec"]
+        self.assert_flagged("phyco-v4: fut_sec does not hold FUT-SEC-1 to FUT-SEC-9")
+        entry["fut_sec"] = dict(fut_sec_005(), **{"FUT-SEC-7": "expected: open for feature 007"})
+        self.assert_flagged("FUT-SEC-7 is not open for feature 008")
+        self.assert_flagged("FUT-SEC-7 names a stage by another number")
+        entry["fut_sec"] = dict(fut_sec_005(), **{"FUT-SEC-8": "expected: done"})
+        self.assert_flagged("FUT-SEC-8 does not name feature 004's demonstration")
+        entry["fut_sec"] = dict(fut_sec_005(), **{"FUT-SEC-5": "expected: open for feature 005"})
+        self.assert_flagged("FUT-SEC-5 does not name the analysis feature 006")
+        entry["fut_sec"] = dict(fut_sec_005(), **{"FUT-SEC-1": "met"})
+        self.assert_flagged("FUT-SEC-1 is not an expected status")
+
+    def test_phyco_v3s_entry_needs_no_fut_sec(self):
+        self.assertNotIn("fut_sec", self.register["models"]["phyco-v3"])
+        self.assert_clean()
+
+    # ------------------------------------------------------------ in_progress, bound, evidence
+
+    def bound_record(self, feature: str, **fields) -> None:
+        body = dict({"kind": "bound", "status": "pass", "validation": "v",
+                     "created_utc": "2026-12-01T00:00:00Z"}, **fields)
+        rep_rel = evidence.FEATURES[feature]["rep"]
+        prefix = evidence.FEATURES[feature]["candidate_prefix"]
+        write(self.root, f"{rep_rel}/candidates/{prefix}A1/b.json", evidence.pretty(body))
+        self.commit("a bound")
+
+    def test_each_model_counts_its_own_features_records(self):
+        self.bound_record("005")
+        self.assert_flagged("phyco-v4: in_progress does not name L2")
+        self.assertEqual(len([r for r in self.rules() if "in_progress" in r]), 1)
+        self.register["models"]["phyco-v4"]["in_progress"] = {
+            "level": "L2", "start": "2026-12-01", "status": "not reached"}
+        self.assert_clean()
+
+    def test_feature_004s_record_counts_for_phyco_v3_alone(self):
+        self.bound_record("004")
+        rules = [r for r in self.rules() if "in_progress" in r]
+        self.assertEqual(len(rules), 1)
+        self.assertNotIn("phyco-v4", rules[0])
+
+    def test_a_split_record_is_never_counted(self):
+        self.bound_record("005", method="split")
+        self.assert_clean()
+        self.register["models"]["phyco-v4"]["in_progress"] = {
+            "level": "L2", "start": "2026-12-01", "status": "not reached"}
+        self.assert_flagged("phyco-v4: in_progress names a level")
+
+    def profile(self) -> str:
+        data = evidence.pretty({"rows": [
+            {"variant_id": "phyco-v4/n16", "claimable": True, "bound_bits": 128, "rounds": "<R16>"},
+            {"variant_id": "phyco-v4/n4", "claimable": True, "bound_bits": "<B4>", "rounds": "<R4>"},
+            {"variant_id": "phyco-v4/n2", "claimable": False, "bound_bits": 32}]})
+        write(self.root, f"{REP_005}/security-target/parameters.json", data)
+        self.commit("the profile")
+        return evidence.sha256(data)
+
+    def test_the_bound_is_this_features_profile_by_variant_placeholders_included(self):
+        self.register["models"]["phyco-v4"]["bound"] = "at most 128 bits"
+        self.assert_flagged("phyco-v4: bound must read none")
+        digest = self.profile()
+        rel = f"{REP_005}/security-target/parameters.json"
+        entry = self.register["models"]["phyco-v4"]
+        entry["bound"] = {"sizes": {"phyco-v4/n16": "at most 128 bits"}, "path": rel, "sha256": digest}
+        entry["evidence"] = [{"path": rel, "sha256": digest}]
+        self.assert_flagged("phyco-v4: bound differs from the profile's bound_bits at phyco-v4/n4")
+        entry["bound"]["sizes"]["phyco-v4/n4"] = "at most <B4> bits"
+        self.assert_clean()
+        self.assertEqual([r for r in self.rules() if "phyco-v3" in r], [])
+        entry["evidence"] = []
+        self.assert_flagged(f"phyco-v4: evidence lacks {rel}")
+
+
+class NoSecondFeature(ClaimRepo):
+    """A repository that holds feature 004 alone: `phyco-v4` stays at L0 there."""
+
+    def test_only_feature_004_is_read(self):
+        self.assertEqual(cc.features_present(), ["004"])
+        self.assert_clean()
+
+    def test_phyco_v4_above_l0_with_no_spec(self):
+        self.register["models"]["phyco-v4"]["claim_level"] = "L1"
+        self.assert_flagged("phyco-v4 reads L1, and its feature has no spec")
 
 
 class WordingRules(unittest.TestCase):

@@ -289,7 +289,7 @@ feature before T009 (FR-003).
 
 ### Step (4): the claim test and the register
 
-- [ ] T016 Write the claim test's extension tests in `tests/test_claims.py` (research R10):
+- [X] T016 Write the claim test's extension tests in `tests/test_claims.py` (research R10):
   `scripts/check_claims.py` scans this feature's documents and reports beside feature 004's, with
   `phyco-v4`, `v4-A<k>` and `v4-B<k>` among its model words; every hand-written document of this
   feature carries the disclaimer naming `phyco-v4`, word for word; this feature's gate rows are read
@@ -310,12 +310,12 @@ feature before T009 (FR-003).
   through an allow-list entry giving FR-026's reason.
   Feature 004's rules and findings are unchanged. (FR-001, FR-011, FR-013, FR-026, FR-030; SC-007;
   R10)
-- [ ] T017 Extend `scripts/check_claims.py` until T016 passes, and give `phyco-v4`'s entry in
+- [X] T017 Extend `scripts/check_claims.py` until T016 passes, and give `phyco-v4`'s entry in
   `protocol/claims.json` its `fut_sec`: the statuses of feature 004's table "Security Policy
   traceability" read for `phyco-v4`, FUT-SEC-8 met by feature 004's demonstration and its review,
   FUT-SEC-7 open for the statistical re-validation feature 008, the analysis feature 006 named by
   its number (FR-030); `phyco-v3`'s entry stays as written. (FR-026, FR-030; SC-007; R10)
-- [ ] T018 Run `python -X utf8 scripts/check_claims.py` over every document of this feature written
+- [X] T018 Run `python -X utf8 scripts/check_claims.py` over every document of this feature written
   before T017, the checklists and `checklist-choices.md` included (FR-026): fix each finding in text
   the agent wrote; for a generated checklist line, never rewritten, add an allow-list entry with its
   reason, that the line is a checklist question naming a parameter, a file or a rule, or quoting the
