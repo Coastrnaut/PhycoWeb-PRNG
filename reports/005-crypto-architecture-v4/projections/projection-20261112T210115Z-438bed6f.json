@@ -1,0 +1,80 @@
+{
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [],
+  "classification": "none",
+  "code_sha256": {},
+  "command": "'C:\\Program Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\\python.exe' python -X utf8 -W ignore -m unittest discover -s tests -t .",
+  "config": {
+    "PHYCOWEB_FEATURE": "005",
+    "cwd": "C:\\GIT\\PhycoWeb-PRNG",
+    "repository_root": "C:\\GIT\\PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-12T21:01:15Z",
+  "design_sha256": "none",
+  "design_sha256_kind": "raw",
+  "design_version": "none",
+  "dirty_paths": [],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v4` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "f587a4c6242bcf4c8c54dca507d355c39a0f576c66540e97ac38917273ffc015",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/005-crypto-architecture-v4/environment-windows.json",
+    "sha256": "2de000d88ddfa05e7615d5805dd7bb77ce02da26fe157f451010fcc2ee29b6a1",
+    "sha256_kind": "raw"
+  },
+  "exit_status": 0,
+  "feature": "005",
+  "git_dirty": false,
+  "git_head": "5f03ab1e749ee8914cb1a90acc0d99ea7ee97a01",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "the committed repository at HEAD",
+  "kind": "projection",
+  "limitations": [],
+  "measured_speed": {
+    "feature 004's closing whole-suite runs of 2026-11-09 (T133)": {
+      "windows_s": 1023.0,
+      "wsl_s": 631.7
+    },
+    "tests.test_protocol_005 on Windows, 2026-11-12": {
+      "seconds": 394.8
+    }
+  },
+  "model_id": null,
+  "outputs": [],
+  "outputs_statement": "no output is kept: the suite's result lines go to the phase report",
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "platform": {
+    "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "logical_cpus": 32,
+    "ram": "68422496256 bytes",
+    "system": "Windows-10-10.0.26300-SP0"
+  },
+  "projected_hours": 1.0,
+  "protocol_line_sha256": "a62df30ba1490305bf34a1e6831079bea15b9e20237409f290922bea005092e7",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 114,
+  "record_id": "projection-20261112T210115Z-438bed6f",
+  "research_sha256": "fb537ec00ce9dbe5fecfd4a5bd4b6aa501ab42b16937b1a78cc2fff176f1e1c1",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "row": "feature-wide",
+  "run": "the whole suite under tests/ with PHYCOWEB_FEATURE=005, on Windows and in WSL with wpy: plan phase 1's closing run (T021), FR-053's two-worker test and feature 004's re-check without a record among it",
+  "share": "whole-suite runs: 2 h of the feature-wide row, two per platform (plan, Values this plan fixes before first use)",
+  "spec_sha256": "36abbd764236d8c474f7df6a99d5347d86dc12113aaab327455784dff1024f81",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "time_hours": 0.0,
+  "variant_id": null,
+  "versions": {
+    "numpy": "2.2.6",
+    "python": "3.10.11",
+    "scipy": "1.15.3"
+  }
+}
