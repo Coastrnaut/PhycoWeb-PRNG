@@ -11,6 +11,7 @@ __pycache__/
 **/build/**
 !fast/build/seed_search
 !research/004/tools/trails/build/arx_search
+!research/005/tools/trails/build/arx_search_ops
 develop-eggs/
 dist/
 downloads/
