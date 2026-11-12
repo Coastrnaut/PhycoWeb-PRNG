@@ -522,13 +522,13 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   `phyco-v4`'s `bound` in `protocol/claims.json` from the profile's `bound_bits` by variant ID,
   placeholders included, and its `evidence`, both files by path and SHA-256 (FR-011);
   `python -X utf8 scripts/check_claims.py` reports 0 findings. (FR-011; SC-007)
-- [ ] T035 [US2] Prepare the security-target review: compute the set the row will name, the SHA-256
+- [X] T035 [US2] Prepare the security-target review: compute the set the row will name, the SHA-256
   of each of the four chapters ("Security target" and "Mode" of both documents), each from its
   heading line to the next heading of the same or a higher level, and of `parameters.json` and
   `limits.json`, with the version read; and list for the owner the approval commits and the
   allow-list entries added since T004, and the open items the chapter lists. (FR-011, FR-012;
   SC-002)
-- [ ] T036 [US2] ⛔ **Security-target review** (**Owner**), in the spec's Review & Approval table,
+- [X] T036 [US2] ⛔ **Security-target review** (**Owner**), in the spec's Review & Approval table,
   before any candidate is proposed: the row names T035's set by SHA-256 with the version read. A
   decline ends in chapters revised and reviewed again in "Security-target review <k>", no candidate
   proposed meanwhile; a parameter change found needed is made only in the stricter direction, a
