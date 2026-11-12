@@ -517,7 +517,7 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   documents' chapters with its reason, each value cited by the design document's chapter and
   section; the later chapters "Not drafted yet"; each section entered in the provenance log.
   (FR-010, FR-026; SC-002, SC-007; R8)
-- [ ] T034 [US2] Run `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json`,
+- [X] T034 [US2] Run `python scripts/mode_limits_v3.py --out $REP/security-target/limits.json`,
   which writes `parameters.json` beside it with R as the placeholders; in the same commit, write
   `phyco-v4`'s `bound` in `protocol/claims.json` from the profile's `bound_bits` by variant ID,
   placeholders included, and its `evidence`, both files by path and SHA-256 (FR-011);

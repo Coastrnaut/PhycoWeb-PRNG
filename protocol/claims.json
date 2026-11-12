@@ -3293,10 +3293,27 @@
       "updated": "2026-11-07"
     },
     "phyco-v4": {
-      "bound": "none",
+      "bound": {
+        "path": "reports/005-crypto-architecture-v4/security-target/parameters.json",
+        "sha256": "20c07576f65255d2639583a25ff8b02827203dfff32bd60dce8735270582ecf7",
+        "sizes": {
+          "phyco-v4/n16-w32-R<R16>-c384": "at most 128 bits",
+          "phyco-v4/n4-w32-R<R4>-c384": "at most 128 bits",
+          "phyco-v4/n8-w32-R<R8>-c384": "at most 128 bits"
+        }
+      },
       "claim": "no claim",
       "claim_level": "L0",
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "reports/005-crypto-architecture-v4/security-target/parameters.json",
+          "sha256": "20c07576f65255d2639583a25ff8b02827203dfff32bd60dce8735270582ecf7"
+        },
+        {
+          "path": "reports/005-crypto-architecture-v4/security-target/limits.json",
+          "sha256": "64293edff9f603eb61f15cb23597eba51c7c250be8b119cee428d81118e969d1"
+        }
+      ],
       "fut_sec": {
         "FUT-SEC-1": "expected: met by specification",
         "FUT-SEC-2": "expected: met by specification",

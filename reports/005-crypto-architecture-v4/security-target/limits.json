@@ -1,0 +1,445 @@
+{
+  "N": "2^128",
+  "analyst": "Claude Code, model claude-opus-5-5",
+  "assertions": [
+    {
+      "assertion": "each bound is within the target advantage at the limits, and doubling a limit that a term reads passes that advantage, at every claimable size",
+      "holds": true
+    },
+    {
+      "assertion": "no violation of a generic bound at a claimable size",
+      "holds": true
+    }
+  ],
+  "bound": {
+    "phyco-v4/n16-w32-R<R16>-c384": {
+      "backtracking": {
+        "at_most_target_advantage": true,
+        "calls_of_next": "2^61",
+        "log2_bound": "-64.999999",
+        "queries": "N + M",
+        "terms_log2": {
+          "from the key": "-85.678072",
+          "preserving": "-65.000000"
+        }
+      },
+      "keystream": {
+        "at_most_target_advantage": true,
+        "log2_bound": "-69.000000",
+        "resources": {
+          "L": "0",
+          "M": "2^62",
+          "N": "2^128",
+          "Omega": "2^61",
+          "q": "2^40",
+          "q_iv": "2^20",
+          "u": "2^20"
+        },
+        "terms_log2": {
+          "initial keys": "-538.000000",
+          "initial states": "-16282.000000",
+          "key pairs": "-217.000001",
+          "key search": "-108.000000",
+          "multicollisions": "-255.000000",
+          "nonce collisions": "-69.000000",
+          "overwrites": "-195.000000",
+          "repeated paths": "-263.000000",
+          "state pairs": "-16260.000000"
+        },
+        "theorem_condition": true
+      }
+    },
+    "phyco-v4/n4-w32-R<R4>-c384": {
+      "backtracking": {
+        "at_most_target_advantage": true,
+        "calls_of_next": "2^61",
+        "log2_bound": "-64.999999",
+        "queries": "N + M",
+        "terms_log2": {
+          "from the key": "-85.678072",
+          "preserving": "-65.000000"
+        }
+      },
+      "keystream": {
+        "at_most_target_advantage": true,
+        "log2_bound": "-69.000000",
+        "resources": {
+          "L": "0",
+          "M": "2^62",
+          "N": "2^128",
+          "Omega": "2^61",
+          "q": "2^40",
+          "q_iv": "2^20",
+          "u": "2^20"
+        },
+        "terms_log2": {
+          "initial keys": "-538.000000",
+          "initial states": "-922.000000",
+          "key pairs": "-217.000001",
+          "key search": "-108.000000",
+          "multicollisions": "-255.000000",
+          "nonce collisions": "-69.000000",
+          "overwrites": "-195.000000",
+          "repeated paths": "-263.000000",
+          "state pairs": "-900.000000"
+        },
+        "theorem_condition": true
+      }
+    },
+    "phyco-v4/n8-w32-R<R8>-c384": {
+      "backtracking": {
+        "at_most_target_advantage": true,
+        "calls_of_next": "2^61",
+        "log2_bound": "-64.999999",
+        "queries": "N + M",
+        "terms_log2": {
+          "from the key": "-85.678072",
+          "preserving": "-65.000000"
+        }
+      },
+      "keystream": {
+        "at_most_target_advantage": true,
+        "log2_bound": "-69.000000",
+        "resources": {
+          "L": "0",
+          "M": "2^62",
+          "N": "2^128",
+          "Omega": "2^61",
+          "q": "2^40",
+          "q_iv": "2^20",
+          "u": "2^20"
+        },
+        "terms_log2": {
+          "initial keys": "-538.000000",
+          "initial states": "-3994.000000",
+          "key pairs": "-217.000001",
+          "key search": "-108.000000",
+          "multicollisions": "-255.000000",
+          "nonce collisions": "-69.000000",
+          "overwrites": "-195.000000",
+          "repeated paths": "-263.000000",
+          "state pairs": "-3972.000000"
+        },
+        "theorem_condition": true
+      }
+    }
+  },
+  "classification": "none",
+  "code_sha256": {
+    "protocol/disclaimer.py": {
+      "kind": "raw",
+      "sha256": "630323a19687af6f9cb462be43011486e0500bf05743a6e4c27163540af20eb4"
+    },
+    "protocol/evidence.py": {
+      "kind": "raw",
+      "sha256": "914d042444243258f283f1cbbbbc5d8cba915fbec01e890cf06971eade4b84c7"
+    },
+    "scripts/mode_limits_v3.py": {
+      "kind": "raw",
+      "sha256": "b714da2152f0f81ff4d43a21d32b801a72dcf7502ef2a502e7529a8e882635a8"
+    }
+  },
+  "command": "/home/coast/.venvs/phycoweb/bin/python scripts/mode_limits_v3.py --out reports/005-crypto-architecture-v4/security-target/limits.json",
+  "config": {
+    "PHYCOWEB_FEATURE": "005",
+    "cwd": "/mnt/c/GIT/PhycoWeb-PRNG",
+    "repository_root": "/mnt/c/GIT/PhycoWeb-PRNG"
+  },
+  "created_utc": "2026-11-12T22:46:22Z",
+  "design_sha256": "4ec0fac991c598a2919c77e3a12b448cf22c0de73eef3fffc9686af33f83effe",
+  "design_sha256_kind": "raw",
+  "design_version": "0.5",
+  "dirty_paths": [
+    "reports/005-crypto-architecture-v4/design-versions/4ec0fac991c598a2919c77e3a12b448cf22c0de73eef3fffc9686af33f83effe.md",
+    "reports/005-crypto-architecture-v4/security-target/parameters.json"
+  ],
+  "disclaimer": "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v4` included, may be used to generate secrets; use an established cryptographic random-number generator for keys, nonces, tokens and salts. Passing statistical tests does not show cryptographic security.",
+  "doubling": {
+    "phyco-v4/n16-w32-R<R16>-c384": {
+      "calls of Π per instantiation": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "calls of Π per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "instantiations per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      },
+      "keys u": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      }
+    },
+    "phyco-v4/n4-w32-R<R4>-c384": {
+      "calls of Π per instantiation": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "calls of Π per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "instantiations per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      },
+      "keys u": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      }
+    },
+    "phyco-v4/n8-w32-R<R8>-c384": {
+      "calls of Π per instantiation": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "calls of Π per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-64.000000"
+      },
+      "instantiations per key": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      },
+      "keys u": {
+        "above_target_advantage": true,
+        "log2_bound": "-63.999999"
+      }
+    }
+  },
+  "ended_outside": "none",
+  "environment": {
+    "approval_sha256": "33343f28557eecbad74ec8827bda6169f69acd60c811d75545cdb3bbf19bb429",
+    "approval_sha256_kind": "canonical",
+    "path": "reports/005-crypto-architecture-v4/environment-wsl.json",
+    "sha256": "9d59bad3e0c2eff169c9e62725f9f91ff30b8219ea94efa5c0475cd38d50e1a9",
+    "sha256_kind": "raw"
+  },
+  "epsilon": "2^-64",
+  "exit_status": 0,
+  "feature": "005",
+  "git_dirty": true,
+  "git_head": "9bbe2ed2421f50d4762ab0830114126df89db473",
+  "heavy_run": false,
+  "hours": "none",
+  "inputs": "none",
+  "kind": "security-target",
+  "limitations": [],
+  "model_id": null,
+  "nonces": {
+    "collision_term": "q^2/2^129",
+    "first_way": "a counter per key, never repeated or wrapped",
+    "second_way": "uniform 128-bit values, with the collision term q^2/2^129"
+  },
+  "other_limits": {
+    "instantiations_per_key": "2^20",
+    "personalization_bytes": 4096,
+    "reseed_input_bytes": 4096,
+    "reseeds_per_instantiation": "2^21"
+  },
+  "outputs": [],
+  "outside_the_doubling_check": {
+    "per-request cap": "research R9 fixes it at 2^19 bits, and no term of the theorem reads it",
+    "reseeds per instantiation": "a reseed takes at least one call, so that the limit on calls holds it"
+  },
+  "parallelism": {
+    "PYTHONHASHSEED": "none",
+    "threads": 1,
+    "workers": 1
+  },
+  "per_instantiate": {
+    "phyco-v4/n16-w32-R<R16>-c384": 8,
+    "phyco-v4/n4-w32-R<R4>-c384": 59,
+    "phyco-v4/n8-w32-R<R8>-c384": 14
+  },
+  "per_instantiation": {
+    "bits": {
+      "phyco-v4/n16-w32-R<R16>-c384": 67108864000,
+      "phyco-v4/n4-w32-R<R4>-c384": 2684354560,
+      "phyco-v4/n8-w32-R<R8>-c384": 15569256448
+    },
+    "calls": "2^22"
+  },
+  "per_key": {
+    "bits": {
+      "phyco-v4/n16-w32-R<R16>-c384": 70368744177664000,
+      "phyco-v4/n4-w32-R<R4>-c384": 2814749767106560,
+      "phyco-v4/n8-w32-R<R8>-c384": 16325548649218048
+    },
+    "calls": "2^42"
+  },
+  "per_request": {
+    "phyco-v4/n16-w32-R<R16>-c384": {
+      "bits": 524288,
+      "calls": 34
+    },
+    "phyco-v4/n4-w32-R<R4>-c384": {
+      "bits": 524288,
+      "calls": 821
+    },
+    "phyco-v4/n8-w32-R<R8>-c384": {
+      "bits": 524288,
+      "calls": 143
+    }
+  },
+  "platform": {
+    "cpu": "none",
+    "logical_cpus": 32,
+    "ram": "33505320960 bytes",
+    "system": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "previous_sha256": "none",
+  "protocol_line_sha256": "a62df30ba1490305bf34a1e6831079bea15b9e20237409f290922bea005092e7",
+  "protocol_line_sha256_kind": "raw",
+  "protocol_seq": 114,
+  "record_id": "security-target-20261112T224622Z-6f854b6b",
+  "research_sha256": "fb537ec00ce9dbe5fecfd4a5bd4b6aa501ab42b16937b1a78cc2fff176f1e1c1",
+  "research_sha256_kind": "raw",
+  "review_status": "pending",
+  "reviewer": "pending",
+  "spec_sha256": "36abbd764236d8c474f7df6a99d5347d86dc12113aaab327455784dff1024f81",
+  "spec_sha256_kind": "raw",
+  "status": "pass",
+  "theorems": [
+    {
+      "citation": "Daemen, Mennink and Van Assche, ASIACRYPT 2017",
+      "covers": [
+        "keystream",
+        "multi-user"
+      ],
+      "fetched_sha256": "eaea8ec5714a4e346dd30c9ec3e9ec8eb6b3e700d7262f1208e5799f5c9c76c8",
+      "id": "full-state keyed duplex",
+      "page": "619-620",
+      "paper": "Daemen.pdf",
+      "preconditions": [
+        {
+          "met": false,
+          "precondition": "one ideal permutation f of b bits, in both directions",
+          "section": "Calls"
+        },
+        {
+          "met": false,
+          "precondition": "r < b and k <= b",
+          "section": "Layout"
+        },
+        {
+          "met": false,
+          "precondition": "the first call applies f to K||iv, the key in the state's first k bits",
+          "section": "Layout"
+        },
+        {
+          "met": false,
+          "precondition": "every later call is f, then the outer part returned, then sigma added",
+          "section": "Calls"
+        },
+        {
+          "met": false,
+          "precondition": "N + M <= 0.1 2^c at the limits",
+          "section": "Limits"
+        },
+        {
+          "met": false,
+          "precondition": "keys drawn independently and uniformly, so H_min and H_coll are k",
+          "section": "Key loading"
+        },
+        {
+          "met": false,
+          "precondition": "no path repeats, L = 0: a nonce is used once per key",
+          "section": "Nonce reuse"
+        },
+        {
+          "met": false,
+          "precondition": "each forget is one query with flag true, and no other call is",
+          "section": "Forget"
+        },
+        {
+          "met": false,
+          "precondition": "inputs absorbed over the rate are sigma with its inner part zero",
+          "section": "Padding and domain separation"
+        },
+        {
+          "met": false,
+          "precondition": "a reseed input is sigma chosen by the adversary before that call's Z",
+          "section": "Calls"
+        },
+        {
+          "met": false,
+          "precondition": "output is the outer part of the state after a full call of f",
+          "section": "Serialization"
+        }
+      ],
+      "status": "unverified",
+      "theorem": "Theorem 1"
+    },
+    {
+      "citation": "Gazi and Tessaro, EUROCRYPT 2016, ePrint 2016/169",
+      "covers": [
+        "backtracking"
+      ],
+      "fetched_sha256": "32c5f17b8f4f748b885810f796b8dbf8dcda7d78ce28fa9474d69d85072956c8",
+      "id": "forget",
+      "page": "25, 22, 14",
+      "paper": "169.pdf",
+      "preconditions": [
+        {
+          "met": false,
+          "precondition": "one ideal permutation of b bits, in both directions",
+          "section": "Calls"
+        },
+        {
+          "met": false,
+          "precondition": "next: f, the outer part read, then t times f and the outer part set to zero",
+          "section": "Forget"
+        },
+        {
+          "met": false,
+          "precondition": "refresh: an input added to the outer part, then f",
+          "section": "Calls"
+        },
+        {
+          "met": false,
+          "precondition": "before each next, a state of zeros in the outer part and a secret inner part",
+          "section": "Forget"
+        },
+        {
+          "met": false,
+          "precondition": "the key's state has min-entropy k, and is independent of f, for Lemma 10",
+          "section": "Key loading"
+        },
+        {
+          "met": false,
+          "precondition": "no seed: every input is taken as chosen by the adversary, and Lemma 12's proof reads only the inner part's secrecy",
+          "section": "Padding and domain separation"
+        },
+        {
+          "met": false,
+          "precondition": "several blocks from one next: the paper's remark on page 15, which it does not work out",
+          "section": "Forget"
+        },
+        {
+          "met": false,
+          "precondition": "the sum over the calls of next stays within the target advantage at the limits",
+          "section": "Limits"
+        },
+        {
+          "met": false,
+          "precondition": "the sum across instantiations and keys, with a nonce the adversary chooses: the mode chapter's own hybrid, which the paper does not state",
+          "section": "Limits"
+        }
+      ],
+      "status": "unverified",
+      "theorem": "Lemma 12, with Lemma 10 and Theorem 4"
+    }
+  ],
+  "u": "2^20",
+  "variant_id": null,
+  "versions": {
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "numpy": "2.5.4",
+    "python": "3.14.4",
+    "scipy": "1.18.1"
+  }
+}
