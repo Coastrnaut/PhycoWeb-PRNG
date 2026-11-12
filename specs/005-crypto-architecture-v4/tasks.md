@@ -271,7 +271,7 @@ feature before T009 (FR-003).
   decided), every clarification row listed by its table; `propose FILE` writes a later entry for a
   row "Protocol change <k>" or "Readings set aside <k>"; an entry that sets a reading aside is
   refused unless its row decides it. Feature 004's mode keeps its behaviour. (FR-001, FR-031)
-- [ ] T014 Write the first entries of this feature's provenance log `$REP/provenance.jsonl` with
+- [X] T014 Write the first entries of this feature's provenance log `$REP/provenance.jsonl` with
   `python scripts/provenance.py add FILE`, one per file drafted before the log or per section
   changed: this feature's documents (spec, plan, research, data model, contract, quickstart, the
   seven checklists, `checklist-choices.md` and this file), `research/005/plan_projections.py`,
