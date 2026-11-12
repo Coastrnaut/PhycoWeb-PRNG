@@ -246,13 +246,13 @@ feature before T009 (FR-003).
 
 ### Step (3): the refused list, the plan's numbers and the logs
 
-- [ ] T011 [P] Create `research/005/refused-constants.json` as a byte copy of
+- [X] T011 [P] Create `research/005/refused-constants.json` as a byte copy of
   `research/004/refused-constants.json` at 99e6994
   (`git show 99e6994:research/004/refused-constants.json`): 66 entries, SHA-256
   `cdbcb8031d1de839dacd71abcabdec38869fa6b102c6e86f10cfea2eb52a8a95`, checked before the commit; the
   file grows afterwards only by this feature's stricter changes, each entered in the protocol change
   log with the list's new SHA-256; `REFUSED_LIST_REL` under `005` names it. (FR-023; R13)
-- [ ] T012 [P] Change `research/005/plan_projections.py` to read feature 004's records as committed
+- [X] T012 [P] Change `research/005/plan_projections.py` to read feature 004's records as committed
   at 99e6994, through `git show 99e6994:<path>`, never from the working tree, its output unchanged:
   `python -X utf8 research/005/plan_projections.py --check` prints "plan-projections.json matches"
   and exits 0 on Windows and with `wpy` in WSL (quickstart V1), the committed

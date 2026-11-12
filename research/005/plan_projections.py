@@ -24,16 +24,20 @@ difference. The rules are research R1 to R3 of specs/005-crypto-architecture-v4/
 This script makes no security claim.
 """
 import argparse
-import glob
+import fnmatch
 import hashlib
 import json
 import statistics
+import subprocess
 import sys
 from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-REP4 = ROOT / "reports/004-crypto-architecture-v3"
+REP4 = "reports/004-crypto-architecture-v3"
+# Feature 004's records are read as committed at this commit, never from the working tree, so that a later record
+# never changes the calibration (spec FR-004).
+BASELINE = "99e6994"
 OUT = ROOT / "research/005/plan-projections.json"
 CAP_004 = 8.0
 R_MAX = 64
@@ -62,18 +66,40 @@ FEATURE_WIDE_NEED = {"probes": 30.0, "two whole-suite runs per platform": 2.0, "
 APPROVED = "E (the owner's extension)"
 
 
+_BLOBS = {}
+
+
+def committed():
+    """Every JSON file of feature 004's reports at the baseline commit, by its path, read once with git."""
+    if not _BLOBS:
+        names = subprocess.run(["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", BASELINE, "--", REP4],
+                               capture_output=True, check=True).stdout.decode("utf-8").split("\n")
+        names = sorted(name for name in names if name.endswith(".json"))
+        batch = subprocess.run(["git", "-C", str(ROOT), "cat-file", "--batch"], capture_output=True, check=True,
+                               input="".join(f"{BASELINE}:{name}\n" for name in names).encode("utf-8")).stdout
+        at = 0
+        for name in names:
+            end = batch.index(b"\n", at)
+            size = int(batch[at:end].split()[2])
+            _BLOBS[name] = batch[end + 1:end + 1 + size]
+            at = end + 1 + size + 1
+    return _BLOBS
+
+
 def load(pattern):
     out = []
-    for path in sorted(glob.glob(str(REP4 / pattern))):
-        record = json.loads(Path(path).read_text(encoding="utf-8"))
-        record["_path"] = Path(path).relative_to(ROOT).as_posix()
+    for path, blob in committed().items():
+        if not fnmatch.fnmatchcase(path, REP4 + "/" + pattern) or path.count("/") != (REP4 + "/" + pattern).count("/"):
+            continue
+        record = json.loads(blob.decode("utf-8"))
+        record["_path"] = path
         out.append(record)
     return out
 
 
 def sha256_of(rel):
-    """SHA-256 over a committed file's bytes, kind raw."""
-    return hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+    """SHA-256 over a committed file's bytes at the baseline commit, kind raw."""
+    return hashlib.sha256(committed()[rel]).hexdigest()
 
 
 def candidate_of(record):
@@ -126,9 +152,9 @@ def calibration(projections, bounds):
 def kind_calibration():
     """Every other kind of evidence: the feature-004 records that hold their own projected and used hours (R1)."""
     out = {}
-    for path in sorted(glob.glob(str(REP4 / "**/*.json"), recursive=True)):
+    for path, blob in committed().items():
         try:
-            record = json.loads(Path(path).read_text(encoding="utf-8"))
+            record = json.loads(blob.decode("utf-8"))
         except (ValueError, UnicodeDecodeError):
             continue
         hours = record.get("hours") if isinstance(record, dict) else None
