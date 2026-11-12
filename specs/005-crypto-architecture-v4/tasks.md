@@ -170,7 +170,7 @@ feature before T009 (FR-003).
 
 ### Step (1): the feature setting
 
-- [ ] T006 Write the feature setting's tests in `tests/test_protocol_005.py` (research R9;
+- [X] T006 Write the feature setting's tests in `tests/test_protocol_005.py` (research R9;
   data-model §1; contracts/cli.md, "The feature setting"): with `PHYCOWEB_FEATURE` unset or `004`,
   `protocol/evidence.py` gives feature 004's paths (`REP_REL`, `FEATURE_REL`, `SPEC_REL`,
   `RESEARCH_REL`, `DESIGN_REL`, `PROTOCOL_LOG_REL`, `CANDIDATE_LOG_REL`, `PROVENANCE_LOG_REL`,
@@ -200,7 +200,7 @@ feature before T009 (FR-003).
   instantiation code reads feature 004's row "FUT-SEC-8 result review" and its demonstration record
   at HEAD, from feature 004's spec and paths, under either setting (FR-030). (FR-001, FR-002,
   FR-003, FR-026, FR-028, FR-030; SC-007; R9, R14)
-- [ ] T007 Make the feature a parameter of the shared code (research R9) until T006 passes:
+- [X] T007 Make the feature a parameter of the shared code (research R9) until T006 passes:
   `protocol/evidence.py` reads `PHYCOWEB_FEATURE` once, `004` by default, and selects from it the
   paths, the model ID, the candidate IDs, the development-input namespace and the disclaimer;
   `protocol/disclaimer.py` gains feature 005's constant, the disclaimer naming `phyco-v4` word for
@@ -216,7 +216,7 @@ feature before T009 (FR-003).
   approved option, and the validation lookup reads both features' validation records (research R14).
   No tool file whose exact hash a validation record matches, its `tool_sha256` and a C tool's
   binary, changes here (T038). (FR-001, FR-002, FR-003, FR-026, FR-028; SC-007; R9, R14)
-- [ ] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
+- [X] T008 Add `--no-record` to `scripts/recheck_004.py`, which prints the result and writes nothing
   (contracts/cli.md, "`scripts/recheck_004.py` for feature 005"), and write FR-003's test in
   `tests/test_protocol_005.py`: with the setting unset, `python scripts/recheck_004.py --no-record`
   at HEAD gives the result that T132's committed record holds,
@@ -224,7 +224,7 @@ feature before T009 (FR-003).
   `d53424fb529ab2254825c107a2f066dab702f46e66c0ef176787b5d5f6526f21`: 160 records, 0
   disagreements), and leaves every file under feature 004's paths as committed (quickstart V2).
   (FR-003; SC-005)
-- [ ] T009 Pin each test to its feature (FR-003): each test that reads feature 004's committed
+- [X] T009 Pin each test to its feature (FR-003): each test that reads feature 004's committed
   records pins feature 004 for those reads, in `tests/test_records_004.py`,
   `tests/test_protocol_004.py`, `tests/test_tools_004.py`, `tests/test_claims.py` and every other
   module of `tests/` that reads them; every test that writes a record writes under the active
