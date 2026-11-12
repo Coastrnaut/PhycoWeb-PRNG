@@ -536,7 +536,7 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   before the review's approval, the output limits recomputed (spec, Edge Cases). In the commit after
   the row's, the agent writes security.md's next version recording the gate in row 5a.1b's status,
   CRLF kept. (FR-010, FR-011, FR-027, FR-031; SC-002; Principle VIII)
-- [ ] T037 [US2] ⛔ **L1 recorded** (**Owner**), once the claim test covers `phyco-v4` (T017) and
+- [X] T037 [US2] ⛔ **L1 recorded** (**Owner**), once the claim test covers `phyco-v4` (T017) and
   the row "Security-target review" reads Approved: the row "L1 recorded" names that row and feature
   004's row "FUT-SEC-8 result review" (ffb1425), each with what it reviewed by path and SHA-256; in
   the same commit (FR-013), the agent sets `phyco-v4`'s `claim_level` and `history` in
