@@ -459,7 +459,7 @@ review's approval commit precedes the candidate log's first `proposed` entry (SC
 V4: `scripts/candidate_log.py propose` exits 2 while the row is pending, and appends once it reads
 Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exists (FR-011).
 
-- [ ] T028 [US2] Write the candidate log's tests for this feature in
+- [X] T028 [US2] Write the candidate log's tests for this feature in
   `tests/test_protocol_005.py` (quickstart V4; data-model §5; contracts/cli.md,
   "`scripts/candidate_log.py propose …`"): `propose` exits 2, appending nothing, while the row
   "Security-target review" does not read Approved at HEAD with the chapters' SHA-256 it names, or
@@ -469,9 +469,9 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   `changes` reading `none` for `derived`, and without `--derived-from`, `derived_from` reads `none`;
   a fourth evaluated candidate of one family exits 2, the limit read from the plan approval (three).
   (FR-011, FR-022, FR-023; SC-002)
-- [ ] T029 [US2] Extend `protocol/candidates.py` and `scripts/candidate_log.py` until T028 passes
+- [X] T029 [US2] Extend `protocol/candidates.py` and `scripts/candidate_log.py` until T028 passes
   (contracts/cli.md; data-model §5). (FR-011, FR-022, FR-023; SC-002)
-- [ ] T030 [US2] Write the security target's tests for this feature in `tests/test_protocol_005.py`,
+- [X] T030 [US2] Write the security target's tests for this feature in `tests/test_protocol_005.py`,
   running feature 004's tests of its chapters and security-target files from
   `tests/test_records_004.py` with the feature as their parameter: each document's header (its
   title, the design-form disclaimer naming `phyco-v4` and one line "Version: 0.5"), the two version
@@ -485,7 +485,7 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   section (FR-010); and `phyco-v4`'s register `bound` holding the profile's `bound_bits` by variant
   ID, placeholders included, with its `evidence` naming both files (FR-011). (FR-010, FR-011,
   FR-026; SC-007)
-- [ ] T031 [US2] Make `scripts/mode_limits_v3.py` read for this feature (research R8) until T030's
+- [X] T031 [US2] Make `scripts/mode_limits_v3.py` read for this feature (research R8) until T030's
   file tests pass: under `005` it reads `specs/005-crypto-architecture-v4/design.md`, taking the
   variant rows from the chapter "Security target"'s parameter table until the chapter "Permutation"
   holds its variant table (research R8), takes a placeholder R as not yet known, computes every
@@ -493,7 +493,7 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   `$REP/security-target/parameters.json` and `limits.json`; a theorem stays `unverified` until its
   paper is read, feature 004's `fetched` entries read as FR-001 states; feature 004's mode is
   unchanged. (FR-001, FR-010, FR-011; SC-007; R8)
-- [ ] T032 [US2] Write `specs/005-crypto-architecture-v4/design.md`, Version 0.5 (FR-010; research
+- [X] T032 [US2] Write `specs/005-crypto-architecture-v4/design.md`, Version 0.5 (FR-010; research
   R8): its header (the title "phyco-v4: design document", the design-form disclaimer naming
   `phyco-v4`, "Version: 0.5"); the chapters "Security target" and "Mode" copied from feature 004's
   `design.md`, Version 0.4, its SHA-256 as FR-010 names it, read with `phyco-v4` for `phyco-v3`,
@@ -509,7 +509,7 @@ Approved at HEAD with the chapters' SHA-256 and `$REP/projection-table.json` exi
   the security target's files are computed (research R8); the chapters after "Mode" reading "Not
   drafted yet" until Phase 6; each section entered in `$REP/provenance.jsonl` as it is drafted.
   (FR-010, FR-012, FR-026; SC-002, SC-007; R8)
-- [ ] T033 [US2] Write `specs/005-crypto-architecture-v4/rationale.md`, Version 0.5: its header (the
+- [X] T033 [US2] Write `specs/005-crypto-architecture-v4/rationale.md`, Version 0.5: its header (the
   title, the design-form disclaimer naming `phyco-v4`, "Version: 0.5"); its chapters "Security
   target" and "Mode" copied from feature 004's `rationale.md`, Version 0.4, its SHA-256 as FR-010
   names it, read and changed the same way, each statement with one of inherited FR-062's seven

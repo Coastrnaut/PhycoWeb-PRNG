@@ -1332,5 +1332,367 @@ class TheProjectionTable(PlannedRepo):
         self.assertEqual(table["families"]["Boolean"]["climbs"]["4x4"]["linear"]["runs"][0]["source"], "plan")
 
 
+# ----------------------------------------------------------------------------- the candidate log
+
+DOCUMENT = """# {title}
+
+> {disclaimer}
+
+Version: 0.5
+
+## Security target
+
+The target{change}.
+
+## Mode
+
+The mode.
+
+## Next
+
+Not drafted yet.
+"""
+
+
+class TheCandidateLog(TempRepo005):
+    """Data-model section 5; contracts/cli.md, "`scripts/candidate_log.py propose …`"; quickstart V4."""
+
+    DESIGN = "specs/005-crypto-architecture-v4/design.md"
+    RATIONALE = "specs/005-crypto-architecture-v4/rationale.md"
+    LIST_004 = "research/004/candidates/cand-A1.py"
+
+    def setUp(self):
+        super().setUp()
+        from scripts import candidate_log
+        self.script = candidate_log
+        self.documents()
+        self.source = (ROOT / self.LIST_004).read_bytes()
+        write(self.root, self.LIST_004, self.source)
+        for name in ("v4-A1", "v4-A2", "v4-A3", "v4-B1"):
+            write(self.root, f"research/005/candidates/{name}.py", f"import ir  # {name}\n")
+        write(self.root, evidence.PLAN_PROJECTIONS_REL,
+              json.dumps({"approved_option": "E", "options": {"E": {"candidates_per_family": 3}}}) + "\n")
+        self.commit("documents and lists")
+
+    def documents(self, change: str = "") -> None:
+        for rel, title in ((self.DESIGN, "design document"), (self.RATIONALE, "design rationale")):
+            write(self.root, rel, DOCUMENT.format(title=title, disclaimer=DESIGN_DISCLAIMER_005, change=change))
+
+    def review(self, name: str = "Security-target review", decision: str = "Approved") -> None:
+        notes = []
+        for rel in (self.DESIGN, self.RATIONALE):
+            for chapter in ("Security target", "Mode"):
+                digest = evidence.sha256(evidence.section_bytes((self.root / rel).read_bytes(), chapter))
+                notes.append(f"`{rel}`, chapter \"{chapter}\", {digest}")
+        self.add_row(name, decision, "Version 0.5; " + "; ".join(notes))
+
+    def table(self, per_family: int = 3) -> None:
+        write(self.root, f"{evidence.REP_REL}/projection-table.json",
+              json.dumps({"candidates_per_family": per_family, "feature_wide_row": {"holds_h": 102.0}}) + "\n")
+        self.commit("the projection table")
+
+    def fields(self, candidate: str = "v4-A1", **more) -> dict:
+        digest = evidence.sha256((self.root / f"research/005/candidates/{candidate}.py").read_bytes())
+        return dict({"candidate_id": candidate, "oplist_sha256": digest,
+                     "parameters": {name: "stated" for name in candidates.PARAMETERS}}, **more)
+
+    def command(self, *arguments, candidate: str = "v4-A1", **more) -> int:
+        write(self.root, "entry.json", json.dumps(self.fields(candidate, **more)))
+        with mock.patch("builtins.print"):
+            return self.script.main(["propose", str(self.root / "entry.json"), *arguments])
+
+    def log(self) -> list:
+        path = self.root / evidence.CANDIDATE_LOG_REL
+        return [json.loads(line) for line in path.read_bytes().decode("utf-8").splitlines()] if path.exists() else []
+
+    def test_no_candidate_before_the_review_reads_approved(self):
+        self.table()
+        self.assertEqual(self.command(), evidence.EXIT_REFUSED)
+        self.review(decision="Declined")
+        self.assertEqual(self.command(), evidence.EXIT_REFUSED)
+        self.assertEqual(self.log(), [])
+
+    def test_no_candidate_before_the_projection_table_exists(self):
+        self.review()
+        self.assertEqual(self.command(), evidence.EXIT_REFUSED)
+        self.assertEqual(self.log(), [])
+        self.table()
+        self.assertEqual(self.command(), 0)
+
+    def test_once_both_hold_the_entry_is_appended_with_derived_from_none(self):
+        self.review()
+        self.table()
+        self.assertEqual(self.command(), 0)
+        entry = self.log()[0]
+        self.assertEqual((entry["event"], entry["candidate_id"], entry["family"], entry["derived_from"]),
+                         ("proposed", "v4-A1", "ARX", "none"))
+
+    def test_a_reviewed_chapter_changed_at_head_refuses_every_proposed_entry(self):
+        self.review()
+        self.table()
+        self.documents(change=", changed")
+        self.commit("a chapter changed")
+        self.assertEqual(self.command(), evidence.EXIT_REFUSED)
+        self.assertEqual(self.command(candidate="v4-B1"), evidence.EXIT_REFUSED)
+        self.review("Security-target review 2")
+        self.assertEqual(self.command(), 0)
+
+    def test_the_row_names_each_of_the_four_chapters(self):
+        digest = evidence.sha256(evidence.section_bytes((self.root / self.DESIGN).read_bytes(), "Mode"))
+        self.add_row("Security-target review", "Approved", f"`{self.DESIGN}`, chapter \"Mode\", {digest}")
+        self.table()
+        self.assertEqual(self.command(), evidence.EXIT_REFUSED)
+
+    def test_derived_from_names_the_feature_004_design(self):
+        self.review()
+        self.table()
+        digest = evidence.sha256(self.source)
+        self.assertEqual(self.command("--derived-from", f"{self.LIST_004}:{digest}", "--relation", "derived"), 0)
+        self.assertEqual(self.log()[0]["derived_from"],
+                         {"feature": "004", "candidate": "cand-A1", "oplist_path": self.LIST_004,
+                          "oplist_sha256": digest, "relation": "derived", "changes": "none"})
+        self.assertEqual(self.command("--derived-from", f"{self.LIST_004}:{digest}", "--relation", "starting-point",
+                                      "--changes", "a fifth step in the box", candidate="v4-A2"), 0)
+        self.assertEqual((self.log()[1]["derived_from"]["relation"], self.log()[1]["derived_from"]["changes"]),
+                         ("starting-point", "a fifth step in the box"))
+
+    def test_a_derived_from_that_does_not_hold_is_refused(self):
+        self.review()
+        self.table()
+        digest = evidence.sha256(self.source)
+        for arguments in (("--derived-from", f"{self.LIST_004}:{'0' * 64}", "--relation", "derived"),
+                          ("--derived-from", f"{self.LIST_004}:{digest}"),
+                          ("--relation", "derived"),
+                          ("--derived-from", f"{self.LIST_004}:{digest}", "--relation", "derived", "--changes", "a change"),
+                          ("--derived-from", f"{self.LIST_004}:{digest}", "--relation", "starting-point"),
+                          ("--derived-from", f"research/005/candidates/v4-A2.py:{digest}", "--relation", "derived")):
+            self.assertEqual(self.command(*arguments), evidence.EXIT_REFUSED, arguments)
+        self.assertEqual(self.log(), [])
+
+    def test_the_limit_per_family_is_the_plan_approvals(self):
+        self.review()
+        self.table(per_family=2)
+        self.assertEqual(candidates.most_per_family(), 2)
+        self.assertEqual(self.command(candidate="v4-A1"), 0)
+        self.assertEqual(self.command(candidate="v4-A2"), 0)
+        self.assertEqual(self.command(candidate="v4-A3"), evidence.EXIT_REFUSED)
+        self.assertEqual(self.command(candidate="v4-B1"), 0)
+        (self.root / evidence.REP_REL / "projection-table.json").unlink()
+        self.assertEqual(candidates.most_per_family(), 3)
+
+    def test_feature_004s_log_keeps_its_rule(self):
+        evidence.set_feature("004")
+        self.addCleanup(evidence.set_feature, "005")
+        self.assertEqual(candidates.most_per_family(), 3)
+        write(self.root, "entry.json", json.dumps({"candidate_id": "cand-A1"}))
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.script.main(["propose", str(self.root / "entry.json"), "--relation", "derived"]),
+                             evidence.EXIT_REFUSED)
+
+
+# ---------------------------------------------------------------------------- the security target
+
+import tests.test_records_004 as records_004  # noqa: E402
+
+DESIGN_005 = ROOT / "specs/005-crypto-architecture-v4/design.md"
+RATIONALE_005 = ROOT / "specs/005-crypto-architecture-v4/rationale.md"
+LIMITS_005 = ROOT / "reports/005-crypto-architecture-v4/security-target/limits.json"
+PROFILE_005 = ROOT / "reports/005-crypto-architecture-v4/security-target/parameters.json"
+PLACEHOLDERS = ("<R4>", "<R8>", "<R16>")
+
+
+class ThisFeaturesFiles:
+    """Feature 004's tests of its chapters and security-target files, run with this feature as their
+    parameter: its documents, its two files and its disclaimer (T030)."""
+
+    def setUp(self):
+        for name, value in (("DESIGN_FILE", DESIGN_005), ("RATIONALE_FILE", RATIONALE_005), ("LIMITS_FILE", LIMITS_005),
+                            ("PROFILE_FILE", PROFILE_005), ("DESIGN_DISCLAIMER", DESIGN_DISCLAIMER_005)):
+            patcher = mock.patch.object(records_004, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        super().setUp()
+
+
+class TheChapters(ThisFeaturesFiles, records_004.Chapters):
+    """Inherited FR-034's chapters and header, for `phyco-v4`, Version 0.5 (spec FR-010, FR-026)."""
+
+    def test_the_drafts_tables_hold_at_the_limits_they_state(self):
+        """Under 005 the parameter table gives the variant rows while "Permutation" is not drafted."""
+        tool = records_004.limits_script()
+        if tool.variant_table_drafted(self.design):
+            self.skipTest("the variant table is drafted: the file's own run takes over")
+        out = tool.compute(self.design, [], ROOT)
+        self.assertTrue(out["held"], out["assertions"])
+        claimable = [row for row in out["parameters"]["rows"] if row["status"] == "claimable"]
+        self.assertEqual([row["bound_bits"] for row in claimable], [128, 128, 128])
+        self.assertEqual([row["R"] for row in claimable], list(PLACEHOLDERS))
+
+    def test_the_version_is_0_5_until_a_later_change(self):
+        self.assertRegex(records_004.header_of(self.design)[-1], r"^Version: 0\.([5-9]|\d\d+)$")
+        self.assertEqual(records_004.header_of(self.design)[0], "# phyco-v4: design document")
+        self.assertEqual(records_004.header_of(self.rationale)[0], "# phyco-v4: design rationale")
+
+    def test_the_chapters_after_mode_read_not_drafted_yet_until_phase_6(self):
+        if len(records_004.drafted(self.design)) > 2:
+            self.skipTest("the later chapters are drafted from plan phase 6 on")
+        self.assertEqual(records_004.drafted(self.design), ["Security target", "Mode"])
+        self.assertEqual(records_004.drafted(self.rationale), ["Security target", "Mode"])
+
+    def test_the_open_items_stand_under_a_heading_of_their_own(self):
+        tool = records_004.limits_script()
+        lines = tool.section_lines(self.design, "Security target", "Open items")
+        text = " ".join(lines)
+        for words in ("<R4>", "<R8>", "<R16>", "margin of instantiation's diffusion", "related-key and related-nonce",
+                      "functionality class"):
+            self.assertIn(words, text)
+
+    def test_the_rationale_lists_the_changes_from_version_0_4_in_both_chapters(self):
+        tool = records_004.limits_script()
+        lines = self.rationale.split("\n")
+        heads = tool.headings(lines)
+        for chapter in ("Security target", "Mode"):
+            first, last = tool.span(heads, 2, chapter, 0, len(lines))
+            start, end = tool.span(heads, 3, "Changes from Version 0.4", first, last)
+            entries = [line for line in lines[start:end] if line.startswith("- **")]
+            self.assertGreaterEqual(len(entries), 5, chapter)
+            block = "\n".join(lines[start:end])
+            self.assertEqual(block.count("Reason:"), len(entries), chapter)
+
+    def test_the_copied_chapters_cite_feature_004s_documents_by_name(self):
+        tool = records_004.limits_script()
+        lines = self.design.split("\n")
+        heads = tool.headings(lines)
+        first, _ = tool.span(heads, 2, "Security target", 0, len(lines))
+        _, last = tool.span(heads, 2, "Mode", 0, len(lines))
+        text = " ".join("\n".join(lines[first:last]).split())
+        bare = re.findall(r"(?<!feature 004's )(?<!feature 005's )\bFR-\d{3}\b", text)
+        self.assertEqual(bare, [])
+        self.assertNotIn("phyco-v3", self.design)
+        self.assertNotIn("feature 008", text)
+        self.assertNotIn("for feature 005", text)
+
+
+class TheSecurityTargetFiles(ThisFeaturesFiles, records_004.SecurityTargetFiles):
+    """The two files with feature 004's fields, R a placeholder until the selection (spec FR-011)."""
+
+    def test_each_row_holds_section_10s_fields(self):
+        names = ("n", "w", "lanes_per_node", "b", "c", "r", "variant_id", "R", "key_entropy_bits", "nonce_bits",
+                 "keyed_variants", "reachable_secret_state_bits", "bound_bits", "bound_terms", "status", "checks")
+        for row in self.profile["rows"]:
+            for name in names:
+                self.assertIn(name, row, row["variant_id"])
+            if row["status"] == "claimable":
+                for name in ("throughput_implied", "throughput_goal", "rate_before_forget"):
+                    self.assertIn(name, row, row["variant_id"])
+                if row["R"] in PLACEHOLDERS:
+                    self.assertEqual((row["throughput_implied"], row["rate_before_forget"]), (row["R"], row["R"]))
+
+    def test_a_placeholder_r_is_read_as_not_yet_known_and_every_other_figure_checked(self):
+        open_rows = [row for row in self.profile["rows"] if row["R"] in PLACEHOLDERS]
+        if not open_rows:
+            self.skipTest("every R is written")
+        for row in open_rows:
+            self.assertIn(f"-R{row['R']}-", row["variant_id"])
+            self.assertEqual(row["R"], f"<R{row['n']}>")
+            self.assertEqual((row["bound_bits"], row["key_entropy_bits"], row["c"], row["violations"]), (128, 256, 384, []))
+        tool = records_004.limits_script()
+        with tool_feature("005"):
+            for old, new in (("| 4 | 32 | 1024 | 384 | 640 | <R4> | 256 | 384 | 128 |", "| 4 | 32 | 1024 | 384 | 640 | <R4> | 256 | 384 | 127 |"),
+                             ("| 4 | 32 | 1024 | 384 | 640 | <R4> |", "| 4 | 32 | 1024 | 384 | 640 | <R8> |"),
+                             ("| 8 | 32 | 4096 | 384 | 3712 | <R8> |", "| 8 | 32 | 4096 | 384 | 3713 | <R8> |")):
+                self.assertIn(old, self.design)
+                with self.assertRaises(Refused, msg=new):
+                    tool.compute(self.design.replace(old, new), [], ROOT)
+
+    def test_the_files_are_this_features_and_name_its_model(self):
+        for record in (self.limits, self.profile):
+            self.assertEqual((record["kind"], record["feature"]), ("security-target", "005"))
+        self.assertTrue(all(row["variant_id"].startswith("phyco-v4/") for row in self.profile["rows"]))
+        self.assertEqual([entry["status"] for entry in self.limits["theorems"]], ["unverified", "unverified"])
+
+    def test_the_register_holds_the_profiles_bound_by_variant_and_names_both_files(self):
+        register = json.loads((ROOT / "protocol/claims.json").read_bytes().decode("utf-8"))["models"]["phyco-v4"]
+        self.assertEqual(register["bound"]["sizes"],
+                         {row["variant_id"]: f"at most {row['bound_bits']} bits" for row in self.profile["rows"]
+                          if row["status"] == "claimable"})
+        self.assertEqual(register["bound"]["sha256"], hashlib.sha256(PROFILE_005.read_bytes()).hexdigest())
+        named = {item["path"]: item["sha256"] for item in register["evidence"]}
+        for path in (PROFILE_005, LIMITS_005):
+            rel = path.relative_to(ROOT).as_posix()
+            self.assertEqual(named.get(rel), hashlib.sha256(path.read_bytes()).hexdigest(), rel)
+
+
+class TheRationalesValues(ThisFeaturesFiles, records_004.RationaleValues):
+    """The rationale restates no value of either file, its sections of changes included (inherited FR-034)."""
+
+
+class tool_feature:
+    """The limits script reads the setting when it computes: a block under one feature."""
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def __enter__(self):
+        self.previous = evidence.set_feature(self.name)
+
+    def __exit__(self, *exc):
+        evidence.set_feature(self.previous)
+
+
+class TheLimitsScriptUnderBothFeatures(unittest.TestCase):
+    """Research R8: under 005 the variant rows come from the parameter table until "Permutation" holds its
+    variant table; feature 004's mode is unchanged."""
+
+    PARAMETERS = """### Parameter table
+
+| Variant | n | w | b | c | r | R | Key entropy | Reachable secret state | Bound | Status |
+|---------|---|---|---|---|---|---|-------------|------------------------|-------|--------|
+| phyco-v4/n4-w32-R<R4>-c384 | 4 | 32 | 1024 | 384 | 640 | <R4> | 256 | 384 | 128 | claimable |
+| phyco-v4/n8-w32-R<R8>-c384 | 8 | 32 | 4096 | 384 | 3712 | <R8> | 256 | 384 | 128 | claimable |
+| phyco-v4/n16-w32-R<R16>-c384 | 16 | 32 | 16384 | 384 | 16000 | <R16> | 256 | 384 | 128 | claimable |
+| phyco-v4/n2-w16-R8-c64 | 2 | 16 | 128 | 64 | 64 | 8 | 64 | 64 | 32 | research |
+"""
+
+    def design(self, permutation: str = "Not drafted yet.\n") -> str:
+        body = records_004.stated_design().split("## Permutation")[0].split("## Mode", 1)[1]
+        return (f"# phyco-v4\n\nVersion: 0.5\n\n## Security target\n\n{self.PARAMETERS}\n## Mode{body}"
+                f"## Permutation\n\n{permutation}")
+
+    def test_under_005_the_parameter_table_gives_the_rows(self):
+        tool = records_004.limits_script()
+        with tool_feature("005"):
+            out = tool.compute(self.design(), [], ROOT)
+        rows = out["parameters"]["rows"]
+        self.assertEqual([row["R"] for row in rows], ["<R4>", "<R8>", "<R16>", 8])
+        self.assertEqual([row["bound_bits"] for row in rows], [128, 128, 128, 32])
+        self.assertTrue(out["held"])
+        self.assertEqual(rows[0]["throughput_implied"], "<R4>")
+        self.assertNotIn("throughput_implied", rows[3])
+        self.assertEqual(sorted(out["limits"]["per_request"]), sorted(row["variant_id"] for row in rows[:3]))
+
+    def test_once_the_variant_table_stands_it_gives_the_rows(self):
+        tool = records_004.limits_script()
+        table = records_004.STATED_VARIANTS.replace("phyco-v3", "phyco-v4")
+        with tool_feature("005"):
+            with self.assertRaises(Refused):
+                tool.compute(self.design(f"### Variant table\n\n{table}\n"), [], ROOT)
+            stated = self.PARAMETERS
+            for size, rounds in ((4, 20), (8, 24), (16, 32)):
+                stated = stated.replace(f"<R{size}>", str(rounds))
+            text = self.design(f"### Variant table\n\n{table}\n").replace(self.PARAMETERS, stated)
+            lines = [line for line in text.split("\n") if "n2-w4-R8-c16" not in line]
+            out = tool.compute("\n".join(lines), [], ROOT)
+        self.assertEqual([row["R"] for row in out["parameters"]["rows"]], [20, 24, 32, 8])
+
+    def test_feature_004_reads_its_variant_table_alone(self):
+        tool = records_004.limits_script()
+        with tool_feature("004"):
+            with self.assertRaises(Refused):
+                tool.compute(self.design(), [], ROOT)
+            out = tool.compute(records_004.stated_design(), [], ROOT)
+        self.assertNotIn("throughput_implied", out["parameters"]["rows"][0])
+
+
 if __name__ == "__main__":
     unittest.main()

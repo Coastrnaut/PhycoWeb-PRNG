@@ -3150,6 +3150,13 @@
         "reason": "The policy: names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model (feature 005, research R10)",
         "text": "  counted trail-bound record, set `phyco-v4`'s `in_progress` in `protocol/claims.json` to L2, not",
         "writer": "Claude Code, model claude-fable-5-2"
+      },
+      {
+        "date": "2026-11-12",
+        "path": "specs/005-crypto-architecture-v4/design.md",
+        "reason": "The design document: FR-004 asks that it be stated as not sought, and this sentence says so; no text implies it (D7); the sentence is feature 004's Version 0.4, copied under feature 005's FR-010",
+        "text": "Prediction resistance is not sought (feature 004's D7; FUT-SEC-4): this feature has no validated",
+        "writer": "Claude Code, model claude-fable-5-2"
       }
     ],
     "phrases": [

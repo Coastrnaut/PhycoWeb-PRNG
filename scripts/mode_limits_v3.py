@@ -62,6 +62,10 @@ FOR_ALL_SIZES = (KEYS, INSTANTIATIONS, RESEEDS, PERSONALIZATION, RESEED_INPUT, F
 PER_SIZE = (PER_INSTANTIATION, PER_KEY, PER_REQUEST, PER_INSTANTIATE)
 PERSONALIZATION_BLOCK, RESEED_BLOCK = 1, 2
 VARIANT_ID = re.compile(r"^[\w-]+/n(\d+)-w(\d+)-R(\d+)-c(\d+)$")
+# Feature 005 (research R8; spec FR-011): the chapter "Security target"'s parameter table, whose R may be a placeholder.
+PARAMETER_COLUMNS = ("Variant", "n", "w", "b", "c", "r", "R", "Key entropy", "Reachable secret state", "Bound", "Status")
+OPEN_VARIANT_ID = re.compile(r"^[\w-]+/n(\d+)-w(\d+)-R(\d+|<R\d+>)-c(\d+)$")
+PLACEHOLDER = re.compile(r"<R(\d+)>")
 LIMITS_FIELDS = ("epsilon", "N", "theorems", "u", "per_instantiation", "per_key", "per_request", "per_instantiate",
                  "other_limits", "nonces", "bound", "doubling", "outside_the_doubling_check")
 PROFILE_FIELDS = ("rows", "u", "throughput_goal")
@@ -242,6 +246,65 @@ def read_variants(text: str) -> List[Variant]:
         out.append(Variant(row["ID"], n, w, b, c, r, int(rounds.group(1)), rounds.group(2) or NONE, row["status"]))
     if len({v.variant_id for v in out}) != len(out):
         raise Refused(f"{where}: a variant listed twice")
+    return out
+
+
+def variant_table_drafted(text: str) -> bool:
+    """Whether the chapter "Permutation" holds its section "Variant table"."""
+    lines = text.split("\n")
+    heads = headings(lines)
+    first, last = span(heads, 2, "Permutation", 0, len(lines))
+    return any(depth == 3 and title == "Variant table" and first < line < last for line, depth, title in heads)
+
+
+def read_parameter_variants(text: str) -> List[Variant]:
+    """Feature 005: the variant rows from the chapter "Security target"'s parameter table, read while the chapter
+    "Permutation" holds no variant table. A placeholder R, `<R4>`, `<R8>` or `<R16>`, stands where a number will: it is
+    read as not yet known, kept as it is written, and every other figure of the row is checked (research R8)."""
+    where = "the parameter table"
+    out = []
+    for row in read_table(section_lines(text, "Security target", "Parameter table"), PARAMETER_COLUMNS, where):
+        match = OPEN_VARIANT_ID.match(row["Variant"])
+        if match is None or match.group(3) != row["R"]:
+            raise Refused(f"{where}: a row it cannot read: {row['Variant']} {row['R']}")
+        n, w, b, c, r = (whole(row[name], where) for name in ("n", "w", "b", "c", "r"))
+        if (int(match.group(1)), int(match.group(2)), int(match.group(4))) != (n, w, c):
+            raise Refused(f"{where}: {row['Variant']} differs from its row")
+        open_r = PLACEHOLDER.fullmatch(row["R"])
+        if open_r is not None and int(open_r.group(1)) != n:
+            raise Refused(f"{where}: {row['Variant']}: the placeholder of size {n} is <R{n}>")
+        if b != 2 * w * n * n or r != b - c or not 0 < c < b:
+            raise Refused(f"{where}: {row['Variant']}: b, c and r do not fit n and w")
+        if row["Status"] not in ("claimable", "research"):
+            raise Refused(f"{where}: {row['Variant']}: no status {row['Status']!r}")
+        out.append(Variant(row["Variant"], n, w, b, c, r, row["R"] if open_r is not None else int(row["R"]), NONE, row["Status"]))
+    if len({v.variant_id for v in out}) != len(out):
+        raise Refused(f"{where}: a variant listed twice")
+    return out
+
+
+def variants_of(text: str) -> List[Variant]:
+    """The variant table; under feature 005, the parameter table until the variant table is drafted (research R8)."""
+    if evidence.FEATURE != "004" and not variant_table_drafted(text):
+        return read_parameter_variants(text)
+    return read_variants(text)
+
+
+def stated_faults(text: str, rows: Sequence[Dict[str, Any]]) -> List[str]:
+    """Feature 005: what the parameter table states beside each variant, against the row computed for it."""
+    out = []
+    computed = {row["variant_id"]: row for row in rows}
+    for row in read_table(section_lines(text, "Security target", "Parameter table"), PARAMETER_COLUMNS, "the parameter table"):
+        have = computed.get(row["Variant"])
+        if have is None:
+            out.append(f"{row['Variant']}: the parameter table names a variant the variant table does not hold")
+            continue
+        secret = have["reachable_secret_state_bits"]
+        secret = secret if secret == NONE else secret["after_generate"]
+        stated = (row["Key entropy"], row["Reachable secret state"], row["Bound"])
+        wanted = (str(have["key_entropy_bits"]), str(secret), str(have["bound_bits"]))
+        if stated != wanted:
+            out.append(f"{row['Variant']}: the parameter table states {stated}, and the row gives {wanted}")
     return out
 
 
@@ -607,7 +670,7 @@ def power(value: int) -> str:
 
 def compute(text: str, manifest: Sequence[Dict], root: Path) -> Dict[str, Any]:
     """Both files' fields from the design document's text, with the run's verdict."""
-    variants = read_variants(text)
+    variants = variants_of(text)
     claimable = [v for v in variants if v.status == "claimable"]
     if not claimable:
         raise Refused("the variant table holds no claimable size")
@@ -642,6 +705,16 @@ def compute(text: str, manifest: Sequence[Dict], root: Path) -> Dict[str, Any]:
             and all(entry["above_target_advantage"] for entry in doubling[v.variant_id].values())
 
     rows = [profile_row(v, layouts, limits, variants, nonce_section, within.get(v.variant_id)) for v in variants]
+    if evidence.FEATURE != "004":
+        for v, row in zip(variants, rows):
+            if v.status == "claimable":
+                # Both figures are computed from R and the hardware structure's latencies (inherited data-model section 10):
+                # where R is a placeholder they keep it, and they wait for the chapter "Hardware structure" otherwise.
+                open_figure = v.rounds if isinstance(v.rounds, str) else NONE
+                row.update(throughput_implied=open_figure, rate_before_forget=open_figure)
+        stated = stated_faults(text, rows)
+        if stated:
+            raise Refused("the parameter table: " + "; ".join(stated))
     broken = sorted(row["variant_id"] for row in rows if row["status"] == "claimable" and row["violations"])
     held = not broken
     limits_fields = {
@@ -720,7 +793,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         design = evidence.REPO.path(evidence.DESIGN_REL)
         if not design.exists():
             raise Refused(f"{evidence.DESIGN_REL} does not exist")
-        return write(compute(design.read_bytes().decode("utf-8"), evidence.read_manifest(), evidence.REPO.root), command)
+        # Feature 005 plans no download: a theorem's paper is feature 004's `fetched` entry, read as FR-001 states.
+        manifest = evidence.read_manifest() if evidence.FEATURE == "004" else evidence.read_manifest("004")
+        return write(compute(design.read_bytes().decode("utf-8"), manifest, evidence.REPO.root), command)
 
     return evidence.main_guard(body)
 

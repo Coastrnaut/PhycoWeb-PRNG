@@ -1,6 +1,9 @@
 """Feature 004: the candidate log's command (contracts/cli.md; data-model section 3).
 
-    candidate_log.py propose FILE    a proposed entry, before any tool runs on it
+    candidate_log.py propose FILE [--derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]]
+                                     a proposed entry, before any tool runs on it; under PHYCOWEB_FEATURE=005 only once
+                                     the security-target review reads Approved and the projection table exists, and
+                                     with the feature-004 design it derives from, if any (feature 005, FR-011, FR-023)
     candidate_log.py mapping FILE    a candidate's mapping entry, before its first score
     candidate_log.py enter           one entered-d4 entry per candidate of the entered set
     candidate_log.py decide FILE     a decision, with the replacement entry it brings
@@ -31,6 +34,9 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("mode", choices=tuple(WITH_FILE) + ("enter",))
     parser.add_argument("file", nargs="?")
+    parser.add_argument("--derived-from", metavar="PATH:SHA256")
+    parser.add_argument("--relation", choices=candidates.RELATIONS)
+    parser.add_argument("--changes")
     args = parser.parse_args(argv)
 
     def run() -> int:
@@ -42,6 +48,15 @@ def main(argv=None) -> int:
             fields = json.loads(Path(args.file).read_bytes().decode("utf-8"))
             if not isinstance(fields, dict):
                 raise evidence.Refused("FILE holds no JSON object")
+            if args.derived_from or args.relation or args.changes:
+                if args.mode != "propose" or evidence.FEATURE == "004":
+                    raise evidence.Refused("--derived-from, --relation and --changes go with propose under PHYCOWEB_FEATURE=005")
+                if not args.derived_from or not args.relation or ":" not in args.derived_from:
+                    raise evidence.Refused("--derived-from PATH:SHA256 and --relation go together")
+                path, digest = args.derived_from.rsplit(":", 1)
+                fields["derived_from"] = {"feature": "004", "candidate": Path(path).stem, "oplist_path": path,
+                                          "oplist_sha256": digest, "relation": args.relation,
+                                          "changes": args.changes if args.changes else evidence.NONE}
             written = WITH_FILE[args.mode](fields)
         for entry in written if isinstance(written, list) else [written]:
             print(f"{candidates.LOG}: entry {entry['seq']}, {entry['event']}")

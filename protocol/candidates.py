@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from protocol import evidence
 from protocol.evidence import NONE, Refused
@@ -66,6 +66,13 @@ FULL, BUDGET_SPENT, OWNER_DECLINED = ("the family full", "the budget spent",
 CLOSE_REASONS = (FULL, BUDGET_SPENT, OWNER_DECLINED)
 OUTCOMES = ("declined", "revised", "fixed", "stopped")
 REVIEW_FAMILY = "Owner design review"
+# Feature 005 (spec FR-011, FR-023; data-model section 5).
+TARGET_REVIEW = "Security-target review"
+REVIEWED_CHAPTERS = ("Security target", "Mode")
+REVIEWED_DOCUMENTS = ("design.md", "rationale.md")
+NAMED_HASH = re.compile(r"`([\w./-]+)`(?:, chapter \"([^\"]+)\")?[^`]*?\b([0-9a-f]{64})\b")
+RELATIONS = ("derived", "starting-point")
+DERIVED_FIELDS = ("feature", "candidate", "oplist_path", "oplist_sha256", "relation", "changes")
 
 
 # -------------------------------------------------------------------------------- reading the log
@@ -191,18 +198,78 @@ def guard_entered_late(log: Sequence[Dict], fields: Dict) -> None:
         raise Refused("after the first score a candidate enters only in place of another")
 
 
+def most_per_family() -> int:
+    """The candidate limit: feature 004's three, or, under another setting, the limit the plan approval fixed, as the
+    projection table holds it (feature 005, data-model section 5)."""
+    if evidence.FEATURE == "004":
+        return MOST_PER_FAMILY
+    table = evidence.projection_table()
+    return int((table if table is not None else evidence.approved_option())["candidates_per_family"])
+
+
+def guard_reviewed_target() -> None:
+    """Feature 005, FR-011: no `proposed` entry while the row "Security-target review" with the highest k does not read
+    Approved at HEAD with the SHA-256 of each reviewed chapter that it names, or while the projection table does not exist."""
+    row = evidence.family_row(TARGET_REVIEW)
+    if row is None or row.decision != "Approved":
+        raise Refused(f"the row \"{TARGET_REVIEW}\" does not read Approved at HEAD: no candidate is proposed before it")
+    named = NAMED_HASH.findall(row.notes)
+    for document in REVIEWED_DOCUMENTS:
+        rel = f"{evidence.FEATURE_REL}/{document}"
+        for chapter in REVIEWED_CHAPTERS:
+            digests = [digest for path, title, digest in named if path == rel and title == chapter]
+            if not digests:
+                raise Refused(f"the row \"{row.name}\" names no SHA-256 of {rel}, chapter \"{chapter}\"")
+            if not evidence.citation_holds(rel, digests[-1], chapter):
+                raise Refused(f"{rel}, chapter \"{chapter}\", differs at HEAD from the SHA-256 the row \"{row.name}\" names")
+    if evidence.projection_table() is None:
+        raise Refused(f"{evidence.REP_REL}/{evidence.PROJECTION_TABLE} does not exist: the table comes before the first candidate")
+
+
+def derived_from(fields: Dict) -> Any:
+    """A `proposed` entry's `derived_from`: `none`, or the feature-004 design it names by path and SHA-256, with its
+    relation and the structural changes listed, `none` for `derived` (feature 005, FR-023; data-model section 5)."""
+    given = fields.get("derived_from", NONE)
+    if given in (NONE, None):
+        return NONE
+    if not isinstance(given, dict) or sorted(given) != sorted(DERIVED_FIELDS):
+        raise Refused(f"derived_from holds {DERIVED_FIELDS}, or reads none")
+    if given["feature"] != "004":
+        raise Refused("derived_from names a design of feature 004")
+    if given["relation"] not in RELATIONS:
+        raise Refused(f"relation {given['relation']!r} is not one of {RELATIONS}")
+    if given["relation"] == "derived" and given["changes"] != NONE:
+        raise Refused("a derived design lists no structural change: changes reads none")
+    if given["relation"] == "starting-point" and (given["changes"] in (NONE, None) or not str(given["changes"]).strip()):
+        raise Refused("a design that takes another as its starting point lists its structural changes")
+    path = str(given["oplist_path"])
+    if not path.startswith(evidence.FEATURES["004"]["research"] + "/candidates/") or not path.endswith(".py"):
+        raise Refused(f"{path} is no operation list of feature 004")
+    if path.rsplit("/", 1)[1][:-3] != given["candidate"]:
+        raise Refused(f"{path} is not the list of {given['candidate']}")
+    blob = evidence.show(path)
+    if blob is None or evidence.sha256(blob) != given["oplist_sha256"]:
+        raise Refused(f"{path} does not have the SHA-256 the entry names at HEAD")
+    return dict(given)
+
+
 def propose(fields: Dict) -> Dict:
     candidate, family = guard_candidate(fields)
     fields = dict(fields, family=family)
     require(fields, ("candidate_id", "oplist_sha256", "parameters"))
+    if evidence.FEATURE != "004":
+        guard_reviewed_target()
+        fields["derived_from"] = derived_from(fields)
     missing = [name for name in PARAMETERS if not fields["parameters"].get(name)]
     if missing:
         raise Refused(f"the entry's parameters hold no {', '.join(missing)}")
     log = entries()
     if of_event(log, "proposed", candidate):
         raise Refused(f"{candidate} has its proposed entry: a change is a correction")
-    if len(proposed_ids(log, family)) >= MOST_PER_FAMILY:
-        raise Refused(f"a fourth proposed entry of {family}: the stop rule allows three per family")
+    if len(proposed_ids(log, family)) >= most_per_family():
+        raise Refused(f"a fourth proposed entry of {family}: the stop rule allows three per family"
+                      if most_per_family() == MOST_PER_FAMILY else
+                      f"a further proposed entry of {family}: the limit is {most_per_family()} per family")
     guard_committed_module(candidate, fields["oplist_sha256"])
     guard_reopened(log, fields)
     guard_entered_late(log, fields)
