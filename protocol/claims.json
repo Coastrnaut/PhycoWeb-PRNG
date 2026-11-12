@@ -2945,7 +2945,7 @@
         "date": "2026-11-09",
         "path": "security.md",
         "reason": "The policy: a bound, a solver's result or a theorem is its object, or the line quotes the rule's list of forms or a published title; the design, the generator or a security property never is; names a level in stating a rule, a gate, a row or a question about the ladder; it states no level for a model",
-        "text": "| 5a.1b | Feature 005: stage 5a.1 again, for a new model ID, `phyco-v4`, under its own pre-registered protocol (row 5a; feature 004's stop rule): every run planned at 16×16 before any candidate, the security target reviewed first, and a bound climb continued past a capped search by sums of shorter spans; then the deliverables of stage 5a.1 (L1, start of L2) | Spec approved by the owner on 2026-11-09, with decisions D1–D14 as their defaults; plan approved on 2026-11-09, with the run limits extended; tasks approved on 2026-11-12; security target reviewed on 2026-11-12, before any candidate, Version 0.5 of the design document and its rationale, the row set by the agent on the owner's standing word of that date; next, the row \"L1 recorded\" |",
+        "text": "| 5a.1b | Feature 005: stage 5a.1 again, for a new model ID, `phyco-v4`, under its own pre-registered protocol (row 5a; feature 004's stop rule): every run planned at 16×16 before any candidate, the security target reviewed first, and a bound climb continued past a capped search by sums of shorter spans; then the deliverables of stage 5a.1 (L1, start of L2) | Spec approved by the owner on 2026-11-09, with decisions D1–D14 as their defaults; plan approved on 2026-11-09, with the run limits extended; tasks approved on 2026-11-12; security target reviewed on 2026-11-12, before any candidate, Version 0.5 of the design document and its rationale, the row set by the agent on the owner's standing word of that date; next, the row \"L1 recorded\" set on 2026-11-12; next, the probes and the projection table, then the candidates |",
         "writer": "Claude Code, model claude-opus-5-5"
       },
       {
@@ -3303,15 +3303,27 @@
         }
       },
       "claim": "no claim",
-      "claim_level": "L0",
+      "claim_level": "L1",
       "evidence": [
+        {
+          "path": "reports/004-crypto-architecture-v3/fut-sec-8/demonstration-20261104T165604Z-4406adb9.json",
+          "sha256": "5c93e850284120dc9935d3e4317b8dc94df3a7b79fc038dbc8a6c49508613651"
+        },
+        {
+          "path": "reports/005-crypto-architecture-v4/security-target/limits.json",
+          "sha256": "64293edff9f603eb61f15cb23597eba51c7c250be8b119cee428d81118e969d1"
+        },
         {
           "path": "reports/005-crypto-architecture-v4/security-target/parameters.json",
           "sha256": "20c07576f65255d2639583a25ff8b02827203dfff32bd60dce8735270582ecf7"
         },
         {
-          "path": "reports/005-crypto-architecture-v4/security-target/limits.json",
-          "sha256": "64293edff9f603eb61f15cb23597eba51c7c250be8b119cee428d81118e969d1"
+          "path": "specs/005-crypto-architecture-v4/design.md",
+          "sha256": "4ec0fac991c598a2919c77e3a12b448cf22c0de73eef3fffc9686af33f83effe"
+        },
+        {
+          "path": "specs/005-crypto-architecture-v4/rationale.md",
+          "sha256": "0eade49c821623998a13258714618e8d6b5e2febffa7d9499a5e3fb49fbfe7b3"
         }
       ],
       "fut_sec": {
