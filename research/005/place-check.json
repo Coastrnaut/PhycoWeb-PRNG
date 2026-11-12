@@ -1,0 +1,2830 @@
+{
+ "lists": "specs/005-crypto-architecture-v4/checklist-choices.md",
+ "plan_approval": "afc676950f9f9e7415b871177a70ce2f8acfbdb0",
+ "compared_to": "671f34df20661f13bdefeb4f6056b447e99ea55c",
+ "places": [
+  "D1",
+  "D10",
+  "D11",
+  "D12",
+  "D13",
+  "D14",
+  "D2",
+  "D3",
+  "D4",
+  "D5",
+  "D6",
+  "D7",
+  "D8",
+  "D9",
+  "FR-001",
+  "FR-002",
+  "FR-003",
+  "FR-004",
+  "FR-005",
+  "FR-006",
+  "FR-007",
+  "FR-008",
+  "FR-009",
+  "FR-010",
+  "FR-011",
+  "FR-012",
+  "FR-013",
+  "FR-014",
+  "FR-015",
+  "FR-016",
+  "FR-017",
+  "FR-018",
+  "FR-019",
+  "FR-020",
+  "FR-021",
+  "FR-022",
+  "FR-023",
+  "FR-024",
+  "FR-025",
+  "FR-026",
+  "FR-027",
+  "FR-028",
+  "FR-029",
+  "FR-030",
+  "FR-031",
+  "R1",
+  "R10",
+  "R11",
+  "R12",
+  "R13",
+  "R14",
+  "R2",
+  "R3",
+  "R4",
+  "R5",
+  "R6",
+  "R7",
+  "R8",
+  "R9",
+  "SC-001",
+  "SC-002",
+  "SC-003",
+  "SC-004",
+  "SC-005",
+  "SC-006",
+  "SC-007",
+  "SC-008",
+  "SC-009",
+  "SC-010",
+  "changed rules: Selection bias",
+  "changed rules: The budgets (stop rule)",
+  "changed rules: The climb (round rule's R_bound)",
+  "changed rules: The security target's parameters",
+  "changed rules: The security target's place",
+  "changed rules: Trail records",
+  "changed rules: introduction",
+  "cli: Changed",
+  "cli: New",
+  "cli: The feature setting",
+  "cli: Unchanged",
+  "cli: candidate_log.py propose FILE [--derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]]",
+  "cli: check_claims.py",
+  "cli: d4_choice.py --tie",
+  "cli: evidence_v3.py",
+  "cli: evidence_v3.py … --probe",
+  "cli: introduction",
+  "cli: mode_limits_v3.py --out",
+  "cli: projection_table.py [--check]",
+  "cli: protocol_change.py create",
+  "cli: recheck_004.py",
+  "cli: research/005/plan_projections.py [--check]",
+  "cli: research/005/selection_bias.py [--check FILE]",
+  "cli: round_rule.py --candidate ID",
+  "cli: validate_tool.py",
+  "data-model §1",
+  "data-model §2",
+  "data-model §3",
+  "data-model §4",
+  "data-model §5",
+  "data-model §6",
+  "data-model §7",
+  "data-model: introduction",
+  "plan: Choices for owner review",
+  "plan: Complexity Tracking",
+  "plan: Constitution Check",
+  "plan: Documentation (this feature)",
+  "plan: Plan Phases",
+  "plan: Project Structure",
+  "plan: Source Code (repository root)",
+  "plan: Summary",
+  "plan: Technical Context",
+  "plan: Values this plan fixes",
+  "plan: header",
+  "quickstart",
+  "research/005/plan-projections.json",
+  "research/005/plan_projections.py",
+  "research: introduction",
+  "spec: Assumptions",
+  "spec: Context",
+  "spec: Decisions Taken as Defaults",
+  "spec: Edge Cases",
+  "spec: Key Entities",
+  "spec: Requirements",
+  "spec: Success Criteria",
+  "spec: User Scenarios & Testing",
+  "spec: User Story 1",
+  "spec: User Story 2",
+  "spec: User Story 3",
+  "spec: User Story 4",
+  "spec: User Story 5",
+  "spec: notes under the Review & Approval table"
+ ],
+ "rules": {
+  "The security-target review": [
+   "FR-011",
+   "FR-012"
+  ],
+  "\"L1 recorded\"": [
+   "FR-013"
+  ],
+  "Sums": [
+   "FR-016"
+  ],
+  "Established bounds": [
+   "FR-016"
+  ],
+  "r = 1 and size-independent searches": [
+   "FR-015"
+  ],
+  "The class of the 16×16 decision": [
+   "FR-018"
+  ],
+  "Trail records": [
+   "FR-019",
+   "FR-020",
+   "R7"
+  ],
+  "The 16×16 decision": [
+   "FR-018"
+  ],
+  "Sums across methods, `split` as bound records": [
+   "FR-016"
+  ],
+  "R_bound not lowered": [
+   "FR-017"
+  ],
+  "D4 before the climbs": [
+   "FR-022"
+  ],
+  "The change log and provenance log": [
+   "FR-031"
+  ],
+  "Feature 004's re-check and FR-053's records": [
+   "FR-003"
+  ],
+  "The probes' conditions": [
+   "FR-005"
+  ],
+  "The budget for replacements": [
+   "FR-022"
+  ],
+  "The candidate log's guard": [
+   "FR-011"
+  ],
+  "The margin": [
+   "changed rules: Selection bias",
+   "changed rules: The budgets (stop rule)",
+   "changed rules: The climb (round rule's R_bound)",
+   "changed rules: The security target's parameters",
+   "changed rules: The security target's place",
+   "changed rules: Trail records",
+   "changed rules: introduction"
+  ],
+  "Probes beyond their share": [
+   "FR-005"
+  ],
+  "A probe above its row": [
+   "FR-009"
+  ],
+  "The calibration's inputs": [
+   "FR-004"
+  ],
+  "The claim test's first scan": [
+   "FR-026"
+  ],
+  "The security target's files": [
+   "FR-011",
+   "R8"
+  ],
+  "Size-independent searches": [
+   "FR-014",
+   "FR-018"
+  ],
+  "Whole cycles": [
+   "FR-016"
+  ],
+  "Bitwise Boolean functions": [
+   "FR-019"
+  ],
+  "Listing and provenance": [
+   "FR-031"
+  ],
+  "Answers to a probe above its row": [
+   "FR-009"
+  ],
+  "The other sizes": [
+   "FR-001"
+  ],
+  "Selection": [
+   "FR-022"
+  ],
+  "Feature 004's downloads": [
+   "FR-001",
+   "FR-012"
+  ],
+  "The guard on instantiation code": [
+   "FR-030"
+  ],
+  "The register's evidence": [
+   "FR-013",
+   "FR-030"
+  ],
+  "The register's bound and level": [
+   "FR-011",
+   "FR-013",
+   "FR-027"
+  ],
+  "The later review": [
+   "FR-012",
+   "FR-013"
+  ],
+  "The rationale's chapters": [
+   "FR-010",
+   "FR-011"
+  ],
+  "The security target's parameters": [
+   "FR-010",
+   "spec: Edge Cases",
+   "changed rules: Selection bias",
+   "changed rules: The budgets (stop rule)",
+   "changed rules: The climb (round rule's R_bound)",
+   "changed rules: The security target's parameters",
+   "changed rules: The security target's place",
+   "changed rules: Trail records",
+   "changed rules: introduction"
+  ],
+  "Trails on unlisted operations": [
+   "FR-020"
+  ],
+  "Allow-list entries of generated lines": [
+   "FR-026"
+  ],
+  "Requirement numbers and the exploration sizes": [
+   "FR-001"
+  ],
+  "Record formats": [
+   "FR-016",
+   "FR-019",
+   "FR-023"
+  ],
+  "The refused list and a re-entered design's amounts": [
+   "FR-023",
+   "FR-031"
+  ],
+  "Selection bias": [
+   "FR-024"
+  ],
+  "Additions of a constant and per-bit S-boxes": [
+   "FR-019",
+   "FR-020"
+  ],
+  "Cycles": [
+   "FR-016"
+  ],
+  "The end of a kind's searches": [
+   "FR-015"
+  ],
+  "The plan's data": [
+   "FR-004",
+   "FR-005",
+   "FR-008"
+  ],
+  "Non-search probes": [
+   "FR-005"
+  ],
+  "Listing changes and trail records' direction": [
+   "FR-031",
+   "changed rules: Selection bias",
+   "changed rules: The budgets (stop rule)",
+   "changed rules: The climb (round rule's R_bound)",
+   "changed rules: The security target's parameters",
+   "changed rules: The security target's place",
+   "changed rules: Trail records",
+   "changed rules: introduction"
+  ],
+  "The place check": [
+   "spec: notes under the Review & Approval table"
+  ],
+  "The change log's first entry and the candidate log's guard": [
+   "FR-031",
+   "FR-011"
+  ],
+  "Readings set aside after the tasks approval": [
+   "FR-031"
+  ],
+  "R and the figures": [
+   "D5",
+   "FR-017",
+   "FR-022"
+  ],
+  "Runs under feature 004's paths and provenance": [
+   "FR-003",
+   "FR-031"
+  ],
+  "Re-entered designs and the candidate log's fields": [
+   "FR-023"
+  ],
+  "Constant-dependent weights": [
+   "FR-016",
+   "FR-019"
+  ],
+  "Non-search needs": [
+   "FR-005"
+  ],
+  "The place check and changes after the tasks approval": [
+   "spec: notes under the Review & Approval table",
+   "FR-031"
+  ],
+  "Runs under the setting": [
+   "FR-003"
+  ],
+  "The candidate log's fields": [
+   "FR-023"
+  ],
+  "Constant-dependent bounds": [
+   "FR-016"
+  ],
+  "The D4 choice": [
+   "FR-022",
+   "cli: d4_choice.py --tie"
+  ],
+  "Re-entered designs": [
+   "FR-023",
+   "R13"
+  ],
+  "The probes": [
+   "FR-005",
+   "R5",
+   "cli: evidence_v3.py … --probe"
+  ],
+  "Trail records and the ARX searches": [
+   "FR-019",
+   "R7"
+  ],
+  "The budget in the 16×16-first order": [
+   "FR-018",
+   "FR-022",
+   "R12",
+   "cli: round_rule.py --candidate ID"
+  ]
+ },
+ "rounds": [
+  {
+   "title": "Round 1 (first run, 2026-11-09)",
+   "heading": "Rows that change the protocol (round 1)",
+   "commits": [
+    "2808b551d0cdafc68a7dbb23c119d3a00a03b1b9",
+    "aedcabd1c290861ff154606c836c34d54fd430ba"
+   ],
+   "rows": 86,
+   "listed": [
+    {
+     "rows": [
+      "SEC-003"
+     ],
+     "rule": "The security-target review",
+     "direction": "settled",
+     "places": [
+      "FR-011",
+      "FR-012"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-012"
+     ],
+     "rule": "\"L1 recorded\"",
+     "direction": "stricter",
+     "places": [
+      "FR-013"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-001"
+     ],
+     "rule": "Sums",
+     "direction": "stricter",
+     "places": [
+      "FR-016"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-002"
+     ],
+     "rule": "Established bounds",
+     "direction": "settled",
+     "places": [
+      "FR-016"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-003",
+      "ANA-009"
+     ],
+     "rule": "r = 1 and size-independent searches",
+     "direction": "settled",
+     "places": [
+      "FR-015"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-004"
+     ],
+     "rule": "The class of the 16×16 decision",
+     "direction": "settled",
+     "places": [
+      "FR-018"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-005",
+      "ANA-006"
+     ],
+     "rule": "Trail records",
+     "direction": "stricter",
+     "places": [
+      "FR-019",
+      "FR-020"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-007"
+     ],
+     "rule": "The 16×16 decision",
+     "direction": "stricter",
+     "places": [
+      "FR-018"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-008",
+      "ANA-011"
+     ],
+     "rule": "Sums across methods, `split` as bound records",
+     "direction": "settled",
+     "places": [
+      "FR-016"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-013"
+     ],
+     "rule": "R_bound not lowered",
+     "direction": "stricter",
+     "places": [
+      "FR-017"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-015"
+     ],
+     "rule": "D4 before the climbs",
+     "direction": "settled",
+     "places": [
+      "FR-022"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-001",
+      "PRO-003",
+      "REP-004",
+      "REP-010"
+     ],
+     "rule": "The change log and provenance log",
+     "direction": "stricter",
+     "places": [
+      "FR-031"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-004",
+      "REP-001"
+     ],
+     "rule": "Feature 004's re-check and FR-053's records",
+     "direction": "stricter",
+     "places": [
+      "FR-003"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-007"
+     ],
+     "rule": "The probes' conditions",
+     "direction": "settled",
+     "places": [
+      "FR-005"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-008"
+     ],
+     "rule": "The budget for replacements",
+     "direction": "settled",
+     "places": [
+      "FR-022"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-010"
+     ],
+     "rule": "The candidate log's guard",
+     "direction": "stricter",
+     "places": [
+      "FR-011"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-011"
+     ],
+     "rule": "The margin",
+     "direction": "stricter",
+     "places": [
+      "changed rules: Selection bias",
+      "changed rules: The budgets (stop rule)",
+      "changed rules: The climb (round rule's R_bound)",
+      "changed rules: The security target's parameters",
+      "changed rules: The security target's place",
+      "changed rules: Trail records",
+      "changed rules: introduction"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-013"
+     ],
+     "rule": "Probes beyond their share",
+     "direction": "stricter",
+     "places": [
+      "FR-005"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-015"
+     ],
+     "rule": "A probe above its row",
+     "direction": "stricter",
+     "places": [
+      "FR-009"
+     ]
+    },
+    {
+     "rows": [
+      "REP-012"
+     ],
+     "rule": "The calibration's inputs",
+     "direction": "settled",
+     "places": [
+      "FR-004"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "D13",
+     "rows": [
+      "HW-009"
+     ],
+     "listed": []
+    },
+    {
+     "place": "D14",
+     "rows": [
+      "RAT-009"
+     ],
+     "listed": []
+    },
+    {
+     "place": "D5",
+     "rows": [
+      "RAT-004"
+     ],
+     "listed": []
+    },
+    {
+     "place": "D7",
+     "rows": [
+      "PRO-009"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-001",
+     "rows": [
+      "SEC-009",
+      "RAT-005",
+      "RAT-013",
+      "HW-005",
+      "REP-003",
+      "REP-007",
+      "REP-013"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-003",
+     "rows": [
+      "PRO-004",
+      "REP-001"
+     ],
+     "listed": [
+      "PRO-004",
+      "REP-001"
+     ]
+    },
+    {
+     "place": "FR-004",
+     "rows": [
+      "ANA-010",
+      "REP-009",
+      "REP-012"
+     ],
+     "listed": [
+      "REP-012"
+     ]
+    },
+    {
+     "place": "FR-005",
+     "rows": [
+      "ANA-012",
+      "PRO-007",
+      "PRO-013",
+      "REP-008"
+     ],
+     "listed": [
+      "PRO-007",
+      "PRO-013"
+     ]
+    },
+    {
+     "place": "FR-008",
+     "rows": [
+      "PRO-009"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-009",
+     "rows": [
+      "PRO-006",
+      "PRO-012",
+      "PRO-015"
+     ],
+     "listed": [
+      "PRO-015"
+     ]
+    },
+    {
+     "place": "FR-010",
+     "rows": [
+      "SEC-001",
+      "RAT-003"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-011",
+     "rows": [
+      "SEC-003",
+      "PRO-010"
+     ],
+     "listed": [
+      "SEC-003",
+      "PRO-010"
+     ]
+    },
+    {
+     "place": "FR-012",
+     "rows": [
+      "SEC-002",
+      "SEC-003",
+      "SEC-013",
+      "HW-006"
+     ],
+     "listed": [
+      "SEC-003"
+     ]
+    },
+    {
+     "place": "FR-013",
+     "rows": [
+      "SEC-007",
+      "SEC-008",
+      "SEC-012"
+     ],
+     "listed": [
+      "SEC-012"
+     ]
+    },
+    {
+     "place": "FR-014",
+     "rows": [
+      "RAT-008",
+      "HW-007"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-015",
+     "rows": [
+      "ANA-003",
+      "ANA-009"
+     ],
+     "listed": [
+      "ANA-003",
+      "ANA-009"
+     ]
+    },
+    {
+     "place": "FR-016",
+     "rows": [
+      "SEC-015",
+      "ANA-001",
+      "ANA-002",
+      "ANA-008",
+      "ANA-011"
+     ],
+     "listed": [
+      "ANA-001",
+      "ANA-002",
+      "ANA-008",
+      "ANA-011"
+     ]
+    },
+    {
+     "place": "FR-017",
+     "rows": [
+      "RAT-004",
+      "ANA-013"
+     ],
+     "listed": [
+      "ANA-013"
+     ]
+    },
+    {
+     "place": "FR-018",
+     "rows": [
+      "ANA-004",
+      "ANA-007"
+     ],
+     "listed": [
+      "ANA-004",
+      "ANA-007"
+     ]
+    },
+    {
+     "place": "FR-019",
+     "rows": [
+      "ANA-005"
+     ],
+     "listed": [
+      "ANA-005",
+      "ANA-006"
+     ]
+    },
+    {
+     "place": "FR-020",
+     "rows": [
+      "SEC-010",
+      "ANA-006"
+     ],
+     "listed": [
+      "ANA-005",
+      "ANA-006"
+     ]
+    },
+    {
+     "place": "FR-022",
+     "rows": [
+      "ANA-015",
+      "PRO-008",
+      "HW-002",
+      "HW-003",
+      "HW-004",
+      "HW-011"
+     ],
+     "listed": [
+      "ANA-015",
+      "PRO-008"
+     ]
+    },
+    {
+     "place": "FR-023",
+     "rows": [
+      "RAT-001",
+      "RAT-006",
+      "RAT-012",
+      "HW-010"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-024",
+     "rows": [
+      "SEC-016",
+      "RAT-007"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-025",
+     "rows": [
+      "RAT-002",
+      "RAT-011"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-026",
+     "rows": [
+      "SEC-005",
+      "SEC-012",
+      "SEC-014",
+      "RAT-010"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-027",
+     "rows": [
+      "SEC-006",
+      "SEC-011"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-029",
+     "rows": [
+      "SEC-016",
+      "RAT-002",
+      "ANA-014"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-030",
+     "rows": [
+      "SEC-004",
+      "HW-001"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-031",
+     "rows": [
+      "PRO-001",
+      "PRO-003",
+      "REP-004",
+      "REP-010"
+     ],
+     "listed": [
+      "PRO-001",
+      "PRO-003",
+      "REP-004",
+      "REP-010"
+     ]
+    },
+    {
+     "place": "R13",
+     "rows": [
+      "RAT-001"
+     ],
+     "listed": []
+    },
+    {
+     "place": "R8",
+     "rows": [
+      "SEC-003"
+     ],
+     "listed": []
+    },
+    {
+     "place": "changed rules: The budgets (stop rule)",
+     "rows": [
+      "PRO-005",
+      "PRO-011"
+     ],
+     "listed": [
+      "PRO-011"
+     ]
+    },
+    {
+     "place": "changed rules: introduction",
+     "rows": [
+      "PRO-005",
+      "PRO-011"
+     ],
+     "listed": [
+      "PRO-011"
+     ]
+    },
+    {
+     "place": "data-model §1",
+     "rows": [
+      "REP-002"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §2",
+     "rows": [
+      "ANA-016"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §3",
+     "rows": [
+      "SEC-010",
+      "ANA-005",
+      "ANA-006"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Plan Phases",
+     "rows": [
+      "SEC-004"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: Assumptions",
+     "rows": [
+      "REP-006"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: Context",
+     "rows": [
+      "PRO-009",
+      "HW-012"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: notes under the Review & Approval table",
+     "rows": [
+      "PRO-014"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Round 2 (first re-run, 2026-11-09)",
+   "heading": "Rows that change the protocol (round 2)",
+   "commits": [
+    "63f400360cefce38ed55f1eaf60e9127749b73b6",
+    "904185acb565be2f45f15d16cd002d5508af2ac4"
+   ],
+   "rows": 18,
+   "listed": [
+    {
+     "rows": [
+      "SEC-018"
+     ],
+     "rule": "The claim test's first scan",
+     "direction": "stricter",
+     "places": [
+      "FR-026"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-020"
+     ],
+     "rule": "The security target's files",
+     "direction": "settled",
+     "places": [
+      "FR-011"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-018",
+      "ANA-019"
+     ],
+     "rule": "Size-independent searches",
+     "direction": "settled",
+     "places": [
+      "FR-014",
+      "FR-018"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-020"
+     ],
+     "rule": "Whole cycles",
+     "direction": "settled",
+     "places": [
+      "FR-016"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-021"
+     ],
+     "rule": "Bitwise Boolean functions",
+     "direction": "settled",
+     "places": [
+      "FR-019"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-022"
+     ],
+     "rule": "The calibration's inputs",
+     "direction": "settled",
+     "places": [
+      "FR-004"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-016",
+      "REP-015"
+     ],
+     "rule": "Listing and provenance",
+     "direction": "stricter",
+     "places": [
+      "FR-031"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-019"
+     ],
+     "rule": "Answers to a probe above its row",
+     "direction": "stricter",
+     "places": [
+      "FR-009"
+     ]
+    },
+    {
+     "rows": [
+      "HW-013"
+     ],
+     "rule": "The other sizes",
+     "direction": "settled",
+     "places": [
+      "FR-001"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-015"
+     ],
+     "rule": "Selection",
+     "direction": "settled",
+     "places": [
+      "FR-022"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "FR-001",
+     "rows": [
+      "HW-013"
+     ],
+     "listed": [
+      "HW-013"
+     ]
+    },
+    {
+     "place": "FR-004",
+     "rows": [
+      "ANA-022"
+     ],
+     "listed": [
+      "ANA-022"
+     ]
+    },
+    {
+     "place": "FR-009",
+     "rows": [
+      "PRO-019"
+     ],
+     "listed": [
+      "PRO-019"
+     ]
+    },
+    {
+     "place": "FR-010",
+     "rows": [
+      "SEC-017"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-011",
+     "rows": [
+      "SEC-020"
+     ],
+     "listed": [
+      "SEC-020"
+     ]
+    },
+    {
+     "place": "FR-014",
+     "rows": [
+      "ANA-018"
+     ],
+     "listed": [
+      "ANA-018",
+      "ANA-019"
+     ]
+    },
+    {
+     "place": "FR-016",
+     "rows": [
+      "ANA-020"
+     ],
+     "listed": [
+      "ANA-020"
+     ]
+    },
+    {
+     "place": "FR-018",
+     "rows": [
+      "ANA-019"
+     ],
+     "listed": [
+      "ANA-018",
+      "ANA-019"
+     ]
+    },
+    {
+     "place": "FR-019",
+     "rows": [
+      "ANA-021"
+     ],
+     "listed": [
+      "ANA-021"
+     ]
+    },
+    {
+     "place": "FR-022",
+     "rows": [
+      "RAT-015"
+     ],
+     "listed": [
+      "RAT-015"
+     ]
+    },
+    {
+     "place": "FR-023",
+     "rows": [
+      "RAT-014"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-026",
+     "rows": [
+      "SEC-018",
+      "SEC-019"
+     ],
+     "listed": [
+      "SEC-018"
+     ]
+    },
+    {
+     "place": "FR-031",
+     "rows": [
+      "PRO-016",
+      "REP-015"
+     ],
+     "listed": [
+      "PRO-016",
+      "REP-015"
+     ]
+    },
+    {
+     "place": "plan: Plan Phases",
+     "rows": [
+      "ANA-022"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: notes under the Review & Approval table",
+     "rows": [
+      "PRO-017"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Round 3 (second re-run, 2026-11-09)",
+   "heading": "Rows that change the protocol (round 3)",
+   "commits": [
+    "2cf3687f77091ac838659cc4d9327f046c4b5e0c",
+    "936f586733c9dba5cc26b23c14d3caae7dc247a6"
+   ],
+   "rows": 56,
+   "listed": [
+    {
+     "rows": [
+      "SEC-023"
+     ],
+     "rule": "Feature 004's downloads",
+     "direction": "settled",
+     "places": [
+      "FR-001",
+      "FR-012"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-024"
+     ],
+     "rule": "The guard on instantiation code",
+     "direction": "settled",
+     "places": [
+      "FR-030"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-025"
+     ],
+     "rule": "The register's evidence",
+     "direction": "stricter",
+     "places": [
+      "FR-013",
+      "FR-030"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-026",
+      "SEC-030"
+     ],
+     "rule": "The register's bound and level",
+     "direction": "settled",
+     "places": [
+      "FR-011",
+      "FR-013",
+      "FR-027"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-027",
+      "SEC-028"
+     ],
+     "rule": "The later review",
+     "direction": "settled",
+     "places": [
+      "FR-012",
+      "FR-013"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-029"
+     ],
+     "rule": "The rationale's chapters",
+     "direction": "settled",
+     "places": [
+      "FR-010",
+      "FR-011"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-031"
+     ],
+     "rule": "The security target's parameters",
+     "direction": "stricter",
+     "places": [
+      "FR-010",
+      "spec: Edge Cases"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-034"
+     ],
+     "rule": "Trails on unlisted operations",
+     "direction": "stricter",
+     "places": [
+      "FR-020"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-036",
+      "SEC-037"
+     ],
+     "rule": "Allow-list entries of generated lines",
+     "direction": "settled",
+     "places": [
+      "FR-026"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-016",
+      "RAT-021"
+     ],
+     "rule": "Requirement numbers and the exploration sizes",
+     "direction": "settled",
+     "places": [
+      "FR-001"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-017",
+      "ANA-033",
+      "ANA-034",
+      "REP-020"
+     ],
+     "rule": "Record formats",
+     "direction": "settled",
+     "places": [
+      "FR-016",
+      "FR-019",
+      "FR-023"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-018",
+      "RAT-019"
+     ],
+     "rule": "The refused list and a re-entered design's amounts",
+     "direction": "settled",
+     "places": [
+      "FR-023",
+      "FR-031"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-026"
+     ],
+     "rule": "Selection bias",
+     "direction": "stricter",
+     "places": [
+      "FR-024"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-023",
+      "ANA-024"
+     ],
+     "rule": "Additions of a constant and per-bit S-boxes",
+     "direction": "settled",
+     "places": [
+      "FR-019",
+      "FR-020"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-025"
+     ],
+     "rule": "Cycles",
+     "direction": "settled",
+     "places": [
+      "FR-016"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-026",
+      "ANA-032"
+     ],
+     "rule": "The end of a kind's searches",
+     "direction": "settled",
+     "places": [
+      "FR-015"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-028",
+      "REP-018",
+      "REP-019"
+     ],
+     "rule": "The plan's data",
+     "direction": "settled",
+     "places": [
+      "FR-004",
+      "FR-005",
+      "FR-008"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-030",
+      "ANA-031"
+     ],
+     "rule": "Non-search probes",
+     "direction": "settled",
+     "places": [
+      "FR-005"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-020",
+      "PRO-025"
+     ],
+     "rule": "Listing changes and trail records' direction",
+     "direction": "settled",
+     "places": [
+      "FR-031",
+      "changed rules: Selection bias",
+      "changed rules: The budgets (stop rule)",
+      "changed rules: The climb (round rule's R_bound)",
+      "changed rules: The security target's parameters",
+      "changed rules: The security target's place",
+      "changed rules: Trail records",
+      "changed rules: introduction"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-021"
+     ],
+     "rule": "The place check",
+     "direction": "stricter",
+     "places": [
+      "spec: notes under the Review & Approval table"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-022"
+     ],
+     "rule": "Answers to a probe above its row",
+     "direction": "settled",
+     "places": [
+      "FR-009"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-023",
+      "PRO-024"
+     ],
+     "rule": "The change log's first entry and the candidate log's guard",
+     "direction": "stricter",
+     "places": [
+      "FR-031",
+      "FR-011"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-026"
+     ],
+     "rule": "Readings set aside after the tasks approval",
+     "direction": "stricter",
+     "places": [
+      "FR-031"
+     ]
+    },
+    {
+     "rows": [
+      "HW-014",
+      "HW-016"
+     ],
+     "rule": "R and the figures",
+     "direction": "settled",
+     "places": [
+      "D5",
+      "FR-017",
+      "FR-022"
+     ]
+    },
+    {
+     "rows": [
+      "REP-016",
+      "REP-017"
+     ],
+     "rule": "Runs under feature 004's paths and provenance",
+     "direction": "stricter",
+     "places": [
+      "FR-003",
+      "FR-031"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "D14",
+     "rows": [
+      "RAT-022"
+     ],
+     "listed": []
+    },
+    {
+     "place": "D5",
+     "rows": [
+      "HW-014"
+     ],
+     "listed": [
+      "HW-014",
+      "HW-016"
+     ]
+    },
+    {
+     "place": "FR-001",
+     "rows": [
+      "SEC-023",
+      "RAT-016",
+      "RAT-021"
+     ],
+     "listed": [
+      "SEC-023",
+      "RAT-016",
+      "RAT-021"
+     ]
+    },
+    {
+     "place": "FR-003",
+     "rows": [
+      "REP-016"
+     ],
+     "listed": [
+      "REP-016",
+      "REP-017"
+     ]
+    },
+    {
+     "place": "FR-009",
+     "rows": [
+      "PRO-022"
+     ],
+     "listed": [
+      "PRO-022"
+     ]
+    },
+    {
+     "place": "FR-010",
+     "rows": [
+      "SEC-021",
+      "SEC-029",
+      "SEC-031",
+      "RAT-025"
+     ],
+     "listed": [
+      "SEC-029",
+      "SEC-031"
+     ]
+    },
+    {
+     "place": "FR-011",
+     "rows": [
+      "SEC-026",
+      "SEC-029",
+      "PRO-024"
+     ],
+     "listed": [
+      "SEC-026",
+      "SEC-030",
+      "SEC-029",
+      "PRO-023",
+      "PRO-024"
+     ]
+    },
+    {
+     "place": "FR-012",
+     "rows": [
+      "SEC-022",
+      "SEC-023",
+      "SEC-027",
+      "SEC-028"
+     ],
+     "listed": [
+      "SEC-023",
+      "SEC-027",
+      "SEC-028"
+     ]
+    },
+    {
+     "place": "FR-013",
+     "rows": [
+      "SEC-025",
+      "SEC-027",
+      "SEC-030"
+     ],
+     "listed": [
+      "SEC-025",
+      "SEC-026",
+      "SEC-030",
+      "SEC-027",
+      "SEC-028"
+     ]
+    },
+    {
+     "place": "FR-015",
+     "rows": [
+      "ANA-026",
+      "ANA-032"
+     ],
+     "listed": [
+      "ANA-026",
+      "ANA-032"
+     ]
+    },
+    {
+     "place": "FR-016",
+     "rows": [
+      "ANA-025"
+     ],
+     "listed": [
+      "RAT-017",
+      "ANA-033",
+      "ANA-034",
+      "REP-020",
+      "ANA-025"
+     ]
+    },
+    {
+     "place": "FR-017",
+     "rows": [
+      "HW-014"
+     ],
+     "listed": [
+      "HW-014",
+      "HW-016"
+     ]
+    },
+    {
+     "place": "FR-019",
+     "rows": [
+      "ANA-023",
+      "ANA-024"
+     ],
+     "listed": [
+      "RAT-017",
+      "ANA-033",
+      "ANA-034",
+      "REP-020",
+      "ANA-023",
+      "ANA-024"
+     ]
+    },
+    {
+     "place": "FR-020",
+     "rows": [
+      "SEC-034",
+      "ANA-023"
+     ],
+     "listed": [
+      "SEC-034",
+      "ANA-023",
+      "ANA-024"
+     ]
+    },
+    {
+     "place": "FR-022",
+     "rows": [
+      "HW-014",
+      "HW-016"
+     ],
+     "listed": [
+      "HW-014",
+      "HW-016"
+     ]
+    },
+    {
+     "place": "FR-023",
+     "rows": [
+      "RAT-018",
+      "RAT-019",
+      "RAT-020"
+     ],
+     "listed": [
+      "RAT-017",
+      "ANA-033",
+      "ANA-034",
+      "REP-020",
+      "RAT-018",
+      "RAT-019"
+     ]
+    },
+    {
+     "place": "FR-024",
+     "rows": [
+      "SEC-035",
+      "RAT-026"
+     ],
+     "listed": [
+      "RAT-026"
+     ]
+    },
+    {
+     "place": "FR-025",
+     "rows": [
+      "RAT-023",
+      "RAT-024"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-026",
+     "rows": [
+      "SEC-036",
+      "SEC-037"
+     ],
+     "listed": [
+      "SEC-036",
+      "SEC-037"
+     ]
+    },
+    {
+     "place": "FR-027",
+     "rows": [
+      "SEC-030",
+      "SEC-032"
+     ],
+     "listed": [
+      "SEC-026",
+      "SEC-030"
+     ]
+    },
+    {
+     "place": "FR-030",
+     "rows": [
+      "SEC-024",
+      "SEC-025",
+      "SEC-033"
+     ],
+     "listed": [
+      "SEC-024",
+      "SEC-025"
+     ]
+    },
+    {
+     "place": "FR-031",
+     "rows": [
+      "RAT-018",
+      "ANA-028",
+      "PRO-020",
+      "PRO-023",
+      "PRO-026",
+      "REP-017"
+     ],
+     "listed": [
+      "RAT-018",
+      "RAT-019",
+      "PRO-020",
+      "PRO-025",
+      "PRO-023",
+      "PRO-024",
+      "PRO-026",
+      "REP-016",
+      "REP-017"
+     ]
+    },
+    {
+     "place": "R12",
+     "rows": [
+      "ANA-027"
+     ],
+     "listed": []
+    },
+    {
+     "place": "R13",
+     "rows": [],
+     "listed": []
+    },
+    {
+     "place": "R2",
+     "rows": [
+      "ANA-029"
+     ],
+     "listed": []
+    },
+    {
+     "place": "R5",
+     "rows": [
+      "ANA-030",
+      "ANA-031"
+     ],
+     "listed": []
+    },
+    {
+     "place": "R8",
+     "rows": [
+      "SEC-027",
+      "SEC-029"
+     ],
+     "listed": []
+    },
+    {
+     "place": "SC-001",
+     "rows": [
+      "PRO-022"
+     ],
+     "listed": []
+    },
+    {
+     "place": "changed rules: The security target's parameters",
+     "rows": [
+      "SEC-031",
+      "PRO-025"
+     ],
+     "listed": [
+      "PRO-020",
+      "PRO-025"
+     ]
+    },
+    {
+     "place": "cli: The feature setting",
+     "rows": [
+      "REP-016",
+      "REP-018"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: candidate_log.py propose ID --derived-from PATH:SHA256",
+     "rows": [
+      "REP-016",
+      "REP-018"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: projection_table.py [--check]",
+     "rows": [
+      "REP-016",
+      "REP-018"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: recheck_004.py",
+     "rows": [
+      "REP-016",
+      "REP-018"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §2",
+     "rows": [
+      "ANA-033",
+      "REP-020"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §3",
+     "rows": [
+      "ANA-023",
+      "ANA-034"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §4",
+     "rows": [
+      "ANA-028",
+      "REP-018",
+      "REP-019",
+      "REP-020"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §5",
+     "rows": [
+      "RAT-017",
+      "PRO-024"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §6",
+     "rows": [
+      "RAT-017"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Plan Phases",
+     "rows": [
+      "PRO-027"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Summary",
+     "rows": [
+      "PRO-027"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Values this plan fixes",
+     "rows": [
+      "PRO-025"
+     ],
+     "listed": []
+    },
+    {
+     "place": "quickstart",
+     "rows": [
+      "ANA-027",
+      "REP-016"
+     ],
+     "listed": []
+    },
+    {
+     "place": "research/005/plan-projections.json",
+     "rows": [
+      "ANA-028"
+     ],
+     "listed": []
+    },
+    {
+     "place": "research/005/plan_projections.py",
+     "rows": [
+      "ANA-028",
+      "REP-019"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: Edge Cases",
+     "rows": [
+      "SEC-031",
+      "ANA-027"
+     ],
+     "listed": [
+      "SEC-031"
+     ]
+    },
+    {
+     "place": "spec: notes under the Review & Approval table",
+     "rows": [
+      "PRO-021"
+     ],
+     "listed": [
+      "PRO-021"
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Round 4 (third re-run, 2026-11-09)",
+   "heading": "Rows that change the protocol (round 4)",
+   "commits": [
+    "a8a70237ae6cf95978eb28b1bf5ce4ffee8ff7f8",
+    "ea2e924a4fd59f87e8811dfafa9b0f01eb7b9a34"
+   ],
+   "rows": 14,
+   "listed": [
+    {
+     "rows": [
+      "SEC-038"
+     ],
+     "rule": "The security target's parameters",
+     "direction": "stricter",
+     "places": [
+      "FR-010",
+      "changed rules: Selection bias",
+      "changed rules: The budgets (stop rule)",
+      "changed rules: The climb (round rule's R_bound)",
+      "changed rules: The security target's parameters",
+      "changed rules: The security target's place",
+      "changed rules: Trail records",
+      "changed rules: introduction"
+     ]
+    },
+    {
+     "rows": [
+      "SEC-040"
+     ],
+     "rule": "The register's evidence",
+     "direction": "settled",
+     "places": [
+      "FR-013"
+     ]
+    },
+    {
+     "rows": [
+      "RAT-027",
+      "RAT-029"
+     ],
+     "rule": "Re-entered designs and the candidate log's fields",
+     "direction": "settled",
+     "places": [
+      "FR-023"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-035"
+     ],
+     "rule": "Constant-dependent weights",
+     "direction": "stricter",
+     "places": [
+      "FR-016",
+      "FR-019"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-036"
+     ],
+     "rule": "Non-search needs",
+     "direction": "settled",
+     "places": [
+      "FR-005"
+     ]
+    },
+    {
+     "rows": [
+      "PRO-029",
+      "PRO-030"
+     ],
+     "rule": "The place check and changes after the tasks approval",
+     "direction": "stricter",
+     "places": [
+      "spec: notes under the Review & Approval table",
+      "FR-031"
+     ]
+    },
+    {
+     "rows": [
+      "REP-021",
+      "REP-022"
+     ],
+     "rule": "Runs under the setting",
+     "direction": "stricter",
+     "places": [
+      "FR-003"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "FR-003",
+     "rows": [
+      "REP-021",
+      "REP-022"
+     ],
+     "listed": [
+      "REP-021",
+      "REP-022"
+     ]
+    },
+    {
+     "place": "FR-004",
+     "rows": [
+      "RAT-030"
+     ],
+     "listed": []
+    },
+    {
+     "place": "FR-010",
+     "rows": [
+      "SEC-038",
+      "RAT-028"
+     ],
+     "listed": [
+      "SEC-038"
+     ]
+    },
+    {
+     "place": "FR-013",
+     "rows": [
+      "SEC-040"
+     ],
+     "listed": [
+      "SEC-040"
+     ]
+    },
+    {
+     "place": "FR-016",
+     "rows": [
+      "ANA-035"
+     ],
+     "listed": [
+      "ANA-035"
+     ]
+    },
+    {
+     "place": "FR-019",
+     "rows": [
+      "ANA-035"
+     ],
+     "listed": [
+      "ANA-035"
+     ]
+    },
+    {
+     "place": "FR-023",
+     "rows": [
+      "RAT-027"
+     ],
+     "listed": [
+      "RAT-027",
+      "RAT-029"
+     ]
+    },
+    {
+     "place": "FR-027",
+     "rows": [
+      "SEC-039"
+     ],
+     "listed": []
+    },
+    {
+     "place": "R5",
+     "rows": [
+      "ANA-036"
+     ],
+     "listed": []
+    },
+    {
+     "place": "changed rules: The security target's parameters",
+     "rows": [
+      "SEC-038"
+     ],
+     "listed": [
+      "SEC-038"
+     ]
+    },
+    {
+     "place": "cli: candidate_log.py propose ID --derived-from PATH:SHA256",
+     "rows": [
+      "RAT-029"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: candidate_log.py propose ID --derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]",
+     "rows": [
+      "RAT-029"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §4",
+     "rows": [
+      "ANA-036"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: Edge Cases",
+     "rows": [
+      "SEC-038"
+     ],
+     "listed": []
+    },
+    {
+     "place": "spec: notes under the Review & Approval table",
+     "rows": [
+      "PRO-029",
+      "PRO-030"
+     ],
+     "listed": [
+      "PRO-029",
+      "PRO-030"
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Round 5 (fourth re-run, 2026-11-09)",
+   "heading": "Rows that change the protocol (round 5)",
+   "commits": [
+    "51536bfa80d4732787c7733447c26b3df39dfe6e",
+    "50aaef155d7ddc391c8c0128fe275adcb4ec2882"
+   ],
+   "rows": 2,
+   "listed": [
+    {
+     "rows": [
+      "RAT-031"
+     ],
+     "rule": "The candidate log's fields",
+     "direction": "settled",
+     "places": [
+      "FR-023"
+     ]
+    },
+    {
+     "rows": [
+      "ANA-037"
+     ],
+     "rule": "Constant-dependent bounds",
+     "direction": "stricter",
+     "places": [
+      "FR-016"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "FR-016",
+     "rows": [
+      "ANA-037"
+     ],
+     "listed": [
+      "ANA-037"
+     ]
+    },
+    {
+     "place": "data-model §5",
+     "rows": [
+      "RAT-031"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 1 (first /speckit-analyze run after /speckit-tasks, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 1)",
+   "commits": [
+    "8382f1b896ecc1e32ed014f023597a65cea801a6",
+    "d8e5d1f8866a29d4c519e5b3ad41fffce7758d76"
+   ],
+   "rows": 19,
+   "listed": [
+    {
+     "rows": [
+      "AR1-I1"
+     ],
+     "rule": "Trail records",
+     "direction": "settled",
+     "places": [
+      "FR-019",
+      "R7"
+     ]
+    },
+    {
+     "rows": [
+      "AR1-I4"
+     ],
+     "rule": "The D4 choice",
+     "direction": "settled",
+     "places": [
+      "FR-022",
+      "cli: d4_choice.py --tie"
+     ]
+    },
+    {
+     "rows": [
+      "AR1-I5"
+     ],
+     "rule": "Re-entered designs",
+     "direction": "settled",
+     "places": [
+      "FR-023",
+      "R13"
+     ]
+    },
+    {
+     "rows": [
+      "AR1-U1"
+     ],
+     "rule": "The probes",
+     "direction": "settled",
+     "places": [
+      "FR-005",
+      "R5",
+      "cli: evidence_v3.py … --probe"
+     ]
+    },
+    {
+     "rows": [
+      "AR1-U2"
+     ],
+     "rule": "The security target's files",
+     "direction": "settled",
+     "places": [
+      "FR-011",
+      "R8"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "FR-022",
+     "rows": [
+      "AR1-I4"
+     ],
+     "listed": [
+      "AR1-I4"
+     ]
+    },
+    {
+     "place": "R13",
+     "rows": [
+      "AR1-I5"
+     ],
+     "listed": [
+      "AR1-I5"
+     ]
+    },
+    {
+     "place": "R5",
+     "rows": [
+      "AR1-U1"
+     ],
+     "listed": [
+      "AR1-U1"
+     ]
+    },
+    {
+     "place": "R7",
+     "rows": [
+      "AR1-I1"
+     ],
+     "listed": [
+      "AR1-I1"
+     ]
+    },
+    {
+     "place": "R8",
+     "rows": [
+      "AR1-U2"
+     ],
+     "listed": [
+      "AR1-U2"
+     ]
+    },
+    {
+     "place": "cli: candidate_log.py propose FILE [--derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]]",
+     "rows": [
+      "AR1-I4",
+      "AR1-I6",
+      "AR1-U1",
+      "AR1-U4",
+      "AR1-I10"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: candidate_log.py propose ID --derived-from PATH:SHA256 --relation derived|starting-point [--changes TEXT]",
+     "rows": [
+      "AR1-I4",
+      "AR1-I6",
+      "AR1-U1",
+      "AR1-U4",
+      "AR1-I10"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: d4_choice.py --tie",
+     "rows": [
+      "AR1-I4",
+      "AR1-I6",
+      "AR1-U1",
+      "AR1-U4",
+      "AR1-I10"
+     ],
+     "listed": [
+      "AR1-I4"
+     ]
+    },
+    {
+     "place": "cli: evidence_v3.py … --probe",
+     "rows": [
+      "AR1-I4",
+      "AR1-I6",
+      "AR1-U1",
+      "AR1-U4",
+      "AR1-I10"
+     ],
+     "listed": [
+      "AR1-U1"
+     ]
+    },
+    {
+     "place": "cli: research/005/selection_bias.py [--check FILE]",
+     "rows": [
+      "AR1-I4",
+      "AR1-I6",
+      "AR1-U1",
+      "AR1-U4",
+      "AR1-I10"
+     ],
+     "listed": []
+    },
+    {
+     "place": "data-model §1",
+     "rows": [
+      "AR1-I11"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Plan Phases",
+     "rows": [
+      "AR1-I1"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Source Code (repository root)",
+     "rows": [
+      "AR1-I1",
+      "AR1-U4",
+      "AR1-I11"
+     ],
+     "listed": []
+    },
+    {
+     "place": "plan: Technical Context",
+     "rows": [
+      "AR1-I1"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 2 (second /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 2)",
+   "commits": [
+    "7c230d1a9ca54f573261e723535b0860610f2d59",
+    "8947e05494cefc585ab132775f2f0ab22e38194e"
+   ],
+   "rows": 7,
+   "listed": [
+    {
+     "rows": [
+      "AR2-I12"
+     ],
+     "rule": "Trail records and the ARX searches",
+     "direction": "settled",
+     "places": [
+      "FR-019",
+      "R7"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "R7",
+     "rows": [
+      "AR2-I12"
+     ],
+     "listed": [
+      "AR2-I12"
+     ]
+    },
+    {
+     "place": "plan: Technical Context",
+     "rows": [
+      "AR2-I15"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 3 (third /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 3)",
+   "commits": [
+    "8d91f6ba6d40fc23a8eb0b9547ab8dc111eba7a1",
+    "3cb08f8f41ce3bdd0ce4d8b606f9e4425a36e1e1"
+   ],
+   "rows": 1,
+   "listed": [],
+   "changed": []
+  },
+  {
+   "title": "Analysis remediation 4 (fourth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 4)",
+   "commits": [
+    "3cc4d8b76c2bcdcdf8e8e4686e0fa996ac5720e1",
+    "6bf28fe7173e360514458af2f1bdab6b5aec4cda"
+   ],
+   "rows": 2,
+   "listed": [
+    {
+     "rows": [
+      "AR4-H1"
+     ],
+     "rule": "The budget in the 16×16-first order",
+     "direction": "settled",
+     "places": [
+      "FR-018",
+      "FR-022",
+      "R12",
+      "cli: round_rule.py --candidate ID"
+     ]
+    }
+   ],
+   "changed": [
+    {
+     "place": "R12",
+     "rows": [
+      "AR4-H1"
+     ],
+     "listed": [
+      "AR4-H1"
+     ]
+    },
+    {
+     "place": "cli: round_rule.py --candidate ID",
+     "rows": [
+      "AR4-H1"
+     ],
+     "listed": [
+      "AR4-H1"
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 5 (fifth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 5)",
+   "commits": [
+    "73be9bb3beafdba89eaac5a064aeff9e4b200f52",
+    "8cbfeaba51828113aa97975fc7fdd35c316f1094"
+   ],
+   "rows": 1,
+   "listed": [],
+   "changed": []
+  },
+  {
+   "title": "Analysis remediation 6 (sixth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 6)",
+   "commits": [
+    "ec6edf70c132606850543ae56a68225263da533b",
+    "01b4c4388beb786454d8b8c6522439bba848e3f9"
+   ],
+   "rows": 1,
+   "listed": [],
+   "changed": [
+    {
+     "place": "cli: evidence_v3.py",
+     "rows": [
+      "AR6-C1"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: mode_limits_v3.py --out",
+     "rows": [
+      "AR6-C1"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: protocol_change.py create",
+     "rows": [
+      "AR6-C1"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: validate_tool.py",
+     "rows": [
+      "AR6-C1"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 7 (seventh /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 7)",
+   "commits": [
+    "77d994d1e6e77c5f1a42b3082c0b82072b030c80",
+    "360d5c2ed8bf3b59b05a5e395c4718a796ea58a2"
+   ],
+   "rows": 3,
+   "listed": [],
+   "changed": [
+    {
+     "place": "cli: check_claims.py",
+     "rows": [
+      "AR7-L2",
+      "AR7-L3"
+     ],
+     "listed": []
+    },
+    {
+     "place": "cli: evidence_v3.py",
+     "rows": [
+      "AR7-L2",
+      "AR7-L3"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 8 (eighth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 8)",
+   "commits": [
+    "0dabd2c1d6103745ed856481140b85bde53b5944",
+    "2c68e467e14d1125545b83e74910275f87298a5e"
+   ],
+   "rows": 2,
+   "listed": [],
+   "changed": [
+    {
+     "place": "FR-001",
+     "rows": [
+      "AR8-L5"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 9 (ninth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 9)",
+   "commits": [
+    "6d6ecd462b7c8688af8cf313111c44ff9c1ad699",
+    "059bdac0c3c061889c45e36751a8315cacd6efd1"
+   ],
+   "rows": 1,
+   "listed": [],
+   "changed": [
+    {
+     "place": "FR-001",
+     "rows": [
+      "AR9-L6"
+     ],
+     "listed": []
+    }
+   ]
+  },
+  {
+   "title": "Analysis remediation 10 (tenth /speckit-analyze run, 2026-11-10)",
+   "heading": "Rows that change the protocol (analysis remediation 10)",
+   "commits": [
+    "5e5ea247e902a188999fdedc7966acf8a58c1248",
+    "62e68f2b8ff99a33b3e20a3748f97e7164f94f4c"
+   ],
+   "rows": 1,
+   "listed": [],
+   "changed": [
+    {
+     "place": "quickstart",
+     "rows": [
+      "AR10-L7"
+     ],
+     "listed": []
+    }
+   ]
+  }
+ ],
+ "spans": [
+  {
+   "from": "afc676950f9f9e7415b871177a70ce2f8acfbdb0",
+   "to": "2808b551d0cdafc68a7dbb23c119d3a00a03b1b9",
+   "after": null,
+   "changes": []
+  },
+  {
+   "from": "aedcabd1c290861ff154606c836c34d54fd430ba",
+   "to": "63f400360cefce38ed55f1eaf60e9127749b73b6",
+   "after": "Rows that change the protocol (round 1)",
+   "changes": []
+  },
+  {
+   "from": "904185acb565be2f45f15d16cd002d5508af2ac4",
+   "to": "2cf3687f77091ac838659cc4d9327f046c4b5e0c",
+   "after": "Rows that change the protocol (round 2)",
+   "changes": []
+  },
+  {
+   "from": "936f586733c9dba5cc26b23c14d3caae7dc247a6",
+   "to": "a8a70237ae6cf95978eb28b1bf5ce4ffee8ff7f8",
+   "after": "Rows that change the protocol (round 3)",
+   "changes": []
+  },
+  {
+   "from": "ea2e924a4fd59f87e8811dfafa9b0f01eb7b9a34",
+   "to": "51536bfa80d4732787c7733447c26b3df39dfe6e",
+   "after": "Rows that change the protocol (round 4)",
+   "changes": []
+  },
+  {
+   "from": "50aaef155d7ddc391c8c0128fe275adcb4ec2882",
+   "to": "8382f1b896ecc1e32ed014f023597a65cea801a6",
+   "after": "Rows that change the protocol (round 5)",
+   "changes": []
+  },
+  {
+   "from": "d8e5d1f8866a29d4c519e5b3ad41fffce7758d76",
+   "to": "7c230d1a9ca54f573261e723535b0860610f2d59",
+   "after": "Rows that change the protocol (analysis remediation 1)",
+   "changes": []
+  },
+  {
+   "from": "8947e05494cefc585ab132775f2f0ab22e38194e",
+   "to": "8d91f6ba6d40fc23a8eb0b9547ab8dc111eba7a1",
+   "after": "Rows that change the protocol (analysis remediation 2)",
+   "changes": []
+  },
+  {
+   "from": "3cb08f8f41ce3bdd0ce4d8b606f9e4425a36e1e1",
+   "to": "3cc4d8b76c2bcdcdf8e8e4686e0fa996ac5720e1",
+   "after": "Rows that change the protocol (analysis remediation 3)",
+   "changes": []
+  },
+  {
+   "from": "6bf28fe7173e360514458af2f1bdab6b5aec4cda",
+   "to": "73be9bb3beafdba89eaac5a064aeff9e4b200f52",
+   "after": "Rows that change the protocol (analysis remediation 4)",
+   "changes": []
+  },
+  {
+   "from": "8cbfeaba51828113aa97975fc7fdd35c316f1094",
+   "to": "ec6edf70c132606850543ae56a68225263da533b",
+   "after": "Rows that change the protocol (analysis remediation 5)",
+   "changes": []
+  },
+  {
+   "from": "01b4c4388beb786454d8b8c6522439bba848e3f9",
+   "to": "77d994d1e6e77c5f1a42b3082c0b82072b030c80",
+   "after": "Rows that change the protocol (analysis remediation 6)",
+   "changes": []
+  },
+  {
+   "from": "360d5c2ed8bf3b59b05a5e395c4718a796ea58a2",
+   "to": "0dabd2c1d6103745ed856481140b85bde53b5944",
+   "after": "Rows that change the protocol (analysis remediation 7)",
+   "changes": []
+  },
+  {
+   "from": "2c68e467e14d1125545b83e74910275f87298a5e",
+   "to": "6d6ecd462b7c8688af8cf313111c44ff9c1ad699",
+   "after": "Rows that change the protocol (analysis remediation 8)",
+   "changes": []
+  },
+  {
+   "from": "059bdac0c3c061889c45e36751a8315cacd6efd1",
+   "to": "5e5ea247e902a188999fdedc7966acf8a58c1248",
+   "after": "Rows that change the protocol (analysis remediation 9)",
+   "changes": []
+  },
+  {
+   "from": "62e68f2b8ff99a33b3e20a3748f97e7164f94f4c",
+   "to": "671f34df20661f13bdefeb4f6056b447e99ea55c",
+   "after": "Rows that change the protocol (analysis remediation 10)",
+   "changes": []
+  }
+ ],
+ "unmade": [
+  {
+   "commit": "936f586733c9dba5cc26b23c14d3caae7dc247a6",
+   "place": "R13",
+   "in": [
+    "2cf3687f77091ac838659cc4d9327f046c4b5e0c",
+    "936f586733c9dba5cc26b23c14d3caae7dc247a6"
+   ],
+   "beside": "Rows that change the protocol (round 3)"
+  }
+ ]
+}
