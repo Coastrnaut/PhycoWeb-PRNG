@@ -560,12 +560,15 @@ state at every addition (FR-019), written and validated, feature 004's tools unc
 and any tool that changes validated again before its first counted use (spec, Edge Cases, "A
 feature-004 tool changed").
 
-- [ ] T038 For each tool of feature 004's validation records that Phase 5 uses, the trail tools,
+- [X] T038 For each tool of feature 004's validation records that Phase 5 uses, the trail tools,
   the structural and bias tools and the cost model among them, compare its exact hash at HEAD with
   the hash its validation record names, and record for the phase report each tool with its record
   ID, the result and whether its validation covers additions of committed constants (FR-016);
   feature 004's records stay in force for the uses they cover while the hash is unchanged. (FR-016,
   FR-022; R14)
+  Done 2026-11-12 at 6e828a3: all twelve tools (the four trail tools, avalanche, bias, bijectivity,
+  costmodel, degree, dependency, invariants, symmetry) have at HEAD the hash their latest feature-004
+  validation records name; no trail tool's validation covers additions of committed constants.
 - [ ] T039 Write research R7's companion of the ARX search,
   `research/005/tools/trails/arx_search_ops.c` with its build file, a copy of feature 004's
   `research/004/tools/trails/arx_search.c` whose trail output adds the state after every step of
