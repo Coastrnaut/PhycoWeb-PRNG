@@ -257,7 +257,7 @@ feature before T009 (FR-003).
   `python -X utf8 research/005/plan_projections.py --check` prints "plan-projections.json matches"
   and exits 0 on Windows and with `wpy` in WSL (quickstart V1), the committed
   `research/005/plan-projections.json` unchanged. (FR-004; SC-001; R1)
-- [ ] T013 Adapt `protocol/changelog.py` and `scripts/protocol_change.py` to this feature (research
+- [X] T013 Adapt `protocol/changelog.py` and `scripts/protocol_change.py` to this feature (research
   R9), with their tests in `tests/test_protocol_005.py`: under `005`, `check` runs
   `research/005/place_check.py`; `create` reads `research/005/place-check.json`, this feature's rows
   "Place check" and "Readings set aside", and the lists of

@@ -24,6 +24,15 @@ from protocol import changelog, evidence  # noqa: E402
 def report(result: dict) -> None:
     """Each place whose text changed, with its commit, the rows of its round listed under its rule
     and each place changed by an edit that no row made."""
+    if "places" in result:
+        # Feature 005's comparison: places, each with the rows of its round that name it.
+        for item in result["rounds"]:
+            print(f"{item['heading']}: {len(item['changed'])} places changed")
+        print(f"changed by an edit that no row made: {len(result['unmade'])}")
+        for item in result["unmade"]:
+            print(f"  {item['commit'][:7]} {item['place']}")
+        print(f"compared to {result['compared_to'][:7]}")
+        return
     for item in result["rounds"]:
         print(item["heading"])
         for changed in item["changed"]:
@@ -39,6 +48,7 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("mode", choices=("check", "create", "propose"))
     parser.add_argument("file", nargs="?")
+    parser.add_argument("--written-approval", help="the owner's written approval, quoted (create)")
     args = parser.parse_args(argv)
 
     def run() -> int:
@@ -46,7 +56,8 @@ def main(argv=None) -> int:
             report(changelog.check())
             return evidence.EXIT_OK
         if args.mode == "create":
-            return changelog.create()
+            given = args.written_approval
+            return changelog.create(None if given is None else evidence.written_approval(given))
         if not args.file:
             raise evidence.Refused("propose needs FILE")
         fields = json.loads(Path(args.file).read_bytes().decode("utf-8"))

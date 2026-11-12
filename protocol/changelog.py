@@ -408,6 +408,114 @@ def build_first_entries() -> List[Dict]:
     return entries
 
 
+# ------------------------------------------------------------ feature 005: its lists in table form
+
+# Spec FR-031 of feature 005: what the first entry names by SHA-256, each a committed blob's bytes,
+# kind `raw`: FR-001's baseline documents at 99e6994, feature 004's refused list there, the spec as
+# the spec approval names it, the plan's documents at 74dd867, and plan-projections.json at HEAD.
+BASELINE_005 = tuple(
+    [("99e6994", "specs/004-crypto-architecture-v3/" + name) for name in
+     ("spec.md", "plan.md", "research.md", "data-model.md", "quickstart.md", "contracts/cli.md",
+      "contracts/model-v3-api.md")]
+    + [("99e6994", "research/004/refused-constants.json"),
+       ("a656bcf", "specs/005-crypto-architecture-v4/spec.md")]
+    + [("74dd867", "specs/005-crypto-architecture-v4/" + name) for name in
+       ("plan.md", "research.md", "data-model.md", "contracts/cli.md", "quickstart.md")]
+    + [("HEAD", "research/005/plan-projections.json")])
+ROW_ID_005 = re.compile(r"(?:(?:SEC|RAT|ANA|PRO|HW|REP)-\d{3}|AR\d+-[A-Z]\d+)")
+
+
+def baseline_entry() -> Dict:
+    """The first entry of feature 005's log: the documents its protocol starts from, by SHA-256."""
+    documents = []
+    for commit, rel in BASELINE_005:
+        blob = evidence.show(rel, commit)
+        if blob is None:
+            raise Refused(f"{rel} is not committed at {commit}")
+        full = evidence.git("rev-parse", "--verify", commit + "^{commit}").decode("ascii").strip()
+        documents.append({"path": rel, "commit": full, "sha256": evidence.sha256(blob),
+                          "sha256_kind": "raw"})
+    return {"rules": [], "row": NONE, "granularity": "baseline", "baseline": documents,
+            "reason": "spec FR-001 and FR-031: the documents this feature's protocol starts from",
+            "refused_list": check_refused_list_at_head(), "last_record_id": NONE, "results_known": []}
+
+
+def guard_comparison_005(row: evidence.Row) -> Dict:
+    """As guard_comparison, for feature 005's comparison, whose `unmade` holds places."""
+    stored = json.loads(evidence.show(PLACE_CHECK_REL).decode("utf-8"))
+    if check(stored["compared_to"]) != stored:
+        raise Refused(f"the comparison up to compared_to differs from {PLACE_CHECK_REL}")
+    module = place_check()
+    head = module.full("HEAD")
+    if head != stored["compared_to"]:
+        after = module.per_commit(stored["compared_to"], head, {})
+        if after:
+            raise Refused(f"a place changed after compared_to, in {after[0]['commit'][:7]}: make "
+                          "the comparison again and confirm it in \"Place check <k>\"")
+    for item in stored["unmade"]:
+        if item["commit"][:7] not in row.notes:
+            raise Refused(f"{item['commit'][:7]} changed a place with no row and no confirmation")
+    return stored
+
+
+def choices_005() -> Dict[str, Tuple[str, str]]:
+    """Each row of feature 005's choices tables: its question and its option A."""
+    text = evidence.show(CHOICES_REL).decode("utf-8").replace("\r\n", "\n")
+    out: Dict[str, Tuple[str, str]] = {}
+    for line in text.split("\n"):
+        cells = [c.strip() for c in line.strip().strip("|").split(" | ")] if line.startswith("| ") else []
+        if len(cells) == 5 and ROW_ID_005.fullmatch(cells[0]):
+            out[cells[0]] = (cells[1], cells[2])
+    return out
+
+
+def build_first_entries_005() -> List[Dict]:
+    """Feature 005's first entries (spec FR-031): the baseline; then, per round or batch in order,
+    one entry per listed row, with its rule's places as they read before and after, and one entry
+    that lists the round's other rows, the clarifications, by their table."""
+    row = place_row()
+    stored = guard_comparison_005(row)
+    decided = evidence.family_row("Readings set aside")
+    if decided is None or decided.decision not in ("Approved", "Not needed"):
+        raise Refused("the row \"Readings set aside\" is not decided at HEAD")
+    module = place_check()
+    cache: Dict = {}
+    table = choices_005()
+    entries: List[Dict] = [baseline_entry()]
+    _, rounds = module.read_lists(stored["compared_to"], set(stored["places"]))
+    for listed in rounds:
+        before, after = listed["commits"]
+        place = {"heading": listed["heading"], "commits": [before, after]}
+        named: List[str] = []
+        for item in listed["listed"]:
+            if item["direction"] not in DIRECTIONS:
+                if decided.decision != "Approved":
+                    raise Refused(f"{item['rows']}: a reading set aside, and the row \"Readings set "
+                                  "aside\" does not decide it")
+                raise Refused(f"{item['rows']}: direction {item['direction']!r} needs an entry of its own")
+            for row_id in item["rows"]:
+                if row_id not in table:
+                    raise Refused(f"{row_id} is listed and has no row in {CHOICES_REL}")
+                question, option = table[row_id]
+                readings = [{"reading": question, "new_reading": option,
+                             "no_looser": "as the row's option states, answered with its round"}] \
+                    if item["direction"] == "settled" else []
+                entries.append({
+                    "rules": [rule_object(module, cache, item["rule"], item["places"], before, after,
+                                          item["direction"], readings)],
+                    "row": {"id": row_id, "question": question, "option": option},
+                    "granularity": "round", "place_check": place, "reason": row_id,
+                    "refused_list": NONE, "last_record_id": NONE, "results_known": []})
+                named.append(row_id)
+        others = [r["row"] for r in listed["rows"] if r["row"] not in named]
+        if others:
+            entries.append({"rules": [], "row": NONE, "granularity": "round", "place_check": place,
+                            "clarifications": others,
+                            "reason": "rows that clarify text and change no rule, listed by their table",
+                            "refused_list": NONE, "last_record_id": NONE, "results_known": []})
+    return entries
+
+
 def guard_entry_fields(entry: Dict) -> None:
     """The fields without which the writer refuses an entry (data-model section 18)."""
     for name in ("last_record_id", "results_known"):
@@ -432,21 +540,25 @@ def approver(digits: str) -> Dict:
     return {"owner": owner_name(), "date": evidence.utc_now()[:10], "approval_confirmed": digits}
 
 
-def create() -> int:
+def create(written: Optional[Dict] = None) -> int:
     """The first entries, after the approval step, through a temporary file renamed to the log's
-    path once all are written, so that a writer that dies leaves no partial log (PRO-065)."""
+    path once all are written, so that a writer that dies leaves no partial log (PRO-065).
+    `written` holds the owner's written approval, which each entry then keeps (spec FR-044)."""
     path = evidence.REPO.path(LOG)
     if path.exists():
         raise Refused(f"{LOG} exists: `create` runs only before it does")
+    evidence.guard_feature_path(LOG)
     environment = evidence.guard_environment("protocol-log")
-    entries = build_first_entries()
+    entries = build_first_entries() if evidence.FEATURE == "004" else build_first_entries_005()
     date = evidence.utc_now()
     for seq, entry in enumerate(entries):
         entry.update({"seq": seq, "date_utc": date, "environment": environment})
+        if written is not None:
+            entry["written_approval"] = written
         guard_entry_fields(entry)
     print(f"{len(entries)} first entries, counted from the lists")
     digest = evidence.first_entries_hash(entries)
-    digits = evidence.approval_step(digest)
+    digits = evidence.approval_step(digest, written)
     with evidence.AppendLock(LOG):
         previous = evidence.ZERO_HASH
         temporary = path.with_name(path.name + ".tmp")

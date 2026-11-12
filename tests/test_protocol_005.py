@@ -14,6 +14,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from protocol import candidates, changelog, devinputs_v3, evidence, provenance
 from protocol.disclaimer import DESIGN_DISCLAIMER, DESIGN_DISCLAIMER_005
@@ -391,6 +392,159 @@ class Feature004Untouched(unittest.TestCase):
                               cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(done.returncode, 0, done.stderr[-600:])
         self.assertEqual(feature_004_status(), status)
+
+
+SPEC_005 = """# Spec
+
+## Review & Approval *(Constitution Principle VIII)*
+
+| Gate | Reviewer | Date | Decision | Notes |
+|------|----------|------|----------|-------|
+{rows}
+Notes under the table.
+
+## Requirements
+
+### Functional Requirements
+
+- **FR-001**: {one}
+- **FR-002**: {two}
+
+### Pre-registered Design Protocol: the changed rules
+
+- **A rule**: FR-001. *Stricter means*: no change.
+"""
+CHOICES_005 = """# Choices
+
+## Round 1 (first run)
+
+| Item | Question | A (recommended) | Alternatives | Where |
+|------|----------|-----------------|--------------|-------|
+| SEC-001 | A limit | The limit falls | B: no change | spec FR-001 |
+| RAT-001 | A word | The word is defined | B: no change | spec FR-002 |
+
+### Rows that change the protocol (round 1)
+{pair}
+| Row | Rule | Direction | Why |
+|-----|------|-----------|-----|
+| SEC-001 | A rule (FR-001) | {direction} | the limit only falls |
+"""
+
+
+class ChangeLog(TempRepo005):
+    """Spec FR-031: feature 005's first entries, from its lists in their table form: the baseline,
+    one entry per listed row and one that lists a round's clarifications."""
+
+    def setUp(self):
+        super().setUp()
+        (self.root / evidence.PROTOCOL_LOG_REL).unlink()
+        self.spec_rows = list(self.rows)
+        write(self.root, "research/005/place_check.py",
+              (ROOT / "research/005/place_check.py").read_bytes())
+        write(self.root, evidence.REFUSED_LIST_REL, (ROOT / evidence.REFUSED_LIST_REL).read_bytes())
+        self.write_spec_005("the limit is 8", "a word")
+        self.base = self.commit("the plan approval")
+        self.write_choices("", "stricter")
+        self.choices = self.commit("choices")
+        self.write_spec_005("the limit is 4", "a word, defined")
+        self.applied = self.commit("applied")
+        self.write_choices(f"\nThe round's two commits are {self.choices[:7]} (its choices) and "
+                           f"{self.applied[:7]} (its changes applied).\n", "stricter")
+        self.commit("the pair")
+        original = changelog.place_check
+
+        def module():
+            found = original()
+            found.PLAN_APPROVAL = self.base
+            found.FILES = ()
+            return found
+
+        patcher = mock.patch.object(changelog, "place_check", module)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch.object(changelog, "BASELINE_005", ((self.base, evidence.SPEC_REL),))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def write_spec_005(self, one: str, two: str) -> None:
+        write(self.root, evidence.SPEC_REL,
+              SPEC_005.format(rows="".join(line + "\n" for line in self.spec_rows), one=one, two=two))
+
+    def write_choices(self, pair: str, direction: str) -> None:
+        write(self.root, changelog.CHOICES_REL, CHOICES_005.format(pair=pair, direction=direction))
+
+    def row(self, gate: str, decision: str, notes: str) -> None:
+        self.spec_rows.append(f"| {gate} | owner | 2026-11-12 | {decision} | {notes} |")
+        text = (self.root / evidence.SPEC_REL).read_bytes().decode("utf-8")
+        one = text.split("**FR-001**: ")[1].split("\n")[0]
+        two = text.split("**FR-002**: ")[1].split("\n")[0]
+        self.write_spec_005(one, two)
+        self.commit(f"row {gate}")
+
+    def compare(self) -> dict:
+        result = changelog.check()
+        data = (json.dumps(result, indent=1, ensure_ascii=False) + "\n").encode("utf-8")
+        write(self.root, changelog.PLACE_CHECK_REL, data)
+        self.commit("the comparison")
+        self.row("Place check", "Approved", f"names it, {hashlib.sha256(data).hexdigest()}")
+        self.row("Readings set aside", "Not needed", "none")
+        return result
+
+    def test_the_first_entries_follow_the_lists(self):
+        result = self.compare()
+        self.assertEqual(result["unmade"], [])
+        entries = changelog.build_first_entries_005()
+        self.assertEqual([e["granularity"] for e in entries], ["baseline", "round", "round"])
+        self.assertEqual(entries[0]["baseline"][0]["path"], evidence.SPEC_REL)
+        self.assertEqual(entries[0]["baseline"][0]["sha256_kind"], "raw")
+        self.assertEqual(entries[0]["refused_list"]["path"], evidence.REFUSED_LIST_REL)
+        rule = entries[1]["rules"][0]
+        self.assertEqual((entries[1]["row"]["id"], rule["rule"], rule["direction"]),
+                         ("SEC-001", "A rule", "stricter"))
+        self.assertIn("the limit is 8", rule["old_text"]["FR-001"])
+        self.assertIn("the limit is 4", rule["new_text"]["FR-001"])
+        self.assertEqual(rule["commits"], [self.choices, self.applied])
+        self.assertEqual(entries[2]["clarifications"], ["RAT-001"])
+        self.assertEqual(entries[2]["rules"], [])
+
+    def test_create_writes_the_log_on_the_owners_written_word(self):
+        self.compare()
+        written = evidence.written_approval("set the rows and commit")
+        self.assertEqual(changelog.create(written), 0)
+        entries = evidence.check_chain(evidence.PROTOCOL_LOG_REL)
+        self.assertEqual(len(entries), 3)
+        self.assertTrue(all(e["written_approval"]["entered_by"] == "agent" for e, _ in entries))
+        self.commit("the log")
+        self.assertEqual(evidence.guard_protocol_log("inverse")[0], 2)
+        with self.assertRaises(Refused):
+            changelog.create(written)
+
+    def test_a_settled_row_holds_its_reading(self):
+        self.write_choices(f"\nThe round's two commits are {self.choices[:7]} (its choices) and "
+                           f"{self.applied[:7]} (its changes applied).\n", "settled")
+        self.commit("settled")
+        self.compare()
+        rule = changelog.build_first_entries_005()[1]["rules"][0]
+        self.assertEqual(rule["direction"], "settled")
+        self.assertEqual(rule["readings"][0]["new_reading"], "The limit falls")
+
+    def test_a_place_changed_after_the_comparison_is_refused(self):
+        self.compare()
+        self.write_spec_005("the limit is 2", "a word, defined")
+        self.commit("a later edit")
+        with self.assertRaises(Refused):
+            changelog.build_first_entries_005()
+
+    def test_an_undecided_gate_is_refused(self):
+        result = changelog.check()
+        data = (json.dumps(result, indent=1, ensure_ascii=False) + "\n").encode("utf-8")
+        write(self.root, changelog.PLACE_CHECK_REL, data)
+        self.commit("the comparison")
+        with self.assertRaises(Refused):
+            changelog.build_first_entries_005()
+        self.row("Place check", "Approved", f"names it, {hashlib.sha256(data).hexdigest()}")
+        with self.assertRaises(Refused):
+            changelog.build_first_entries_005()
 
 
 if __name__ == "__main__":
