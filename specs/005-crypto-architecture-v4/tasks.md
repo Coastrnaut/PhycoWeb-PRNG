@@ -135,15 +135,17 @@ itself. No task of phases 1 to 9 starts before T004.
   ticks the agent set in the six checklists on the owner's advance approval of 2026-11-09, the
   readings set aside (none in rounds 1 to 5), and T002's places with their proposed answers.
   (FR-026, FR-031; Principle VIII)
-- [ ] T004 ⛔ **Tasks approval** (**Owner**), in `specs/005-crypto-architecture-v4/spec.md`'s Review
-  & Approval table: review this list with the `/speckit-analyze` findings and their remediation;
-  review the ticks in the six checklists, unticking any item not accepted; confirm each list "Rows
-  that change the protocol", a row taken out being recorded beside its list with the owner's reason;
-  set the row "Place check", naming `research/005/place-check.json` by SHA-256 with its
-  `compared_to` and each place it records as changed by an edit that no row made, confirmed as an
-  entry of its own or as no change of rule, with the reason; set the row "Readings set aside",
-  reading Not needed where no listed change sets a reading aside; set the row "Tasks approval"; and
-  commit the rows with the spec's Status line. (FR-031; spec notes; Principle VIII)
+- [X] T004 (done on the owner's written word of 2026-11-12, "tasks approved, R13 as proposed, set
+  the rows and commit", the rows written and committed by the agent) ⛔ **Tasks approval**
+  (**Owner**), in `specs/005-crypto-architecture-v4/spec.md`'s Review & Approval table: review this
+  list with the `/speckit-analyze` findings and their remediation; review the ticks in the six
+  checklists, unticking any item not accepted; confirm each list "Rows that change the protocol", a
+  row taken out being recorded beside its list with the owner's reason; set the row "Place check",
+  naming `research/005/place-check.json` by SHA-256 with its `compared_to` and each place it records
+  as changed by an edit that no row made, confirmed as an entry of its own or as no change of rule,
+  with the reason; set the row "Readings set aside", reading Not needed where no listed change sets
+  a reading aside; set the row "Tasks approval"; and commit the rows with the spec's Status line.
+  (FR-031; spec notes; Principle VIII)
 - [ ] T005 In the commit after T004's, write security.md's next version, CRLF kept, with its
   history entry: row 5a.1b's status naming the tasks approval as passed and the next gate, with its
   allow-list entry in `protocol/claims.json` where the claim test asks for one;
