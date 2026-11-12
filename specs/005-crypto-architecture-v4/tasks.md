@@ -609,7 +609,7 @@ cap and its candidate's row as `$REP/projection-table.json` fixes them, at most 
 per family; D4 chooses the family, the other analysed at the production width only if the chosen one
 ends with no eligible candidate (D14).
 
-- [ ] T040 [US3] Write the round rule's tests for this feature in `tests/test_protocol_005.py`
+- [X] T040 [US3] Write the round rule's tests for this feature in `tests/test_protocol_005.py`
   (quickstart V5, V6; contracts/cli.md, "`scripts/round_rule.py --candidate ID`"; data-model §2): at
   the production width the climbs run at 16×16, then 8×8, then 4×4; a size-independent search, such
   as an ARX box's bound over one call, runs first under the 4×4 cap, charged to the trail row, its
@@ -638,7 +638,7 @@ ends with no eligible candidate (D14).
   max(2·R_dist, R_bound + Δ, 2·max(R_f, R_b)), Δ = 2; and `round-rule.json` names, per size and
   kind, the record that sets R_bound, searched or `split`, the last searched record and the r of the
   first capped or refused search. (FR-014, FR-015, FR-016, FR-017, FR-018, FR-022; SC-003, SC-004)
-- [ ] T041 [US3] Change `scripts/round_rule.py` for this feature (contracts/cli.md; data-model §2;
+- [X] T041 [US3] Change `scripts/round_rule.py` for this feature (contracts/cli.md; data-model §2;
   research R6, R12) until T040 passes; feature 004's mode keeps its rule. (FR-014, FR-015, FR-016,
   FR-017, FR-018; SC-003, SC-004)
 - [ ] T042 [US3] Write the trail record's and the evidence runner's tests in

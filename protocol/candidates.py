@@ -56,9 +56,11 @@ D4_NOT_ANALYSED = "not analysed at the production width: D4 chose the other fami
 D4_TIE = "D4 chose the other family by its tie-breaks"
 UNIFORM_CONTROL, NO_TRAIL_ROUTE, SHARED_MATCH = ("uniform control fired", "no validated trail route",
                                                  "match in the shared polynomial")
+# Feature 005 (spec FR-018; data-model section 5): the climb ended at 16×16 with no R_bound there.
+NO_R_BOUND = "no R_bound at 16×16"
 CAUSES = {"rejected": (FAILED_CHECK,),
           "ineligible": (ITEM, INCONCLUSIVE, SPENT, D4_NOT_ANALYSED, D4_TIE, UNIFORM_CONTROL,
-                         NO_TRAIL_ROUTE, SHARED_MATCH)}
+                         NO_TRAIL_ROUTE, SHARED_MATCH, NO_R_BOUND)}
 ALWAYS_SHARED = (D4_NOT_ANALYSED, D4_TIE, UNIFORM_CONTROL, NO_TRAIL_ROUTE, SHARED_MATCH)
 SHARED_REASON = "cause shared"
 FULL, BUDGET_SPENT, OWNER_DECLINED = ("the family full", "the budget spent",
@@ -349,6 +351,15 @@ def shows_reason(candidate: str, cause: str, record: Dict, fields: Dict) -> bool
     if cause == ITEM:
         return record.get("kind") == "round-rule" and record.get("candidate") == candidate \
             and failed_items(record)
+    if cause == NO_R_BOUND:
+        # The record that ends the climb at 16×16: a capped search's, a refused search's projection, or the last
+        # `split` record below the target weight at R_max; the entry states that no hour was charged at 8×8 or 4×4.
+        if evidence.FEATURE == "004" or "8×8 or 4×4" not in str(fields.get("statement", "")):
+            return False
+        if record.get("kind") == "projection":
+            return record.get("row") == f"{candidate}/trails" and bool(record.get("refused"))
+        return record.get("kind") == "bound" and record.get("candidate") == candidate \
+            and (record.get("status") == "inconclusive" or record.get("capped") is True or record.get("method") == "split")
     if cause == INCONCLUSIVE:
         return record.get("status") == "inconclusive" and record.get("candidate") == candidate
     if cause == SPENT:
@@ -390,7 +401,9 @@ def spent_is_shared(fields: Dict, record: Dict) -> bool:
 def replacement_state(cause: str, fields: Dict, record: Dict) -> Dict:
     """What the rules' classification gives: pending where the cause lies in the candidate itself,
     closed at once where its family or the whole set shares it (ANA-073; ANA-088)."""
-    shared = cause in ALWAYS_SHARED or (cause == SPENT and spent_is_shared(fields, record))
+    shared = cause in ALWAYS_SHARED or (cause == SPENT and spent_is_shared(fields, record)) \
+        or (cause == NO_R_BOUND and record.get("kind") == "projection" and float(record.get("projected_hours", 0.0))
+            > evidence.row_hours(fields["candidate_id"], "trails"))
     return {"state": "closed", "reason": SHARED_REASON} if shared else {"state": "pending"}
 
 

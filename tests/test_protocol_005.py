@@ -1807,7 +1807,7 @@ class TheClimb(TempRepo005):
 
     def put(self, candidate: str, **fields) -> dict:
         record = dict({"kind": "bound", "width": 32, "status": "pass", "created_utc": self.stamp(),
-                       "record_id": f"bound-{self.clock:04d}"}, **fields)
+                       "record_id": f"bound-{self.clock:04d}", "candidate": candidate}, **fields)
         write(self.root, f"{evidence.REP_REL}/candidates/{candidate}/{record['record_id']}.json", evidence.pretty(record))
         return record
 
@@ -1948,6 +1948,93 @@ class TheClimb(TempRepo005):
         self.assertEqual(self.climb.next_step("v4-A1", counted=lambda r: False)["rounds"], 1)
         self.assertEqual(self.named(self.climb.next_step("v4-A1", counted=lambda r: r["record_id"] == record["record_id"])),
                          ("search", 16, "differential", 1))
+
+
+class TheDrivenClimb(TheClimb):
+    """scripts/round_rule.py under 005: the climb driven step by step, a sum written as a record, a candidate without
+    R_bound at 16x16 decided at once with the record that ends the climb (quickstart V5, V6)."""
+
+    def setUp(self):
+        super().setUp()
+        from scripts import round_rule
+        self.rr = round_rule
+        self.log = []
+        for name in ("v4-A1", "v4-B1"):
+            self.log.append({"event": "proposed", "candidate_id": name, "family": evidence.family_of(name)})
+        write(self.root, evidence.CANDIDATE_LOG_REL, chain(self.log))
+        self.commit("the log")
+        patcher = mock.patch.object(self.rr, "cross_checked", lambda candidate, record: True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        # The temporary repository holds no copy of the scripts: a split record names no code here.
+        patcher = mock.patch.object(self.rr, "CODE", [])
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch.object(self.rr.candidates, "module_rel", lambda candidate: "protocol/climb.py")
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        write(self.root, "protocol/climb.py", (ROOT / "protocol/climb.py").read_bytes())
+        self.commit("the climb's code")
+        self.searches = []
+
+    def fake_search(self, plan):
+        """A search that writes the record `plan` gives for its step, or none."""
+        def search(candidate, step):
+            self.searches.append((step["size"], step["bound_kind"], step["rounds"]))
+            made = plan(step)
+            if made is not None:
+                self.count(step["size"], step["bound_kind"], step["rounds"], made[0], candidate=candidate, **made[1])
+            return 0
+        return search
+
+    def test_a_search_capped_at_16x16_with_no_bound_decides_the_candidate_and_stops(self):
+        plan = lambda step: ([], {"status": "inconclusive", "capped": True})  # noqa: E731
+        driven = self.rr.drive_climb("v4-B1", ["round_rule.py"], self.fake_search(plan))
+        self.assertEqual(driven["ended"], "no R_bound at 16×16")
+        self.assertEqual(self.searches, [(16, "linear", 1)])
+        decision = [e for e in candidates.entries() if e["event"] == "decision"]
+        self.assertEqual((decision[0]["decision"], decision[0]["cause"]), ("ineligible", "no R_bound at 16×16"))
+        self.assertIn("no hour was charged at 8×8 or 4×4", decision[0]["statement"])
+        self.assertEqual([e["event"] for e in candidates.entries()][-1], "replacement")
+        self.assertFalse([size for size, _, _ in self.searches if size != 16])
+
+    def test_sums_carry_the_climb_past_a_cap_and_are_records_of_their_own(self):
+        self.box()
+        def plan(step):
+            if step["bound_kind"] == "linear" and step["rounds"] >= 3:
+                return [], {"status": "inconclusive", "capped": True}
+            if step["bound_kind"] == "differential":
+                return [130] * step["rounds"], {}
+            return [40 * (i + 1) for i in range(step["rounds"])], {}
+        driven = self.rr.drive_climb("v4-A1", ["round_rule.py"], self.fake_search(plan))
+        splits = [step for step in driven["steps"] if step["step"] == "split" and step["size"] == 16]
+        self.assertEqual(splits[0]["rounds"], 3)
+        self.assertEqual(self.climb.r_bound("v4-A1", 16)[0], 4)
+        self.assertEqual(driven["ended"], "R_bound at every claimable size")
+        sizes = [size for size, _, _ in self.searches]
+        self.assertEqual(sizes, sorted(sizes, reverse=True))
+        record = json.loads((self.root / evidence.REP_REL / "candidates/v4-A1" / f"{splits[0]['record']}.json").read_bytes())
+        self.assertEqual((record["method"], record["bound"], record["tool"], record["feature"]), ("split", "120", "none", "005"))
+        for part in record["parts"]:
+            found = evidence.find_record(part["record_id"])
+            self.assertEqual(hashlib.sha256(found[0].read_bytes()).hexdigest(), part["sha256"])
+
+    def test_a_search_that_moves_nothing_stops_the_climb_with_a_refusal(self):
+        self.box()
+        with self.assertRaises(Refused):
+            self.rr.drive_climb("v4-A1", ["round_rule.py"], self.fake_search(lambda step: None))
+        self.assertEqual(self.searches, [(16, "linear", 1)])
+
+    def test_round_rule_json_names_per_size_the_record_that_sets_r_bound(self):
+        self.box()
+        for size in (16, 8, 4):
+            for kind in self.climb.KINDS:
+                self.count(size, kind, 1, [130])
+        fields = self.rr.climb_fields("v4-A1")
+        self.assertEqual(fields["order"], [16, 8, 4])
+        row = fields["sizes"]["16"]
+        self.assertEqual(row["R_bound"], 1)
+        self.assertEqual(set(row["kinds"]["linear"]), {"r", "record", "method", "last_searched_record", "first_capped_or_refused_r"})
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ for place in (str(ROOT), str(ROOT / "scripts"), str(ROOT / "research/004"), str(
 
 import numpy as np  # noqa: E402
 
-from protocol import candidates, devinputs_v3, evidence  # noqa: E402
+from protocol import candidates, climb, devinputs_v3, evidence, rules  # noqa: E402
 from protocol.evidence import NONE, Refused, ToolFailure  # noqa: E402
 
 import active_sbox  # noqa: E402
@@ -88,6 +88,16 @@ MODULES = {"bijectivity": bijectivity, "dependency": dependency, "bias": bias, "
            "exhaustive tables": tables}
 ARX_BINARY = "research/004/tools/trails/build/arx_search"
 ARX_MAKE = "research/004/tools/trails/arx_search.mk"
+# The ARX search by feature: feature 004's tool, or under 005 its companion alone (feature 005, research R7), which
+# prints every step of each trail and is validated under its own name on the same known results.
+ARX = "ARX search"
+ARX_FILES = {"004": ("ARX search", "research/004/tools/trails/arx_search.c", "research/004/tools/trails/build/arx_search",
+                     "research/004/tools/trails/arx_search.mk", "research/004/tools/trails/arx_search_known.py"),
+             "005": ("ARX search, every step", "research/005/tools/trails/arx_search_ops.c",
+                     "research/005/tools/trails/build/arx_search_ops", "research/005/tools/trails/arx_search_ops.mk",
+                     "research/005/tools/trails/arx_search_ops_known.py")}
+ARX_DRIVER = ARX_FILES["004"][4]
+ARX_MODULES = {"004": arx_search_known}
 CODE = list(dict.fromkeys(
     [SCRIPT, "protocol/evidence.py", "protocol/disclaimer.py", "protocol/candidates.py", "protocol/devinputs_v3.py",
      "research/004/ir.py", "research/004/tools/symmetry.py", "research/004/tools/invariants.py",
@@ -128,10 +138,32 @@ SMALLEST_STATES = ((4, 4), (4, 8))
 DEFECTS_REL = "research/004/validation/defects"
 
 
+def companion_module():
+    """The companion's driver, loaded from research/005/tools/trails/ once."""
+    if "005" not in ARX_MODULES:
+        spec = importlib.util.spec_from_file_location("arx_search_ops_known", ROOT / ARX_FILES["005"][4])
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["arx_search_ops_known"] = module
+        spec.loader.exec_module(module)
+        ARX_MODULES["005"] = module
+    return ARX_MODULES["005"]
+
+
 def _follow_feature() -> None:
-    """A defect note goes under the active feature's paths (feature 005, research R9)."""
-    global DEFECTS_REL
+    """A defect note goes under the active feature's paths, and the ARX search is the active feature's (feature 005,
+    research R7, R9)."""
+    global DEFECTS_REL, ARX, ARX_BINARY, ARX_MAKE, ARX_DRIVER, arx_search_known
     DEFECTS_REL = evidence.FEATURES[evidence.FEATURE]["research"] + "/validation/defects"
+    for name in ARX_FILES.values():
+        TRAIL_PATHS.pop(name[0], None)
+        MODULES.pop(name[0], None)
+    ARX, source, ARX_BINARY, ARX_MAKE, ARX_DRIVER = ARX_FILES[evidence.FEATURE]
+    arx_search_known = ARX_MODULES["004"] if evidence.FEATURE == "004" else companion_module()
+    paths = {ARX: source}
+    paths.update(TRAIL_PATHS)
+    TRAIL_PATHS.clear()
+    TRAIL_PATHS.update(paths)
+    MODULES[ARX] = arx_search_known
 
 
 evidence.on_feature(_follow_feature)
@@ -352,7 +384,8 @@ def loading_start(n: int, w: int, symbols: int) -> np.ndarray:
         for bit in range(w):
             if lane * w + bit >= symbols:
                 start[lane, bit] = 0
-    return start
+    # A set holds the `symbols` input bits alone, as `first_full` compares it: the words beyond them are dropped.
+    return np.ascontiguousarray(start[:, :, :dependency.words_for(symbols)])
 
 
 def through_instantiate(subject: Subject) -> Any:
@@ -753,7 +786,7 @@ def run_avalanche(subject: Subject, run: evidence.Run, cited: Optional[str] = No
 
 def tool_hash(tool: str) -> Tuple[str, Optional[str]]:
     source = evidence.sha256(evidence.REPO.path(TRAIL_PATHS[tool]).read_bytes())
-    if tool != "ARX search":
+    if tool != ARX:
         return source, None
     return source, evidence.sha256(evidence.REPO.path(ARX_BINARY).read_bytes())
 
@@ -911,7 +944,7 @@ def active_sbox_method(subject: Subject, kind: str, rounds: int, args: argparse.
 
 
 CROSS_SECONDS = [INSTANCE_HOURS * 3600.0]
-METHODS = {"branch-and-bound": {"tool": "ARX search", "run": box_method},
+METHODS = {"branch-and-bound": {"tool": "the ARX search of the feature", "run": box_method},
            "active-box count": {"tool": "long-trail active-box counting", "run": active_box_method},
            "active-S-box count": {"tool": "active-S-box counting", "run": active_sbox_method}}
 
@@ -930,7 +963,7 @@ def cross_check_cited(candidate: str, tool: str, width: int) -> Any:
     """A bound from the ARX search or the active-S-box counter cites the cross-check of that candidate and that tool's exact hash. A
     production-width search needs the cross-check of the amounts it runs on, and a reduced-width search comes before they are chosen
     (data-model section 6; research R7)."""
-    if tool not in ("ARX search", "active-S-box counting"):
+    if tool not in (ARX, "active-S-box counting"):
         return NONE
     source, _ = tool_hash(tool)
     held = [record for _, record in evidence.iter_records("cross-check", f"candidates/{candidate}")
@@ -1015,7 +1048,7 @@ def arx_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespac
     """Research R12's two checks on each distinct box. One run of them is one instance, within its 8 h (seq 522): the searches climb
     together, up to the top of their range or until what is left of the cap only just holds the tables to the r they have all reached,
     and the tables then run to that r. The search's value and the exhaustive ones stand beside each other at every r from 1."""
-    tool = "ARX search"
+    tool = ARX
     source, binary = tool_hash(tool)
     cap = CROSS_SECONDS[0]
     started = time.monotonic()
@@ -1116,7 +1149,7 @@ def run_cross_check(subject: Subject, run: evidence.Run, args: argparse.Namespac
     """Research R12's checks on a candidate's own boxes or layers."""
     if args.tool == "active-S-box counting":
         return boolean_cross_check(subject, args)
-    if args.tool != "ARX search":
+    if args.tool != ARX:
         raise Refused(f"research R12 asks for no cross-check of {args.tool}")
     return arx_cross_check(subject, run, args)
 
@@ -1210,7 +1243,7 @@ def boolean_ranking(subject: Subject, run: evidence.Run) -> Dict:
 
 
 def ranking_tools(candidate: str) -> List[str]:
-    return ["ARX search", "long-trail active-box counting"] if is_arx(candidate) else ["active-S-box counting"]
+    return [ARX, "long-trail active-box counting"] if is_arx(candidate) else ["active-S-box counting"]
 
 
 def run_ranking(subject: Subject, run: evidence.Run, cross: Any, citations: Dict) -> Dict:
@@ -1228,8 +1261,8 @@ def run_rotation(args: argparse.Namespace, command: List[str], code: List[str], 
     if args.size not in (None, RANK_SIZE):
         raise Refused("the ranking stands at 4×4")
     tools = ranking_tools(candidate)
-    if tools[0] == "ARX search":
-        code = code + [TRAIL_PATHS["ARX search"], ARX_BINARY, ARX_MAKE]
+    if tools[0] == ARX:
+        code = code + [TRAIL_PATHS[ARX], ARX_BINARY, ARX_MAKE, ARX_DRIVER]
     citations = {}
     for tool in tools:
         source, binary = tool_hash(tool)
@@ -1491,12 +1524,67 @@ def carried_out(run: evidence.Run, candidate: str, row: str, hours: float, work:
     return exit_of(result)
 
 
+def cap_hours(size: int) -> float:
+    """A search's cap: feature 004's 8 h, or under 005 its size's cap from the projection table, a size-independent
+    search and a reduced-width one taking the 4×4 cap (feature 005, FR-006)."""
+    if evidence.FEATURE == "004":
+        return INSTANCE_HOURS
+    table = evidence.projection_table()
+    if table is None:
+        raise Refused(f"{evidence.REP_REL}/{evidence.PROJECTION_TABLE} does not exist: no cap is fixed yet")
+    caps = table["caps_h"]
+    name = f"{size}x{size}"
+    return float((caps[name] if name in caps else caps["4x4"])["holds_h"])
+
+
+class search_cap:
+    """The tools' own limits held at the search's cap for as long as it runs."""
+
+    def __init__(self, hours: float):
+        self.seconds = hours * 3600.0
+
+    def __enter__(self) -> None:
+        self.saved = (dict(long_trail.SETTINGS), dict(active_sbox.SETTINGS), arx_search_known.INSTANCE_SECONDS)
+        long_trail.SETTINGS["time_limit"] = self.seconds
+        active_sbox.SETTINGS["time_limit"] = self.seconds
+        arx_search_known.INSTANCE_SECONDS = self.seconds
+
+    def __exit__(self, *exc: Any) -> None:
+        long_trail.SETTINGS.update(self.saved[0])
+        active_sbox.SETTINGS.update(self.saved[1])
+        arx_search_known.INSTANCE_SECONDS = self.saved[2]
+
+
+def guard_climb_order(candidate: str, size: int, method: str, project: bool) -> None:
+    """Feature 005, FR-014: a production-width bound search at 8×8 or 4×4 waits for the candidate's climb at the size
+    before it in the order 16×16, 8×8, 4×4; the size-independent search comes first and waits for none."""
+    if project or method == "branch-and-bound" or size not in climb.SIZES or size == climb.SIZES[0]:
+        return
+    if set(evidence.candidate_decisions(candidate)) & {"ineligible", "rejected"}:
+        raise Refused(f"{candidate} is ineligible or rejected")
+    before = climb.SIZES[climb.SIZES.index(size) - 1]
+    counted = lambda record: rules.cross_checked(candidate, record)  # noqa: E731
+    if climb.r_bound(candidate, before, counted)[0] is None:
+        raise Refused(f"a bound search at {size}×{size} waits for the climb at {before}×{before} to end with its R_bound")
+
+
+def reserved_by_table(candidate: str, size: int, method: str) -> float:
+    """Feature 005, research R12: the hours a trail search holds back for the sizes not yet climbed, the projection
+    table's needs of those sizes' listed runs for the candidate's family; no probe runs at those sizes."""
+    table = evidence.projection_table()
+    if table is None:
+        raise Refused(f"{evidence.REP_REL}/{evidence.PROJECTION_TABLE} does not exist")
+    climbs = table["families"][evidence.family_of(candidate)]["climbs"]
+    later = climb.SIZES if method == "branch-and-bound" else climb.SIZES[climb.SIZES.index(size) + 1:] if size in climb.SIZES else ()
+    return sum(float(row["need_h"]) for at in later for row in climbs[f"{at}x{at}"].values())
+
+
 def trail_seconds(subject: Subject, args: argparse.Namespace, tool: str, rounds: int) -> float:
     """A timing of one instance's first round within a minute in all (research R7), scaled by a stated ratio per further round, a search
     of two box calls or more projecting its cap, and the cap above it all. A box search shares the minute among its boxes, and a count
     is count_seconds's."""
-    cap = INSTANCE_HOURS * 3600.0
-    if tool == "ARX search":
+    cap = cap_hours(subject.n) * 3600.0
+    if tool == ARX:
         boxes = len(boxes_of(subject.candidate, subject.w))
         if rounds > 1:
             return cap * boxes
@@ -1560,7 +1648,7 @@ def ranking_seconds(subject: Subject, tools: Sequence[str], workers: int) -> flo
     """The ranking's hours from one point's first search, each search an instance of R7's."""
     points = len(space_of(subject.candidate))
     args = argparse.Namespace(bound_kind="differential")
-    if tools[0] == "ARX search":
+    if tools[0] == ARX:
         return trail_seconds(subject, args, tools[0], 1) * 64 * 2 / max(1, workers)
     return count_seconds(subject, args, tools[0]) * RANK_ROUNDS * RATIO_OF_A_ROUND * points * 2 / max(1, workers)
 
@@ -1636,7 +1724,8 @@ def reserved_trails(candidate: str, this: Dict) -> float:
 def row_refusal(candidate: str, row: str, hours: float, probe: Dict) -> Optional[str]:
     """Why the row refuses a search, or None. A climb ends at such a refusal, so the search's projection record holds it (research R6); a
     probe that does not exist yet is no refusal of the row, and it raises."""
-    reserved = reserved_trails(candidate, probe)
+    reserved = reserved_trails(candidate, probe) if evidence.FEATURE == "004" or probe.get("width") != PRODUCTION_WIDTH \
+        else reserved_by_table(candidate, probe["size"], probe["method"]) + (0.0 if chosen_cross_checked(candidate) else INSTANCE_HOURS)
     try:
         evidence.guard_candidate_row(candidate, row, hours, reserved)
     except Refused as exc:
@@ -1652,10 +1741,13 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         raise Refused("a bound needs --bound-kind differential|linear and a --method the script knows")
     if args.kind == "cross-check" and args.tool not in TRAIL_PATHS:
         raise Refused(f"--tool names one of {tuple(TRAIL_PATHS)}")
-    evidence.guard_order_of_sizes(candidate, args.kind, n, args.project)
-    tool = METHODS[args.method]["tool"] if args.kind == "bound" else args.tool
-    if tool == "ARX search":
-        code = code + [TRAIL_PATHS[tool], ARX_BINARY, ARX_MAKE]
+    if evidence.FEATURE != "004" and args.kind == "bound" and w == PRODUCTION_WIDTH:
+        guard_climb_order(candidate, n, args.method, args.project)
+    else:
+        evidence.guard_order_of_sizes(candidate, args.kind, n, args.project)
+    tool = (ARX if args.method == "branch-and-bound" else METHODS[args.method]["tool"]) if args.kind == "bound" else args.tool
+    if tool == ARX:
+        code = code + [TRAIL_PATHS[tool], ARX_BINARY, ARX_MAKE, ARX_DRIVER]
     rounds = args.rounds or 1
     if args.method == "branch-and-bound" and w != PRODUCTION_WIDTH and rounds != 1:
         raise Refused("at a reduced width a box's bound is over one call, the ranking's measure (research R6)")
@@ -1669,7 +1761,7 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         if citation is None:
             raise Refused(f"a bound needs a validated tool: {tool} has no re-found record of its exact hash")
         cross = cross_check_cited(candidate, tool, w)
-        if tool in ("ARX search", "active-S-box counting") and cross == NONE and not args.project:
+        if tool in (ARX, "active-S-box counting") and cross == NONE and not args.project:
             raise Refused(f"{tool}'s results on {candidate} count once its cross-check has passed (research R12)")
         if w not in MODULES[tool].KIND["widths"]:
             citation = None
@@ -1695,7 +1787,7 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         return record.get("tool") == tool and record.get("tool_sha256") == source
 
     again = repeats(candidate, args.kind, same)
-    workers = min(args.workers, 2 * len(CROSS_WIDTHS) * 2) if args.kind == "cross-check" and tool == "ARX search" else 1
+    workers = min(args.workers, 2 * len(CROSS_WIDTHS) * 2) if args.kind == "cross-check" and tool == ARX else 1
     run = evidence.Run(args.kind, candidate=candidate, model_id=candidate, variant_id=subject.variant_id, code_files=code, argv=command,
                        heavy=True, projected_hours=hours, workers=workers, namespace="dev", config={"size": n, "width": w, "rounds": rounds})
     run.extra["exclusions_and_reruns"] = again
@@ -1703,8 +1795,10 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
     def work() -> Dict:
         if args.kind == "cross-check":
             return run_cross_check(subject, run, args)
-        result = run_bound(subject, run, args, tool, citation, cross)
-        result["fields"]["budget"] = {"cap_hours": INSTANCE_HOURS, "hours_used": (time.monotonic() - run.clock) / 3600.0}
+        cap = cap_hours(n)
+        with search_cap(cap):
+            result = run_bound(subject, run, args, tool, citation, cross)
+        result["fields"]["budget"] = {"cap_hours": cap, "hours_used": (time.monotonic() - run.clock) / 3600.0}
         return result
 
     return carried_out(run, candidate, row, hours, work)

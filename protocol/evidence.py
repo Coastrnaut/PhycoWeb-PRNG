@@ -98,7 +98,7 @@ LIGHT_HOURS = 10.0 / 60.0
 CLOSING_DECISIONS = ("withdrawn", "rejected", "ineligible")
 # Research R12's table: the rows that name the trail tools.
 TRAIL_TOOLS = ("ARX search", "active-S-box counting", "long-trail active-box counting",
-               "exhaustive tables")
+               "exhaustive tables", "ARX search, every step")
 TRAIL_TOOLS_REL = "research/004/tools/trails/"
 # What makes two searches the same instance: a search at its cap stays refused with any tool.
 SEARCH_FIELDS = ("bound_kind", "rounds", "width", "size")
