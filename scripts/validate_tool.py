@@ -28,7 +28,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
@@ -109,7 +109,14 @@ TOOLS: Dict[str, Tool] = {
     "ARX search": Tool("ARX search", f"{TOOLS_REL}/trails/arx_search.c",
                        f"{TOOLS_REL}/trails/arx_search_known.py",
                        f"{TOOLS_REL}/trails/build/arx_search", f"{TOOLS_REL}/trails/arx_search.mk"),
+    # Feature 005 (research R7, R14): the ARX search's companion, validated on the ARX search's known results.
+    "ARX search, every step": Tool("ARX search, every step", "research/005/tools/trails/arx_search_ops.c",
+                                   "research/005/tools/trails/arx_search_ops_known.py",
+                                   "research/005/tools/trails/build/arx_search_ops",
+                                   "research/005/tools/trails/arx_search_ops.mk"),
 }
+# A tool of a later feature that is validated on another tool's known results, which it reads and never writes.
+COMPANIONS: Dict[str, str] = {"ARX search, every step": "ARX search"}
 FINDINGS: Dict[str, Tuple[str, str]] = {
     "s7": ("symmetry", "security.md S7, its three rotation relations"),
     "s12": ("bias", "security.md S12, ranges and classes"),
@@ -189,11 +196,19 @@ def entries_of(rel: str, entries: Sequence[Dict]) -> List[Dict]:
     return [e for e in entries if e.get("path") == rel]
 
 
-def logged(known: Known, entries: Sequence[Dict], before: int) -> Dict:
-    """A self-written known result's entry: its hash the file's, and logged before the tool."""
+def logged(known: Known, entries: Sequence[Dict], before: int, earlier: Sequence[Dict] = ()) -> Dict:
+    """A self-written known result's entry: its hash the file's, and logged before the tool. `earlier` holds feature
+    004's log under another setting: a known result that stands there, unchanged, precedes every tool of a later feature."""
     if known.path is None:
         return {"known_id": known.known_id, "statement": known.statement}
     found = entries_of(known.path, entries)
+    if not found and entries_of(known.path, earlier):
+        found = entries_of(known.path, earlier)
+        digest, kind = evidence.named_hash(known.path)
+        if found[-1]["sha256"] != digest:
+            raise Refused(f"{known.path} differs from its provenance entry in feature 004's log")
+        return {"known_id": known.known_id, "path": known.path, "sha256": digest, "sha256_kind": kind,
+                "provenance_seq": min(e["seq"] for e in found), "provenance_log": evidence.FEATURES["004"]["rep"] + "/provenance.jsonl"}
     if not found:
         raise Refused(f"{known.path} has no provenance entry")
     digest, kind = evidence.named_hash(known.path)
@@ -210,15 +225,17 @@ def guard_order(tool: Tool, targets: Sequence[Known], table: Dict[str, Known]) -
     """Each known result and each second stands in the log, unchanged, before the tool's first entry
     (data-model sections 7 and 14)."""
     entries = [entry for entry, _ in evidence.check_chain(evidence.PROVENANCE_LOG_REL)]
+    earlier = [] if evidence.FEATURE == "004" else \
+        [entry for entry, _ in evidence.check_chain(evidence.FEATURES["004"]["rep"] + "/provenance.jsonl")]
     own = entries_of(tool.source, entries)
     if not own:
         raise Refused(f"{tool.source} has no provenance entry")
     before = min(e["seq"] for e in own)
     cited = {}
     for known in targets:
-        cited[known.known_id] = logged(known, entries, before)
+        cited[known.known_id] = logged(known, entries, before, earlier)
         for second in seconds_of(table, known.known_id):
-            cited[second.known_id] = logged(second, entries, before)
+            cited[second.known_id] = logged(second, entries, before, earlier)
     return cited
 
 
@@ -250,7 +267,8 @@ def guard_source(known: Known) -> Dict:
     if module is None:
         raise Refused(f"{known.known_id}: no recorded source for its value")
     names = [module.DOWNLOAD] if isinstance(module.DOWNLOAD, str) else list(module.DOWNLOAD)
-    manifest = evidence.read_manifest()
+    # Feature 005 plans no download: a published value rests on feature 004's `fetched` entry (feature 005, FR-001).
+    manifest = evidence.read_manifest() if evidence.FEATURE == "004" else evidence.read_manifest("004")
     digests = []
     for name in names:
         fetched = [e for e in manifest if e.get("name") == name and e.get("status") == "fetched"]
@@ -407,6 +425,11 @@ def validate(args: argparse.Namespace, command: List[str]) -> int:
         raise Refused(f"no tool {args.tool!r}")
     tool = TOOLS[args.tool]
     table = known_results()
+    if tool.name in COMPANIONS:
+        if evidence.FEATURE == "004":
+            raise Refused(f"{tool.name} is a tool of a later feature: it is validated under its own setting")
+        table = {known_id: replace(known, tool=tool.name) if known.tool == COMPANIONS[tool.name] else known
+                 for known_id, known in table.items()}
     if args.known not in table:
         raise Refused(f"no known result {args.known!r}")
     known = table[args.known]
