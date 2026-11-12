@@ -1,7 +1,7 @@
 {
  "lists": "specs/005-crypto-architecture-v4/checklist-choices.md",
  "plan_approval": "afc676950f9f9e7415b871177a70ce2f8acfbdb0",
- "compared_to": "671f34df20661f13bdefeb4f6056b447e99ea55c",
+ "compared_to": "2159d2464dd6391669e00451152d91d4df2ba0a7",
  "places": [
   "D1",
   "D10",
@@ -2811,9 +2811,16 @@
   },
   {
    "from": "62e68f2b8ff99a33b3e20a3748f97e7164f94f4c",
-   "to": "671f34df20661f13bdefeb4f6056b447e99ea55c",
+   "to": "2159d2464dd6391669e00451152d91d4df2ba0a7",
    "after": "Rows that change the protocol (analysis remediation 10)",
-   "changes": []
+   "changes": [
+    {
+     "commit": "49e6eaafa4a620f45ee5588f5137c64f0a9cba8f",
+     "places": [
+      "research/005/plan_projections.py"
+     ]
+    }
+   ]
   }
  ],
  "unmade": [
@@ -2825,6 +2832,15 @@
     "936f586733c9dba5cc26b23c14d3caae7dc247a6"
    ],
    "beside": "Rows that change the protocol (round 3)"
+  },
+  {
+   "commit": "49e6eaafa4a620f45ee5588f5137c64f0a9cba8f",
+   "place": "research/005/plan_projections.py",
+   "in": [
+    "62e68f2b8ff99a33b3e20a3748f97e7164f94f4c",
+    "2159d2464dd6391669e00451152d91d4df2ba0a7"
+   ],
+   "beside": "Rows that change the protocol (analysis remediation 10)"
   }
  ]
 }
