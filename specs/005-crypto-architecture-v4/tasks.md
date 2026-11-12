@@ -146,10 +146,11 @@ itself. No task of phases 1 to 9 starts before T004.
   with the reason; set the row "Readings set aside", reading Not needed where no listed change sets
   a reading aside; set the row "Tasks approval"; and commit the rows with the spec's Status line.
   (FR-031; spec notes; Principle VIII)
-- [ ] T005 In the commit after T004's, write security.md's next version, CRLF kept, with its
-  history entry: row 5a.1b's status naming the tasks approval as passed and the next gate, with its
-  allow-list entry in `protocol/claims.json` where the claim test asks for one;
-  `python -X utf8 scripts/check_claims.py` reports 0 findings. (FR-027; SC-007)
+- [X] T005 (done: security.md 2.22, the claim test at 0 findings) In the commit after T004's, write
+  security.md's next version, CRLF kept, with its history entry: row 5a.1b's status naming the tasks
+  approval as passed and the next gate, with its allow-list entry in `protocol/claims.json` where
+  the claim test asks for one; `python -X utf8 scripts/check_claims.py` reports 0 findings. (FR-027;
+  SC-007)
 
 **Checkpoint**: tasks approved; "Place check" and "Readings set aside" decided at HEAD, where the
 protocol change log's creation reads them (T015).
