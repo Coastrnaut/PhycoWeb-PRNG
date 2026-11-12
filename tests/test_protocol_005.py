@@ -10,6 +10,7 @@ This file makes no security claim.
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import unittest
@@ -983,6 +984,352 @@ class TheRecheckOfThisFeature(TempRepo005):
         record["candidate"] = "v4-A9"
         found = self.recheck.differences(record, self.recheck.check_trail(record, evidence))
         self.assertIn("not committed", found[0]["recomputed"])
+
+
+# ----------------------------------------------------------- the probes and the projection table
+
+CAPS = {16: 48.0, 8: 24.0, 4: 8.0}
+REFERENCE_DESIGNS = ("cand-A1", "cand-B1")
+
+
+def plan_fixture() -> dict:
+    """A small plan-projections.json of the committed one's form: both reference designs, each size
+    and kind, with searches that feature 004 made (a source), projected (none) or left to the cap."""
+    climbs, trails = {}, {}
+    for design in REFERENCE_DESIGNS:
+        trails[design] = 0.0
+        for size, cap in CAPS.items():
+            for kind in ("linear", "differential"):
+                if design == "cand-A1":
+                    searches = [{"r": 1, "need_h": 0.5, "source": "bound-a"}, {"r": 2, "need_h": 1.0, "source": "bound-b"}]
+                    if size == 16 and kind == "differential":
+                        searches.append({"r": 3, "need_h": cap, "note": "reaches this cap"})
+                elif size == 16:
+                    searches = [{"r": 1, "need_h": cap, "note": "reaches this cap"}]
+                elif size == 8:
+                    searches = [{"r": 1, "need_h": 6.0, "note": "projected"}, {"r": 2, "need_h": cap, "note": "reaches this cap"}]
+                else:
+                    searches = [{"r": 1, "need_h": 0.1, "note": "projected"}]
+                need = sum(row["need_h"] for row in searches)
+                trails[design] += need
+                climbs[f"{design} {size}x{size} {kind}"] = {"cap_h": cap, "need_h": round(need, 4), "searches": searches}
+    rows = {family: {"trails_need_h": round(trails[design], 3), "structural_need_h": 12.0, "bias_need_h": 24.0,
+                     "row_h": round(2 * (trails[design] + 36.0), 1)}
+            for design, family in (("cand-A1", "ARX"), ("cand-B1", "Boolean"))}
+    option = {"caps_h": {f"{n}x{n}": cap for n, cap in CAPS.items()}, "candidates_per_family": 3, "ceiling_h": 2200.0,
+              "provisional_needs_h": {"structural": 12.0, "bias": 24.0},
+              "feature_wide_needs_h": {"probes": 40.0, "two whole-suite runs per platform": 2.0, "reproductions and re-checks": 9.0},
+              "feature_wide_row_h": 102.0, "rows": rows, "climbs": climbs,
+              "sum_of_rows_h": round(3 * sum(row["row_h"] for row in rows.values()) + 102.0, 1)}
+    return {"approved_option": "E", "margin": 2, "options": {"E": option}}
+
+
+def chain(entries) -> bytes:
+    lines, previous = b"", evidence.ZERO_HASH
+    for seq, entry in enumerate(entries):
+        raw = json.dumps(dict(entry, seq=seq, prev_sha256=previous, date_utc="2026-11-12T00:00:00Z"),
+                         sort_keys=True, ensure_ascii=False).encode("utf-8") + b"\n"
+        lines += raw
+        previous = evidence.sha256(raw)
+    return lines
+
+
+class PlannedRepo(TempRepo005):
+    """A repository with the plan's projections, the reference designs and feature 004's log of them."""
+
+    def setUp(self):
+        super().setUp()
+        from scripts import evidence_v3, projection_table
+        self.ev, self.table = evidence_v3, projection_table
+        write(self.root, evidence.PLAN_PROJECTIONS_REL, json.dumps(plan_fixture(), indent=1, sort_keys=True) + "\n")
+        write(self.root, evidence.REFUSED_LIST_REL, (ROOT / evidence.REFUSED_LIST_REL).read_bytes())
+        entries = []
+        for design in REFERENCE_DESIGNS:
+            source = (ROOT / f"research/004/candidates/{design}.py").read_bytes()
+            write(self.root, f"research/004/candidates/{design}.py", source)
+            entries.append({"event": "proposed", "candidate_id": design, "oplist_sha256": evidence.sha256(source)})
+        write(self.root, "research/004/candidates.jsonl", chain(entries))
+        for name in ("bound-a", "bound-b"):
+            write(self.root, f"reports/004-crypto-architecture-v3/candidates/cand-A1/{name}.json",
+                  json.dumps({"record_id": name}) + "\n")
+        for rel in ("research/004/tools/trails/long_trail.py", "research/004/tools/trails/active_sbox.py"):
+            write(self.root, rel, (ROOT / rel).read_bytes())
+        self.commit("the plan and the reference designs")
+        for target, name, value in ((projection_table, "BASELINE", "HEAD"), (evidence_v3, "CODE", [])):
+            patcher = mock.patch.object(target, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.real_plan_check = projection_table.guard_plan_check
+        patcher = mock.patch.object(projection_table, "guard_plan_check")
+        self.plan_check = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def probe_record(self, design, kind, size, result="finished", hours=1.0, bound_kind=evidence.NONE, rounds=66):
+        extra = {"table_probe": {"design": design, "family": "ARX" if design == "cand-A1" else "Boolean", "kind": kind,
+                                 "size": size, "width": 32, "rounds": rounds, "bound_kind": bound_kind,
+                                 "method": evidence.NONE}, "result": result, "limit_hours": 4.0}
+        if result == "finished":
+            extra["probe_hours"] = hours
+        return evidence.write_projection(run="probe", row=evidence.FEATURE_ROW, inputs="none", measured_speed={},
+                                         projected_hours=4.0, time_hours=0.0 if result == "refused" else hours, extra=extra)
+
+    def every_probe(self, **override):
+        """One record per listed probe, each finished in an hour unless `override` names it."""
+        listed = [(design, kind, size, evidence.NONE, 66) for design in REFERENCE_DESIGNS
+                  for kind in ("structural", "bias") for size in (4, 8, 16)]
+        listed += [("cand-A1", "bound", 16, "differential", 3)]
+        listed += [("cand-B1", "bound", size, kind, r) for size, last in ((16, 1), (8, 2))
+                   for kind in ("linear", "differential") for r in range(1, last + 1)]
+        for design, kind, size, bound_kind, rounds in listed:
+            name = f"{design} {kind} {size} {bound_kind} {rounds}"
+            result, hours = override.get(name, ("finished", 1.0))
+            if result is not None:
+                self.probe_record(design, kind, size, result, hours, bound_kind, rounds)
+        self.commit("the probes")
+
+    def propose(self):
+        write(self.root, evidence.CANDIDATE_LOG_REL, chain([{"event": "proposed", "candidate_id": "v4-A1", "family": "ARX"}]))
+        self.commit("a candidate")
+
+
+class Probes(PlannedRepo):
+    """contracts/cli.md, "`scripts/evidence_v3.py … --probe`"; research R5; spec FR-005."""
+
+    def run_probe(self, *arguments, finishes=True):
+        calls = []
+
+        def limited(function, job, seconds):
+            calls.append(job)
+            return 1.0 if finishes is True or len(calls) <= finishes else None
+
+        with mock.patch.object(self.ev, "limited", limited), mock.patch("builtins.print"):
+            code = self.ev.main(["--probe", "--candidate", "cand-A1", *arguments])
+        records = sorted(((self.root / evidence.REP_REL / "projections").glob("projection-*.json")),
+                         key=lambda path: path.stat().st_mtime_ns)
+        return code, calls, [json.loads(path.read_bytes().decode("utf-8")) for path in records]
+
+    def test_a_probe_is_a_projection_record_of_the_feature_wide_row(self):
+        code, calls, records = self.run_probe("--kind", "structural", "--size", "4")
+        self.assertEqual(code, 0)
+        record = records[-1]
+        self.assertEqual((record["kind"], record["row"], record["result"]), ("projection", "feature-wide", "finished"))
+        self.assertEqual(record["table_probe"], {"design": "cand-A1", "family": "ARX", "kind": "structural", "size": 4,
+                                                 "width": 32, "rounds": 66, "bound_kind": "none", "method": "none"})
+        self.assertEqual(sorted(record["hours_by_kind"]), sorted(["inverse", "dependency", "symmetry", "invariant", "degree"]))
+        self.assertEqual([job[1] for job in calls], ["inverse", "dependency", "symmetry", "invariant", "degree"])
+        self.assertEqual(record["parallelism"], {"threads": 1, "workers": 1})
+        self.assertEqual(record["limit_hours"], 4.0)
+        self.assertIn("discarded unread", record["outputs_statement"])
+        self.assertEqual(record["probe_hours"], record["time_hours"])
+        self.assertEqual(record["design"]["sha256"],
+                         evidence.sha256((ROOT / "research/004/candidates/cand-A1.py").read_bytes()))
+        self.assertEqual(record["feature"], "005")
+        self.assertFalse((self.root / "data/heavy-run.lock").exists())
+
+    def test_a_bias_probe_runs_at_66_rounds_and_one_thread(self):
+        code, calls, records = self.run_probe("--kind", "bias", "--size", "8")
+        self.assertEqual(code, 0)
+        self.assertEqual([(job[1], job[2], job[3]) for job in calls], [("frequency", 8, 66), ("avalanche", 8, 66)])
+        self.assertEqual(records[-1]["parallelism"]["threads"], 1)
+        self.assertEqual(self.run_probe("--kind", "bias", "--size", "8", "--rounds", "12")[0], evidence.EXIT_REFUSED)
+
+    def test_a_probe_that_does_not_finish_reached_the_probe_limit(self):
+        code, calls, records = self.run_probe("--kind", "structural", "--size", "16", finishes=2)
+        self.assertEqual(code, 0)
+        self.assertEqual(records[-1]["result"], "reached the probe limit")
+        self.assertNotIn("probe_hours", records[-1])
+        self.assertEqual(sorted(records[-1]["hours_by_kind"]), ["dependency", "inverse"])
+        self.assertEqual(len(calls), 3)
+
+    def test_a_search_probe_names_its_kind_and_r_and_is_projected_at_the_plans_need(self):
+        code, calls, records = self.run_probe("--kind", "bound", "--size", "16", "--bound-kind", "differential", "--rounds", "2")
+        self.assertEqual(code, 0)
+        self.assertEqual(records[-1]["projected_hours"], 1.0)
+        self.assertEqual(records[-1]["table_probe"]["method"], "active-box count")
+        self.assertEqual([job[1:5] for job in calls], [("bound", 16, 2, "differential")])
+        code, _, records = self.run_probe("--kind", "bound", "--size", "16", "--bound-kind", "differential", "--rounds", "3")
+        self.assertEqual(records[-1]["projected_hours"], 4.0)
+        self.assertEqual(self.run_probe("--kind", "bound", "--size", "16")[0], evidence.EXIT_REFUSED)
+        self.assertEqual(self.run_probe("--kind", "bound", "--size", "16", "--bound-kind", "linear", "--rounds", "9")[0],
+                         evidence.EXIT_REFUSED)
+
+    def test_it_exits_2_once_a_proposed_entry_exists(self):
+        self.propose()
+        code, calls, records = self.run_probe("--kind", "structural", "--size", "4")
+        self.assertEqual((code, calls, records), (evidence.EXIT_REFUSED, [], []))
+
+    def test_a_probe_past_the_40_h_share_is_refused_and_keeps_the_plans_projection(self):
+        self.assertEqual(self.ev.probes_share(), 40.0)
+        for _ in range(4):
+            self.probe_record("cand-B1", "bias", 4, hours=9.5)
+        self.assertEqual(self.ev.probes_used(), 38.0)
+        code, calls, records = self.run_probe("--kind", "structural", "--size", "4")
+        self.assertEqual((code, calls), (evidence.EXIT_REFUSED, []))
+        refused = [record for record in records if record["result"] == "refused"]
+        self.assertEqual([(record["time_hours"], record["table_probe"]["kind"]) for record in refused], [(0.0, "structural")])
+        code, _, records = self.run_probe("--kind", "bound", "--size", "16", "--bound-kind", "differential", "--rounds", "2")
+        self.assertEqual(code, 0)
+        self.assertEqual(len([record for record in records if record["table_probe"]["kind"] == "bound"]), 1)
+
+    def test_the_share_is_the_tables_once_it_exists(self):
+        write(self.root, f"{evidence.REP_REL}/projection-table.json",
+              json.dumps({"feature_wide_row": {"holds_h": 102.0, "probes_share_h": 30.0}}))
+        self.assertEqual(self.ev.probes_share(), 30.0)
+
+    def test_only_a_reference_design_as_feature_004s_log_holds_it(self):
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.ev.main(["--probe", "--candidate", "v4-A1", "--kind", "bias", "--size", "4"]),
+                             evidence.EXIT_REFUSED)
+        write(self.root, "research/004/candidates/cand-A1.py", "import ir\n")
+        self.assertEqual(self.run_probe("--kind", "bias", "--size", "4")[0], evidence.EXIT_REFUSED)
+        self.commit("another list")
+        self.assertEqual(self.run_probe("--kind", "bias", "--size", "4")[0], evidence.EXIT_REFUSED)
+
+    def test_it_runs_under_005_alone_and_at_a_claimable_size(self):
+        self.assertEqual(self.run_probe("--kind", "bias", "--size", "2")[0], evidence.EXIT_REFUSED)
+        self.assertEqual(self.run_probe("--kind", "inverse", "--size", "4")[0], evidence.EXIT_REFUSED)
+        evidence.set_feature("004")
+        self.addCleanup(evidence.set_feature, "005")
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.ev.main(["--probe", "--candidate", "cand-A1", "--kind", "bias", "--size", "4"]),
+                             evidence.EXIT_REFUSED)
+
+
+class TheProjectionTable(PlannedRepo):
+    """contracts/cli.md, "`scripts/projection_table.py [--check]`"; data-model section 4."""
+
+    def main(self, *arguments):
+        with mock.patch("builtins.print") as printed:
+            code = self.table.main(list(arguments))
+        return code, " ".join(str(call.args[0]) for call in printed.call_args_list if call.args)
+
+    def test_each_value_is_the_smaller_of_the_plans_and_the_probes(self):
+        self.every_probe()
+        table = self.table.compute()
+        plan = plan_fixture()["options"]["E"]
+        for family in ("ARX", "Boolean"):
+            row = table["rows"][family]
+            self.assertEqual(row["structural"], {"plan_h": 24.0, "need_h": 3.0, "holds_h": 6.0})
+            self.assertEqual(row["bias"], {"plan_h": 48.0, "need_h": 3.0, "holds_h": 6.0})
+            self.assertLessEqual(row["trails"]["holds_h"], row["trails"]["plan_h"])
+            self.assertEqual(row["row"]["plan_h"], plan["rows"][family]["row_h"])
+            self.assertLessEqual(row["row"]["holds_h"], row["row"]["plan_h"])
+        search = table["families"]["ARX"]["climbs"]["16x16"]["differential"]["runs"][2]
+        self.assertEqual((search["plan_need_h"], search["need_h"], search["probe_result"]), (48.0, 1.0, "finished"))
+        self.assertEqual(table["rows"]["ARX"]["trails"]["need_h"], 9.0 + 1.0)
+        self.assertEqual(table["caps_h"]["16x16"], {"plan_h": 48.0, "holds_h": 48.0})
+        self.assertEqual(table["feature_wide_row"]["holds_h"], 102.0)
+        self.assertLessEqual(table["sum_of_rows_h"], table["plan_sum_of_rows_h"])
+        self.assertTrue(table["fits_ceiling"])
+        self.assertEqual(table["above_row"], [])
+
+    def test_no_value_is_raised(self):
+        self.every_probe(**{"cand-B1 bound 8 linear 1": ("finished", 20.0), "cand-A1 structural 4 none 66": ("finished", 30.0)})
+        table = self.table.compute()
+        run = table["families"]["Boolean"]["climbs"]["8x8"]["linear"]["runs"][0]
+        self.assertEqual((run["plan_need_h"], run["need_h"]), (6.0, 6.0))
+        self.assertEqual(table["rows"]["ARX"]["structural"]["need_h"], 12.0)
+        self.assertEqual(table["rows"]["ARX"]["structural"]["holds_h"], 24.0)
+
+    def test_a_search_probe_at_the_limit_reads_as_its_search_at_the_cap(self):
+        self.every_probe(**{"cand-B1 bound 8 linear 1": ("reached the probe limit", 4.0),
+                            "cand-B1 bound 8 linear 2": (None, 0.0)})
+        climb = self.table.compute()["families"]["Boolean"]["climbs"]["8x8"]["linear"]
+        self.assertEqual(len(climb["runs"]), 1)
+        self.assertEqual((climb["runs"][0]["need_h"], climb["runs"][0]["reaches_cap"]), (24.0, True))
+        self.assertEqual((climb["plan_need_h"], climb["need_h"]), (30.0, 24.0))
+
+    def test_a_probe_that_did_not_finish_keeps_its_sizes_share(self):
+        self.every_probe(**{"cand-A1 bias 16 none 66": ("reached the probe limit", 4.0),
+                            "cand-A1 structural 8 none 66": ("refused", 0.0)})
+        rows = self.table.compute()["rows"]["ARX"]
+        self.assertEqual(rows["bias"]["need_h"], 1.0 + 1.0 + 8.0)
+        self.assertEqual(rows["structural"]["need_h"], 1.0 + 4.0 + 1.0)
+
+    def test_a_need_shown_above_its_row_is_recorded_and_printed(self):
+        self.every_probe(**{f"cand-A1 structural {size} none 66": ("finished", 9.0) for size in (4, 8, 16)})
+        table = self.table.compute()
+        self.assertEqual(table["rows"]["ARX"]["structural"]["holds_h"], 24.0)
+        self.assertEqual(len(table["above_row"]), 1)
+        self.assertEqual((table["above_row"][0]["family"], table["above_row"][0]["row"], table["above_row"][0]["shown_at_least_h"]),
+                         ("ARX", "structural", 27.0))
+        code, printed = self.main()
+        self.assertEqual(code, 0)
+        self.assertIn("above its row: ARX structural", printed)
+
+    def test_a_listed_probe_missing_or_not_committed_is_refused(self):
+        self.every_probe(**{"cand-B1 bound 16 linear 1": (None, 0.0)})
+        self.assertEqual(self.main()[0], evidence.EXIT_REFUSED)
+        self.probe_record("cand-B1", "bound", 16, bound_kind="linear", rounds=1)
+        self.assertEqual(self.main()[0], evidence.EXIT_REFUSED)
+        self.commit("the last probe")
+        self.assertEqual(self.main()[0], 0)
+
+    def test_it_exits_2_once_a_proposed_entry_exists_or_the_plan_fails_its_check(self):
+        self.every_probe()
+        self.plan_check.side_effect = Refused("plan-projections.json fails its --check")
+        self.assertEqual(self.main()[0], evidence.EXIT_REFUSED)
+        self.plan_check.side_effect = None
+        self.propose()
+        self.assertEqual(self.main()[0], evidence.EXIT_REFUSED)
+        self.assertFalse((self.root / evidence.REP_REL / "projection-table.json").exists())
+
+    def test_the_plans_check_is_the_plan_scripts(self):
+        with mock.patch.object(self.table.subprocess, "run", return_value=mock.Mock(returncode=1, stdout="differs", stderr="")):
+            with self.assertRaises(Refused):
+                self.real_plan_check()
+        with mock.patch.object(self.table.subprocess, "run", return_value=mock.Mock(returncode=0, stdout="matches", stderr="")):
+            self.real_plan_check()
+
+    def test_the_table_is_written_checked_and_read(self):
+        self.every_probe()
+        code, printed = self.main()
+        self.assertEqual(code, 0)
+        path = self.root / evidence.REP_REL / "projection-table.json"
+        table = json.loads(path.read_bytes().decode("utf-8"))
+        self.assertEqual((table["kind"], table["feature"], table["classification"]), ("projection-table", "005", "none"))
+        blob = (self.root / evidence.PLAN_PROJECTIONS_REL).read_bytes()
+        self.assertEqual((table["plan_projections_sha256"], table["plan_projections_sha256_kind"]),
+                         (hashlib.sha256(blob).hexdigest(), "raw"))
+        self.assertEqual(self.main("--check")[0], 0)
+        self.assertEqual(evidence.row_hours("v4-A1", "trails"), table["rows"]["ARX"]["trails"]["holds_h"])
+        self.assertEqual(evidence.row_hours("v4-B2", "statistics"), table["rows"]["Boolean"]["bias"]["holds_h"])
+        self.assertEqual(evidence.feature_row_hours(), 102.0)
+        table["rows"]["ARX"]["trails"]["holds_h"] += 1.0
+        path.write_bytes(evidence.pretty(table))
+        self.assertEqual(self.main("--check")[0], evidence.EXIT_VERDICT)
+
+    def test_it_holds_numbers_record_ids_and_fixed_names_and_no_prose(self):
+        self.every_probe(**{"cand-B1 bound 8 linear 1": ("reached the probe limit", 4.0),
+                            "cand-B1 bound 8 linear 2": (None, 0.0)})
+        allowed = {"projection-table", "005", "none", "raw", "E", "cap", "plan", "finished", "reached the probe limit",
+                   "refused", "cand-A1", "cand-B1", "ARX", "Boolean"}
+
+        def texts(value):
+            if isinstance(value, dict):
+                for item in value.values():
+                    yield from texts(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from texts(item)
+            elif isinstance(value, str):
+                yield value
+
+        for text in texts(self.table.compute()):
+            if text in allowed or re.fullmatch(r"[0-9a-f]{64}", text):
+                continue
+            self.assertRegex(text, r"^(projection-\d{8}T\d{6}Z-[0-9a-f]{8}|bound-[a-z]|reports/00[45]-[\w./-]+\.json)$")
+
+    def test_a_source_is_named_by_record_id_path_and_sha256(self):
+        self.every_probe()
+        table = self.table.compute()
+        made = table["families"]["ARX"]["climbs"]["4x4"]["linear"]["runs"][0]["source"]
+        rel = "reports/004-crypto-architecture-v3/candidates/cand-A1/bound-a.json"
+        self.assertEqual(made, {"record_id": "bound-a", "path": rel, "sha256_kind": "raw",
+                                "sha256": hashlib.sha256((self.root / rel).read_bytes()).hexdigest()})
+        probed = table["families"]["Boolean"]["climbs"]["16x16"]["linear"]["runs"][0]["source"]
+        self.assertEqual(hashlib.sha256((self.root / probed["path"]).read_bytes()).hexdigest(), probed["sha256"])
+        self.assertEqual(table["families"]["Boolean"]["climbs"]["4x4"]["linear"]["runs"][0]["source"], "plan")
 
 
 if __name__ == "__main__":

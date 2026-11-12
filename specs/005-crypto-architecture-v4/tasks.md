@@ -383,7 +383,7 @@ most the plan's (FR-005, FR-009; R5).
 plan's, and every row holds at least twice the projected needs it holds, the rows of the families
 that hold candidates (SC-001).
 
-- [ ] T022 [US1] Write the tests of the probes and the projection table in
+- [X] T022 [US1] Write the tests of the probes and the projection table in
   `tests/test_protocol_005.py` (contracts/cli.md, "`scripts/evidence_v3.py … --probe`" and
   "`scripts/projection_table.py [--check]`"; data-model §4): `--probe` exits 2 once any `proposed`
   entry exists; it writes a `projection` record charged to the feature-wide row, at one thread,
@@ -402,7 +402,7 @@ that hold candidates (SC-001).
   table holds numbers, record IDs and fixed field names and no prose (FR-024), with
   `plan_projections_sha256` and its kind `raw`; `--check` recomputes it and exits 1 on a difference;
   a probe that shows a need above its row is printed and recorded. (FR-005, FR-009, FR-024; SC-001)
-- [ ] T023 [P] [US1] Add `--probe` to `scripts/evidence_v3.py` (contracts/cli.md; research R5) until
+- [X] T023 [P] [US1] Add `--probe` to `scripts/evidence_v3.py` (contracts/cli.md; research R5) until
   T022's probe tests pass: the run itself on a reference design's committed operation list,
   `research/004/candidates/cand-A1.py` or `cand-B1.py`, read and never written, up to 4 h, written
   as a `projection` record charged to the feature-wide row at one thread, the row and the probes' 40
@@ -410,7 +410,7 @@ that hold candidates (SC-001).
   exist; the guard that refuses an operation list without a `proposed` entry reads, for a probe,
   feature 004's candidate log, where both reference designs hold theirs. (FR-005, FR-007; SC-001;
   R5)
-- [ ] T024 [P] [US1] Write `scripts/projection_table.py [--check]` (contracts/cli.md; data-model §4)
+- [X] T024 [P] [US1] Write `scripts/projection_table.py [--check]` (contracts/cli.md; data-model §4)
   until T022 passes: per family, size and kind, each listed run with `need_h`, its source (a
   feature-004 run or a probe, by `record_id`, path and SHA-256 over the committed bytes, kind `raw`,
   or `cap`) and the value fixed, from the option `plan-projections.json` names as

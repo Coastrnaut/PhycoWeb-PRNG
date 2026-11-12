@@ -18,6 +18,7 @@ Statistical evidence is not evidence of security. This script makes no security 
 import argparse
 import gzip
 import hashlib
+import importlib.util
 import json
 import math
 import multiprocessing
@@ -706,9 +707,9 @@ def dependency_cited(candidate: str, n: int) -> Optional[str]:
     return max(found, key=lambda record: record["created_utc"])["record_id"] if found else None
 
 
-def run_avalanche(subject: Subject, run: evidence.Run) -> Dict:
+def run_avalanche(subject: Subject, run: evidence.Run, cited: Optional[str] = None) -> Dict:
     n, w, rounds = subject.n, subject.w, subject.rounds
-    cited = dependency_cited(subject.candidate, n)
+    cited = cited or dependency_cited(subject.candidate, n)
     if cited is None:
         raise Refused(f"an avalanche run needs the candidate's dependency record at {n}×{n}")
     first, whole = bias_entries(n)
@@ -1709,6 +1710,214 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
     return carried_out(run, candidate, row, hours, work)
 
 
+# ------------------------------------------------------------- probes for the projection table
+
+PROBE_LIMIT_HOURS = 4.0
+PROBE_ROUNDS = 66
+PROBE_CAPACITY = 384
+PROBE_DESIGNS = {"cand-A1": "ARX", "cand-B1": "Boolean"}
+PROBE_GROUPS = {"structural": ("inverse", "dependency", "symmetry", "invariant", "degree"), "bias": ("frequency", "avalanche")}
+PROBE_METHODS = {"cand-A1": "active-box count", "cand-B1": "active-S-box count"}
+PROBE_SHARE = "probes"
+REFERENCE = evidence.FEATURES["004"]
+FINISHED, REACHED_LIMIT, PROBE_REFUSED = "finished", "reached the probe limit", "refused"
+PROBE_STATEMENT = "every output other than the timing is discarded unread"
+
+
+class ProbeRun:
+    """What a kind's run asks of its Run, for a probe: one worker, a directory of its own, and every output discarded unread."""
+
+    workers = 1
+
+    def __init__(self, tmp: Path):
+        self.tmp = tmp
+        self.extra: Dict[str, Any] = {"exclusions_and_reruns": []}
+
+    def output(self, name: str, data: bytes, **_: Any) -> Dict:
+        return {"path": name, "sha256": NONE, "sha256_kind": "raw"}
+
+    def adopt(self, name: str, path: Path, part: Dict) -> Dict:
+        return {"path": name, "sha256": NONE, "sha256_kind": "raw"}
+
+
+def reference_rel(design: str) -> str:
+    return f"{REFERENCE['research']}/candidates/{design}.py"
+
+
+def guard_reference(design: str) -> Dict:
+    """A probe's operation list is a reference design's, committed and as feature 004's candidate log holds it: the list is read and
+    never written (feature 005, FR-005; research R5)."""
+    if design not in PROBE_DESIGNS:
+        raise Refused(f"a probe runs on a reference design, one of {tuple(PROBE_DESIGNS)}")
+    rel = reference_rel(design)
+    blob = evidence.show(rel)
+    if blob is None or evidence.REPO.path(rel).read_bytes() != blob:
+        raise Refused(f"{rel} is not committed as it stands")
+    digest = evidence.sha256(blob)
+    held = [entry for entry, _ in evidence.check_chain(f"{REFERENCE['research']}/candidates.jsonl")
+            if entry.get("candidate_id") == design and entry.get("oplist_sha256") == digest]
+    if not held:
+        raise Refused(f"feature 004's candidate log holds no entry of {design} with the list's SHA-256")
+    return {"path": rel, "sha256": digest, "sha256_kind": "raw"}
+
+
+def reference_module(design: str):
+    """A reference design's module, loaded from feature 004's directory under the name its tools look for."""
+    name = design.replace("-", "_")
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, evidence.REPO.path(reference_rel(design)))
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+    return sys.modules[name]
+
+
+def probe_subject(design: str, n: int, rounds: int, tmp: Optional[Path]) -> Subject:
+    """The reference design at n and w = 32; with `tmp`, its constant table of `rounds` rows by the inherited rule, written there
+    for the run to name and never under feature 004's paths."""
+    loaded = ir.load(reference_module(design).build(n, PRODUCTION_WIDTH))
+    if tmp is None:
+        return Subject(design, n, PRODUCTION_WIDTH, rounds, 0, f"n{n}-w{PRODUCTION_WIDTH}", loaded, [], "")
+    entries, _ = gen_constants_v3.guard_refused_list(evidence.REPO.root)
+    polynomial = gen_constants_v3.chosen_polynomial(entries)
+    read = gen_constants_v3.read_table(polynomial, rounds, ir.last_constant(loaded.program) + 1, PRODUCTION_WIDTH)
+    variant = f"n{n}-w{PRODUCTION_WIDTH}-R{rounds}-c{PROBE_CAPACITY}"
+    tmp.mkdir(parents=True, exist_ok=True)
+    path = tmp / f"{variant}.json"
+    path.write_bytes(gen_constants_v3.table_file(variant, loaded.program, rounds, polynomial, read))
+    return Subject(design, n, PRODUCTION_WIDTH, rounds, PROBE_CAPACITY, variant, loaded, read["table"], evidence.rel_to_repo(path))
+
+
+def reference_box_costs(design: str, kind: str) -> Tuple[int, ...]:
+    """The reference design's box bounds at w = 32, from feature 004's committed box record, read and never written."""
+    found = None
+    base = evidence.REPO.path(f"{REFERENCE['rep']}/candidates/{design}")
+    for path in sorted(base.glob("bound-*.json")):
+        record = json.loads(path.read_bytes().decode("utf-8"))
+        if record.get("method") == "branch-and-bound" and record.get("bound_kind") == kind and record.get("width") == PRODUCTION_WIDTH \
+                and record.get("status") == "pass" and (found is None or record["created_utc"] > found["created_utc"]):
+            found = record
+    if found is None:
+        raise Refused(f"feature 004 holds no box bound of {design}, kind {kind}, at w = {PRODUCTION_WIDTH}")
+    scale = 2 if kind == "linear" else 1
+    return tuple(scale * min(row["weights"][str(t)] for row in found["boxes"].values()) for t in range(1, found["rounds"] + 1))
+
+
+def probe_work(job: Tuple) -> float:
+    """One kind of a probe, the run itself, in a process of its own: its seconds, every other output discarded unread."""
+    design, kind, n, rounds, bound_kind, tmp, seconds = job
+    started = time.monotonic()
+    reference_module(design)
+    if kind == "bound":
+        subject = probe_subject(design, n, 0, None)
+        for module in (long_trail, active_sbox):
+            module.SETTINGS["time_limit"] = seconds + 600.0
+        if PROBE_DESIGNS[design] == "ARX":
+            long_trail.minima(branch_layer(subject.program, bound_kind), reference_box_costs(design, bound_kind), rounds)
+        else:
+            active_sbox.minima(boolean_layer(design, n, PRODUCTION_WIDTH), bound_kind, rounds)
+        return time.monotonic() - started
+    directory = Path(tmp)
+    subject = probe_subject(design, n, 0, None) if kind in NO_TABLE else probe_subject(design, n, rounds, directory)
+    run = ProbeRun(directory / kind)
+    if kind == "avalanche":
+        run_avalanche(subject, run, cited="a probe: the dependency matrices are computed here and no record is cited")
+    else:
+        RUNS[kind](subject, run)
+    return time.monotonic() - started
+
+
+def table_probes() -> List[Dict]:
+    return [record for _, record in evidence.iter_records("projection", "projections") if isinstance(record.get("table_probe"), dict)]
+
+
+def probes_used() -> float:
+    return sum(float(record.get("time_hours", 0.0)) for record in table_probes())
+
+
+def probes_share() -> float:
+    """The probes' share of the feature-wide row: the projection table's once it exists, the approved option's before (FR-005)."""
+    table = evidence.projection_table()
+    if table is not None:
+        return float(table["feature_wide_row"]["probes_share_h"])
+    return float(evidence.approved_option()["feature_wide_needs_h"][PROBE_SHARE])
+
+
+def plan_need(design: str, n: int, bound_kind: str, rounds: int) -> float:
+    for search in evidence.approved_option()["climbs"][f"{design} {n}x{n} {bound_kind}"]["searches"]:
+        if search["r"] == rounds:
+            return float(search["need_h"])
+    raise Refused(f"the approved option lists no {bound_kind} search of {design} at {n}×{n}, r = {rounds}")
+
+
+def run_probe(args: argparse.Namespace, command: List[str]) -> int:
+    """A probe for the projection table (research R5; contracts/cli.md): the run itself on a reference design's committed operation
+    list, up to 4 h at one thread, written as a `projection` record charged to the feature-wide row."""
+    if evidence.FEATURE == "004":
+        raise Refused("--probe runs under PHYCOWEB_FEATURE=005")
+    if candidates.of_event(candidates.entries(), "proposed"):
+        raise Refused("the candidate log holds a `proposed` entry: the probes come before the first")
+    design, group = args.candidate, args.kind
+    if group not in tuple(PROBE_GROUPS) + ("bound",):
+        raise Refused(f"a probe's --kind is one of {tuple(PROBE_GROUPS) + ('bound',)}")
+    n = args.size
+    if n not in evidence.CLAIMABLE_SIZES:
+        raise Refused(f"a probe names --size, one of {evidence.CLAIMABLE_SIZES}")
+    named = guard_reference(design)
+    if group == "bound":
+        if not args.bound_kind or not args.rounds:
+            raise Refused("a search probe names --bound-kind and --rounds")
+        rounds, kinds = args.rounds, ("bound",)
+        projected = min(PROBE_LIMIT_HOURS, plan_need(design, n, args.bound_kind, rounds))
+        code = CODE + [named["path"], TRAIL_PATHS[METHODS[PROBE_METHODS[design]]["tool"]]]
+    else:
+        if (args.rounds or PROBE_ROUNDS) != PROBE_ROUNDS:
+            raise Refused(f"a structural or bias probe runs at --rounds {PROBE_ROUNDS}, R_max + Δ (research R5)")
+        rounds, kinds, projected = PROBE_ROUNDS, PROBE_GROUPS[group], PROBE_LIMIT_HOURS
+        code = CODE + [named["path"]]
+    probe = {"design": design, "family": PROBE_DESIGNS[design], "kind": group, "size": n, "width": PRODUCTION_WIDTH, "rounds": rounds,
+             "bound_kind": args.bound_kind or NONE, "method": PROBE_METHODS[design] if group == "bound" else NONE}
+    used, share = probes_used(), probes_share()
+
+    def record(result: str, hours: Dict[str, float], elapsed: float) -> Path:
+        extra = {"table_probe": probe, "result": result, "hours_by_kind": hours, "limit_hours": PROBE_LIMIT_HOURS,
+                 "parallelism": {"threads": 1, "workers": 1}, "design": named, "share": {"name": PROBE_SHARE, "hours": share, "used_before": used}}
+        if result == FINISHED:
+            extra["probe_hours"] = elapsed
+        return evidence.write_projection(
+            run=f"probe: {group} of {design} at {n}×{n}, w = {PRODUCTION_WIDTH}" + (f", {args.bound_kind}, r = {rounds}" if group == "bound" else f", R = {rounds}"),
+            row=evidence.FEATURE_ROW, inputs="the reference design's committed operation list", measured_speed={"hours_by_kind": hours},
+            projected_hours=projected, time_hours=elapsed, statement=PROBE_STATEMENT, argv=command, code_files=code, extra=extra)
+
+    if used + projected > share:
+        path = record(PROBE_REFUSED, {}, 0.0)
+        raise Refused(f"{evidence.rel_to_repo(path)}: the probe, {projected:.3f} h, would take the probes past their {share:.1f} h share, "
+                      f"{used:.3f} h used: its run keeps the plan's projection")
+    evidence.guard_feature_row([projected])
+    for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+        os.environ[name] = "1"
+    tmp = evidence.REPO.path(evidence.LOCAL_REL) / "probes" / f"{design}-{group}-n{n}"
+    hours: Dict[str, float] = {}
+    result = FINISHED
+    started = time.monotonic()
+    with evidence.HeavyRunLock(" ".join(command)):
+        try:
+            for kind in kinds:
+                left = PROBE_LIMIT_HOURS * 3600.0 - (time.monotonic() - started)
+                before = time.monotonic()
+                done = limited(probe_work, (design, kind, n, rounds, args.bound_kind, str(tmp), left), left) if left > 0 else None
+                if done is None:
+                    result = REACHED_LIMIT
+                    break
+                hours[kind] = (time.monotonic() - before) / 3600.0
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+    elapsed = (time.monotonic() - started) / 3600.0
+    path = record(result, hours, elapsed)
+    print(f"{evidence.rel_to_repo(path)}: {result}, {elapsed:.3f} h")
+    return evidence.EXIT_OK
+
+
 # ------------------------------------------------------------------------- --aborted and controls
 
 def aborted(args: argparse.Namespace) -> int:
@@ -1984,7 +2193,8 @@ def guard_out_dir(args: argparse.Namespace) -> None:
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--candidate")
-    parser.add_argument("--kind", choices=KINDS + ("control",))
+    parser.add_argument("--kind", choices=KINDS + ("control", "structural", "bias"))
+    parser.add_argument("--probe", action="store_true", help="feature 005: a probe for the projection table (research R5)")
     parser.add_argument("--test", choices=BIAS_KINDS)
     parser.add_argument("--size", type=int)
     parser.add_argument("--width", type=int)
@@ -2006,6 +2216,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             return reproduce(args, command)
         if args.aborted:
             return aborted(args)
+        if args.probe:
+            return run_probe(args, command)
         if args.kind is None:
             raise Refused("a run names --kind")
         if args.kind != "control" and not args.candidate:
