@@ -91,25 +91,31 @@ from `/mnt/c/GIT/PhycoWeb-PRNG`. From T007 on, every command of this list runs w
 **Purpose**: the place check that the spec's notes ask for at the tasks approval, and the approval
 itself. No task of phases 1 to 9 starts before T004.
 
-- [ ] T001 Write `research/005/place_check.py`, feature 004's `research/004/place_check.py`
-  (2392150) adapted to this feature's paths and to its lists' table form (spec, notes under the
-  Review & Approval table; PRO-029): `FEATURE` `specs/005-crypto-architecture-v4/`, the plan
-  approval's commit `afc6769`, the output `research/005/place-check.json`; each list read from its
-  heading `### Rows that change the protocol (round <k>)`, or `(analysis remediation <k>)` for a
-  section of its own outside a round (FR-031), its two commits from the sentence "The round's two
-  commits are <choices> (its choices) and <apply> (its changes applied).", "batch's" for such a
-  section, and its rows from the table `| Row | Rule | Direction | Why |`, the places of each row
-  being the FR items, the research sections, the data-model sections and the contract's script
-  sections, each keyed by its heading's code span as feature 004's tool keys it, a renamed heading
-  reading as one place removed and one added, that its Rule cell names; each place's text read as
-  feature 004's tool reads it, with the spec's bullets under "Pre-registered Design Protocol: the
-  changed rules" in place of the protocol's paragraphs, the plan's table "Values this plan fixes
-  before first use", and `quickstart.md` and `research/005/plan-projections.json`, each whole,
-  beside them; standard library only, with the exit statuses of feature 004's tool. Check it on
-  rounds 1 to 5: it finds each list's two commits and the places each row's Rule names, and records
-  as changed by an edit that no row made the places of round 3 that the row "Checklist choices,
-  round 3" names beyond its rows' "Where" (research R8 and R13, data-model §4 and §5, the contract).
-  (FR-031; spec notes; PRO-029)
+- [X] T001 (done; the check on rounds 1 to 5 found each list's two commits and each row's places; of
+  the round-3 places that its last clause names, the comparison records research R13 alone as
+  changed by an edit that no row made, research R8, data-model §4 and §5 and the contract each being
+  named by another row of that round; the tool also compares the decisions, the other sections of
+  the spec, the plan and the contract and `research/005/plan_projections.py`, and reads two texts
+  that differ only in white space as one) Write `research/005/place_check.py`, feature 004's
+  `research/004/place_check.py` (2392150) adapted to this feature's paths and to its lists' table
+  form (spec, notes under the Review & Approval table; PRO-029): `FEATURE`
+  `specs/005-crypto-architecture-v4/`, the plan approval's commit `afc6769`, the output
+  `research/005/place-check.json`; each list read from its heading
+  `### Rows that change the protocol (round <k>)`, or `(analysis remediation <k>)` for a section of
+  its own outside a round (FR-031), its two commits from the sentence "The round's two commits are
+  <choices> (its choices) and <apply> (its changes applied).", "batch's" for such a section, and its
+  rows from the table `| Row | Rule | Direction | Why |`, the places of each row being the FR items,
+  the research sections, the data-model sections and the contract's script sections, each keyed by
+  its heading's code span as feature 004's tool keys it, a renamed heading reading as one place
+  removed and one added, that its Rule cell names; each place's text read as feature 004's tool
+  reads it, with the spec's bullets under "Pre-registered Design Protocol: the changed rules" in
+  place of the protocol's paragraphs, the plan's table "Values this plan fixes before first use",
+  and `quickstart.md` and `research/005/plan-projections.json`, each whole, beside them; standard
+  library only, with the exit statuses of feature 004's tool. Check it on rounds 1 to 5: it finds
+  each list's two commits and the places each row's Rule names, and records as changed by an edit
+  that no row made the places of round 3 that the row "Checklist choices, round 3" names beyond its
+  rows' "Where" (research R8 and R13, data-model §4 and §5, the contract). (FR-031; spec notes;
+  PRO-029)
 - [ ] T002 Once this file and every change of the `/speckit-analyze` loop are committed, run
   `python research/005/place_check.py --to HEAD`, which writes `research/005/place-check.json` over
   the commits from `afc6769` to HEAD; compare its places with the lists "Rows that change the
