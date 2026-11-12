@@ -32,6 +32,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from protocol.devinputs_v3 import PAIRS  # noqa: E402
+from protocol import evidence  # noqa: E402
 from protocol.evidence import Refused  # noqa: E402
 
 CANDIDATES = ROOT / "research/004/candidates"
@@ -531,10 +532,17 @@ def oplist_sha256(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def candidate_modules(directory: Path = CANDIDATES) -> Dict[str, Callable[[int, int], Program]]:
+def candidates_directory() -> Path:
+    """The active feature's candidates: research/004/candidates, or research/005/candidates under
+    PHYCOWEB_FEATURE=005 (feature 005, research R9)."""
+    return ROOT / evidence.FEATURES[evidence.FEATURE]["research"] / "candidates"
+
+
+def candidate_modules(directory: Optional[Path] = None) -> Dict[str, Callable[[int, int], Program]]:
     """Each candidate module's `build(n, w)`, by the module's name."""
     found: Dict[str, Callable[[int, int], Program]] = {}
-    for path in sorted(Path(directory).glob("cand-*.py")):
+    directory = candidates_directory() if directory is None else directory
+    for path in sorted(Path(directory).glob(evidence.CANDIDATE_PREFIX + "*.py")):
         name = path.stem.replace("-", "_")
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)

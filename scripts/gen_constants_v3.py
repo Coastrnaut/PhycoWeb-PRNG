@@ -58,6 +58,20 @@ MODULE_REL = "phycoweb/constants_v3.py"
 VECTORS_REL = "vectors/phyco-v3"
 SIDECAR_REL = VECTORS_REL + "/MANIFEST.json"
 EXPLORATION_REL = "research/004/exploration"
+
+
+def _follow_feature() -> None:
+    """The module, the vectors and the exploration tables are the active feature's model's
+    (feature 005, research R9): phycoweb/constants_v4.py and vectors/phyco-v4 under 005."""
+    global MODULE_REL, VECTORS_REL, SIDECAR_REL, EXPLORATION_REL
+    version = evidence.MODEL_ID.rsplit("-", 1)[-1]
+    MODULE_REL = f"phycoweb/constants_{version}.py"
+    VECTORS_REL = "vectors/" + evidence.MODEL_ID
+    SIDECAR_REL = VECTORS_REL + "/MANIFEST.json"
+    EXPLORATION_REL = evidence.FEATURES[evidence.FEATURE]["research"] + "/exploration"
+
+
+evidence.on_feature(_follow_feature)
 REFERENCE_STATES = 12
 RUN_FIELDS = ("files", "refused_list", "checks")
 CHECK_FIELDS = ("files", "refused_list", "verdict")
@@ -411,7 +425,7 @@ def exploration_table(root: Path, n: int, w: int, entries: Sequence[Dict], log: 
     c = chosen_polynomial(entries)
     program = build_list(root, selected, n, w, exploration=True)
     read, checks = checked(program, rounds, c, entries)
-    data = table_file(f"phyco-v3/n{n}-w{w}-R{rounds}", program, rounds, c, read)
+    data = table_file(f"{evidence.MODEL_ID}/n{n}-w{w}-R{rounds}", program, rounds, c, read)
     return {"files": {f"{EXPLORATION_REL}/constants_n{n}_w{w}.json": data}, "checks": checks}
 
 
@@ -494,7 +508,7 @@ def append_sidecar(record_id: str, argv: Sequence[str], seconds: float) -> None:
 def write_frozen(root: Path, entries: Sequence[Dict], log: Sequence[Dict], refused: Dict,
                  argv: Sequence[str], started: float) -> int:
     files = frozen_files(root, entries, log)
-    with evidence.Run("generator-run", argv=argv, code_files=CODE, model_id="phyco-v3") as run:
+    with evidence.Run("generator-run", argv=argv, code_files=CODE, model_id=evidence.MODEL_ID) as run:
         for rel, data in files.items():
             target = evidence.REPO.path(rel)
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -514,7 +528,7 @@ def check_frozen(root: Path, entries: Sequence[Dict], log: Sequence[Dict], refus
                if not (root / rel).exists() or (root / rel).read_bytes() != data]
     verdict = "differs" if differs else "match"
     code = evidence.EXIT_VERDICT if differs else evidence.EXIT_OK
-    with evidence.Run("generator-check", argv=argv, code_files=CODE, model_id="phyco-v3") as run:
+    with evidence.Run("generator-check", argv=argv, code_files=CODE, model_id=evidence.MODEL_ID) as run:
         path = run.finish("fail" if differs else "pass", exit_status=code, fields={
             "files": [file_row(rel, data) for rel, data in sorted(files.items())],
             "refused_list": refused, "verdict": verdict, "differs": sorted(differs), "inputs": NONE})

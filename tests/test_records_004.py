@@ -18,6 +18,10 @@ from unittest import mock
 from protocol import devinputs_v3, evidence
 from protocol.disclaimer import DESIGN_DISCLAIMER
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = "reports/004-crypto-architecture-v3"
 # Every path this feature pins, read while no record exists (research R18).
@@ -172,6 +176,11 @@ class TwoWorkers(unittest.TestCase):
 
     STATEMENT = "the test compared the outputs of its stated test operation list and kept none"
     TOTAL = 2 ** 18
+
+    def setUp(self):
+        # This test writes records: they go under the paths of the feature the suite runs for, so
+        # that a run with PHYCOWEB_FEATURE=005 writes nothing under feature 004's (005, FR-003).
+        self.addCleanup(evidence.set_feature, evidence.set_feature(evidence.ENTRY_FEATURE))
 
     def stated_subject(self, script):
         import ir

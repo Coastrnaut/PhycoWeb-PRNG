@@ -48,6 +48,22 @@ SNAPSHOT = {"platform": evidence.platform_name(), "python": "3.10.11",
             "gcc": "gcc (Ubuntu 15.2.0) 15.2.0"}
 
 
+def pin_feature_004():
+    """For a module whose tests read feature 004's committed records or build its temporary
+    repositories: feature 004 is in force while the module loads and while its tests run, whatever
+    PHYCOWEB_FEATURE the suite was started with (feature 005, FR-003). Returns the module's
+    setUpModule and tearDownModule."""
+    evidence.set_feature("004")
+
+    def set_up() -> None:
+        evidence.set_feature("004")
+
+    def tear_down() -> None:
+        evidence.set_feature(evidence.ENTRY_FEATURE)
+
+    return set_up, tear_down
+
+
 def write(root: Path, rel: str, data) -> Path:
     path = root / rel
     path.parent.mkdir(parents=True, exist_ok=True)

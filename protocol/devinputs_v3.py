@@ -8,6 +8,9 @@ Standard library only.
 """
 import hashlib
 
+# The namespace of each feature's inputs; feature 005 derives its own under phycoweb-005/
+# (feature 005, FR-028), chosen by protocol/evidence.py from the setting PHYCOWEB_FEATURE, feature 004 by default.
+PREFIXES = {"004": "phycoweb-004/", "005": "phycoweb-005/"}
 PREFIX = "phycoweb-004/"
 NAMESPACES = ("dev", "control")
 # Spec FR-018's sizes with research R14's widths: 4 at 2x2 only, then 8, 16 and 32.
@@ -73,6 +76,48 @@ FINGERPRINTS = {
         },
     },
 }
+
+# Feature 005's fingerprints, of the same derivation under its own namespace.
+FINGERPRINTS_005 = {'dev': {'key': '753ed549abf6bac533197b85b6ac9383e57a86469ca57c42a469b61377e0e700',
+         'nonce': 'ad2b7d1f8de452e443e42a7eb13cc859801cc4215274a87a276c8e7d05e5ed88',
+         'pers': '3b7f43e47d4b948c3c6687837530da0ff9e58ba209b1a9ffa1dda16dcaafc89a',
+         'reseed': '19128b95ddc645872b1e5d26c687e1992ac962d134cae39768bf012f8eb9a1d6',
+         'state': {(2, 4): '46cf997e559eb6924ea2065bc826ef28962233f94f6d3328627fcef8e60d3c9a',
+                   (2, 8): '6992460a8bbbe1652fc8d72b81dbb52cefaca3b0e0f0e8dd345087898e0ba79c',
+                   (2, 16): '4388c9b67838d5e9fee4dea1e93aee600711dd7f55ed93eafb004ea9b4f2366e',
+                   (2, 32): '49db33f64c0f30c29d533446e6f50d403b0ddfb2523a3a1ceb4491b12e90fc31',
+                   (3, 8): '39bfa2f12d301482f9039dd858ec5ade798956fbf6ae66f60e2c7d54cfae7371',
+                   (3, 16): '80d7729c608ec3c05d61f0db5408463129c8f0a7142cfb7ed1173785fb6f716a',
+                   (3, 32): 'c8db755a97be95d236d7573801de5711c09e00825346c638b700fb5c7c0d89e9',
+                   (4, 8): '83e5328c94ce39f46596dd1a9f5db254ef10490205d84942157210f21297eeee',
+                   (4, 16): '77499db4bf8a7ba20c9fffb5546fdab9341afe0ede5aa5b4dbe5f4c99312eeb9',
+                   (4, 32): '3439f788b382784951f067832f22adbb49f443724c307d5802c634194d45f515',
+                   (8, 8): '50d0fee06c91fe08f0be414141b54a54857a2f086bca107ff44893249e8b4e9f',
+                   (8, 16): '3f95f2a9af3a2608bbd9ac26b6219c2d9f2d17d12196dab798320a0be41ad1b8',
+                   (8, 32): 'cfa8e83075e062680f0e9a0f5b8ff1d66f584664ebdd5e8bfaac03051b735591',
+                   (16, 8): '857f9a482c398ec538d09a8b7180cc9107151012bba2026baaa23ff9bb59b2f6',
+                   (16, 16): 'b2073023dfa34d7c9664ca7325da715609ad63875df57227a2a5c851f1664188',
+                   (16, 32): 'e34ac7a3113057439f44376c4021ed756704e440682f931ec64107292eaaca49'},
+         'synthetic': {4: 'f64194f106c24413f82fe474b54c164d1cbd2498fbc9292fcf1cf9f7af9c6778',
+                       8: 'ba9792ec686e370c5e91ba114c8a5561c0d2377f3be10cbad7f2fe48195d9842',
+                       16: 'ee0288d82cce6de52eee2213e0e2a5f384decf7f762a4f612242327e32e68344'}},
+ 'control': {'state': {(2, 4): '4174aeda33f238d9e7f52dfaa192d853404a5e7d6ec1abb003b8e4da16b4b8b3',
+                       (2, 8): 'ee3c833447eb1fedbb0e6b71f15aa7b9697d60d87ccfb2818409b5cb8ee17eed',
+                       (2, 16): 'a2ab8002f0855b49f25b13f53765da078e7f841906616f5ed1f4c8f8f8607a8a',
+                       (2, 32): '7c6e0b8a4182af7bd448b473d2fc6f1728bf598828cfcb436cc1efe093d45d10',
+                       (3, 8): '67190282c0ffc187135cf71b20894d901e98b603be6e61cbb2e731fef9b1492c',
+                       (3, 16): '4a7567a8ecd9141edf1e5192c5ea491ad28a5d9bde35f1c31dede151e8c13080',
+                       (3, 32): '41b4c0cdcfa9ec7625833e9894e669cef2342c018c70141507eec40b721ba05b',
+                       (4, 8): '29a3492fb44994ea1be2f09b14f45fdbd002d849843a7f2d188c839ac0840f6e',
+                       (4, 16): 'a14f9bc3d9c7168a25549b16ebbcf687dc9175faad1f79a6fe35bf0ba07be649',
+                       (4, 32): '1ae1ce3e38a74fbdfd86538f7fc6362757f4520041f08157b1bf6d46b16f6567',
+                       (8, 8): '8f73cdce7eea29f3ebae6f4904e25d96318e56d8e1ca8f44dc0be4a88e2c6548',
+                       (8, 16): '199c3e83ad8dc83e124e62f5461041c318d305b3ac024fa9e8360ee4e6ba8fb8',
+                       (8, 32): '67befb2e011073913119594d6a72ba1ed2e13b7c48beb1f317a449ee79a26ab9',
+                       (16, 8): '35edc703519c1f30131276fb5638fcf8889f69aa22dc0e6117d95e4b9302d5e4',
+                       (16, 16): '5dd5c66ef8bd02c9d18143590e2f11cb732a8b9486ce96d5fce40d24debaeb33',
+                       (16, 32): '533e1585fba7164fa1c53d22c1cf197f00b146f110e68e48835df1a6912faa96'}}}
+FINGERPRINTS_BY_FEATURE = {"004": FINGERPRINTS, "005": FINGERPRINTS_005}
 
 
 class InputRefused(PermissionError):
@@ -226,3 +271,12 @@ def load(ns: str, kind: str, allow, count: int, n=None, w=None, m=None) -> Value
     if actual != wanted:
         raise UnknownInput(f"{ns} {kind}: fingerprint {actual} != {wanted}")
     return Values(reader(ns, kind, n, w, m), count)
+
+
+def set_feature(name: str) -> None:
+    """The feature whose namespace and fingerprints `load` takes."""
+    global PREFIX, FINGERPRINTS
+    if name not in PREFIXES:
+        raise UnknownInput(f"no development inputs for feature {name!r}")
+    PREFIX, FINGERPRINTS = PREFIXES[name], FINGERPRINTS_BY_FEATURE[name]
+

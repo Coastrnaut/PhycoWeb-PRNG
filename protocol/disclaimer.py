@@ -13,3 +13,11 @@ DESIGN_DISCLAIMER = (
     "used to generate secrets; use an established cryptographic random-number generator for keys, "
     "nonces, tokens and salts. Passing statistical tests does not show cryptographic security."
 )
+
+# The design-form disclaimer of feature 005, the block directly under the title of
+# specs/005-crypto-architecture-v4/spec.md, its lines joined by single spaces (feature 005, FR-026).
+DESIGN_DISCLAIMER_005 = (
+    "This feature makes no security claim. No PhycoWeb-PRNG model, `phyco-v4` included, may be "
+    "used to generate secrets; use an established cryptographic random-number generator for keys, "
+    "nonces, tokens and salts. Passing statistical tests does not show cryptographic security."
+)

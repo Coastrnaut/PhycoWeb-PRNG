@@ -26,6 +26,20 @@ REFUSED_REL = evidence.REFUSED_LIST_REL
 CHOICES_REL = evidence.FEATURE_REL + "/checklist-choices.md"
 PLACE_CHECK_REL = "research/004/place-check.json"
 PLACE_CHECK_SCRIPT = "research/004/place_check.py"
+
+
+def _follow_feature() -> None:
+    """This log, the refused list, the choices and the place check are the active feature's."""
+    global LOG, REFUSED_REL, CHOICES_REL, PLACE_CHECK_REL, PLACE_CHECK_SCRIPT
+    research = evidence.FEATURES[evidence.FEATURE]["research"]
+    LOG = evidence.PROTOCOL_LOG_REL
+    REFUSED_REL = evidence.REFUSED_LIST_REL
+    CHOICES_REL = evidence.FEATURE_REL + "/checklist-choices.md"
+    PLACE_CHECK_REL = research + "/place-check.json"
+    PLACE_CHECK_SCRIPT = research + "/place_check.py"
+
+
+evidence.on_feature(_follow_feature)
 DIRECTIONS = ("stricter", "settled")
 CONSTANT_RULE = "Constant rule"
 # Spec FR-044's list: the headings whose direction is "no change", where a row is `settled`.

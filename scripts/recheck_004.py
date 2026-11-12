@@ -450,6 +450,14 @@ def recheck(args: argparse.Namespace, command: List[str]) -> int:
         raise Refused(f"no kind {args.kind!r}: {tuple(CHECKS)}")
     environment = own_environment()
     fields = run_checks(kinds)
+    if args.no_record:
+        # Feature 005, FR-003: the result printed, nothing written.
+        found = fields["disagreements"]
+        print(json.dumps({"results": fields["results"], "decisions_checked": fields["decisions_checked"],
+                          "disagreements": found}, sort_keys=True, ensure_ascii=False))
+        print(f"no record written: {sum(row['checked'] for row in fields['results'].values())} records, "
+              f"{len(found)} disagreements")
+        return evidence.EXIT_VERDICT if found else evidence.EXIT_OK
     run = evidence.Run("recheck", code_files=CODE, argv=command, environment=environment)
     with run:
         found = fields["disagreements"]
@@ -493,6 +501,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--kind")
     parser.add_argument("--reproduce")
+    parser.add_argument("--no-record", action="store_true", help="print the result and write nothing")
     args = parser.parse_args(argv)
     command = [SCRIPT] + list(sys.argv[1:] if argv is None else argv)
 

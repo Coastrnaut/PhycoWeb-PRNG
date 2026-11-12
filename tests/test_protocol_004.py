@@ -21,6 +21,10 @@ from protocol.disclaimer import DESIGN_DISCLAIMER
 from protocol.evidence import NONE, Refused
 from tests.support_004 import CODE_ROOT, SNAPSHOT, TempRepo, Tool, report_files, write
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 ROOT = Path(__file__).resolve().parents[1]
 WORD = {"words": "go on with this candidate", "date": "2026-11-05"}
 ARGV = ["scripts/tool.py", "--flag"]

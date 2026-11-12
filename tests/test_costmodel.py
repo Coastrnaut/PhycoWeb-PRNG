@@ -20,6 +20,10 @@ import ir  # noqa: E402
 
 from protocol.evidence import Refused  # noqa: E402
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 N, W = 4, 32
 P, V = ir.PRESSURE, ir.VEIN
 

@@ -45,6 +45,17 @@ VALIDATION_REL = "research/004/validation"
 DEFECTS_REL = VALIDATION_REL + "/defects"
 TOOLS_REL = "research/004/tools"
 OUT_DIR = evidence.REP_REL + "/validation"
+
+
+def _follow_feature() -> None:
+    """Records and defect notes go under the active feature's paths; the known results and the
+    tools stay where feature 004 keeps them (feature 005, research R9)."""
+    global OUT_DIR, DEFECTS_REL
+    OUT_DIR = evidence.REP_REL + "/validation"
+    DEFECTS_REL = evidence.FEATURES[evidence.FEATURE]["research"] + "/validation/defects"
+
+
+evidence.on_feature(_follow_feature)
 LICENCE = "GPL-3.0, this repository"
 CODE = ["scripts/validate_tool.py", "protocol/evidence.py", "protocol/disclaimer.py",
         "protocol/devinputs_v3.py"]

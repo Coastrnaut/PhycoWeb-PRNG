@@ -20,6 +20,10 @@ if str(ROOT / "research/004") not in sys.path:
 
 import ir  # noqa: E402
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 
 P, V = 0, 1
 

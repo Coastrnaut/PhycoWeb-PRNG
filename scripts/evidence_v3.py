@@ -125,6 +125,15 @@ RATIO_OF_A_ROUND = 6.0
 BITS_EXPONENT = 1.7
 SMALLEST_STATES = ((4, 4), (4, 8))
 DEFECTS_REL = "research/004/validation/defects"
+
+
+def _follow_feature() -> None:
+    """A defect note goes under the active feature's paths (feature 005, research R9)."""
+    global DEFECTS_REL
+    DEFECTS_REL = evidence.FEATURES[evidence.FEATURE]["research"] + "/validation/defects"
+
+
+evidence.on_feature(_follow_feature)
 OUTPUT_FIELDS = ("raw_counts", "p_values", "failure_locations", "solver", "budget", "hours_used")
 RUN_HERE = """
 import importlib.util, sys
@@ -1441,7 +1450,7 @@ def run_candidate(args: argparse.Namespace, command: List[str]) -> int:
     seconds = probe_seconds(kind, subject, workers)
     path = write_probe(kind, subject, candidate, row, seconds, workers, command, code, started)
     hours = seconds / 3600.0
-    left = evidence.ROW_HOURS[row] - evidence.candidate_row_used(candidate, row)
+    left = evidence.row_hours(candidate, row) - evidence.candidate_row_used(candidate, row)
     if args.project:
         print(f"{evidence.rel_to_repo(path)}: {hours:.3f} h projected, {left:.3f} h left")
         return evidence.EXIT_OK
@@ -1823,7 +1832,7 @@ def rows_charged(hours: float) -> Tuple[List[str], List[str]]:
     for candidate in sorted({entry["candidate_id"] for entry in candidates.of_event(log, "entered-d4")}):
         if set(candidates.decisions(log, candidate)) & set(evidence.CLOSING_DECISIONS):
             continue
-        held = hours <= evidence.ROW_HOURS["statistics"] - evidence.candidate_row_used(candidate, "statistics")
+        held = hours <= evidence.row_hours(candidate, "statistics") - evidence.candidate_row_used(candidate, "statistics")
         (charged if held else spared).append(candidate)
     return charged, spared
 

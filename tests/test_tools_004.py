@@ -27,6 +27,10 @@ from protocol import evidence
 from protocol.evidence import NONE
 from tests.support_004 import CODE_ROOT, TempRepo, Tool, write
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 VALIDATION = evidence.REP_REL + "/validation"
 PROVENANCE = evidence.PROVENANCE_LOG_REL
 TOOL_REL = "research/004/tools/fake.py"

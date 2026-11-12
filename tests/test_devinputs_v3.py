@@ -15,6 +15,10 @@ from unittest import mock
 from protocol import devinputs_v3 as d
 from protocol import evidence
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 ROOT = Path(__file__).resolve().parents[1]
 MODULE = ROOT / "protocol/devinputs_v3.py"
 SPEC_PAIRS = {(2, 4)} | {(n, w) for n in (2, 3, 4, 8, 16) for w in (8, 16, 32)}

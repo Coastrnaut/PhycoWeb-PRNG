@@ -23,6 +23,18 @@ CANDIDATES_REL = "research/004/candidates"
 SUPERSEDED_REL = evidence.SUPERSEDED_REL
 FAMILIES = {"A": "ARX", "B": "Boolean"}
 CANDIDATE_ID = re.compile(r"cand-([AB])([123])")
+
+
+def _follow_feature() -> None:
+    """This log, its candidates' directory and their IDs are the active feature's."""
+    global LOG, CANDIDATES_REL, SUPERSEDED_REL, CANDIDATE_ID
+    LOG = evidence.CANDIDATE_LOG_REL
+    CANDIDATES_REL = evidence.FEATURES[evidence.FEATURE]["research"] + "/candidates"
+    SUPERSEDED_REL = evidence.SUPERSEDED_REL
+    CANDIDATE_ID = re.compile(re.escape(evidence.CANDIDATE_PREFIX) + r"([AB])([123])")
+
+
+evidence.on_feature(_follow_feature)
 MOST_PER_FAMILY = 3
 ADDED_BY_THE_WRITER = ("seq", "prev_sha256", "date_utc")
 # What a `proposed` entry's `parameters` holds, all of it before the candidate's first tool run.
@@ -259,7 +271,7 @@ def failed_items(record: Dict) -> bool:
 
 
 def left_in_row(candidate: str, row: str) -> float:
-    return evidence.ROW_HOURS[row] - evidence.candidate_row_used(candidate, row)
+    return evidence.row_hours(candidate, row) - evidence.candidate_row_used(candidate, row)
 
 
 def shows_reason(candidate: str, cause: str, record: Dict, fields: Dict) -> bool:
@@ -304,7 +316,8 @@ def guard_d4_reason(log: Sequence[Dict], candidate: str) -> None:
 def spent_is_shared(fields: Dict, record: Dict) -> bool:
     """A run every candidate needs is shared where its need exceeds the row's value, and the
     candidate's own where its earlier charges left too little (ANA-078)."""
-    return float(record.get("projected_hours", 0.0)) > evidence.ROW_HOURS[fields["row"]]
+    return float(record.get("projected_hours", 0.0)) \
+        > evidence.row_hours(fields.get("candidate_id") or record.get("candidate"), fields["row"])
 
 
 def replacement_state(cause: str, fields: Dict, record: Dict) -> Dict:

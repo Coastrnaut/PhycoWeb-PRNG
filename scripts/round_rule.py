@@ -301,7 +301,8 @@ def tie_row_name(selection: Path) -> str:
 def variant_map(candidate: str) -> Dict[str, str]:
     record = read_round_rule(candidate)
     return {f"{candidate}/n{size}-w{WIDTH}-R{record['sizes'][str(size)]['R']}-c384":
-            f"phyco-v3/n{size}-w{WIDTH}-R{record['sizes'][str(size)]['R']}-c384" for size in SIZES}
+            f"{evidence.MODEL_ID}/n{size}-w{WIDTH}-R{record['sizes'][str(size)]['R']}-c384"
+            for size in SIZES}
 
 
 def decide(command: List[str]) -> int:

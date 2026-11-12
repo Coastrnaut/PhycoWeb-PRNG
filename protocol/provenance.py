@@ -17,6 +17,16 @@ from protocol.evidence import NONE, Refused
 LOG = evidence.PROVENANCE_LOG_REL
 STATUSES = ("pending", "accepted", "changes-requested")
 RATIONALE_REL = evidence.FEATURE_REL + "/rationale.md"
+
+
+def _follow_feature() -> None:
+    """This log and the rationale are the active feature's."""
+    global LOG, RATIONALE_REL
+    LOG = evidence.PROVENANCE_LOG_REL
+    RATIONALE_REL = evidence.FEATURE_REL + "/rationale.md"
+
+
+evidence.on_feature(_follow_feature)
 ADDED_BY_THE_WRITER = ("seq", "prev_sha256", "date_utc")
 ENTRY_FIELDS = ("path", "section", "sha256", "sha256_kind", "tool", "model", "session", "task_id",
                 "review_status")

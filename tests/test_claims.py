@@ -15,6 +15,10 @@ from protocol.evidence import NONE
 from scripts import check_claims as cc
 from tests.support_004 import SPEC_HEAD, SPEC_TAIL, TempRepo, write
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 FEATURE_DOC = "specs/004-crypto-architecture-v3/note.md"
 STANDARD = "SP 800-90A"
 BLOCK = f"> {DESIGN_DISCLAIMER}\n\n"

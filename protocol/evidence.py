@@ -31,8 +31,9 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
+from protocol import devinputs_v3
 from protocol.devinputs_v3 import InputRefused, UnknownInput
-from protocol.disclaimer import DESIGN_DISCLAIMER
+from protocol.disclaimer import DESIGN_DISCLAIMER, DESIGN_DISCLAIMER_005
 
 EXIT_OK, EXIT_VERDICT, EXIT_REFUSED, EXIT_TOOL = 0, 1, 2, 3
 NONE = "none"
@@ -62,6 +63,22 @@ APPROVAL_FIELDS = ("freeze_status", "approved_by", "approved_utc", "approval_wor
 SELF_HASH_FIELDS = ("draft_sha256",)
 PLACEHOLDER = "<record_id>"
 PARTIAL_REL = LOCAL_REL + "/.partial"
+# Research R9 of feature 005: the feature is a setting, PHYCOWEB_FEATURE, feature 004 its default.
+# Each feature has its paths, model ID, candidate IDs, development inputs and disclaimer.
+FEATURE_SETTING = "PHYCOWEB_FEATURE"
+FEATURES = {
+    "004": {"rep": "reports/004-crypto-architecture-v3", "spec": "specs/004-crypto-architecture-v3",
+            "research": "research/004", "local": "data/local/004", "model_id": "phyco-v3",
+            "candidate_prefix": "cand-", "disclaimer": DESIGN_DISCLAIMER},
+    "005": {"rep": "reports/005-crypto-architecture-v4", "spec": "specs/005-crypto-architecture-v4",
+            "research": "research/005", "local": "data/local/005", "model_id": "phyco-v4",
+            "candidate_prefix": "v4-", "disclaimer": DESIGN_DISCLAIMER_005},
+}
+FEATURE = "004"
+MODEL_ID = "phyco-v3"
+CANDIDATE_PREFIX = "cand-"
+FEATURE_DISCLAIMER = DESIGN_DISCLAIMER
+_FEATURE_HOOKS: List[Callable[[], None]] = []
 RUN_FILE = "run.json"
 STATUSES = ("pass", "fail", "inconclusive", "not evaluated", "blocked")
 
@@ -141,6 +158,59 @@ class Repo:
     @property
     def append_lock(self) -> Path:
         return self.path(APPEND_LOCK_REL)
+
+
+def feature_roots(name: str) -> Tuple[str, ...]:
+    """The paths that belong to one feature alone."""
+    f = FEATURES[name]
+    return (f["rep"] + "/", f["spec"] + "/", f["research"] + "/", f["local"] + "/",
+            "vectors/" + f["model_id"] + "/")
+
+
+def set_feature(name: str) -> str:
+    """Select the feature whose paths, model ID, candidate IDs, development inputs and disclaimer
+    this module and its users take; returns the one in force before (feature 005, research R9)."""
+    global FEATURE, REP_REL, FEATURE_REL, SPEC_REL, RESEARCH_REL, DESIGN_REL, PROTOCOL_LOG_REL
+    global CANDIDATE_LOG_REL, PROVENANCE_LOG_REL, DOWNLOADS_REL, SIDECAR_REL, SUPERSEDED_REL
+    global REFUSED_LIST_REL, LOCAL_REL, PARTIAL_REL, MODEL_ID, CANDIDATE_PREFIX, FEATURE_DISCLAIMER
+    if name not in FEATURES:
+        raise Refused(f"{FEATURE_SETTING}={name!r} names no known feature: {sorted(FEATURES)}")
+    previous, f = FEATURE, FEATURES[name]
+    FEATURE = name
+    REP_REL, FEATURE_REL, LOCAL_REL = f["rep"], f["spec"], f["local"]
+    SPEC_REL = FEATURE_REL + "/spec.md"
+    RESEARCH_REL = FEATURE_REL + "/research.md"
+    DESIGN_REL = FEATURE_REL + "/design.md"
+    PROTOCOL_LOG_REL = f["research"] + "/protocol-changes.jsonl"
+    CANDIDATE_LOG_REL = f["research"] + "/candidates.jsonl"
+    PROVENANCE_LOG_REL = REP_REL + "/provenance.jsonl"
+    DOWNLOADS_REL = REP_REL + "/downloads.json"
+    SIDECAR_REL = "vectors/" + f["model_id"] + "/MANIFEST.json"
+    SUPERSEDED_REL = f["research"] + "/candidates/superseded.json"
+    REFUSED_LIST_REL = f["research"] + "/refused-constants.json"
+    PARTIAL_REL = LOCAL_REL + "/.partial"
+    MODEL_ID, CANDIDATE_PREFIX = f["model_id"], f["candidate_prefix"]
+    FEATURE_DISCLAIMER = f["disclaimer"]
+    # A script that this process starts, a reproduction's run among them, takes the same feature.
+    os.environ[FEATURE_SETTING] = name
+    devinputs_v3.set_feature(name)
+    for hook in _FEATURE_HOOKS:
+        hook()
+    return previous
+
+
+def on_feature(hook: Callable[[], None]) -> None:
+    """A module that keeps values of its own derived from the feature registers how it derives
+    them; they are derived now and again at every change of the setting."""
+    _FEATURE_HOOKS.append(hook)
+    hook()
+
+
+def guard_feature_path(rel: str) -> None:
+    """No run writes under another feature's paths (feature 005, FR-003; cli, The feature setting)."""
+    for name in FEATURES:
+        if name != FEATURE and rel.startswith(feature_roots(name)):
+            raise Refused(f"{rel} lies under feature {name}'s paths, and the setting is {FEATURE}")
 
 
 ROOT_OF_CODE = Path(__file__).resolve().parents[1]
@@ -346,7 +416,10 @@ def directory_of(kind: str, candidate: Optional[str] = None, original: Optional[
 
 def iter_records(kind: Optional[str] = None, directory: str = "") -> Iterator[Tuple[Path, Dict]]:
     """Every record under the reports directory, earlier fixed-name versions left out."""
-    base = REPO.rep / directory if directory else REPO.rep
+    yield from records_under(REPO.rep / directory if directory else REPO.rep, kind)
+
+
+def records_under(base: Path, kind: Optional[str] = None) -> Iterator[Tuple[Path, Dict]]:
     if not base.exists():
         return
     for path in sorted(base.rglob("*.json")):
@@ -364,6 +437,10 @@ def find_record(record_id: str) -> Optional[Tuple[Path, Dict]]:
     for path, record in iter_records():
         if record.get("record_id") == record_id:
             return path, record
+    if FEATURE != "004" and record_id.startswith("validation-"):
+        for path, record in records_under(REPO.path(FEATURES["004"]["rep"]) / "validation"):
+            if record.get("record_id") == record_id:
+                return path, record
     return None
 
 
@@ -554,13 +631,15 @@ def parse_table(section: str) -> List[Row]:
     return rows
 
 
-def head_table() -> List[Row]:
-    """The table as committed at HEAD; exit 2 while the working tree's table differs (Approvals)."""
-    blob = show(SPEC_REL)
+def head_table(spec_rel: Optional[str] = None) -> List[Row]:
+    """The table as committed at HEAD; exit 2 while the working tree's table differs (Approvals).
+    `spec_rel` names another feature's spec, whose rows a guard of this feature reads."""
+    spec_rel = spec_rel or SPEC_REL
+    blob = show(spec_rel)
     if blob is None:
-        raise Refused(f"{SPEC_REL} is not committed at HEAD")
+        raise Refused(f"{spec_rel} is not committed at HEAD")
     committed = table_section(blob.decode("utf-8"))
-    working = table_section(REPO.path(SPEC_REL).read_bytes().decode("utf-8"))
+    working = table_section(REPO.path(spec_rel).read_bytes().decode("utf-8"))
     if committed != working:
         raise Refused("the working tree's Review & Approval table differs from HEAD's")
     return parse_table(committed)
@@ -971,23 +1050,33 @@ def guard_order_of_sizes(candidate: str, kind: str, size: int, project: bool = F
 
 
 def latest_demonstration() -> Optional[Tuple[Path, Dict]]:
-    records = list(iter_records("demonstration", "fut-sec-8"))
+    """Feature 004's demonstration, under either setting (feature 005, FR-030)."""
+    records = list(records_under(REPO.path(FEATURES["004"]["rep"]) / "fut-sec-8", "demonstration"))
     return max(records, key=lambda item: item[1]["created_utc"]) if records else None
 
 
 def guard_order_of_us1() -> None:
     """No key is loaded before the FUT-SEC-8 result review with the highest k reads Approved at
     HEAD and names the latest demonstration record by path and SHA-256 (FR-001, FR-003)."""
-    row = family_row("FUT-SEC-8 result review")
+    spec_004 = FEATURES["004"]["spec"] + "/spec.md"
+    row = family_row("FUT-SEC-8 result review", head_table(spec_004))
     if row is None or row.decision != "Approved":
         raise Refused("the row \"FUT-SEC-8 result review\" does not read Approved at HEAD")
     latest = latest_demonstration()
     if latest is None:
         raise Refused("no demonstration record exists")
     path, _ = latest
-    if rel_to_repo(path).split(REP_REL + "/", 1)[-1] not in row.notes \
+    if rel_to_repo(path).split(FEATURES["004"]["rep"] + "/", 1)[-1] not in row.notes \
             or sha256(path.read_bytes()) not in row.notes:
         raise Refused(f"the review row does not name the latest demonstration record {path.name}")
+
+
+def validation_records() -> Iterator[Tuple[Path, Dict]]:
+    """This feature's validation records and, under another setting, feature 004's, which stay in
+    force for the uses they cover while the tool's exact hash is unchanged (feature 005, R14)."""
+    yield from iter_records("validation", "validation")
+    if FEATURE != "004":
+        yield from records_under(REPO.path(FEATURES["004"]["rep"]) / "validation", "validation")
 
 
 def validation_record(tool: Optional[str], tool_sha256: str, binary_sha256: Optional[str] = None,
@@ -998,7 +1087,7 @@ def validation_record(tool: Optional[str], tool_sha256: str, binary_sha256: Opti
     never outlasts a failure on another (data-model section 7)."""
     found = None
     failed = ""
-    for _, record in iter_records("validation", "validation"):
+    for _, record in validation_records():
         if tool is not None and record.get("tool") != tool:
             continue
         if record.get("tool_sha256") != tool_sha256:
@@ -1115,8 +1204,56 @@ def feature_row_used() -> float:
     return used
 
 
+PROJECTION_TABLE = "projection-table.json"
+PLAN_PROJECTIONS_REL = "research/005/plan-projections.json"
+ROW_NAMES = {"trails": "trails", "structural": "structural", "statistics": "bias"}
+
+
+def projection_table() -> Optional[Dict]:
+    path = REPO.rep / PROJECTION_TABLE
+    return json.loads(path.read_bytes().decode("utf-8")) if path.exists() else None
+
+
+def approved_option() -> Dict:
+    """The option of plan-projections.json that the plan approval fixed (feature 005)."""
+    path = REPO.path(PLAN_PROJECTIONS_REL)
+    if not path.exists():
+        raise Refused(f"{PLAN_PROJECTIONS_REL} does not exist")
+    data = json.loads(path.read_bytes().decode("utf-8"))
+    return data["options"][data["approved_option"]]
+
+
+def family_of(candidate: str) -> str:
+    match = re.fullmatch(re.escape(CANDIDATE_PREFIX) + r"([AB])\d", candidate or "")
+    if match is None:
+        raise Refused(f"candidate {candidate!r} is no candidate of feature {FEATURE}")
+    return {"A": "ARX", "B": "Boolean"}[match.group(1)]
+
+
+def row_hours(candidate: str, row: str) -> float:
+    """A candidate's row: feature 004's constant, or, under another setting, the value that holds
+    for its family in the projection table, which exists before any candidate (feature 005)."""
+    if FEATURE == "004":
+        return ROW_HOURS[row]
+    table = projection_table()
+    if table is None:
+        raise Refused(f"{REP_REL}/{PROJECTION_TABLE} does not exist: no candidate's row is fixed yet")
+    return float(table["rows"][family_of(candidate)][ROW_NAMES[row]]["holds_h"])
+
+
+def feature_row_hours() -> float:
+    """The feature-wide row: feature 004's constant, or the projection table's value and, before
+    the table exists, that of the approved option of plan-projections.json (feature 005)."""
+    if FEATURE == "004":
+        return FEATURE_ROW_HOURS
+    table = projection_table()
+    if table is not None:
+        return float(table["feature_wide_row"]["holds_h"])
+    return float(approved_option()["feature_wide_row_h"])
+
+
 def guard_feature_row(projections: Sequence[float]) -> None:
-    left = FEATURE_ROW_HOURS - feature_row_used()
+    left = feature_row_hours() - feature_row_used()
     if sum(projections) > left:
         raise Refused(f"the projections, {sum(projections):.3f} h, do not fit the {left:.3f} h "
                       f"left in research R7's feature-wide row")
@@ -1162,7 +1299,7 @@ def candidate_row_used(candidate: str, row: str) -> float:
 def guard_candidate_row(candidate: str, row: str, projected: float, reserved: float = 0.0) -> None:
     """A heavy run starts only if its projection, plus the probes of every run its row still needs,
     fits the hours left in its row (research R7)."""
-    left = ROW_HOURS[row] - candidate_row_used(candidate, row)
+    left = row_hours(candidate, row) - candidate_row_used(candidate, row)
     if projected + reserved > left or left <= 0.0:
         raise Refused(f"{candidate}: {projected + reserved:.3f} h do not fit the {left:.3f} h left "
                       f"in its {row} row")
@@ -1328,6 +1465,7 @@ def append_entry(rel: str, entry: Dict, finish: Optional[Callable[[Dict], Dict]]
     """One append to a hash-chained log: under the lock, the chain checked up to its last line,
     `seq`, `prev_sha256` and `date_utc` added by the writer (research R16). `finish` gives a
     writer's approval step the complete entry before it is written."""
+    guard_feature_path(rel)
     with AppendLock(rel):
         path = REPO.path(rel)
         data = path.read_bytes() if path.exists() else b""
@@ -1678,7 +1816,11 @@ class Run:
             "command": command_line(self.argv),
             "config": dict(self.config, cwd=os.getcwd(), repository_root=str(REPO.root)),
             "inputs": self.inputs, "analyst": self.analyst, "reviewer": "pending",
-            "review_status": "pending", "ended_outside": NONE, "disclaimer": DESIGN_DISCLAIMER})
+            "review_status": "pending", "ended_outside": NONE, "disclaimer": FEATURE_DISCLAIMER})
+        if FEATURE != "004":
+            # Fields only added: a record without `feature` is feature 004's (data-model 005, §1).
+            record["feature"] = FEATURE
+            record["config"][FEATURE_SETTING] = FEATURE
         return record
 
     def prepare(self, status: str, *, classification: str = NONE, assertions: Iterable[Any] = (),
@@ -1710,13 +1852,16 @@ class Run:
     def write(self, record: Dict, approval: Optional[Dict] = None) -> Path:
         """Keep what the record cites, rename its outputs to its ID and write it."""
         out = dict(record, **(approval or {}))
+        path = self.stated_path() or self.record_dir() / f"{out['record_id']}.json"
+        if out.get("feature", "004") != FEATURE:
+            raise Refused(f"the record's feature {out.get('feature', '004')} is not the setting's, {FEATURE}")
+        guard_feature_path(rel_to_repo(path))
         for subdir, data in self.documents:
             keep_version(subdir, data)
         for source, final in self.moves:
             target = REPO.path(final.replace(PLACEHOLDER, out["record_id"]))
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(source), str(target))
-        path = self.stated_path() or self.record_dir() / f"{out['record_id']}.json"
         if self.fixed:
             if path.exists():
                 old = path.read_bytes()
@@ -1764,9 +1909,10 @@ def write_projection(*, run: str, row: str, inputs: Any, measured_speed: Any,
                                code_files=code_files, writes_evidence=writes_evidence)
 
 
-def read_manifest() -> List[Dict]:
-    """The downloads manifest's entries; none before it exists."""
-    path = REPO.path(DOWNLOADS_REL)
+def read_manifest(feature: Optional[str] = None) -> List[Dict]:
+    """The downloads manifest's entries; none before it exists. `feature` names another feature's
+    manifest, read as that feature's (feature 005, FR-001)."""
+    path = REPO.path(FEATURES[feature]["rep"] + "/downloads.json" if feature else DOWNLOADS_REL)
     if not path.exists():
         return []
     return json.loads(path.read_bytes().decode("utf-8"))["entries"]
@@ -2234,7 +2380,7 @@ def run_reproduction(job: Reproduction, run: Run, original: Dict, out: Path,
     reported_second: Optional[Dict] = None
     not_made: Optional[str] = None
     if rebuilt and not counted:
-        left = FEATURE_ROW_HOURS - feature_row_used() - used
+        left = feature_row_hours() - feature_row_used() - used
         if run.heavy and projections[1] > left:
             not_made = (f"the second run's projection, {projections[1]:.3f} h, no longer fits the "
                         f"{left:.3f} h left, the first run having taken more than its own")
@@ -2332,3 +2478,21 @@ def main_guard(fn: Callable[[], int]) -> int:
     except (ToolFailure, OSError) as exc:
         print(f"tool failure: {exc}", file=sys.stderr)
         return EXIT_TOOL
+
+
+# The setting the process started with, which a test that pins a feature returns to.
+ENTRY_FEATURE = "004"
+
+
+def _initial_feature() -> None:
+    global ENTRY_FEATURE
+    name = os.environ.get(FEATURE_SETTING, "004")
+    ENTRY_FEATURE = name
+    try:
+        set_feature(name)
+    except Refused as exc:
+        print(f"refused: {exc}", file=sys.stderr)
+        raise SystemExit(EXIT_REFUSED) from None
+
+
+_initial_feature()

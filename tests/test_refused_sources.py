@@ -13,6 +13,10 @@ from pathlib import Path
 
 from protocol import changelog
 
+from tests.support_004 import pin_feature_004  # noqa: E402
+
+setUpModule, tearDownModule = pin_feature_004()
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "research/004/refused_sources.py"
 LIST = ROOT / "research/004/refused-constants.json"
