@@ -1694,5 +1694,100 @@ class TheLimitsScriptUnderBothFeatures(unittest.TestCase):
         self.assertNotIn("throughput_implied", out["parameters"]["rows"][0])
 
 
+# -------------------------------------------------------------------- the selection-bias statement
+
+def selection_bias():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("selection_bias", ROOT / "research/005/selection_bias.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class TheSelectionBiasStatement(unittest.TestCase):
+    """Data-model section 6; research R11; quickstart V9: every design of both features, from their logs."""
+
+    def setUp(self):
+        import tempfile
+        self.tool = selection_bias()
+        self.tmp = Path(tempfile.mkdtemp(prefix="phyco005-"))
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, True)
+
+    def log_005(self, entries) -> None:
+        write(self.tmp, "research/005/candidates.jsonl",
+              "".join(json.dumps(dict(entry, seq=seq), sort_keys=True) + "\n" for seq, entry in enumerate(entries)))
+        write(self.tmp, "research/004/candidates.jsonl", (ROOT / "research/004/candidates.jsonl").read_bytes())
+
+    def test_feature_004s_designs_and_their_decisions(self):
+        text = self.tool.statement()
+        for line in ("| 004 | `cand-A1` | ARX | ineligible | feature 004, seq 107 | none |",
+                     "| 004 | `cand-B1` | Boolean | ineligible | feature 004, seq 47 | none |",
+                     "| 004 | `cand-B2` | Boolean | proposed and declined | feature 004, seq 49 | none |",
+                     "| 004 | `cand-A2` | ARX | proposed and declined | feature 004, seq 109 | none |"):
+            self.assertIn(line, text)
+
+    def test_feature_004s_d4_and_selection_records_by_path_and_sha256(self):
+        text = self.tool.statement()
+        for rel, record in (("reports/004-crypto-architecture-v3/d4/choice.json", "d4-choice-20261108T110819Z-b980295b"),
+                            ("reports/004-crypto-architecture-v3/freeze/selection.json", "selection-20261109T122326Z-254be6df")):
+            digest = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+            self.assertIn(f"`{rel}`, record `{record}`, SHA-256 `{digest}` (raw)", text)
+        self.assertIn("Feature 004 ran no bias test at w = 32.", text)
+
+    def test_this_features_designs_with_what_they_derive_from(self):
+        derived = {"feature": "004", "candidate": "cand-A1", "oplist_path": "x", "oplist_sha256": "y",
+                   "relation": "derived", "changes": "none"}
+        self.log_005([
+            {"event": "proposed", "candidate_id": "v4-A1", "family": "ARX", "derived_from": derived},
+            {"event": "proposed", "candidate_id": "v4-B1", "family": "Boolean", "derived_from": "none"},
+            {"event": "proposed", "candidate_id": "v4-A2", "family": "ARX", "derived_from": "none"},
+            {"event": "decision", "candidate_id": "v4-B1", "decision": "ineligible"},
+            {"event": "decision", "candidate_id": "v4-A1", "decision": "eligible"},
+            {"event": "decision", "candidate_id": "v4-A2", "decision": "eligible"},
+            {"event": "replacement", "candidate_id": "v4-B1", "family": "Boolean", "reason": self.tool.DECLINED},
+        ])
+        write(self.tmp, "reports/005-crypto-architecture-v4/freeze/selection.json",
+              json.dumps({"created_utc": "2026-12-01T00:00:00Z", "selected": "v4-A2"}))
+        text = self.tool.statement(self.tmp)
+        for line in ("| 005 | `v4-A1` | ARX | not selected | feature 005, seq 4 | feature 004, cand-A1, derived |",
+                     "| 005 | `v4-B1` | Boolean | ineligible | feature 005, seq 3 | none |",
+                     "| 005 | `v4-A2` | ARX | selected | feature 005, seq 5 | none |",
+                     "| 005 | `v4-B2` | Boolean | proposed and declined | feature 005, seq 6 | none |",
+                     "| 004 | `cand-A1` | ARX | ineligible | feature 004, seq 107 | none |"):
+            self.assertIn(line, text)
+
+    def test_the_family_wise_rate_over_this_features_tests(self):
+        self.log_005([])
+        base = "reports/005-crypto-architecture-v4/candidates/v4-A1"
+        write(self.tmp, f"{base}/frequency-1.json", json.dumps({"status": "pass", "config": {"size": 4, "rounds": 10}}))
+        write(self.tmp, f"{base}/avalanche-1.json", json.dumps({"status": "pass", "config": {"size": 4, "rounds": 10}}))
+        write(self.tmp, f"{base}/avalanche-2.json", json.dumps({"status": "inconclusive", "config": {"size": 8, "rounds": 10}}))
+        self.assertEqual(self.tool.bias_tests("reports/005-crypto-architecture-v4", self.tmp), (5, [2.0]))
+        self.assertAlmostEqual(self.tool.rate(5, [2.0]), 1 - 0.995 ** 5 * 0.99, places=12)
+        self.assertIn("5 pairs of a size and a round count and 1 avalanche sizes: 0.0345.", self.tool.statement(self.tmp))
+
+    def test_check_compares_the_statement_a_file_holds(self):
+        held = self.tmp / "report.md"
+        held.write_text("# Report\n\n" + self.tool.statement() + "\nMore.\n", encoding="utf-8", newline="\r\n")
+        with mock.patch("builtins.print"):
+            self.assertEqual(self.tool.main(["--check", str(held)]), 0)
+            held.write_text(self.tool.statement().replace("seq 107", "seq 106"), encoding="utf-8")
+            self.assertEqual(self.tool.main(["--check", str(held)]), 1)
+
+    def test_no_line_of_it_is_flagged_by_the_claim_test(self):
+        from scripts import check_claims
+        lines = self.tool.statement().split("\n")
+        register = json.loads((ROOT / "protocol/claims.json").read_bytes().decode("utf-8"))
+        found = check_claims.scan_lines("specs/005-crypto-architecture-v4/rationale.md", list(range(len(lines))), lines,
+                                        dict(register, allow_list={"phrases": [], "lines": []}))
+        self.assertEqual([(f.rule, f.text) for f in found], [])
+
+    def test_it_reads_both_logs_and_writes_neither(self):
+        source = (ROOT / "research/005/selection_bias.py").read_text(encoding="utf-8")
+        self.assertNotIn("write_bytes", source)
+        self.assertNotIn("write_text", source)
+        self.assertNotIn('open(', source)
+
+
 if __name__ == "__main__":
     unittest.main()

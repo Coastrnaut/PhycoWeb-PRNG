@@ -668,7 +668,7 @@ ends with no eligible candidate (D14).
   record matches (`tool_sha256`, and a C tool's binary) changes here, and a change that would reach
   one goes through T039 before the tool's first counted use. (FR-006, FR-007, FR-014, FR-019,
   FR-020; SC-005; R7)
-- [ ] T044 [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
+- [X] T044 [US4] Write the selection-bias statement's tests in `tests/test_protocol_005.py`
   (data-model §6; quickstart V9): from the candidate logs of both features, one row per design with
   `feature`, `id`, `family`, `outcome` (`ineligible`, `proposed and declined`, `selected`,
   `not selected`, `withdrawn`, `rejected`), the decision's log entry (feature and `seq`) and
@@ -676,7 +676,7 @@ ends with no eligible candidate (D14).
   and declined (entries 49 and 109); feature 004's D4 record and selection record by path and
   SHA-256; the bias rule's family-wise rate over this feature's tests, feature 004 having run none
   at w = 32; and no line that the claim test flags. (FR-024; SC-006; R11)
-- [ ] T045 [US4] Write `research/005/selection_bias.py [--check FILE]` (contracts/cli.md) until T044
+- [X] T045 [US4] Write `research/005/selection_bias.py [--check FILE]` (contracts/cli.md) until T044
   passes: it generates the statement as a Markdown table from `research/004/candidates.jsonl` and
   `research/005/candidates.jsonl`, reading both and writing neither, and `--check FILE` compares the
   table FILE holds with its output, exit 1 on a difference. (FR-024; SC-006; R11)
