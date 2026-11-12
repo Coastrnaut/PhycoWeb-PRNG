@@ -34,10 +34,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from protocol import candidates, evidence, rules  # noqa: E402
+from protocol import trailcheck  # noqa: E402
 from protocol.evidence import NONE, Refused, ToolFailure  # noqa: E402
 
 SCRIPT = "scripts/recheck_004.py"
-CODE = [SCRIPT, "protocol/evidence.py", "protocol/disclaimer.py", "protocol/devinputs_v3.py", "protocol/candidates.py", "protocol/rules.py"]
+CODE = [SCRIPT, "protocol/evidence.py", "protocol/disclaimer.py", "protocol/devinputs_v3.py", "protocol/candidates.py", "protocol/rules.py",
+        "protocol/oplist.py", "protocol/trailcheck.py"]
 DIRECTORIES = {"demonstration": "fut-sec-8", "validation": "validation", "control": "controls", "selection": "freeze", "d4-choice": "d4",
                "generator-check": "generator-checks", "generator-run": "generator-runs"}
 RUN_HERE = """
@@ -201,7 +203,36 @@ def count_stands(row: Dict) -> bool:
     return row.get("status") == 0 and ("sum_of" in row or row.get("below", {}).get("status") == 2)
 
 
+def searched_bound(record: Dict) -> Optional[str]:
+    """A searched record's bound by this re-check's own reading of its rows, or None where it does not stand."""
+    found = check_searched_bound(record, evidence)
+    return found["bound"] if found["status"] == "pass" else None
+
+
+def committed_bounds() -> Dict[str, Tuple[bytes, Dict]]:
+    """Each bound record of the feature in force, by its ID, with its committed bytes."""
+    out = {}
+    for path, record in evidence.iter_records("bound"):
+        blob = evidence.show(evidence.rel_to_repo(path))
+        if blob is not None:
+            out[record["record_id"]] = (blob, json.loads(blob.decode("utf-8")))
+    return out
+
+
+def defect_recorded(record_id: str) -> bool:
+    """Whether a tool defect is recorded against a record: a sum stands only while both its parts stand (feature 005, Edge Cases)."""
+    research = evidence.FEATURES[evidence.FEATURE]["research"]
+    return evidence.REPO.path(f"{research}/validation/defects/{record_id}.json").exists()
+
+
 def check_bound(record: Dict, v: ModuleType) -> Dict:
+    """Feature 005: a `split` bound again from its two parts' committed bytes (FR-016, FR-020; data-model section 2)."""
+    if evidence.FEATURE != "004" and record.get("method") == "split":
+        return trailcheck.split_found(record, committed_bounds(), evidence.sha256, searched_bound, defect_recorded)
+    return check_searched_bound(record, v)
+
+
+def check_searched_bound(record: Dict, v: ModuleType) -> Dict:
     if record.get("capped") is True:
         return {"status": "inconclusive", "classification": NONE, "bound": NONE}
     held = all(count_stands(row) for row in (record.get("counts") or {}).values())
@@ -212,7 +243,13 @@ def check_bound(record: Dict, v: ModuleType) -> Dict:
 def check_trail(record: Dict, v: ModuleType) -> Dict:
     """The weight again from its rational, and the class from the tool: a trail that a validated tool found is a finding of the
     rounds it covers, and one from a tool not yet validated an unverified hypothesis, `blocked` until a validated tool or the
-    validated exact models settle it (data-model sections 1, 5 and 6)."""
+    validated exact models settle it (data-model sections 1, 5 and 6). Feature 005: the weight, every transition and the class again
+    from the characteristic and the candidate's committed operation list, read by protocol/oplist.py (FR-019, FR-020)."""
+    if evidence.FEATURE != "004":
+        research = evidence.FEATURES[evidence.FEATURE]["research"]
+        source = evidence.show(f"{research}/candidates/{record.get('candidate')}.py")
+        return trailcheck.trail_found(record, source, lambda rounds: trailcheck.table_rows(record, evidence.show, evidence.sha256, rounds),
+                                      evidence.trail_weight_log2)
     found: Dict[str, Any] = {"weight_log2": function(v, "trail_weight_log2")(record["weight"])}
     validation = record.get("validation")
     if isinstance(validation, dict) and validation.get("record_id"):

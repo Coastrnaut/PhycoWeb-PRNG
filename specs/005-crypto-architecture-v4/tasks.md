@@ -326,7 +326,7 @@ feature before T009 (FR-003).
 
 ### Step (5): the re-check of sums and trails
 
-- [ ] T019 Write the re-check's tests in `tests/test_protocol_005.py` (quickstart V5, V7): a `split`
+- [X] T019 Write the re-check's tests in `tests/test_protocol_005.py` (quickstart V5, V7): a `split`
   record (data-model §2) recomputed from its two parts' committed bytes, as an exact rational sum,
   r₁ + r₂ = r, each part `pass` and established, of the same candidate, kind, size and width, never
   `inconclusive`, with its `alternatives` and the larger of the sum and `searched` checked; a part
@@ -342,7 +342,7 @@ feature before T009 (FR-003).
   one operation's output gives a disagreement; and the operation list is read by a standard-library
   reader of the forms of `research/004/ir.py` under `protocol/`, its evaluation of each linear step
   equal to `ir`'s on the reference designs' committed lists. (FR-016, FR-019, FR-020; SC-005)
-- [ ] T020 Extend `scripts/recheck_004.py` for this feature (contracts/cli.md) until T019 passes:
+- [X] T020 Extend `scripts/recheck_004.py` for this feature (contracts/cli.md) until T019 passes:
   under `005` it recomputes every `split` bound from its two parts, and every trail's weight,
   transitions and class from its characteristic, the candidate's committed operation list, read by
   T019's standard-library reader and never through `research/004/ir.py` or numpy, so that the

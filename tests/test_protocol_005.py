@@ -16,7 +16,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from protocol import candidates, changelog, devinputs_v3, evidence, provenance
+from protocol import candidates, changelog, devinputs_v3, evidence, oplist, provenance, trailcheck
 from protocol.disclaimer import DESIGN_DISCLAIMER, DESIGN_DISCLAIMER_005
 from protocol.evidence import Refused
 from tests.support_004 import TempRepo, write
@@ -545,6 +545,444 @@ class ChangeLog(TempRepo005):
         self.row("Place check", "Approved", f"names it, {hashlib.sha256(data).hexdigest()}")
         with self.assertRaises(Refused):
             changelog.build_first_entries_005()
+
+
+# ------------------------------------------------------------- the re-check of sums and trails
+
+W8 = 8
+TRIPLES = ((0x01, 0x00, 0x01), (0x80, 0x80, 0x00), (0x03, 0x05, 0x06), (0x40, 0x40, 0x80),
+           (0x11, 0x01, 0x30), (0x7f, 0x01, 0x80), (0x00, 0x00, 0x00), (0xff, 0xff, 0xfe))
+CONSTANTS_W8 = (0x01, 0x5d, 0x80, 0xff, 0x00)
+PAIRS = ((0x01, 0x01), (0x01, 0x03), (0x80, 0x80), (0x06, 0x1a), (0xff, 0x01), (0x00, 0x00))
+
+
+def operate(sub: bool):
+    return (lambda x, y: (x - y) & 0xff) if sub else (lambda x, y: (x + y) & 0xff)
+
+
+def sign(*bits: int) -> int:
+    return -1 if sum(trailcheck.parity(b) for b in bits) & 1 else 1
+
+
+def best(key, fixed, free, output, weigh):
+    """A chooser for a built characteristic: the first most likely transition, by exhaustive count
+    over the outputs, the free input of a mask's addition taken equal to its fixed one."""
+    inputs = list(fixed) + ([fixed[0]] if free and fixed else [0] * free)
+    if output is not None:
+        candidates = [(m, output) for m in range(1 << 4)] if free and not fixed else [(None, output)]
+    else:
+        candidates = [(None, o) for o in range(1 << W8)]
+    found = None
+    for free_value, out in candidates:
+        trial = inputs if free_value is None else [free_value]
+        try:
+            weight = weigh(trial, out)
+        except IndexError:
+            continue
+        if weight and (found is None or weight > found[0]):
+            found = (weight, list(trial), out)
+    if found is None:
+        raise AssertionError(f"no transition of nonzero weight at {key}")
+    return found[1], found[2]
+
+
+class ExactWeights(unittest.TestCase):
+    """Spec FR-020's exact weights, each equal to an exhaustive count at w = 8 over the stated
+    inputs, outputs and constants."""
+
+    def test_the_differential_probability_of_an_addition_and_a_subtraction(self):
+        for sub in (False, True):
+            op = operate(sub)
+            for a, b, g in TRIPLES:
+                count = sum(1 for x in range(256) for y in range(256) if op(x ^ a, y ^ b) == op(x, y) ^ g)
+                self.assertEqual(trailcheck.add_count(W8, a, b, g, sub), count, (a, b, g, sub))
+
+    def test_the_squared_correlation_of_an_addition_and_a_subtraction(self):
+        for sub in (False, True):
+            op = operate(sub)
+            for u, v, t in TRIPLES:
+                total = sum(sign(u & x, v & y, t & op(x, y)) for x in range(256) for y in range(256))
+                self.assertEqual(trailcheck.add_sum(W8, u, v, t, sub), total, (u, v, t, sub))
+
+    def test_an_addition_of_a_constant_by_the_carrys_automaton(self):
+        for c in CONSTANTS_W8:
+            for a, b in PAIRS:
+                count = sum(1 for x in range(256) if ((x ^ a) + c) & 0xff == ((x + c) & 0xff) ^ b)
+                self.assertEqual(trailcheck.add_constant_count(W8, c, a, b), count, (c, a, b))
+                total = sum(sign(a & x, b & ((x + c) & 0xff)) for x in range(256))
+                self.assertEqual(trailcheck.add_constant_sum(W8, c, a, b), total, (c, a, b))
+
+    def test_every_transition_of_an_addition_at_w_4(self):
+        for a in range(16):
+            for b in range(16):
+                row = [trailcheck.add_count(4, a, b, g) for g in range(16)]
+                self.assertEqual(sum(row), 256)
+                for g in range(16):
+                    count = sum(1 for x in range(16) for y in range(16)
+                                if ((x ^ a) + (y ^ b)) & 15 == ((x + y) & 15) ^ g)
+                    self.assertEqual(row[g], count)
+
+    def test_an_s_box_from_its_table(self):
+        table = (0x9, 0xC, 0x3, 0x0, 0x2, 0x5, 0x4, 0x7, 0x6, 0x1, 0xA, 0xB, 0x8, 0xD, 0xE, 0xF)
+        counts = [[trailcheck.table_count(table, a, b) for b in range(16)] for a in range(16)]
+        self.assertEqual(counts[0][0], 16)
+        self.assertTrue(all(sum(row) == 16 for row in counts))
+        self.assertEqual(max(counts[a][b] for a in range(1, 16) for b in range(16)), 4)
+        sums = [[trailcheck.table_sum(table, a, b) for b in range(16)] for a in range(16)]
+        self.assertEqual(max(abs(sums[a][b]) for a in range(16) for b in range(1, 16)), 8)
+        self.assertEqual(sum(v * v for v in sums[5]), 256)
+
+    def test_the_class_by_the_threshold(self):
+        from fractions import Fraction
+        self.assertEqual(trailcheck.classify(Fraction(1, 1 << 127)), "confirmed vulnerability")
+        self.assertEqual(trailcheck.classify(Fraction(1, 1 << 128)), evidence.NONE)
+        self.assertEqual(trailcheck.classify(Fraction(1, 1 << 129)), evidence.NONE)
+
+
+class TheReader(unittest.TestCase):
+    """The standard-library reader of research/004/ir.py's forms: the reference designs' committed
+    lists read by it equal `ir`'s, form for form and value for value."""
+
+    SIZES = ((2, 8), (4, 16), (4, 32))
+
+    def setUp(self):
+        if str(ROOT / "research/004") not in sys.path:
+            sys.path.insert(0, str(ROOT / "research/004"))
+        import ir
+        self.ir = ir
+        evidence.set_feature("004")
+        self.addCleanup(evidence.set_feature, "005")
+        self.builds = ir.candidate_modules(ROOT / "research/004/candidates")
+
+    def test_it_imports_the_standard_library_and_protocol_alone(self):
+        for name in ("oplist", "trailcheck"):
+            source = (ROOT / f"protocol/{name}.py").read_text(encoding="utf-8")
+            imports = [line for line in source.split("\n") if line.startswith(("import ", "from "))]
+            for line in imports:
+                module = line.split()[1].split(".")[0]
+                self.assertIn(module, ("__future__", "sys", "types", "json", "dataclasses", "fractions",
+                                       "typing", "protocol"), line)
+
+    def test_the_lists_and_their_values_equal_irs(self):
+        state_seed = 0x9E3779B97F4A7C15
+        for name in ("cand-A1", "cand-B1"):
+            source = (ROOT / f"research/004/candidates/{name}.py").read_bytes()
+            for n, w in self.SIZES:
+                program, _ = oplist.read(source, name, n, w)
+                theirs = self.builds[name](n, w)
+                self.assertEqual(repr(program), repr(theirs), (name, n, w))
+                values, x = [], state_seed
+                for _ in range(2 * n * n + 3 * 3):
+                    x = (x * 6364136223846793005 + 1442695040888963407) & (2 ** 64 - 1)
+                    values.append((x >> 20) & ((1 << w) - 1))
+                state, table = values[:2 * n * n], [values[2 * n * n + 3 * r:][:3] for r in range(3)]
+                self.assertEqual(oplist.permute(program, state, table),
+                                 self.ir.permute(self.ir.load(theirs), state, table), (name, n, w))
+
+    def test_ir_stays_what_import_ir_finds_afterwards(self):
+        source = (ROOT / "research/004/candidates/cand-A1.py").read_bytes()
+        oplist.read(source, "cand-A1", 2, 8)
+        self.assertIs(sys.modules["ir"], self.ir)
+
+    def test_a_linear_steps_transpose(self):
+        w = 8
+        expr = oplist.Rotl(oplist.Xor(oplist.Lane(1), oplist.Shl(oplist.Lane(1), 3)), 5)
+        for mask in (0x01, 0x80, 0x5a):
+            into = {}
+            oplist.transpose(expr, mask, into, w)
+            for x in range(256):
+                value = oplist.linear(expr, [0, x], w)
+                self.assertEqual(trailcheck.parity(mask & value), trailcheck.parity(into[1] & x))
+
+
+def one(update, w=W8):
+    return oplist.Program("one", 1, w, (oplist.Phase(0, (update,)),))
+
+
+class Trails(unittest.TestCase):
+    """Data-model section 3: a characteristic with every nonlinear operation recorded re-checks to
+    its weight, by exact arithmetic from the operation list; a changed transition is a disagreement."""
+
+    def a1(self, kind="differential", rounds=2, lane=1, value=0x80):
+        source = (ROOT / "research/004/candidates/cand-A1.py").read_bytes()
+        program, _ = oplist.read(source, "cand-A1", 2, W8)
+        state = [0] * 8
+        state[lane] = value
+        rows = [(0x12, 0x34, 0x56)] * rounds
+        characteristic, weight = trailcheck.build(program, kind, state, rows, best)
+        return program, rows, characteristic, weight
+
+    def test_a_single_additions_trail_is_its_differential(self):
+        from fractions import Fraction
+        program = one(oplist.Mix(0, "add", oplist.Rotl(oplist.Lane(1), 3)))
+        characteristic, weight = trailcheck.build(program, "differential", [0x05, 0x21], [()], best)
+        after = trailcheck.state_of(characteristic[0]["state_out"], 2, W8)
+        count = sum(1 for x in range(256) for y in range(256)
+                    if oplist.permute(program, [x ^ 0x05, y ^ 0x21]) == [
+                        a ^ b for a, b in zip(oplist.permute(program, [x, y]), after)])
+        self.assertEqual(weight, Fraction(count, 65536))
+        self.assertEqual(trailcheck.recompute(program, "differential", characteristic, [()]), weight)
+
+    def test_a_single_additions_trail_is_its_squared_correlation(self):
+        from fractions import Fraction
+        for op in ("add", "sub"):
+            program = one(oplist.Mix(0, op, oplist.Rotl(oplist.Lane(1), 3)))
+            characteristic, weight = trailcheck.build(program, "linear", [0x06, 0x00], [()], best)
+            before = trailcheck.state_of(characteristic[0]["state_in"], 2, W8)
+            after = trailcheck.state_of(characteristic[0]["state_out"], 2, W8)
+            total = 0
+            for x in range(256):
+                for y in range(256):
+                    out = oplist.permute(program, [x, y])
+                    total += sign(before[0] & x, before[1] & y, after[0] & out[0], after[1] & out[1])
+            self.assertEqual(weight, Fraction(total * total, 1 << 32), op)
+            self.assertEqual(trailcheck.recompute(program, "linear", characteristic, [()]), weight)
+
+    def test_an_addition_of_a_committed_constant(self):
+        from fractions import Fraction
+        for op in ("add", "sub"):
+            program = one(oplist.Mix(0, op, oplist.Constant(0)))
+            rows = [(0x5d,)]
+            characteristic, weight = trailcheck.build(program, "differential", [0x06, 0x00], rows, best)
+            after = trailcheck.state_of(characteristic[0]["state_out"], 2, W8)
+            count = sum(1 for x in range(256)
+                        if oplist.permute(program, [x ^ 0x06, 0], rows)[0] == oplist.permute(program, [x, 0], rows)[0] ^ after[0])
+            self.assertEqual(weight, Fraction(count, 256), op)
+            self.assertEqual(trailcheck.recompute(program, "differential", characteristic, rows), weight)
+            with self.assertRaises(Refused):
+                trailcheck.recompute(program, "differential", characteristic, [()])
+            self.assertNotEqual(trailcheck.recompute(program, "differential", characteristic, rows), 0)
+
+    def test_a_function_of_one_update_is_its_truth_table(self):
+        from fractions import Fraction
+        program = one(oplist.Mix(0, "xor", oplist.And(oplist.Lane(1), oplist.Rotl(oplist.Lane(1), 1))))
+        characteristic, weight = trailcheck.build(program, "differential", [0x00, 0x01], [()], best)
+        after = trailcheck.state_of(characteristic[0]["state_out"], 2, W8)
+        count = sum(1 for x in range(256) for y in range(256)
+                    if oplist.permute(program, [x, y ^ 0x01]) == [
+                        a ^ b for a, b in zip(oplist.permute(program, [x, y]), after)])
+        self.assertEqual(weight, Fraction(count, 65536))
+        self.assertEqual(trailcheck.recompute(program, "differential", characteristic, [()]), weight)
+
+    def test_a_reference_designs_trail_rechecks_to_its_weight(self):
+        for kind in trailcheck.KINDS:
+            program, rows, characteristic, weight = self.a1(kind)
+            self.assertLess(weight, 1)
+            self.assertGreater(sum(len(r["operations"]) for r in characteristic), 2)
+            self.assertEqual(trailcheck.recompute(program, kind, characteristic, rows), weight)
+
+    def test_a_changed_output_is_a_disagreement(self):
+        program, rows, characteristic, _ = self.a1()
+        operation = characteristic[0]["operations"][0]
+        operation["output"] = trailcheck.hexadecimal(trailcheck.number(operation["output"]) ^ 0x02)
+        with self.assertRaises(trailcheck.Disagreement):
+            trailcheck.recompute(program, "differential", characteristic, rows)
+
+    def test_a_changed_weight_input_or_state_is_a_disagreement(self):
+        for change in ("weight", "inputs", "state_out", "dropped", "added", "round"):
+            program, rows, characteristic, _ = self.a1()
+            operations = characteristic[1]["operations"]
+            if change == "weight":
+                operations[0]["weight"] = "1/3"
+            elif change == "inputs":
+                operations[0]["inputs"][0] = trailcheck.hexadecimal(trailcheck.number(operations[0]["inputs"][0]) ^ 1)
+            elif change == "state_out":
+                characteristic[1]["state_out"] = characteristic[1]["state_in"]
+            elif change == "dropped":
+                del operations[0]
+            elif change == "added":
+                operations.append({"op_index": 9999, "position": evidence.NONE, "inputs": ["0x0", "0x0"],
+                                   "output": "0x0", "weight": "1"})
+            else:
+                characteristic[1]["round"] = 3
+            with self.assertRaises(trailcheck.Disagreement, msg=change):
+                trailcheck.recompute(program, "differential", characteristic, rows)
+
+    def test_updates_in_turn_form_one_s_box_per_bit_position(self):
+        source = (ROOT / "research/004/candidates/cand-B1.py").read_bytes()
+        program, module = oplist.read(source, "cand-B1", 4, W8)
+        walk = trailcheck.Walk(program, "differential", 4)
+        table = walk.network_table(walk.member_of[(1, 0)], ())
+        mine = lambda x: (x & 1) | ((x >> 3) & 1) << 1 | ((x >> 2) & 1) << 2 | ((x >> 1) & 1) << 3
+        self.assertEqual([table[mine(x)] for x in range(16)], [mine(y) for y in module.SBOX])
+        for kind in trailcheck.KINDS:
+            state = [0] * 32
+            state[2] = 0x10
+            characteristic, weight = trailcheck.build(program, kind, state, [()], best, 4)
+            self.assertLess(weight, 1)
+            self.assertEqual(trailcheck.recompute(program, kind, characteristic, [()], 4), weight)
+            operation = characteristic[0]["operations"][-1]
+            operation["output"] = trailcheck.hexadecimal(trailcheck.number(operation["output"]) ^ 0x0f)
+            with self.assertRaises(trailcheck.Disagreement):
+                trailcheck.recompute(program, kind, characteristic, [()], 4)
+
+    def test_a_record_is_read_with_its_product_its_log_and_its_class(self):
+        program, rows, characteristic, weight = self.a1(rounds=1)
+        source = (ROOT / "research/004/candidates/cand-A1.py").read_bytes()
+        record = {"candidate": "cand-A1", "size": 2, "width": W8, "rounds": 1, "trail_kind": "differential",
+                  "characteristic": characteristic, "weight": str(weight),
+                  "weight_log2": evidence.trail_weight_log2(str(weight)),
+                  "classification": "confirmed vulnerability"}
+        found = trailcheck.trail_found(record, source, lambda rounds: rows[:rounds], evidence.trail_weight_log2)
+        self.assertEqual(found, {key: record[key] for key in ("weight", "weight_log2", "classification")})
+        characteristic[0]["operations"][0]["weight"] = "1/7"
+        found = trailcheck.trail_found(record, source, lambda rounds: rows[:rounds], evidence.trail_weight_log2)
+        self.assertIn("differs from", found["transitions"])
+        self.assertIn("not committed", trailcheck.trail_found(record, None, lambda rounds: rows, None)["transitions"])
+
+
+def bound_record(name, rounds, bound, **fields):
+    record = dict({"record_id": name, "kind": "bound", "candidate": "v4-A1", "bound_kind": "linear", "size": 16,
+                   "width": 32, "rounds": rounds, "status": "pass", "method": "searched", "bound": bound,
+                   "created_utc": "2026-12-01T00:00:00Z"}, **fields)
+    return (json.dumps(record, sort_keys=True) + "\n").encode("utf-8"), record
+
+
+class Splits(unittest.TestCase):
+    """Data-model section 2: a `split` bound again from its two parts' committed bytes."""
+
+    def setUp(self):
+        self.records = {name: bound_record(name, rounds, bound)
+                        for name, rounds, bound in (("b1", 1, "8"), ("b2", 2, "81/2"), ("b3", 3, "70"))}
+        self.defects = set()
+
+    def split(self, first="b2", second="b3", **fields):
+        parts = [{"record_id": name, "sha256": hashlib.sha256(self.records[name][0]).hexdigest(),
+                  "sha256_kind": "raw", "rounds": self.records[name][1]["rounds"],
+                  "bound": self.records[name][1]["bound"]} for name in (first, second)]
+        record = dict({"record_id": "s5", "kind": "bound", "candidate": "v4-A1", "bound_kind": "linear", "size": 16,
+                       "width": 32, "rounds": 5, "method": "split", "parts": parts, "bound": "221/2",
+                       "alternatives": 1, "searched": evidence.NONE, "status": "pass",
+                       "classification": "no weakness identified within the analysis performed",
+                       "created_utc": "2026-12-02T00:00:00Z"}, **fields)
+        return record
+
+    def found(self, record):
+        return trailcheck.split_found(record, self.records, lambda blob: hashlib.sha256(blob).hexdigest(),
+                                      lambda other: other["bound"], lambda name: name in self.defects)
+
+    def differs(self, record):
+        found = self.found(record)
+        return {key: value for key, value in found.items() if record.get(key) != value}
+
+    def test_the_exact_rational_sum(self):
+        self.assertEqual(self.differs(self.split()), {})
+
+    def test_another_sum_is_a_difference(self):
+        self.assertEqual(self.differs(self.split(bound="111")), {"bound": "221/2"})
+
+    def test_a_part_whose_sha256_differs(self):
+        record = self.split()
+        record["parts"][0]["sha256"] = "0" * 64
+        self.assertIn("another SHA-256", self.differs(record)["sum"])
+
+    def test_a_part_that_is_not_established(self):
+        for change in ({"status": "inconclusive"}, {"capped": True}, {"status": "fail"}):
+            blob, _ = bound_record("b2", 2, "81/2", **change)
+            self.records["b2"] = (blob, json.loads(blob))
+            self.assertIn("not an established bound", self.differs(self.split())["sum"], change)
+
+    def test_a_part_of_another_candidate_kind_size_or_width(self):
+        for change in ({"candidate": "v4-B1"}, {"bound_kind": "differential"}, {"size": 8}, {"width": 16}):
+            blob, _ = bound_record("b3", 3, "70", **change)
+            self.records["b3"] = (blob, json.loads(blob))
+            self.assertIn("another candidate, kind, size or width", self.differs(self.split())["sum"])
+
+    def test_the_parts_cover_the_rounds(self):
+        self.assertIn("cover 4 rounds", self.differs(self.split("b1", "b3"))["sum"])
+
+    def test_a_part_with_a_defect_no_longer_stands(self):
+        self.defects.add("b3")
+        self.assertIn("no longer stands", self.differs(self.split())["sum"])
+
+    def test_a_sum_of_a_sum_stands_while_its_parts_do(self):
+        inner = self.split(record_id="s5")
+        self.records["s5"] = ((json.dumps(inner, sort_keys=True) + "\n").encode("utf-8"), inner)
+        outer = self.split("s5", "b2", record_id="s7", rounds=7, bound="151", alternatives=1,
+                           created_utc="2026-12-03T00:00:00Z")
+        self.assertEqual(self.differs(outer), {})
+        self.defects.add("b3")
+        self.assertIn("no longer stands", self.differs(outer)["sum"])
+
+    def test_the_alternatives_and_the_largest_sum(self):
+        blob, record = bound_record("b4", 4, "110")
+        self.records["b4"] = (blob, record)
+        self.assertEqual(self.differs(self.split()), {"alternatives": 2,
+                                                      "sum": "the largest sum of two established bounds is 118"})
+        self.assertEqual(self.differs(self.split("b1", "b4", bound="118", alternatives=2)), {})
+
+    def test_a_later_record_is_not_compared(self):
+        blob, record = bound_record("b4", 4, "110", created_utc="2026-12-05T00:00:00Z")
+        self.records["b4"] = (blob, record)
+        self.assertEqual(self.differs(self.split()), {})
+
+    def test_the_searched_bound_is_shown_and_must_be_smaller(self):
+        blob, record = bound_record("b5", 5, "100")
+        self.records["b5"] = (blob, record)
+        self.assertEqual(self.differs(self.split()), {"searched": "100"})
+        self.assertEqual(self.differs(self.split(searched="100")), {})
+        blob, record = bound_record("b5", 5, "111")
+        self.records["b5"] = (blob, record)
+        self.assertIn("no smaller than the sum", self.differs(self.split(searched="111"))["sum"])
+
+
+class TheRecheckOfThisFeature(TempRepo005):
+    """scripts/recheck_004.py under 005: a `split` bound and a trail are read from the committed
+    records and the candidate's committed operation list."""
+
+    def setUp(self):
+        super().setUp()
+        from scripts import recheck_004
+        self.recheck = recheck_004
+
+    def test_a_split_bound_and_its_parts(self):
+        base = f"{evidence.REP_REL}/candidates/v4-A1"
+        blobs = {}
+        for name, rounds, bound in (("bound-1", 2, "40"), ("bound-2", 3, "70")):
+            blob, _ = bound_record(name, rounds, bound, method="active-box count",
+                                   counts={str(rounds): {"count": int(bound), "status": 0, "sum_of": [1, 1]}})
+            blobs[name] = blob
+            write(self.root, f"{base}/{name}.json", blob)
+        self.commit("the parts")
+        parts = [{"record_id": name, "sha256": hashlib.sha256(blob).hexdigest(), "sha256_kind": "raw",
+                  "rounds": json.loads(blob)["rounds"], "bound": json.loads(blob)["bound"]}
+                 for name, blob in blobs.items()]
+        record = {"record_id": "bound-3", "kind": "bound", "candidate": "v4-A1", "bound_kind": "linear", "size": 16,
+                  "width": 32, "rounds": 5, "method": "split", "parts": parts, "bound": "110", "alternatives": 1,
+                  "searched": evidence.NONE, "status": "pass", "created_utc": "2026-12-02T00:00:00Z",
+                  "classification": "no weakness identified within the analysis performed"}
+        self.assertEqual(self.recheck.differences(record, self.recheck.check_bound(record, evidence)), [])
+        write(self.root, f"{evidence.RESEARCH_REL.replace(evidence.FEATURE_REL, 'research/005').rsplit('/', 1)[0]}"
+                         "/validation/defects/bound-2.json", "{}\n")
+        found = self.recheck.differences(record, self.recheck.check_bound(record, evidence))
+        self.assertEqual([item["field"] for item in found], ["sum"])
+        self.assertIn("no longer stands", found[0]["recomputed"])
+
+    def test_a_trail_from_the_committed_operation_list(self):
+        source = (ROOT / "research/004/candidates/cand-A1.py").read_bytes()
+        write(self.root, "research/005/candidates/v4-A1.py", source)
+        table = {"table": [["0x12", "0x34", "0x56"], ["0x9a", "0xbc", "0xde"]]}
+        blob = (json.dumps(table) + "\n").encode("utf-8")
+        write(self.root, "research/005/candidates/v4-A1/constants/t.json", blob)
+        self.commit("the candidate")
+        program, _ = oplist.read(source, "v4-A1", 2, W8)
+        state = [0] * 8
+        state[1] = 0x80
+        rows = [(0x9a, 0xbc, 0xde)]
+        characteristic, weight = trailcheck.build(program, "differential", state, rows, best)
+        record = {"record_id": "trail-1", "candidate": "v4-A1", "size": 2, "width": W8, "rounds": 1,
+                  "first_round": 2, "trail_kind": "differential", "characteristic": characteristic,
+                  "weight": str(weight), "weight_log2": evidence.trail_weight_log2(str(weight)),
+                  "classification": "confirmed vulnerability",
+                  "constants": {"path": "research/005/candidates/v4-A1/constants/t.json",
+                                "sha256": hashlib.sha256(blob).hexdigest()}}
+        self.assertEqual(self.recheck.differences(record, self.recheck.check_trail(record, evidence)), [])
+        record["constants"]["sha256"] = "0" * 64
+        found = self.recheck.differences(record, self.recheck.check_trail(record, evidence))
+        self.assertIn("another SHA-256", found[0]["recomputed"])
+        record["candidate"] = "v4-A9"
+        found = self.recheck.differences(record, self.recheck.check_trail(record, evidence))
+        self.assertIn("not committed", found[0]["recomputed"])
 
 
 if __name__ == "__main__":
