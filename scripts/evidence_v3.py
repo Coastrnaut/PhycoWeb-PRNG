@@ -100,6 +100,7 @@ ARX_DRIVER = ARX_FILES["004"][4]
 ARX_MODULES = {"004": arx_search_known}
 CODE = list(dict.fromkeys(
     [SCRIPT, "protocol/evidence.py", "protocol/disclaimer.py", "protocol/candidates.py", "protocol/devinputs_v3.py",
+     "protocol/climb.py", "protocol/rules.py",
      "research/004/ir.py", "research/004/tools/symmetry.py", "research/004/tools/invariants.py",
      "research/004/tools/dependency.py", "research/004/tools/degree.py", "research/004/tools/bijectivity.py",
      "research/004/tools/bias.py", "research/004/tools/avalanche.py", bias.TABLE_REL, "scripts/gen_constants_v3.py"]
@@ -806,6 +807,15 @@ def box_bounds(candidate: str, kind: str, w: int, rounds: int) -> Dict:
         found[f"box {index}"] = {"steps": [list(step) for step in steps],
                                  "weights": {str(r): item["weight"] for r, item in result.items()},
                                  "walks": {str(r): item["walks"] for r, item in result.items()}}
+        if evidence.FEATURE != "004":
+            # Feature 005, FR-019: each optimal trail of the box with every addition's inputs, output and exact weight,
+            # recomputed from the printed steps by the companion's driver; a step it cannot recompute is a tool failure.
+            found[f"box {index}"]["trails"] = {
+                str(r): {"states": item["trail"],
+                         "additions": [[{"step": op["step"], "inputs": [f"0x{v:x}" for v in op["inputs"]],
+                                         "output": f"0x{op['output']:x}", "weight": op["weight"]} for op in row]
+                                       for row in arx_search_known.operations(kind, w, steps, item)]}
+                for r, item in result.items()}
     return found
 
 
@@ -1262,7 +1272,7 @@ def run_rotation(args: argparse.Namespace, command: List[str], code: List[str], 
         raise Refused("the ranking stands at 4×4")
     tools = ranking_tools(candidate)
     if tools[0] == ARX:
-        code = code + [TRAIL_PATHS[ARX], ARX_BINARY, ARX_MAKE, ARX_DRIVER]
+        code = code + [TRAIL_PATHS[ARX], ARX_BINARY, ARX_MAKE, ARX_DRIVER] + list(getattr(arx_search_known, "CODE", ()))
     citations = {}
     for tool in tools:
         source, binary = tool_hash(tool)
@@ -1747,7 +1757,7 @@ def run_trail_kind(args: argparse.Namespace, command: List[str], code: List[str]
         evidence.guard_order_of_sizes(candidate, args.kind, n, args.project)
     tool = (ARX if args.method == "branch-and-bound" else METHODS[args.method]["tool"]) if args.kind == "bound" else args.tool
     if tool == ARX:
-        code = code + [TRAIL_PATHS[tool], ARX_BINARY, ARX_MAKE, ARX_DRIVER]
+        code = code + [TRAIL_PATHS[tool], ARX_BINARY, ARX_MAKE, ARX_DRIVER] + list(getattr(arx_search_known, "CODE", ()))
     rounds = args.rounds or 1
     if args.method == "branch-and-bound" and w != PRODUCTION_WIDTH and rounds != 1:
         raise Refused("at a reduced width a box's bound is over one call, the ranking's measure (research R6)")
